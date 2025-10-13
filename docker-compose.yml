@@ -49,7 +49,7 @@ services:
     depends_on:
       - api
     ports:
-      - "${CLIENT_PORT}:${CLIENT_PORT_INNER}"
+      - "${CLIENT_PORT_OUTER}:${CLIENT_PORT_INNER}"
     networks:
       - procureaccess-net
 
