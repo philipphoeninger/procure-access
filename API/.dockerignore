@@ -1,0 +1,12 @@
+# optionally ignore test project folders (they're not needed at runtime)
+# API.TESTS.ProcureAccess/
+# DAL.TESTS.ProcureAccess/
+# SERVICES.TESTS.ProcureAccess/
+
+bin/
+obj/
+*.user
+*.suo
+.vscode/
+.idea/
+.env

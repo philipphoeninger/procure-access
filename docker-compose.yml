@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: procureaccess-db
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: "Y"
+    ports:
+      - "${DB_PORT_OUTER}:${DB_PORT_INNER}"
+    volumes:
+      - ./DB/data:/var/opt/mssql/data
+      - ./DB/init:/docker-entrypoint-initdb.d
+    networks:
+      - procureaccess-net
+
+  api:
+    build:
+      context: .
+      dockerfile: ./API/Dockerfile
+    container_name: procureaccess-api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Server=${DB_HOST};Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;
+    ports:
+      - "${API_PORT_OUTER}:${API_PORT_INNER}"
+    networks:
+      - procureaccess-net
+
+  services:
+    build:
+      context: .
+      dockerfile: ./SERVICES/Dockerfile
+    container_name: procureaccess-services
+    depends_on:
+      - db
+      - api
+    networks:
+      - procureaccess-net
+
+  client:
+    build:
+      context: ./CLIENT
+      dockerfile: Dockerfile
+    container_name: procureaccess-client
+    depends_on:
+      - api
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT_INNER}"
+    networks:
+      - procureaccess-net
+
+networks:
+  procureaccess-net:
+    driver: bridge
