@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../identity/shared/auth.service';
+import { AuthService } from '@features/identity/services/auth.service';
 
 @Injectable({
   providedIn: 'root',

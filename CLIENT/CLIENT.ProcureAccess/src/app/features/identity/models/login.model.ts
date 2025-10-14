@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { jsonObject, jsonMember } from 'typedjson';
+import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
 
 @jsonObject
 export class LoginModel {
