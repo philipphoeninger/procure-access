@@ -199,7 +199,10 @@
 </style>
 
 @if (loggedIn) {
-<main id="main">Hello, you are now logged in.</main>
+<main id="main">
+  <pa-header></pa-header>
+  Hello, you are now logged in.
+</main>
 }
 
 <router-outlet (activate)="loggedIn = false" (deactivate)="loggedIn = true" name="login" />
