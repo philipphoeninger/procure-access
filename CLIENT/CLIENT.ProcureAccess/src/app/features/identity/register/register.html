@@ -1,0 +1,69 @@
+<div class="panel">
+  <!-- <img class="ps-logo" src="" alt="Procure Access Logo" /> -->
+  <div class="header">
+    <mat-icon>app_registration</mat-icon>
+    <span class="title">Register</span>
+  </div>
+
+  <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm, $event)">
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input matInput type="email" name="email" [formControl]="emailFormControl" required #emailInput minlength="3"
+        maxlength="50" [errorStateMatcher]="matcher" />
+      @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+      <mat-error>Please enter a valid email address</mat-error>
+      }
+      @if (emailFormControl.hasError('required')) {
+      <mat-error>Email is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Username</mat-label>
+      <input matInput type="string" name="username" [(ngModel)]="username" required #usernameInput="ngModel"
+        minlength="3" maxlength="50" />
+      @if (usernameInput.invalid && usernameInput.touched) {
+      <mat-error>Username is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field id="password-field">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" name="password" [(ngModel)]="password" required #passwordInput="ngModel"
+        minlength="6" maxlength="50" />
+      @if (passwordInput.invalid && passwordInput.touched) {
+      <mat-error>Password is required.</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field id="confirm-password-field">
+      <mat-label>Confirm Password</mat-label>
+      <input matInput type="password" name="password" [(ngModel)]="confirmPassword" required
+        #confirmPasswordInput="ngModel" minlength="6" maxlength="50" />
+      @if (confirmPasswordInput.invalid && confirmPasswordInput.touched) {
+      <mat-error>Confirm password is required.</mat-error>
+      }
+    </mat-form-field>
+    <div class="selections-container">
+      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">Keep me
+        signed in</mat-checkbox>
+      <mat-form-field class="selection">
+        <mat-label>Language</mat-label>
+        <mat-select [(ngModel)]="selectedLanguage" name="selectedLanguage">
+          @for (language of languages; track language) {
+          <mat-option [value]="language">{{ language.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    @if (registerErrorMessage) {
+    <span class="error-message ng-touched ng-invalid">{{ registerErrorMessage }}</span>
+    }
+    <div class="buttons">
+      <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid">
+        Sign up
+      </button>
+    </div>
+  </form>
+</div>
+<div id="register-section">
+  <span>Already have an account?</span>
+  <button mat-button color="primary" (click)="authService.showLogin()">Login here</button>
+</div>

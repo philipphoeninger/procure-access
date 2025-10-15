@@ -7,7 +7,7 @@ import {
   withState
 } from '@ngrx/signals';
 
-export const withLoading = () {
+export function withLoading() {
   return signalStoreFeature(
     withState({ loadingCount: 0 }),
     withMethods((state) => ({
