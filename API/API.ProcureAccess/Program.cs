@@ -1,44 +1,53 @@
+[assembly: ApiController]
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers()
+                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+builder.Services.AddSwaggerExplorer(builder.Configuration)
+                .AddFileSharingApiVersionConfiguration(new ApiVersion(0, 1))
+                .AddSqlServerConnection(builder.Configuration)
+                .AddAppConfig(builder.Configuration)
+                .AddCors()
+                .AddIdentityHandlersAndStores()
+                .ConfigureIdentityOptions()
+                .AddHttpContextAccessor()
+                .AddIdentityAuth(builder.Configuration)
+                .AddRepositories();
+
+
+// Configure logging
+builder.ConfigureSerilog();
+builder.Services.RegisterLoggingInterfaces();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Initialize the database
+    if (app.Configuration.GetValue<bool>("RebuildDatabase"))
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        //SampleDataInitializer.InitializeData(dbContext, userManager);
+        await SampleDataInitializer.ClearAndReseedDatabase(dbContext, userManager);
+    }
+    app.ConfigureSwaggerExplorer();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.ConfigureCORS(builder.Configuration)
+   .AddIdentityAuthMiddlewares();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.MapControllers();
+app.MapGroup("/api")
+   .MapIdentityApi<User>();
+app.MapGroup("/api")
+   .MapIdentityUserEndpoints();
+
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
