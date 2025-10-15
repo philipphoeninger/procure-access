@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
                 .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 builder.Services.AddSwaggerExplorer(builder.Configuration)
-                .AddFileSharingApiVersionConfiguration(new ApiVersion(0, 1))
+                .AddProcureAccessApiVersionConfiguration(new ApiVersion(0, 1))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
                 .AddCors()
