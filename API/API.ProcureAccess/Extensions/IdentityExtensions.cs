@@ -51,10 +51,13 @@ public static class IdentityExtensions
         });
         services.AddAuthorization(options =>
         {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
                                             .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                                             .RequireAuthenticatedUser()
                                             .Build();
+
+            // ensures [AllowAnonymous] is respected properly
+            options.FallbackPolicy = null;
         });
         return services;
     }

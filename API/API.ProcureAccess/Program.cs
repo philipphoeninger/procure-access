@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
                 .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 builder.Services.AddSwaggerExplorer(builder.Configuration)
-                .AddProcureAccessApiVersionConfiguration(new ApiVersion(0, 1))
+                .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
                 .AddCors()
@@ -49,5 +49,14 @@ app.MapGroup("/api")
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();
 
+
+// add anonymously available health check endpoint
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/health", () => Results.Ok(new { status = "Healthy", time = DateTime.UtcNow }))
+       .AllowAnonymous();
+    // .WithName("GetHealth")
+    // .WithOpenApi();
+}
 
 app.Run();
