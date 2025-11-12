@@ -1,58 +1,70 @@
-version: "3.9"
+version: '3.9'
 
 services:
+  client:
+    build:
+      context: ./CLIENT/CLIENT.ProcureAccess
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "${CLIENT_PORT_OUTER}:${CLIENT_PORT_INNER}"
+    # volumes:
+    #   - ./:/app
+        # - ./CLIENT/CLIENT.ProcureAccess:/app
+        # - /app/node_modules
+    # command: npm run start
+    # environment:
+    #   - CHOKIDAR_USEPOLLING=true
+    #   - WATCHPACK_POLLING=true
+    networks:
+      - procureaccess-net
+
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: procureaccess-db
     environment:
-      SA_PASSWORD: ${SA_PASSWORD}
-      ACCEPT_EULA: "Y"
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd_h3r3
+      #- MSSQL_PID=Developer
+    #user: "0:0"
     ports:
       - "${DB_PORT_OUTER}:${DB_PORT_INNER}"
     volumes:
-      - ./DB/data:/var/opt/mssql/data
-      - ./DB/init:/docker-entrypoint-initdb.d
+      - mssql_data:/var/opt/mssql
+      #- ./DB/data:/var/opt/mssql/data
+      # - mssql_data:/var/opt/mssql/data
+      - ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - procureaccess-net
 
   api:
     build:
       context: .
-      dockerfile: ./API/Dockerfile
-    container_name: procureaccess-api
+      dockerfile: ./API/API.ProcureAccess/Dockerfile
     depends_on:
       - db
+        #condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Server=${DB_HOST};Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;
+      #- ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      #- ConnectionStrings__ProcureAccess=Server=${DB_HOST};User Id=${DB_USER};Password=YourStrong!Passw0rd_h3r3;TrustServerCertificate=True;
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_HOST: db
+      #DB_NAME: ProcureAccessDb
+      DB_USER: sa
+      MSSQL_SA_PASSWORD: YourStrong!Passw0rd_h3r3
+      #MSSQL_PID: Developer
     ports:
       - "${API_PORT_OUTER}:${API_PORT_INNER}"
+    volumes:
+      - ./API/API.ProcureAccess:/src
     networks:
       - procureaccess-net
-
-  services:
-    build:
-      context: .
-      dockerfile: ./SERVICES/Dockerfile
-    container_name: procureaccess-services
-    depends_on:
-      - db
-      - api
-    networks:
-      - procureaccess-net
-
-  client:
-    build:
-      context: ./CLIENT
-      dockerfile: Dockerfile
-    container_name: procureaccess-client
-    depends_on:
-      - api
-    ports:
-      - "${CLIENT_PORT_OUTER}:${CLIENT_PORT_INNER}"
-    networks:
-      - procureaccess-net
+    restart: on-failure
 
 networks:
   procureaccess-net:
     driver: bridge
+
+volumes:
+  mssql_data:
