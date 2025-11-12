@@ -20,6 +20,7 @@ global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Settings;
 
+global using SERVICES.ProcureAccess.DataServices;
 global using SERVICES.ProcureAccess.Utilities;
 global using SERVICES.ProcureAccess.Logging.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Configuration;
