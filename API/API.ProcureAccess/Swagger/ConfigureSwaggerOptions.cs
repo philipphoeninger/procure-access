@@ -34,6 +34,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             x.MajorVersion == (description.ApiVersion.MajorVersion ?? 0)
             && x.MinorVersion == (description.ApiVersion.MinorVersion ?? 0)
             && (string.IsNullOrEmpty(description.ApiVersion.Status) || x.Status == description.ApiVersion.Status));
+
         var info = new OpenApiInfo()
         {
             Title = settings.Title,
@@ -43,10 +44,12 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             TermsOfService = new System.Uri("https://www.linktotermsofservice.com"),
             License = new OpenApiLicense() { Name = "MIT", Url = new System.Uri("https://opensource.org/licenses/MIT") }
         };
+
         if (description.IsDeprecated)
         {
             info.Description += "<p><font color='red'>This API version has been deprecated.</font></p> ";
         }
+        
         return info;
     }
 }

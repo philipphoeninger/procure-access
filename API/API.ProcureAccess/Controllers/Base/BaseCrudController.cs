@@ -22,7 +22,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     /// <param name="id">Primary key of the record</param>
     /// <returns>Single record</returns>
     [HttpGet("{id}")]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -44,7 +44,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     /// </summary>
     /// <returns>All records</returns>
     [HttpGet]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,7 +74,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     /// <param name="entity">Entity to update</param>
     /// <returns>Single record</returns>
     [HttpPut("{id}")]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,7 +116,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     /// <param name="entity">Record to add</param>
     /// <returns>Added record</returns>
     [HttpPost]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -148,7 +148,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     /// <param name="entity"></param>
     /// <returns></returns>
     [HttpDelete("{id}")]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

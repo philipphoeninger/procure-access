@@ -25,7 +25,7 @@ public class AccountsController : ControllerBase
     /// <param name="id">Primary key of the record</param>
     /// <returns>Single record</returns>
     [HttpGet("{id}")]
-    [ApiVersion("0.1")]
+    [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
