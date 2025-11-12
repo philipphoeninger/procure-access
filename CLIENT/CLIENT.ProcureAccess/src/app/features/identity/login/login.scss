@@ -7,6 +7,19 @@ $panel-width: 390px;
   align-items: center;
   justify-content: center;
   background: #f6f6f6;
+  margin-top: -12px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+
+  .pa-logo {
+    clip-path: circle();
+    width: 49px;
+    height: 50px;
+    margin-right: 11px;
+  }
 }
 
 .panel {
@@ -18,7 +31,7 @@ $panel-width: 390px;
   border-radius: 4px;
   box-shadow: 0 2px 4px #727685;
   width: $panel-width;
-  margin: 32px 16px 8px;
+  margin: 16px 16px 8px;
 
   .header {
     display: flex;

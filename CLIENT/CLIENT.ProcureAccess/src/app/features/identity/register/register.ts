@@ -53,6 +53,8 @@ export class Register {
   public registerErrorMessage?: string;
   public showLanguageSelection = true;
 
+  protected logoPath = '/werte_it_logo.jpg';
+
   public languages = [
     { value: 'en', label: 'English' },
     { value: 'de', label: 'Deutsch' },
