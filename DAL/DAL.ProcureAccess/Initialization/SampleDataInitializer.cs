@@ -17,10 +17,10 @@ public static class SampleDataInitializer
 
     internal static async Task ClearData(ApplicationDBContext dbContext, UserManager<User> userManager)
     {
-        var entities = new[]
-        {
+        string[] entities = []; //new[]
+        //{
             // typeof(SomeEntity).FullName,
-        };
+        //};
         ServiceCollection serviceCollection = new ServiceCollection();
 
         //serviceCollection.AddDbContextDesignTimeServices(dbContext);
