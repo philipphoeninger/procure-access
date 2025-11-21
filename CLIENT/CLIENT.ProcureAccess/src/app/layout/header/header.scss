@@ -1,0 +1,72 @@
+@use "@angular/material" as mat;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+#app-name {
+  display: none;
+  margin-left: 8px;
+  margin-right: 16px;
+}
+
+#header-search-field {
+  display: none;
+}
+
+#pa-header {
+  position: fixed;
+  z-index: 2;
+
+  form {
+    @include mat.form-field-density(minimum);
+    margin-right: 8px;
+
+    mat-form-field {
+      width: 155px;
+
+      mat-label {
+        height: 24px;
+        display: block;
+      }
+    }
+  }
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+/* -- MEDIA -- */
+
+@media (min-width: 23em) {
+  #app-name {
+    display: block;
+  }
+}
+
+@media (min-width: 31em) {
+  #header-search-field {
+    display: block;
+  }
+
+  #header-search-icon {
+    display: none;
+  }
+}
+
+@media (min-width: 48em) {
+  #menu-btn {
+    display: none;
+  }
+}

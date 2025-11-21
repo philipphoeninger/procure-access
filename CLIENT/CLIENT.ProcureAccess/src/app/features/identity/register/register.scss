@@ -1,0 +1,98 @@
+$panel-width: 390px;
+
+:host {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f6f6f6;
+  margin-top: -8px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+
+  .pa-logo {
+    clip-path: circle();
+    width: 49px;
+    height: 50px;
+    margin-right: 11px;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 56px 48px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px #727685;
+  width: $panel-width;
+  margin: 16px 16px 8px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      margin-left: 8px;
+      font-size: 24px;
+      line-height: 24px;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 44px;
+  }
+
+  // #password-field {
+  //   margin-top: 4px;
+  // }
+
+  .selections-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+
+    .selection {
+      width: 50%;
+    }
+
+    .keep-signed-in {
+      padding-bottom: 20px;
+    }
+  }
+
+  .error-message {
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+
+    #register-button {
+      padding-inline: 48px;
+      margin-left: auto;
+    }
+  }
+}
+
+#login-section {
+  width: $panel-width;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+

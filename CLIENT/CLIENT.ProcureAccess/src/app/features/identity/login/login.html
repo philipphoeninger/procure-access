@@ -1,0 +1,54 @@
+<div class="logo-container">
+  <img class="pa-logo" [src]="logoPath" alt="WERTE.IT Logo" />
+  <span>WERTE.IT</span>
+</div>
+<div class="panel">
+  <div class="header">
+    <mat-icon>lock</mat-icon>
+    <span class="title">Login</span>
+  </div>
+
+  <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)">
+    <mat-form-field>
+      <mat-label>Username</mat-label>
+      <input matInput type="text" name="username" [(ngModel)]="username" required #usernameInput="ngModel" minlength="3"
+        maxlength="50" />
+      @if (usernameInput.invalid && usernameInput.touched) {
+      <mat-error>Username is required.</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field id="password-field">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" name="password" [(ngModel)]="password" required #passwordInput="ngModel"
+        minlength="6" maxlength="50" />
+      @if (passwordInput.invalid && passwordInput.touched) {
+      <mat-error>Password is required.</mat-error>
+      }
+    </mat-form-field>
+    <div class="selections-container">
+      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">Keep me
+        signed in</mat-checkbox>
+      <mat-form-field class="selection">
+        <mat-label>Language</mat-label>
+        <mat-select [(ngModel)]="selectedLanguage" name="selectedLanguage">
+          @for (language of languages; track language) {
+          <mat-option [value]="language">{{ language.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    @if (loginErrorMessage) {
+    <span class="error-message ng-touched ng-invalid">{{ loginErrorMessage }}</span>
+    }
+    <div class="buttons">
+      <button mat-button color="primary">Forgot Password</button>
+      <button id="login-button" mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">
+        Login
+      </button>
+    </div>
+  </form>
+</div>
+<div id="register-section">
+  <span>No account yet?</span>
+  <button mat-button color="primary" (click)="authService.showRegister()">Register here</button>
+</div>

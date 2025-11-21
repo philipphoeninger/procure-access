@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API.ProcureAccess</name>
+    </assembly>
+    <members>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.GetOne(System.Int32)">
+            <summary>
+            Gets a single record
+            </summary>
+            <param name="id">Primary key of the record</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.GetAll">
+            <summary>
+            Gets all records
+            </summary>
+            <returns>All records</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.UpdateOne(System.Int32,`0)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="id">Primary key of the record to update</param>
+            <param name="entity">Entity to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.AddOne(`0)">
+            <summary>
+            Adds a single record
+            </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="entity">Record to add</param>
+            <returns>Added record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.DeleteOne(System.Int32,`0)">
+            <summary>
+            Deletes a single record
+            </summary>
+            <remarks>
+            Sample body:
+            </remarks>
+            <param name="id"></param>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Identity.AccountsController.GetOneAsync(System.Int32)">
+            <summary>
+            Gets a single record
+            </summary>
+            <param name="id">Primary key of the record</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
+            <summary>
+            loops through the API’s versions, generating a Swagger document for each version
+            </summary>
+            <param name="options"></param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+    </members>
+</doc>

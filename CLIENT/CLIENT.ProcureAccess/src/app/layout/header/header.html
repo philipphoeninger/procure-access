@@ -1,0 +1,32 @@
+<mat-toolbar id="pa-header">
+  <button id="menu-btn" mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="onHomeClicked()">
+      <mat-icon>home</mat-icon>
+      <span>Home</span></button>,
+  </mat-menu>
+  <h1 id="app-name">ProcureAccess</h1>
+  <div class="tools">
+    <form id="header-search-field">
+      <mat-form-field class="ctn-form-field-size-small" subscriptSizing="dynamic" appearance="outline">
+        <mat-label>Search</mat-label>
+        <input type="text" matInput />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </form>
+    <button mat-icon-button id="header-search-icon" class="search-btn" aria-label="Search icon-button">
+      <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'profile'">
+      <mat-icon>person</mat-icon>
+    </button>
+    <button mat-icon-button class="settings-btn" aria-label="Settings icon-button" [routerLink]="'settings'">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="authService.logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
