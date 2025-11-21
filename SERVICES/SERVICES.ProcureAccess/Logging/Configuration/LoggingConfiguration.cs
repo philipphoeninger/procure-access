@@ -60,12 +60,12 @@ public static class LoggingConfiguration
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: logLevel,
                 outputTemplate: OutputTemplate)
-            .WriteTo.Console(restrictedToMinimumLevel: logLevel)
-            .WriteTo.MSSqlServer(
-                connectionString: connectionString,
-                sqlOptions,
-                restrictedToMinimumLevel: logLevel,
-                columnOptions: ColumnOptions);
+            .WriteTo.Console(restrictedToMinimumLevel: logLevel);
+            //.WriteTo.MSSqlServer(
+            //    connectionString: connectionString,
+            //    sqlOptions,
+            //    restrictedToMinimumLevel: logLevel,
+            //    columnOptions: ColumnOptions);
 
         builder.Logging.AddSerilog(log.CreateLogger(), false);
     }
