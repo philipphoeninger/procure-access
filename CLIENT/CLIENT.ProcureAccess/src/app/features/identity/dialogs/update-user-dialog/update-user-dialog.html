@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Update {{ property() }}</h2>
+<mat-dialog-content>
+  <p>Type in your new {{ property() }}</p>
+  <mat-form-field id="property-input">
+    <mat-label>{{ property() }}</mat-label>
+    <input matInput [(ngModel)]="value" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button matButton (click)="onCancelClick()">Cancel</button>
+  <button matButton [mat-dialog-close]="value()" cdkFocusInitial>Save</button>
+</mat-dialog-actions>
