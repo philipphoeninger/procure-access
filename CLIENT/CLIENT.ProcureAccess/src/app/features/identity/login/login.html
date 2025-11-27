@@ -10,11 +10,11 @@
 
   <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)">
     <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput type="text" name="username" [(ngModel)]="username" required #usernameInput="ngModel" minlength="3"
+      <mat-label>EMail</mat-label>
+      <input matInput type="text" name="email" [(ngModel)]="email" required #emailInput="ngModel" minlength="3"
         maxlength="50" />
-      @if (usernameInput.invalid && usernameInput.touched) {
-      <mat-error>Username is required.</mat-error>
+      @if (emailInput.invalid && emailInput.touched) {
+      <mat-error>EMail is required.</mat-error>
       }
     </mat-form-field>
     <mat-form-field id="password-field">
@@ -41,7 +41,7 @@
     <span class="error-message ng-touched ng-invalid">{{ loginErrorMessage }}</span>
     }
     <div class="buttons">
-      <button mat-button color="primary">Forgot Password</button>
+      <button mat-button color="primary" (click)="openForgotPwDialog()" type="button">Forgot Password</button>
       <button id="login-button" mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">
         Login
       </button>

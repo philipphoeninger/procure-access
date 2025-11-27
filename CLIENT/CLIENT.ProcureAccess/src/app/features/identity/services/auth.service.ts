@@ -40,5 +40,9 @@ export class AuthService {
     const isExpired = helper.isTokenExpired(token);
     return !isExpired;
   }
+
+  public forgotPassword(email: string) {
+    return this.http.post<any>(`${httpAppConfig.apiEndpoint}/forgotPassword`, { email });
+  }
 }
 
