@@ -3,11 +3,11 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="onHomeClicked()">
+    <button mat-menu-item [routerLink]="'home'">
       <mat-icon>home</mat-icon>
-      <span>Home</span></button>,
+      <span>Home</span></button>
   </mat-menu>
-  <h1 id="app-name">ProcureAccess</h1>
+  <button matButton class="home-btn" aria-label="Home button" [routerLink]="'home'"><h1 id="app-name">ProcureAccess</h1></button>
   <div class="tools">
     <form id="header-search-field">
       <mat-form-field class="ctn-form-field-size-small" subscriptSizing="dynamic" appearance="outline">

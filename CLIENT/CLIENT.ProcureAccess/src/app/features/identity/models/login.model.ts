@@ -7,13 +7,18 @@ export class LoginModel {
   email: string;
 
   @jsonMember
+  username: string;
+
+  @jsonMember
   password: string;
 
   constructor(
     pEmail: string,
+    pUsername: string,
     pPassword: string,
   ) {
     this.email = pEmail;
+    this.username = pUsername;
     this.password = pPassword;
   }
 }

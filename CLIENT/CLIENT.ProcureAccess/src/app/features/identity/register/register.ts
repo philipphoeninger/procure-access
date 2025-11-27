@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroupDirective,
@@ -14,10 +14,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { finalize, map } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
-import { RegisterModel } from '../models/register.model';
+import { LoginModel } from '../models/login.model';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -74,6 +75,8 @@ export class Register {
 
   matcher = new MyErrorStateMatcher();
 
+  private _snackBar = inject(MatSnackBar);
+
   constructor(
     private router: Router,
     protected authService: AuthService,
@@ -81,13 +84,20 @@ export class Register {
 
   ngOnInit() {}
 
+  openSnackbar(message: string) {
+    this._snackBar.open(message, 'Close', {
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
+    });
+  }
+
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
 
-    let registerCommand = new RegisterModel(
+    let registerCommand = new LoginModel(
       this.emailFormControl.value!,
       this.username!,
-      this.password!,
+      this.password!
     );
 
     // TODO: start spinner
@@ -95,7 +105,12 @@ export class Register {
       .register(registerCommand)
       .pipe(
         map((response: any) => {
-          console.log(response);
+          if (response.succeeded) {
+            this.router.navigateByUrl('/(login:auth)');
+            this.openSnackbar('A registration has been sent to your email address and needs to be confirmed.\nPlease confirm it and come back to login.');
+          } else {
+            this.openSnackbar('The registration could not be completed. Please check your inputs and try again.');
+          }
         }),
         finalize(() => {
           // TODO: stop spinner

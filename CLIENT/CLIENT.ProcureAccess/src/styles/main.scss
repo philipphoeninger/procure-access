@@ -3,3 +3,18 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.list-item-container {
+    .mat-mdc-slide-toggle {
+        width: 100%;
+
+        .mat-internal-form-field {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+
+            .mdc-label {
+                margin-left: 0;
+            }
+        }
+    }
+}

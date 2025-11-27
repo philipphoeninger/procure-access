@@ -1,4 +1,10 @@
 #main {
+  display: flex;
+  flex-direction: column;
+  padding: 64px 1rem 1rem 1rem;
+  justify-content: start;
+  align-items: start;
+
   pa-navbar {
     display: none;
   }

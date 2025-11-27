@@ -1,0 +1,67 @@
+<h2 class="heading">Settings</h2>
+<mat-list>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <label for="foreground-cp">Foreground color: </label>
+      <div>
+        <input
+          id="foreground-cp" 
+          [(colorPicker)]="fgColor" 
+          [style.background]="fgColor" 
+          (openDialog)="(null)"
+          (closeDialog)="(null)" 
+        />
+      </div>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <label for="background-cp">Background color: </label>
+      <div>
+        <input
+          id="background-cp"
+          [(colorPicker)]="bgColor"
+          [style.background]="bgColor"
+          (openDialog)="(null)"
+          (closeDialog)="(null)" />
+      </div>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <label for="text-cp">Text color: </label>
+      <div>
+        <input
+          id="text-cp"
+          [(colorPicker)]="textColor"
+          [style.background]="textColor"
+          (openDialog)="(null)"
+          (closeDialog)="(null)" />
+      </div>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+        <mat-slide-toggle 
+          class="example-margin" 
+          labelPosition="before" 
+          [(ngModel)]="orientationControl">
+            Orientation: vertical 
+        </mat-slide-toggle>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <mat-slide-toggle
+        class="example-margin" 
+        labelPosition="before" 
+        [(ngModel)]="highContrastControl">
+          High contrast on
+        </mat-slide-toggle>
+    </div>
+  </mat-list-item>
+</mat-list>

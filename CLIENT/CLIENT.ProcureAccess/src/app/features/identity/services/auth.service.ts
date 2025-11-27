@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { httpAppConfig } from '../../../app.config';
 import { Observable } from 'rxjs';
 import { LoginModel } from '../models/login.model';
-import { RegisterModel } from '../models/register.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 
@@ -18,7 +17,7 @@ export class AuthService {
     return this.http.post<any>(`${httpAppConfig.apiEndpoint}/signIn`, command);
   }
 
-  register(command: RegisterModel): Observable<any> {
+  register(command: LoginModel): Observable<any> {
     return this.http.post<any>(`${httpAppConfig.apiEndpoint}/signUp`, command);
   }
 
@@ -40,6 +39,10 @@ export class AuthService {
     const helper = new JwtHelperService();
     const isExpired = helper.isTokenExpired(token);
     return !isExpired;
+  }
+
+  public forgotPassword(email: string) {
+    return this.http.post<any>(`${httpAppConfig.apiEndpoint}/forgotPassword`, { email });
   }
 }
 
