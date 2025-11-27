@@ -1,0 +1,19 @@
+.heading {
+  //font-size: 1.75em;
+  width: 100%;
+}
+
+.list-item {
+  overflow: visible;
+}
+
+.list-item-container {
+  display: flex;
+  justify-content: space-between;
+
+  label {
+    margin-right: 2rem;
+  }
+
+  /* See more styling in main.scss */
+}

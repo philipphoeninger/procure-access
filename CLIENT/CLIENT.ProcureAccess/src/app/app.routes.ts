@@ -4,6 +4,7 @@ import { Register } from '@features/identity/register/register';
 import { Home } from '@pages/home/home';
 import { AuthGuard } from '@core/guards/auth.guard';
 import { Profile } from '@features/identity/profile/profile';
+import { Settings } from '@features/settings/settings';
 
 export const routes: Routes = [
   {
@@ -31,4 +32,10 @@ export const routes: Routes = [
     component: Profile,
     canActivate: [AuthGuard],
   },
+  {
+    path: 'settings',
+    component: Settings,
+    canActivate: [AuthGuard],
+  },
+
 ];
