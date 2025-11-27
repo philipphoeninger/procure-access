@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
 
 @jsonObject
-export class RegisterModel {
+export class User {
   @jsonMember
   email: string;
 
@@ -10,12 +10,11 @@ export class RegisterModel {
   username: string;
 
   @jsonMember
-  password: string;
+  twoFAEnabled: boolean;
 
-  constructor(pEmail: string, pUsername: string, pPassword: string) {
+  constructor(pEmail: string, pUsername: string, pTwoFAEnabled: boolean) {
     this.email = pEmail;
     this.username = pUsername;
-    this.password = pPassword;
+    this.twoFAEnabled = pTwoFAEnabled;
   }
 }
-
