@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 
 @Component({
   selector: 'app-home',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './home.scss'
 })
 export class Home {
-
+  protected store = inject(ProcureAccessStore);
 }
