@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>Update {{ property() }}</h2>
+<h2 mat-dialog-title>Update {{ property().toLowerCase() }}</h2>
 <mat-dialog-content>
-  <p>Type in your new {{ property() }}</p>
+  <p>Type in your new {{ property().toLowerCase() }}</p>
   <mat-form-field id="property-input">
     <mat-label>{{ property() }}</mat-label>
     <input matInput [(ngModel)]="value" />
