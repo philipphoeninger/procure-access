@@ -1,0 +1,21 @@
+<mat-accordion class="example-headers-align">
+    @for (criterion of filteredCriteria; track criterion; let idx = $index, e = $even) {
+        <mat-expansion-panel [expanded]="step() === idx" (opened)="setStep(idx)" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title> {{ criterion.name }} </mat-panel-title>
+                <mat-panel-description>
+                    <!-- Type your name and age <mat-icon>account_circle</mat-icon> -->
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            {{ criterion.description }}
+
+            <mat-action-row>
+                @if (idx > 0) {
+                  <button matButton (click)="prevStep()">Previous</button>
+                }
+                <button matButton (click)="nextStep()">Next</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+    }
+</mat-accordion>
