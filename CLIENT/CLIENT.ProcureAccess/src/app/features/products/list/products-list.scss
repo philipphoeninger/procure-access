@@ -1,0 +1,24 @@
+// .heading {
+//   //font-size: 1.75em;
+//   width: 100%;
+// }
+
+:host {
+  max-height: calc(100vh - 281px);
+  display: block;
+  overflow: auto;
+}
+
+.cdk-table {
+  // display: table;
+}
+
+.products-heading-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .products-actions {
+    display: flex;
+  }
+}

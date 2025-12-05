@@ -1,0 +1,54 @@
+<!-- <div class="products-heading-container"> -->
+    <!-- <h2 class="heading">Products</h2> -->
+    <!-- <div class="products-actions">
+        <button mat-icon-button class="products-link-btn" aria-label="Products link button" (click)="linkCopied()"><mat-icon>link</mat-icon></button>
+        <button mat-icon-button class="products-export-btn" aria-label="Products export button" (click)="exportProductsFile()"><mat-icon>arrow_downward</mat-icon></button>
+        <button mat-icon-button class="products-save-btn" aria-label="Products save button" (click)="openProductsSearchDialog()"><mat-icon>add_2</mat-icon></button>
+    </div>
+</div> -->
+<table 
+    mat-table
+    matSort
+    class="products-table" 
+    [dataSource]="dataSource" 
+    class="mat-elevation-z8"
+    (matSortChange)="announceSortChange($event)">
+  <!-- Position Column -->
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by position"> No. </th>
+    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+  </ng-container>
+
+  <!-- Id Column -->
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id"> Id </th>
+    <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name"> Name </th>
+    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+  </ng-container>
+
+  <!-- Link Column -->
+  <ng-container matColumnDef="link">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by link"> Link </th>
+    <td mat-cell *matCellDef="let element"> <a [href]="'https://' + element.link" target="_blank"> {{element.link}} </a></td>
+  </ng-container>
+
+  <!-- Functionality Column -->
+  <ng-container matColumnDef="functionality">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by functionality"> Functionality </th>
+    <td mat-cell *matCellDef="let element"> {{element.functionality}} </td>
+  </ng-container>
+
+  <!-- Type Column -->
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by type"> Type </th>
+    <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
