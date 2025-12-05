@@ -1,1 +1,87 @@
-<p>Hello {{ store.user()?.username }} and welcome back.</p>
+<div class="home-text-container">
+<p>Hello <span class="username">{{ store.user()?.username }}</span> and welcome back.</p>
+<p style="display: flex; align-items: center;">Find accessible products 
+    <button 
+        mat-icon-button
+        class="filters-btn"
+        aria-label="Filters icon-button"
+        [routerLink]="'/filters'">
+        <mat-icon>arrow_forward</mat-icon>
+    </button>
+</p>
+<p style="display: flex; align-items: center;">See your saved searches and products
+    <button 
+        mat-icon-button
+        class="favourites-btn" 
+        aria-label="Favourites icon-button" 
+        [routerLink]="'/favourites'">
+        <mat-icon>arrow_forward</mat-icon>
+    </button>
+</p>
+<p style="display: flex; align-items: center;">Need any help or want to report a bug? Contact us
+    <button 
+        mat-icon-button
+        class="contact-btn" 
+        aria-label="Contact icon-button" 
+        [routerLink]="'/settings'">
+        <mat-icon>arrow_forward</mat-icon>
+    </button>
+</p>
+</div>
+<div class="recently-added-container">
+<mat-divider></mat-divider>
+<h3>Recently added products</h3>
+<div class="recently-added-scroller">
+    <mat-card class="product-card" appearance="outlined">
+        <mat-card-header>
+            <mat-card-title>AquilaWare</mat-card-title>
+            <mat-card-subtitle>Reporting</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="document_stock_img.jpeg" alt="Stock image of an accessible document">
+        <mat-card-content>
+            <p>
+                Type: <span style="font-style: italic;">Document</span><br />
+                A simple and accessible document for resource overviews.
+            </p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button matButton>Details</button>
+        </mat-card-actions>
+    </mat-card>
+    <mat-card class="product-card" appearance="outlined">
+        <mat-card-header>
+            <mat-card-title>WorklineOS</mat-card-title>
+            <mat-card-subtitle>Training management</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="hardware_stock_img.jpeg" alt="Photo of a Shiba Inu">
+        <mat-card-content>
+            <p>
+                Type: <span style="font-style: italic;">Hardware</span><br />
+                The main advantage is the intricate surface as well as the size of this tool.
+            </p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button matButton>Details</button>
+        </mat-card-actions>
+    </mat-card>
+    <mat-card class="product-card" appearance="outlined">
+        <mat-card-header>
+            <mat-card-title>PrimeHub</mat-card-title>
+            <mat-card-subtitle>HR App</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="webapp_stock_img.png" alt="Stock image of a web app">
+        <mat-card-content>
+            <p>
+                Type: <span style="font-style: italic;">Website/Webapp</span><br />
+                Strengths of this app are it's easy to understand UI & the seamless workflow.
+            </p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button matButton>Details</button>
+        </mat-card-actions>
+    </mat-card>
+    <button matButton [routerLink]="'/filters'">See more ...</button>
+</div>
+<mat-divider style="margin-top: 16px"></mat-divider>
+
+</div>
