@@ -42,6 +42,13 @@
   .home-btn {
     padding-inline: 0;
     margin-right: 16px;
+
+    .pa-logo {
+      clip-path: circle();
+      width: 30px;
+      height: 31px;
+      margin-right: 8px;
+    }
   }
 }
 
@@ -56,7 +63,7 @@
 
 @media (min-width: 23em) {
   #app-name {
-    display: block;
+    display: flex;
   }
 }
 

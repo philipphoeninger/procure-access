@@ -23,7 +23,9 @@ import { AuthService } from '@features/identity/services/auth.service';
   styleUrl: './header.scss'
 })
 export class Header {
-    constructor(
+  protected logoPath = '/werte_it_logo.jpg';
+
+  constructor(
     protected authService: AuthService,
     private router: Router,
   ) {}
