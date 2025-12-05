@@ -1,0 +1,35 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 281px);
+    overflow: auto;
+}
+
+.accordion-action-buttons {
+    display: flex;
+    justify-content: end;
+}
+
+.filters-accordion {
+    margin-block: 8px;
+}
+
+.list-selection-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.example-chip-list {
+  width: 100%;
+}
