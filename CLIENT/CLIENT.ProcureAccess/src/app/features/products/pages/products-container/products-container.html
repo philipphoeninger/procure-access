@@ -1,0 +1,57 @@
+<mat-stepper labelPosition="bottom" #stepper>
+  <mat-step [stepControl]="firstFormGroup">
+    <form [formGroup]="firstFormGroup">
+      <ng-template matStepLabel>Enter Filters</ng-template>
+      <!-- <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
+      </mat-form-field> -->
+      <pa-products-filters></pa-products-filters>
+      <div class="stepper-actions-container">
+        <button matButton (click)="stepper.reset()">Reset</button>
+        <button matButton matStepperNext>Enter</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="secondFormGroup"> <!--optional-->
+    <form [formGroup]="secondFormGroup">
+      <ng-template matStepLabel>Products Result</ng-template>
+      <!-- <mat-form-field>
+        <mat-label>Address</mat-label>
+        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
+               required>
+      </mat-form-field> -->
+      <!-- <pa-products-list></pa-products-list> -->
+        <pa-criteria-list></pa-criteria-list>
+      <div class="stepper-actions-container">
+        <div class="action-buttons">
+            <button matButton matStepperPrevious>Back</button>
+            <button matButton (click)="stepper.reset()">Reset</button>
+        </div>
+        <div class="action-sharing">
+            <button 
+                mat-icon-button 
+                class="products-link-btn" 
+                aria-label="Products link button" 
+                (click)="linkCopied()">
+                <mat-icon>link</mat-icon>
+            </button>
+            <button 
+                mat-icon-button 
+                class="products-export-btn" 
+                aria-label="Products export button" 
+                (click)="exportProductsFile()">
+                <mat-icon>arrow_downward</mat-icon>
+            </button>
+            <button 
+                mat-icon-button 
+                class="products-save-btn" 
+                aria-label="Products save button" 
+                (click)="openProductsSearchDialog()">
+                <mat-icon>add_2</mat-icon>
+            </button>
+        </div>
+      </div>
+    </form>
+  </mat-step>
+</mat-stepper>

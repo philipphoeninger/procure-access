@@ -1,0 +1,23 @@
+:host {
+    margin-top: 8px;
+    width: 100%;
+}
+
+.mat-mdc-form-field {
+  margin-top: 16px;
+}
+
+.stepper-actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+
+    .mat-stepper-next {
+        margin-left: auto;
+    }
+
+    .action-sharing {
+        display: flex;
+    }
+}
