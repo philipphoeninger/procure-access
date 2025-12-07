@@ -1,21 +1,22 @@
 <mat-stepper labelPosition="bottom" #stepper>
-  <mat-step [stepControl]="firstFormGroup">
-    <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Enter Filters</ng-template>
+  <mat-step [stepControl]="selectedFiltersFormGroup">
+    <form [formGroup]="selectedFiltersFormGroup">
+      <!-- <ng-template matStepLabel>Enter Filters</ng-template> -->
       <!-- <mat-form-field>
         <mat-label>Name</mat-label>
         <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
       </mat-form-field> -->
-      <pa-products-filters></pa-products-filters>
+      <!--<pa-products-filters></pa-products-filters> [formGroup1]="criteriaFiltersFormGroup"-->
+      <pa-filters-container [formGroup1]="selectedFiltersFormGroup" (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">Reset</button>
-        <button matButton matStepperNext>Enter</button>
+        <button matButton matStepperNext (click)="asdf()">Enter</button>
       </div>
     </form>
   </mat-step>
   <mat-step [stepControl]="secondFormGroup"> <!--optional-->
     <form [formGroup]="secondFormGroup">
-      <ng-template matStepLabel>Products Result</ng-template>
+      <!-- <ng-template matStepLabel>Criteria</ng-template> -->
       <!-- <mat-form-field>
         <mat-label>Address</mat-label>
         <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
@@ -49,6 +50,15 @@
                 aria-label="Products save button" 
                 (click)="openProductsSearchDialog()">
                 <mat-icon>add_2</mat-icon>
+            </button>
+        </div>
+        <div class="products-page-btn">
+            <button 
+                matButton="filled"
+                class="products-page-btn"
+                aria-label="Products page button"
+                [routerLink]="'/products'">
+                Show Products
             </button>
         </div>
       </div>
