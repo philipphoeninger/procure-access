@@ -8,9 +8,9 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveSearchDialog } from '../dialogs/save-search-dialog/save-search-dialog';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 
 @Component({
   selector: 'pa-products-list',
@@ -36,7 +36,8 @@ export class ProductsList {
   sort!: MatSort;
 
   readonly dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+
+  constructor(protected snackbarService: SnackbarService) {}
 
   ngOnInit() {}
 
@@ -58,7 +59,7 @@ export class ProductsList {
   }
 
   linkCopied() {
-    this.showSnackbar('Link was copied to clipboard!');
+    this.snackbarService.showInfo('Link was created and copied to clipboard!');
   }
 
   exportProductsFile(){
@@ -78,16 +79,8 @@ export class ProductsList {
 
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name !== undefined) {
-        this.showSnackbar('The products were saved under: ' + name);
+        this.snackbarService.showInfo('The products were saved under: ' + name);
       }
-    });
-  }
-
-  // TODO: make it a service
-  showSnackbar(message: string) {
-    this._snackBar.open(message, 'Close', {
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
     });
   }
 }

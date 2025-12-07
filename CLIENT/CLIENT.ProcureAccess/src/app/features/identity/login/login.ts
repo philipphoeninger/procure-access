@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { finalize, map } from 'rxjs/operators';
 import { AuthService } from '@features/identity/services/auth.service';
@@ -15,6 +14,7 @@ import { LoginModel } from '@features/identity/models/login.model';
 import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { User } from '../models/user.model';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 
 @Component({
   selector: 'pa-login',
@@ -52,11 +52,11 @@ export class Login {
   public keepSignedIn = model(false);
 
   readonly dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
 
   constructor(
     protected authService: AuthService,
     private router: Router,
+    protected snackbarService: SnackbarService
   ) {}
 
   ngOnInit() {}
@@ -73,18 +73,11 @@ export class Login {
           .forgotPassword(email)
           .pipe(
             map((response: any) => {
-              this.showSnackbar('A passwort reset was sent to the given mail address.');
+              this.snackbarService.showInfo('A passwort reset was sent to the given mail address.');
             })
           )
           .subscribe();
       }
-    });
-  }
-
-  showSnackbar(message: string) {
-    this._snackBar.open(message, 'Close', {
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
     });
   }
 
@@ -103,7 +96,7 @@ export class Login {
             this.store.setUser(user);
             this.router.navigateByUrl('/home');
           } else {
-            this.showSnackbar('No login found for the given information. Please check your inputs and try again.');
+            this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
           }
         }),
         finalize(() => {

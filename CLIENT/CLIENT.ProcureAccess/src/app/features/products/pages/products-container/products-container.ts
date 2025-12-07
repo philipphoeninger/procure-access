@@ -47,10 +47,12 @@ export class ProductsContainer {
     secondCtrl: ['', Validators.required],
   });
 
+  constructor(protected snackbarService: SnackbarService) {}
+
   ngOnInit() {}
 
     linkCopied() {
-      this.showSnackbar('Link was copied to clipboard!');
+      this.snackbarService.showInfo('Link was copied to clipboard!');
     }
   
     exportProductsFile(){
@@ -70,7 +72,7 @@ export class ProductsContainer {
   
       dialogRef.afterClosed().subscribe((name: string) => {
         if (name !== undefined) {
-          this.showSnackbar('The products were saved under: ' + name);
+          this.snackbarService.showInfo('The products were saved under: ' + name);
         }
       });
     }
