@@ -2,38 +2,35 @@ import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { products } from '../data/dummy-data';
+import { products } from '../../products/data/dummy-data';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 
 @Component({
-  selector: 'pa-products-favourites',
+  selector: 'pa-products-favorites',
   imports: [
     FormsModule,
     MatDividerModule,
     MatButtonModule,
     MatIconModule
   ],
-  templateUrl: './favourites.html',
-  styleUrl: './favourites.scss'
+  templateUrl: './favorites.html',
+  styleUrl: './favorites.scss'
 })
-export class Favourites {
+export class Favorites {
   protected store = inject(ProcureAccessStore);
 
   readonly dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+
+  constructor(protected snackbarService: SnackbarService) {}
 
   ngOnInit() {}
 
   ngAfterViewInit() {}
 
-  // TODO: make it a service
   showSnackbar(message: string) {
-    this._snackBar.open(message, 'Close', {
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
-    });
+    this.snackbarService.showInfo(message);
   }
 }
