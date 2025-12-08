@@ -1,3 +1,4 @@
+import { Criterion } from "@app/features/criteria/models/criterion.model";
 import { AppCustomization } from "./appCustomization.model";
 import { IdentityState } from "@app/features/identity/state/with-identity";
 
@@ -5,6 +6,8 @@ export interface AppState {
     loadingCount: number;
     appConfiguration: AppCustomization;
     identity: IdentityState;
+    selectedFilters: number[];
+    criteria: Criterion[];
 }
 
 export const initialAppState: AppState = {
@@ -18,5 +21,7 @@ export const initialAppState: AppState = {
     },
     identity: {
         user: null
-    }
+    },
+    selectedFilters: [],
+    criteria: []
 }
