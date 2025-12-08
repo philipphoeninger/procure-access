@@ -1,6 +1,6 @@
 <mat-accordion class="example-headers-align">
-    @for (criterion of filteredCriteria; track criterion; let idx = $index, e = $even) {
-        <mat-expansion-panel [expanded]="step() === idx" (opened)="setStep(idx)" hideToggle>
+    @for (criterion of store.criteria(); track criterion; let idx = $index, e = $even) {
+        <mat-expansion-panel [expanded]="step() === (idx + 1)" (opened)="setStep(idx + 1)"> <!--hideToggle-->
             <mat-expansion-panel-header>
                 <mat-panel-title> {{ criterion.name }} </mat-panel-title>
                 <mat-panel-description>
@@ -8,7 +8,7 @@
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
-            {{ criterion.description }}
+            <p>{{ criterion.description }}</p>
 
             <mat-action-row>
                 @if (idx > 0) {
@@ -19,3 +19,7 @@
         </mat-expansion-panel>
     }
 </mat-accordion>
+
+@if (store.criteriaCount() == 0) {
+    <p>No criteria could be found. Please try again...</p>
+}

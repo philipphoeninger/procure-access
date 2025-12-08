@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -6,7 +6,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
-import { criteria } from '../data/dummy-data';
+import { ProcureAccessStore } from '@app/core/state/app.store';
+import { CriteriaApiService } from '../services/api/criteria-api.service';
 
 @Component({
   selector: 'pa-criteria-list',
@@ -24,9 +25,15 @@ import { criteria } from '../data/dummy-data';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CriteriaList {
+  protected store = inject(ProcureAccessStore);
+
   step = signal(0);
 
-  filteredCriteria = criteria;
+  constructor(
+    protected criteriaApiService: CriteriaApiService
+  ) {}
+
+  ngOnInit() {}
 
   setStep(index: number) {
     this.step.set(index);
