@@ -6,7 +6,8 @@ import { AuthGuard } from '@core/guards/auth.guard';
 import { Profile } from '@features/identity/profile/profile';
 import { Settings } from '@features/settings/settings';
 import { ProductsContainer } from '@features/products/pages/products-container/products-container';
-import { Favourites } from '@features/products/favourites/favourites';
+import { Favorites } from '@app/features/favorites/list/favorites';
+import { ProductsList } from './features/products/list/products-list';
 
 export const routes: Routes = [
   {
@@ -45,8 +46,13 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'favourites',
-    component: Favourites,
+    path: 'favorites',
+    component: Favorites,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'products',
+    component: ProductsList,
     canActivate: [AuthGuard],
   },
 ];
