@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@features/identity/services/auth.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'pa-header',
@@ -17,13 +18,16 @@ import { AuthService } from '@features/identity/services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatMenuModule,
-    RouterModule
+    RouterModule,
+    MatTooltipModule
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
 export class Header {
-    constructor(
+  protected logoPath = '/werte_it_logo.jpg';
+
+  constructor(
     protected authService: AuthService,
     private router: Router,
   ) {}

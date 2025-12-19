@@ -1,0 +1,83 @@
+<p>Please enter the app types and filters for which you need accessibility criteria and example products.</p>
+
+<div class="accordion-action-buttons">
+  <button matButton (click)="accordion().openAll()">Expand All</button>
+  <button matButton (click)="accordion().closeAll()">Collapse All</button>
+</div>
+
+<mat-accordion class="filters-accordion" multi>
+  <mat-expansion-panel class="filter-section">
+    <mat-expansion-panel-header>
+      <mat-panel-title>{{ filterTypes[0].name }}</mat-panel-title>
+      <mat-panel-description>
+        {{ productTypes().length }} selected
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <p>{{ filterTypes[0].displayQuestion }}</p>
+    <form> <!-- [formGroup]="formGroup1()"-->
+        <mat-form-field class="example-chip-list">
+            <mat-label>{{ filterTypes[0].name }}</mat-label>
+            <input
+                name="currentProductType"
+                placeholder=""
+                #productTypeInput
+                matInput
+                [formControl]="myControl"
+                [matChipInputFor]="chipGrid"
+                [matAutocomplete]="auto"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="add($event)"
+            />
+                 <!-- [(ngModel)]="currentProductType" -->
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event); productTypeInput.value = ''">
+                @for (productType of filteredProductTypes | async; track productType) {
+                    <mat-option [value]="productType">{{ productType }}</mat-option>
+                }
+            </mat-autocomplete>
+        </mat-form-field>
+    </form>
+                <mat-chip-grid #chipGrid aria-label="Product Type selection">
+                @for (productType of productTypes(); track $index) {
+                    <mat-chip-row (removed)="remove(productType)">
+                        {{ productType }}
+                        <button matChipRemove [attr.aria-label]="'remove ' + productType">
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                    </mat-chip-row>
+                }
+            </mat-chip-grid>
+  </mat-expansion-panel>
+
+    @for (typeId of [1, 2, 3]; track typeId; let idx = $index, e = $even) {
+        <mat-expansion-panel class="filter-section">
+            <mat-expansion-panel-header>
+                <mat-panel-title>{{ filterTypes[typeId].name }}</mat-panel-title>
+                <mat-panel-description>
+                    {{ filterTypes1.selectedOptions.selected.length + filterTypes2.selectedOptions.selected.length }} selected
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+
+            <p>{{ filterTypes[typeId].displayQuestion }}</p>
+            <div class="list-selection-container">
+                <div>
+                    <mat-selection-list #filterTypes1>
+                        @for (filterType of filterTypes[typeId].values.slice(0, (filterTypes[typeId].values.length + 1) / 2); track filterType) {
+                            <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, filterType.id)">{{ filterType.name }}</mat-list-option>
+                        }
+                    </mat-selection-list>
+                </div>
+                <div>
+                    <mat-selection-list #filterTypes2>
+                        @for (filterType of filterTypes[typeId].values.slice((filterTypes[typeId].values.length + 1) / 2, filterTypes[typeId].values.length); track filterType) {
+                            <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, filterType.id)">{{ filterType.name }}</mat-list-option>
+                        }
+                    </mat-selection-list>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    }
+</mat-accordion>
+
+<p style="margin-left: auto;">{{ selectedFilterTypeIds().length }} selected</p>

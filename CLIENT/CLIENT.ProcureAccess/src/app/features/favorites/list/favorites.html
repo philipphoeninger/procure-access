@@ -1,0 +1,41 @@
+<mat-tab-group>
+  <mat-tab label="Searches / Criteria">
+    @if (store.filterSetFavoritesCount() === 0) {
+        <p class="no-favorites-msg">
+            Currently no searches / criteria saved.<br /> 
+            Go to the filter section and save a search filter result.
+        </p>
+    } @else {
+        <p>Show List...</p>
+    }
+  </mat-tab>
+  <mat-tab label="Products">
+    @if (store.productFavoritesCount() === 0) {
+        <p class="no-favorites-msg">
+            Currently no products saved.<br /> 
+            Go to the filter section and save a product list filter result or a single product.
+        </p>
+    } @else {
+        <mat-list role="list" class="favorite-products-list">
+            @for (productSave of store.productSaves(); track productSave) {
+                <mat-list-item role="listitem" class="list-item">
+                    <div class="favorites-list-item-container">
+                        <span>{{ productSave.productId }}</span>
+                        <div>
+                            <button 
+                                mat-icon-button
+                                class="product-favorite-remove-btn"
+                                aria-label="Product favorite remove icon-button"
+                                matTooltip="Remove" 
+                                matTooltipPosition="left"
+                                (click)="store.removeProductFavorite(productSave.id)">
+                                <mat-icon>remove</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </mat-list-item>
+            }
+        </mat-list>
+    }
+  </mat-tab>
+</mat-tab-group>

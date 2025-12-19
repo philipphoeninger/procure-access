@@ -1,0 +1,21 @@
+@if (productId == null) {
+    <p>No permissible Product ID found. Please try again...</p>
+} @else if (!product) {
+    <p>No product with the ID: {{ productId }} was found. Please try again...</p>
+}
+@else {
+    <div class="product-info-container">
+        <img mat-card-image src="document_stock_img.jpeg" alt="Stock image of an accessible document">
+        <div class="product-info">
+            <h2 style="margin-block: 20px;">{{ product.name }}</h2>
+            <p>Type: <span style="font-style: italic;">{{ product.type }}</span></p>
+            <p>Website: <a [href]="'https://' + product.link" target="_blank"> {{ product.link }} </a></p>
+            <p>
+                <span style="display: block; text-decoration: underline; margin-bottom: 8px;">Functionality: </span>
+                <span style="display: block;">{{ product.functionality }}</span>
+            </p>
+        </div>
+    </div>
+}
+  
+<mat-divider></mat-divider>

@@ -1,0 +1,26 @@
+:host {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.no-favorites-msg {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.favorites-list-item-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.favorite-products-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .list-item {
+        width: 60%;
+    }
+}

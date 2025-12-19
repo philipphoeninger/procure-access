@@ -1,6 +1,20 @@
+:host {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .heading {
   //font-size: 1.75em;
   width: 100%;
+  max-width: 700px;
+}
+
+.settings-list {
+  width: 100%;
+  max-width: 700px;
 }
 
 .list-item {
@@ -16,4 +30,13 @@
   }
 
   /* See more styling in main.scss */
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 16px;
+  gap: 16px;
 }
