@@ -1,6 +1,6 @@
 <div class="home-text-container">
 <p>Hello <span class="username">{{ store.user()?.username }}</span> and welcome back.</p>
-<p style="display: flex; align-items: center;">Find accessible products 
+<p style="display: flex; align-items: center;">Find accessibility 
     <button 
         mat-icon-button
         class="filters-btn"
@@ -45,7 +45,7 @@
             </p>
         </mat-card-content>
         <mat-card-actions>
-            <button matButton>Details</button>
+            <button matButton [routerLink]="['/product', 17]">Details</button>
         </mat-card-actions>
     </mat-card>
     <mat-card class="product-card" appearance="outlined">
@@ -61,7 +61,7 @@
             </p>
         </mat-card-content>
         <mat-card-actions>
-            <button matButton>Details</button>
+            <button matButton [routerLink]="['/product', 16]">Details</button>
         </mat-card-actions>
     </mat-card>
     <mat-card class="product-card" appearance="outlined">
@@ -77,7 +77,7 @@
             </p>
         </mat-card-content>
         <mat-card-actions>
-            <button matButton>Details</button>
+            <button matButton [routerLink]="['/product', 15]">Details</button>
         </mat-card-actions>
     </mat-card>
     <button matButton [routerLink]="'/filters'">See more ...</button>

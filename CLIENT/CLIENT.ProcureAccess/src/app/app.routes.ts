@@ -8,6 +8,7 @@ import { Settings } from '@features/settings/settings';
 import { ProductsContainer } from '@features/products/pages/products-container/products-container';
 import { Favorites } from '@app/features/favorites/list/favorites';
 import { ProductsList } from './features/products/list/products-list';
+import { ProductDetails } from './features/products/details/product-details';
 
 export const routes: Routes = [
   {
@@ -55,4 +56,9 @@ export const routes: Routes = [
     component: ProductsList,
     canActivate: [AuthGuard],
   },
+  { 
+    path: 'product/:id', 
+    component: ProductDetails,
+    canActivate: [AuthGuard],
+   }
 ];
