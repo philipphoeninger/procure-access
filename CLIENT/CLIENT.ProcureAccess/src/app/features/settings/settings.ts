@@ -4,6 +4,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ColorPickerDirective } from 'ngx-color-picker';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 
 @Component({
   selector: 'pa-settings',
@@ -12,7 +14,8 @@ import { MatListModule } from '@angular/material/list';
     ColorPickerDirective,
     MatSlideToggleModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatButtonModule
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
@@ -24,4 +27,16 @@ export class Settings {
 
   protected orientationControl = false;
   protected highContrastControl = false;
+
+  constructor(
+    protected snackbarService: SnackbarService
+  ) {}
+
+  saveSettings() {
+    this.snackbarService.showInfo("Settings saved");
+  }
+
+  resetSettings() {
+    this.snackbarService.showInfo("Settings resetted to standard");
+  }
 }

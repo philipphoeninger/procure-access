@@ -4,9 +4,11 @@
 // }
 
 :host {
-  max-height: calc(100vh - 281px);
+  max-height: calc(100vh - 100px);
   display: block;
   overflow: auto;
+  width: 100%;
+  margin-top: 16px;
 }
 
 .cdk-table {

@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveSearchDialog } from '../dialogs/save-search-dialog/save-search-dialog';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { RouterModule } from '@angular/router';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'pa-products-list',
@@ -20,7 +22,9 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
     MatTableModule, 
     MatButtonModule,
     MatSortModule,
-    MatIconModule
+    MatIconModule,
+    RouterModule,
+    MatTooltipModule
   ],
   templateUrl: './products-list.html',
   styleUrl: './products-list.scss'
@@ -29,7 +33,7 @@ export class ProductsList {
   protected store = inject(ProcureAccessStore);
   private _liveAnnouncer = inject(LiveAnnouncer);
 
-  displayedColumns: string[] = ['id', 'name', 'link', 'functionality', 'type'];
+  displayedColumns: string[] = ['actions', 'id', 'name', 'link', 'functionality', 'type'];
   dataSource = new MatTableDataSource(products);
 
   @ViewChild(MatSort)
@@ -82,5 +86,10 @@ export class ProductsList {
         this.snackbarService.showInfo('The products were saved under: ' + name);
       }
     });
+  }
+
+  addProductFavorite(productId: string) {
+    this.store.addProductFavorite(productId);
+    this.snackbarService.showInfo('Saved the product to your favorites!')
   }
 }

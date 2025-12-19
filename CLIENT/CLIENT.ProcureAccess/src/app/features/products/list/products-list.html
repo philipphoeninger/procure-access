@@ -19,6 +19,32 @@
     <td mat-cell *matCellDef="let element"> {{element.position}} </td>
   </ng-container>
 
+  <!-- Actions Column -->
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef> Actions </th>
+    <td mat-cell *matCellDef="let element" style="padding-left: 8px;">
+      <button
+        mat-icon-button
+        class="product-details-btn"
+        aria-label="Product details icon-button"
+        matTooltip="Details"
+        matTooltipPosition="above"
+        [routerLink]="['/product', element.id]"
+      >
+        <mat-icon>visibility</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="product-save-btn"
+        aria-label="Product save icon-button"
+        matTooltip="Save to favorites" 
+        matTooltipPosition="right"
+        (click)="addProductFavorite(element.name)">
+        <mat-icon>add</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
   <!-- Id Column -->
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id"> Id </th>
