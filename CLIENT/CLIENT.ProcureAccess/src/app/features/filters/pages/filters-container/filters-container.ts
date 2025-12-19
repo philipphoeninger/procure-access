@@ -115,7 +115,6 @@ export class FiltersContainer {
     }
 
     selected(event: MatAutocompleteSelectedEvent): void {
-        debugger;
         this.productTypes.update(productTypes => [...productTypes, event.option.viewValue]);
         this.currentProductType.set('');
         event.option.deselect();

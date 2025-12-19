@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { FiltersContainer } from '@app/features/filters/pages/filters-container/filters-container';
 import { FilterTypeValue } from '@app/features/filters/models/filterTypeValue.model';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'pa-products-container',
@@ -28,7 +29,8 @@ import { FilterTypeValue } from '@app/features/filters/models/filterTypeValue.mo
     MatInputModule,
     CriteriaList,
     RouterModule,
-    FiltersContainer
+    FiltersContainer,
+    MatTooltipModule
   ],
   templateUrl: './products-container.html',
   styleUrl: './products-container.scss'
