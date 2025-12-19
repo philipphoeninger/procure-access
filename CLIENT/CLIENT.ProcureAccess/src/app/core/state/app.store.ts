@@ -4,6 +4,7 @@ import { withLoading } from "@app/shared/state/with-loading";
 import { withIdentity } from "@app/features/identity/state/with-identity";
 import { withFilters } from "@app/features/filters/state/with-filters";
 import { withCriteria } from "@app/features/criteria/state/with-criteria";
+import { withFavorites } from "@app/features/favorites/state/with-favorites";
 
 export const ProcureAccessStore = signalStore(
     { providedIn: 'root' },
@@ -12,6 +13,7 @@ export const ProcureAccessStore = signalStore(
     withIdentity(),
     withFilters(),
     withCriteria(),
+    withFavorites(),
     withMethods((state) => {
 
         return {};
