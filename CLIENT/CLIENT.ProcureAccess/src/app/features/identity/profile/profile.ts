@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateUserDialog } from '../dialogs/update-user-dialog/update-user-dialog';
+import { SnackbarService } from '@app/core/services/snackbar.service';
+import { DeleteAccountDialog } from '../dialogs/delete-account-dialog/delete-account-dialog';
 
 export interface UserInformation {
   position: number,
@@ -29,6 +31,10 @@ export class Profile {
 
   readonly dialog = inject(MatDialog);
 
+  constructor(
+      protected snackbarService: SnackbarService
+  ) {}
+
   ngOnInit() {
     let userInformation: UserInformation[] = [
       { position: 1, name: 'Username', value: this.store.user()?.username, actions: '' },
@@ -47,6 +53,32 @@ export class Profile {
 
     dialogRef.afterClosed().subscribe((newValue: string) => {
       console.log(newValue);
+      // TODO
+      // if (email !== undefined) {
+      //   this.authService
+      //     .forgotPassword(email)
+      //     .pipe(
+      //       map((response: any) => {
+      //         this.showSnackbar('A passwort reset was sent to the given mail address.');
+      //       })
+      //     )
+      //     .subscribe();
+      // }
+    });
+  }
+
+  deleteAccount() {
+    const dialogRef = this.dialog.open(DeleteAccountDialog, {
+      data: { email: this.store.user()?.email },
+      width: '420px'
+    });
+
+    dialogRef.afterClosed().subscribe((toDelete: boolean) => {
+      if (toDelete) {
+        // TODO: delete account
+        this.snackbarService.showInfo("Account deleted. Redirecting to Login page...");
+        // TODO: redirect to login
+      }
       // TODO
       // if (email !== undefined) {
       //   this.authService

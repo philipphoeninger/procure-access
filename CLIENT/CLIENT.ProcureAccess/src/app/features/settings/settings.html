@@ -1,5 +1,5 @@
 <h2 class="heading">Settings</h2>
-<mat-list>
+<mat-list class="settings-list">
   <mat-list-item class="list-item">
     <div class="list-item-container">
       <label for="foreground-cp">Foreground color: </label>
@@ -65,3 +65,7 @@
     </div>
   </mat-list-item>
 </mat-list>
+<div class="settings-actions">
+  <button matButton (click)="resetSettings()">Reset</button>
+  <button matButton="filled" (click)="saveSettings()">Save</button>
+</div>

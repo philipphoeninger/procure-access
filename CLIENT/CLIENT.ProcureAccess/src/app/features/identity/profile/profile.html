@@ -1,5 +1,5 @@
 <h2 class="heading">Profile</h2>
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 profile-table">
   <!-- Position Column -->
   <ng-container matColumnDef="position">
     <th mat-header-cell *matHeaderCellDef> No. </th>
@@ -27,3 +27,6 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+<div class="profile-actions">
+  <button matButton="filled" (click)="deleteAccount()" class="delete-btn">Delete</button>
+</div>

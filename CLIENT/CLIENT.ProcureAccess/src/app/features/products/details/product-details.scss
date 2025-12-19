@@ -1,0 +1,23 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 16px;
+}
+
+img {
+    max-height: 480px;
+    object-fit: cover;
+}
+
+.product-info-container {
+    display: flex;
+    width: 100%;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
