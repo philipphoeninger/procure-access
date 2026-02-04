@@ -13,4 +13,12 @@ public static class SampleData
             ConcurrencyStamp = "3411a4b2-b9a4-4554-b2c8-f90654dc0f0f",
         }
     };
+
+    public static List<FilterType> FilterTypes => new()
+    {
+        new() { Id = 1, Name = "Product Types", IsDeleted = false },
+        new() { Id = 2, Name = "Application Types", IsDeleted = false },
+        new() { Id = 3, Name = "Product Parts", IsDeleted = false },
+        new() { Id = 4, Name = "Test Types", IsDeleted = false }
+    };
 }

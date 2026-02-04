@@ -27,6 +27,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
 
     #region fields
     public virtual DbSet<SeriLogEntry> SeriLogEntries { get; set; }
+    public virtual DbSet<FilterType> FilterTypes { get; set; }
     // add more fields ...
     #endregion
 
@@ -43,6 +44,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "Identity");
 
         new SeriLogEntryConfiguration().Configure(modelBuilder.Entity<SeriLogEntry>());
+        new FilterTypeConfiguration().Configure(modelBuilder.Entity<FilterType>());
         // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);
