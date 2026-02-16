@@ -14,8 +14,10 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { map, Observable, startWith } from 'rxjs';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { filterTypes } from '../../data/dummy-data';
-import { FilterTypeValue } from '../../models/filterTypeValue.model';
+import { FiltersApiService } from '../../services/api/filters-api.service';
+import { EnFilterType } from '../../models/filterTypes.enum';
+import { FilterType } from '../../models/filterType.model';
+import { CriteriaFilter } from '../../models/criteriaFilter.model';
 
 @Component({
   selector: 'pa-filters-container',
@@ -39,8 +41,11 @@ import { FilterTypeValue } from '../../models/filterTypeValue.model';
 })
 export class FiltersContainer {
     protected store = inject(ProcureAccessStore);
+    protected filtersApiService = inject(FiltersApiService);
 
-    filterTypes = filterTypes;
+    filterTypes = signal<FilterType[]>([]);
+
+    EnFilterType = EnFilterType;
 
     accordion = viewChild.required(MatAccordion);
 
@@ -48,7 +53,37 @@ export class FiltersContainer {
 
     filteredProductTypes: Observable<string[]>;
 
-    ngOnInit() {}
+    constructor() {
+        this.filteredProductTypes = this.myControl.valueChanges.pipe(
+            startWith(''),
+            map(value => this._filter(value || '')),
+        );
+    }
+
+    ngOnInit() {
+        this.filtersApiService.getAllCriteriaFilters().then((allFilters) => {
+            let productFilterTypes = 
+                allFilters.filter(x => x.filterType.name == EnFilterType.productType);
+            let productFilterTypesNames = productFilterTypes.map(x => x.name);
+            this.allProductTypes = productFilterTypesNames;
+
+            let appFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.appType);
+            let testFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.testType);
+            let productPartFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.productPart);
+
+            let updateAllFilterTypes: Record<string, CriteriaFilter[]> = {};
+            updateAllFilterTypes[EnFilterType.productType] = productFilterTypes;
+            updateAllFilterTypes[EnFilterType.appType] = appFilterTypes;
+            updateAllFilterTypes[EnFilterType.testType] = testFilterTypes;
+            updateAllFilterTypes[EnFilterType.productPart] = productPartFilterTypes;
+
+            this.allFilterTypes.set(updateAllFilterTypes);
+        });
+
+        this.filtersApiService.getAllFilterTypes().then((allFilterTypes) => {
+            this.filterTypes.set(allFilterTypes);
+        })
+    }
 
     // ------
 
@@ -57,7 +92,9 @@ export class FiltersContainer {
     readonly separatorKeysCodes: number[] = [ENTER, COMMA];
     readonly currentProductType = model('');
     readonly productTypes: WritableSignal<string[]> = signal([]);
-    readonly allProductTypes: string[] = [];
+    allProductTypes: string[] = [];
+
+    allFilterTypes = signal<Record<string, CriteriaFilter[]>>({});
 
     // remaining filters:
     readonly selectedFilterTypeIds: WritableSignal<number[]> = signal([]);
@@ -71,17 +108,6 @@ export class FiltersContainer {
     //   });
 
     readonly announcer = inject(LiveAnnouncer);
-
-    constructor() {
-        filterTypes[0].values.forEach(productType => {
-            this.allProductTypes.push(productType.name);
-        });
-
-        this.filteredProductTypes = this.myControl.valueChanges.pipe(
-            startWith(''),
-            map(value => this._filter(value || '')),
-        );
-    }
 
     private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();

@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
-import { FilterTypeValue } from './filterTypeValue.model';
 
 @jsonObject
 export class FilterType {
@@ -11,15 +10,11 @@ export class FilterType {
   name: string;
 
   @jsonMember
-  displayQuestion: string;
+  description: string;
 
-  @jsonMember
-  values: FilterTypeValue[];
-
-  constructor(pId: number, pName: string, pValues: FilterTypeValue[], pDisplayQuestion: string) {
+  constructor(pId: number, pName: string, pDescription: string = '') {
     this.id = pId;
     this.name = pName;
-    this.values = pValues;
-    this.displayQuestion = pDisplayQuestion;
+    this.description = pDescription;
   }
 }
