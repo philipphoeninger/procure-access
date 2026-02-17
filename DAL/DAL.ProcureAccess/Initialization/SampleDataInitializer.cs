@@ -77,6 +77,7 @@ public static class SampleDataInitializer
         {
             var succeeded = await ProcessUserInsert(dbContext, userManager, SampleData.Users);
             ProcessInsert(dbContext, dbContext.FilterTypes, SampleData.FilterTypes); // SampleData.SomeEntities(userManager.Users.First())
+            ProcessInsert(dbContext, dbContext.CriteriaFilters, SampleData.CriteriaFilters);
             ProcessInsert(dbContext, dbContext.Criteria, SampleData.Criteria);
             // insert more Entities...
         }
