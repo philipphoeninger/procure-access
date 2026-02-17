@@ -29,6 +29,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<SeriLogEntry> SeriLogEntries { get; set; }
     public virtual DbSet<FilterType> FilterTypes { get; set; }
     public virtual DbSet<Criterion> Criteria { get; set; }
+    public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
     // add more fields ...
     #endregion
 
@@ -47,6 +48,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new SeriLogEntryConfiguration().Configure(modelBuilder.Entity<SeriLogEntry>());
         new FilterTypeConfiguration().Configure(modelBuilder.Entity<FilterType>());
         new CriterionConfiguration().Configure(modelBuilder.Entity<Criterion>());
+        new CriteriaFilterConfiguration().Configure(modelBuilder.Entity<CriteriaFilter>());
         // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);

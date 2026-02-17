@@ -1,8 +1,8 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("Criteria", Schema = "dbo")]
-[EntityTypeConfiguration(typeof(CriterionConfiguration))]
-public partial class Criterion : BaseEntity
+[Table("CriteriaFilters", Schema = "dbo")]
+[EntityTypeConfiguration(typeof(CriteriaFilterConfiguration))]
+public partial class CriteriaFilter : BaseEntity
 {
     #region fields
     [Required]
@@ -10,12 +10,12 @@ public partial class Criterion : BaseEntity
     public string Name { get; set; }
 
     [Required]
-    [Column(TypeName = "nvarchar(max)")]
-    [StringLength(6000)]
-    public string Description { get; set; } = string.Empty;
+    [ForeignKey("FilterType")]
+    public int FilterTypeId { get; set; }
 
-    public int? CriteriaFilterId { get; set; }
-    public CriteriaFilter? CriteriaFilter { get; set; }
+    public virtual FilterType FilterTypes { get; set; }
+
+    public ICollection<Criterion> Criteria { get; } = new List<Criterion>();
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -25,25 +25,26 @@ public partial class Criterion : BaseEntity
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public string? Display { get; set; }
+
     #endregion
 
     #region ctors
-    public Criterion()
+    public CriteriaFilter()
     {
         // TODO: generate Name
     }
 
-    public Criterion(string pName, string pDescription)
+    public CriteriaFilter(string pName)
     {
         Name = pName;
-        Description = pDescription;
+        CreatedAt = DateTime.Now;
     }
     #endregion
 
     #region methods
     public override string ToString()
     {
-        return $"The Criterion {Name} has the ID {Id}";
+        return $"The CriteriaFilter {Name} has the ID {Id}";
     }
     #endregion
 }
