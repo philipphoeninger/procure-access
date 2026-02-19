@@ -17,6 +17,12 @@ public partial class CriteriaFilter : BaseEntity
 
     public ICollection<Criterion> Criteria { get; } = new List<Criterion>();
 
+    public int? ProductIdPart { get; set; }
+    public Product? ProductPart { get; set; }
+
+    public int? ProductIdTest { get; set; }
+    public Product? ProductTest { get; set; }
+
     [Required]
     public DateTime CreatedAt { get; set; }
 

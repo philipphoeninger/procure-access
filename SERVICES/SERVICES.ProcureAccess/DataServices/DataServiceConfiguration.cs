@@ -9,6 +9,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IFilterTypeRepo, FilterTypeRepo>();
         services.AddScoped<ICriterionRepo, CriterionRepo>();
         services.AddScoped<ICriteriaFilterRepo, CriteriaFilterRepo>();
+        services.AddScoped<IProductRepo, ProductRepo>();
         
         return services;
     }

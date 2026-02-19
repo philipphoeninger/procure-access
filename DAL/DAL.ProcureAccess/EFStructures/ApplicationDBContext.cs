@@ -30,6 +30,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<FilterType> FilterTypes { get; set; }
     public virtual DbSet<Criterion> Criteria { get; set; }
     public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
     // add more fields ...
     #endregion
 
