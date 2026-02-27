@@ -5,14 +5,32 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     public void Configure(EntityTypeBuilder<Product> builder)
     {
         // properties
-        builder.Property(p => p.CreatedAt).HasDefaultValueSql("GetDate()");
-        builder.Property(p => p.Display)
+        builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
+        builder.Property(x => x.Display)
             .HasComputedColumnSql("[Name]", stored: true);
 
         builder.HasIndex(
-            p => new { p.Name }).IsUnique();
+            x => new { x.Name }).IsUnique();
         builder.HasIndex(
-            p => new { p.Link }).IsUnique();
+            x => new { x.Link }).IsUnique();
+
+        builder.HasOne(x => x.Type)
+            .WithMany(cf => cf.ProductsByType)
+            .HasForeignKey(x => x.TypeId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
+
+        builder.HasMany(x => x.Parts)
+            // .WithMany(cf => cf.ProductParts);
+            .WithOne(pp => pp.Product)
+            .HasForeignKey(pp => pp.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.Tests)
+            // .WithMany(p => p.ProductTests);
+            .WithOne(pt => pt.Product)
+            .HasForeignKey(pt => pt.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>

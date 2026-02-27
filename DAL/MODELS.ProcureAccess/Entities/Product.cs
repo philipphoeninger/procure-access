@@ -10,17 +10,18 @@ public partial class Product : BaseEntity
     public string Name { get; set; }
 
     [StringLength(500)]
-    public string Link { get; set; }
+    public string? Link { get; set; }
 
     [Column(TypeName = "nvarchar(max)")]
     [StringLength(6000)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public virtual CriteriaFilter Type { get; set; }
+    public int TypeId { get; set; }
+    public CriteriaFilter Type { get; set; }
 
-    public ICollection<CriteriaFilter> Parts { get; set; }
+    public ICollection<ProductPart> Parts { get; set; } = new List<ProductPart>();
 
-    public ICollection<CriteriaFilter> Tests { get; set; }
+    public ICollection<ProductTest> Tests { get; set; } = new List<ProductTest>();
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -38,9 +39,12 @@ public partial class Product : BaseEntity
         // TODO: generate Name
     }
 
-    public Product(string pName)
+    public Product(string pName, int pTypeId)
     {
         Name = pName;
+        TypeId = pTypeId;
+        CreatedAt = DateTime.UtcNow;
+        IsDeleted = false;
     }
     #endregion
 

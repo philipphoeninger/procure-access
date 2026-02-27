@@ -13,15 +13,15 @@ public partial class CriteriaFilter : BaseEntity
     [ForeignKey("FilterType")]
     public int FilterTypeId { get; set; }
 
-    public virtual FilterType FilterTypes { get; set; }
+    public FilterType FilterType { get; set; }
 
-    public ICollection<Criterion> Criteria { get; } = new List<Criterion>();
+    public ICollection<Criterion> Criteria { get; set; } = new List<Criterion>();
 
-    public int? ProductIdPart { get; set; }
-    public Product? ProductPart { get; set; }
+    public ICollection<Product> ProductsByType { get; set; } = new List<Product>();
 
-    public int? ProductIdTest { get; set; }
-    public Product? ProductTest { get; set; }
+    public ICollection<ProductPart> ProductParts { get; set; } = new List<ProductPart>();
+
+    public ICollection<ProductTest> ProductTests { get; set; } = new List<ProductTest>();
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -40,10 +40,12 @@ public partial class CriteriaFilter : BaseEntity
         // TODO: generate Name
     }
 
-    public CriteriaFilter(string pName)
+    public CriteriaFilter(string pName, int pFilterTypeId)
     {
         Name = pName;
-        CreatedAt = DateTime.Now;
+        FilterTypeId = pFilterTypeId;
+        CreatedAt = DateTime.UtcNow;
+        IsDeleted = false;
     }
     #endregion
 

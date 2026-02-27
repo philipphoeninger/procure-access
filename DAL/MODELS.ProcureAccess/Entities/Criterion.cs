@@ -37,6 +37,8 @@ public partial class Criterion : BaseEntity
     {
         Name = pName;
         Description = pDescription;
+        CreatedAt = DateTime.UtcNow;
+        IsDeleted = false;
     }
     #endregion
 

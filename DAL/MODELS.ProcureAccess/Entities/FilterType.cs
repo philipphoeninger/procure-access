@@ -9,6 +9,8 @@ public partial class FilterType : BaseEntity
     [StringLength(200)]
     public string Name { get; set; }
 
+    public ICollection<CriteriaFilter> CriteriaFilters { get; set; } = new List<CriteriaFilter>();
+
     [Required]
     public DateTime CreatedAt { get; set; }
 
@@ -28,6 +30,8 @@ public partial class FilterType : BaseEntity
     public FilterType(string pName)
     {
         Name = pName;
+        CreatedAt = DateTime.UtcNow;
+        IsDeleted = false;
     }
     #endregion
 

@@ -5,12 +5,12 @@ public class CriterionConfiguration : IEntityTypeConfiguration<Criterion>
     public void Configure(EntityTypeBuilder<Criterion> builder)
     {
         // properties
-        builder.Property(c => c.CreatedAt).HasDefaultValueSql("GetDate()");
-        builder.Property(c => c.Display)
+        builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
+        builder.Property(x => x.Display)
             .HasComputedColumnSql("[Name]", stored: true);
 
         builder.HasIndex(
-            c => new { c.Name }).IsUnique();
+            x => new { x.Name }).IsUnique();
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>

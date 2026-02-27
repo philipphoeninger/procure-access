@@ -12,13 +12,11 @@ public class CriteriaFilterConfiguration : IEntityTypeConfiguration<CriteriaFilt
         builder.HasIndex(
             c => new { c.Name }).IsUnique();
 
-        builder.HasOne(c => c.ProductPart)
-            .WithMany(p => p.Parts)
-            .HasForeignKey(c => c.ProductIdPart);
-        
-        builder.HasOne(c => c.ProductTest)
-            .WithMany(p => p.Tests)
-            .HasForeignKey(c => c.ProductIdTest);
+        builder
+            .HasOne(x => x.FilterType)
+            .WithMany(ft => ft.CriteriaFilters)
+            .HasForeignKey(x => x.FilterTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>

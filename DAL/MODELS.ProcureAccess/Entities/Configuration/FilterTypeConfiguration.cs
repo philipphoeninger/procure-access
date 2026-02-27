@@ -5,12 +5,12 @@ public class FilterTypeConfiguration : IEntityTypeConfiguration<FilterType>
     public void Configure(EntityTypeBuilder<FilterType> builder)
     {
         // properties
-        builder.Property(f => f.CreatedAt).HasDefaultValueSql("GetDate()");
-        builder.Property(f => f.Display)
+        builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
+        builder.Property(x => x.Display)
             .HasComputedColumnSql("[Name]", stored: true);
 
         builder.HasIndex(
-            f => new { f.Name }).IsUnique();
+            x => new { x.Name }).IsUnique();
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>
