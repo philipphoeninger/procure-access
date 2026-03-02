@@ -79,6 +79,9 @@ public static class SampleDataInitializer
             ProcessInsert(dbContext, dbContext.FilterTypes, SampleData.FilterTypes); // SampleData.SomeEntities(userManager.Users.First())
             ProcessInsert(dbContext, dbContext.CriteriaFilters, SampleData.CriteriaFilters);
             ProcessInsert(dbContext, dbContext.Criteria, SampleData.Criteria);
+            ProcessInsert(dbContext, dbContext.Products, SampleData.Products);
+            ProcessInsert(dbContext, dbContext.ProductParts, SampleData.ProductParts);
+            ProcessInsert(dbContext, dbContext.ProductTests, SampleData.ProductTests);
             // insert more Entities...
         }
         catch (Exception ex)
