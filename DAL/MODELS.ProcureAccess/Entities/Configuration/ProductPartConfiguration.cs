@@ -4,7 +4,7 @@ public class ProductPartConfiguration : IEntityTypeConfiguration<ProductPart>
 {
     public void Configure(EntityTypeBuilder<ProductPart> builder)
     {
-        builder.HasKey(x => new { x.ProductId, x.CriteriaFilterId });
+        builder.HasKey(x => new { x.Id, x.ProductId, x.CriteriaFilterId });
 
         builder
             .HasOne(x => x.CriteriaFilter)

@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities;
 
 [Table("ProductParts", Schema = "dbo")]
 [EntityTypeConfiguration(typeof(ProductPartConfiguration))]
-public class ProductPart
+public class ProductPart : BaseEntity
 {
     public int ProductId { get; set; }
     public Product Product { get; set; }
