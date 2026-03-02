@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
 
 @jsonObject
-export class ProductPart {
+export class ProductTest {
   @jsonMember
   id: number;
 
@@ -22,3 +22,5 @@ export class ProductPart {
     this.name = pName;
   }
 }
+
+// TODO: add ProductType

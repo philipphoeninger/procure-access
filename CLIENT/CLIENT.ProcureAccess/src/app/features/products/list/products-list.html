@@ -63,10 +63,10 @@
     <td mat-cell *matCellDef="let element"> <a [href]="'https://' + element.link" target="_blank"> {{element.link}} </a></td>
   </ng-container>
 
-  <!-- Functionality Column -->
-  <ng-container matColumnDef="functionality">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by functionality"> Functionality </th>
-    <td mat-cell *matCellDef="let element"> {{element.functionality}} </td>
+  <!-- Description Column -->
+  <ng-container matColumnDef="description">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by description"> Functionality </th>
+    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
   </ng-container>
 
   <!-- Type Column -->

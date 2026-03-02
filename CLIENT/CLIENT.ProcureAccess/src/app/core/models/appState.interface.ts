@@ -3,6 +3,7 @@ import { AppCustomization } from "./appCustomization.model";
 import { IdentityState } from "@app/features/identity/state/with-identity";
 import { ProductSave } from "@app/features/favorites/models/productSave.model";
 import { FilterSet } from "@app/features/favorites/models/filterSet.model";
+import { Product } from "@app/features/products/models/product.model";
 
 export interface AppState {
     loadingCount: number;
@@ -12,6 +13,7 @@ export interface AppState {
     criteria: Criterion[];
     productSaves: ProductSave[];
     filterSets: FilterSet[];
+    products: Product[];
 }
 
 export const initialAppState: AppState = {
@@ -29,5 +31,6 @@ export const initialAppState: AppState = {
     selectedFilters: [],
     criteria: [],
     productSaves: [],
-    filterSets: []
+    filterSets: [],
+    products: []
 }

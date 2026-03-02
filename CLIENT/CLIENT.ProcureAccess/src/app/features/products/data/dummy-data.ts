@@ -5,119 +5,153 @@ export const products: Product[] = [
         id: 0,
         name: "CoreFlow",
         link: "www.coreflow.org",
-        functionality: "A short description for...",
-        type: "website/webapp"
+        description: "A short description for...",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 1,
         name: "IntraSphere",
         link: "www.intrasphere.com",
-        functionality: "",
-        type: "hardware"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 2,
         name: "ProximaSuite",
         link: "www.proximasuite.com",
-        functionality: "",
-        type: "dispatch/emergency service"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 3,
         name: "WorkBridge",
         link: "www.workbridge.com",
-        functionality: "",
-        type: "software (closed-source)"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 4,
         name: "SyntraLogic",
         link: "www.syntralogic.it",
-        functionality: "",
-        type: "mobile app (open-source)"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 5,
         name: "Nexaro",
         link: "www.nexaro.de",
-        functionality: "Another long description...",
-        type: "website/webapp"
+        description: "Another long description...",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 6,
         name: "FlowMatrix",
         link: "www.flowmatrix.com",
-        functionality: "",
-        type: "document"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 7,
         name: "OptiCore",
         link: "www.opticore.com",
-        functionality: "",
-        type: "dispatch/emergency service"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 8,
         name: "BizStream",
         link: "www.bizstream.ru",
-        functionality: "",
-        type: "website/webapp"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 9,
         name: "NovaDesk",
         link: "www.novadesk.at",
-        functionality: "",
-        type: "website/webapp"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 10,
         name: "ClarioOne",
         link: "www.clarioone.fr",
-        functionality: "",
-        type: "website/webapp"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 11,
         name: "FlexiSuite",
         link: "www.flexisuite.com",
-        functionality: "",
-        type: "mobile app (closed-source)"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 13,
         name: "EvoManage",
         link: "www.evomanage.com",
-        functionality: "",
-        type: "software (open-source)"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 14,
         name: "TaskFusion",
         link: "www.taskfusion.com",
-        functionality: "",
-        type: ""
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 15,
         name: "PrimeHub",
         link: "www.primehub.org",
-        functionality: "",
-        type: "website/webapp"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 16,
         name: "WorklineOS",
         link: "www.worklineos.de",
-        functionality: "",
-        type: "hardware"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     },
     {
         id: 17,
         name: "AquilaWare",
         link: "www.aquilaware.com",
-        functionality: "",
-        type: "document"
+        description: "",
+        typeId: 1,
+        parts: [],
+        tests: []
     }
 ];

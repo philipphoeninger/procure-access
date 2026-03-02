@@ -20,4 +20,8 @@ import { MatDivider } from "@angular/material/divider";
 })
 export class Home {
   protected store = inject(ProcureAccessStore);
+
+  ngOnInit() {
+    this.store.load();
+  }
 }
