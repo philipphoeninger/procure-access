@@ -8,7 +8,7 @@ services:
       #- MSSQL_PID=Developer
     #user: "0:0"
     ports:
-      - "${DB_PORT_OUTER}:${DB_PORT_INNER}"
+      - 14333:1433
     volumes:
       - mssql_data:/var/opt/mssql
       # - mssql_data:/var/opt/mssql/data
@@ -34,7 +34,7 @@ services:
       MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
     ports:
-      - "${API_PORT_OUTER}:${API_PORT_INNER}"
+      - 5000:8080
     volumes:
       - ./API/API.ProcureAccess:/src
     networks:
@@ -48,7 +48,7 @@ services:
     depends_on:
       - api
     ports:
-      - "${CLIENT_PORT_OUTER}:${CLIENT_PORT_INNER}"
+      - 4200:80
     # volumes:
     #   - ./:/app
         # - ./CLIENT/CLIENT.ProcureAccess:/app
