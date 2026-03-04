@@ -3,7 +3,6 @@ import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { products } from '../data/dummy-data';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
@@ -33,8 +32,8 @@ export class ProductsList {
   protected store = inject(ProcureAccessStore);
   private _liveAnnouncer = inject(LiveAnnouncer);
 
-  displayedColumns: string[] = ['actions', 'id', 'name', 'link', 'functionality', 'type'];
-  dataSource = new MatTableDataSource(products);
+  displayedColumns: string[] = ['actions', 'id', 'name', 'link', 'description', 'type'];
+  dataSource = new MatTableDataSource(this.store.products());
 
   @ViewChild(MatSort)
   sort!: MatSort;

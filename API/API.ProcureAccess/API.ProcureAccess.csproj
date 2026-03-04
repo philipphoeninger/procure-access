@@ -48,9 +48,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DAL\DAL.ProcureAccess\DAL.ProcureAccess.csproj" />
-    <ProjectReference Include="..\..\DAL\MODELS.ProcureAccess\MODELS.ProcureAccess.csproj" />
-    <ProjectReference Include="..\..\SERVICES\SERVICES.ProcureAccess\SERVICES.ProcureAccess.csproj" />
+    <ProjectReference Include="../../DAL/DAL.ProcureAccess/DAL.ProcureAccess.csproj" />
+    <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
+    <ProjectReference Include="../../SERVICES/SERVICES.ProcureAccess/SERVICES.ProcureAccess.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
-import { products } from '../data/dummy-data';
 import { Product } from '../models/product.model';
 import { MatDividerModule } from '@angular/material/divider';
 
@@ -28,6 +27,6 @@ export class ProductDetails {
   }
 
   ngOnInit() {
-    this.product = products.find(product => product.id === this.productId);
+    this.product = this.store.getProductById(this.productId!);
   }
 }

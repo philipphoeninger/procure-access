@@ -23,10 +23,10 @@ export function withCriteria() {
         let criteriaApiService = inject(CriteriaApiService);
 
         return {
-            async getCriteriaBySelectedFilterTypeValueIds() {
+            async getCriteriaBySelectedCriteriaFilterIds() {
                 state.incrementLoadingCount();
                 
-                let criteria = await criteriaApiService.getCriteriaByFilterTypeIds(state.selectedFilters());
+                let criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(state.selectedFilters());
                 this.setCriteria(criteria);
 
                 state.decrementLoadingCount();

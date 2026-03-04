@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DAL\MODELS.ProcureAccess\MODELS.ProcureAccess.csproj" />
-    <ProjectReference Include="..\..\DAL\DAL.ProcureAccess\DAL.ProcureAccess.csproj" />
+    <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
+    <ProjectReference Include="../../DAL/DAL.ProcureAccess/DAL.ProcureAccess.csproj" />
   </ItemGroup>
 
 </Project>

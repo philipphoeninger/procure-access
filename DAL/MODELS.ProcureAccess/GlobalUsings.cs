@@ -1,3 +1,4 @@
+global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Owned;
 global using MODELS.ProcureAccess.Entities.Configuration;

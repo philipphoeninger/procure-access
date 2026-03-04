@@ -27,6 +27,12 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
 
     #region fields
     public virtual DbSet<SeriLogEntry> SeriLogEntries { get; set; }
+    public virtual DbSet<FilterType> FilterTypes { get; set; }
+    public virtual DbSet<Criterion> Criteria { get; set; }
+    public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ProductPart> ProductParts { get; set; }
+    public virtual DbSet<ProductTest> ProductTests { get; set; }
     // add more fields ...
     #endregion
 
@@ -43,6 +49,12 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "Identity");
 
         new SeriLogEntryConfiguration().Configure(modelBuilder.Entity<SeriLogEntry>());
+        new FilterTypeConfiguration().Configure(modelBuilder.Entity<FilterType>());
+        new CriterionConfiguration().Configure(modelBuilder.Entity<Criterion>());
+        new CriteriaFilterConfiguration().Configure(modelBuilder.Entity<CriteriaFilter>());
+        new ProductConfiguration().Configure(modelBuilder.Entity<Product>());
+        new ProductPartConfiguration().Configure(modelBuilder.Entity<ProductPart>());
+        new ProductTestConfiguration().Configure(modelBuilder.Entity<ProductTest>());
         // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,0 +1,16 @@
+# git
+.git
+.gitignore
+
+# node
+**/node_modules
+**/dist
+
+# tests
+**/*.Tests/
+
+# docker
+**/.dockerignore
+
+# DB runtime data (do NOT exclude DB entirely!)
+DB/data/*

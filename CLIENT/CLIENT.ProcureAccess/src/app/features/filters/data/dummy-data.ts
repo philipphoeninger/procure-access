@@ -1,8 +1,8 @@
 import { Criterion } from "@app/features/criteria/models/criterion.model";
 import { FilterType } from "../models/filterType.model";
-import { FilterTypeValue } from "../models/filterTypeValue.model";
+import { CriteriaFilter } from "../models/criteriaFilter.model";
 
-export const appTypeFilterTypeValue6Criteria: Criterion[] = [
+export const appTypeCriteria1: Criterion[] = [
     {
         id: 0,
         name: "Orientation",
@@ -15,7 +15,8 @@ export const appTypeFilterTypeValue6Criteria: Criterion[] = [
     }
 ];
 
-export const appTypeFilterTypeValue7Criteria: Criterion[] = [
+
+export const appTypeCriteria2: Criterion[] = [
     {
         id: 2,
         name: "Resize Text",
@@ -28,204 +29,227 @@ export const appTypeFilterTypeValue7Criteria: Criterion[] = [
     }
 ];
 
-export const productTypeFilterTypeValues: FilterTypeValue[] = [
+export const filterTypes: FilterType[] = [
+    {
+        id: 0,
+        name: "Product Types",
+        description: "What product is being developed or purchased?",
+    },
+    {
+        id: 1,
+        name: "Application Types",
+        description: "What type of IT solution is being developed or purchased?"
+    },
+    {
+        id: 2,
+        name: "Product Parts",
+        description: "Which of the following characteristics apply?"
+    },
+    {
+        id: 3,
+        name: "Test Types",
+        description: "Which accessibility tests should the products at least have been tested on?"
+    }
+];
+
+export const productTypeCriteriaFilters: CriteriaFilter[] = [
     {
         id: 0,
         name: "Datenbankgestützte Fachanwendung",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     },
     {
         id: 1,
         name: "Human Resources",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     },
     {
         id: 2,
         name: "Reporting",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     },
     {
         id: 3,
         name: "Fortbildungsmanagement",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     },
     {
         id: 4,
         name: "Dienstreiseanträge",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     },
     {
         id: 5,
         name: "Gehaltsabrechnungen",
         description: "",
+        filterType: filterTypes[0],
         criteria: []
     }
 ];
 
-export const appTypeFilterTypeValues: FilterTypeValue[] = [
+export const appTypeCriteriaFilters: CriteriaFilter[] = [
     {
         id: 6,
         name: "Website / Webapp",
         description: "",
-        criteria: appTypeFilterTypeValue6Criteria
+        filterType: filterTypes[1],
+        criteria: []
+        // criteria: appTypeFilterTypeValue6Criteria
     },
     {
         id: 7,
         name: "Software (open-source)",
         description: "",
-        criteria: appTypeFilterTypeValue7Criteria
+        filterType: filterTypes[1],
+        criteria: []
+        // criteria: appTypeFilterTypeValue7Criteria
     },
     {
         id: 8,
         name: "Software (closed-source)",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     },
     {
         id: 9,
         name: "Mobile App (open-source)",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     },
     {
         id: 10,
         name: "Mobile App (closed-source)",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     },
     {
         id: 11,
         name: "Document",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     },
     {
         id: 12,
         name: "Hardware",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     },
     {
         id: 13,
         name: "Dispatch / Emergency Service",
         description: "",
+        filterType: filterTypes[1],
         criteria: []
     }
 ];
 
-export const productPartFilterTypeValues: FilterTypeValue[] = [
+export const productPartCriteriaFilters: CriteriaFilter[] = [
     {
         id: 14,
         name: "Core functionality",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 15,
         name: "Audio",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 16,
         name: "Video",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 17,
         name: "Two-way voice communication",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 18,
         name: "Real-time text",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 19,
         name: "Biometrics",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     },
     {
         id: 20,
         name: "Authoring tools",
         description: "",
+        filterType: filterTypes[2],
         criteria: []
     }
 ];
 
 
-export const testFilterTypeValues: FilterTypeValue[] = [
+export const testTypeCriteriaFilters: CriteriaFilter[] = [
     {
         id: 21,
         name: "BITV",
         description: "",
+        filterType: filterTypes[3],
         criteria: []
     },
     {
         id: 22,
         name: "Automated",
         description: "",
+        filterType: filterTypes[3],
         criteria: []
     },
     {
         id: 23,
         name: "In-Person",
         description: "",
+        filterType: filterTypes[3],
         criteria: []
     },
     {
         id: 24,
         name: "Manual",
         description: "",
+        filterType: filterTypes[3],
         criteria: []
     }
 ];
 
-export const filterTypes: FilterType[] = [
-    {
-        id: 0,
-        name: "Product Types",
-        displayQuestion: "What product is being developed or purchased?",
-        values: productTypeFilterTypeValues
-    },
-    {
-        id: 1,
-        name: "Application Types",
-        values: appTypeFilterTypeValues,
-        displayQuestion: "What type of IT solution is being developed or purchased?"
-    },
-    {
-        id: 2,
-        name: "Product Parts",
-        values: productPartFilterTypeValues,
-        displayQuestion: "Which of the following characteristics apply?"
-    },
-    {
-        id: 3,
-        name: "Test Types",
-        values: testFilterTypeValues,
-        displayQuestion: "Which accessibility tests should the products at least have been tested on?"
-    }
-];
-
-export const filterTypeValues: FilterTypeValue[] = [
-    ...productTypeFilterTypeValues,
-    ...appTypeFilterTypeValues,
-    ...productPartFilterTypeValues,
-    ...testFilterTypeValues
+export const criteriaFilters: CriteriaFilter[] = [
+    ...productTypeCriteriaFilters,
+    ...appTypeCriteriaFilters,
+    ...productPartCriteriaFilters,
+    ...testTypeCriteriaFilters
 ];
 
 export const criteria: Criterion[] = [
-    ...appTypeFilterTypeValue6Criteria,
-    ...appTypeFilterTypeValue7Criteria
+    ...appTypeCriteria1,
+    ...appTypeCriteria2
 ];
