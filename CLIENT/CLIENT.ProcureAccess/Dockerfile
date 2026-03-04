@@ -5,9 +5,9 @@ RUN npm install -g @angular/cli
 COPY package*.json ./
 RUN npm ci
 COPY . ./
-RUN ng build --configuration=development
+RUN npm run build --configuration=development
 
 # stage 2: serve with nginx
-FROM nginx:stable AS final
+FROM nginx:latest AS final
 EXPOSE 80
 COPY --from=build /app/dist/procure-access/browser /usr/share/nginx/html

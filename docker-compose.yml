@@ -4,7 +4,7 @@ services:
     container_name: procureaccess-db
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd_h3r3
+      - MSSQL_SA_PASSWORD=YourStrongPassw0rd_h3r3
       #- MSSQL_PID=Developer
     #user: "0:0"
     ports:
@@ -12,7 +12,8 @@ services:
     volumes:
       - mssql_data:/var/opt/mssql
       # - mssql_data:/var/opt/mssql/data
-      - ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
+      #- ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
+      #- ./DB/init:/docker-entrypoint-initdb.d/init.sql
     networks:
       - procureaccess-net
 
@@ -25,12 +26,12 @@ services:
         #condition: service_healthy
     environment:
       #- ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      #- ConnectionStrings__ProcureAccess=Server=${DB_HOST};User Id=${DB_USER};Password=YourStrong!Passw0rd_h3r3;TrustServerCertificate=True;
+      #- ConnectionStrings__ProcureAccess=Server=${DB_HOST};User Id=${DB_USER};Password=YourStrongPassw0rd_h3r3;TrustServerCertificate=True;
       ASPNETCORE_ENVIRONMENT: Development
       DB_HOST: db
       DB_NAME: ProcureAccessDb
       DB_USER: sa
-      MSSQL_SA_PASSWORD: YourStrong!Passw0rd_h3r3
+      MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
     ports:
       - "${API_PORT_OUTER}:${API_PORT_INNER}"
