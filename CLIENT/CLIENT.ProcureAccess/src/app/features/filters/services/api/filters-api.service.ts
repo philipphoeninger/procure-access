@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { httpAppConfig } from "@app/app.config";
 import { lastValueFrom, Observable, of } from "rxjs";
-import { criteriaFilters, filterTypes } from "@app/features/filters/data/dummy-data";
+import { criteriaFilters } from "@app/features/filters/data/dummy-data";
 import { CriteriaFilter } from "../../models/criteriaFilter.model";
 import { FilterType } from "../../models/filterType.model";
 

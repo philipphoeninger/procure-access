@@ -13,8 +13,8 @@ import { CriteriaList } from '@app/features/criteria/list/criteria-list';
 import { RouterModule } from '@angular/router';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { FiltersContainer } from '@app/features/filters/pages/filters-container/filters-container';
-import { FilterTypeValue } from '@app/features/filters/models/filterTypeValue.model';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CriteriaFilter } from '@app/features/filters/models/criteriaFilter.model';
 
 @Component({
   selector: 'pa-products-container',
@@ -40,10 +40,10 @@ export class ProductsContainer {
 
   readonly dialog = inject(MatDialog);
 
-    private _formBuilder = inject(FormBuilder);
+  private _formBuilder = inject(FormBuilder);
 
-  selectedFiltersFormGroup = this._formBuilder.group<{ filterTypes: FilterTypeValue[]}>({
-    filterTypes: []
+  selectedFiltersFormGroup = this._formBuilder.group<{ criteriaFilter: CriteriaFilter[]}>({
+    criteriaFilter: []
   });
   secondFormGroup = this._formBuilder.group({
     secondCtrl: ['', Validators.required],
@@ -79,14 +79,14 @@ export class ProductsContainer {
       });
     }
 
-    selectedFilterTypeValueIds: WritableSignal<number[]> = signal([]);
+    selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
 
     fdsa(event: number[]) {
-      this.selectedFilterTypeValueIds.set(event);
+      this.selectedCriteriaFilterIds.set(event);
     }
 
     asdf() {
-      this.store.setSelectedFilters(this.selectedFilterTypeValueIds());
-      this.store.getCriteriaBySelectedFilterTypeValueIds();
+      this.store.setSelectedFilters(this.selectedCriteriaFilterIds());
+      this.store.getCriteriaBySelectedCriteriaFilterIds();
     }
 }

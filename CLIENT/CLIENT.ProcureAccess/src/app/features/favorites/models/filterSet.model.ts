@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
-import { FilterTypeValue } from '@app/features/filters/models/filterTypeValue.model';
+import { CriteriaFilter } from '@app/features/filters/models/criteriaFilter.model';
 
 @jsonObject
 export class FilterSet {
@@ -14,12 +14,12 @@ export class FilterSet {
   userId: string;
 
   @jsonMember
-  filterTypeValues: FilterTypeValue[];
+  criteriaFilter: CriteriaFilter[];
 
-  constructor(pId: number, pName: string, pUserId: string, pFilterTypeValues: FilterTypeValue[]) {
+  constructor(pId: number, pName: string, pUserId: string, pCriteriaFilter: CriteriaFilter[]) {
     this.id = pId;
     this.name = pName;
     this.userId = pUserId;
-    this.filterTypeValues = pFilterTypeValues;
+    this.criteriaFilter = pCriteriaFilter;
   }
 }
