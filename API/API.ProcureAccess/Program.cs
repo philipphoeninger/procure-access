@@ -59,7 +59,7 @@ using (var scope = app.Services.CreateScope())
     app.ConfigureSwaggerExplorer();
 // }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
