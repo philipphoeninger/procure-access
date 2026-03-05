@@ -15,7 +15,7 @@ services:
       #- ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
       #- ./DB/init:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - procureaccess-net
+      - dokploy-network
 
   api:
     build:
@@ -38,7 +38,7 @@ services:
     volumes:
       - ./API/API.ProcureAccess:/src
     networks:
-      - procureaccess-net
+      - dokploy-network
     restart: on-failure
 
   client:
@@ -58,11 +58,11 @@ services:
     #   - CHOKIDAR_USEPOLLING=true
     #   - WATCHPACK_POLLING=true
     networks:
-      - procureaccess-net
+      - dokploy-network
 
 networks:
-  procureaccess-net:
-    driver: bridge
+  dokploy-network:
+    external: true
 
 volumes:
   mssql_data:
