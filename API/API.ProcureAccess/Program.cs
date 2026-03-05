@@ -8,7 +8,16 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
-                .AddCors()
+                .AddCors(options =>
+                    {
+                        options.AddPolicy("frontend", policy =>
+                        {
+                            policy
+                                .WithOrigins("https://procureaccess.tech")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        });
+                    })
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
@@ -63,6 +72,8 @@ using (var scope = app.Services.CreateScope())
 
 app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
+
+app.UseCors("frontend");
 
 app.MapControllers();
 app.MapGroup("/api")
