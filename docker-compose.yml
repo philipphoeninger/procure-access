@@ -35,8 +35,6 @@ services:
       #MSSQL_PID: Developer
     ports:
       - 5000:8080
-    volumes:
-      - ./API/API.ProcureAccess:/src
     networks:
       - dokploy-network
     restart: on-failure
