@@ -33,7 +33,7 @@ services:
       DB_USER: sa
       MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
-    ports:
+    expose:
       - "8080"
     networks:
       - dokploy-network
