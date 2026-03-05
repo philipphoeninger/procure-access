@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://procureaccess.tech:8080'
+  apiUrl: 'https://procureaccess.tech:8080'
 };

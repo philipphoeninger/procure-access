@@ -25,6 +25,6 @@ export const appConfig: ApplicationConfig = {
 };
 
 export const httpAppConfig: any = {
-  apiEndpoint: 'http://procureaccess.tech:5000/api',
+  apiEndpoint: 'https://procureaccess.tech:5000/api',
 };
 

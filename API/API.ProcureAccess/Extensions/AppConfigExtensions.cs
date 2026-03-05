@@ -4,7 +4,7 @@ public static class AppConfigExtensions
 {
     public static WebApplication ConfigureCORS(this WebApplication app, IConfiguration config)
     {
-        app.UseCors(options => options.WithOrigins("http://procureaccess.tech:4200").AllowAnyMethod().AllowAnyHeader());
+        app.UseCors(options => options.WithOrigins("https://procureaccess.tech").AllowAnyMethod().AllowAnyHeader());
         return app;
     }
 

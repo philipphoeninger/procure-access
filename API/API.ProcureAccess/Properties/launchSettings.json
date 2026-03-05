@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://procureaccess.tech:25953",
+      "applicationUrl": "https://procureaccess.tech:25953",
       "sslPort": 44388
     }
   },
@@ -24,7 +24,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://procureaccess.tech:7189;http://procureaccess.tech:5292",
+      "applicationUrl": "https://procureaccess.tech:7189;https://procureaccess.tech:5292",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
