@@ -34,7 +34,7 @@ services:
       MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
     ports:
-      - 5000:8080
+      - "8080"
     networks:
       - dokploy-network
     restart: on-failure
