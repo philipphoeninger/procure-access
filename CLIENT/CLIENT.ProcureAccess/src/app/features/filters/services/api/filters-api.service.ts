@@ -1,8 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { httpAppConfig } from "@app/app.config";
-import { lastValueFrom, Observable, of } from "rxjs";
-import { criteriaFilters } from "@app/features/filters/data/dummy-data";
+import { lastValueFrom } from "rxjs";
 import { CriteriaFilter } from "../../models/criteriaFilter.model";
 import { FilterType } from "../../models/filterType.model";
 
@@ -17,7 +16,8 @@ export class FiltersApiService {
   }
 
   getAllCriteriaFilters(): Promise<CriteriaFilter[]> {
-    let allCriteriaFilters = criteriaFilters;
-    return lastValueFrom(of(allCriteriaFilters));
+    return lastValueFrom(
+      this.http.get<CriteriaFilter[]>(`${httpAppConfig.apiEndpoint}/CriteriaFilters`)
+    );
   }
 }

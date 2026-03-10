@@ -19,25 +19,21 @@ export function withCriteria() {
     withState<CriteriaState>({ criteria: initialAppState.criteria }),
     withLoading(),
     withFilters(),
-    withMethods((state) => {
-        let criteriaApiService = inject(CriteriaApiService);
+    withMethods((state, criteriaApiService = inject(CriteriaApiService)) => ({
+      async getCriteriaBySelectedCriteriaFilterIds() {
+          state.incrementLoadingCount();
+          
+          let criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(state.selectedCriteriaFilters());
+          this.setCriteria(criteria);
 
-        return {
-            async getCriteriaBySelectedCriteriaFilterIds() {
-                state.incrementLoadingCount();
-                
-                let criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(state.selectedFilters());
-                this.setCriteria(criteria);
-
-                state.decrementLoadingCount();
-            },
-            setCriteria(criteria: Criterion[]) {
-                patchState(state, {
-                    criteria
-                });
-            }
-        };
-    }),
+          state.decrementLoadingCount();
+      },
+      setCriteria(criteria: Criterion[]) {
+          patchState(state, {
+              criteria
+          });
+      }
+    })),
     withComputed((state) => ({
       criteriaCount: computed(() => {
         return state.criteria().length;

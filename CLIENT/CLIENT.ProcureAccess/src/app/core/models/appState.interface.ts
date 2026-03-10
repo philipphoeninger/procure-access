@@ -4,12 +4,13 @@ import { IdentityState } from "@app/features/identity/state/with-identity";
 import { ProductSave } from "@app/features/favorites/models/productSave.model";
 import { FilterSet } from "@app/features/favorites/models/filterSet.model";
 import { Product } from "@app/features/products/models/product.model";
+import { FiltersState } from "@app/features/filters/state/with-filters";
 
 export interface AppState {
     loadingCount: number;
     appConfiguration: AppCustomization;
     identity: IdentityState;
-    selectedFilters: number[];
+    filters: FiltersState;
     criteria: Criterion[];
     productSaves: ProductSave[];
     filterSets: FilterSet[];
@@ -28,7 +29,11 @@ export const initialAppState: AppState = {
     identity: {
         user: null
     },
-    selectedFilters: [],
+    filters: {
+        filterTypes: [],
+        criteriaFilters: [],
+        selectedCriteriaFilters: []
+    },
     criteria: [],
     productSaves: [],
     filterSets: [],

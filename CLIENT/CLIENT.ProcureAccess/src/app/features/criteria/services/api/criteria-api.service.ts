@@ -17,12 +17,12 @@ export class CriteriaApiService {
 
   getCriteriaByCriteriaFilterIds(selectedFilterTypeIds: number[]): Promise<Criterion[]> {
     // return this.http.get<Criterion[]>(`${httpAppConfig.apiEndpoint}/Criteria`);
-    let filterTypes = 
-        criteriaFilters.filter(filterType => selectedFilterTypeIds.includes(filterType.id));
-    let criteria: Criterion[] = [];
-    filterTypes.forEach(type => {
-        criteria = criteria.concat(type.criteria);
-    });
-    return lastValueFrom(of(criteria));
+    // let filterTypes = 
+    //     criteriaFilters.filter(filterType => selectedFilterTypeIds.includes(filterType.id));
+    // let criteria: Criterion[] = [];
+    // filterTypes.forEach(type => {
+    //     criteria = criteria.concat(type.criteria);
+    // });
+    return lastValueFrom(of([]));
   }
 }

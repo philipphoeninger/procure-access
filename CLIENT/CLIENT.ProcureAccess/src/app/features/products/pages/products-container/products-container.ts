@@ -42,7 +42,7 @@ export class ProductsContainer {
 
   private _formBuilder = inject(FormBuilder);
 
-  selectedFiltersFormGroup = this._formBuilder.group<{ criteriaFilter: CriteriaFilter[]}>({
+  selectedCriteriaFiltersFormGroup = this._formBuilder.group<{ criteriaFilter: CriteriaFilter[]}>({
     criteriaFilter: []
   });
   secondFormGroup = this._formBuilder.group({
@@ -86,7 +86,7 @@ export class ProductsContainer {
     }
 
     asdf() {
-      this.store.setSelectedFilters(this.selectedCriteriaFilterIds());
+      this.store.setSelectedCriteriaFilters(this.selectedCriteriaFilterIds());
       this.store.getCriteriaBySelectedCriteriaFilterIds();
     }
 }

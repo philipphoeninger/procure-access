@@ -6,7 +6,7 @@
 </div>
 
 <mat-accordion class="filters-accordion" multi>
-    @for (filterType of filterTypes(); track filterType; let idx = $index, e = $even)  {
+    @for (filterType of store.filters.filterTypes(); track filterType; let idx = $index, e = $even)  {
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>{{ filterType.name }}</mat-panel-title>
@@ -19,7 +19,7 @@
             @if (filterType.name == EnFilterType.productType) {
                 <form> <!-- [formGroup]="formGroup1()"-->
                     <mat-form-field class="example-chip-list">
-                        <mat-label>{{ filterTypes()[0].name }}</mat-label>
+                        <mat-label>{{ filterType.name }}</mat-label>
                         <input
                             name="currentProductType"
                             placeholder=""
@@ -53,15 +53,15 @@
                 <div class="list-selection-container">
                     <div>
                         <mat-selection-list #filterTypes1>
-                            @for (filterTypeInner of allFilterTypes()[filterType.name].slice(0, (allFilterTypes()[filterType.name].length + 1) / 2); track filterTypeInner) {
-                                <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, filterTypeInner.id)">{{ filterTypeInner.name }}</mat-list-option>
+                            @for (criteriaFilter of filterType.criteriaFilters.slice(0, (filterType.criteriaFilters.length + 1) / 2); track criteriaFilter) {
+                                <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, criteriaFilter.id)">{{ criteriaFilter.name }}</mat-list-option>
                             }
                         </mat-selection-list>
                     </div>
                     <div>
                         <mat-selection-list #filterTypes2>
-                            @for (filterTypeInner of allFilterTypes()[filterType.name].slice((allFilterTypes()[filterType.name].length + 1) / 2, allFilterTypes()[filterType.name].length); track filterTypeInner) {
-                                <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, filterTypeInner.id)">{{ filterTypeInner.name }}</mat-list-option>
+                            @for (criteriaFilter of filterType.criteriaFilters.slice((filterType.criteriaFilters.length + 1) / 2, filterType.criteriaFilters.length); track criteriaFilter) {
+                                <mat-list-option togglePosition="before" (selectedChange)="changeFilterTypeSelection($event, criteriaFilter.id)">{{ criteriaFilter.name }}</mat-list-option>
                             }
                         </mat-selection-list>
                     </div>
