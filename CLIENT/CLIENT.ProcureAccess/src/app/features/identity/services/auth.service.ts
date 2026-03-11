@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   constructor(
     private http: HttpClient,
-    private router: Router,
+    private router: Router
   ) {}
 
   login(command: LoginModel): Observable<any> {

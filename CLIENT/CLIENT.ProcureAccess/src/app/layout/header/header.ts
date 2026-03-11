@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@features/identity/services/auth.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 
 @Component({
   selector: 'pa-header',
@@ -26,6 +27,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class Header {
   protected logoPath = '/werte_it_logo.jpg';
+  protected store = inject(ProcureAccessStore);
 
   constructor(
     protected authService: AuthService,

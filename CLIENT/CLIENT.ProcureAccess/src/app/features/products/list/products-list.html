@@ -33,15 +33,17 @@
       >
         <mat-icon>visibility</mat-icon>
       </button>
-      <button
-        mat-icon-button
-        class="product-save-btn"
-        aria-label="Product save icon-button"
-        matTooltip="Save to favorites" 
-        matTooltipPosition="right"
-        (click)="addProductFavorite(element.name)">
-        <mat-icon>add</mat-icon>
-      </button>
+      @if (store.isAuthenticated()) {
+        <button
+          mat-icon-button
+          class="product-save-btn"
+          aria-label="Product save icon-button"
+          matTooltip="Save to favorites" 
+          matTooltipPosition="right"
+          (click)="addProductFavorite(element.name)">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
     </td>
   </ng-container>
 

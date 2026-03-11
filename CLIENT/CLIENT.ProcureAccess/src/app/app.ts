@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@features/identity/services/auth.service';
 import { Header } from '@layout/header/header';
@@ -11,10 +11,9 @@ import { Header } from '@layout/header/header';
 })
 export class App {
   protected readonly title = signal('ProcureAccess');
+  protected authService = inject(AuthService);
 
-  loggedIn = false;
+  showHeader = true;
 
-  constructor(private authService: AuthService) {
-    this.loggedIn = authService.isAuthenticated();
-  }
+  constructor() {}
 }

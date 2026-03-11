@@ -17,6 +17,10 @@ export const routes: Routes = [
     redirectTo: 'home',
   },
   {
+    path: 'home',
+    component: Home
+  },
+  {
     path: 'auth',
     component: Login,
     outlet: 'login',
@@ -27,18 +31,13 @@ export const routes: Routes = [
     outlet: 'login',
   },
   {
-    path: 'home',
-    component: Home
-  },
-  {
     path: 'profile',
     component: Profile,
     canActivate: [AuthGuard],
   },
   {
     path: 'settings',
-    component: Settings,
-    canActivate: [AuthGuard],
+    component: Settings
   },
   {
     path: 'filters',
