@@ -43,8 +43,6 @@ export class FiltersContainer {
     protected store = inject(ProcureAccessStore);
     protected filtersApiService = inject(FiltersApiService);
 
-    filterTypes = signal<FilterType[]>([]);
-
     EnFilterType = EnFilterType;
 
     accordion = viewChild.required(MatAccordion);
@@ -61,28 +59,31 @@ export class FiltersContainer {
     }
 
     ngOnInit() {
-        this.filtersApiService.getAllCriteriaFilters().then((allFilters) => {
-            let productFilterTypes = 
-                allFilters.filter(x => x.filterType.name == EnFilterType.productType);
-            let productFilterTypesNames = productFilterTypes.map(x => x.name);
-            this.allProductTypes = productFilterTypesNames;
+        if (this.store.filterTypes().length === 0) 
+            this.store.loadFilters();
 
-            let appFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.appType);
-            let testFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.testType);
-            let productPartFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.productPart);
+        // this.filtersApiService.getAllCriteriaFilters().then((allFilters) => {
+        //     let productFilterTypes = 
+        //         allFilters.filter(x => x.filterType.name == EnFilterType.productType);
+        //     let productFilterTypesNames = productFilterTypes.map(x => x.name);
+        //     this.allProductTypes = productFilterTypesNames;
 
-            let updateAllFilterTypes: Record<string, CriteriaFilter[]> = {};
-            updateAllFilterTypes[EnFilterType.productType] = productFilterTypes;
-            updateAllFilterTypes[EnFilterType.appType] = appFilterTypes;
-            updateAllFilterTypes[EnFilterType.testType] = testFilterTypes;
-            updateAllFilterTypes[EnFilterType.productPart] = productPartFilterTypes;
+        //     let appFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.appType);
+        //     let testFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.testType);
+        //     let productPartFilterTypes = allFilters.filter(x => x.filterType.name == EnFilterType.productPart);
 
-            this.allFilterTypes.set(updateAllFilterTypes);
-        });
+        //     let updateAllFilterTypes: Record<string, CriteriaFilter[]> = {};
+        //     updateAllFilterTypes[EnFilterType.productType] = productFilterTypes;
+        //     updateAllFilterTypes[EnFilterType.appType] = appFilterTypes;
+        //     updateAllFilterTypes[EnFilterType.testType] = testFilterTypes;
+        //     updateAllFilterTypes[EnFilterType.productPart] = productPartFilterTypes;
 
-        this.filtersApiService.getAllFilterTypes().then((allFilterTypes) => {
-            this.filterTypes.set(allFilterTypes);
-        })
+        //     this.allFilterTypes.set(updateAllFilterTypes);
+        // });
+
+        // this.filtersApiService.getAllFilterTypes().then((allFilterTypes) => {
+        //     this.filterTypes.set(allFilterTypes);
+        // })
     }
 
     // ------

@@ -15,16 +15,12 @@ export class CriteriaFilter {
   description: string;
 
   @jsonMember
-  filterType: FilterType;
+  filterTypeId: number;
 
-  @jsonMember
-  criteria: Criterion[];
-
-  constructor(pId: number, pName: string, pDescription: string, pFilterType: FilterType, pCriteria: Criterion[]) {
+  constructor(pId: number, pName: string, pDescription: string, pFilterTypeId: number) {
     this.id = pId;
     this.name = pName;
     this.description = pDescription;
-    this.filterType = pFilterType;
-    this.criteria = pCriteria;
+    this.filterTypeId = pFilterTypeId;
   }
 }

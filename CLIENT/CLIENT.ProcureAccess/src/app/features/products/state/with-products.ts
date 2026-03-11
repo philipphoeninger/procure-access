@@ -17,14 +17,12 @@ export function withProducts() {
   return signalStoreFeature(
     withState<ProductState>({ products: initialAppState.products }),
     withLoading(),
-    withMethods((state) => {
-      const productsApiService = inject(ProductsApiService);
-      
-      return {
+    withMethods((state, productsApiService = inject(ProductsApiService)) => ({      
         async loadProducts() {
           state.incrementLoadingCount();
           let products = await productsApiService.getAllProducts();
           this.setProducts(products);
+          state.decrementLoadingCount();
         },
         setProducts(products: Product[]) {
           patchState(state, {
@@ -35,8 +33,7 @@ export function withProducts() {
           let product = state.products().find(product => product.id === productId);
           return product;
         }
-      }
-    }),
+    })),
     withComputed((state) => ({
       productsCount: computed(() => {
         return state.products().length;
