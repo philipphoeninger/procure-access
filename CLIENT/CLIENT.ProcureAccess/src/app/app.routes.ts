@@ -28,8 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    component: Home,
-    canActivate: [AuthGuard],
+    component: Home
   },
   {
     path: 'profile',
@@ -43,8 +42,7 @@ export const routes: Routes = [
   },
   {
     path: 'filters',
-    component: ProductsContainer,
-    canActivate: [AuthGuard],
+    component: ProductsContainer
   },
   {
     path: 'favorites',
@@ -53,12 +51,10 @@ export const routes: Routes = [
   },
   {
     path: 'products',
-    component: ProductsList,
-    canActivate: [AuthGuard],
+    component: ProductsList
   },
   { 
     path: 'product/:id', 
-    component: ProductDetails,
-    canActivate: [AuthGuard],
+    component: ProductDetails
    }
 ];

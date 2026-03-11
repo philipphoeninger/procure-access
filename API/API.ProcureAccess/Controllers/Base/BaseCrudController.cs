@@ -48,15 +48,11 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
-    [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<IEnumerable<string>> GetAll()
+    public virtual ActionResult<IEnumerable<TEntity>> GetAll()
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
-        return Ok(MainRepo.GetAll(userId));
+        return Ok(MainRepo.GetAll());
     }
 
     /// <summary>
