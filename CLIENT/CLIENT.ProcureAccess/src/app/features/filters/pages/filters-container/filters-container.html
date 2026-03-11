@@ -6,7 +6,7 @@
 </div>
 
 <mat-accordion class="filters-accordion" multi>
-    @for (filterType of store.filters.filterTypes(); track filterType; let idx = $index, e = $even)  {
+    @for (filterType of store.filterTypes(); track filterType; let idx = $index, e = $even)  {
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>{{ filterType.name }}</mat-panel-title>

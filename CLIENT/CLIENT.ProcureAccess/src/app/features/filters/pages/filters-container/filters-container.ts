@@ -59,10 +59,9 @@ export class FiltersContainer {
     }
 
     ngOnInit() {
-        // --- new ---
-        if (this.store.filters.filterTypes()?.length === 0) this.store.loadFilters();
+        if (this.store.filterTypes().length === 0) 
+            this.store.loadFilters();
 
-        //
         // this.filtersApiService.getAllCriteriaFilters().then((allFilters) => {
         //     let productFilterTypes = 
         //         allFilters.filter(x => x.filterType.name == EnFilterType.productType);

@@ -8,11 +8,14 @@ public class CriterionRepo : TemporalTableBaseRepo<Criterion>, ICriterionRepo
     #endregion
 
     #region methods
-    // TODO
-
     // public override IEnumerable<Criterion> GetAll()
     // {
     //     return Context.Criteria;
     // }
+
+    public IEnumerable<Criterion> GetByCriteriaFilterIds(int[] criteriaFilterIds)
+    {
+        return Context.Criteria.Where(x => criteriaFilterIds.Any(a => a == x.CriteriaFilterId)).ToList();
+    }
     #endregion
 }

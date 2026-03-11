@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { httpAppConfig } from "@app/app.config";
 import { lastValueFrom, Observable, of } from "rxjs";
 import { Criterion } from "../../models/criterion.model";
-import { criteriaFilters } from "@app/features/filters/data/dummy-data";
 
 @Injectable({ providedIn:'root' })
 export class CriteriaApiService {
@@ -16,13 +15,14 @@ export class CriteriaApiService {
   }
 
   getCriteriaByCriteriaFilterIds(selectedFilterTypeIds: number[]): Promise<Criterion[]> {
-    // return this.http.get<Criterion[]>(`${httpAppConfig.apiEndpoint}/Criteria`);
-    // let filterTypes = 
-    //     criteriaFilters.filter(filterType => selectedFilterTypeIds.includes(filterType.id));
-    // let criteria: Criterion[] = [];
-    // filterTypes.forEach(type => {
-    //     criteria = criteria.concat(type.criteria);
-    // });
-    return lastValueFrom(of([]));
+    return lastValueFrom(
+      this.http.get<Criterion[]>(
+        `${httpAppConfig.apiEndpoint}/Criteria/byCriteriaFilterIds`, {
+          params: {
+            criteriaFilterIds: selectedFilterTypeIds
+          }
+        }
+      )
+    );
   }
 }
