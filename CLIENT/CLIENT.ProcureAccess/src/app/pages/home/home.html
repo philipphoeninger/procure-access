@@ -25,7 +25,7 @@
             mat-icon-button
             class="login-btn" 
             aria-label="Login icon-button" 
-            [routerLink]="'/login'">
+            (click)="authService.showLogin()" >
             <mat-icon>arrow_forward</mat-icon>
         </button>
     </p>

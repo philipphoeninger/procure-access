@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatCardModule } from '@angular/material/card';
 import { MatDivider } from "@angular/material/divider";
+import { AuthService } from '@app/features/identity/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +21,7 @@ import { MatDivider } from "@angular/material/divider";
 })
 export class Home {
   protected store = inject(ProcureAccessStore);
+  protected authService = inject(AuthService);
 
   ngOnInit() {
     this.store.load();
