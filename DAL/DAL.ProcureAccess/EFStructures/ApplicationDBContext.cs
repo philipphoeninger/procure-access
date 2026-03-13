@@ -33,6 +33,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<ProductPart> ProductParts { get; set; }
     public virtual DbSet<ProductTest> ProductTests { get; set; }
+    public virtual DbSet<UICustomization> UICustomizations { get; set; }
     // add more fields ...
     #endregion
 
