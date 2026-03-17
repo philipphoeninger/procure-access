@@ -28,3 +28,4 @@ export const httpAppConfig: any = {
   apiEndpoint: 'http://localhost:5000/api',
 };
 
+export const appName: string = 'ProcureAccess';

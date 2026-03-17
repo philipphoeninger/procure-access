@@ -30,12 +30,12 @@ export class AuthService {
   }
 
   public logout() {
-    localStorage.removeItem('procure-access-token');
-    this.router.navigateByUrl('/(login:auth)');
+    localStorage.removeItem('procureaccess-token');
+    this.router.navigateByUrl('/home'); // /(login:auth)
   }
 
   public isAuthenticated(): boolean {
-    const token = localStorage.getItem('procure-access-token');
+    const token = localStorage.getItem('procureaccess-token');
     const helper = new JwtHelperService();
     const isExpired = helper.isTokenExpired(token);
     return !isExpired;
