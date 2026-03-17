@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.ProcureAccess.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20260313121946_AddUICustomization")]
+    [Migration("20260317164936_AddUICustomization")]
     partial class AddUICustomization
     {
         /// <inheritdoc />
@@ -449,91 +449,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.ToTable("SeriLogs", "Logging");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.UICustomization", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BackgroundColor")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasDefaultValue("#dbdedf");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GetDate()");
-
-                    b.Property<bool>("DarkModeOn")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ForegroundColor")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasDefaultValue("#111111");
-
-                    b.Property<bool>("HighContrastOn")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("OrientationVertical")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("TextColor")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasDefaultValue("#111111");
-
-                    b.Property<byte[]>("TimeStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("ValidFrom")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ValidFrom");
-
-                    b.Property<DateTime>("ValidTo")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ValidTo");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UICustomization", "dbo");
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                            {
-                                ttb.UseHistoryTable("UICustomizationAudit");
-                                ttb
-                                    .HasPeriodStart("ValidFrom")
-                                    .HasColumnName("ValidFrom");
-                                ttb
-                                    .HasPeriodEnd("ValidTo")
-                                    .HasColumnName("ValidTo");
-                            }));
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -824,15 +739,50 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.UICustomization", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
                 {
-                    b.HasOne("MODELS.ProcureAccess.Entities.User", "User")
-                        .WithOne("UICustomization")
-                        .HasForeignKey("MODELS.ProcureAccess.Entities.UICustomization", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("MODELS.ProcureAccess.Entities.UICustomization", "UICustomization", b1 =>
+                        {
+                            b1.Property<string>("UserId")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)");
 
-                    b.Navigation("User");
+                            b1.Property<string>("BackgroundColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<bool>("DarkModeOn")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("ForegroundColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<bool>("HighContrastOn")
+                                .HasColumnType("bit");
+
+                            b1.Property<bool>("OrientationVertical")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("TextColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users", "Identity");
+
+                            b1.ToJson("UICustomization");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("UICustomization")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -907,11 +857,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Parts");
 
                     b.Navigation("Tests");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
-                {
-                    b.Navigation("UICustomization");
                 });
 #pragma warning restore 612, 618
         }
