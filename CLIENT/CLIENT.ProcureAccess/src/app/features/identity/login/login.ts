@@ -92,7 +92,7 @@ export class Login {
       .pipe(
         map((response: { token: string, username: string, uiCustomization: UICustomization }) => {
           if (response.token) {
-            localStorage.setItem('procure-access-token', response.token);
+            localStorage.setItem('procureaccess-token', response.token);
             let user: User = new User(loginCommand.email, response.username, false);
             this.store.setUser(user);
             this.store.setUICustomization(response.uiCustomization);

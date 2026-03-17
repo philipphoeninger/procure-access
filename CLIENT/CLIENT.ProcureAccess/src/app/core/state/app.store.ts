@@ -1,4 +1,4 @@
-import { signalStore, withMethods, withState } from "@ngrx/signals";
+import { signalStore, withHooks, withMethods, withState } from "@ngrx/signals";
 import { AppState, initialAppState } from "../models/appState.interface";
 import { withLoading } from "@app/shared/state/with-loading";
 import { withIdentity } from "@app/features/identity/state/with-identity";
@@ -20,9 +20,18 @@ export const ProcureAccessStore = signalStore(
     withSettings(),
     withMethods((state) => {
         return {
-            async load() {
+            async init() {
+                // load necessary data:
+                // set settings
+                await state.loadSettings();
+                // set products
                 await state.loadProducts();
             }
         };
-    })
+    }),
+    withHooks((store) => ({
+        onInit() {
+            store.init().finally(() => console.log("store initialized"));
+        }
+    }))
 );

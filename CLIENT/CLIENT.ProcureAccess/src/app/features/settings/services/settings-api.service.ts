@@ -10,6 +10,12 @@ export class SettingsApiService {
     private http: HttpClient
   ) {}
 
+  getUICustomization(): Promise<UICustomization> {
+    return lastValueFrom(
+      this.http.get<UICustomization>(`${httpAppConfig.apiEndpoint}/UICustomization`)
+    );
+  }
+
   updateUICustomization(command: UICustomization): Promise<UICustomization> {
     return lastValueFrom(
       this.http.put<UICustomization>(`${httpAppConfig.apiEndpoint}/UICustomization`, command)

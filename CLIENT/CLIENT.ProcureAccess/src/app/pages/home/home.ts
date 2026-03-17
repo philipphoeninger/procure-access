@@ -22,8 +22,4 @@ import { AuthService } from '@app/features/identity/services/auth.service';
 export class Home {
   protected store = inject(ProcureAccessStore);
   protected authService = inject(AuthService);
-
-  ngOnInit() {
-    this.store.load();
-  }
 }

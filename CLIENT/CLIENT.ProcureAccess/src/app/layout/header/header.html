@@ -44,7 +44,7 @@
       <mat-icon>settings</mat-icon>
     </button>
     @if (store.isAuthenticated()) {
-      <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="authService.logout()" matTooltip="Logout" matTooltipPosition="below">
+      <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="logout()" matTooltip="Logout" matTooltipPosition="below">
         <mat-icon>logout</mat-icon>
       </button>
     } @else {

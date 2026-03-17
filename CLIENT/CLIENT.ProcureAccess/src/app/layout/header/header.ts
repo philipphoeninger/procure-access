@@ -34,9 +34,9 @@ export class Header {
     private router: Router,
   ) {}
 
-  ngOnInit() {}
-
-  onHomeClicked() {
-    alert('Home clicked');
+  logout() {
+    this.authService.logout();
+    this.store.setUser(null);
+    this.store.loadSettings();
   }
 }
