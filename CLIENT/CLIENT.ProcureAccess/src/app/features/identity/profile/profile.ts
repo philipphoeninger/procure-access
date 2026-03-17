@@ -37,10 +37,9 @@ export class Profile {
 
   ngOnInit() {
     let userInformation: UserInformation[] = [
-      { position: 1, name: 'Username', value: this.store.user()?.username, actions: '' },
-      { position: 2, name: 'Email', value: this.store.user()?.email, actions: '' },
-      { position: 3, name: 'Password', value: '********', actions: '' },
-      { position: 4, name: '2FA enabled', value: this.store.user()?.twoFAEnabled ? 'Yes' : 'No', actions: '' }
+      { position: 1, name: 'Email', value: this.store.user()?.email, actions: '' },
+      { position: 2, name: 'Password', value: '********', actions: '' }
+      // { position: 3, name: '2FA enabled', value: this.store.user()?.twoFAEnabled ? 'Yes' : 'No', actions: '' }
     ];
     this.dataSource = userInformation;
   }

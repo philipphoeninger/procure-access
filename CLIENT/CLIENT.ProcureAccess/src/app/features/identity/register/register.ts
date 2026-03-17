@@ -63,7 +63,6 @@ export class Register {
   ];
   public selectedLanguage = 'en';
 
-  protected username?: string;
   protected password?: string;
   protected confirmPassword?: string;
   public keepSignedIn: boolean = false;
@@ -81,14 +80,11 @@ export class Register {
     protected snackbarService: SnackbarService
   ) {}
 
-  ngOnInit() {}
-
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
 
     let registerCommand = new LoginModel(
       this.emailFormControl.value!,
-      this.username!,
       this.password!
     );
 

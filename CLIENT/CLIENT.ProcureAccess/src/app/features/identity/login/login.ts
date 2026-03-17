@@ -84,16 +84,16 @@ export class Login {
 
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
-    let loginCommand = new LoginModel(this.email!(), '', this.password!());
+    let loginCommand = new LoginModel(this.email!(), this.password!());
 
     // TODO: start spinner
     this.authService
       .login(loginCommand)
       .pipe(
-        map((response: { token: string, username: string, uiCustomization: UICustomization }) => {
+        map((response: { token: string, email: string, uiCustomization: UICustomization }) => {
           if (response.token) {
             localStorage.setItem('procureaccess-token', response.token);
-            let user: User = new User(loginCommand.email, response.username, false);
+            let user: User = new User(loginCommand.email, false);
             this.store.setUser(user);
             this.store.setUICustomization(response.uiCustomization);
             this.router.navigateByUrl('/home');

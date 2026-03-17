@@ -7,14 +7,10 @@ export class User {
   email: string;
 
   @jsonMember
-  username: string;
-
-  @jsonMember
   twoFAEnabled: boolean;
 
-  constructor(pEmail: string, pUsername: string, pTwoFAEnabled: boolean) {
+  constructor(pEmail: string, pTwoFAEnabled: boolean) {
     this.email = pEmail;
-    this.username = pUsername;
     this.twoFAEnabled = pTwoFAEnabled;
   }
 }
