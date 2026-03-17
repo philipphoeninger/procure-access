@@ -5,6 +5,7 @@ import { ProductSave } from "@app/features/favorites/models/productSave.model";
 import { FilterSet } from "@app/features/favorites/models/filterSet.model";
 import { Product } from "@app/features/products/models/product.model";
 import { FiltersState } from "@app/features/filters/state/with-filters";
+import { SettingsState } from "@app/features/settings/state/with-settings";
 
 export interface AppState {
     loadingCount: number;
@@ -15,6 +16,7 @@ export interface AppState {
     productSaves: ProductSave[];
     filterSets: FilterSet[];
     products: Product[];
+    settings: SettingsState;
 }
 
 export const initialAppState: AppState = {
@@ -37,5 +39,15 @@ export const initialAppState: AppState = {
     criteria: [],
     productSaves: [],
     filterSets: [],
-    products: []
+    products: [],
+    settings: {
+        uiCustomization: {
+            foregroundColor: "",
+            backgroundColor: "",
+            textColor: "",
+            darkModeOn: false,
+            orientationVertical: false,
+            highContrastOn: false
+        }
+    }
 }

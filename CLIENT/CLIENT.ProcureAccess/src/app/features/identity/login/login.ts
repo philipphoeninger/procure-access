@@ -15,6 +15,7 @@ import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { User } from '../models/user.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { UICustomization } from '@app/features/settings/models/uiCustomization.model';
 
 @Component({
   selector: 'pa-login',
@@ -89,11 +90,12 @@ export class Login {
     this.authService
       .login(loginCommand)
       .pipe(
-        map((response: { token: string, username: string }) => {
+        map((response: { token: string, username: string, uiCustomization: UICustomization }) => {
           if (response.token) {
             localStorage.setItem('procure-access-token', response.token);
             let user: User = new User(loginCommand.email, response.username, false);
             this.store.setUser(user);
+            this.store.setUICustomization(response.uiCustomization);
             this.router.navigateByUrl('/home');
           } else {
             this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');

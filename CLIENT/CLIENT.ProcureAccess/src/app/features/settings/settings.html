@@ -6,8 +6,8 @@
       <div>
         <input
           id="foreground-cp" 
-          [(colorPicker)]="fgColor" 
-          [style.background]="fgColor" 
+          [(colorPicker)]="updateUICustomization().foregroundColor"
+          [style.background]="updateUICustomization().foregroundColor" 
           (openDialog)="(null)"
           (closeDialog)="(null)" 
         />
@@ -21,8 +21,8 @@
       <div>
         <input
           id="background-cp"
-          [(colorPicker)]="bgColor"
-          [style.background]="bgColor"
+          [(colorPicker)]="updateUICustomization().backgroundColor"
+          [style.background]="updateUICustomization().backgroundColor"
           (openDialog)="(null)"
           (closeDialog)="(null)" />
       </div>
@@ -35,8 +35,8 @@
       <div>
         <input
           id="text-cp"
-          [(colorPicker)]="textColor"
-          [style.background]="textColor"
+          [(colorPicker)]="updateUICustomization().textColor"
+          [style.background]="updateUICustomization().textColor"
           (openDialog)="(null)"
           (closeDialog)="(null)" />
       </div>
@@ -48,7 +48,7 @@
         <mat-slide-toggle 
           class="example-margin" 
           labelPosition="before" 
-          [(ngModel)]="orientationControl">
+          [(ngModel)]="updateUICustomization().orientationVertical">
             Orientation: vertical 
         </mat-slide-toggle>
     </div>
@@ -59,7 +59,7 @@
       <mat-slide-toggle
         class="example-margin" 
         labelPosition="before" 
-        [(ngModel)]="highContrastControl">
+        [(ngModel)]="updateUICustomization().highContrastOn">
           High contrast on
         </mat-slide-toggle>
     </div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ColorPickerDirective } from 'ngx-color-picker';
@@ -23,22 +23,19 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 })
 export class Settings {
   protected store = inject(ProcureAccessStore);
-  
-  protected fgColor = '#111111';
-  protected bgColor = '#ffffff';
-  protected textColor = '#000000';
+  protected snackbarService = inject(SnackbarService);
 
-  protected orientationControl = false;
-  protected highContrastControl = false;
+  protected updateUICustomization = model(this.store.uiCustomization());
 
-  constructor(
-    protected snackbarService: SnackbarService
-  ) {}
+  constructor() {}
+
+  ngOnInit() {}
 
   saveSettings() {
-    this.snackbarService.showInfo(
-      this.store.isAuthenticated() ? "Settings saved" : "Settings saved as cookie"
-    );
+    this.store.updateUICustomization(this.updateUICustomization());
+    // this.snackbarService.showInfo(
+    //   this.store.isAuthenticated() ? "Settings saved" : "Settings saved as cookie"
+    // );
   }
 
   resetSettings() {
