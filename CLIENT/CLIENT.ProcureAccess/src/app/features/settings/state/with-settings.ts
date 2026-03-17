@@ -36,10 +36,12 @@ export function withSettings() {
       async updateUICustomization(uiCustomization: UICustomization) {
         state.incrementLoadingCount();
         let success = await settingsApiService.updateUICustomization(uiCustomization);
-        debugger;
+
         if (success) {
           this.setUICustomization(uiCustomization);
-          snackbarService.showInfo('Settings saved!');
+          snackbarService.showInfo(
+            state.isAuthenticated() ? "Settings saved" : "Settings saved as cookie"
+          );
         }
         else {
           snackbarService.showError('Error occured on saving settings. Please try again later.');

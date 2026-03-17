@@ -10,9 +10,9 @@ export class SettingsApiService {
     private http: HttpClient
   ) {}
 
-  updateUICustomization(command: UICustomization): Promise<any> {
+  updateUICustomization(command: UICustomization): Promise<UICustomization> {
     return lastValueFrom(
-      this.http.put<any>(`${httpAppConfig.apiEndpoint}/UICustomization`, command)
+      this.http.put<UICustomization>(`${httpAppConfig.apiEndpoint}/UICustomization`, command)
     );
   }
 }

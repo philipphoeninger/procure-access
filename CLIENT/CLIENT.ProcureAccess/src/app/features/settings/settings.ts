@@ -33,9 +33,6 @@ export class Settings {
 
   saveSettings() {
     this.store.updateUICustomization(this.updateUICustomization());
-    // this.snackbarService.showInfo(
-    //   this.store.isAuthenticated() ? "Settings saved" : "Settings saved as cookie"
-    // );
   }
 
   resetSettings() {
