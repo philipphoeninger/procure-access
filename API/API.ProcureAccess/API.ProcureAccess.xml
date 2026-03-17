@@ -73,11 +73,12 @@
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.GetAll">
+        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.UpdateOne(System.String,MODELS.ProcureAccess.Entities.Dto.UpdateUICustomizationDto)">
             <summary>
-            Gets all records
+            Updates a single record
             </summary>
-            <returns>All records</returns>
+            <param name="dto">Dto to update</param>
+            <returns>Single record</returns>
         </member>
         <member name="M:API.ProcureAccess.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
             <summary>

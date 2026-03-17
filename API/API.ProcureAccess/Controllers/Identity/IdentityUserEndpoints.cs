@@ -34,7 +34,7 @@ public static class IdentityUserEndpoints
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
             string token = tokenHandler.WriteToken(securityToken);
-            return Results.Ok(new { token, username = user.UserName });
+            return Results.Ok(new { token, username = user.UserName, uiCustomization = user.UICustomization });
         }
         else return Results.BadRequest(new { message = "Username or password is incorrect." });
     }

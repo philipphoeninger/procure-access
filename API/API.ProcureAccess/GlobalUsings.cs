@@ -18,6 +18,7 @@ global using DAL.ProcureAccess.Repos.Interfaces;
 
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
+global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Settings;
 
 global using SERVICES.ProcureAccess.DataServices;

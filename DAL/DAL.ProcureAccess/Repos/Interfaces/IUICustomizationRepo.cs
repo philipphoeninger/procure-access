@@ -1,6 +1,7 @@
 namespace DAL.ProcureAccess.Repos.Interfaces;
 
-public interface IUICustomizationRepo : ITemporalTableBaseRepo<UICustomization>
+public interface IUICustomizationRepo
 {
-    IEnumerable<UICustomization> GetAll(string userId);
+    Task<UICustomization> GetAsync(string userId);
+    Task UpdateAsync(string userId, UpdateUICustomizationDto dto);
 }
