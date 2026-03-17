@@ -17,6 +17,43 @@ public class UICustomizationController : ControllerBase
         UserManager = userManager;
     }
 
+    /// <summary>
+    /// Gets a single record
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <returns>Single record</returns>
+    [HttpGet]
+    [ApiVersion("1.0")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [SwaggerResponse(200, "The execution was successful")]
+    [SwaggerResponse(400, "The request was invalid")]
+    [SwaggerResponse(401, "Unauthorized access attempted")]
+    public async Task<ActionResult<UICustomization>> GetOne()
+    {
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        UICustomization entity = null;
+
+        try
+        {
+            entity = await Repo.GetAsync(userId);
+        }
+        catch (CustomException ex)
+        {
+            // TODO: handle more gracefully
+            return BadRequest(ex);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+        return Ok(entity);
+    }
+
 
     /// <summary>
     /// Updates a single record
@@ -36,9 +73,10 @@ public class UICustomizationController : ControllerBase
     [SwaggerResponse(401, "Unauthorized access attempted")]
     public async Task<IActionResult> UpdateOne(UpdateUICustomizationDto dto)
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
         try
         {
             await Repo.UpdateAsync(userId, dto);
