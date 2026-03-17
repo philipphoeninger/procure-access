@@ -46,7 +46,7 @@ export const withSettings = () => signalStoreFeature(
       async loadSettings() {
         let isAuthenticated = state.isAuthenticated();
         await this.loadUICustomization(isAuthenticated);
-        // load more settings...
+        // load more settings here...
       },
       async loadUICustomization(isAuthenticated: boolean) {
         if (!isAuthenticated) {
@@ -54,7 +54,9 @@ export const withSettings = () => signalStoreFeature(
             this.setUICustomization(initialAppState.settings.uiCustomization);
           }
         } else if (!state.user()) { //gate
+          state.incrementLoadingCount();
           this.setUICustomization(await settingsApiService.getUICustomization());
+          state.decrementLoadingCount();
         }
       },
       setUICustomization(uiCustomization: UICustomization) {
