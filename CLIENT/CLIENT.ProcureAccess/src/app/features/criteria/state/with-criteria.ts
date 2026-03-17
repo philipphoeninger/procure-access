@@ -14,8 +14,7 @@ import { withFilters } from '@app/features/filters/state/with-filters';
 
 export type CriteriaState = { criteria: Criterion[] };
 
-export function withCriteria() {
-  return signalStoreFeature(
+export const withCriteria = () => signalStoreFeature(
     withState<CriteriaState>({ criteria: initialAppState.criteria }),
     withLoading(),
     withFilters(),
@@ -40,4 +39,3 @@ export function withCriteria() {
       })
     }))
   );
-}

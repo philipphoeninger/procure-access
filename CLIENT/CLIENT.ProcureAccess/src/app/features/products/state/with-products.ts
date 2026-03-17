@@ -13,8 +13,7 @@ import { withLoading } from '@app/shared/state/with-loading';
 
 export type ProductState = { products: Product[] };
 
-export function withProducts() {
-  return signalStoreFeature(
+export const withProducts = () => signalStoreFeature(
     withState<ProductState>({ products: initialAppState.products }),
     withLoading(),
     withMethods((state, productsApiService = inject(ProductsApiService)) => ({      
@@ -39,5 +38,4 @@ export function withProducts() {
         return state.products().length;
       })
     }))
-  )
-}
+);

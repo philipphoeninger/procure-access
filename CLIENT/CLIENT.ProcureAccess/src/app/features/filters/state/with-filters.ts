@@ -18,8 +18,7 @@ export type FiltersState = {
   selectedCriteriaFilters: number[] 
 };
 
-export function withFilters() {
-  return signalStoreFeature(
+export const withFilters = () => signalStoreFeature(
     withState<FiltersState>({
       filterTypes: initialAppState.filters.filterTypes,
       criteriaFilters: initialAppState.filters.criteriaFilters,
@@ -64,5 +63,4 @@ export function withFilters() {
         return state.selectedCriteriaFilters().length;
       })
     }))
-  );
-}
+);

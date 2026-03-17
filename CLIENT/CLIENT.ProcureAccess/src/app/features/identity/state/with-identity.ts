@@ -11,8 +11,7 @@ import { AuthService } from '../services/auth.service';
 
 export type IdentityState = { user: User | null };
 
-export function withIdentity() {
-  return signalStoreFeature(
+export const withIdentity = () => signalStoreFeature(
     withState<IdentityState>({ user: null }),
     withMethods((state, authService = inject(AuthService)) => ({
       setUser(user: User | null) {
@@ -26,4 +25,3 @@ export function withIdentity() {
     })),
     withComputed((state) => ({ }))
   );
-}
