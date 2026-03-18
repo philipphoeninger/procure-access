@@ -10,8 +10,7 @@ public class UICustomizationController : ControllerBase
     public UICustomizationController(
         IAppLogging<UICustomizationController> logger, 
         IUICustomizationRepo repo,
-        UserManager<User> userManager
-        )
+        UserManager<User> userManager)
     {
         Repo = repo;
         UserManager = userManager;

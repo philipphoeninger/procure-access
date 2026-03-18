@@ -4,6 +4,11 @@ namespace MODELS.ProcureAccess.Entities;
 public class User : IdentityUser
 {
     #region fields
+    [Required]
+    public bool IsDeleted { get; set; } = false;
+
+    public DateTime? DeletedAt { get; set; } = null;
+
     private UICustomization _uiCustomization = new();
     public UICustomization UICustomization
     {

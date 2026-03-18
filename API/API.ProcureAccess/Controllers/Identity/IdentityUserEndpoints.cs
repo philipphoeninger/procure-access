@@ -16,6 +16,8 @@ public static class IdentityUserEndpoints
         IOptions<JWTSettings> jwtSettings)
     {
         User? user = await userManager.FindByEmailAsync(loginRequest.Email);
+        if (user != null && user.IsDeleted)
+            return Results.BadRequest(Microsoft.AspNetCore.Identity.SignInResult.NotAllowed); //gate
         if (user != null && await userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
             SymmetricSecurityKey signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Value.Key));

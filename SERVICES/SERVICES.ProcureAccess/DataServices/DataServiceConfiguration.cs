@@ -12,6 +12,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IProductPartRepo, ProductPartRepo>();
         services.AddScoped<IProductTestRepo, ProductTestRepo>();
         services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
+        services.AddScoped<IUserRepo, UserRepo>();
         
         return services;
     }
