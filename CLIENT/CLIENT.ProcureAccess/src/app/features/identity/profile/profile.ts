@@ -67,28 +67,10 @@ export class Profile {
   }
 
   deleteAccount() {
-    const dialogRef = this.dialog.open(DeleteAccountDialog, {
+    this.dialog.open(DeleteAccountDialog, {
       data: { email: this.store.user()?.email },
       width: '420px'
-    });
-
-    dialogRef.afterClosed().subscribe((toDelete: boolean) => {
-      if (toDelete) {
-        // TODO: delete account
-        this.snackbarService.showInfo("Account deleted. Redirecting to Login page...");
-        // TODO: redirect to login
-      }
-      // TODO
-      // if (email !== undefined) {
-      //   this.authService
-      //     .forgotPassword(email)
-      //     .pipe(
-      //       map((response: any) => {
-      //         this.showSnackbar('A passwort reset was sent to the given mail address.');
-      //       })
-      //     )
-      //     .subscribe();
-      // }
-    });
+    })
+    .afterClosed().subscribe(() => this.store.deleteAccount());
   }
 }

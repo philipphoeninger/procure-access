@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, inject, model } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { AuthService } from '@features/identity/services/auth.service';
 import { LoginModel } from '@features/identity/models/login.model';
 import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
@@ -16,6 +16,9 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { User } from '../models/user.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { UICustomization } from '@app/features/settings/models/uiCustomization.model';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
+import { JWT_NAME } from '@app/app.config';
 
 @Component({
   selector: 'pa-login',
@@ -55,6 +58,7 @@ export class Login {
   readonly dialog = inject(MatDialog);
 
   constructor(
+    @Inject(JWT_NAME) private jwtName: string,
     protected authService: AuthService,
     private router: Router,
     protected snackbarService: SnackbarService
@@ -86,23 +90,27 @@ export class Login {
     event.preventDefault();
     let loginCommand = new LoginModel(this.email!(), this.password!());
 
-    // TODO: start spinner
+    this.store.incrementLoadingCount();
     this.authService
       .login(loginCommand)
       .pipe(
-        map((response: { token: string, email: string, uiCustomization: UICustomization }) => {
-          if (response.token) {
-            localStorage.setItem('procureaccess-token', response.token);
-            let user: User = new User(loginCommand.email, false);
-            this.store.setUser(user);
-            this.store.setUICustomization(response.uiCustomization);
-            this.router.navigateByUrl('/home');
-          } else {
-            this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
-          }
+        map((response: HttpResponse<{ token: string, email: string, uiCustomization: UICustomization }>) => {
+          if (!response.body?.token) {
+            this.snackbarService.showInfo('Login failed. Please try again.');
+            return;
+          } //gate
+          localStorage.setItem(this.jwtName, response.body.token);
+          let user: User = new User(loginCommand.email, false);
+          this.store.setUser(user);
+          this.store.setUICustomization(response.body.uiCustomization);
+          this.router.navigateByUrl('/home');
+        }),
+        catchError((error: HttpErrorResponse) => {
+          this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
+          return throwError(() => new Error(error.message));
         }),
         finalize(() => {
-          // TODO: stop spinner
+          this.store.decrementLoadingCount();
         }),
       )
       .subscribe();
