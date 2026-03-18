@@ -1,23 +1,25 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { httpAppConfig } from "@app/app.config";
+import { Inject, Injectable } from "@angular/core";
+import { API_URL } from "@app/app.config";
 import { lastValueFrom, Observable, of } from "rxjs";
 import { Criterion } from "../../models/criterion.model";
 
 @Injectable({ providedIn:'root' })
 export class CriteriaApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    @Inject(API_URL) private apiUrl: string,
+    private http: HttpClient) {}
 
   getAllCriteria(): Promise<Criterion[]> {
     return lastValueFrom(
-        this.http.get<Criterion[]>(`${httpAppConfig.apiEndpoint}/Criteria`)
+        this.http.get<Criterion[]>(`${this.apiUrl}/Criteria`)
     );
   }
 
   getCriteriaByCriteriaFilterIds(selectedFilterTypeIds: number[]): Promise<Criterion[]> {
     return lastValueFrom(
       this.http.get<Criterion[]>(
-        `${httpAppConfig.apiEndpoint}/Criteria/byCriteriaFilterIds`, {
+        `${this.apiUrl}/Criteria/byCriteriaFilterIds`, {
           params: {
             criteriaFilterIds: selectedFilterTypeIds
           }

@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, isSignal, PLATFORM_ID } from '@angular/core';
-import { appName } from '@app/app.config';
+import { API_URL } from '@app/app.config';
 import {
   patchState,
   signalStoreFeature,
@@ -13,6 +13,7 @@ export function withLocalStorage(storageKeys: string[]) {
     withState({}),
     withMethods((state) => {
       const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+      const appName = inject(API_URL);
 
       return {
         saveAllToLocalStorage() {
