@@ -12,9 +12,9 @@
                     </mat-panel-description>
                 </mat-expansion-panel-header>
 
-                <p>{{ criterion.description }}</p>
+                <markdown [data]="criterion.description"></markdown>
 
-               <mat-action-row>
+                <mat-action-row>
                     @if (idx > 0) {
                       <button matButton (click)="prevStep()">Previous</button>
                     }

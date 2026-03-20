@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { headersInterceptor } from './core/interceptors/headers.interceptor';
+import { provideMarkdown } from 'ngx-markdown';
 import { environment } from '../environments/environment';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
@@ -26,6 +27,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor, headersInterceptor]),
     ),
+    provideMarkdown(),
     { provide: APP_NAME, useValue: 'ProcureAccess'},
     { provide: API_URL, useValue: environment.apiUrl },
     { provide: JWT_NAME,
