@@ -7,8 +7,9 @@ import { Profile } from '@features/identity/profile/profile';
 import { Settings } from '@features/settings/settings';
 import { ProductsContainer } from '@features/products/pages/products-container/products-container';
 import { Favorites } from '@app/features/favorites/list/favorites';
-import { ProductsList } from './features/products/list/products-list';
-import { ProductDetails } from './features/products/details/product-details';
+import { ProductsList } from '@app/features/products/list/products-list';
+import { ProductDetails } from '@app/features/products/details/product-details';
+import { ProductProposition } from '@app/features/products/proposition/product-proposition';
 
 export const routes: Routes = [
   {
@@ -55,5 +56,10 @@ export const routes: Routes = [
   { 
     path: 'product/:id', 
     component: ProductDetails
+   },
+   {
+    path: 'product-proposition',
+    component: ProductProposition,
+    canActivate: [AuthGuard]
    }
 ];

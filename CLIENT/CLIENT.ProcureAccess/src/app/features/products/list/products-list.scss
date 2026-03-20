@@ -4,15 +4,27 @@
 // }
 
 :host {
-  max-height: calc(100vh - 100px);
   display: block;
-  overflow: auto;
   width: 100%;
   margin-top: 16px;
 }
 
+.product-list-actions {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
 .cdk-table {
   // display: table;
+}
+
+.table-container {
+  max-height: calc(100vh - 160px);
+  overflow: auto;
 }
 
 .products-heading-container {
