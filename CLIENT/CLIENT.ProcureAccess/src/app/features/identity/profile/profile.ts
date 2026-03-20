@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UpdateUserDialog } from '../dialogs/update-user-dialog/update-user-dialog';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { DeleteAccountDialog } from '../dialogs/delete-account-dialog/delete-account-dialog';
+import { MatIconModule } from "@angular/material/icon";
 
 export interface UserInformation {
   position: number,
@@ -18,7 +19,12 @@ export interface UserInformation {
 
 @Component({
   selector: 'pa-profile',
-  imports: [MatListModule, MatDividerModule, MatTableModule, MatButtonModule],
+  imports: [
+    MatListModule, 
+    MatDividerModule, 
+    MatTableModule, 
+    MatButtonModule, 
+    MatIconModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,6 +77,8 @@ export class Profile {
       data: { email: this.store.user()?.email },
       width: '420px'
     })
-    .afterClosed().subscribe(() => this.store.deleteAccount());
+    .afterClosed().subscribe((toDelete: boolean) => {
+      if (toDelete) this.store.deleteAccount();
+    });
   }
 }

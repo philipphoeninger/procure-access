@@ -30,3 +30,62 @@
 <div class="profile-actions">
   <button matButton="filled" (click)="deleteAccount()" class="delete-btn">Delete</button>
 </div>
+
+<div class="proposals-container">
+  <h3>Your open proposals</h3>
+  <mat-list role="list">
+    <mat-list-item role="listitem">
+      <span matListItemIcon class="material-symbols-outlined">box</span>
+      <!-- <mat-icon matListItemIcon>box</mat-icon> -->
+      <span matListItemTitle>Product 1</span>
+      <span>Status: draft</span>
+      <div matListItemMeta>
+        <button matIconButton (click)="null">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+    <mat-list-item role="listitem">
+      <mat-icon matListItemIcon>rule</mat-icon>
+      <span matListItemTitle>Criterion 1</span>
+      <span>Status: sent</span>
+      <div matListItemMeta>
+        <button matIconButton (click)="null">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+    <mat-list-item role="listitem">
+      <span matListItemIcon class="material-symbols-outlined">box</span>
+      <!-- <mat-icon matListItemIcon>box</mat-icon> -->
+      <span matListItemTitle>Product 2</span>
+      <span>Status: sent</span>
+      <div matListItemMeta>
+        <button matIconButton (click)="null">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button matIconButton (click)="null">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div class="proposals-container">
+  <h3>Closed proposals made by you</h3>
+</div>
