@@ -1,7 +1,7 @@
 @if (store.criteriaCount() == 0) {
     <p>No criteria could be found. Please try again...</p>
 } @else {
-    <mat-accordion class="example-headers-align">
+    <mat-accordion class="criteria-accordion">
        @for (criterion of store.criteria(); track criterion; let idx = $index, e = $even) {
             <mat-expansion-panel [expanded]="step() === (idx + 1)" (opened)="setStep(idx + 1)"> <!--hideToggle-->
                 <mat-expansion-panel-header>

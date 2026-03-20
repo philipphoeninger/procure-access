@@ -10,6 +10,7 @@ import { Favorites } from '@app/features/favorites/list/favorites';
 import { ProductsList } from '@app/features/products/list/products-list';
 import { ProductDetails } from '@app/features/products/details/product-details';
 import { ProductProposition } from '@app/features/products/proposition/product-proposition';
+import { CriterionProposition } from '@app/features/criteria/proposition/criterion-proposition';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,11 @@ export const routes: Routes = [
    {
     path: 'product-proposition',
     component: ProductProposition,
+    canActivate: [AuthGuard]
+   },
+   {
+    path: 'criterion-proposition',
+    component: CriterionProposition,
     canActivate: [AuthGuard]
    }
 ];

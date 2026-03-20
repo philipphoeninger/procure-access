@@ -10,6 +10,13 @@
       <pa-filters-container (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">Reset</button>
+        @if (store.isAuthenticated()) {
+          <button 
+            matButton="filled" 
+            aria-label="Criterion proposition button" 
+            [routerLink]="'/criterion-proposition'"
+          >Propose criterion</button>
+        }
         <button matButton matStepperNext (click)="asdf()">Enter</button>
       </div>
     </form>
@@ -62,7 +69,15 @@
                 </button>
             }
         </div>
-        <div class="products-page-btn">
+        <div>
+            @if (store.isAuthenticated()) {
+                <button 
+                  matButton="elevated"
+                  aria-label="Criterion proposition button" 
+                  [routerLink]="'/criterion-proposition'"
+                  style="margin-right: 8px">Propose criterion
+                </button>
+            }
             <button 
                 matButton="filled"
                 class="products-page-btn"

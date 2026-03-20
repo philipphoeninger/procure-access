@@ -9,6 +9,7 @@ import {MatInputModule} from '@angular/material/input';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { CriteriaApiService } from '../services/api/criteria-api.service';
 import { MarkdownComponent } from 'ngx-markdown';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'pa-criteria-list',
@@ -24,7 +25,8 @@ import { MarkdownComponent } from 'ngx-markdown';
     MatInputModule,
     MatButtonModule,
     MatDatepickerModule,
-    MarkdownComponent
+    MarkdownComponent,
+    RouterModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
