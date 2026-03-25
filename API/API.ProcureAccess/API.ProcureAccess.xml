@@ -66,17 +66,101 @@
             <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
             <returns>Criteria</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.Identity.AccountsController.GetOneAsync(System.Int32)">
+        <member name="M:API.ProcureAccess.Controllers.CriteriaController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.CriterionDto)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="id">Primary key of the record to update</param>
+            <param name="entity">Entity to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Identity.UsersController.ChangeEmail(API.ProcureAccess.Controllers.Models.ChangeEmailRequest)">
             <summary>
             Gets a single record
             </summary>
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.UpdateOne(System.String,MODELS.ProcureAccess.Entities.Dto.UpdateUICustomizationDto)">
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.UpdateOne(System.Int32,MODELS.ProcureAccess.Entities.Product)">
             <summary>
             Updates a single record
             </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="id">Primary key of the record to update</param>
+            <param name="entity">Entity to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.AddOne(MODELS.ProcureAccess.Entities.Product)">
+            <summary>
+            Adds a single record
+            </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="entity">Record to add</param>
+            <returns>Added record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.DeleteOne(System.Int32,MODELS.ProcureAccess.Entities.Product)">
+            <summary>
+            Deletes a single record
+            </summary>
+            <remarks>
+            Sample body:
+            </remarks>
+            <param name="id"></param>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.ProductDto)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            Sample body:
+            <pre>
+            {
+                ...
+            }
+            </pre>
+            </remarks>
+            <param name="id">Primary key of the record to update</param>
+            <param name="entity">Entity to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.GetOne">
+            <summary>
+            Gets a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.UpdateOne(MODELS.ProcureAccess.Entities.Dto.UICustomizationDto)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            </remarks>
             <param name="dto">Dto to update</param>
             <returns>Single record</returns>
         </member>

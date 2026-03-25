@@ -78,7 +78,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public IActionResult UpdateOne(int id, TEntity entity)
+    public virtual IActionResult UpdateOne(int id, TEntity entity)
     {
         if (id != entity.Id) return BadRequest();
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -120,7 +120,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(201, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<TEntity> AddOne(TEntity entity)
+    public virtual ActionResult<TEntity> AddOne(TEntity entity)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         try
@@ -152,7 +152,7 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<TEntity> DeleteOne(int id, TEntity entity)
+    public virtual ActionResult<TEntity> DeleteOne(int id, TEntity entity)
     {
         if (id != entity.Id) return BadRequest();
         try
