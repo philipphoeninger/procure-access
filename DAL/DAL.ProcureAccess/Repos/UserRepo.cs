@@ -145,7 +145,7 @@ public class UserRepo : IUserRepo
             });
 
         // Anonymize
-        user.Email = $"deleted_{Guid.NewGuid()}";
+        user.Email = $"deleted_{Guid.NewGuid()}@anonymous.de";
         user.UserName = user.Email;
         // Soft delete
         user.IsDeleted = true;
