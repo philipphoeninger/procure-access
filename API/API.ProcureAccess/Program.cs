@@ -54,7 +54,12 @@ using (var scope = app.Services.CreateScope())
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         //SampleDataInitializer.InitializeData(dbContext, userManager);
-        await SampleDataInitializer.ClearAndReseedDatabase(dbContext, userManager);
+        await SampleDataInitializer.ClearDatabase(dbContext, userManager);
+        // add role management
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await app.AddRolesAndPermissions(roleManager);
+
+        await SampleDataInitializer.InitializeData(dbContext, userManager);
     }
     app.ConfigureSwaggerExplorer();
 // }

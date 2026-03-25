@@ -1,4 +1,5 @@
 global using API.ProcureAccess.ApiVersionSupport;
+global using API.ProcureAccess.Authorization;
 global using API.ProcureAccess.Swagger;
 global using API.ProcureAccess.Swagger.Models;
 global using API.ProcureAccess.Controllers;

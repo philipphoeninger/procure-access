@@ -8,6 +8,11 @@ public static class SampleDataInitializer
         await SeedData(dbContext, userManager);
     }
 
+    public static async Task ClearDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
+    {
+        await ClearData(dbContext, userManager);
+    }
+
     public static async Task ClearAndReseedDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
     {
         await ClearData(dbContext, userManager);
