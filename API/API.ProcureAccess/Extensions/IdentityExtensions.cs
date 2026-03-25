@@ -5,6 +5,7 @@ public static class IdentityExtensions
     public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
     {
         services.AddIdentityCore<User>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddApiEndpoints();
         return services;
