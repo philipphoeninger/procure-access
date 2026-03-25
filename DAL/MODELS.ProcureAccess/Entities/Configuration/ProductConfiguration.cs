@@ -4,6 +4,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
+        builder.HasQueryFilter(x => !x.ToApprove);
+
         // properties
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
         builder.Property(x => x.Display)
