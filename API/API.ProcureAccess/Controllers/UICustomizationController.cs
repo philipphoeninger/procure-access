@@ -70,7 +70,7 @@ public class UICustomizationController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> UpdateOne(UpdateUICustomizationDto dto)
+    public async Task<IActionResult> UpdateOne(UICustomizationDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

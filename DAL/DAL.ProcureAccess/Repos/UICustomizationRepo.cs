@@ -27,7 +27,7 @@ public class UICustomizationRepo : IUICustomizationRepo
             .FirstAsync();
     }
 
-    public async Task UpdateAsync(string userId, UpdateUICustomizationDto dto)
+    public async Task UpdateAsync(string userId, UICustomizationDto dto)
     {
         var user = await Context.Users.FirstAsync(u => u.Id == userId);
 

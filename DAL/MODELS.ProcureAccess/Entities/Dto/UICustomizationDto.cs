@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities.Dto;
 
-public class UpdateUICustomizationDto
+public class UICustomizationDto : BaseDto
 {
     public string? BackgroundColor { get; set; }
     public string? ForegroundColor { get; set; }
