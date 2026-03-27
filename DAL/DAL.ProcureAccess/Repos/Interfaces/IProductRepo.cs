@@ -1,5 +1,5 @@
 namespace DAL.ProcureAccess.Repos.Interfaces;
 
-public interface IProductRepo : ITemporalTableBaseRepo<Product>, IApproveRepo<ProductDto>
+public interface IProductRepo : ITemporalTableBaseRepo<Product>
 {
 }

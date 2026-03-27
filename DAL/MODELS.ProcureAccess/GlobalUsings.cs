@@ -1,3 +1,5 @@
+global using AutoMapper;
+
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Owned;

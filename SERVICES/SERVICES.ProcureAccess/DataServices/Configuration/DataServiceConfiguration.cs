@@ -1,4 +1,4 @@
-namespace SERVICES.ProcureAccess.DataServices;
+namespace SERVICES.ProcureAccess.DataServices.Configuration;
 
 public static class DataServiceConfiguration
 {
@@ -13,6 +13,19 @@ public static class DataServiceConfiguration
         services.AddScoped<IProductTestRepo, ProductTestRepo>();
         services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
         services.AddScoped<IUserRepo, UserRepo>();
+        
+        return services;
+    }
+
+    public static IServiceCollection AddDataServices(this IServiceCollection services)
+    {
+        // Add DataServices:
+        services.AddScoped<ICriteriaFilterService, CriteriaFilterService>();
+        services.AddScoped<ICriterionService, CriterionService>();
+        services.AddScoped<IFilterTypeService, FilterTypeService>();
+        services.AddScoped<IProductPartService, ProductPartService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductTestService, ProductTestService>();
         
         return services;
     }

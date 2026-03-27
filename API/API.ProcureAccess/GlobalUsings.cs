@@ -10,6 +10,8 @@ global using API.ProcureAccess.Extensions;
 //global using API.ProcureAccess.Filters;
 //global using API.ProcureAccess.Security;
 
+global using AutoMapper;
+
 global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Initialization;
 global using DAL.ProcureAccess.Exceptions;
@@ -23,6 +25,8 @@ global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Settings;
 
 global using SERVICES.ProcureAccess.DataServices;
+global using SERVICES.ProcureAccess.DataServices.Configuration;
+global using SERVICES.ProcureAccess.DataServices.Interfaces;
 global using SERVICES.ProcureAccess.Utilities;
 global using SERVICES.ProcureAccess.Logging.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Configuration;

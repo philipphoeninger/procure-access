@@ -3,17 +3,50 @@ namespace API.ProcureAccess.Controllers.Base;
 [ApiController]
 [Route("api/[controller]")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class BaseCrudController<TEntity, TController> : ControllerBase
+public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
     where TEntity : BaseEntity, new()
+    where TDto : BaseDto, new()
     where TController : class
 {
-    protected readonly IBaseRepo<TEntity> MainRepo;
+    protected readonly IBaseService<TEntity, TDto> MainService;
     protected readonly IAppLogging<TController> Logger;
 
-    protected BaseCrudController(IAppLogging<TController> logger, IBaseRepo<TEntity> repo)
+    protected BaseCrudController(
+        IAppLogging<TController> logger, 
+        IBaseService<TEntity, TDto> service)
     {
-        MainRepo = repo;
+        MainService = service;
         Logger = logger;
+    }
+
+    /// <summary>
+    /// Adds a single record
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="dto">Record to add</param>
+    /// <returns>Added record</returns>
+    [HttpPost]
+    [ApiVersion("1.0")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [SwaggerResponse(201, "The execution was successful")]
+    [SwaggerResponse(400, "The request was invalid")]
+    [SwaggerResponse(401, "Unauthorized access attempted")]
+    public virtual ActionResult<TDto> AddOne(TDto dto)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        try
+        {
+            MainService.Create(dto);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+        return CreatedAtAction(nameof(GetOne), new { id = dto.Id });
     }
 
     /// <summary>
@@ -32,11 +65,11 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<TEntity> GetOne(int id)
+    public ActionResult<TDto> GetOne(int id)
     {
-        var entity = MainRepo.Find(id);
+        TDto? dto = MainService.Read(id);
 
-        return entity == null ? NoContent() : Ok(entity);
+        return dto == null ? NoContent() : Ok(dto);
     }
 
     /// <summary>
@@ -50,24 +83,17 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
-    public virtual ActionResult<IEnumerable<TEntity>> GetAll()
+    public virtual ActionResult<IEnumerable<TDto>> GetAll()
     {
-        return Ok(MainRepo.GetAll());
+        return Ok(MainService.ReadAll());
     }
 
     /// <summary>
     /// Updates a single record
     /// </summary>
     /// <remarks>
-    /// Sample body:
-    /// <pre>
-    /// {
-    ///     ...
-    /// }
-    /// </pre>
     /// </remarks>
-    /// <param name="id">Primary key of the record to update</param>
-    /// <param name="entity">Entity to update</param>
+    /// <param name="dto">Dto of Entity to update</param>
     /// <returns>Single record</returns>
     [HttpPut("{id}")]
     [ApiVersion("1.0")]
@@ -78,13 +104,12 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public virtual IActionResult UpdateOne(int id, TEntity entity)
+    public virtual IActionResult UpdateOne(TDto dto)
     {
-        if (id != entity.Id) return BadRequest();
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         try
         {
-            MainRepo.Update(entity);
+            MainService.Update(dto);
         }
         catch (CustomException ex)
         {
@@ -95,53 +120,15 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
         {
             return BadRequest(ex);
         }
-        return Ok(entity);
-    }
-
-    /// <summary>
-    /// Adds a single record
-    /// </summary>
-    /// <remarks>
-    /// Sample body:
-    /// <pre>
-    /// {
-    ///     ...
-    /// }
-    /// </pre>
-    /// </remarks>
-    /// <param name="entity">Record to add</param>
-    /// <returns>Added record</returns>
-    [HttpPost]
-    [ApiVersion("1.0")]
-    [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [SwaggerResponse(201, "The execution was successful")]
-    [SwaggerResponse(400, "The request was invalid")]
-    [SwaggerResponse(401, "Unauthorized access attempted")]
-    public virtual ActionResult<TEntity> AddOne(TEntity entity)
-    {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
-        try
-        {
-            MainRepo.Add(entity);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex);
-        }
-        return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, entity);
+        return Ok(dto);
     }
 
     /// <summary>
     /// Deletes a single record
     /// </summary>
     /// <remarks>
-    /// Sample body:
     /// </remarks>
     /// <param name="id"></param>
-    /// <param name="entity"></param>
     /// <returns></returns>
     [HttpDelete("{id}")]
     [ApiVersion("1.0")]
@@ -152,19 +139,18 @@ public class BaseCrudController<TEntity, TController> : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public virtual ActionResult<TEntity> DeleteOne(int id, TEntity entity)
+    public virtual ActionResult<int> DeleteOne(int id)
     {
-        if (id != entity.Id) return BadRequest();
+        int? result = null;
         try
         {
-            MainRepo.Delete(entity);
+            result = MainService.Delete(id);
         }
         catch (Exception ex)
         {
             // TODO: handle more gracefully
             return new BadRequestObjectResult(ex.GetBaseException()?.Message);
         }
-        return Ok();
+        return result != null ? Ok(result) : BadRequest("Deletion failed");
     }
 }
-

@@ -13,7 +13,10 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
                 .AddIdentityAuth(builder.Configuration)
-                .AddRepositories();
+                .AddRepositories()
+                .AddDataServices()
+                .AddAutoMapper(cfg => {},
+                    typeof(MappingProfile).Assembly);
 
 // Configure logging
 builder.ConfigureSerilog();
