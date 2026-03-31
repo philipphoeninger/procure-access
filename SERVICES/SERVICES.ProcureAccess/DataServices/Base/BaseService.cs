@@ -16,22 +16,21 @@ public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
     #endregion
 
     #region methods
-    public TDto? Create(TDto dto)
+    public virtual TDto? Create(TDto dto)
     {
-        return null;
-        // TEntity entity = Mapper.Map<>();
-        // int success = MainRepo.Add(entity);
-        // return Convert.ToBoolean(success) ? Read(entity.id) : null;
+        TEntity entity = Mapper.Map<TEntity>(dto);
+        int success = MainRepo.Add(entity);
+        return Convert.ToBoolean(success) ? Read(entity.Id) : null;
     }
 
-    public TDto? Read(int id)
+    public virtual TDto? Read(int id)
     {
         TEntity? entity = MainRepo.Find(id);
         if (entity is null) return null; //gate
         return Mapper.Map<TDto>(entity);
     }
 
-    public IEnumerable<TDto> ReadAll()
+    public virtual IEnumerable<TDto> ReadAll()
     {
         List<TEntity> entities = MainRepo.GetAll().ToList();
         List<TDto> dtos = new List<TDto>();
@@ -39,21 +38,23 @@ public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
         return dtos;
     }
 
-    public TDto? Update(TDto dto)
+    public virtual TDto? Update(TDto dto)
     {
         TEntity? entity = MainRepo.Find(dto.Id);
         if (entity is null) return null; //gate
 
-        // TODO: update
-
+        // update
+        TEntity updatedEntity = Mapper.Map<TEntity>(dto);
         int success = MainRepo.Update(entity);
-        return Convert.ToBoolean(success) ? Mapper.Map<TDto>(entity) : null;
+
+        return Convert.ToBoolean(success) ? Mapper.Map<TDto>(updatedEntity) : null;
     }
 
-    public int Delete(int id)
+    public virtual int Delete(int id)
     {
-        return -1;
-        //return MainRepo.Delete(id); // TODO: timestamp
+        long binaryNow = DateTime.Now.ToBinary();
+        byte[] arrayNow = BitConverter.GetBytes(binaryNow);
+        return MainRepo.Delete(id, arrayNow);
     }
     #endregion
 }
