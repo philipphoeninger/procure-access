@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { LoginModel } from '../models/login.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
+import { ResetPasswordModel } from '../models/reset-password.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -44,6 +45,19 @@ export class AuthService {
   }
 
   public forgotPassword(email: string) {
-    return this.http.post<any>(`${this.apiUrl}/forgotPassword`, { email });
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  public resetPassword(command: ResetPasswordModel) {
+    return this.http.post<{ succeeded: boolean }>(`${this.apiUrl}/reset-password`, command);
+  }
+
+  public confirmEmail(userId: string, token: string) {
+    return this.http.get<{ succeeded: boolean }>(`${this.apiUrl}/confirm-email`, {
+        params: {
+          userId,
+          token
+        }
+      });
   }
 }
