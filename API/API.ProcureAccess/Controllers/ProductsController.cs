@@ -33,12 +33,13 @@ public class ProductsController : BaseCrudController<Product, ProductDto, Produc
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public IActionResult ApproveOne(ProductDto dto)
+    public ActionResult<bool> ApproveOne(ProductDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        int success = -1;
         try
         {
-            _productService.Approve(dto);
+            success = _productService.Approve(dto);
         }
         catch (CustomException ex)
         {
@@ -49,6 +50,6 @@ public class ProductsController : BaseCrudController<Product, ProductDto, Produc
         {
             return BadRequest(ex);
         }
-        return Ok(dto);
+        return Ok(Convert.ToBoolean(success));
     }
 }

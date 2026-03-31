@@ -4,59 +4,44 @@
         <name>API.ProcureAccess</name>
     </assembly>
     <members>
-        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.GetOne(System.Int32)">
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.AddOne(`1)">
+            <summary>
+            Adds a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="dto">Record to add</param>
+            <returns>Added record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.GetOne(System.Int32)">
             <summary>
             Gets a single record
             </summary>
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.GetAll">
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.GetAll">
             <summary>
             Gets all records
             </summary>
             <returns>All records</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.UpdateOne(System.Int32,`0)">
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.UpdateOne(`1)">
             <summary>
             Updates a single record
             </summary>
             <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
             </remarks>
-            <param name="id">Primary key of the record to update</param>
-            <param name="entity">Entity to update</param>
+            <param name="dto">Dto of Entity to update</param>
             <returns>Single record</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.AddOne(`0)">
-            <summary>
-            Adds a single record
-            </summary>
-            <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
-            </remarks>
-            <param name="entity">Record to add</param>
-            <returns>Added record</returns>
-        </member>
-        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`2.DeleteOne(System.Int32,`0)">
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.DeleteOne(System.Int32)">
             <summary>
             Deletes a single record
             </summary>
             <remarks>
-            Sample body:
             </remarks>
             <param name="id"></param>
-            <param name="entity"></param>
             <returns></returns>
         </member>
         <member name="M:API.ProcureAccess.Controllers.CriteriaController.ByCriteriaFilterIds(System.Int32[])">
@@ -66,87 +51,15 @@
             <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
             <returns>Criteria</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.CriteriaController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.CriterionDto)">
-            <summary>
-            Updates a single record
-            </summary>
-            <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
-            </remarks>
-            <param name="id">Primary key of the record to update</param>
-            <param name="entity">Entity to update</param>
-            <returns>Single record</returns>
-        </member>
-        <member name="M:API.ProcureAccess.Controllers.Identity.UsersController.ChangeEmail(API.ProcureAccess.Controllers.Models.ChangeEmailRequest)">
+        <!-- Badly formed XML comment ignored for member "M:API.ProcureAccess.Controllers.CriteriaController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.CriterionDto)" -->
+        <member name="M:API.ProcureAccess.Controllers.Identity.UsersController.ChangeEmail(MODELS.ProcureAccess.Entities.Identity.ChangeEmailRequest)">
             <summary>
             Gets a single record
             </summary>
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
-        <member name="M:API.ProcureAccess.Controllers.ProductsController.UpdateOne(System.Int32,MODELS.ProcureAccess.Entities.Product)">
-            <summary>
-            Updates a single record
-            </summary>
-            <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
-            </remarks>
-            <param name="id">Primary key of the record to update</param>
-            <param name="entity">Entity to update</param>
-            <returns>Single record</returns>
-        </member>
-        <member name="M:API.ProcureAccess.Controllers.ProductsController.AddOne(MODELS.ProcureAccess.Entities.Product)">
-            <summary>
-            Adds a single record
-            </summary>
-            <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
-            </remarks>
-            <param name="entity">Record to add</param>
-            <returns>Added record</returns>
-        </member>
-        <member name="M:API.ProcureAccess.Controllers.ProductsController.DeleteOne(System.Int32,MODELS.ProcureAccess.Entities.Product)">
-            <summary>
-            Deletes a single record
-            </summary>
-            <remarks>
-            Sample body:
-            </remarks>
-            <param name="id"></param>
-            <param name="entity"></param>
-            <returns></returns>
-        </member>
-        <member name="M:API.ProcureAccess.Controllers.ProductsController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.ProductDto)">
-            <summary>
-            Updates a single record
-            </summary>
-            <remarks>
-            Sample body:
-            <pre>
-            {
-                ...
-            }
-            </pre>
-            </remarks>
-            <param name="id">Primary key of the record to update</param>
-            <param name="entity">Entity to update</param>
-            <returns>Single record</returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:API.ProcureAccess.Controllers.ProductsController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.ProductDto)" -->
         <member name="M:API.ProcureAccess.Controllers.UICustomizationController.GetOne">
             <summary>
             Gets a single record

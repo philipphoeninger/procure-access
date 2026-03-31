@@ -29,7 +29,7 @@ public class CriteriaController : BaseCrudController<Criterion, CriterionDto, Cr
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<List<Criterion>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
+    public ActionResult<List<CriterionDto>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
     {
         var filteredCriteria = _criterionService.GetByCriteriaFilterIds(criteriaFilterIds);
         return Ok(filteredCriteria);
@@ -55,12 +55,13 @@ public class CriteriaController : BaseCrudController<Criterion, CriterionDto, Cr
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public IActionResult ApproveOne(CriterionDto dto)
+    public ActionResult<bool> ApproveOne(CriterionDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        int success = -1;
         try
         {
-            _criterionService.Approve(dto);
+            success = _criterionService.Approve(dto);
         }
         catch (CustomException ex)
         {
@@ -71,6 +72,6 @@ public class CriteriaController : BaseCrudController<Criterion, CriterionDto, Cr
         {
             return BadRequest(ex);
         }
-        return Ok(dto);
+        return Ok(Convert.ToBoolean(success));
     }
 }

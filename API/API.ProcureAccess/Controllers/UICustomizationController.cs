@@ -31,15 +31,15 @@ public class UICustomizationController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<ActionResult<UICustomization>> GetOne()
+    public async Task<ActionResult<UICustomizationDto>> GetOne()
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Unauthorized();
-        UICustomization entity = null;
+        UICustomizationDto dto = null;
 
         try
         {
-            entity = await Repo.GetAsync(userId);
+            dto = await Repo.GetAsync(userId);
         }
         catch (CustomException ex)
         {
@@ -50,7 +50,7 @@ public class UICustomizationController : ControllerBase
         {
             return BadRequest(ex);
         }
-        return Ok(entity);
+        return Ok(dto);
     }
 
 
@@ -70,7 +70,7 @@ public class UICustomizationController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> UpdateOne(UICustomizationDto dto)
+    public async Task<ActionResult<UICustomizationDto>> UpdateOne(UICustomizationDto dto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

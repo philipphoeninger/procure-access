@@ -8,6 +8,7 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
+                .AddEmailConfig(builder.Configuration)
                 .AddCors()
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
@@ -73,8 +74,6 @@ app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
 
 app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityApi<User>();
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();
 
