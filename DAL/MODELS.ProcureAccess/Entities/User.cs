@@ -4,6 +4,8 @@ namespace MODELS.ProcureAccess.Entities;
 public class User : IdentityUser
 {
     #region fields
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    
     [Required]
     public bool IsDeleted { get; set; } = false;
 
