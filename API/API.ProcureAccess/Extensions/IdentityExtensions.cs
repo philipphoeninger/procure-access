@@ -7,7 +7,8 @@ public static class IdentityExtensions
         services.AddIdentityCore<User>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
-                .AddApiEndpoints();
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
         return services;
     }
 
