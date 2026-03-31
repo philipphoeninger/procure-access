@@ -11,6 +11,7 @@ public class UserService : IUserService
     private readonly IMapper _mapper;
     private readonly JWTSettings _jwt;
     private readonly IEmailService _emailService;
+    private readonly IEmailTemplateService _templateService;
     private readonly IConfiguration _config;
 
     public UserService(
@@ -20,6 +21,7 @@ public class UserService : IUserService
         IMapper mapper,
         IOptions<JWTSettings> jwt,
         IEmailService emailService,
+        IEmailTemplateService templateService,
         IConfiguration config)
     {
         _userManager = userManager;
@@ -28,6 +30,7 @@ public class UserService : IUserService
         _mapper = mapper;
         _jwt = jwt.Value;
         _emailService = emailService;
+        _templateService = templateService;
         _config = config;
     }
 
@@ -69,31 +72,52 @@ public class UserService : IUserService
 
         await _userManager.AddToRoleAsync(user, Roles.Member);
 
-        // Generate email confirmation token
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await this.SendConfirmationEmailAsync(user.Email);
+
+        return IdentityResult.Success;
+    }
+
+    public async Task RequestPasswordResetAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user == null || !user.EmailConfirmed)
+            return; // prevent user enumeration
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         var encodedToken = Uri.EscapeDataString(token);
 
-        var confirmationLink = $"{_config["App:BaseUrl"]}/confirm-email?userId={user.Id}&token={encodedToken}";
+        var link = $"{_config["App:BaseUrl"]}/reset-password?email={email}&token={encodedToken}";
 
-        // Send confirmation mail
-        var html = $"""
-        <h2>Welcome to ProcureAccess</h2>
-        <p>Please confirm your email address:</p>
+        var html = await _templateService.RenderAsync("ResetPassword",
+            new Dictionary<string, string>
+            {
+                { "link", link }
+            });
 
-        <p>
-            <a href="{confirmationLink}" 
-            style="padding:10px 20px;background:#4CAF50;color:white;text-decoration:none;">
-            Confirm Email
-            </a>
-        </p>
+        await _emailService.SendEmailAsync(
+            email,
+            "Reset your password",
+            html);
+    }
 
-        <p>If you didn’t request this, ignore this email.</p>
-        """;
+    public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
 
-        await _emailService.SendEmailAsync(user.Email!, "Confirm your email", html);
+        if (user == null)
+            return IdentityResult.Failed(new IdentityError
+            {
+                Description = "Invalid request"
+            });
 
-        return IdentityResult.Success;
+        var decodedToken = Uri.UnescapeDataString(dto.Token);
+
+        return await _userManager.ResetPasswordAsync(
+            user,
+            decodedToken,
+            dto.NewPassword);
     }
 
     // REFRESH TOKEN
@@ -195,11 +219,14 @@ public class UserService : IUserService
 
         var encodedToken = Uri.EscapeDataString(token);
 
-        var link = $"{_config["App:BaseUrl"]}/confirm-email?userId={user.Id}&token={encodedToken}";
+        var confirmationLink = $"{_config["App:BaseUrl"]}/confirm-email?userId={user.Id}&token={encodedToken}";
 
-        await _emailService.SendEmailAsync(
-            user.Email!,
-            "Confirm your email",
-            link);
+        var html = await _templateService.RenderAsync("ConfirmEmail",
+            new Dictionary<string, string>
+            {
+                { "link", confirmationLink }
+            });
+
+        await _emailService.SendEmailAsync(user.Email!, "Confirm your email", html);
     }
 }
