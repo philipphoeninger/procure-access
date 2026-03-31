@@ -26,6 +26,8 @@ public static class DataServiceConfiguration
         services.AddScoped<IProductPartService, ProductPartService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IProductTestService, ProductTestService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEmailService, EmailService>();
         
         return services;
     }
