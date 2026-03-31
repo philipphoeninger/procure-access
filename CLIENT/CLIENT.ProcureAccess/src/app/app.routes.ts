@@ -11,6 +11,8 @@ import { ProductsList } from '@app/features/products/list/products-list';
 import { ProductDetails } from '@app/features/products/details/product-details';
 import { ProductProposition } from '@app/features/products/proposition/product-proposition';
 import { CriterionProposition } from '@app/features/criteria/proposition/criterion-proposition';
+import { ResetPassword } from './features/identity/reset-password/reset-password';
+import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
 
 export const routes: Routes = [
   {
@@ -67,5 +69,13 @@ export const routes: Routes = [
     path: 'criterion-proposition',
     component: CriterionProposition,
     canActivate: [AuthGuard]
-   }
+   },
+  { 
+    path: 'reset-password', 
+    component: ResetPassword
+  },
+  { 
+    path: 'confirm-email', 
+    component: EmailConfirmation
+  }
 ];
