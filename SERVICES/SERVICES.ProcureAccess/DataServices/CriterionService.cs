@@ -6,9 +6,14 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
     {
     }
 
-    public IEnumerable<Criterion> GetByCriteriaFilterIds(int[] criteriaFilterIds)
+    public IEnumerable<CriterionDto> GetByCriteriaFilterIds(int[] criteriaFilterIds)
     {
-        return MainRepo.Context.Criteria.Where(x => criteriaFilterIds.Any(a => a == x.CriteriaFilterId)).ToList();
+        List<Criterion> criteria = 
+            MainRepo.Context.Criteria.Where(x => 
+                criteriaFilterIds.Any(a => a == x.CriteriaFilterId)).ToList();
+        List<CriterionDto> criteriaDtos = new List<CriterionDto>();
+        criteria.ForEach(x => criteriaDtos.Add(Mapper.Map<CriterionDto>(x)));
+        return criteriaDtos;
     }
 
     public int Approve(CriterionDto dto)

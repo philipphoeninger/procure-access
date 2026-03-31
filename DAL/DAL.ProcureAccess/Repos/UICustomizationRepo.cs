@@ -4,27 +4,31 @@ public class UICustomizationRepo : IUICustomizationRepo
 {
     private readonly bool _disposeContext;
     public ApplicationDBContext Context { get; }
+    private readonly IMapper _mapper;
 
     #region ctors
-    public UICustomizationRepo(ApplicationDBContext context)
+    public UICustomizationRepo(ApplicationDBContext context, IMapper mapper)
     {
         Context = context;
+        _mapper = mapper;
     }
-    protected UICustomizationRepo(DbContextOptions<ApplicationDBContext> options)
-        : this(new ApplicationDBContext(options))
+    protected UICustomizationRepo(DbContextOptions<ApplicationDBContext> options, IMapper mapper)
+        : this(new ApplicationDBContext(options), mapper)
     {
         _disposeContext = true;
     }
     #endregion
 
     #region methods
-    public async Task<UICustomization> GetAsync(string userId)
+    public async Task<UICustomizationDto> GetAsync(string userId)
     {
-        return await Context.Users
+        UICustomization entity = await Context.Users
             .AsNoTracking()
             .Where(u => u.Id == userId)
             .Select(u => u.UICustomization)
             .FirstAsync();
+        
+        return _mapper.Map<UICustomizationDto>(entity);
     }
 
     public async Task UpdateAsync(string userId, UICustomizationDto dto)
