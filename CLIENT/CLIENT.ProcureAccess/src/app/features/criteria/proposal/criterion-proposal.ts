@@ -15,7 +15,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 
 @Component({
-  selector: 'pa-criterion-proposition',
+  selector: 'pa-criterion-proposal',
   imports: [
     FormsModule,
     MatFormFieldModule,
@@ -28,11 +28,11 @@ import { MatListModule } from '@angular/material/list';
     RouterModule,
     MatListModule
 ],
-  templateUrl: './criterion-proposition.html',
-  styleUrl: './criterion-proposition.scss',
+  templateUrl: './criterion-proposal.html',
+  styleUrl: './criterion-proposal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CriterionProposition {
+export class CriterionProposal {
   protected store = inject(ProcureAccessStore);
 
   readonly dialog = inject(MatDialog);

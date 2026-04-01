@@ -16,7 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { FiltersSelection } from "@app/features/filters/selection/filters-selection";
 
 @Component({
-  selector: 'pa-product-proposition',
+  selector: 'pa-product-proposal',
   imports: [
     FormsModule,
     MatFormFieldModule,
@@ -30,11 +30,11 @@ import { FiltersSelection } from "@app/features/filters/selection/filters-select
     MatListModule,
     FiltersSelection
 ],
-  templateUrl: './product-proposition.html',
-  styleUrl: './product-proposition.scss',
+  templateUrl: './product-proposal.html',
+  styleUrl: './product-proposal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProductProposition {
+export class ProductProposal {
   protected store = inject(ProcureAccessStore);
 
   readonly dialog = inject(MatDialog);

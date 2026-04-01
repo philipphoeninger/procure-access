@@ -13,8 +13,8 @@
         @if (store.isAuthenticated()) {
           <button 
             matButton="filled" 
-            aria-label="Criterion proposition button" 
-            [routerLink]="'/criterion-proposition'"
+            aria-label="Criterion proposal button" 
+            [routerLink]="'/criterion-proposal'"
           >Propose criterion</button>
         }
         <button matButton matStepperNext (click)="asdf()">Enter</button>
@@ -73,8 +73,8 @@
             @if (store.isAuthenticated()) {
                 <button 
                   matButton="elevated"
-                  aria-label="Criterion proposition button" 
-                  [routerLink]="'/criterion-proposition'"
+                  aria-label="Criterion proposal button" 
+                  [routerLink]="'/criterion-proposal'"
                   style="margin-right: 8px">Propose criterion
                 </button>
             }

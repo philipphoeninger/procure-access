@@ -9,8 +9,8 @@ import { ProductsContainer } from '@features/products/pages/products-container/p
 import { Favorites } from '@app/features/favorites/list/favorites';
 import { ProductsList } from '@app/features/products/list/products-list';
 import { ProductDetails } from '@app/features/products/details/product-details';
-import { ProductProposition } from '@app/features/products/proposition/product-proposition';
-import { CriterionProposition } from '@app/features/criteria/proposition/criterion-proposition';
+import { ProductProposal } from '@app/features/products/proposal/product-proposal';
+import { CriterionProposal } from '@app/features/criteria/proposal/criterion-proposal';
 import { ResetPassword } from './features/identity/reset-password/reset-password';
 import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
 
@@ -61,13 +61,13 @@ export const routes: Routes = [
     component: ProductDetails
    },
    {
-    path: 'product-proposition',
-    component: ProductProposition,
+    path: 'product-proposal',
+    component: ProductProposal,
     canActivate: [AuthGuard]
    },
    {
-    path: 'criterion-proposition',
-    component: CriterionProposition,
+    path: 'criterion-proposal',
+    component: CriterionProposal,
     canActivate: [AuthGuard]
    },
   { 
