@@ -52,7 +52,7 @@
     <span class="error-message ng-touched ng-invalid">{{ registerErrorMessage }}</span>
     }
     <div class="buttons">
-      <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid">
+      <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || submitDisabled()">
         Sign up
       </button>
     </div>

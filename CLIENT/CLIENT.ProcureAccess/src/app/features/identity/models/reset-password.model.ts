@@ -10,11 +10,11 @@ export class ResetPasswordModel {
     token: string;
 
     @jsonMember
-    password: string;
+    newPassword: string;
 
-    constructor(pEmail: string, pToken: string, pPassword: string) {
+    constructor(pEmail: string, pToken: string, pNewPassword: string) {
         this.email = pEmail;
         this.token = pToken;
-        this.password = pPassword;
+        this.newPassword = pNewPassword;
     }
 }

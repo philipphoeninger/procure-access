@@ -6,13 +6,13 @@ import {
   withMethods,
   withState
 } from '@ngrx/signals';
-import { User } from '../models/user.model';
 import { AuthService } from '../services/auth.service';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { withLoading } from '@app/shared/state/with-loading';
 import { IdentityApiService } from '../services/identity-api.service';
+import { UserDto } from '../models/user.dto';
 
-export type IdentityState = { user: User | null };
+export type IdentityState = { user: UserDto | null };
 
 export const withIdentity = () => signalStoreFeature(
     withState<IdentityState>({ user: null }),
@@ -23,7 +23,7 @@ export const withIdentity = () => signalStoreFeature(
       identityApiService = inject(IdentityApiService),
       snackbarService = inject(SnackbarService)
     ) => ({
-      setUser(user: User | null) {
+      setUser(user: UserDto | null) {
         patchState(state, {
           user
         });

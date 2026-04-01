@@ -10,6 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { ResetPasswordModel } from '../models/reset-password.model';
 import { finalize, map } from 'rxjs/operators';
 
+enum PasswordResetState {
+    resetting = 'resetting',
+    failed = 'failed',
+}
+
 @Component({
   selector: 'pa-reset-password',
   imports: [
@@ -34,6 +39,9 @@ export class ResetPassword {
     protected confirmPassword = model("");
 
     resetDisabled = computed(() => this.password() !== this.confirmPassword());
+
+    protected PasswordResetState = PasswordResetState;
+    protected resettingState = signal(PasswordResetState.resetting);
 
     constructor(
         private router: Router,
@@ -60,19 +68,16 @@ export class ResetPassword {
 
         // TODO: start spinner
         this.authService
-            .register(resetCommand)
+            .resetPassword(resetCommand)
             .pipe(
                 map((response: { succeeded: boolean }) => {
                 if (response.succeeded) {
                     this.router.navigateByUrl('/(login:auth)');
                     this.snackbarService.showInfo('The password has been reset successfully. Please login with your new password.');
                 } else {
-                    this.snackbarService.showInfo('Something went wrong resetting your password. Please contact the support via email.');
+                    this.resettingState.set(PasswordResetState.failed);
                 }
-                }),
-                finalize(() => {
-                    // TODO: stop spinner
-                }),
+                })
             )
             .subscribe();
     }

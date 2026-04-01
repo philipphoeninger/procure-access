@@ -16,6 +16,7 @@ import { environment } from '../environments/environment';
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
 export const JWT_NAME = new InjectionToken<string>('JWT_NAME');
+export const REFRESH_TOKEN_NAME = new InjectionToken<string>('REFRESH_TOKEN_NAME');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,6 +35,12 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         const appName = inject(APP_NAME);
         return appName.toLowerCase() + '-token';
+      }
+    },
+    { provide: REFRESH_TOKEN_NAME,
+      useFactory: () => {
+        const appName = inject(APP_NAME);
+        return appName.toLowerCase() + '-refresh-token';
       }
     }
   ]

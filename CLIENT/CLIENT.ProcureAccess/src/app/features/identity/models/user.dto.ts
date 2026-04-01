@@ -2,18 +2,15 @@ import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
 
 @jsonObject
-export class LoginModel {
+export class UserDto {
+  @jsonMember
+  id: string;
+
   @jsonMember
   email: string;
 
-  @jsonMember
-  password: string;
-
-  constructor(
-    pEmail: string,
-    pPassword: string,
-  ) {
+  constructor(pId: string, pEmail: string) {
+    this.id = pId;
     this.email = pEmail;
-    this.password = pPassword;
   }
 }

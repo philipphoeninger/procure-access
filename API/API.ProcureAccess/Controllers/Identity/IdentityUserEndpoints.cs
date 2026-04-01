@@ -26,6 +26,25 @@ public static class IdentityUserEndpoints
                 : Results.BadRequest(result.Errors);
         });
 
+        app.MapPost("/forgot-password", async (
+            IUserService service,
+            ForgotPWRequest request) =>
+        {
+            await service.RequestPasswordResetAsync(request.Email);
+            return Results.Ok();
+        });
+
+        app.MapPost("/reset-password", async (
+            IUserService service,
+            ResetPasswordDto dto) =>
+        {
+            var result = await service.ResetPasswordAsync(dto);
+
+            return result.Succeeded
+                ? Results.Ok(result)
+                : Results.BadRequest(result.Errors);
+        });
+
         app.MapPost("/refresh", async (
             IUserService service,
             string refreshToken) =>

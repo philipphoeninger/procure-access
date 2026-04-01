@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize, map } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpResponse } from '@angular/common/http';
 
 enum EmailConfirmationState {
     confirming = 'confirming',
@@ -53,16 +54,13 @@ export class EmailConfirmation {
         this.authService
             .confirmEmail(this.userId(), this.token())
             .pipe(
-                map((response: { succeeded: boolean }) => {
-                if (response.succeeded) {
+                map((response: HttpResponse<any>) => {
+                if (response.ok) {
                     this.confirmationState.set(EmailConfirmationState.success);
                 } else {
                     this.confirmationState.set(EmailConfirmationState.failed);
                 }
-                }),
-                finalize(() => {
-                    // TODO: stop spinner
-                }),
+                })
             )
             .subscribe();
     }

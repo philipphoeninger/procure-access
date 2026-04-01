@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, model } from '@angular/core';
 import {
   FormControl,
   FormGroupDirective,
@@ -19,6 +19,7 @@ import { finalize, map } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { LoginModel } from '../models/login.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -51,6 +52,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrl: './register.scss'
 })
 export class Register {
+  protected store = inject(ProcureAccessStore);
   public registerErrorMessage?: string;
   public showLanguageSelection = true;
 
@@ -63,8 +65,8 @@ export class Register {
   ];
   public selectedLanguage = 'en';
 
-  protected password?: string;
-  protected confirmPassword?: string;
+  protected password = model('');
+  protected confirmPassword = model('');
   public keepSignedIn: boolean = false;
 
   emailFormControl = new FormControl('', [
@@ -73,6 +75,8 @@ export class Register {
   ]);
 
   matcher = new MyErrorStateMatcher();
+
+  submitDisabled = computed(() => this.password() !== this.confirmPassword());
 
   constructor(
     private router: Router,
@@ -85,14 +89,14 @@ export class Register {
 
     let registerCommand = new LoginModel(
       this.emailFormControl.value!,
-      this.password!
+      this.password()!
     );
 
-    // TODO: start spinner
+    this.store.incrementLoadingCount();
     this.authService
       .register(registerCommand)
       .pipe(
-        map((response: any) => {
+        map((response) => {
           if (response.succeeded) {
             this.router.navigateByUrl('/(login:auth)');
             this.snackbarService.showInfo('A registration has been sent to your email address and needs to be confirmed.\nPlease confirm it and come back to login.');
@@ -100,9 +104,7 @@ export class Register {
             this.snackbarService.showInfo('The registration could not be completed. Please check your inputs and try again.');
           }
         }),
-        finalize(() => {
-          // TODO: stop spinner
-        }),
+        finalize(() => this.store.decrementLoadingCount())
       )
       .subscribe();
   }
