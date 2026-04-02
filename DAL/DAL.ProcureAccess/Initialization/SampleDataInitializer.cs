@@ -87,6 +87,7 @@ public static class SampleDataInitializer
             ProcessInsert(dbContext, dbContext.Products, SampleData.Products);
             ProcessInsert(dbContext, dbContext.ProductParts, SampleData.ProductParts);
             ProcessInsert(dbContext, dbContext.ProductTests, SampleData.ProductTests);
+            ProcessInsert(dbContext, dbContext.ProductTypes, SampleData.ProductTypes);
             // insert more Entities...
         }
         catch (Exception ex)

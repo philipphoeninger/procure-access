@@ -11,6 +11,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IProductRepo, ProductRepo>();
         services.AddScoped<IProductPartRepo, ProductPartRepo>();
         services.AddScoped<IProductTestRepo, ProductTestRepo>();
+        services.AddScoped<IProductTypeRepo, ProductTypeRepo>();
         services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
         services.AddScoped<IUserRepo, UserRepo>();
         
@@ -26,6 +27,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IProductPartService, ProductPartService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IProductTestService, ProductTestService>();
+        services.AddScoped<IProductTypeService, ProductTypeService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();

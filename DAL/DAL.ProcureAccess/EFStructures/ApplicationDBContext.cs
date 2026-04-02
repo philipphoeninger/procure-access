@@ -31,6 +31,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<Criterion> Criteria { get; set; }
     public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
     public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ProductType> ProductTypes { get; set; }
     public virtual DbSet<ProductPart> ProductParts { get; set; }
     public virtual DbSet<ProductTest> ProductTests { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }

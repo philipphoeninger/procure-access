@@ -17,7 +17,7 @@ public partial class CriteriaFilter : BaseEntity
 
     public ICollection<Criterion> Criteria { get; set; } = new List<Criterion>();
 
-    public ICollection<Product> ProductsByType { get; set; } = new List<Product>();
+    public ICollection<ProductType> ProductTypes { get; set; } = new List<ProductType>();
 
     public ICollection<ProductPart> ProductParts { get; set; } = new List<ProductPart>();
 

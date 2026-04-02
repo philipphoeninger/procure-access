@@ -16,8 +16,7 @@ public partial class Product : BaseEntity, IApprovalObject
     [StringLength(6000)]
     public string? Description { get; set; }
 
-    public int TypeId { get; set; }
-    public CriteriaFilter Type { get; set; }
+    public ICollection<ProductType> Types { get; set; } = new List<ProductType>();
 
     public ICollection<ProductPart> Parts { get; set; } = new List<ProductPart>();
 
@@ -42,10 +41,9 @@ public partial class Product : BaseEntity, IApprovalObject
         // TODO: generate Name
     }
 
-    public Product(string pName, int pTypeId)
+    public Product(string pName)
     {
         Name = pName;
-        TypeId = pTypeId;
         ToApprove = false;
         CreatedAt = DateTime.UtcNow;
         IsDeleted = false;

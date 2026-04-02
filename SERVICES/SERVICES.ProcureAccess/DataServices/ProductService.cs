@@ -16,8 +16,6 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
             product.Link = dto.Link;
         if (dto.Description != null)
             product.Description = dto.Description;
-        if (dto.TypeId != null)
-            product.TypeId = (int)dto.TypeId;
 
         if (dto.IsDeleted.HasValue)
             product.IsDeleted = dto.IsDeleted.Value;

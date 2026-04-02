@@ -16,6 +16,8 @@ public class MappingProfile : Profile
         CreateMap<ProductPart, ProductPartDto>().ReverseMap();
         CreateMap<ProductTest, ProductTestDto>();
         CreateMap<ProductTest, ProductTestDto>().ReverseMap();
+        CreateMap<ProductType, ProductTypeDto>();
+        CreateMap<ProductType, ProductTypeDto>().ReverseMap();
 
         CreateMap<User, UserDto>();
         CreateMap<UICustomization, UICustomizationDto>();

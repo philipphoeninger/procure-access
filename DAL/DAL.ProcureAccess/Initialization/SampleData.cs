@@ -180,23 +180,23 @@ public static class SampleData
 
     public static List<Product> Products => new()
     {
-        new() { Id = 1, Name = "CoreFlow", Link = "www.coreflow.org", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 2, Name = "IntraSphere", Link = "www.intrasphere.com", Description = "A description for...", TypeId = 14, IsDeleted = false },
-        new() { Id = 3, Name = "ProximaSuite", Link = "www.proximasuite.com", Description = "A description for...", TypeId = 15, IsDeleted = false },
-        new() { Id = 4, Name = "WorkBridge", Link = "www.workbridge.com", Description = "A description for...", TypeId = 11, IsDeleted = false },
-        new() { Id = 5, Name = "SyntraLogic", Link = "www.syntralogic.it", Description = "A description for...", TypeId = 12, IsDeleted = false },
-        new() { Id = 6, Name = "Nexaro", Link = "www.nexaro.de", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 7, Name = "FlowMatrix", Link = "www.flowmatrix.com", Description = "A description for...", TypeId = 9, IsDeleted = false },
-        new() { Id = 8, Name = "OptiCore", Link = "www.opticore.com", Description = "A description for...", TypeId = 15, IsDeleted = false },
-        new() { Id = 9, Name = "BizStream", Link = "www.bizstream.ru", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 10, Name = "NovaDesk", Link = "www.novadesk.at", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 11, Name = "ClarioOne", Link = "www.clarioone.fr", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 12, Name = "FlexiSuite", Link = "www.flexisuite.com", Description = "A description for...", TypeId = 13, IsDeleted = false },
-        new() { Id = 13, Name = "EvoManage", Link = "www.evomanage.com", Description = "A description for...", TypeId = 10, IsDeleted = false },
-        new() { Id = 14, Name = "TaskFusion", Link = "www.taskfusion.com", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 15, Name = "PrimeHub", Link = "www.primehub.org", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 16, Name = "WorklineOS", Link = "www.worklineos.de", Description = "A description for...", TypeId = 14, IsDeleted = false },
-        new() { Id = 17, Name = "AquilaWare", Link = "www.aquilaware.com", Description = "A description for...", TypeId = 9, IsDeleted = false },
+        new() { Id = 1, Name = "CoreFlow", Link = "www.coreflow.org", Description = "A description for...", IsDeleted = false },
+        new() { Id = 2, Name = "IntraSphere", Link = "www.intrasphere.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 3, Name = "ProximaSuite", Link = "www.proximasuite.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 4, Name = "WorkBridge", Link = "www.workbridge.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 5, Name = "SyntraLogic", Link = "www.syntralogic.it", Description = "A description for...", IsDeleted = false },
+        new() { Id = 6, Name = "Nexaro", Link = "www.nexaro.de", Description = "A description for...", IsDeleted = false },
+        new() { Id = 7, Name = "FlowMatrix", Link = "www.flowmatrix.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 8, Name = "OptiCore", Link = "www.opticore.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 9, Name = "BizStream", Link = "www.bizstream.ru", Description = "A description for...", IsDeleted = false },
+        new() { Id = 10, Name = "NovaDesk", Link = "www.novadesk.at", Description = "A description for...", IsDeleted = false },
+        new() { Id = 11, Name = "ClarioOne", Link = "www.clarioone.fr", Description = "A description for...", IsDeleted = false },
+        new() { Id = 12, Name = "FlexiSuite", Link = "www.flexisuite.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 13, Name = "EvoManage", Link = "www.evomanage.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 14, Name = "TaskFusion", Link = "www.taskfusion.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 15, Name = "PrimeHub", Link = "www.primehub.org", Description = "A description for...", IsDeleted = false },
+        new() { Id = 16, Name = "WorklineOS", Link = "www.worklineos.de", Description = "A description for...", IsDeleted = false },
+        new() { Id = 17, Name = "AquilaWare", Link = "www.aquilaware.com", Description = "A description for...", IsDeleted = false },
     };
 
     public static List<ProductPart> ProductParts => new()
@@ -261,5 +261,26 @@ public static class SampleData
         new() { Id = 16, ProductId = 15, CriteriaFilterId = 24 },
         new() { Id = 17, ProductId = 17, CriteriaFilterId = 23 },
         new() { Id = 18, ProductId = 17, CriteriaFilterId = 26 },
+    };
+
+    public static List<ProductType> ProductTypes => new()
+    {
+        new() { Id = 1, ProductId = 1, CriteriaFilterId = 8 },
+        new() { Id = 2, ProductId = 2, CriteriaFilterId = 14 },
+        new() { Id = 3, ProductId = 3, CriteriaFilterId = 15 },
+        new() { Id = 4, ProductId = 4, CriteriaFilterId = 11 },
+        new() { Id = 5, ProductId = 5, CriteriaFilterId = 12 },
+        new() { Id = 6, ProductId = 6, CriteriaFilterId = 8 },
+        new() { Id = 7, ProductId = 7, CriteriaFilterId = 9 },
+        new() { Id = 8, ProductId = 8, CriteriaFilterId = 15 },
+        new() { Id = 9, ProductId = 9, CriteriaFilterId = 8 },
+        new() { Id = 10, ProductId = 10, CriteriaFilterId = 8 },
+        new() { Id = 11, ProductId = 11, CriteriaFilterId = 8 },
+        new() { Id = 12, ProductId = 12, CriteriaFilterId = 13 },
+        new() { Id = 13, ProductId = 13, CriteriaFilterId = 10 },
+        new() { Id = 14, ProductId = 14, CriteriaFilterId = 8 },
+        new() { Id = 15, ProductId = 15, CriteriaFilterId = 8 },
+        new() { Id = 16, ProductId = 16, CriteriaFilterId = 14 },
+        new() { Id = 17, ProductId = 17, CriteriaFilterId = 9 },
     };
 }
