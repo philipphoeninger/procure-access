@@ -9,6 +9,10 @@ public partial class CriteriaFilter : BaseEntity
     [StringLength(200)]
     public string Name { get; set; }
 
+    [Column(TypeName = "nvarchar(max)")]
+    [StringLength(2000)]
+    public string Description { get; set; } = string.Empty;
+
     [Required]
     [ForeignKey("FilterType")]
     public int FilterTypeId { get; set; }
@@ -40,9 +44,10 @@ public partial class CriteriaFilter : BaseEntity
         // TODO: generate Name
     }
 
-    public CriteriaFilter(string pName, int pFilterTypeId)
+    public CriteriaFilter(string pName, int pFilterTypeId, string pDescription)
     {
         Name = pName;
+        Description = pDescription;
         FilterTypeId = pFilterTypeId;
         CreatedAt = DateTime.UtcNow;
         IsDeleted = false;
