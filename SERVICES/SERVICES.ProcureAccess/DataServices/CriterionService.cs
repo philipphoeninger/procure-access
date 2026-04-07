@@ -6,6 +6,16 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
     {
     }
 
+    public override IEnumerable<CriterionDto> ReadAll()
+    {
+        List<Criterion> entities = MainRepo.GetAll().ToList();
+        entities = entities.FindAll(x => x.Proposal == null || x.Proposal.IsApproved);
+        List<CriterionDto> dtos = new List<CriterionDto>();
+        entities.ForEach(x => dtos.Add(Mapper.Map<CriterionDto>(x)));
+        return dtos;
+    }
+
+
     public IEnumerable<CriterionDto> GetByCriteriaFilterIds(int[] criteriaFilterIds)
     {
         List<Criterion> criteria = 
@@ -31,7 +41,7 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
             criteria.IsDeleted = dto.IsDeleted.Value;
 
         // approve
-        criteria.ToApprove = false;
+        criteria.Proposal.IsApproved = true;
 
         return MainRepo.SaveChanges();
     }
