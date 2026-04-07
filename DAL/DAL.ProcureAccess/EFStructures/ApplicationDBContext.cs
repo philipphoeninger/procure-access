@@ -57,6 +57,9 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new ProductConfiguration().Configure(modelBuilder.Entity<Product>());
         new ProductPartConfiguration().Configure(modelBuilder.Entity<ProductPart>());
         new ProductTestConfiguration().Configure(modelBuilder.Entity<ProductTest>());
+        new ProductTypeConfiguration().Configure(modelBuilder.Entity<ProductType>());
+        new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
+        new UserConfiguration().Configure(modelBuilder.Entity<User>());
         // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);
