@@ -5,6 +5,9 @@ public class User : IdentityUser
 {
     #region fields
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    public ICollection<Proposal> Proposals { get; set; } = new List<Proposal>();
+    public ICollection<Proposal> Approvals { get; set; } = new List<Proposal>();
     
     [Required]
     public bool IsDeleted { get; set; } = false;

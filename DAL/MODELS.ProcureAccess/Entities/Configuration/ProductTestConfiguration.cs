@@ -4,7 +4,8 @@ public class ProductTestConfiguration : IEntityTypeConfiguration<ProductTest>
 {
     public void Configure(EntityTypeBuilder<ProductTest> builder)
     {
-        builder.HasQueryFilter(x => !x.Product.ToApprove);
+        // Query Filters
+        builder.HasQueryFilter(x => !x.Product.IsDeleted);
 
         builder.HasKey(x => new { x.Id, x.ProductId, x.CriteriaFilterId });
 

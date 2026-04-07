@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities;
 
 [Table("Criteria", Schema = "dbo")]
 [EntityTypeConfiguration(typeof(CriterionConfiguration))]
-public partial class Criterion : BaseEntity, IApprovalObject
+public partial class Criterion : BaseEntity
 {
     #region fields
     [Required]
@@ -16,9 +16,9 @@ public partial class Criterion : BaseEntity, IApprovalObject
 
     public int? CriteriaFilterId { get; set; }
     public CriteriaFilter? CriteriaFilter { get; set; }
-    
-    [Required]
-    public bool ToApprove { get; set; } = false;
+
+    public int? ProposalId { get; set; }
+    public Proposal? Proposal { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -40,7 +40,6 @@ public partial class Criterion : BaseEntity, IApprovalObject
     {
         Name = pName;
         Description = pDescription;
-        ToApprove = false;
         CreatedAt = DateTime.UtcNow;
         IsDeleted = false;
     }

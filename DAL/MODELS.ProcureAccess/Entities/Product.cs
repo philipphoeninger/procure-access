@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities;
 
 [Table("Products", Schema = "dbo")]
 [EntityTypeConfiguration(typeof(ProductConfiguration))]
-public partial class Product : BaseEntity, IApprovalObject
+public partial class Product : BaseEntity
 {
     #region fields
     [Required]
@@ -22,8 +22,8 @@ public partial class Product : BaseEntity, IApprovalObject
 
     public ICollection<ProductTest> Tests { get; set; } = new List<ProductTest>();
 
-    [Required]
-    public bool ToApprove { get; set; } = false;
+    public int? ProposalId { get; set; }
+    public Proposal? Proposal { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -44,7 +44,6 @@ public partial class Product : BaseEntity, IApprovalObject
     public Product(string pName)
     {
         Name = pName;
-        ToApprove = false;
         CreatedAt = DateTime.UtcNow;
         IsDeleted = false;
     }
