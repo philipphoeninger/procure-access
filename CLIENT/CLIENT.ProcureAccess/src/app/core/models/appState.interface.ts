@@ -5,7 +5,7 @@ import { FilterSet } from "@app/features/favorites/models/filterSet.model";
 import { Product } from "@app/features/products/models/product.model";
 import { FiltersState } from "@app/features/filters/state/with-filters";
 import { initialSettingsState, SettingsState } from "@app/features/settings/state/with-settings";
-import { ProposalDto } from "@app/features/approval/models/proposal.dto";
+import { ProposalDto } from "@app/features/proposal/models/proposal.dto";
 
 export interface AppState {
     loadingCount: number;

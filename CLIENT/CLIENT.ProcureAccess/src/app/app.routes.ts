@@ -14,7 +14,7 @@ import { CriterionProposal } from '@app/features/criteria/proposal/criterion-pro
 import { ResetPassword } from './features/identity/reset-password/reset-password';
 import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
 import { PermissionGuard } from './features/identity/guards/permission.guard';
-import { ProposalList } from './features/approval/list/proposal-list';
+import { ProposalList } from './features/proposal/list/proposal-list';
 import { Unauthorized } from './pages/unauthorized/unauthorized';
 
 export const routes: Routes = [
