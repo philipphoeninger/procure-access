@@ -29,16 +29,16 @@ export const withFilters = () => signalStoreFeature(
         async loadFilters() {
           state.incrementLoadingCount();
           // get Filter Types
-          let filterTypes = await filtersApiService.getAllFilterTypes();
+          let filterTypesResult = await filtersApiService.getAllFilterTypes();
           // get & set Criteria Filters
-          let criteriaFilters = await filtersApiService.getAllCriteriaFilters();
-          this.setCriteriaFilters(criteriaFilters);
+          let criteriaFiltersResult = await filtersApiService.getAllCriteriaFilters();
+          this.setCriteriaFilters(criteriaFiltersResult.value ?? []);
           // set Criteria Filters of each Filter Type & set Filter Types
-          filterTypes.forEach(filterType => {
+          filterTypesResult.value?.forEach(filterType => {
             filterType.criteriaFilters = 
-              criteriaFilters.filter(cf => cf.filterTypeId === filterType.id);
+              state.criteriaFilters().filter(cf => cf.filterTypeId === filterType.id);
           });
-          this.setFilterTypes(filterTypes);
+          this.setFilterTypes(filterTypesResult.value ?? []);
 
           state.decrementLoadingCount();
         },

@@ -3,6 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { API_URL } from "@app/app.config";
 import { lastValueFrom, Observable, of } from "rxjs";
 import { Product } from "../../models/product.model";
+import { TResult } from "@app/core/models/result.model";
 
 @Injectable({ providedIn:'root' })
 export class ProductsApiService {
@@ -10,11 +11,11 @@ export class ProductsApiService {
     @Inject(API_URL) private apiUrl: string,
     private http: HttpClient) {}
 
-  getAllProducts(): Promise<Product[]> {
+  getAllProducts(): Promise<TResult<Product[]>> {
     // let allProducts = products;
     // return lastValueFrom(of(allProducts));
     return lastValueFrom(
-        this.http.get<Product[]>(`${this.apiUrl}/Products`)
+        this.http.get<TResult<Product[]>>(`${this.apiUrl}/Products`)
     );
   }
 

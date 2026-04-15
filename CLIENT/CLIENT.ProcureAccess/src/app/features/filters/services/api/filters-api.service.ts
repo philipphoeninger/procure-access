@@ -4,6 +4,7 @@ import { API_URL } from "@app/app.config";
 import { lastValueFrom } from "rxjs";
 import { CriteriaFilter } from "../../models/criteriaFilter.model";
 import { FilterType } from "../../models/filterType.model";
+import { TResult } from "@app/core/models/result.model";
 
 @Injectable({ providedIn:'root' })
 export class FiltersApiService {
@@ -11,15 +12,15 @@ export class FiltersApiService {
     @Inject(API_URL) private apiUrl: string,
     private http: HttpClient) {}
 
-  getAllFilterTypes(): Promise<FilterType[]> {
+  getAllFilterTypes(): Promise<TResult<FilterType[]>> {
     return lastValueFrom(
-      this.http.get<FilterType[]>(`${this.apiUrl}/FilterTypes`)
+      this.http.get<TResult<FilterType[]>>(`${this.apiUrl}/FilterTypes`)
     );
   }
 
-  getAllCriteriaFilters(): Promise<CriteriaFilter[]> {
+  getAllCriteriaFilters(): Promise<TResult<CriteriaFilter[]>> {
     return lastValueFrom(
-      this.http.get<CriteriaFilter[]>(`${this.apiUrl}/CriteriaFilters`)
+      this.http.get<TResult<CriteriaFilter[]>>(`${this.apiUrl}/CriteriaFilters`)
     );
   }
 }

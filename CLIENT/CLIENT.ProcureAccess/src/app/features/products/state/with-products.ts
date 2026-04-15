@@ -19,8 +19,8 @@ export const withProducts = () => signalStoreFeature(
     withMethods((state, productsApiService = inject(ProductsApiService)) => ({      
         async loadProducts() {
           state.incrementLoadingCount();
-          let products = await productsApiService.getAllProducts();
-          this.setProducts(products);
+          let result = await productsApiService.getAllProducts();
+          this.setProducts(result.value ?? []);
           state.decrementLoadingCount();
         },
         setProducts(products: Product[]) {
@@ -29,8 +29,7 @@ export const withProducts = () => signalStoreFeature(
           });
         },
         getProductById(productId: number) {
-          let product = state.products().find(product => product.id === productId);
-          return product;
+          return state.products().find(product => product.id === productId) ?? null;
         }
     })),
     withComputed((state) => ({
