@@ -104,11 +104,13 @@ export class Login {
             this.snackbarService.showInfo('Login failed. Please try again.');
             return;
           } //gate
+          this.authService.loadUserFromToken(response.accessToken);
           localStorage.setItem(this.jwtName, response.accessToken);
           localStorage.setItem(this.refreshTokenName, response.refreshToken);
           let user: UserDto = new UserDto(response.user.id, response.user.email);
           this.store.setUser(user);
           this.store.setUICustomization(response.user.uiCustomization);
+          this.store.loadProposals();
           this.router.navigateByUrl('/home');
         }),
         catchError((error: HttpErrorResponse) => {
