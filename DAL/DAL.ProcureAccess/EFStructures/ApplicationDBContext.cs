@@ -35,7 +35,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<ProductPart> ProductParts { get; set; }
     public virtual DbSet<ProductTest> ProductTests { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
-    // add more fields ...
+    public virtual DbSet<Proposal> Proposals { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -37,7 +37,7 @@ public class ProposalConfiguration : IEntityTypeConfiguration<Proposal>
         // Check Constraints
         builder
             .ToTable(b => b.HasCheckConstraint(
-                "CK_ProductId_CriterionId_NN", 
-                "([ProductId] IS NOT NULL AND [CriterionId] IS NULL) OR ([ProductId] IS NULL AND [CriterionId] IS NOT NULL)"));
+                "CK_Proposal_Snapshot_NN", 
+                "([ProductSnapshot] IS NOT NULL AND [CriterionSnapshot] IS NULL) OR ([ProductSnapshot] IS NULL AND [CriterionSnapshot] IS NOT NULL)"));
     }
 }

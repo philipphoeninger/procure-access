@@ -4,6 +4,7 @@ using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.ProcureAccess.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260414175804_AddObjectApprovalSnapshots")]
+    partial class AddObjectApprovalSnapshots
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -469,7 +472,7 @@ namespace DAL.ProcureAccess.Migrations
 
                     b.ToTable("Proposals", "dbo", t =>
                         {
-                            t.HasCheckConstraint("CK_Proposal_Snapshot_NN", "([ProductSnapshot] IS NOT NULL AND [CriterionSnapshot] IS NULL) OR ([ProductSnapshot] IS NULL AND [CriterionSnapshot] IS NOT NULL)");
+                            t.HasCheckConstraint("CK_ProductId_CriterionId_NN", "([ProductId] IS NOT NULL AND [CriterionId] IS NULL) OR ([ProductId] IS NULL AND [CriterionId] IS NOT NULL)");
                         });
                 });
 
