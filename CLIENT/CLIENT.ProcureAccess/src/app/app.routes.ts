@@ -77,5 +77,9 @@ export const routes: Routes = [
   { 
     path: 'confirm-email', 
     component: EmailConfirmation
+  },
+  { 
+    path: 'unauthorized', 
+    component: Unauthorized
   }
 ];
