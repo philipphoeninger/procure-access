@@ -44,11 +44,17 @@ public class UICustomizationController : ControllerBase
         catch (CustomException ex)
         {
             // TODO: handle more gracefully
-            return BadRequest(ex);
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex);
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
         }
         return Ok(dto);
     }
@@ -83,11 +89,17 @@ public class UICustomizationController : ControllerBase
         catch (CustomException ex)
         {
             // TODO: handle more gracefully
-            return BadRequest(ex);
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex);
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
         }
         return Ok(dto);
     }

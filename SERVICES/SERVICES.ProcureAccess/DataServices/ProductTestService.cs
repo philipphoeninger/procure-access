@@ -6,13 +6,13 @@ public class ProductTestService : BaseService<ProductTest, ProductTestDto>, IPro
     {
     }
 
-    public override IEnumerable<ProductTestDto> ReadAll()
+    public override async Task<Result<IEnumerable<ProductTestDto>>> ReadAll()
     {
         List<ProductTest> entities = MainRepo.GetAll().ToList();
         entities = entities.FindAll(x => x.Product.Proposal == null || 
-                                            x.Product.Proposal.IsApproved);
+                                            x.Product.Proposal.Status == ProposalStatus.Approved);
         List<ProductTestDto> dtos = new List<ProductTestDto>();
         entities.ForEach(x => dtos.Add(Mapper.Map<ProductTestDto>(x)));
-        return dtos;
+        return Result<IEnumerable<ProductTestDto>>.Success(dtos);
     }
 }

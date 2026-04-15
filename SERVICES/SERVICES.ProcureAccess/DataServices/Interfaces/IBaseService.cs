@@ -6,9 +6,9 @@ public interface IBaseService<TEntity, TDto>
 {
     IBaseRepo<TEntity> MainRepo { get; set; }
     IMapper Mapper { get; set; }
-    TDto? Create(TDto dto);
-    TDto? Read(int id);
-    IEnumerable<TDto> ReadAll();
-    TDto? Update(TDto dto);
+    Task<Result<TDto?>> Create(TDto dto);
+    Task<Result<TDto?>> Read(int id);
+    Task<Result<IEnumerable<TDto>>> ReadAll();
+    Task<Result<TDto?>> Update(TDto dto);
     int Delete(int id);
 }

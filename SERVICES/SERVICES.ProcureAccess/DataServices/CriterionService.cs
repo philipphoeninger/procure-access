@@ -6,15 +6,14 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
     {
     }
 
-    public override IEnumerable<CriterionDto> ReadAll()
+    public override async Task<Result<IEnumerable<CriterionDto>>> ReadAll()
     {
-        List<Criterion> entities = MainRepo.GetAll().ToList();
-        entities = entities.FindAll(x => x.Proposal == null || x.Proposal.IsApproved);
+        List<Criterion> entities = MainRepo.Context.Criteria.Where(x => 
+            x.Proposal == null || x.Proposal.Status == ProposalStatus.Approved).ToList();
         List<CriterionDto> dtos = new List<CriterionDto>();
         entities.ForEach(x => dtos.Add(Mapper.Map<CriterionDto>(x)));
-        return dtos;
+        return Result<IEnumerable<CriterionDto>>.Success(dtos);
     }
-
 
     public IEnumerable<CriterionDto> GetByCriteriaFilterIds(int[] criteriaFilterIds)
     {
