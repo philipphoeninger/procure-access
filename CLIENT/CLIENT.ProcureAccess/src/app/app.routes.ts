@@ -13,6 +13,9 @@ import { ProductProposal } from '@app/features/products/proposal/product-proposa
 import { CriterionProposal } from '@app/features/criteria/proposal/criterion-proposal';
 import { ResetPassword } from './features/identity/reset-password/reset-password';
 import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
+import { PermissionGuard } from './features/identity/guards/permission.guard';
+import { ProposalList } from './features/approval/list/proposal-list';
+import { Unauthorized } from './pages/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
@@ -33,6 +36,12 @@ export const routes: Routes = [
     path: 'register',
     component: Register,
     outlet: 'login',
+  },
+  {
+    path: 'proposals',
+    component: ProposalList,
+    canActivate: [PermissionGuard],
+    data: { permission: 'objects:approve' }
   },
   {
     path: 'profile',

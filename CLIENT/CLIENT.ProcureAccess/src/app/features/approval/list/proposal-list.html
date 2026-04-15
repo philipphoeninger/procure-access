@@ -1,0 +1,109 @@
+
+<div class="table-container">
+  <table
+      mat-table
+      matSort
+      class="proposal-table" 
+      [dataSource]="dataSource"
+      class="mat-elevation-z8"
+      (matSortChange)="announceSortChange($event)">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by position"> No. </th>
+      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let element" style="padding-left: 8px;">
+        <!--TODO <button
+          mat-icon-button
+          class="proposal-details-btn"
+          aria-label="Proposal details icon-button"
+          matTooltip="Details"
+          matTooltipPosition="above"
+          [routerLink]="['/proposal', element.id]"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button> -->
+        <button
+            mat-icon-button
+            class="proposal-edit-btn"
+            aria-label="Proposal edit icon-button"
+            matTooltip="Edit" 
+            matTooltipPosition="right"
+            (click)="openProposal(element.id, element.product != null)">
+            <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Id Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id"> Id </th>
+      <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+    </ng-container>
+
+    <!-- ProposerId Column -->
+    <ng-container matColumnDef="proposerId">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by proposer id"> Proposer </th>
+      <td mat-cell *matCellDef="let element"> {{element.proposerId}} </td>
+    </ng-container>
+
+    <!-- ApproverId Column -->
+    <ng-container matColumnDef="approverId">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by approver id"> Approver </th>
+      <td mat-cell *matCellDef="let element"> {{element.approverId}} </td>
+    </ng-container>
+
+    <!-- Product name Column -->
+    <ng-container matColumnDef="productName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by product name"> Product </th>
+      <td mat-cell *matCellDef="let element"> {{element.product?.name}} </td>
+    </ng-container>
+
+    <!-- CriterionName Column -->
+    <ng-container matColumnDef="criterionName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by criterion name"> Criterion </th>
+      <td mat-cell *matCellDef="let element"> {{element.criterion?.name}} </td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> Status </th>
+      <td mat-cell *matCellDef="let element"> {{ ProposalStatus[element.status] }} </td>
+    </ng-container>
+
+    <!-- Note Column -->
+    <ng-container matColumnDef="note">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by note"> Note </th>
+      <td mat-cell *matCellDef="let element"> {{element.note}} </td>
+    </ng-container>
+
+    <!-- CreatedAt Column -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by created at"> Created At </th>
+      <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
+    </ng-container>
+
+    <!-- FinishedAt Column -->
+    <ng-container matColumnDef="finishedAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by finished at"> Finished At </th>
+      <td mat-cell *matCellDef="let element"> {{element.finishedAt}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    @if (dataSource._filterData.length == 0) {
+        <p>No open proposals found</p>
+    }
+  </table>
+</div>
+
+@if (store.isLoading()) {
+  <mat-spinner 
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+    ></mat-spinner>
+}
