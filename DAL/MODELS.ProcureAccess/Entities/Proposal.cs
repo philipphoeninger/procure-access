@@ -21,7 +21,7 @@ public partial class Proposal : BaseEntity
     public Criterion? Criterion { get; set; }
 
     [Required]
-    public bool IsApproved { get; set; } = false;
+    public ProposalStatus Status { get; set; } = ProposalStatus.Pending;
 
     [Column(TypeName = "nvarchar(max)")]
     [StringLength(5000)]
@@ -40,7 +40,6 @@ public partial class Proposal : BaseEntity
     public Proposal()
     {
         CreatedAt = DateTime.UtcNow;
-        IsApproved = false;
         IsDeleted = false;
     }
     #endregion
