@@ -7,9 +7,13 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { ResetPasswordModel } from '../models/reset-password.model';
 import { AuthResponse } from '../models/auth-response.model';
+import { jwtDecode } from 'jwt-decode';
+import { EnCustomClaimTypes } from '../models/custom-claim-types.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+   private permissions: string[] = [];
+
   constructor(
     @Inject(API_URL) private apiUrl: string,
     @Inject(JWT_NAME) private jwtName: string,
@@ -63,5 +67,18 @@ export class AuthService {
         },
         observe: 'response' 
       });
+  }
+
+  loadUserFromToken(token: string) {
+    const decoded: any = jwtDecode(token);
+    this.permissions = decoded[EnCustomClaimTypes.Permission] || [];
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.permissions.includes(permission);
+  }
+
+  hasNotPermission(permission: string): boolean {
+    return !this.permissions.includes(permission);
   }
 }
