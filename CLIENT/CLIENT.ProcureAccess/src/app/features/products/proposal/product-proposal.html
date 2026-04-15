@@ -12,7 +12,7 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
   <form class="product-form" #addProductForm="ngForm" (ngSubmit)="onSubmit(addProductForm, $event)">
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput type="text" name="name" [(ngModel)]="name" required #nameInput="ngModel"
+      <input matInput type="text" name="name" [(ngModel)]="proposal().product!.name" required #nameInput="ngModel"
         maxlength="50" />
       @if (nameInput.invalid && nameInput.touched) {
       <mat-error>Name is required.</mat-error>
@@ -20,7 +20,7 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
     </mat-form-field>
     <mat-form-field id="link-field">
       <mat-label>Link</mat-label>
-      <input matInput type="text" name="link" [(ngModel)]="link" required #linkInput="ngModel"
+      <input matInput type="text" name="link" [(ngModel)]="proposal().product!.link" required #linkInput="ngModel"
         minlength="6" maxlength="200" />
       @if (linkInput.invalid && linkInput.touched) {
       <mat-error>Link is required.</mat-error>
@@ -29,7 +29,7 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
     <mat-form-field id="description-field">
       <mat-label>Description</mat-label>
       <!-- TODO: make text area markdown input -->
-      <textarea matInput type="text" name="description" [(ngModel)]="description" required #descriptionInput="ngModel"
+      <textarea matInput type="text" name="description" [(ngModel)]="proposal().product!.description" required #descriptionInput="ngModel"
         minlength="6" maxlength="2000"></textarea>
       @if (descriptionInput.invalid && descriptionInput.touched) {
         <mat-error>Description is required.</mat-error>
@@ -43,10 +43,24 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
         <span class="error-message ng-touched ng-invalid">{{ formErrorMessage }}</span>
     }
     <div class="buttons">
-      <button mat-button color="primary" (click)="null" type="button">Reset</button>
-      <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addProductForm.invalid">
-        Send
-      </button>
+      <div>
+        <button mat-button color="primary" (click)="null" type="button">Reset</button>
+        <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addProductForm.invalid">
+          {{ proposalId() ? "Save" : "Send" }}
+        </button>
+      </div>
+      <div *appHasPermission="'objects:approve'" id="approval-btns">
+        <button mat-button color="warn" (click)="approve(false)" type="button">Reject</button>
+        <button
+          id="approve-button"
+          mat-flat-button
+          color="primary"
+          type="button"
+          [disabled]="addProductForm.dirty"
+          (click)="approve(true)">
+          Approve
+        </button>
+      </div>
     </div>
   </form>
 </div>

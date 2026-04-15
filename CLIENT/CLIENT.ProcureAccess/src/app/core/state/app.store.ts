@@ -7,7 +7,7 @@ import { withCriteria } from "@app/features/criteria/state/with-criteria";
 import { withFavorites } from "@app/features/favorites/state/with-favorites";
 import { withProducts } from "@app/features/products/state/with-products";
 import { withSettings } from "@app/features/settings/state/with-settings";
-import { withProposal } from "@app/features/approval/state/with-proposal";
+import { withProposal } from "@app/features/proposal/state/with-proposal";
 
 export const ProcureAccessStore = signalStore(
     { providedIn: 'root' },
