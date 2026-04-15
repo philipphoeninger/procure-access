@@ -9,6 +9,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@features/identity/services/auth.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
 
 @Component({
   selector: 'pa-header',
@@ -20,7 +21,8 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
     MatInputModule,
     MatMenuModule,
     RouterModule,
-    MatTooltipModule
+    MatTooltipModule,
+    HasPermissionDirective
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss'

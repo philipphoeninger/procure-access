@@ -35,6 +35,9 @@
         <mat-icon>favorite</mat-icon>
       </button>
     }
+    <button *appHasPermission="'objects:approve'" mat-icon-button class="proposals-btn" aria-label="Proposals icon-button" [routerLink]="'/proposals'" matTooltip="Proposals" matTooltipPosition="below">
+      <mat-icon>approval</mat-icon>
+    </button>
     @if (store.isAuthenticated()) {
       <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'/profile'" matTooltip="Profile" matTooltipPosition="below">
         <mat-icon>person</mat-icon>
