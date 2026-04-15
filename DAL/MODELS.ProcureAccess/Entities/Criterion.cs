@@ -17,7 +17,6 @@ public partial class Criterion : BaseEntity
     public int? CriteriaFilterId { get; set; }
     public CriteriaFilter? CriteriaFilter { get; set; }
 
-    public int? ProposalId { get; set; }
     public Proposal? Proposal { get; set; }
 
     [Required]

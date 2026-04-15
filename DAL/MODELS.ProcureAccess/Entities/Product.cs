@@ -9,6 +9,7 @@ public partial class Product : BaseEntity
     [StringLength(200)]
     public string Name { get; set; }
 
+    [Url]
     [StringLength(500)]
     public string? Link { get; set; }
 
@@ -22,7 +23,6 @@ public partial class Product : BaseEntity
 
     public ICollection<ProductTest> Tests { get; set; } = new List<ProductTest>();
 
-    public int? ProposalId { get; set; }
     public Proposal? Proposal { get; set; }
 
     [Required]
