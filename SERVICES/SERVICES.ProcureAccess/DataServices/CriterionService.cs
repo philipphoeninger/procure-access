@@ -25,24 +25,4 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
         criteria.ForEach(x => criteriaDtos.Add(Mapper.Map<CriterionDto>(x)));
         return criteriaDtos;
     }
-
-    public int Approve(CriterionDto dto)
-    {
-        var criteria = MainRepo.FindIgnoreQueryFilters(dto.Id);
-
-        if (dto.Name != null)
-            criteria.Name = dto.Name;
-        if (dto.Description != null)
-            criteria.Description = dto.Description;
-        if (dto.CriteriaFilterId != null)
-            criteria.CriteriaFilterId = dto.CriteriaFilterId;
-
-        if (dto.IsDeleted.HasValue)
-            criteria.IsDeleted = dto.IsDeleted.Value;
-
-        // approve
-        criteria.Proposal.IsApproved = true;
-
-        return MainRepo.SaveChanges();
-    }
 }

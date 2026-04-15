@@ -1,5 +1,5 @@
 namespace SERVICES.ProcureAccess.DataServices.Interfaces;
 
-public interface IProductService : IBaseService<Product, ProductDto>, IApproveService<ProductDto>
+public interface IProductService : IBaseService<Product, ProductDto>
 {
 }
