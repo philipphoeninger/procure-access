@@ -70,12 +70,12 @@ export const routes: Routes = [
     component: ProductDetails
    },
    {
-    path: 'product-proposal',
+    path: 'product-proposal/:id',
     component: ProductProposal,
     canActivate: [AuthGuard]
    },
    {
-    path: 'criterion-proposal',
+    path: 'criterion-proposal/:id',
     component: CriterionProposal,
     canActivate: [AuthGuard]
    },
