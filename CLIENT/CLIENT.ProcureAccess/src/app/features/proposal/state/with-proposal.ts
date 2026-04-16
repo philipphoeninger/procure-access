@@ -58,6 +58,12 @@ export const withProposal = () => signalStoreFeature(
     withComputed((state) => ({
       proposalsCount: computed(() => {
         return state.proposals().length;
-      })
+      }),
+      openProposals: computed(() => state.proposals().filter(x => !x.finishedAt)),
+      closedProposals: computed(() => state.proposals().filter(x => x.finishedAt))
+    })),
+    withComputed((state) => ({
+        openProposalsCount: computed(() => state.openProposals().length),
+        closedProposalsCount: computed(() => state.closedProposals().length)
     }))
   );

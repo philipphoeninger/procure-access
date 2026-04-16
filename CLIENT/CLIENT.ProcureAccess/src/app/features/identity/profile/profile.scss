@@ -37,4 +37,18 @@
 
 .proposals-container {
   width: 100%;
+
+  .proposal-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  mat-list {
+    .mat-mdc-list-item-meta {
+      display: flex;
+      height: 100%;
+      align-items: center;
+    }
+  }
 }
