@@ -9,7 +9,7 @@
   <form class="criterion-form" #addCriterionForm="ngForm" (ngSubmit)="onSubmit(addCriterionForm, $event)">
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput type="text" name="name" [(ngModel)]="name" required #nameInput="ngModel"
+      <input matInput type="text" name="name" [(ngModel)]="proposal().criterion!.name" required #nameInput="ngModel"
         maxlength="50" />
       @if (nameInput.invalid && nameInput.touched) {
       <mat-error>Name is required.</mat-error>
@@ -18,7 +18,7 @@
     <mat-form-field id="description-field">
       <mat-label>Description</mat-label>
       <!-- TODO: make text area markdown input -->
-      <textarea matInput type="text" name="description" [(ngModel)]="description" required #descriptionInput="ngModel"
+      <textarea matInput type="text" name="description" [(ngModel)]="proposal().criterion!.description" required #descriptionInput="ngModel"
         minlength="6" maxlength="2000"></textarea>
       @if (descriptionInput.invalid && descriptionInput.touched) {
         <mat-error>Description is required.</mat-error>
@@ -29,10 +29,24 @@
         <span class="error-message ng-touched ng-invalid">{{ formErrorMessage }}</span>
     }
     <div class="buttons">
-      <button mat-button color="primary" (click)="null" type="button">Reset</button>
-      <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addCriterionForm.invalid">
-        Send
-      </button>
+      <div>
+        <button mat-button color="primary" (click)="null" type="button">Reset</button>
+        <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addCriterionForm.invalid">
+          {{ proposalId() ? "Save" : "Send" }}
+        </button>
+      </div>
+      <div *appHasPermission="'objects:approve'" id="approval-btns">
+        <button mat-button color="warn" (click)="approve(false)" type="button">Reject</button>
+        <button
+          id="approve-button"
+          mat-flat-button
+          color="primary"
+          type="button"
+          [disabled]="addCriterionForm.dirty"
+          (click)="approve(true)">
+          Approve
+        </button>
+      </div>
     </div>
   </form>
 </div>

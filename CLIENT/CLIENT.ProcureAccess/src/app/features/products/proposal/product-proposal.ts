@@ -17,7 +17,7 @@ import { ProposalDto } from '@app/features/proposal/models/proposal.dto';
 import { ProposalApiService } from '@app/features/proposal/services/api/proposal-api.service';
 import { CreateProductDto } from '../models/create-product.dto';
 import { UpsertProposal } from '@app/features/proposal/models/upsert-proposal-request.model';
-import { ProposalStatus } from '../models/proposal-status.enum';
+import { ProposalStatus } from '../../proposal/models/proposal-status.enum';
 import { ReviewProposal } from '@app/features/proposal/models/review-proposal-request.model';
 import { ApproveProposal } from '@app/features/proposal/models/approve-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';

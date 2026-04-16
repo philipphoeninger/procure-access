@@ -31,6 +31,9 @@ export const withCriteria = () => signalStoreFeature(
           patchState(state, {
               criteria
           });
+      },
+      getCriterionById(criterionId: number) {
+          return state.criteria().find(criterion => criterion.id === criterionId) ?? null;
       }
     })),
     withComputed((state) => ({

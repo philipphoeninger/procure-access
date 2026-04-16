@@ -11,7 +11,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ProposalStatus } from '@app/features/products/models/proposal-status.enum';
+import { ProposalStatus } from '@app/features/proposal/models/proposal-status.enum';
 
 @Component({
   selector: 'pa-proposal',
