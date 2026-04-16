@@ -31,9 +31,11 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<Criterion> Criteria { get; set; }
     public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
     public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ProductType> ProductTypes { get; set; }
     public virtual DbSet<ProductPart> ProductParts { get; set; }
     public virtual DbSet<ProductTest> ProductTests { get; set; }
-    // add more fields ...
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    public virtual DbSet<Proposal> Proposals { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +57,9 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new ProductConfiguration().Configure(modelBuilder.Entity<Product>());
         new ProductPartConfiguration().Configure(modelBuilder.Entity<ProductPart>());
         new ProductTestConfiguration().Configure(modelBuilder.Entity<ProductTest>());
+        new ProductTypeConfiguration().Configure(modelBuilder.Entity<ProductType>());
+        new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
+        new UserConfiguration().Configure(modelBuilder.Entity<User>());
         // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);

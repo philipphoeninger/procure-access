@@ -1,0 +1,10 @@
+@if (confirmationState() == EmailConfirmationState.confirming) {
+    <h1>Confirming email...</h1>
+    <p>Please wait... </p><mat-spinner ></mat-spinner>
+} @else if (confirmationState() == EmailConfirmationState.success) {
+    <h1>Email confirmed</h1>
+    <p>Email confirmed successfully. You can now close this window.</p>
+} @else {
+    <h1>Email confirmation failed</h1>
+    <p>Something went wrong confirming your email. Please contact the support via email.</p>
+}

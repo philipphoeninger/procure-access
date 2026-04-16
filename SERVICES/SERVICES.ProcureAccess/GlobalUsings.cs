@@ -1,9 +1,12 @@
-﻿global using DAL.ProcureAccess.Repos;
+﻿global using AutoMapper;
+
+global using DAL.ProcureAccess.Repos;
 global using DAL.ProcureAccess.Repos.Base;
 global using DAL.ProcureAccess.Repos.Interfaces;
 
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
+global using MODELS.ProcureAccess.Entities.Dto;
 
 global using Microsoft.AspNetCore.Builder;
 
@@ -27,9 +30,11 @@ global using System.Text;
 global using System.Text.Json;
 
 global using SERVICES.ProcureAccess.DataServices;
+global using SERVICES.ProcureAccess.DataServices.Base;
+global using SERVICES.ProcureAccess.DataServices.Configuration;
+global using SERVICES.ProcureAccess.DataServices.Interfaces;
 //global using SERVICES.ProcureAccess.DataServices.Api;
 //global using SERVICES.ProcureAccess.DataServices.Api.Base;
-//global using SERVICES.ProcureAccess.DataServices.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Configuration;
 global using SERVICES.ProcureAccess.Logging.Settings;

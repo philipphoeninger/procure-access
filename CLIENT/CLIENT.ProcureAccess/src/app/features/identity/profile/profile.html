@@ -30,3 +30,91 @@
 <div class="profile-actions">
   <button matButton="filled" (click)="deleteAccount()" class="delete-btn">Delete</button>
 </div>
+
+<div *appHasNotPermission="'objects:approve'" class="proposals-container">
+  <div class="proposal-title">
+    <h3>Your open proposals (max. 3)</h3>
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+      class="create-proposal-btn"
+      aria-label="Create proposal icon-button"
+      matTooltip="Create new proposal" 
+      matTooltipPosition="left"
+      (click)="null"
+    ><mat-icon>add</mat-icon></button>
+    <mat-menu #menu="matMenu">
+      <button
+        mat-menu-item
+        aria-label="Product proposal button"
+        [routerLink]="'/product-proposal/0'"
+        >Product</button>
+      <button 
+        mat-menu-item
+        aria-label="Criterion proposal button"
+        [routerLink]="'/criterion-proposal/0'"
+        >Criterion</button>
+    </mat-menu>
+  </div>
+  @if (store.openProposalsCount() > 0) {
+    <mat-list role="list">
+      @for (proposal of store.openProposals(); track proposal) {
+        <mat-list-item role="listitem">
+           @if (proposal.product) {
+            <span matListItemIcon class="material-symbols-outlined">
+              box
+            </span>
+          } @else {
+            <mat-icon matListItemIcon>rule</mat-icon>
+          }
+          <span matListItemTitle>
+            {{ proposal.product ? proposal.product.name : proposal.criterion!.name }}
+          </span>
+          <span>Status: pending<mat-icon>draft</mat-icon></span>
+          <div matListItemMeta>
+            <button matIconButton (click)="null">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button matIconButton (click)="null">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button matIconButton (click)="null">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      }
+    </mat-list>
+  } @else {
+    <p>- No open proposals yet -</p>
+  }
+</div>
+<div class="proposals-container">
+  <h3>Closed proposals made by you</h3>
+  @if (store.closedProposalsCount() > 0) {
+    <mat-list role="list">
+      @for (proposal of store.closedProposals(); track proposal) {
+        <mat-list-item role="listitem">
+          @if (proposal.product) {
+            <span matListItemIcon class="material-symbols-outlined">
+              box
+            </span>
+          } @else {
+            <mat-icon matListItemIcon>rule</mat-icon>
+          }
+          <span matListItemTitle>
+            {{ proposal.product ? proposal.product.name : proposal.criterion!.name }}
+          </span>
+          <span>Status: {{ ProposalStatus[proposal.status] }}<mat-icon>done_all</mat-icon></span>
+          <div matListItemMeta>
+            <button matIconButton (click)="null">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      }
+    </mat-list>
+  } @else {
+    <p>- No closed proposals yet -</p>
+  }
+</div>

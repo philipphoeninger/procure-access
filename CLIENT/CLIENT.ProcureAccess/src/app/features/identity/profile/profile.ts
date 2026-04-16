@@ -2,12 +2,17 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule} from '@angular/material/list';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateUserDialog } from '../dialogs/update-user-dialog/update-user-dialog';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { DeleteAccountDialog } from '../dialogs/delete-account-dialog/delete-account-dialog';
+import { MatIconModule } from "@angular/material/icon";
+import { RouterModule } from '@angular/router';
+import { MatMenuModule } from '@angular/material/menu';
+import { HasNotPermissionDirective } from '../directives/has-not-permission.directive';
+import { ProposalStatus } from '@app/features/proposal/models/proposal-status.enum';
 
 export interface UserInformation {
   position: number,
@@ -18,16 +23,31 @@ export interface UserInformation {
 
 @Component({
   selector: 'pa-profile',
-  imports: [MatListModule, MatDividerModule, MatTableModule, MatButtonModule],
+  imports: [
+    MatListModule, 
+    MatDividerModule, 
+    MatTableModule, 
+    MatButtonModule, 
+    MatIconModule,
+    RouterModule,
+    MatMenuModule,
+    HasNotPermissionDirective
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Profile {
   protected store = inject(ProcureAccessStore);
+  ProposalStatus = ProposalStatus;
 
   displayedColumns: string[] = ['name', 'value', 'actions'];
-  dataSource: UserInformation[] = [];
+  userInformation: UserInformation[] = [
+      { position: 1, name: 'Email', value: this.store.user()?.email, actions: '' },
+      { position: 2, name: 'Password', value: '********', actions: '' }
+      // { position: 3, name: '2FA enabled', value: this.store.user()?.twoFAEnabled ? 'Yes' : 'No', actions: '' }
+    ];
+  dataSource = new MatTableDataSource<UserInformation>(this.userInformation);
 
   readonly dialog = inject(MatDialog);
 
@@ -35,15 +55,7 @@ export class Profile {
       protected snackbarService: SnackbarService
   ) {}
 
-  ngOnInit() {
-    let userInformation: UserInformation[] = [
-      { position: 1, name: 'Username', value: this.store.user()?.username, actions: '' },
-      { position: 2, name: 'Email', value: this.store.user()?.email, actions: '' },
-      { position: 3, name: 'Password', value: '********', actions: '' },
-      { position: 4, name: '2FA enabled', value: this.store.user()?.twoFAEnabled ? 'Yes' : 'No', actions: '' }
-    ];
-    this.dataSource = userInformation;
-  }
+  ngOnInit() {}
 
   openChangeUserDialog(element: any): void {
     const dialogRef = this.dialog.open(UpdateUserDialog, {
@@ -68,28 +80,12 @@ export class Profile {
   }
 
   deleteAccount() {
-    const dialogRef = this.dialog.open(DeleteAccountDialog, {
+    this.dialog.open(DeleteAccountDialog, {
       data: { email: this.store.user()?.email },
       width: '420px'
-    });
-
-    dialogRef.afterClosed().subscribe((toDelete: boolean) => {
-      if (toDelete) {
-        // TODO: delete account
-        this.snackbarService.showInfo("Account deleted. Redirecting to Login page...");
-        // TODO: redirect to login
-      }
-      // TODO
-      // if (email !== undefined) {
-      //   this.authService
-      //     .forgotPassword(email)
-      //     .pipe(
-      //       map((response: any) => {
-      //         this.showSnackbar('A passwort reset was sent to the given mail address.');
-      //       })
-      //     )
-      //     .subscribe();
-      // }
+    })
+    .afterClosed().subscribe((toDelete: boolean) => {
+      if (toDelete) this.store.deleteAccount();
     });
   }
 }

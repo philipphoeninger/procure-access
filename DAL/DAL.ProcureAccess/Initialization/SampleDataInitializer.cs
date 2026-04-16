@@ -8,6 +8,11 @@ public static class SampleDataInitializer
         await SeedData(dbContext, userManager);
     }
 
+    public static async Task ClearDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
+    {
+        await ClearData(dbContext, userManager);
+    }
+
     public static async Task ClearAndReseedDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
     {
         await ClearData(dbContext, userManager);
@@ -82,6 +87,7 @@ public static class SampleDataInitializer
             ProcessInsert(dbContext, dbContext.Products, SampleData.Products);
             ProcessInsert(dbContext, dbContext.ProductParts, SampleData.ProductParts);
             ProcessInsert(dbContext, dbContext.ProductTests, SampleData.ProductTests);
+            ProcessInsert(dbContext, dbContext.ProductTypes, SampleData.ProductTypes);
             // insert more Entities...
         }
         catch (Exception ex)

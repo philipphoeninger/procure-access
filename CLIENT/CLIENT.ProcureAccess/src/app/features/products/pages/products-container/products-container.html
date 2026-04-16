@@ -7,9 +7,16 @@
         <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
       </mat-form-field> -->
       <!--<pa-products-filters></pa-products-filters> [formGroup1]="criteriaFiltersFormGroup"-->
-      <pa-filters-container [formGroup1]="selectedCriteriaFiltersFormGroup" (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
+      <pa-filters-container (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">Reset</button>
+        @if (store.isAuthenticated()) {
+          <button 
+            matButton="filled" 
+            aria-label="Criterion proposal button" 
+            [routerLink]="'/criterion-proposal/0'"
+          >Propose criterion</button>
+        }
         <button matButton matStepperNext (click)="asdf()">Enter</button>
       </div>
     </form>
@@ -30,15 +37,17 @@
             <button matButton (click)="stepper.reset()">Reset</button>
         </div>
         <div class="action-sharing">
-            <button 
-                mat-icon-button
-                class="products-link-btn"
-                aria-label="Products link button"
-                matTooltip="Create link" 
-                matTooltipPosition="above"
-                (click)="linkCopied()">
-                <mat-icon>link</mat-icon>
-            </button>
+            @if (store.isAuthenticated()) {
+              <button 
+                  mat-icon-button
+                  class="products-link-btn"
+                  aria-label="Products link button"
+                  matTooltip="Create link" 
+                  matTooltipPosition="above"
+                  (click)="linkCopied()">
+                  <mat-icon>link</mat-icon>
+              </button>
+            }
             <button 
                 mat-icon-button
                 class="products-export-btn"
@@ -48,17 +57,27 @@
                 (click)="exportProductsFile()">
                 <mat-icon>arrow_downward</mat-icon>
             </button>
-            <button 
-                mat-icon-button
-                class="products-save-btn"
-                aria-label="Products save button"
-                matTooltip="Save" 
-                matTooltipPosition="above"
-                (click)="openProductsSearchDialog()">
-                <mat-icon>add_2</mat-icon>
-            </button>
+            @if (store.isAuthenticated()) {
+                <button 
+                    mat-icon-button
+                    class="products-save-btn"
+                    aria-label="Products save button"
+                    matTooltip="Save" 
+                    matTooltipPosition="above"
+                    (click)="openProductsSearchDialog()">
+                    <mat-icon>add_2</mat-icon>
+                </button>
+            }
         </div>
-        <div class="products-page-btn">
+        <div>
+            @if (store.isAuthenticated()) {
+                <button 
+                  matButton="elevated"
+                  aria-label="Criterion proposal button" 
+                  [routerLink]="'/criterion-proposal/0'"
+                  style="margin-right: 8px">Propose criterion
+                </button>
+            }
             <button 
                 matButton="filled"
                 class="products-page-btn"

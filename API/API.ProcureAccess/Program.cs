@@ -3,17 +3,24 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
-                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+                .AddJsonOptions(x => {
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
+                .AddEmailConfig(builder.Configuration)
                 .AddCors()
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
                 .AddIdentityAuth(builder.Configuration)
-                .AddRepositories();
+                .AddRepositories()
+                .AddDataServices()
+                .AddAutoMapper(cfg => {},
+                    typeof(MappingProfile).Assembly);
 
 // Configure logging
 builder.ConfigureSerilog();
@@ -54,7 +61,12 @@ using (var scope = app.Services.CreateScope())
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         //SampleDataInitializer.InitializeData(dbContext, userManager);
-        await SampleDataInitializer.ClearAndReseedDatabase(dbContext, userManager);
+        await SampleDataInitializer.ClearDatabase(dbContext, userManager);
+        // add role management
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await app.AddRolesAndPermissions(roleManager);
+
+        await SampleDataInitializer.InitializeData(dbContext, userManager);
     }
     app.ConfigureSwaggerExplorer();
 // }
@@ -65,8 +77,6 @@ app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
 
 app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityApi<User>();
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();
 

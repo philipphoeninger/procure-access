@@ -13,4 +13,10 @@ public static class AppConfigExtensions
         services.Configure<JWTSettings>(config.GetSection("JWTSettings"));
         return services;
     }
+
+    public static IServiceCollection AddEmailConfig(this IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<EmailSettings>(config.GetSection("Email"));
+        return services;
+    }
 }

@@ -2,11 +2,14 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : BaseCrudController<Product, ProductsController>
+public class ProductsController : BaseCrudController<Product, ProductDto, ProductsController>
 {
-    public ProductsController(IAppLogging<ProductsController> logger, IProductRepo repo) : base(logger, repo)
-    {
-    }
+    private readonly IProductService _productService;
 
-    // TODO: put more individual Requests here
+    public ProductsController(
+        IAppLogging<ProductsController> logger, 
+        IProductService service) : base(logger, service)
+    {
+        _productService = service;
+    }
 }

@@ -3,11 +3,11 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item [routerLink]="'home'">
+    <button mat-menu-item [routerLink]="'/home'">
       <mat-icon>home</mat-icon>
       <span>Home</span></button>
   </mat-menu>
-  <button matButton class="home-btn" aria-label="Home button" [routerLink]="'home'">
+  <button matButton class="home-btn" aria-label="Home button" [routerLink]="'/home'">
     <h1 id="app-name"><img class="pa-logo" [src]="logoPath" alt="WERTE.IT Logo" />ProcureAccess</h1>
   </button>
   <div class="tools">
@@ -21,26 +21,39 @@
     <button mat-icon-button id="header-search-icon" class="search-btn" aria-label="Search icon-button">
       <mat-icon>search</mat-icon>
     </button>
-    <button mat-icon-button class="home-icon-btn" aria-label="Home icon-button" [routerLink]="'home'" matTooltip="Home" matTooltipPosition="below">
+    <button mat-icon-button class="home-icon-btn" aria-label="Home icon-button" [routerLink]="'/home'" matTooltip="Home" matTooltipPosition="below">
       <mat-icon>home</mat-icon>
     </button>
-    <button mat-icon-button class="filters-btn" aria-label="Filters icon-button" [routerLink]="'filters'" matTooltip="Filter" matTooltipPosition="below">
+    <button mat-icon-button class="filters-btn" aria-label="Filters icon-button" [routerLink]="'/filters'" matTooltip="Filter" matTooltipPosition="below">
       <span class="material-symbols-outlined">action_key</span>
     </button>
-    <button mat-icon-button class="products-btn" aria-label="Products icon-button" [routerLink]="'products'" matTooltip="Products" matTooltipPosition="below">
+    <button mat-icon-button class="products-btn" aria-label="Products icon-button" [routerLink]="'/products'" matTooltip="Products" matTooltipPosition="below">
       <mat-icon>warehouse</mat-icon>
     </button>
-    <button mat-icon-button class="favorites-btn" aria-label="Favorites icon-button" [routerLink]="'favorites'" matTooltip="Favorites" matTooltipPosition="below">
-      <mat-icon>favorite</mat-icon>
+    @if (store.isAuthenticated()) {
+      <button mat-icon-button class="favorites-btn" aria-label="Favorites icon-button" [routerLink]="'/favorites'" matTooltip="Favorites" matTooltipPosition="below">
+        <mat-icon>favorite</mat-icon>
+      </button>
+    }
+    <button *appHasPermission="'objects:approve'" mat-icon-button class="proposals-btn" aria-label="Proposals icon-button" [routerLink]="'/proposals'" matTooltip="Proposals" matTooltipPosition="below">
+      <mat-icon>approval</mat-icon>
     </button>
-    <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'profile'" matTooltip="Profile" matTooltipPosition="below">
-      <mat-icon>person</mat-icon>
-    </button>
-    <button mat-icon-button class="settings-btn" aria-label="Settings icon-button" [routerLink]="'settings'" matTooltip="Settings" matTooltipPosition="below">
+    @if (store.isAuthenticated()) {
+      <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'/profile'" matTooltip="Profile" matTooltipPosition="below">
+        <mat-icon>person</mat-icon>
+      </button>
+    }
+    <button mat-icon-button class="settings-btn" aria-label="Settings icon-button" [routerLink]="'/settings'" matTooltip="Settings" matTooltipPosition="below">
       <mat-icon>settings</mat-icon>
     </button>
-    <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="authService.logout()" matTooltip="Logout" matTooltipPosition="below">
-      <mat-icon>logout</mat-icon>
-    </button>
+    @if (store.isAuthenticated()) {
+      <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="logout()" matTooltip="Logout" matTooltipPosition="below">
+        <mat-icon>logout</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button class="login-btn" aria-label="Login icon-button" (click)="authService.showLogin()" matTooltip="Login" matTooltipPosition="below">
+        <mat-icon>login</mat-icon>
+      </button>
+    }
   </div>
 </mat-toolbar>

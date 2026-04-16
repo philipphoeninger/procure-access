@@ -2,13 +2,15 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CriteriaController : BaseCrudController<Criterion, CriteriaController>
+public class CriteriaController : BaseCrudController<Criterion, CriterionDto, CriteriaController>
 {
-    protected readonly ICriterionRepo Repo;
+    private readonly ICriterionService _criterionService;
 
-    public CriteriaController(IAppLogging<CriteriaController> logger, ICriterionRepo repo) : base(logger, repo)
+    public CriteriaController(
+        IAppLogging<CriteriaController> logger, 
+        ICriterionService service) : base(logger, service)
     {
-        Repo = repo;
+        _criterionService = service;
     }
 
     /// <summary>
@@ -27,9 +29,9 @@ public class CriteriaController : BaseCrudController<Criterion, CriteriaControll
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<List<Criterion>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
+    public ActionResult<List<CriterionDto>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
     {
-        var filteredCriteria = Repo.GetByCriteriaFilterIds(criteriaFilterIds);
+        var filteredCriteria = _criterionService.GetByCriteriaFilterIds(criteriaFilterIds);
         return Ok(filteredCriteria);
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ColorPickerDirective } from 'ngx-color-picker';
@@ -6,6 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 
 @Component({
   selector: 'pa-settings',
@@ -21,19 +22,17 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
   styleUrl: './settings.scss'
 })
 export class Settings {
-  protected fgColor = '#111111';
-  protected bgColor = '#ffffff';
-  protected textColor = '#000000';
+  protected store = inject(ProcureAccessStore);
+  protected snackbarService = inject(SnackbarService);
 
-  protected orientationControl = false;
-  protected highContrastControl = false;
+  protected updateUICustomization = model(this.store.uiCustomization());
 
-  constructor(
-    protected snackbarService: SnackbarService
-  ) {}
+  constructor() {}
+
+  ngOnInit() {}
 
   saveSettings() {
-    this.snackbarService.showInfo("Settings saved");
+    this.store.updateUICustomization(this.updateUICustomization());
   }
 
   resetSettings() {

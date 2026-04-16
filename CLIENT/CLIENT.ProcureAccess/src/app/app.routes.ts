@@ -7,14 +7,25 @@ import { Profile } from '@features/identity/profile/profile';
 import { Settings } from '@features/settings/settings';
 import { ProductsContainer } from '@features/products/pages/products-container/products-container';
 import { Favorites } from '@app/features/favorites/list/favorites';
-import { ProductsList } from './features/products/list/products-list';
-import { ProductDetails } from './features/products/details/product-details';
+import { ProductsList } from '@app/features/products/list/products-list';
+import { ProductDetails } from '@app/features/products/details/product-details';
+import { ProductProposal } from '@app/features/products/proposal/product-proposal';
+import { CriterionProposal } from '@app/features/criteria/proposal/criterion-proposal';
+import { ResetPassword } from './features/identity/reset-password/reset-password';
+import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
+import { PermissionGuard } from './features/identity/guards/permission.guard';
+import { ProposalList } from './features/proposal/list/proposal-list';
+import { Unauthorized } from './pages/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     redirectTo: 'home',
+  },
+  {
+    path: 'home',
+    component: Home
   },
   {
     path: 'auth',
@@ -27,9 +38,10 @@ export const routes: Routes = [
     outlet: 'login',
   },
   {
-    path: 'home',
-    component: Home,
-    canActivate: [AuthGuard],
+    path: 'proposals',
+    component: ProposalList,
+    canActivate: [PermissionGuard],
+    data: { permission: 'objects:approve' }
   },
   {
     path: 'profile',
@@ -38,13 +50,11 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
-    component: Settings,
-    canActivate: [AuthGuard],
+    component: Settings
   },
   {
     path: 'filters',
-    component: ProductsContainer,
-    canActivate: [AuthGuard],
+    component: ProductsContainer
   },
   {
     path: 'favorites',
@@ -53,12 +63,32 @@ export const routes: Routes = [
   },
   {
     path: 'products',
-    component: ProductsList,
-    canActivate: [AuthGuard],
+    component: ProductsList
   },
   { 
     path: 'product/:id', 
-    component: ProductDetails,
-    canActivate: [AuthGuard],
-   }
+    component: ProductDetails
+   },
+   {
+    path: 'product-proposal/:id',
+    component: ProductProposal,
+    canActivate: [AuthGuard]
+   },
+   {
+    path: 'criterion-proposal/:id',
+    component: CriterionProposal,
+    canActivate: [AuthGuard]
+   },
+  { 
+    path: 'reset-password', 
+    component: ResetPassword
+  },
+  { 
+    path: 'confirm-email', 
+    component: EmailConfirmation
+  },
+  { 
+    path: 'unauthorized', 
+    component: Unauthorized
+  }
 ];

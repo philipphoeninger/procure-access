@@ -18,8 +18,7 @@ export type FiltersState = {
   selectedCriteriaFilters: number[] 
 };
 
-export function withFilters() {
-  return signalStoreFeature(
+export const withFilters = () => signalStoreFeature(
     withState<FiltersState>({
       filterTypes: initialAppState.filters.filterTypes,
       criteriaFilters: initialAppState.filters.criteriaFilters,
@@ -30,16 +29,16 @@ export function withFilters() {
         async loadFilters() {
           state.incrementLoadingCount();
           // get Filter Types
-          let filterTypes = await filtersApiService.getAllFilterTypes();
+          let filterTypesResult = await filtersApiService.getAllFilterTypes();
           // get & set Criteria Filters
-          let criteriaFilters = await filtersApiService.getAllCriteriaFilters();
-          this.setCriteriaFilters(criteriaFilters);
+          let criteriaFiltersResult = await filtersApiService.getAllCriteriaFilters();
+          this.setCriteriaFilters(criteriaFiltersResult.value ?? []);
           // set Criteria Filters of each Filter Type & set Filter Types
-          filterTypes.forEach(filterType => {
+          filterTypesResult.value?.forEach(filterType => {
             filterType.criteriaFilters = 
-              criteriaFilters.filter(cf => cf.filterTypeId === filterType.id);
+              state.criteriaFilters().filter(cf => cf.filterTypeId === filterType.id);
           });
-          this.setFilterTypes(filterTypes);
+          this.setFilterTypes(filterTypesResult.value ?? []);
 
           state.decrementLoadingCount();
         },
@@ -64,5 +63,4 @@ export function withFilters() {
         return state.selectedCriteriaFilters().length;
       })
     }))
-  );
-}
+);

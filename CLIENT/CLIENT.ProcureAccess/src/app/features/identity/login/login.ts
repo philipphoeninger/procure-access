@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, inject, model } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,13 +8,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { AuthService } from '@features/identity/services/auth.service';
 import { LoginModel } from '@features/identity/models/login.model';
 import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { User } from '../models/user.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { UICustomization } from '@app/features/settings/models/uiCustomization.model';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
+import { JWT_NAME, REFRESH_TOKEN_NAME } from '@app/app.config';
+import { UserDto } from '../models/user.dto';
 
 @Component({
   selector: 'pa-login',
@@ -54,6 +58,8 @@ export class Login {
   readonly dialog = inject(MatDialog);
 
   constructor(
+    @Inject(JWT_NAME) private jwtName: string,
+    @Inject(REFRESH_TOKEN_NAME) private refreshTokenName: string,
     protected authService: AuthService,
     private router: Router,
     protected snackbarService: SnackbarService
@@ -69,12 +75,16 @@ export class Login {
 
     dialogRef.afterClosed().subscribe((email: string) => {
       if (email !== undefined) {
+        this.store.incrementLoadingCount();
         this.authService
           .forgotPassword(email)
           .pipe(
-            map((response: any) => {
-              this.snackbarService.showInfo('A passwort reset was sent to the given mail address.');
-            })
+            map((response: HttpResponse<any>) => {
+              this.snackbarService.showInfo(
+                response.ok ? 'A passwort reset was sent to the given mail address.'
+                            : 'Could not reset the password. Please contact the support via email.');
+            }),
+            finalize(() => this.store.decrementLoadingCount())
           )
           .subscribe();
       }
@@ -83,25 +93,31 @@ export class Login {
 
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
-    let loginCommand = new LoginModel(this.email!(), '', this.password!());
+    let loginCommand = new LoginModel(this.email!(), this.password!());
 
-    // TODO: start spinner
+    this.store.incrementLoadingCount();
     this.authService
       .login(loginCommand)
       .pipe(
-        map((response: { token: string, username: string }) => {
-          if (response.token) {
-            localStorage.setItem('procure-access-token', response.token);
-            let user: User = new User(loginCommand.email, response.username, false);
-            this.store.setUser(user);
-            this.router.navigateByUrl('/home');
-          } else {
-            this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
-          }
+        map((response) => {
+          if (!response.accessToken) {
+            this.snackbarService.showInfo('Login failed. Please try again.');
+            return;
+          } //gate
+          this.authService.loadUserFromToken(response.accessToken);
+          localStorage.setItem(this.jwtName, response.accessToken);
+          localStorage.setItem(this.refreshTokenName, response.refreshToken);
+          let user: UserDto = new UserDto(response.user.id, response.user.email);
+          this.store.setUser(user);
+          this.store.setUICustomization(response.user.uiCustomization);
+          this.store.loadProposals();
+          this.router.navigateByUrl('/home');
         }),
-        finalize(() => {
-          // TODO: stop spinner
+        catchError((error: HttpErrorResponse) => {
+          this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
+          return throwError(() => new Error(error.message));
         }),
+        finalize(() => this.store.decrementLoadingCount())
       )
       .subscribe();
   }

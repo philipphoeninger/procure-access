@@ -9,7 +9,6 @@
 .heading {
   //font-size: 1.75em;
   width: 100%;
-  max-width: 700px;
 }
 
 .profile-table {
@@ -33,5 +32,23 @@
 
   .delete-btn {
     background-color: #d11515eb;
+  }
+}
+
+.proposals-container {
+  width: 100%;
+
+  .proposal-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  mat-list {
+    .mat-mdc-list-item-meta {
+      display: flex;
+      height: 100%;
+      align-items: center;
+    }
   }
 }

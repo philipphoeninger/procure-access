@@ -2,9 +2,11 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CriteriaFiltersController : BaseCrudController<CriteriaFilter, CriteriaFiltersController>
+public class CriteriaFiltersController : BaseCrudController<CriteriaFilter, CriteriaFilterDto, CriteriaFiltersController>
 {
-    public CriteriaFiltersController(IAppLogging<CriteriaFiltersController> logger, ICriteriaFilterRepo repo) : base(logger, repo)
+    public CriteriaFiltersController(
+        IAppLogging<CriteriaFiltersController> logger, 
+        ICriteriaFilterService service) : base(logger, service)
     {
     }
 

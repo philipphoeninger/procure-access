@@ -8,8 +8,6 @@ public class ProductRepo : TemporalTableBaseRepo<Product>, IProductRepo
     #endregion
 
     #region methods
-    // TODO
-
     // public override IEnumerable<Product> GetAll()
     // {
     //     return Context.Products;

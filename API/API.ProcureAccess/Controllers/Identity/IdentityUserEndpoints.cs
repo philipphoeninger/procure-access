@@ -4,53 +4,70 @@ public static class IdentityUserEndpoints
 {
     public static IEndpointRouteBuilder MapIdentityUserEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/signIn", SignInAsync);
-        app.MapPost("/signUp", SignUpAsync);
+        app.MapPost("/signIn", async (
+            IUserService service,
+            LoginRequest request) =>
+        {
+            var result = await service.SignInAsync(request);
+
+            return result == null
+                ? Results.BadRequest("Invalid login")
+                : Results.Ok(result);
+        });
+
+        app.MapPost("/signUp", async (
+            IUserService service,
+            RegistrationRequest request) =>
+        {
+            var result = await service.SignUpAsync(request);
+
+            return result.Succeeded
+                ? Results.Ok(result)
+                : Results.BadRequest(result.Errors);
+        });
+
+        app.MapPost("/forgot-password", async (
+            IUserService service,
+            ForgotPWRequest request) =>
+        {
+            await service.RequestPasswordResetAsync(request.Email);
+            return Results.Ok();
+        });
+
+        app.MapPost("/reset-password", async (
+            IUserService service,
+            ResetPasswordDto dto) =>
+        {
+            var result = await service.ResetPasswordAsync(dto);
+
+            return result.Succeeded
+                ? Results.Ok(result)
+                : Results.BadRequest(result.Errors);
+        });
+
+        app.MapPost("/refresh", async (
+            IUserService service,
+            string refreshToken) =>
+        {
+            var result = await service.RefreshTokenAsync(refreshToken);
+
+            return result == null
+                ? Results.BadRequest("Invalid refresh token")
+                : Results.Ok(result);
+        });
+
+        app.MapGet("/confirm-email", async (
+            IUserService service,
+            string userId,
+            string token) =>
+        {
+            var result = await service.ConfirmEmailAsync(userId, token);
+
+            return result.Succeeded
+                ? Results.Ok("Email confirmed")
+                : Results.BadRequest(result.Errors);
+        });
+
         return app;
-    }
-
-    [AllowAnonymous]
-    private static async Task<IResult> SignInAsync(
-        UserManager<User> userManager,
-        [FromBody] LoginRequest loginRequest,
-        IOptions<JWTSettings> jwtSettings)
-    {
-        User? user = await userManager.FindByEmailAsync(loginRequest.Email);
-        if (user != null && await userManager.CheckPasswordAsync(user, loginRequest.Password))
-        {
-            SymmetricSecurityKey signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Value.Key));
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new(ClaimTypes.NameIdentifier, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new SigningCredentials(
-                    signInKey,
-                    SecurityAlgorithms.HmacSha256Signature
-                    )
-            };
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
-            string token = tokenHandler.WriteToken(securityToken);
-            return Results.Ok(new { token, username = user.UserName });
-        }
-        else return Results.BadRequest(new { message = "Username or password is incorrect." });
-    }
-
-    [AllowAnonymous]
-    private static async Task<IResult> SignUpAsync(
-        UserManager<User> userManager,
-        [FromBody] RegistrationRequest registerRequest)
-    {
-        User user = new User()
-        {
-            Email = registerRequest.Email,
-            UserName = registerRequest.UserName
-        };
-        IdentityResult result = await userManager.CreateAsync(user, registerRequest.Password);
-
-        return result.Succeeded ? Results.Ok(result) : Results.BadRequest(result);
     }
 }

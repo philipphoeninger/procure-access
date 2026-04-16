@@ -1,0 +1,27 @@
+<div class="unauthorized-container">
+  <mat-card class="unauthorized-card">
+
+    <div class="icon-wrapper">
+      <mat-icon>lock</mat-icon> <!--color="warn"-->
+    </div>
+
+    <h1>403</h1>
+    <h2>Access Denied</h2>
+
+    <p>
+      You don’t have permission to view this page.
+      If you believe this is a mistake, please contact your administrator.
+    </p>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" [routerLink]="'/home'">
+        Go Home
+      </button>
+
+      <button mat-stroked-button color="accent" (click)="authService.showLogin()">
+        Login
+      </button>
+    </div>
+
+  </mat-card>
+</div>

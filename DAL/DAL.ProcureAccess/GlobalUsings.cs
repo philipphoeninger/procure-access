@@ -7,6 +7,7 @@ global using DAL.ProcureAccess.Initialization;
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Configuration;
+global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.ViewModels;
 global using MODELS.ProcureAccess.ViewModels.Interfaces;
 //global using MODELS.ProcureAccess.ViewModels.Configuration;

@@ -16,40 +16,40 @@ public static class SampleData
 
     public static List<FilterType> FilterTypes => new()
     {
-        new() { Id = 1, Name = "Product Types", IsDeleted = false },
-        new() { Id = 2, Name = "Application Types", IsDeleted = false },
-        new() { Id = 3, Name = "Product Parts", IsDeleted = false },
-        new() { Id = 4, Name = "Test Types", IsDeleted = false }
+        new() { Id = 1, Name = "Product Types", Description = "", IsDeleted = false },
+        new() { Id = 2, Name = "Application Types", Description = "", IsDeleted = false },
+        new() { Id = 3, Name = "Product Parts", Description = "", IsDeleted = false },
+        new() { Id = 4, Name = "Test Types", Description = "", IsDeleted = false }
     };
 
     public static List<CriteriaFilter> CriteriaFilters => new()
     {
-        new() { Id = 1, Name = "Core Functionality", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 2, Name = "Audio", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 3, Name = "Video", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 4, Name = "Two-Way Voice Communication", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 5, Name = "Real-Time Text", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 6, Name = "Biometrics", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 7, Name = "Authoring Tools", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 8, Name = "Website / Webapp", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 9, Name = "Document", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 10, Name = "Software (Open-Source)", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 11, Name = "Software (Closed-Source)", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 12, Name = "Mobile App (Open-Source)", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 13, Name = "Mobile App (Closed-Source)", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 14, Name = "Hardware", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 15, Name = "Dispatch / Emergency Service", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 16, Name = "Database-supported specialist application", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 17, Name = "HR application", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 18, Name = "Reporting application", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 19, Name = "Training management", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 20, Name = "Travel expense claims", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 21, Name = "Payroll statements", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 22, Name = "Internal communication and data exchange platform", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 23, Name = "BITV", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 24, Name = "Automated", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 25, Name = "In-Person", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 26, Name = "Manual", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 1, Name = "Core Functionality", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 2, Name = "Audio", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 3, Name = "Video", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 4, Name = "Two-Way Voice Communication", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 5, Name = "Real-Time Text", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 6, Name = "Biometrics", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 7, Name = "Authoring Tools", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 8, Name = "Website / Webapp", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 9, Name = "Document", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 10, Name = "Software (Open-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 11, Name = "Software (Closed-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 12, Name = "Mobile App (Open-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 13, Name = "Mobile App (Closed-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 14, Name = "Hardware", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 15, Name = "Dispatch / Emergency Service", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 16, Name = "Database-supported specialist application", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 17, Name = "HR application", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 18, Name = "Reporting application", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 19, Name = "Training management", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 20, Name = "Travel expense claims", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 21, Name = "Payroll statements", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 22, Name = "Internal communication and data exchange platform", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 23, Name = "BITV", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 24, Name = "Automated", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 25, Name = "In-Person", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 26, Name = "Manual", Description = "", FilterTypeId = 4, IsDeleted = false },
     };
 
     public static List<Criterion> Criteria => new()
@@ -180,23 +180,23 @@ public static class SampleData
 
     public static List<Product> Products => new()
     {
-        new() { Id = 1, Name = "CoreFlow", Link = "www.coreflow.org", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 2, Name = "IntraSphere", Link = "www.intrasphere.com", Description = "A description for...", TypeId = 14, IsDeleted = false },
-        new() { Id = 3, Name = "ProximaSuite", Link = "www.proximasuite.com", Description = "A description for...", TypeId = 15, IsDeleted = false },
-        new() { Id = 4, Name = "WorkBridge", Link = "www.workbridge.com", Description = "A description for...", TypeId = 11, IsDeleted = false },
-        new() { Id = 5, Name = "SyntraLogic", Link = "www.syntralogic.it", Description = "A description for...", TypeId = 12, IsDeleted = false },
-        new() { Id = 6, Name = "Nexaro", Link = "www.nexaro.de", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 7, Name = "FlowMatrix", Link = "www.flowmatrix.com", Description = "A description for...", TypeId = 9, IsDeleted = false },
-        new() { Id = 8, Name = "OptiCore", Link = "www.opticore.com", Description = "A description for...", TypeId = 15, IsDeleted = false },
-        new() { Id = 9, Name = "BizStream", Link = "www.bizstream.ru", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 10, Name = "NovaDesk", Link = "www.novadesk.at", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 11, Name = "ClarioOne", Link = "www.clarioone.fr", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 12, Name = "FlexiSuite", Link = "www.flexisuite.com", Description = "A description for...", TypeId = 13, IsDeleted = false },
-        new() { Id = 13, Name = "EvoManage", Link = "www.evomanage.com", Description = "A description for...", TypeId = 10, IsDeleted = false },
-        new() { Id = 14, Name = "TaskFusion", Link = "www.taskfusion.com", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 15, Name = "PrimeHub", Link = "www.primehub.org", Description = "A description for...", TypeId = 8, IsDeleted = false },
-        new() { Id = 16, Name = "WorklineOS", Link = "www.worklineos.de", Description = "A description for...", TypeId = 14, IsDeleted = false },
-        new() { Id = 17, Name = "AquilaWare", Link = "www.aquilaware.com", Description = "A description for...", TypeId = 9, IsDeleted = false },
+        new() { Id = 1, Name = "CoreFlow", Link = "www.coreflow.org", Description = "A description for...", IsDeleted = false },
+        new() { Id = 2, Name = "IntraSphere", Link = "www.intrasphere.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 3, Name = "ProximaSuite", Link = "www.proximasuite.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 4, Name = "WorkBridge", Link = "www.workbridge.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 5, Name = "SyntraLogic", Link = "www.syntralogic.it", Description = "A description for...", IsDeleted = false },
+        new() { Id = 6, Name = "Nexaro", Link = "www.nexaro.de", Description = "A description for...", IsDeleted = false },
+        new() { Id = 7, Name = "FlowMatrix", Link = "www.flowmatrix.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 8, Name = "OptiCore", Link = "www.opticore.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 9, Name = "BizStream", Link = "www.bizstream.ru", Description = "A description for...", IsDeleted = false },
+        new() { Id = 10, Name = "NovaDesk", Link = "www.novadesk.at", Description = "A description for...", IsDeleted = false },
+        new() { Id = 11, Name = "ClarioOne", Link = "www.clarioone.fr", Description = "A description for...", IsDeleted = false },
+        new() { Id = 12, Name = "FlexiSuite", Link = "www.flexisuite.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 13, Name = "EvoManage", Link = "www.evomanage.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 14, Name = "TaskFusion", Link = "www.taskfusion.com", Description = "A description for...", IsDeleted = false },
+        new() { Id = 15, Name = "PrimeHub", Link = "www.primehub.org", Description = "A description for...", IsDeleted = false },
+        new() { Id = 16, Name = "WorklineOS", Link = "www.worklineos.de", Description = "A description for...", IsDeleted = false },
+        new() { Id = 17, Name = "AquilaWare", Link = "www.aquilaware.com", Description = "A description for...", IsDeleted = false },
     };
 
     public static List<ProductPart> ProductParts => new()
@@ -261,5 +261,26 @@ public static class SampleData
         new() { Id = 16, ProductId = 15, CriteriaFilterId = 24 },
         new() { Id = 17, ProductId = 17, CriteriaFilterId = 23 },
         new() { Id = 18, ProductId = 17, CriteriaFilterId = 26 },
+    };
+
+    public static List<ProductType> ProductTypes => new()
+    {
+        new() { Id = 1, ProductId = 1, CriteriaFilterId = 8 },
+        new() { Id = 2, ProductId = 2, CriteriaFilterId = 14 },
+        new() { Id = 3, ProductId = 3, CriteriaFilterId = 15 },
+        new() { Id = 4, ProductId = 4, CriteriaFilterId = 11 },
+        new() { Id = 5, ProductId = 5, CriteriaFilterId = 12 },
+        new() { Id = 6, ProductId = 6, CriteriaFilterId = 8 },
+        new() { Id = 7, ProductId = 7, CriteriaFilterId = 9 },
+        new() { Id = 8, ProductId = 8, CriteriaFilterId = 15 },
+        new() { Id = 9, ProductId = 9, CriteriaFilterId = 8 },
+        new() { Id = 10, ProductId = 10, CriteriaFilterId = 8 },
+        new() { Id = 11, ProductId = 11, CriteriaFilterId = 8 },
+        new() { Id = 12, ProductId = 12, CriteriaFilterId = 13 },
+        new() { Id = 13, ProductId = 13, CriteriaFilterId = 10 },
+        new() { Id = 14, ProductId = 14, CriteriaFilterId = 8 },
+        new() { Id = 15, ProductId = 15, CriteriaFilterId = 8 },
+        new() { Id = 16, ProductId = 16, CriteriaFilterId = 14 },
+        new() { Id = 17, ProductId = 17, CriteriaFilterId = 9 },
     };
 }

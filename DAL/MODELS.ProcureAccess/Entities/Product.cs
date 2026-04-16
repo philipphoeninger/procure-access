@@ -9,6 +9,7 @@ public partial class Product : BaseEntity
     [StringLength(200)]
     public string Name { get; set; }
 
+    [Url]
     [StringLength(500)]
     public string? Link { get; set; }
 
@@ -16,12 +17,13 @@ public partial class Product : BaseEntity
     [StringLength(6000)]
     public string? Description { get; set; }
 
-    public int TypeId { get; set; }
-    public CriteriaFilter Type { get; set; }
+    public ICollection<ProductType> Types { get; set; } = new List<ProductType>();
 
     public ICollection<ProductPart> Parts { get; set; } = new List<ProductPart>();
 
     public ICollection<ProductTest> Tests { get; set; } = new List<ProductTest>();
+
+    public Proposal? Proposal { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }
@@ -39,10 +41,9 @@ public partial class Product : BaseEntity
         // TODO: generate Name
     }
 
-    public Product(string pName, int pTypeId)
+    public Product(string pName)
     {
         Name = pName;
-        TypeId = pTypeId;
         CreatedAt = DateTime.UtcNow;
         IsDeleted = false;
     }

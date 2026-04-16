@@ -1,4 +1,4 @@
-import { computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   patchState,
   signalStoreFeature,
@@ -6,24 +6,40 @@ import {
   withMethods,
   withState
 } from '@ngrx/signals';
-import { User } from '../models/user.model';
+import { AuthService } from '../services/auth.service';
+import { SnackbarService } from '@app/core/services/snackbar.service';
+import { withLoading } from '@app/shared/state/with-loading';
+import { IdentityApiService } from '../services/identity-api.service';
+import { UserDto } from '../models/user.dto';
 
-export type IdentityState = { user: User | null };
+export type IdentityState = { user: UserDto | null };
 
-export function withIdentity() {
-  return signalStoreFeature(
+export const withIdentity = () => signalStoreFeature(
     withState<IdentityState>({ user: null }),
-    withMethods((state) => ({
-      setUser(user: User | null) {
+    withLoading(),
+    withMethods((
+      state, 
+      authService = inject(AuthService),
+      identityApiService = inject(IdentityApiService),
+      snackbarService = inject(SnackbarService)
+    ) => ({
+      setUser(user: UserDto | null) {
         patchState(state, {
           user
         });
+      },
+      isAuthenticated() {
+        return authService.isAuthenticated();
+      },
+      async deleteAccount() {
+        state.incrementLoadingCount();
+        let error = await identityApiService.deleteAccount();
+        if (!error) authService.logout();
+        snackbarService.showInfo(
+          error ? "Something went wrong.\nPlease try again." : "Account deleted"
+        );
+        state.decrementLoadingCount();
       }
     })),
-    withComputed((state) => ({
-    //   isLoading: computed(() => {
-    //     return state.loadingCount() > 0;
-    //   })
-    }))
+    withComputed((state) => ({ }))
   );
-}

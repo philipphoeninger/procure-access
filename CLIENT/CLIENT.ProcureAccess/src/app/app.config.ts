@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, InjectionToken, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -10,6 +10,13 @@ import {
 } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { headersInterceptor } from './core/interceptors/headers.interceptor';
+import { provideMarkdown } from 'ngx-markdown';
+import { environment } from '../environments/environment';
+
+export const APP_NAME = new InjectionToken<string>('APP_NAME');
+export const API_URL = new InjectionToken<string>('API_URL');
+export const JWT_NAME = new InjectionToken<string>('JWT_NAME');
+export const REFRESH_TOKEN_NAME = new InjectionToken<string>('REFRESH_TOKEN_NAME');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,10 +28,20 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor, headersInterceptor]),
     ),
+    provideMarkdown(),
+    { provide: APP_NAME, useValue: 'ProcureAccess'},
+    { provide: API_URL, useValue: environment.apiUrl },
+    { provide: JWT_NAME,
+      useFactory: () => {
+        const appName = inject(APP_NAME);
+        return appName.toLowerCase() + '-token';
+      }
+    },
+    { provide: REFRESH_TOKEN_NAME,
+      useFactory: () => {
+        const appName = inject(APP_NAME);
+        return appName.toLowerCase() + '-refresh-token';
+      }
+    }
   ]
 };
-
-export const httpAppConfig: any = {
-  apiEndpoint: 'http://localhost:5000/api',
-};
-

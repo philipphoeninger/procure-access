@@ -20,14 +20,6 @@
       <mat-error>Email is <strong>required</strong></mat-error>
       }
     </mat-form-field>
-    <mat-form-field>
-      <mat-label>Username</mat-label>
-      <input matInput type="string" name="username" [(ngModel)]="username" required #usernameInput="ngModel"
-        minlength="3" maxlength="50" />
-      @if (usernameInput.invalid && usernameInput.touched) {
-      <mat-error>Username is <strong>required</strong></mat-error>
-      }
-    </mat-form-field>
     <mat-form-field id="password-field">
       <mat-label>Password</mat-label>
       <input matInput type="password" name="password" [(ngModel)]="password" required #passwordInput="ngModel"
@@ -60,7 +52,7 @@
     <span class="error-message ng-touched ng-invalid">{{ registerErrorMessage }}</span>
     }
     <div class="buttons">
-      <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid">
+      <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || submitDisabled()">
         Sign up
       </button>
     </div>

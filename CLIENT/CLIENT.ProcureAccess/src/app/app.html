@@ -198,11 +198,11 @@
   }
 </style>
 
-@if (loggedIn) {
-<main id="main">
-  <pa-header></pa-header>
-  <router-outlet />
-</main>
+@if (showHeader) {
+  <main id="main">
+    <pa-header></pa-header>
+    <router-outlet />
+  </main>
 }
 
-<router-outlet (activate)="loggedIn = false" (deactivate)="loggedIn = true" name="login" />
+<router-outlet (activate)="showHeader = false" (deactivate)="showHeader = true" name="login" />

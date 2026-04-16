@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.container {
+    border: 1px solid #dccaca;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.25rem;
+
+        mat-icon {
+            margin-right: 8px;
+        }
+    }
+}
+
+.criterion-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: end;
+    gap: 16px;
+    margin-top: 8px;
+
+    #approval-btns {
+        margin-left: auto;
+    }
+}

@@ -1,7 +1,11 @@
+global using AutoMapper;
+
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Owned;
 global using MODELS.ProcureAccess.Entities.Configuration;
+global using MODELS.ProcureAccess.Entities.Dto;
+global using MODELS.ProcureAccess.Entities.Interfaces;
 global using MODELS.ProcureAccess.Settings;
 
 global using MODELS.ProcureAccess.ViewModels.Interfaces;
@@ -20,3 +24,5 @@ global using System.Xml.Linq;
 global using System.Linq.Expressions;
 global using System.Security.Claims;
 global using System.Diagnostics;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;

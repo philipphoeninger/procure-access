@@ -4,6 +4,9 @@ public class CriterionConfiguration : IEntityTypeConfiguration<Criterion>
 {
     public void Configure(EntityTypeBuilder<Criterion> builder)
     {
+        // Query Filters
+        builder.HasQueryFilter(x => !x.IsDeleted);
+        
         // properties
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
         builder.Property(x => x.Display)

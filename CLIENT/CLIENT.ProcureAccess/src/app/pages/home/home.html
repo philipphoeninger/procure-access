@@ -1,5 +1,5 @@
 <div class="home-text-container">
-<p>Hello <span class="username">{{ store.user()?.username }}</span> and welcome back.</p>
+<p>Hello and welcome back.</p>
 <p style="display: flex; align-items: center;">Find accessibility 
     <button 
         mat-icon-button
@@ -9,15 +9,27 @@
         <mat-icon>arrow_forward</mat-icon>
     </button>
 </p>
-<p style="display: flex; align-items: center;">See your saved searches and products
-    <button 
-        mat-icon-button
-        class="favorites-btn" 
-        aria-label="Favorites icon-button" 
-        [routerLink]="'/favorites'">
-        <mat-icon>arrow_forward</mat-icon>
-    </button>
-</p>
+@if (store.isAuthenticated()) {
+    <p style="display: flex; align-items: center;">See your saved searches and products
+        <button 
+            mat-icon-button
+            class="favorites-btn" 
+            aria-label="Favorites icon-button" 
+            [routerLink]="'/favorites'">
+            <mat-icon>arrow_forward</mat-icon>
+        </button>
+    </p>
+} @else {
+    <p style="display: flex; align-items: center;">Login / Register to save searches and products
+        <button 
+            mat-icon-button
+            class="login-btn" 
+            aria-label="Login icon-button" 
+            (click)="authService.showLogin()" >
+            <mat-icon>arrow_forward</mat-icon>
+        </button>
+    </p>
+}
 <p style="display: flex; align-items: center;">Need any help or want to report a bug? Contact us
     <button 
         mat-icon-button
