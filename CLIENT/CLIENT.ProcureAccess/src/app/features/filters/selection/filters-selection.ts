@@ -15,7 +15,7 @@ import { map, Observable, startWith } from 'rxjs';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { FiltersApiService } from '../services/api/filters-api.service';
-import { EnFilterType } from '../models/filterTypes.enum';
+import { EnFilterTypeName } from '../models/filterTypes.enum';
 import { FilterType } from '../models/filterType.model';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
 
@@ -43,7 +43,7 @@ export class FiltersSelection {
     protected store = inject(ProcureAccessStore);
     protected filtersApiService = inject(FiltersApiService);
 
-    EnFilterType = EnFilterType;
+    EnFilterTypeName = EnFilterTypeName;
 
     accordion = viewChild.required(MatAccordion);
 

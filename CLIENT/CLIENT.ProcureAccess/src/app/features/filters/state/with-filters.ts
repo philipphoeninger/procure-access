@@ -11,6 +11,7 @@ import { FilterType } from '../models/filterType.model';
 import { withLoading } from '@app/shared/state/with-loading';
 import { FiltersApiService } from '../services/api/filters-api.service';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
+import { EnFilterTypeId } from '../models/filterTypes.enum';
 
 export type FiltersState = { 
   filterTypes: FilterType[], 
@@ -61,6 +62,8 @@ export const withFilters = () => signalStoreFeature(
     withComputed((state) => ({
       selectedCriteriaFiltersCount: computed(() => {
         return state.selectedCriteriaFilters().length;
-      })
+      }),
+      productParts: computed(() => 
+        state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.productPart))
     }))
 );

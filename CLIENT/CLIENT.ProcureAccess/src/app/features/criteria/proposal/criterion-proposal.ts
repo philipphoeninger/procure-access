@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { FormControl, FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,15 +58,17 @@ export class CriterionProposal {
     new CriterionDto(
       0,
       "",
-      ""
+      "",
+      1
     ),
     ProposalStatus.pending,
     undefined,
     new Date(),
     undefined
   ));
-
-  selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
+  productPartsControl = new FormControl<number[]>(
+     [this.proposal().criterion!.criteriaFilterId]
+  );
 
   public formErrorMessage?: string;
 
@@ -80,7 +82,10 @@ export class CriterionProposal {
     await this.store.loadProposals();
 
     let stateProposal = this.store.getProposalById(this.proposalId()!);
-    if (stateProposal) this.proposal.set(stateProposal);
+    if (stateProposal) {
+      this.proposal.set(stateProposal);
+      this.productPartsControl.setValue([stateProposal.criterion!.criteriaFilterId]);
+    }
   }
 
   onSubmit(form: NgForm, event: Event) {
@@ -89,7 +94,8 @@ export class CriterionProposal {
     
     let upsertCriterion: CreateCriterionDto = new CreateCriterionDto(
       this.proposal().criterion?.name!,
-      this.proposal().criterion?.description!
+      this.proposal().criterion?.description!,
+      this.productPartsControl.value![0]
     );
 
     // TODO: only send changed values

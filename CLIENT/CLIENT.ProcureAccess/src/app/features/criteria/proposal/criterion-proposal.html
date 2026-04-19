@@ -25,6 +25,19 @@
       }
     </mat-form-field>
 
+    <!-- <p>{{ productPart.description }}</p> -->
+    <p>Some description, why this is needed and what to check if unsure.</p>
+    <div class="list-selection-container">
+      <mat-selection-list #productPartsList [formControl]="productPartsControl" name="productParts" [multiple]="false" required>
+        @for (productPart of store.productParts(); track productPart) {
+          <mat-list-option [value]="productPart.id" togglePosition="before">{{ productPart.name }}</mat-list-option>
+        }
+      </mat-selection-list>
+      @if (!productPartsList.selectedOptions.hasValue() && productPartsControl.touched) {
+        <mat-error>Product Part is required.</mat-error>
+      }
+    </div>
+
     @if (formErrorMessage) {
         <span class="error-message ng-touched ng-invalid">{{ formErrorMessage }}</span>
     }
@@ -42,7 +55,7 @@
           mat-flat-button
           color="primary"
           type="button"
-          [disabled]="addCriterionForm.dirty"
+          [disabled]="addCriterionForm.dirty || !productPartsList.selectedOptions.hasValue()"
           (click)="approve(true)">
           Approve
         </button>

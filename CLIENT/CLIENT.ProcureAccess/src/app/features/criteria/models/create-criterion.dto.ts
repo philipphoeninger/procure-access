@@ -9,8 +9,15 @@ export class CreateCriterionDto {
   @jsonMember
   description: string;
 
-  constructor(pName: string, pDescription: string) {
+  @jsonMember
+  criteriaFilterId: number;
+
+  constructor(
+    pName: string, 
+    pDescription: string,
+    pCriteriaFilter: number) {
     this.name = pName;
     this.description = pDescription;
+    this.criteriaFilterId = pCriteriaFilter;
   }
 }

@@ -12,9 +12,17 @@ export class CriterionDto {
   @jsonMember
   description: string;
 
-  constructor(pId: number, pName: string, pDescription: string) {
+  @jsonMember
+  criteriaFilterId: number;
+
+  constructor(
+    pId: number, 
+    pName: string, 
+    pDescription: string, 
+    pCriteriaFilterId: number) {
     this.id = pId;
     this.name = pName;
     this.description = pDescription;
+    this.criteriaFilterId = pCriteriaFilterId;
   }
 }
