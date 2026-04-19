@@ -14,6 +14,12 @@ public class CriterionConfiguration : IEntityTypeConfiguration<Criterion>
 
         builder.HasIndex(
             x => new { x.Name }).IsUnique();
+        
+        builder
+            .HasOne(x => x.CriteriaFilter)
+            .WithMany(cf => cf.Criteria)
+            .HasForeignKey(x => x.CriteriaFilterId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>
