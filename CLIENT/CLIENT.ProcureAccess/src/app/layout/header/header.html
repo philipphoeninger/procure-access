@@ -36,7 +36,9 @@
       </button>
     }
     <button *appHasPermission="'objects:approve'" mat-icon-button class="proposals-btn" aria-label="Proposals icon-button" [routerLink]="'/proposals'" matTooltip="Proposals" matTooltipPosition="below">
-      <mat-icon>tv_options_edit_channels</mat-icon>
+      <span class="material-symbols-outlined">
+        tv_options_edit_channels
+      </span>
     </button>
     @if (store.isAuthenticated()) {
       <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'/profile'" matTooltip="Profile" matTooltipPosition="below">

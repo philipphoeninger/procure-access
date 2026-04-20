@@ -1,0 +1,44 @@
+@use '@angular/material' as mat;
+@use './theme-colors' as custom-colors;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: (
+        primary: custom-colors.$primary-palette,
+        tertiary: custom-colors.$tertiary-palette,
+        theme-type: color-scheme
+    ),
+    typography: (
+        plain-family: Poppins,
+        brand-family: Poppins,
+        bold-weight: 700,
+        medium-weight: 500,
+        regular-weight: 400,
+        density: 0 // 0 to -5
+    )
+  ));
+}
+
+/*
+Colors: 
+primary: #172C3F -> background
+secondary: #1500FF
+text: #FFFFFF
+accent: #D0E2F2
+239fe91: #F4F4F4
+201a98b: #FFFFFF
+ccbdd64: #F7F7F9
+bed2f4a: #FFFFFF
+955ab3c: #F0EDFE
+174c659: #E8E8EA
+8d488f3: #23293B
+5fe7d27: #F4F2FE
+eb0115e: #DB6FD8 -> hover, accent
+ea3bdc6: #4C6873
+*/
+
+body {
+  // background: var(--mat-sys-surface);
+  // color: var(--mat-sys-on-surface);
+}

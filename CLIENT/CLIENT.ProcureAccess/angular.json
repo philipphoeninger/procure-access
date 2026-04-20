@@ -27,7 +27,7 @@
               }
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles/theme.scss",
               "src/styles/main.scss"
             ]
           },
@@ -88,7 +88,7 @@
               }
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles/theme.scss",
               "src/styles/main.scss"
             ]
           }

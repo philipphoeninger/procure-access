@@ -7,6 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { ThemePicker } from '@app/shared/components/theme-picker/theme-picker';
 
 @Component({
   selector: 'pa-settings',
@@ -16,7 +17,8 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
     MatSlideToggleModule,
     MatListModule,
     MatDividerModule,
-    MatButtonModule
+    MatButtonModule,
+    ThemePicker
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
