@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { API_URL, JWT_NAME, REFRESH_TOKEN_NAME } from "@app/app.config";
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { LoginModel } from '../models/login.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { ResetPasswordModel } from '../models/reset-password.model';
 import { AuthResponse } from '../models/auth-response.model';
 import { jwtDecode } from 'jwt-decode';
 import { EnCustomClaimTypes } from '../models/custom-claim-types.enum';
+import { User } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -21,6 +22,10 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {}
+
+  me(): Promise<User | null> {
+    return lastValueFrom(this.http.get<User | null>(`${this.apiUrl}/me`));
+  }
 
   login(command: LoginModel): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signIn`, command);

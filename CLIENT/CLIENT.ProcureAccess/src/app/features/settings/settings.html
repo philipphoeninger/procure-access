@@ -56,19 +56,29 @@
   <mat-divider></mat-divider>
   <mat-list-item class="list-item">
     <div class="list-item-container">
-      <mat-slide-toggle
-        class="example-margin" 
-        labelPosition="before" 
-        [(ngModel)]="updateUICustomization().highContrastOn">
-          High contrast on
-        </mat-slide-toggle>
+      <label for="app-contrast-picker">Contrast mode: </label>
+      <button 
+        id="app-contrast-picker" 
+        mat-icon-button 
+        (click)="toggleContrastMode()">
+        <span class="material-symbols-outlined">
+            {{ store.highContrastOn() ? 'contrast_rtl_off' : 'contrast'}}
+        </span>
+      </button>
     </div>
   </mat-list-item>
   <mat-divider></mat-divider>
   <mat-list-item class="list-item">
     <div class="list-item-container">
       <label for="app-theme-picker">Dark mode: </label>
-      <app-theme-picker id="app-theme-picker"></app-theme-picker>
+      <button
+        id="app-theme-picker"
+        mat-icon-button
+        (click)="toggleColorMode()">
+        <mat-icon>
+          {{ store.darkModeOn() ? 'light_mode' : 'dark_mode'}}
+        </mat-icon>
+      </button>
     </div>
   </mat-list-item>
 </mat-list>

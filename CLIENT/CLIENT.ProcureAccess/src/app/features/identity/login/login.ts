@@ -109,7 +109,9 @@ export class Login {
           localStorage.setItem(this.refreshTokenName, response.refreshToken);
           let user: UserDto = new UserDto(response.user.id, response.user.email);
           this.store.setUser(user);
+          // set settings
           this.store.setUICustomization(response.user.uiCustomization);
+          this.store.removeSettingsFromLocalStorage();
           this.store.loadProposals();
           this.router.navigateByUrl('/home');
         }),

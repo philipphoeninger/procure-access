@@ -23,6 +23,14 @@ export const withIdentity = () => signalStoreFeature(
       identityApiService = inject(IdentityApiService),
       snackbarService = inject(SnackbarService)
     ) => ({
+      async loadIdentity() {
+        if (this.isAuthenticated() && !state.user()) {
+          let user = await authService.me();
+          this.setUser(user);
+          return user;
+        }
+        return null;
+      },
       setUser(user: UserDto | null) {
         patchState(state, {
           user

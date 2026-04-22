@@ -20,6 +20,26 @@ html {
   ));
 }
 
+.tertiary {
+  @include mat.theme((color: custom-colors.$tertiary-palette));
+}
+
+.secondary {
+  @include mat.theme((color: custom-colors.$secondary-palette));
+}
+
+.error {
+  @include mat.theme((color: custom-colors.$error-palette));
+}
+
+.text-error {
+  color: var(--mat-sys-error-container);
+}
+
+.contrast-more {
+  @include custom-colors.high-contrast-overrides(color-scheme);
+}
+
 /*
 Colors: 
 primary: #172C3F -> background

@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+import { computed, inject, RendererFactory2 } from '@angular/core';
 import {
   patchState,
   signalStoreFeature,
@@ -41,48 +41,136 @@ export const withSettings = () => signalStoreFeature(
     withMethods((
       state,
       settingsApiService = inject(SettingsApiService),
-      snackbarService = inject(SnackbarService)
-    ) => ({
-      async loadSettings() {
-        let isAuthenticated = state.isAuthenticated();
-        await this.loadUICustomization(isAuthenticated);
-        // load more settings here...
-      },
-      async loadUICustomization(isAuthenticated: boolean) {
-        if (!isAuthenticated) {
-          if (!state.loadFromLocalStorage(LocalStorageKeys.uiCustomization)) {
-            this.setUICustomization(initialAppState.settings.uiCustomization);
-          }
-        } else if (!state.user()) { //gate
-          state.incrementLoadingCount();
-          this.setUICustomization(await settingsApiService.getUICustomization());
-          state.decrementLoadingCount();
-        }
-      },
-      setUICustomization(uiCustomization: UICustomization) {
-          patchState(state, {
-            uiCustomization
-          });
-      },
-      async updateUICustomization(uiCustomization: UICustomization) {
-        if (!state.isAuthenticated()) {
-          this.setUICustomization(uiCustomization);
-          state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
-          snackbarService.showInfo('Settings saved as cookie');
-          return; //gate
-        }
+      snackbarService = inject(SnackbarService),
+      rendererFactory = inject(RendererFactory2)
+    ) => {
+      let renderer = rendererFactory.createRenderer(null, null);
 
-        state.incrementLoadingCount();
-        let success = await settingsApiService.updateUICustomization(uiCustomization);
-        if (success) {
+      return {
+        activateMediaEventListeners() {
+          // theme mode
+          window
+            .matchMedia('(prefers-color-scheme: dark)')
+            .addEventListener('change', event => {
+              if (state.isAuthenticated()) {
+                let uiCustomization = state.uiCustomization();
+                uiCustomization.darkModeOn = event.matches;
+                this.setUICustomization(uiCustomization);
+                snackbarService.showInfo(
+                  'You changed the preferred color scheme in your browser.\n' +
+                  'If you want to change the setting permanently, you must save it in the Settings page.');
+              } else {
+                // drops unsaved setting changes
+                state.loadFromLocalStorage(LocalStorageKeys.uiCustomization);
+                let uiCustomization = state.uiCustomization();
+                uiCustomization.darkModeOn = event.matches;
+                this.setUICustomization(uiCustomization);
+                state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
+                snackbarService.showInfo('New color scheme saved as cookie.');
+              }
+            });
+          // contrast mode
+          window
+            .matchMedia('(prefers-contrast: more)')
+            .addEventListener('change', event => {
+              if (state.isAuthenticated()) {
+                let uiCustomization = state.uiCustomization();
+                uiCustomization.highContrastOn = event.matches;
+                this.setUICustomization(uiCustomization);
+                snackbarService.showInfo(
+                  'You changed the preferred contrast mode in your browser.\n' +
+                  'If you want to change the setting permanently, you must save it in the Settings page.');
+              } else {
+                // drops unsaved setting changes
+                state.loadFromLocalStorage(LocalStorageKeys.uiCustomization);
+                let uiCustomization = state.uiCustomization();
+                uiCustomization.highContrastOn = event.matches;
+                this.setUICustomization(uiCustomization);
+                state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
+                snackbarService.showInfo('New contrast mode saved as cookie.');
+              }
+            });
+        },
+        async reloadUICustomization() {
+          if (!state.isAuthenticated()) {
+            if (state.loadFromLocalStorage(LocalStorageKeys.uiCustomization)) {
+              // Renderer effects
+              renderer.setStyle(
+                document.documentElement, 
+                'color-scheme', 
+                state.uiCustomization().darkModeOn ? 'dark' : 'light');
+
+              if (state.uiCustomization().highContrastOn)
+                renderer.addClass(document.documentElement, 'contrast-more');
+              else renderer.removeClass(document.documentElement, 'contrast-more');
+              
+              return; //gate
+            }
+            let initialSettings = initialAppState.settings.uiCustomization;
+            initialSettings.darkModeOn =
+                window.matchMedia('(prefers-color-scheme: dark)').matches;
+            initialSettings.highContrastOn =
+                window.matchMedia('(prefers-contrast: more)').matches;
+            this.setUICustomization(initialSettings);
+            state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
+          } else {
+            state.incrementLoadingCount();
+            this.removeSettingsFromLocalStorage();
+            let uiCustomization = await settingsApiService.getUICustomization();
+            this.setUICustomization(uiCustomization ?? initialAppState.settings.uiCustomization);
+            state.decrementLoadingCount();
+          }
+        },
+        removeSettingsFromLocalStorage() {
+          state.removeFromLocalStorage(LocalStorageKeys.uiCustomization);
+        },
+        setUICustomization(uiCustomization: UICustomization) {
+          patchState(state, {
+            uiCustomization: { ...uiCustomization }
+          });
+
+          // Renderer effects
+          renderer.setStyle(
+            document.documentElement, 
+            'color-scheme', 
+            state.uiCustomization().darkModeOn ? 'dark' : 'light');
+          
+          if (state.uiCustomization().highContrastOn)
+            renderer.addClass(document.documentElement, 'contrast-more');
+          else renderer.removeClass(document.documentElement, 'contrast-more');
+        },
+        async updateUICustomization(uiCustomization: UICustomization) {
+          if (!state.isAuthenticated()) {
+            this.setUICustomization(uiCustomization);
+            state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
+            snackbarService.showInfo('Settings saved as cookie');
+            return; //gate
+          }
+
+          state.incrementLoadingCount();
+          let success = await settingsApiService.updateUICustomization(uiCustomization);
+          if (success) {
+            this.setUICustomization(uiCustomization);
+            snackbarService.showInfo('Settings saved permanently');
+          } else {
+            snackbarService.showError('Error occured on saving settings. Please try again later.');
+          }
+          state.decrementLoadingCount();
+        },
+        toggleDarkMode() {
+          let uiCustomization = state.uiCustomization();
+          uiCustomization.darkModeOn = !uiCustomization.darkModeOn;
           this.setUICustomization(uiCustomization);
-          snackbarService.showInfo('Settings saved permanently');
+        },
+        toggleContrastMode() {
+          let uiCustomization = state.uiCustomization();
+          uiCustomization.highContrastOn = !uiCustomization.highContrastOn;
+          this.setUICustomization(uiCustomization);
         }
-        else {
-          snackbarService.showError('Error occured on saving settings. Please try again later.');
-        }
-        state.decrementLoadingCount();
-      }
-    })),
-    withComputed((state) => ({ }))
-);
+     }
+    }),
+    withComputed((state) => ({
+      darkModeOn: computed(() => state.uiCustomization().darkModeOn),
+      highContrastOn: computed(() => state.uiCustomization().highContrastOn)
+    }))
+  );
