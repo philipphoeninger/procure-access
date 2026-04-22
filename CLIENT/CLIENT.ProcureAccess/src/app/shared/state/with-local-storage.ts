@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, isSignal, PLATFORM_ID } from '@angular/core';
-import { API_URL } from '@app/app.config';
+import { APP_NAME } from '@app/app.config';
 import {
   patchState,
   signalStoreFeature,
@@ -13,7 +13,7 @@ export function withLocalStorage(storageKeys: string[]) {
     withState({}),
     withMethods((state) => {
       const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-      const appName = inject(API_URL);
+      const appName = inject(APP_NAME);
 
       return {
         saveAllToLocalStorage() {
@@ -25,7 +25,7 @@ export function withLocalStorage(storageKeys: string[]) {
             if (!stateValue) continue;
             // update local storage
             window.localStorage.setItem(
-              appName + '-' + key,
+              appName.toLowerCase() + '-' + key,
               JSON.stringify(stateValue[key])
             );
           }
@@ -49,7 +49,7 @@ export function withLocalStorage(storageKeys: string[]) {
           if (!isBrowser) return false; // gate
 
           const storageValue = window.localStorage.getItem(
-            appName + '-' + storageKey
+            appName.toLowerCase() + '-' + storageKey
           );
           if (!storageValue) return false; //gate
 
@@ -57,6 +57,15 @@ export function withLocalStorage(storageKeys: string[]) {
           updatedState[storageKey] = JSON.parse(storageValue);
 
           patchState(state, updatedState);
+          return true;
+        },
+        removeFromLocalStorage(storageKey: string) {
+          if (!isBrowser) return false; // gate
+          
+          // update local storage
+          window.localStorage.removeItem(
+            appName.toLowerCase() + '-' + storageKey
+          );
           return true;
         }
     }})
