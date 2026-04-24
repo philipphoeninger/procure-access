@@ -1,6 +1,6 @@
 <div class="accordion-action-buttons">
-  <button matButton (click)="accordion().openAll()">Expand All</button>
-  <button matButton (click)="accordion().closeAll()">Collapse All</button>
+  <button matButton (click)="accordion().openAll()">{{ 'COMMON.EXPAND_ALL' | translate }}</button>
+  <button matButton (click)="accordion().closeAll()">{{ 'COMMON.COLLAPSE_ALL' | translate }}</button>
 </div>
 
 <mat-accordion class="filters-accordion" multi>
@@ -9,7 +9,7 @@
             <mat-expansion-panel-header>
                 <mat-panel-title>{{ filterType.name }}</mat-panel-title>
                 <mat-panel-description>
-                    {{ productTypes().length }} selected
+                    {{ productTypes().length }} {{ 'COMMON.SELECTED' | translate }}
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
@@ -69,4 +69,4 @@
     }
 </mat-accordion>
 
-<p style="margin-left: auto; text-align: right;">{{ selectedFilterTypeIds().length }} selected</p>
+<p style="margin-left: auto; text-align: right;">{{ selectedFilterTypeIds().length }} {{ 'COMMON.SELECTED' | translate }}</p>

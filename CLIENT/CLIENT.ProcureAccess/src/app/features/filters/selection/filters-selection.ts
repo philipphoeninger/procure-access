@@ -18,6 +18,7 @@ import { FiltersApiService } from '../services/api/filters-api.service';
 import { EnFilterTypeName } from '../models/filterTypes.enum';
 import { FilterType } from '../models/filterType.model';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-filters-selection',
@@ -33,7 +34,8 @@ import { CriteriaFilter } from '../models/criteriaFilter.model';
     AsyncPipe,
     MatChipsModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslatePipe
   ],
   templateUrl: './filters-selection.html',
   styleUrl: './filters-selection.scss',
@@ -118,7 +120,6 @@ export class FiltersSelection {
     add(event: MatChipInputEvent): void {
         const value = (event.value || '').trim();
 
-        // Add our fruit
         if (value) {
             this.productTypes.update(productTypes => [...productTypes, value]);
         }

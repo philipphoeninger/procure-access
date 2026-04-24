@@ -1,45 +1,45 @@
-<h2 class="heading">Profile</h2>
+<h2 class="heading">{{ 'AUTH.PROFILE' | translate }}</h2>
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 profile-table">
   <!-- Position Column -->
   <ng-container matColumnDef="position">
-    <th mat-header-cell *matHeaderCellDef> No. </th>
+    <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.NUMBER' | translate }} </th>
     <td mat-cell *matCellDef="let element"> {{element.position}} </td>
   </ng-container>
 
   <!-- Name Column -->
   <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef> Name </th>
+    <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.NAME' | translate }} </th>
     <td mat-cell *matCellDef="let element"> {{element.name}} </td>
   </ng-container>
 
   <!-- Value Column -->
   <ng-container matColumnDef="value">
-    <th mat-header-cell *matHeaderCellDef> Value </th>
+    <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.VALUE' | translate }} </th>
     <td mat-cell *matCellDef="let element"> {{element.value}} </td>
   </ng-container>
 
   <!-- Actions Column -->
   <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef> Actions </th>
-    <td mat-cell *matCellDef="let element"> <button mat-flat-button (click)="openChangeUserDialog(element)">Change</button> </td>
+    <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.ACTIONS' | translate }} </th>
+    <td mat-cell *matCellDef="let element"> <button mat-flat-button (click)="openChangeUserDialog(element)">{{ 'COMMON.CHANGE' | translate }}</button> </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 <div class="profile-actions">
-  <button mat-flat-button class="delete-btn error" (click)="deleteAccount()">Delete</button>
+  <button mat-flat-button class="delete-btn error" (click)="deleteAccount()">{{ 'COMMON.DELETE' | translate }}</button>
 </div>
 
 <div *appHasNotPermission="'objects:approve'" class="proposals-container">
   <div class="proposal-title">
-    <h3>Your open proposals (max. 3)</h3>
+    <h3>{{ 'PROPOSALS.OPEN_HEADER' | translate }}</h3>
     <button
       mat-icon-button
       [matMenuTriggerFor]="menu"
       class="create-proposal-btn"
       aria-label="Create proposal icon-button"
-      matTooltip="Create new proposal" 
+      [matTooltip]="'PROPOSALS.CREATE' | translate" 
       matTooltipPosition="left"
       (click)="null"
     ><mat-icon>add</mat-icon></button>
@@ -48,12 +48,12 @@
         mat-menu-item
         aria-label="Product proposal button"
         [routerLink]="'/product-proposal/0'"
-        >Product</button>
-      <button 
+        >{{ 'PRODUCTS.PRODUCT_LABEL' | translate }}</button>
+      <button
         mat-menu-item
         aria-label="Criterion proposal button"
         [routerLink]="'/criterion-proposal/0'"
-        >Criterion</button>
+        >{{ 'CRITERIA.CRITERION_LABEL' | translate }}</button>
     </mat-menu>
   </div>
   @if (store.openProposalsCount() > 0) {
@@ -70,7 +70,7 @@
           <span matListItemTitle>
             {{ proposal.product ? proposal.product.name : proposal.criterion!.name }}
           </span>
-          <span>Status: pending<mat-icon>draft</mat-icon></span>
+          <span>{{ 'PROPOSALS.STATUS' | translate }}: {{ 'PROPOSALS.PENDING' | translate }}<mat-icon>draft</mat-icon></span>
           <div matListItemMeta>
             <button matIconButton (click)="null">
               <mat-icon>visibility</mat-icon>
@@ -86,11 +86,11 @@
       }
     </mat-list>
   } @else {
-    <p>- No open proposals yet -</p>
+    <p>- {{ 'PROPOSALS.NON_OPEN' | translate }} -</p>
   }
 </div>
 <div class="proposals-container">
-  <h3>Closed proposals made by you</h3>
+  <h3>{{ 'PROPOSALS.CLOSED_HEADER' | translate }}</h3>
   @if (store.closedProposalsCount() > 0) {
     <mat-list role="list">
       @for (proposal of store.closedProposals(); track proposal) {
@@ -105,7 +105,7 @@
           <span matListItemTitle>
             {{ proposal.product ? proposal.product.name : proposal.criterion!.name }}
           </span>
-          <span>Status: {{ ProposalStatus[proposal.status] }}<mat-icon>done_all</mat-icon></span>
+          <span>{{ 'PROPOSALS.STATUS' | translate }}: {{ ProposalStatus[proposal.status] }}<mat-icon>done_all</mat-icon></span>
           <div matListItemMeta>
             <button matIconButton (click)="null">
               <mat-icon>visibility</mat-icon>
@@ -115,6 +115,6 @@
       }
     </mat-list>
   } @else {
-    <p>- No closed proposals yet -</p>
+    <p>- {{ 'PROPOSALS.NON_CLOSED' | translate }} -</p>
   }
 </div>

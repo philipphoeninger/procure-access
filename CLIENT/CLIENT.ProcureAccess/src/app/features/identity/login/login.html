@@ -5,50 +5,53 @@
 <div class="panel">
   <div class="header">
     <mat-icon>lock</mat-icon>
-    <span class="title">Login</span>
+    <span class="title">{{ 'AUTH.LOGIN' | translate }}</span>
   </div>
 
   <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm, $event)">
     <mat-form-field>
-      <mat-label>EMail</mat-label>
+      <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
       <input matInput type="text" name="email" [(ngModel)]="email" required #emailInput="ngModel" minlength="3"
         maxlength="50" />
       @if (emailInput.invalid && emailInput.touched) {
-      <mat-error>EMail is required.</mat-error>
+        <mat-error>{{ 'AUTH.EMAIL' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </mat-form-field>
     <mat-form-field id="password-field">
-      <mat-label>Password</mat-label>
+      <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
       <input matInput type="password" name="password" [(ngModel)]="password" required #passwordInput="ngModel"
         minlength="6" maxlength="50" />
       @if (passwordInput.invalid && passwordInput.touched) {
-      <mat-error>Password is required.</mat-error>
+      <mat-error>{{ 'AUTH.PASSWORD' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </mat-form-field>
     <div class="selections-container">
-      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">Keep me
-        signed in</mat-checkbox>
+      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">
+        {{ 'AUTH.KEEP_SIGNED_IN' | translate }}
+      </mat-checkbox>
       <mat-form-field class="selection">
-        <mat-label>Language</mat-label>
+        <mat-label>{{ 'COMMON.LANGUAGE' | translate }}</mat-label>
         <mat-select [(ngModel)]="selectedLanguage" name="selectedLanguage">
           @for (language of languages; track language) {
-          <mat-option [value]="language">{{ language.label }}</mat-option>
+            <mat-option [value]="language">{{ language.label }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
     @if (loginErrorMessage) {
-    <span class="error-message ng-touched ng-invalid">{{ loginErrorMessage }}</span>
+      <span class="error-message ng-touched ng-invalid">{{ loginErrorMessage }}</span>
     }
     <div class="buttons">
-      <button mat-button color="primary" (click)="openForgotPwDialog()" type="button">Forgot Password</button>
+      <button mat-button color="primary" (click)="openForgotPwDialog()" type="button">
+        {{ 'AUTH.FORGOT_PW' | translate }}
+      </button>
       <button id="login-button" mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">
-        Login
+        {{ 'AUTH.LOGIN' | translate }}
       </button>
     </div>
   </form>
 </div>
 <div id="register-section">
-  <span>No account yet?</span>
-  <button mat-button color="primary" (click)="authService.showRegister()">Register here</button>
+  <span>{{ 'AUTH.NO_ACCOUNT_YET' | translate }}</span>
+  <button mat-button color="primary" (click)="authService.showRegister()">{{ 'AUTH.REGISTER_HERE' | translate }}</button>
 </div>

@@ -77,7 +77,8 @@
     "EMAIL_CONFIRMED_HEADER": "Correo confirmado",
     "EMAIL_CONFIRMED_MSG": "Correo confirmado correctamente. Puedes cerrar esta ventana.",
     "EMAIL_CONFIRM_FAILED_HEADER": "Error al confirmar correo",
-    "EMAIL_CONFIRM_FAILED_MSG": "Ocurrió un error al confirmar el correo."
+    "EMAIL_CONFIRM_FAILED_MSG": "Ocurrió un error al confirmar el correo.",
+    "PW_RESET_FAILED_MSG": "Ha surgido un problema al restablecer la contraseña. Ponte en contacto con el servicio de asistencia por correo electrónico."
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Criterio",

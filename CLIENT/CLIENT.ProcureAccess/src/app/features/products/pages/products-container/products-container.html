@@ -9,15 +9,15 @@
       <!--<pa-products-filters></pa-products-filters> [formGroup1]="criteriaFiltersFormGroup"-->
       <pa-filters-container (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
       <div class="stepper-actions-container">
-        <button matButton (click)="stepper.reset()">Reset</button>
+        <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
         @if (store.isAuthenticated()) {
-          <button 
-            matButton="filled" 
-            aria-label="Criterion proposal button" 
+          <button
+            matButton="filled"
+            aria-label="Criterion proposal button"
             [routerLink]="'/criterion-proposal/0'"
-          >Propose criterion</button>
+          >{{ 'CRITERIA.CRITERIA' | translate }}</button>
         }
-        <button matButton matStepperNext (click)="asdf()">Enter</button>
+        <button matButton matStepperNext (click)="asdf()">{{ 'COMMON.ENTER' | translate }}</button>
       </div>
     </form>
   </mat-step>
@@ -33,16 +33,16 @@
         <pa-criteria-list></pa-criteria-list>
       <div class="stepper-actions-container">
         <div class="action-buttons">
-            <button matButton matStepperPrevious>Back</button>
-            <button matButton (click)="stepper.reset()">Reset</button>
+            <button matButton matStepperPrevious>{{ 'COMMON.BACK' | translate }}</button>
+            <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
         </div>
         <div class="action-sharing">
             @if (store.isAuthenticated()) {
-              <button 
+              <button
                   mat-icon-button
                   class="products-link-btn"
                   aria-label="Products link button"
-                  matTooltip="Create link" 
+                  [matTooltip]="'PRODUCTS.CREATE_LINK' | translate"
                   matTooltipPosition="above"
                   (click)="linkCopied()">
                   <mat-icon>link</mat-icon>
@@ -52,17 +52,17 @@
                 mat-icon-button
                 class="products-export-btn"
                 aria-label="Products export button"
-                matTooltip="Download" 
+                [matTooltip]="'COMMON.DOWNLOAD' | translate" 
                 matTooltipPosition="above"
                 (click)="exportProductsFile()">
                 <mat-icon>arrow_downward</mat-icon>
             </button>
             @if (store.isAuthenticated()) {
-                <button 
+                <button
                     mat-icon-button
                     class="products-save-btn"
                     aria-label="Products save button"
-                    matTooltip="Save" 
+                    [matTooltip]="'COMMON.SAVE' | translate"
                     matTooltipPosition="above"
                     (click)="openProductsSearchDialog()">
                     <mat-icon>add_2</mat-icon>
@@ -75,17 +75,17 @@
                   matButton="elevated"
                   aria-label="Criterion proposal button" 
                   [routerLink]="'/criterion-proposal/0'"
-                  style="margin-right: 8px">Propose criterion
+                  style="margin-right: 8px">{{ 'CRITERIA.PROPOSE' | translate }}
                 </button>
             }
             <button 
                 matButton="filled"
                 class="products-page-btn"
                 aria-label="Products page button"
-                matTooltip="Show products that meet the filtered criteria" 
+                [matTooltip]="'PRODUCTS.SHOW_TOOLTIP' | translate" 
                 matTooltipPosition="above"
                 [routerLink]="'/products'">
-                Show Products
+                {{ 'PRODUCTS.SHOW' | translate }}
             </button>
         </div>
       </div>

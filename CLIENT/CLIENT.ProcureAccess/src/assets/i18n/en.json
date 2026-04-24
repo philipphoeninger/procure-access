@@ -77,7 +77,8 @@
     "EMAIL_CONFIRMED_HEADER": "Email confirmed",
     "EMAIL_CONFIRMED_MSG": "Email confirmed successfully. You can now close this window.",
     "EMAIL_CONFIRM_FAILED_HEADER": "Email confirmation failed",
-    "EMAIL_CONFIRM_FAILED_MSG": "Something went wrong confirming your email. Please contact the support via email."
+    "EMAIL_CONFIRM_FAILED_MSG": "Something went wrong confirming your email. Please contact the support via email.",
+    "PW_RESET_FAILED_MSG": "Something went wrong resetting the password. Please contact support via email."
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Criterion",

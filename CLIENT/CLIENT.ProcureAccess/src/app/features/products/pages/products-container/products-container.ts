@@ -15,6 +15,7 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { FiltersContainer } from '@app/features/filters/pages/filters-container/filters-container';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CriteriaFilter } from '@app/features/filters/models/criteriaFilter.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-products-container',
@@ -30,7 +31,8 @@ import { CriteriaFilter } from '@app/features/filters/models/criteriaFilter.mode
     CriteriaList,
     RouterModule,
     FiltersContainer,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './products-container.html',
   styleUrl: './products-container.scss'

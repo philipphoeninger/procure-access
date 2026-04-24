@@ -10,6 +10,7 @@ import { AuthService } from '@features/identity/services/auth.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-header',
@@ -22,7 +23,8 @@ import { HasPermissionDirective } from '@app/features/identity/directives/has-pe
     MatMenuModule,
     RouterModule,
     MatTooltipModule,
-    HasPermissionDirective
+    HasPermissionDirective,
+    TranslatePipe
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss'

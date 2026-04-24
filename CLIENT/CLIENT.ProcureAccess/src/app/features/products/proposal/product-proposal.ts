@@ -21,6 +21,7 @@ import { ProposalStatus } from '../../proposal/models/proposal-status.enum';
 import { ReviewProposal } from '@app/features/proposal/models/review-proposal-request.model';
 import { ApproveProposal } from '@app/features/proposal/models/approve-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-product-proposal',
@@ -36,7 +37,8 @@ import { HasPermissionDirective } from '@app/features/identity/directives/has-pe
     RouterModule,
     MatListModule,
     FiltersSelection,
-    HasPermissionDirective
+    HasPermissionDirective,
+    TranslatePipe
 ],
   templateUrl: './product-proposal.html',
   styleUrl: './product-proposal.scss',

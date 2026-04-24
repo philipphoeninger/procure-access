@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@app/features/identity/services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-unauthorized',
@@ -11,7 +12,8 @@ import { AuthService } from '@app/features/identity/services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    RouterModule
+    RouterModule,
+    TranslatePipe
 ],
   templateUrl: './unauthorized.html',
   styleUrl: './unauthorized.scss'

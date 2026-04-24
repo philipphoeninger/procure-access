@@ -1,20 +1,20 @@
-<h2 mat-dialog-title class="text-error">Delete account</h2>
+<h2 mat-dialog-title class="text-error">{{ 'AUTH.DELETE_ACCOUNT' | translate }}</h2>
 <mat-dialog-content>
-  <p>You're about to delete your account.</p>
-  <p>For verification, please enter your email below and click the 'Delete' button.</p>
-  <p>Your E-Mail: {{ email() }}</p>
-  <p>Attention: this cannot be undone!</p>
+  <p>{{ 'AUTH.DELETE_ACCOUNT_WARNING' | translate }}</p>
+  <p>{{ 'AUTH.DELETE_ACCOUNT_VERIFICATION_MSG' | translate }}</p>
+  <p>{{ 'AUTH.YOUR_EMAIL' | translate }}: {{ email() }}</p>
+  <p>{{ 'AUTH.CANNOT_UNDO_WARNING' | translate }}</p>
   <mat-form-field id="property-input">
-    <mat-label>E-Mail</mat-label>
+    <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
     <input matInput [(ngModel)]="inputEmail" />
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button matButton [mat-dialog-close]="false">Cancel</button>
+  <button matButton [mat-dialog-close]="false">{{ 'COMMON.CANCEL' | translate }}</button>
   <button
     mat-flat-button
     class="error"
     [disabled]="deletionDisabled()"
     [mat-dialog-close]="true"
-    cdkFocusInitial>Delete</button>
+    cdkFocusInitial>{{ 'COMMON.DELETE' | translate }}</button>
 </mat-dialog-actions>

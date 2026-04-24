@@ -1,32 +1,31 @@
-<p>Please enter information about the criterion.</p>
-<p>Not all fields have to be filled out. The more information you can provide, 
-    the easier it is for our admin to recheck everything.</p>
+<p>{{ 'CRITERIA.ENTER_INFO_MSG' | translate }}</p>
+<p>{{ 'PROPOSALS.NOT_ALL_FIELDS_MSG' | translate }}</p>
 
 <div class="container">
   <div class="header">
-    <div class="title"><mat-icon>add_2</mat-icon> <span>Criterion</span></div>
+    <div class="title"><mat-icon>add_2</mat-icon> <span>{{ 'CRITERIA.CRITERION_LABEL' | translate }}</span></div>
   </div>
   <form class="criterion-form" #addCriterionForm="ngForm" (ngSubmit)="onSubmit(addCriterionForm, $event)">
     <mat-form-field>
-      <mat-label>Name</mat-label>
+      <mat-label>{{ 'COMMON.NAME' | translate }}</mat-label>
       <input matInput type="text" name="name" [(ngModel)]="proposal().criterion!.name" required #nameInput="ngModel"
         maxlength="50" />
       @if (nameInput.invalid && nameInput.touched) {
-      <mat-error>Name is required.</mat-error>
+        <mat-error>{{ 'COMMON.NAME' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </mat-form-field>
     <mat-form-field id="description-field">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ 'COMMON.DESCRIPTION' | translate }}</mat-label>
       <!-- TODO: make text area markdown input -->
       <textarea matInput type="text" name="description" [(ngModel)]="proposal().criterion!.description" required #descriptionInput="ngModel"
         minlength="6" maxlength="2000"></textarea>
       @if (descriptionInput.invalid && descriptionInput.touched) {
-        <mat-error>Description is required.</mat-error>
+        <mat-error>{{ 'COMMON.DESCRIPTION' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </mat-form-field>
 
     <!-- <p>{{ productPart.description }}</p> -->
-    <p>Some description, why this is needed and what to check if unsure.</p>
+    <p>{{ 'CRITERIA.ENTER_PRODUCT_PART_INFO' | translate }}</p>
     <div class="list-selection-container">
       <mat-selection-list #productPartsList [formControl]="productPartsControl" name="productParts" [multiple]="false" required>
         @for (productPart of store.productParts(); track productPart) {
@@ -34,7 +33,7 @@
         }
       </mat-selection-list>
       @if (!productPartsList.selectedOptions.hasValue() && productPartsControl.touched) {
-        <mat-error>Product Part is required.</mat-error>
+        <mat-error>{{ 'COMMON.PRODUCT_PART' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </div>
 
@@ -43,13 +42,13 @@
     }
     <div class="buttons">
       <div>
-        <button mat-button color="primary" (click)="null" type="button">Reset</button>
+        <button mat-button color="primary" (click)="null" type="button">{{ 'COMMON.RESET' | translate }}</button>
         <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addCriterionForm.invalid">
-          {{ proposalId() ? "Save" : "Send" }}
+          {{ proposalId() ? ('COMMON.SAVE' | translate) : ('COMMON.SEND' | translate) }}
         </button>
       </div>
       <div *appHasPermission="'objects:approve'" id="approval-btns">
-        <button mat-button color="warn" (click)="approve(false)" type="button">Reject</button>
+        <button mat-button color="warn" (click)="approve(false)" type="button">{{ 'COMMON.REJECT' | translate }}</button>
         <button
           id="approve-button"
           mat-flat-button
@@ -57,7 +56,7 @@
           type="button"
           [disabled]="addCriterionForm.dirty || !productPartsList.selectedOptions.hasValue()"
           (click)="approve(true)">
-          Approve
+          {{ 'COMMON.APPROVE' | translate }}
         </button>
       </div>
     </div>

@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { FiltersSelection } from '../../selection/filters-selection';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-filters-container',
   imports: [
-    FiltersSelection
+    FiltersSelection,
+    TranslatePipe
   ],
   templateUrl: './filters-container.html',
   styleUrl: './filters-container.scss',

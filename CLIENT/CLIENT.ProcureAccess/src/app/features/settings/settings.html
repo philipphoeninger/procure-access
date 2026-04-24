@@ -1,6 +1,6 @@
-<h2 class="heading">Settings</h2>
+<h2 class="heading">{{ 'SETTINGS.LABEL' | translate }}</h2>
 <mat-list class="settings-list">
-  <mat-list-item class="list-item">
+  <!-- <mat-list-item class="list-item">
     <div class="list-item-container">
       <label for="foreground-cp">Foreground color: </label>
       <div>
@@ -42,24 +42,24 @@
       </div>
     </div>
   </mat-list-item>
-  <mat-divider></mat-divider>
+  <mat-divider></mat-divider> -->
   <mat-list-item class="list-item">
     <div class="list-item-container">
         <mat-slide-toggle 
           class="example-margin" 
           labelPosition="before" 
           [(ngModel)]="updateUICustomization().orientationVertical">
-            Orientation: vertical 
+            {{ 'SETTINGS.ORIENTATION_VERTICAL' | translate }}
         </mat-slide-toggle>
     </div>
   </mat-list-item>
   <mat-divider></mat-divider>
   <mat-list-item class="list-item">
     <div class="list-item-container">
-      <label for="app-contrast-picker">Contrast mode: </label>
-      <button 
-        id="app-contrast-picker" 
-        mat-icon-button 
+      <label for="app-contrast-picker">{{ 'SETTINGS.CONTRAST_MODE' | translate }}</label>
+      <button
+        id="app-contrast-picker"
+        mat-icon-button
         (click)="toggleContrastMode()">
         <span class="material-symbols-outlined">
             {{ store.highContrastOn() ? 'contrast_rtl_off' : 'contrast'}}
@@ -70,7 +70,7 @@
   <mat-divider></mat-divider>
   <mat-list-item class="list-item">
     <div class="list-item-container">
-      <label for="app-theme-picker">Dark mode: </label>
+      <label for="app-theme-picker">{{ 'SETTINGS.DARK_MODE' | translate }}</label>
       <button
         id="app-theme-picker"
         mat-icon-button
@@ -83,6 +83,6 @@
   </mat-list-item>
 </mat-list>
 <div class="settings-actions">
-  <button matButton (click)="resetSettings()">Reset</button>
-  <button matButton="filled" (click)="saveSettings()">Save</button>
+  <button matButton (click)="resetSettings()">{{ 'COMMON.RESET' | translate }}</button>
+  <button matButton="filled" (click)="saveSettings()">{{ 'COMMON.SAVE' | translate }}</button>
 </div>

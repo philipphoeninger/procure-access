@@ -12,6 +12,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-save-search-dialog',
@@ -23,7 +24,8 @@ import { MatInputModule } from '@angular/material/input';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    TranslatePipe
   ],
   templateUrl: './save-search-dialog.html',
   styleUrl: './save-search-dialog.scss'

@@ -30,7 +30,8 @@ import { UserDto } from '../models/user.dto';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    TranslatePipe
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',

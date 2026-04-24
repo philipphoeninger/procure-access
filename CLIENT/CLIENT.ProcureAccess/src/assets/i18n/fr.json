@@ -77,7 +77,8 @@
     "EMAIL_CONFIRMED_HEADER": "Confirmé",
     "EMAIL_CONFIRMED_MSG": "E-mail confirmé.",
     "EMAIL_CONFIRM_FAILED_HEADER": "Échec",
-    "EMAIL_CONFIRM_FAILED_MSG": "Erreur lors de la confirmation."
+    "EMAIL_CONFIRM_FAILED_MSG": "Erreur lors de la confirmation.",
+    "PW_RESET_FAILED_MSG": "Une erreur s'est produite lors de la réinitialisation du mot de passe. Veuillez contacter le service d'assistance par e-mail."
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Critère",

@@ -9,6 +9,7 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-settings',
@@ -20,7 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDividerModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
 ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',

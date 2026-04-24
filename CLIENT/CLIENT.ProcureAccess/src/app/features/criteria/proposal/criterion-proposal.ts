@@ -22,6 +22,7 @@ import { CreateCriterionDto } from '../models/create-criterion.dto';
 import { ReviewProposal } from '@app/features/proposal/models/review-proposal-request.model';
 import { UpsertProposal } from '@app/features/proposal/models/upsert-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-criterion-proposal',
@@ -36,7 +37,8 @@ import { HasPermissionDirective } from '@app/features/identity/directives/has-pe
     MatCheckboxModule,
     RouterModule,
     MatListModule,
-    HasPermissionDirective
+    HasPermissionDirective,
+    TranslatePipe
 ],
   templateUrl: './criterion-proposal.html',
   styleUrl: './criterion-proposal.scss',

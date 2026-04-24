@@ -5,45 +5,46 @@
 <div class="panel">
   <div class="header">
     <mat-icon>app_registration</mat-icon>
-    <span class="title">Register</span>
+    <span class="title">{{ 'AUTH.REGISTER' | translate }}</span>
   </div>
 
   <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm, $event)">
     <mat-form-field>
-      <mat-label>Email</mat-label>
+      <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
       <input matInput type="email" name="email" [formControl]="emailFormControl" required #emailInput minlength="3"
         maxlength="50" [errorStateMatcher]="matcher" />
       @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
-      <mat-error>Please enter a valid email address</mat-error>
+        <mat-error>{{ 'AUTH.EMAIL_INPUT_INVALID' | translate }}</mat-error>
       }
       @if (emailFormControl.hasError('required')) {
-      <mat-error>Email is <strong>required</strong></mat-error>
+        <mat-error>{{ 'AUTH.EMAIL' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="password-field">
-      <mat-label>Password</mat-label>
+      <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
       <input matInput type="password" name="password" [(ngModel)]="password" required #passwordInput="ngModel"
         minlength="6" maxlength="50" />
       @if (passwordInput.invalid && passwordInput.touched) {
-      <mat-error>Password is required.</mat-error>
+        <mat-error>{{ 'AUTH.PASSWORD' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="confirm-password-field">
-      <mat-label>Confirm Password</mat-label>
+      <mat-label>{{ 'AUTH.CONFIRM_PW' | translate }}</mat-label>
       <input matInput type="password" name="password" [(ngModel)]="confirmPassword" required
         #confirmPasswordInput="ngModel" minlength="6" maxlength="50" />
       @if (confirmPasswordInput.invalid && confirmPasswordInput.touched) {
-      <mat-error>Confirm password is required.</mat-error>
+        <mat-error>{{ 'AUTH.CONFIRM_PW' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <div class="selections-container">
-      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">Keep me
-        signed in</mat-checkbox>
+      <mat-checkbox class="keep-signed-in" [(ngModel)]="keepSignedIn" name="keepSignedIn" labelPosition="after">
+        {{ 'AUTH.KEEP_SIGNED_IN' | translate }}
+      </mat-checkbox>
       <mat-form-field class="selection">
-        <mat-label>Language</mat-label>
+        <mat-label>{{ 'COMMON.LANGUAGE' | translate }}</mat-label>
         <mat-select [(ngModel)]="selectedLanguage" name="selectedLanguage">
           @for (language of languages; track language) {
-          <mat-option [value]="language">{{ language.label }}</mat-option>
+            <mat-option [value]="language">{{ language.label }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -53,12 +54,12 @@
     }
     <div class="buttons">
       <button id="register-button" mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || submitDisabled()">
-        Sign up
+        {{ 'AUTH.SIGN_UP' | translate }}
       </button>
     </div>
   </form>
 </div>
 <div id="register-section">
-  <span>Already have an account?</span>
-  <button mat-button color="primary" (click)="authService.showLogin()">Login here</button>
+  <span>{{ 'AUTH.ALREADY_HAVE_ACCOUNT' | translate }}</span>
+  <button mat-button color="primary" (click)="authService.showLogin()">{{ 'AUTH.LOGIN_HERE' | translate }}</button>
 </div>

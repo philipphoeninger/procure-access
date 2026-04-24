@@ -9,6 +9,7 @@ import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { ResetPasswordModel } from '../models/reset-password.model';
 import { finalize, map } from 'rxjs/operators';
+import { TranslatePipe } from '@ngx-translate/core';
 
 enum PasswordResetState {
     resetting = 'resetting',
@@ -24,7 +25,9 @@ enum PasswordResetState {
     MatFormFieldModule,
     FormsModule,
     ReactiveFormsModule,
-    MatInputModule],
+    MatInputModule,
+    TranslatePipe
+  ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

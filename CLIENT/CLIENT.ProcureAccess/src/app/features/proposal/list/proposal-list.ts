@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProposalStatus } from '@app/features/proposal/models/proposal-status.enum';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-proposal',
@@ -23,7 +24,8 @@ import { ProposalStatus } from '@app/features/proposal/models/proposal-status.en
     MatIconModule,
     RouterModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './proposal-list.html',
   styleUrl: './proposal-list.scss',

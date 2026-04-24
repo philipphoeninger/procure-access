@@ -11,6 +11,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-delete-account-dialog',
@@ -22,7 +23,8 @@ import { MatInputModule } from '@angular/material/input';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    TranslatePipe
   ],
   templateUrl: './delete-account-dialog.html',
   styleUrl: './delete-account-dialog.scss'

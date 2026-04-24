@@ -77,7 +77,8 @@
     "EMAIL_CONFIRMED_HEADER": "E-Mail bestätigt",
     "EMAIL_CONFIRMED_MSG": "E-Mail erfolgreich bestätigt. Sie können dieses Fenster jetzt schließen.",
     "EMAIL_CONFIRM_FAILED_HEADER": "E-Mail-Bestätigung fehlgeschlagen",
-    "EMAIL_CONFIRM_FAILED_MSG": "Beim Bestätigen der E-Mail ist ein Fehler aufgetreten. Bitte kontaktieren Sie den Support."
+    "EMAIL_CONFIRM_FAILED_MSG": "Beim Bestätigen der E-Mail ist ein Fehler aufgetreten. Bitte kontaktieren Sie den Support.",
+    "PW_RESET_FAILED_MSG": "Beim Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte wenden Sie sich per E-Mail an den Support."
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Kriterium",
