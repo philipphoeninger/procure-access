@@ -46,10 +46,11 @@ public static class SampleData
         new() { Id = 20, Name = "Travel expense claims", Description = "", FilterTypeId = 1, IsDeleted = false },
         new() { Id = 21, Name = "Payroll statements", Description = "", FilterTypeId = 1, IsDeleted = false },
         new() { Id = 22, Name = "Internal communication and data exchange platform", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 23, Name = "BITV", Description = "", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 24, Name = "Automated", Description = "", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 25, Name = "In-Person", Description = "", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 26, Name = "Manual", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 23, Name = "BIT inklusiv Software-Test", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 24, Name = "BIT inklusiv App-Test", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 25, Name = "BIT inklusiv PDF-Test ", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 26, Name = "BIK BITV-Test (Web)", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 27, Name = "BIK BITV-Test (App)", Description = "", FilterTypeId = 4, IsDeleted = false },
     };
 
     public static List<Criterion> Criteria => new()
