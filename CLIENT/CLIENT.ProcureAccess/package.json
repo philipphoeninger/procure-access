@@ -38,6 +38,8 @@
     "@ngrx/router-store": "^20.0.1",
     "@ngrx/signals": "^20.0.1",
     "@ngrx/store": "^20.0.1",
+    "@ngx-translate/core": "^17.0.0",
+    "@ngx-translate/http-loader": "^17.0.0",
     "flatted": "^3.3.3",
     "jsonpath": "^1.1.1",
     "jwt-decode": "^4.0.0",
