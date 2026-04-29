@@ -9,8 +9,6 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { catchError, finalize, map, throwError } from 'rxjs';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { ProposalApiService } from '@app/features/proposal/services/api/proposal-api.service';
