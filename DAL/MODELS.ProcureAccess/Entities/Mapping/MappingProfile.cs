@@ -30,6 +30,11 @@ public class MappingProfile : Profile
         // CreateMap<Proposal, ProposalDto>().ReverseMap();
 
         CreateMap<User, UserDto>();
-        CreateMap<UICustomization, UICustomizationDto>();
+        CreateMap<UICustomization, UICustomizationDto>()
+            .ForMember(dest => dest.Language,
+                opt => opt.ConvertUsing(new EnumToLanguageConverter(), src => src.Language))
+            .ReverseMap()
+            .ForMember(dest => dest.Language,
+                opt => opt.ConvertUsing(new LanguageToEnumConverter(), src => src.Language));
     }
 }

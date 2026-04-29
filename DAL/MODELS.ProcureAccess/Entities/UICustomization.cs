@@ -14,9 +14,11 @@ public class UICustomization
     public bool OrientationVertical { get; set; } = true;
 
     public bool HighContrastOn { get; set; } = false;
+
+    public Language Language { get; set; } = Language.German;
     #endregion
 
-        #region ctors
+    #region ctors
     public UICustomization() {}
     #endregion
 }

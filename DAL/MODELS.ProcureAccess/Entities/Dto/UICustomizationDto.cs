@@ -8,4 +8,5 @@ public class UICustomizationDto : BaseDto
     public bool? DarkModeOn { get; set; }
     public bool? HighContrastOn { get; set; }
     public bool? OrientationVertical { get; set; }
+    public string? Language { get; set; }
 }
