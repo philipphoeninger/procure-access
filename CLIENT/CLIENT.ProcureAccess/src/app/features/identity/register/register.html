@@ -42,9 +42,12 @@
       </mat-checkbox>
       <mat-form-field class="selection">
         <mat-label>{{ 'COMMON.LANGUAGE' | translate }}</mat-label>
-        <mat-select [(ngModel)]="selectedLanguage" name="selectedLanguage">
+        <mat-select 
+          [(ngModel)]="updateUICustomization().language" 
+          (selectionChange)="store.setLanguage($event.value)" 
+          name="selectedLanguage">
           @for (language of languages; track language) {
-            <mat-option [value]="language">{{ language.label }}</mat-option>
+            <mat-option [value]="language">{{ languageLabels[language] }}</mat-option>
           }
         </mat-select>
       </mat-form-field>

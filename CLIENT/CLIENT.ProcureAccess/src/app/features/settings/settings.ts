@@ -10,6 +10,9 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
+import { EnLanguage } from '@app/core/models/language.enum';
+import { MatSelectModule } from '@angular/material/select';
+import { LANGUAGES } from '@app/core/models/languages.map';
 
 @Component({
   selector: 'pa-settings',
@@ -22,7 +25,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    TranslatePipe
+    TranslatePipe,
+    MatSelectModule
 ],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
@@ -33,16 +37,11 @@ export class Settings {
   protected snackbarService = inject(SnackbarService);
 
   protected updateUICustomization = model(this.store.uiCustomization());
+  
+  protected languages = Object.values(EnLanguage);
+  protected languageLabels = LANGUAGES;
 
   constructor() {}
-
-  toggleColorMode() {
-    this.store.toggleDarkMode();
-  }
-
-  toggleContrastMode() {
-    this.store.toggleContrastMode();
-  }
 
   saveSettings() {
     this.store.updateUICustomization(this.store.uiCustomization());
