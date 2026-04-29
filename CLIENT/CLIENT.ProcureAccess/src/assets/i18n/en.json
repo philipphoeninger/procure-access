@@ -145,5 +145,23 @@
     "LOGIN_CTA": "Login / Register to save searches and products",
     "HELP_CTA": "Need any help or want to report a bug? Contact us",
     "RECENTLY_ADDED_PRODUCTS": "Recently added products"
+  },
+  "ERROR": {
+    "USER_NOT_FOUND": "User could not be found.",
+    "INVALID_PASSWORD": "Email or password is incorrect. Please try again.",
+    "INVALID_LOGIN": "Login failed. Please try again.",
+    "INVALID_REFRESH_TOKEN": "The refresh token is invalid. Please log in again.",
+    "SIGN_UP": "Registration could not be completed. Please try again later or contact support.",
+    "UICUSTOMIZATION_NOT_FOUND": "User-specific UI settings could not be found.",
+    "EMAIL_CONFIRM": "An error occurred while confirming the email. Please try again later or contact support.",
+    "EMAIL_CHANGE": "An error occurred while changing the email. Please try again later or contact support.",
+    "PW_CHANGE": "An error occurred while changing your password. Please try again later or contact support.",
+    "PW_RESET": "An error occurred while resetting your password. Please try again later or contact support.",
+    "REVOKE_SESSIONS": "An error occurred while resetting your sessions. Please try again later or contact support.",
+    "USER_DELETE": "An error occurred while deleting your account. Please try again later or contact support.",
+    "CREATE": "An error occurred while creating/adding.",
+    "UPDATE": "An error occurred while changing/saving.",
+    "DELETE": "An error occurred while deleting/removing.",
+    "GENERIC": "An error occurred. Please try again later or contact support."
   }
 }

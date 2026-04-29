@@ -145,5 +145,23 @@
     "LOGIN_CTA": "Anmelden / Registrieren",
     "HELP_CTA": "Hilfe benötigt? Kontaktieren Sie uns",
     "RECENTLY_ADDED_PRODUCTS": "Kürzlich hinzugefügte Produkte"
+  },
+  "ERROR": {
+    "USER_NOT_FOUND": "Der Benutzer konnte nicht gefunden werden.",
+    "INVALID_PASSWORD": "E-Mail oder Passwort ist falsch. Bitte probieren Sie es erneut.",
+    "INVALID_LOGIN": "Login war fehlerhaft. Bitte probieren Sie es erneut.",
+    "INVALID_REFRESH_TOKEN": "Der Refresh Token ist ungültig. Bitte erneut einloggen.",
+    "SIGN_UP": "Registrierung konnte nicht durchgeführt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "UICUSTOMIZATION_NOT_FOUND": "Die benutzerspezifischen UI-Einstellungen konnten nicht gefunden werden.",
+    "EMAIL_CONFIRM": "Beim Bestätigen der E-Mail ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "EMAIL_CHANGE": "Beim Ändern der E-Mail ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "PW_CHANGE": "Beim Ändern des Passworts ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "PW_RESET": "Beim Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "REVOKE_SESSIONS": "Beim Zurücksetzen der Sessions ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "USER_DELETE": "Beim Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.",
+    "CREATE": "Beim Erstellen/Hinzufügen ist ein Fehler aufgetreten.",
+    "UPDATE": "Beim Ändern/Speichern ist ein Fehler aufgetreten.",
+    "DELETE": "Beim Löschen/Entfernen ist ein Fehler aufgetreten.",
+    "GENERIC": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support."
   }
 }

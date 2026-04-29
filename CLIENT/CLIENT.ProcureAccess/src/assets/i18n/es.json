@@ -145,5 +145,23 @@
     "LOGIN_CTA": "Iniciar sesión / Registrarse",
     "HELP_CTA": "¿Necesitas ayuda? Contáctanos",
     "RECENTLY_ADDED_PRODUCTS": "Productos añadidos recientemente"
+  },
+  "ERROR": {
+    "USER_NOT_FOUND": "No se pudo encontrar al usuario.",
+    "INVALID_PASSWORD": "El correo electrónico o la contraseña son incorrectos. Inténtelo de nuevo.",
+    "INVALID_LOGIN": "Error al iniciar sesión. Inténtelo de nuevo.",
+    "INVALID_REFRESH_TOKEN": "El token de actualización no es válido. Inicie sesión de nuevo.",
+    "SIGN_UP": "No se pudo completar el registro. Inténtelo de nuevo más tarde.",
+    "UICUSTOMIZATION_NOT_FOUND": "No se encontraron las configuraciones de interfaz de usuario específicas del usuario.",
+    "EMAIL_CONFIRM": "Se produjo un error al confirmar el correo electrónico. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "EMAIL_CHANGE": "Se produjo un error al cambiar el correo electrónico. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "PW_CHANGE": "Se produjo un error al cambiar la contraseña. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "PW_RESET": "Se produjo un error al restablecer la contraseña. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "REVOKE_SESSIONS": "Se produjo un error al restablecer las sesiones. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "USER_DELETE": "Se produjo un error al restablecer la contraseña. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico.",
+    "CREATE": "Se produjo un error al crear/añadir.",
+    "UPDATE": "Se produjo un error al cambiar/guardar.",
+    "DELETE": "Se produjo un error al eliminar/borrar.",
+    "GENERIC": "Se produjo un error. Inténtelo de nuevo más tarde o póngase en contacto con el soporte técnico."
   }
 }

@@ -145,5 +145,23 @@
     "LOGIN_CTA": "Connexion / Inscription",
     "HELP_CTA": "Besoin d’aide ? Contactez-nous",
     "RECENTLY_ADDED_PRODUCTS": "Produits récents"
+  },
+  "ERROR": {
+    "USER_NOT_FOUND": "Utilisateur introuvable.",
+    "INVALID_PASSWORD": "Adresse e-mail ou mot de passe incorrect. Veuillez réessayer.",
+    "INVALID_LOGIN": "Échec de la connexion. Veuillez réessayer.",
+    "INVALID_REFRESH_TOKEN": "Jeton de rafraîchissement invalide. Veuillez vous reconnecter.",
+    "SIGN_UP": "L'inscription n'a pas pu être effectuée. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "UICUSTOMIZATION_NOT_FOUND": "Paramètres d'interface utilisateur spécifiques à l'utilisateur introuvables.",
+    "EMAIL_CONFIRM": "Une erreur s'est produite lors de la confirmation de l'adresse e-mail. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "EMAIL_CHANGE": "Une erreur s'est produite lors de la modification de l'adresse e-mail. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "PW_CHANGE": "Une erreur s'est produite lors de la modification de votre mot de passe. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "PW_RESET": "Une erreur s'est produite lors de la réinitialisation de votre mot de passe. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "REVOKE_SESSIONS": "Une erreur s'est produite lors de la réinitialisation de vos sessions. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "USER_DELETE": "Une erreur s'est produite lors de la réinitialisation de votre mot de passe. Veuillez réessayer plus tard ou contacter l'assistance.",
+    "CREATE": "Une erreur s'est produite lors de la création/l'ajout.",
+    "UPDATE": "Une erreur s'est produite lors de la modification/l'enregistrement.",
+    "DELETE": "Une erreur s'est produite lors de la suppression.",
+    "GENERIC": "Une erreur s'est produite. Veuillez réessayer plus tard ou contacter l'assistance."
   }
 }
