@@ -30,12 +30,13 @@ export const ProcureAccessStore = signalStore(
                 // settings
                 if (user != null) {
                     state.setUICustomization(user.uiCustomization);
+                    state.setLanguage(user.uiCustomization.language);
                     state.removeSettingsFromLocalStorage();
                 } else {
                     await state.reloadUICustomization();
                 }
                 state.activateMediaEventListeners();
-                
+
                 // products
                 await state.loadProducts();
             }

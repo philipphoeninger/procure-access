@@ -13,6 +13,9 @@ import { SettingsApiService } from '../services/settings-api.service';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { withIdentity } from '@app/features/identity/state/with-identity';
 import { withLocalStorage } from '@app/shared/state/with-local-storage';
+import { EnLanguage } from '../../../core/models/language.enum';
+import { LanguageService } from '@app/features/settings/services/language.service';
+import { DEFAULT_LANGUAGE } from '@app/app.config';
 
 export type SettingsState = { 
     uiCustomization: UICustomization
@@ -25,7 +28,8 @@ export const initialSettingsState: SettingsState = {
         textColor: "#111111",
         darkModeOn: false,
         orientationVertical: true,
-        highContrastOn: false
+        highContrastOn: false,
+        language: DEFAULT_LANGUAGE
     }
 }
 
@@ -42,6 +46,7 @@ export const withSettings = () => signalStoreFeature(
       state,
       settingsApiService = inject(SettingsApiService),
       snackbarService = inject(SnackbarService),
+      languageService = inject(LanguageService),
       rendererFactory = inject(RendererFactory2)
     ) => {
       let renderer = rendererFactory.createRenderer(null, null);
@@ -104,6 +109,14 @@ export const withSettings = () => signalStoreFeature(
                 renderer.addClass(document.documentElement, 'contrast-more');
               else renderer.removeClass(document.documentElement, 'contrast-more');
               
+              renderer.setAttribute(
+                document.documentElement, 
+                'lang', 
+                state.uiCustomization().language);
+
+              // setup language service
+              languageService.init(state.uiCustomization().language);
+
               return; //gate
             }
             let initialSettings = initialAppState.settings.uiCustomization;
@@ -111,12 +124,16 @@ export const withSettings = () => signalStoreFeature(
                 window.matchMedia('(prefers-color-scheme: dark)').matches;
             initialSettings.highContrastOn =
                 window.matchMedia('(prefers-contrast: more)').matches;
+            // set language
+            languageService.init(DEFAULT_LANGUAGE);
+            initialSettings.language = languageService.get();
             this.setUICustomization(initialSettings);
             state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
           } else {
             state.incrementLoadingCount();
             this.removeSettingsFromLocalStorage();
             let uiCustomization = await settingsApiService.getUICustomization();
+            languageService.init(uiCustomization.language);
             this.setUICustomization(uiCustomization ?? initialAppState.settings.uiCustomization);
             state.decrementLoadingCount();
           }
@@ -138,6 +155,8 @@ export const withSettings = () => signalStoreFeature(
           if (state.uiCustomization().highContrastOn)
             renderer.addClass(document.documentElement, 'contrast-more');
           else renderer.removeClass(document.documentElement, 'contrast-more');
+
+          renderer.setAttribute(document.documentElement, 'lang', state.uiCustomization().language);
         },
         async updateUICustomization(uiCustomization: UICustomization) {
           if (!state.isAuthenticated()) {
@@ -166,11 +185,18 @@ export const withSettings = () => signalStoreFeature(
           let uiCustomization = state.uiCustomization();
           uiCustomization.highContrastOn = !uiCustomization.highContrastOn;
           this.setUICustomization(uiCustomization);
+        },
+        setLanguage(lang: EnLanguage) {
+          let uiCustomization = state.uiCustomization();
+          uiCustomization.language = lang;
+          languageService.set(uiCustomization.language);
+          this.setUICustomization(uiCustomization);
         }
-     }
+      }
     }),
     withComputed((state) => ({
       darkModeOn: computed(() => state.uiCustomization().darkModeOn),
-      highContrastOn: computed(() => state.uiCustomization().highContrastOn)
+      highContrastOn: computed(() => state.uiCustomization().highContrastOn),
+      language: computed(() => state.uiCustomization().language)
     }))
   );
