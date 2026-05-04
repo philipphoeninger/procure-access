@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { ColorPickerDirective } from 'ngx-color-picker';
+// import { ColorPickerDirective } from 'ngx-color-picker';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,7 +18,7 @@ import { LANGUAGES } from '@app/core/models/languages.map';
   selector: 'pa-settings',
   imports: [
     FormsModule,
-    ColorPickerDirective,
+    // ColorPickerDirective,
     MatSlideToggleModule,
     MatListModule,
     MatDividerModule,

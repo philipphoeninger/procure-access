@@ -51,6 +51,7 @@
     "PASSWORD": "Mot de passe",
     "DELETE_ACCOUNT": "Supprimer le compte",
     "SIGN_UP": "S’inscrire",
+    "SIGN_UP_SUCCESS": "Un e-mail de confirmation vous a été envoyé et doit être validé avant que vous puissiez utiliser certaines fonctionnalités.",
     "ALREADY_HAVE_ACCOUNT": "Vous avez déjà un compte ?",
     "DELETE_ACCOUNT_WARNING": "Vous êtes sur le point de supprimer votre compte.",
     "DELETE_ACCOUNT_VERIFICATION_MSG": "Pour confirmer, saisissez votre e-mail et cliquez sur \"Supprimer\".",
@@ -109,7 +110,9 @@
     "NO_FAVORITE_PRODUCTS_MSG": "Aucun produit enregistré.",
     "SAVE_SEARCH_HEADER": "Enregistrer la recherche",
     "SAVE_FAVORITE": "Ajouter aux favoris",
-    "SAVE_SEARCH_MSG": "Enregistrer cette recherche"
+    "SAVE_SEARCH_MSG": "Enregistrer cette recherche",
+    "SAVED_PRODUCT": "Vous avez ajouté ce produit à vos favoris!",
+    "SAVED_SEARCH": ""
   },
   "FILTERS": {
     "LABEL": "Filtres",
@@ -136,7 +139,9 @@
     "LABEL": "Paramètres",
     "ORIENTATION_VERTICAL": "Orientation verticale",
     "CONTRAST_MODE": "Mode contraste",
-    "DARK_MODE": "Mode sombre"
+    "DARK_MODE": "Mode sombre",
+    "SAVED_AS_COOKIE": "Paramètres enregistrés sous forme de cookie",
+    "SAVED_PERMANENTLY": "Paramètres enregistrés de manière permanente"
   },
   "HOME": {
     "WELCOME_MSG": "Bienvenue.",

@@ -15,13 +15,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map, tap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { LoginModel } from '../models/login.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { EnLanguage } from '@app/core/models/language.enum';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LANGUAGES } from '@app/core/models/languages.map';
 
 /** Error when invalid control is dirty, touched, or submitted. */
@@ -57,6 +57,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class Register {
   protected store = inject(ProcureAccessStore);
+  protected translate = inject(TranslateService);
   public registerErrorMessage?: string;
   public showLanguageSelection = true;
 
@@ -100,9 +101,10 @@ export class Register {
         map((response) => {
           if (response.succeeded) {
             this.router.navigateByUrl('/(login:auth)');
-            this.snackbarService.showInfo('A registration has been sent to your email address and needs to be confirmed.\nPlease confirm it and come back to login.');
-          } else {
-            this.snackbarService.showInfo('The registration could not be completed. Please check your inputs and try again.');
+            this.translate
+              .get('AUTH.SIGN_UP_SUCCESS')
+              .pipe(tap(message => this.snackbarService.showInfo(message)))
+              .subscribe();
           }
         }),
         finalize(() => this.store.decrementLoadingCount())
