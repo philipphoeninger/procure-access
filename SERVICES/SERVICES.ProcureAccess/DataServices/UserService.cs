@@ -67,8 +67,8 @@ public class UserService : IUserService
         if (!result.Succeeded)
             return null; //gate
 
-        if (!user.EmailConfirmed)
-            throw new Exception("Email not confirmed");
+        // if (!user.EmailConfirmed)
+        //     throw new Exception("Email not confirmed");
 
         return await GenerateAuthResponse(user);
     }

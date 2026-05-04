@@ -6,11 +6,13 @@ public static class SampleData
     {
         new() 
         { 
-            UserName = "JohnDoe",
-            Email = "john_doe@mail.mailtest",
-            PasswordHash = "AQAAAAIAAYagAAAAEGed18XsPagWrAAPb3hyt7t66n9BA03w1ctadgdd09uFUiZ17BSUq1Wv3TRzAK94Jg==",
-            SecurityStamp = "A3VLN7PDJ3LPKUGYHXOSG5RFQV3FDWFM",
-            ConcurrencyStamp = "3411a4b2-b9a4-4554-b2c8-f90654dc0f0f",
+            UserName = "hoeninger@werte.it",
+            Email = "hoeninger@werte.it",
+            UICustomization = new(),
+            PasswordHash = "AQAAAAIAAYagAAAAEIXWOPxH++T/W4r8ji4Kl9oOMkl4YhnN+mpMYFOdKhGugALVkLTBv5N+tVf9Zz2YUA==",
+            SecurityStamp = "JFL3OXKFWI23KPP5DGEJ62HFZ4T2TRMR",
+            ConcurrencyStamp = "b01be0de-8be0-45c3-9fda-152bfb9804d9",
+            EmailConfirmed = true
         }
     };
 

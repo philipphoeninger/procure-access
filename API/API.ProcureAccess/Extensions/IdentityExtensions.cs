@@ -4,7 +4,13 @@ public static class IdentityExtensions
 {
     public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
     {
-        services.AddIdentityCore<User>()
+        services.AddIdentityCore<User>(options =>
+                    {
+                        options.SignIn.RequireConfirmedEmail = false;
+
+                        options.Lockout.MaxFailedAccessAttempts = 5;
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                    })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddSignInManager()
