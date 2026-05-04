@@ -14,15 +14,18 @@
         <mat-error>{{ 'COMMON.NAME' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
       }
     </mat-form-field>
-    <mat-form-field id="description-field">
-      <mat-label>{{ 'COMMON.DESCRIPTION' | translate }}</mat-label>
-      <!-- TODO: make text area markdown input -->
-      <textarea matInput type="text" name="description" [(ngModel)]="proposal().criterion!.description" required #descriptionInput="ngModel"
-        minlength="6" maxlength="2000"></textarea>
-      @if (descriptionInput.invalid && descriptionInput.touched) {
+    <div id="description-field">
+      <label for="descriptionInput">{{ 'COMMON.DESCRIPTION' | translate }}</label>
+      <!-- TODO: make required, show errors, etc. -->
+      <app-markdown-editor
+        id="descriptionInput"
+        name="description"
+        [(value)]="proposal().criterion!.description"
+        #descriptionInput></app-markdown-editor>
+      <!-- @if (descriptionInput.editorElement.invalid && descriptionInput.touched) {
         <mat-error>{{ 'COMMON.DESCRIPTION' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}.</mat-error>
-      }
-    </mat-form-field>
+      } -->
+    </div>
 
     <!-- <p>{{ productPart.description }}</p> -->
     <p>{{ 'CRITERIA.ENTER_PRODUCT_PART_INFO' | translate }}</p>

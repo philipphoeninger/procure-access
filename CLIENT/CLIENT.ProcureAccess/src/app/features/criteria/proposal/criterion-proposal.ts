@@ -21,6 +21,7 @@ import { ReviewProposal } from '@app/features/proposal/models/review-proposal-re
 import { UpsertProposal } from '@app/features/proposal/models/upsert-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MarkdownEditor } from "@app/shared/components/markdown-editor/markdown-editor";
 
 @Component({
   selector: 'pa-criterion-proposal',
@@ -36,7 +37,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     RouterModule,
     MatListModule,
     HasPermissionDirective,
-    TranslatePipe
+    TranslatePipe,
+    MarkdownEditor
 ],
   templateUrl: './criterion-proposal.html',
   styleUrl: './criterion-proposal.scss',
