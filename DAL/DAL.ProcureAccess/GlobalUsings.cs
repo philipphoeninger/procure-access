@@ -1,3 +1,5 @@
+global using AutoMapper;
+
 global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Exceptions;
 global using DAL.ProcureAccess.Repos.Base;
@@ -5,9 +7,11 @@ global using DAL.ProcureAccess.Repos.Interfaces;
 global using DAL.ProcureAccess.Initialization;
 
 global using MODELS.ProcureAccess.Entities;
+global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Configuration;
 global using MODELS.ProcureAccess.Entities.Dto;
+global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.ViewModels;
 global using MODELS.ProcureAccess.ViewModels.Interfaces;
 //global using MODELS.ProcureAccess.ViewModels.Configuration;
