@@ -51,7 +51,6 @@
             <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
             <returns>Criteria</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:API.ProcureAccess.Controllers.CriteriaController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.CriterionDto)" -->
         <member name="M:API.ProcureAccess.Controllers.Identity.UsersController.ChangeEmail(MODELS.ProcureAccess.Entities.Identity.ChangeEmailRequest)">
             <summary>
             Gets a single record
@@ -59,7 +58,24 @@
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:API.ProcureAccess.Controllers.ProductsController.ApproveOne(MODELS.ProcureAccess.Entities.Dto.ProductDto)" -->
+        <member name="M:API.ProcureAccess.Controllers.ProposalsController.Upsert(MODELS.ProcureAccess.Entities.Requests.UpsertProposalCommand)">
+            <summary>
+            Creates/Updates a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="request">Request with Entities to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProposalsController.Review(MODELS.ProcureAccess.Entities.Requests.ReviewProposalCommand)">
+            <summary>
+            Updates proposal object of a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="request">Request with object to update</param>
+            <returns>Single record</returns>
+        </member>
         <member name="M:API.ProcureAccess.Controllers.UICustomizationController.GetOne">
             <summary>
             Gets a single record
