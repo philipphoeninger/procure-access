@@ -1,12 +1,12 @@
-<h2 mat-dialog-title>Save search</h2>
+<h2 mat-dialog-title>{{ 'FAVORITES.SAVE_SEARCH_HEADER' | translate }}</h2>
 <mat-dialog-content>
-  <p>Save this search to your favorites</p>
+  <p>{{ 'FAVORITES.SAVE_SEARCH_MSG' | translate }}</p>
   <mat-form-field id="property-input">
-    <mat-label>Name</mat-label>
+    <mat-label>{{ 'COMMON.NAME' | translate }}</mat-label>
     <input matInput [(ngModel)]="name" />
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button matButton (click)="onCancelClick()">Cancel</button>
-  <button matButton [mat-dialog-close]="name()" cdkFocusInitial>Save</button>
+  <button matButton (click)="onCancelClick()">{{ 'COMMON.CANCEL' | translate }}</button>
+  <button matButton [mat-dialog-close]="name()" cdkFocusInitial>{{ 'COMMON.SAVE' | translate }}</button>
 </mat-dialog-actions>

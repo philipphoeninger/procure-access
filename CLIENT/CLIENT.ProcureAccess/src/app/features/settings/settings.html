@@ -1,13 +1,13 @@
-<h2 class="heading">Settings</h2>
+<h2 class="heading">{{ 'SETTINGS.LABEL' | translate }}</h2>
 <mat-list class="settings-list">
-  <mat-list-item class="list-item">
+  <!-- <mat-list-item class="list-item">
     <div class="list-item-container">
       <label for="foreground-cp">Foreground color: </label>
       <div>
         <input
           id="foreground-cp" 
-          [(colorPicker)]="fgColor" 
-          [style.background]="fgColor" 
+          [(colorPicker)]="updateUICustomization().foregroundColor"
+          [style.background]="updateUICustomization().foregroundColor" 
           (openDialog)="(null)"
           (closeDialog)="(null)" 
         />
@@ -21,8 +21,8 @@
       <div>
         <input
           id="background-cp"
-          [(colorPicker)]="bgColor"
-          [style.background]="bgColor"
+          [(colorPicker)]="updateUICustomization().backgroundColor"
+          [style.background]="updateUICustomization().backgroundColor"
           (openDialog)="(null)"
           (closeDialog)="(null)" />
       </div>
@@ -35,11 +35,26 @@
       <div>
         <input
           id="text-cp"
-          [(colorPicker)]="textColor"
-          [style.background]="textColor"
+          [(colorPicker)]="updateUICustomization().textColor"
+          [style.background]="updateUICustomization().textColor"
           (openDialog)="(null)"
           (closeDialog)="(null)" />
       </div>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider> -->
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <label for="app-contrast-picker">{{ 'COMMON.LANGUAGE' | translate }}</label>
+      <mat-select 
+        id="language-select" 
+        [(ngModel)]="updateUICustomization().language" 
+        (selectionChange)="store.setLanguage($event.value)" 
+        name="selectedLanguage">
+          @for (language of languages; track language) {
+            <mat-option [value]="language">{{ languageLabels[language] }}</mat-option>
+          }
+        </mat-select>
     </div>
   </mat-list-item>
   <mat-divider></mat-divider>
@@ -48,24 +63,41 @@
         <mat-slide-toggle 
           class="example-margin" 
           labelPosition="before" 
-          [(ngModel)]="orientationControl">
-            Orientation: vertical 
+          [(ngModel)]="updateUICustomization().orientationVertical">
+            {{ 'SETTINGS.ORIENTATION_VERTICAL' | translate }}
         </mat-slide-toggle>
     </div>
   </mat-list-item>
   <mat-divider></mat-divider>
   <mat-list-item class="list-item">
     <div class="list-item-container">
-      <mat-slide-toggle
-        class="example-margin" 
-        labelPosition="before" 
-        [(ngModel)]="highContrastControl">
-          High contrast on
-        </mat-slide-toggle>
+      <label for="app-contrast-picker">{{ 'SETTINGS.CONTRAST_MODE' | translate }}</label>
+      <button
+        id="app-contrast-picker"
+        mat-icon-button
+        (click)="store.toggleContrastMode()">
+        <span class="material-symbols-outlined">
+            {{ store.highContrastOn() ? 'contrast_rtl_off' : 'contrast'}}
+        </span>
+      </button>
+    </div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item class="list-item">
+    <div class="list-item-container">
+      <label for="app-theme-picker">{{ 'SETTINGS.DARK_MODE' | translate }}</label>
+      <button
+        id="app-theme-picker"
+        mat-icon-button
+        (click)="store.toggleDarkMode()">
+        <mat-icon>
+          {{ store.darkModeOn() ? 'light_mode' : 'dark_mode'}}
+        </mat-icon>
+      </button>
     </div>
   </mat-list-item>
 </mat-list>
 <div class="settings-actions">
-  <button matButton (click)="resetSettings()">Reset</button>
-  <button matButton="filled" (click)="saveSettings()">Save</button>
+  <button matButton (click)="resetSettings()">{{ 'COMMON.RESET' | translate }}</button>
+  <button matButton="filled" (click)="saveSettings()">{{ 'COMMON.SAVE' | translate }}</button>
 </div>

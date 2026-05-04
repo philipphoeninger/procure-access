@@ -35,6 +35,10 @@ services:
       #MSSQL_PID: Developer
     expose:
       - "8080"
+    ports:
+      - "${API_PORT_OUTER}:${API_PORT_INNER}"
+    # volumes:
+    #   - ./API/API.ProcureAccess:/src
     networks:
       - dokploy-network
     restart: on-failure

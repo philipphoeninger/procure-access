@@ -3,11 +3,15 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
-                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+                .AddJsonOptions(x => {
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddSqlServerConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
+                .AddEmailConfig(builder.Configuration)
                 .AddCors(options =>
                     {
                         options.AddPolicy("frontend", policy =>
@@ -22,11 +26,25 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
                 .AddIdentityAuth(builder.Configuration)
-                .AddRepositories();
+                .AddRepositories()
+                .AddDataServices()
+                .AddAutoMapper(cfg => {},
+                    typeof(MappingProfile).Assembly)
+                .AddLocalization(options => options.ResourcesPath = "Resources");
 
 // Configure logging
 builder.ConfigureSerilog();
 builder.Services.RegisterLoggingInterfaces();
+
+// Configure localization
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { "en", "de" };
+
+    options.SetDefaultCulture("de")
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures);
+});
 
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
@@ -63,12 +81,18 @@ using (var scope = app.Services.CreateScope())
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         //SampleDataInitializer.InitializeData(dbContext, userManager);
-        await SampleDataInitializer.ClearAndReseedDatabase(dbContext, userManager);
+        await SampleDataInitializer.ClearDatabase(dbContext, userManager);
+        // add role management
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await app.AddRolesAndPermissions(roleManager);
+
+        await SampleDataInitializer.InitializeData(dbContext, userManager);
     }
     app.ConfigureSwaggerExplorer();
 // }
 
 //app.UseHttpsRedirection();
+app.UseRequestLocalization();
 
 app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
@@ -76,8 +100,6 @@ app.ConfigureCORS(builder.Configuration)
 app.UseCors("frontend");
 
 app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityApi<User>();
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();
 

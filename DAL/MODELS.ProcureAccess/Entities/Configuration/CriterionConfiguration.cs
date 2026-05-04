@@ -4,6 +4,9 @@ public class CriterionConfiguration : IEntityTypeConfiguration<Criterion>
 {
     public void Configure(EntityTypeBuilder<Criterion> builder)
     {
+        // Query Filters
+        builder.HasQueryFilter(x => !x.IsDeleted);
+        
         // properties
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
         builder.Property(x => x.Display)
@@ -11,6 +14,12 @@ public class CriterionConfiguration : IEntityTypeConfiguration<Criterion>
 
         builder.HasIndex(
             x => new { x.Name }).IsUnique();
+        
+        builder
+            .HasOne(x => x.CriteriaFilter)
+            .WithMany(cf => cf.Criteria)
+            .HasForeignKey(x => x.CriteriaFilterId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // temporal
         builder.ToTable(b => b.IsTemporal(tb =>

@@ -46,7 +46,7 @@ public abstract class BaseViewRepo<T> : IBaseViewRepo<T> where T : class, new()
         _isDisposed = true;
     }
 
-    public virtual IEnumerable<T> GetAll(string userId) => Table.AsQueryable();
+    public virtual IEnumerable<T> GetAll() => Table.AsQueryable();
 
     public virtual IEnumerable<T> GetAllIgnoreQueryFilters() => Table.AsQueryable().IgnoreQueryFilters();
 

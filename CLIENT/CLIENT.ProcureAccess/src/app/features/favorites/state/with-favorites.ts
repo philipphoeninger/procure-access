@@ -15,8 +15,7 @@ import { withIdentity } from '@app/features/identity/state/with-identity';
 
 export type FavoritesState = { productSaves: ProductSave[], filterSets: FilterSet[] };
 
-export function withFavorites() {
-  return signalStoreFeature(
+export const withFavorites = () => signalStoreFeature(
     withState<FavoritesState>({ 
         productSaves: initialAppState.productSaves,
         filterSets: initialAppState.filterSets
@@ -71,5 +70,4 @@ export function withFavorites() {
       productFavoritesCount: computed(() => state.productSaves().length),
       filterSetFavoritesCount: computed(() => state.filterSets().length)
     }))
-  );
-}
+);

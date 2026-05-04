@@ -1,0 +1,23 @@
+<div class="unauthorized-container">
+  <mat-card class="unauthorized-card">
+
+    <div class="icon-wrapper">
+      <mat-icon>lock</mat-icon> <!--color="warn"-->
+    </div>
+
+    <h1>403</h1>
+    <h2>{{ 'AUTH.ACCESS_DENIED_LABEL' | translate }}</h2>
+
+    <p>{{ 'AUTH.ACCESS_DENIED_MSG' | translate }}</p>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" [routerLink]="'/home'">
+        {{ 'COMMON.GO_TO_HOME' | translate }}
+      </button>
+
+      <button mat-stroked-button color="accent" (click)="authService.showLogin()">
+        {{ 'AUTH.LOGIN' | translate }}
+      </button>
+    </div>
+  </mat-card>
+</div>

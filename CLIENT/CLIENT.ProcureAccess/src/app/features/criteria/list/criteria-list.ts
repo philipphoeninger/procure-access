@@ -8,12 +8,17 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { CriteriaApiService } from '../services/api/criteria-api.service';
+import { MarkdownComponent } from 'ngx-markdown';
+import { RouterModule } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-criteria-list',
   templateUrl: 'criteria-list.html',
   styleUrl: 'criteria-list.scss',
-  providers: [provideNativeDateAdapter()],
+  providers: [
+    provideNativeDateAdapter()
+  ],
   imports: [
     MatExpansionModule,
     MatIconModule,
@@ -21,6 +26,9 @@ import { CriteriaApiService } from '../services/api/criteria-api.service';
     MatInputModule,
     MatButtonModule,
     MatDatepickerModule,
+    MarkdownComponent,
+    RouterModule,
+    TranslatePipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

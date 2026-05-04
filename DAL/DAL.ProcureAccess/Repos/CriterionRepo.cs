@@ -12,10 +12,5 @@ public class CriterionRepo : TemporalTableBaseRepo<Criterion>, ICriterionRepo
     // {
     //     return Context.Criteria;
     // }
-
-    public IEnumerable<Criterion> GetByCriteriaFilterIds(int[] criteriaFilterIds)
-    {
-        return Context.Criteria.Where(x => criteriaFilterIds.Any(a => a == x.CriteriaFilterId)).ToList();
-    }
     #endregion
 }

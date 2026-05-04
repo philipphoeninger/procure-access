@@ -63,7 +63,6 @@ public abstract class BaseRepo<T> : BaseViewRepo<T>, IBaseRepo<T> where T : Base
         return persist ? SaveChanges() : 0;
     }
 
-    // delete
     public virtual int Delete(T entity, bool persist = true)
     {
         Table.Remove(entity);

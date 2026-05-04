@@ -13,15 +13,14 @@ import { withLoading } from '@app/shared/state/with-loading';
 
 export type ProductState = { products: Product[] };
 
-export function withProducts() {
-  return signalStoreFeature(
+export const withProducts = () => signalStoreFeature(
     withState<ProductState>({ products: initialAppState.products }),
     withLoading(),
     withMethods((state, productsApiService = inject(ProductsApiService)) => ({      
         async loadProducts() {
           state.incrementLoadingCount();
-          let products = await productsApiService.getAllProducts();
-          this.setProducts(products);
+          let result = await productsApiService.getAllProducts();
+          this.setProducts(result.value ?? []);
           state.decrementLoadingCount();
         },
         setProducts(products: Product[]) {
@@ -30,14 +29,20 @@ export function withProducts() {
           });
         },
         getProductById(productId: number) {
-          let product = state.products().find(product => product.id === productId);
-          return product;
-        }
+          return state.products().find(product => product.id === productId) ?? null;
+        },
+        async getProductsBySelectedCriteriaFilterIds(selectedCriteriaFilterIds: number[]) {
+          state.incrementLoadingCount();
+          
+          let products = await productsApiService.getProductsByCriteriaFilterIds(selectedCriteriaFilterIds);
+          this.setProducts(products.value ?? []);
+
+          state.decrementLoadingCount();
+      },
     })),
     withComputed((state) => ({
       productsCount: computed(() => {
         return state.products().length;
       })
     }))
-  )
-}
+);

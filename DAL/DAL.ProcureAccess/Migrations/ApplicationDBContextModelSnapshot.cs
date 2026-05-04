@@ -35,6 +35,11 @@ namespace DAL.ProcureAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GetDate()");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Display")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasMaxLength(200)
@@ -89,6 +94,36 @@ namespace DAL.ProcureAccess.Migrations
                             }));
                 });
 
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilterExclusion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CriteriaFilterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExclusionId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("TimeStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExclusionId");
+
+                    b.HasIndex("CriteriaFilterId", "ExclusionId")
+                        .IsUnique();
+
+                    b.ToTable("CriteriaFilterExclusions", "dbo");
+                });
+
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
                 {
                     b.Property<int>("Id")
@@ -102,7 +137,7 @@ namespace DAL.ProcureAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GetDate()");
 
-                    b.Property<int?>("CriteriaFilterId")
+                    b.Property<int>("CriteriaFilterId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -173,6 +208,11 @@ namespace DAL.ProcureAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GetDate()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Display")
                         .ValueGeneratedOnAddOrUpdate()
@@ -264,9 +304,6 @@ namespace DAL.ProcureAccess.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ValidFrom")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -286,8 +323,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("TypeId");
-
                     b.ToTable("Products", "dbo");
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
@@ -302,7 +337,7 @@ namespace DAL.ProcureAccess.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductPart", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductCriteriaFilter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -328,10 +363,10 @@ namespace DAL.ProcureAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductParts", "dbo");
+                    b.ToTable("ProductCriteriaFilters", "dbo");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductTest", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Proposal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,10 +374,45 @@ namespace DAL.ProcureAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ProductId")
+                    b.Property<string>("ApproverId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GetDate()");
+
+                    b.Property<int?>("CriterionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CriteriaFilterId")
+                    b.Property<string>("CriterionSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FinishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProposerId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("TimeStamp")
@@ -351,13 +421,62 @@ namespace DAL.ProcureAccess.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.HasKey("Id", "ProductId", "CriteriaFilterId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CriteriaFilterId");
+                    b.HasIndex("ApproverId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("CriterionId")
+                        .IsUnique()
+                        .HasFilter("[CriterionId] IS NOT NULL");
 
-                    b.ToTable("ProductTests", "dbo");
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasFilter("[ProductId] IS NOT NULL");
+
+                    b.HasIndex("ProposerId");
+
+                    b.HasIndex("ProductId", "CriterionId")
+                        .IsUnique()
+                        .HasFilter("[ProductId] IS NOT NULL AND [CriterionId] IS NOT NULL");
+
+                    b.ToTable("Proposals", "dbo", t =>
+                        {
+                            t.HasCheckConstraint("CK_Proposal_Snapshot_NN", "([ProductSnapshot] IS NOT NULL AND [CriterionSnapshot] IS NULL) OR ([ProductSnapshot] IS NULL AND [CriterionSnapshot] IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens", "dbo");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.SeriLogEntry", b =>
@@ -460,11 +579,17 @@ namespace DAL.ProcureAccess.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -678,36 +803,46 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("FilterType");
                 });
 
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilterExclusion", b =>
+                {
+                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
+                        .WithMany("Exclusions")
+                        .HasForeignKey("CriteriaFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "Exclusion")
+                        .WithMany("ParentExclusions")
+                        .HasForeignKey("ExclusionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CriteriaFilter");
+
+                    b.Navigation("Exclusion");
+                });
+
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
                 {
                     b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
                         .WithMany("Criteria")
-                        .HasForeignKey("CriteriaFilterId");
+                        .HasForeignKey("CriteriaFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("CriteriaFilter");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Product", b =>
-                {
-                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "Type")
-                        .WithMany("ProductsByType")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Type");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductPart", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductCriteriaFilter", b =>
                 {
                     b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
-                        .WithMany("ProductParts")
+                        .WithMany("Products")
                         .HasForeignKey("CriteriaFilterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithMany("Parts")
+                        .WithMany("ProductCriteriaFilters")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -717,23 +852,93 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductTest", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Proposal", b =>
                 {
-                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
-                        .WithMany("ProductTests")
-                        .HasForeignKey("CriteriaFilterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("MODELS.ProcureAccess.Entities.User", "Approver")
+                        .WithMany("Approvals")
+                        .HasForeignKey("ApproverId");
+
+                    b.HasOne("MODELS.ProcureAccess.Entities.Criterion", "Criterion")
+                        .WithOne("Proposal")
+                        .HasForeignKey("MODELS.ProcureAccess.Entities.Proposal", "CriterionId");
 
                     b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithMany("Tests")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithOne("Proposal")
+                        .HasForeignKey("MODELS.ProcureAccess.Entities.Proposal", "ProductId");
+
+                    b.HasOne("MODELS.ProcureAccess.Entities.User", "Proposer")
+                        .WithMany("Proposals")
+                        .HasForeignKey("ProposerId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CriteriaFilter");
+                    b.Navigation("Approver");
+
+                    b.Navigation("Criterion");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Proposer");
+                });
+
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("MODELS.ProcureAccess.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
+                {
+                    b.OwnsOne("MODELS.ProcureAccess.Entities.UICustomization", "UICustomization", b1 =>
+                        {
+                            b1.Property<string>("UserId")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)");
+
+                            b1.Property<string>("BackgroundColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<bool>("DarkModeOn")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("ForegroundColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<bool>("HighContrastOn")
+                                .HasColumnType("bit");
+
+                            b1.Property<int>("Language")
+                                .HasColumnType("int");
+
+                            b1.Property<bool>("OrientationVertical")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("TextColor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users", "Identity");
+
+                            b1.ToJson("UICustomization");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("UICustomization")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -791,11 +996,16 @@ namespace DAL.ProcureAccess.Migrations
                 {
                     b.Navigation("Criteria");
 
-                    b.Navigation("ProductParts");
+                    b.Navigation("Exclusions");
 
-                    b.Navigation("ProductTests");
+                    b.Navigation("ParentExclusions");
 
-                    b.Navigation("ProductsByType");
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
+                {
+                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.FilterType", b =>
@@ -805,9 +1015,18 @@ namespace DAL.ProcureAccess.Migrations
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Product", b =>
                 {
-                    b.Navigation("Parts");
+                    b.Navigation("ProductCriteriaFilters");
 
-                    b.Navigation("Tests");
+                    b.Navigation("Proposal");
+                });
+
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
+                {
+                    b.Navigation("Approvals");
+
+                    b.Navigation("Proposals");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

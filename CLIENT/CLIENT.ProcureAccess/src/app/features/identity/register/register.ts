@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, model } from '@angular/core';
 import {
   FormControl,
   FormGroupDirective,
@@ -15,10 +15,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map, tap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { LoginModel } from '../models/login.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { ProcureAccessStore } from '@app/core/state/app.store';
+import { EnLanguage } from '@app/core/models/language.enum';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LANGUAGES } from '@app/core/models/languages.map';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -46,26 +50,25 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatInputModule,
     MatButtonModule,
     MatCheckboxModule,
+    TranslatePipe
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })
 export class Register {
+  protected store = inject(ProcureAccessStore);
+  protected translate = inject(TranslateService);
   public registerErrorMessage?: string;
   public showLanguageSelection = true;
 
   protected logoPath = '/werte_it_logo.jpg';
 
-  public languages = [
-    { value: 'en', label: 'English' },
-    { value: 'de', label: 'Deutsch' },
-    { value: 'fr', label: 'Français' },
-  ];
-  public selectedLanguage = 'en';
+  protected languages = Object.values(EnLanguage);
+  protected languageLabels = LANGUAGES;
+  protected updateUICustomization = model(this.store.uiCustomization());
 
-  protected username?: string;
-  protected password?: string;
-  protected confirmPassword?: string;
+  protected password = model('');
+  protected confirmPassword = model('');
   public keepSignedIn: boolean = false;
 
   emailFormControl = new FormControl('', [
@@ -75,38 +78,36 @@ export class Register {
 
   matcher = new MyErrorStateMatcher();
 
+  submitDisabled = computed(() => this.password() !== this.confirmPassword());
+
   constructor(
     private router: Router,
     protected authService: AuthService,
     protected snackbarService: SnackbarService
   ) {}
 
-  ngOnInit() {}
-
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
 
     let registerCommand = new LoginModel(
       this.emailFormControl.value!,
-      this.username!,
-      this.password!
+      this.password()!
     );
 
-    // TODO: start spinner
+    this.store.incrementLoadingCount();
     this.authService
       .register(registerCommand)
       .pipe(
-        map((response: any) => {
+        map((response) => {
           if (response.succeeded) {
             this.router.navigateByUrl('/(login:auth)');
-            this.snackbarService.showInfo('A registration has been sent to your email address and needs to be confirmed.\nPlease confirm it and come back to login.');
-          } else {
-            this.snackbarService.showInfo('The registration could not be completed. Please check your inputs and try again.');
+            this.translate
+              .get('AUTH.SIGN_UP_SUCCESS')
+              .pipe(tap(message => this.snackbarService.showInfo(message)))
+              .subscribe();
           }
         }),
-        finalize(() => {
-          // TODO: stop spinner
-        }),
+        finalize(() => this.store.decrementLoadingCount())
       )
       .subscribe();
   }

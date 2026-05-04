@@ -8,6 +8,11 @@ public static class SampleDataInitializer
         await SeedData(dbContext, userManager);
     }
 
+    public static async Task ClearDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
+    {
+        await ClearData(dbContext, userManager);
+    }
+
     public static async Task ClearAndReseedDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
     {
         await ClearData(dbContext, userManager);
@@ -78,10 +83,10 @@ public static class SampleDataInitializer
             var succeeded = await ProcessUserInsert(dbContext, userManager, SampleData.Users);
             ProcessInsert(dbContext, dbContext.FilterTypes, SampleData.FilterTypes); // SampleData.SomeEntities(userManager.Users.First())
             ProcessInsert(dbContext, dbContext.CriteriaFilters, SampleData.CriteriaFilters);
+            ProcessInsert(dbContext, dbContext.CriteriaFilterExclusions, SampleData.CriteriaFilterExclusions);
             ProcessInsert(dbContext, dbContext.Criteria, SampleData.Criteria);
             ProcessInsert(dbContext, dbContext.Products, SampleData.Products);
-            ProcessInsert(dbContext, dbContext.ProductParts, SampleData.ProductParts);
-            ProcessInsert(dbContext, dbContext.ProductTests, SampleData.ProductTests);
+            ProcessInsert(dbContext, dbContext.ProductCriteriaFilters, SampleData.ProductCriteriaFilters);
             // insert more Entities...
         }
         catch (Exception ex)
@@ -131,6 +136,8 @@ public static class SampleDataInitializer
                     allSucceeded = false;
                     break;
                 }
+                await userManager.AddToRoleAsync(user, Roles.Member);
+                await userManager.AddToRoleAsync(user, Roles.Approver);
             }
             return allSucceeded;
         }

@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatCardModule } from '@angular/material/card';
 import { MatDivider } from "@angular/material/divider";
+import { AuthService } from '@app/features/identity/services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -13,15 +15,13 @@ import { MatDivider } from "@angular/material/divider";
     MatIconModule,
     RouterModule,
     MatCardModule,
-    MatDivider
+    MatDivider,
+    TranslatePipe
 ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
 export class Home {
   protected store = inject(ProcureAccessStore);
-
-  ngOnInit() {
-    this.store.load();
-  }
+  protected authService = inject(AuthService);
 }

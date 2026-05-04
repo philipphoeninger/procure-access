@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, inject, model } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,8 +13,10 @@ import { AuthService } from '@features/identity/services/auth.service';
 import { LoginModel } from '@features/identity/models/login.model';
 import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { User } from '../models/user.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { JWT_NAME, REFRESH_TOKEN_NAME } from '@app/app.config';
+import { UserDto } from '../models/user.dto';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-login',
@@ -26,7 +28,8 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    TranslatePipe
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -40,13 +43,6 @@ export class Login {
 
   protected logoPath = '/werte_it_logo.jpg';
 
-  public languages = [
-    { value: 'en', label: 'English' },
-    { value: 'de', label: 'Deutsch' },
-    { value: 'fr', label: 'Français' },
-  ];
-  public selectedLanguage = model('en');
-
   protected email? = model('');
   protected password? = model('');
   public keepSignedIn = model(false);
@@ -54,6 +50,8 @@ export class Login {
   readonly dialog = inject(MatDialog);
 
   constructor(
+    @Inject(JWT_NAME) private jwtName: string,
+    @Inject(REFRESH_TOKEN_NAME) private refreshTokenName: string,
     protected authService: AuthService,
     private router: Router,
     protected snackbarService: SnackbarService
@@ -69,13 +67,10 @@ export class Login {
 
     dialogRef.afterClosed().subscribe((email: string) => {
       if (email !== undefined) {
+        this.store.incrementLoadingCount();
         this.authService
           .forgotPassword(email)
-          .pipe(
-            map((response: any) => {
-              this.snackbarService.showInfo('A passwort reset was sent to the given mail address.');
-            })
-          )
+          .pipe(finalize(() => this.store.decrementLoadingCount()))
           .subscribe();
       }
     });
@@ -83,25 +78,27 @@ export class Login {
 
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
-    let loginCommand = new LoginModel(this.email!(), '', this.password!());
+    let loginCommand = new LoginModel(this.email!(), this.password!());
 
-    // TODO: start spinner
+    this.store.incrementLoadingCount();
     this.authService
       .login(loginCommand)
       .pipe(
-        map((response: { token: string, username: string }) => {
-          if (response.token) {
-            localStorage.setItem('procure-access-token', response.token);
-            let user: User = new User(loginCommand.email, response.username, false);
-            this.store.setUser(user);
-            this.router.navigateByUrl('/home');
-          } else {
-            this.snackbarService.showInfo('No login found for the given information. Please check your inputs and try again.');
-          }
+        map((response) => {
+          if (!response.accessToken) return; //gate
+          this.authService.loadUserFromToken(response.accessToken);
+          localStorage.setItem(this.jwtName, response.accessToken);
+          localStorage.setItem(this.refreshTokenName, response.refreshToken);
+          let user: UserDto = new UserDto(response.user.id, response.user.email);
+          this.store.setUser(user);
+          // set settings
+          this.store.setUICustomization(response.user.uiCustomization);
+          this.store.setLanguage(response.user.uiCustomization.language);
+          this.store.removeSettingsFromLocalStorage();
+          this.store.loadProposals();
+          this.router.navigateByUrl('/home');
         }),
-        finalize(() => {
-          // TODO: stop spinner
-        }),
+        finalize(() => this.store.decrementLoadingCount())
       )
       .subscribe();
   }
