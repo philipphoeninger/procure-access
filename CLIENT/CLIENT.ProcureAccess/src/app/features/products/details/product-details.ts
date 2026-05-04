@@ -4,11 +4,13 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
 import { Product } from '../models/product.model';
 import { MatDividerModule } from '@angular/material/divider';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-product-details',
   imports: [
-    MatDividerModule
+    MatDividerModule,
+    TranslatePipe
   ],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss'

@@ -9,6 +9,6 @@ public class CriterionDto : BaseDto
     [Required]
     [StringLength(6000)]
     public string Description { get; set; }
-    
-    public int? CriteriaFilterId { get; set; }
+
+    public int CriteriaFilterId { get; set; }
 }

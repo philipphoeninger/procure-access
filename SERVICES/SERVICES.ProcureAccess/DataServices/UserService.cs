@@ -13,6 +13,8 @@ public class UserService : IUserService
     private readonly IEmailService _emailService;
     private readonly IEmailTemplateService _templateService;
     private readonly IConfiguration _config;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
 
     public UserService(
         UserManager<User> userManager,
@@ -22,7 +24,8 @@ public class UserService : IUserService
         IOptions<JWTSettings> jwt,
         IEmailService emailService,
         IEmailTemplateService templateService,
-        IConfiguration config)
+        IConfiguration config,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -32,6 +35,20 @@ public class UserService : IUserService
         _emailService = emailService;
         _templateService = templateService;
         _config = config;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public async Task<UserDto?> GetCurrentUser()
+    {
+        ClaimsPrincipal? claimsPrincipal = _httpContextAccessor.HttpContext?.User;
+        if (claimsPrincipal is null) return null; //gate
+        var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return null; //gate
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null || user.IsDeleted)
+            return null; //gate
+        return _mapper.Map<UserDto>(user);
     }
 
     // SIGN IN (with lockout support)

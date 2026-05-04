@@ -30,7 +30,15 @@ export const withProducts = () => signalStoreFeature(
         },
         getProductById(productId: number) {
           return state.products().find(product => product.id === productId) ?? null;
-        }
+        },
+        async getProductsBySelectedCriteriaFilterIds(selectedCriteriaFilterIds: number[]) {
+          state.incrementLoadingCount();
+          
+          let products = await productsApiService.getProductsByCriteriaFilterIds(selectedCriteriaFilterIds);
+          this.setProducts(products.value ?? []);
+
+          state.decrementLoadingCount();
+      },
     })),
     withComputed((state) => ({
       productsCount: computed(() => {

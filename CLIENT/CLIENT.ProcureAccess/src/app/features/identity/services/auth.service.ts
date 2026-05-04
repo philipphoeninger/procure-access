@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { API_URL, JWT_NAME, REFRESH_TOKEN_NAME } from "@app/app.config";
-import { Observable } from 'rxjs';
+import { BehaviorSubject, catchError, filter, lastValueFrom, map, Observable, of, take, tap } from 'rxjs';
 import { LoginModel } from '../models/login.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
@@ -9,10 +9,13 @@ import { ResetPasswordModel } from '../models/reset-password.model';
 import { AuthResponse } from '../models/auth-response.model';
 import { jwtDecode } from 'jwt-decode';
 import { EnCustomClaimTypes } from '../models/custom-claim-types.enum';
+import { User } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-   private permissions: string[] = [];
+  private permissions: string[] = [];
+  private isRefreshing = false;
+  private refreshSubject = new BehaviorSubject<AuthResponse | null>(null);
 
   constructor(
     @Inject(API_URL) private apiUrl: string,
@@ -21,6 +24,10 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {}
+
+  me(): Promise<User | null> {
+    return lastValueFrom(this.http.get<User | null>(`${this.apiUrl}/me`));
+  }
 
   login(command: LoginModel): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signIn`, command);
@@ -80,5 +87,32 @@ export class AuthService {
 
   hasNotPermission(permission: string): boolean {
     return !this.permissions.includes(permission);
+  }
+
+  refreshToken(refreshToken: string): Observable<AuthResponse> {
+    if (this.isRefreshing) {
+      return this.refreshSubject.pipe(
+        filter(v => v !== null),
+        take(1)
+      );
+    }
+
+    this.isRefreshing = true;
+    this.refreshSubject.next(null);
+
+    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, {
+      params: { refreshToken }
+    }).pipe(
+      map((response: AuthResponse) => {
+        this.isRefreshing = false;
+        this.refreshSubject.next(response);
+        return response;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.isRefreshing = false;
+        this.refreshSubject.next(null);
+        throw error;
+      })
+    );
   }
 }

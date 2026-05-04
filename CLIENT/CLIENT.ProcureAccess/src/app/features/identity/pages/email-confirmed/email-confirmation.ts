@@ -3,10 +3,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { MatIconModule } from "@angular/material/icon";
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpResponse } from '@angular/common/http';
+import { TranslatePipe } from '@ngx-translate/core';
 
 enum EmailConfirmationState {
     confirming = 'confirming',
@@ -20,8 +21,9 @@ enum EmailConfirmationState {
     MatButtonModule, 
     MatIconModule,
     RouterModule,
-    MatProgressSpinnerModule
-    ],
+    MatProgressSpinnerModule,
+    TranslatePipe
+  ],
   templateUrl: './email-confirmation.html',
   styleUrl: './email-confirmation.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

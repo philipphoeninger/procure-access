@@ -14,8 +14,8 @@ public partial class Criterion : BaseEntity
     [StringLength(6000)]
     public string Description { get; set; } = string.Empty;
 
-    public int? CriteriaFilterId { get; set; }
-    public CriteriaFilter? CriteriaFilter { get; set; }
+    public int CriteriaFilterId { get; set; }
+    public CriteriaFilter CriteriaFilter { get; set; }
 
     public Proposal? Proposal { get; set; }
 

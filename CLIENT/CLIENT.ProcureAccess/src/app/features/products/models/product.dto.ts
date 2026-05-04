@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON, jsonArrayMember } from 'typedjson';
-import { ProductPart } from './productPart.model';
-import { ProductTest } from './productTest.model';
 
 @jsonObject
 export class ProductDto {

@@ -13,6 +13,8 @@ import { RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { HasNotPermissionDirective } from '../directives/has-not-permission.directive';
 import { ProposalStatus } from '@app/features/proposal/models/proposal-status.enum';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface UserInformation {
   position: number,
@@ -31,7 +33,9 @@ export interface UserInformation {
     MatIconModule,
     RouterModule,
     MatMenuModule,
-    HasNotPermissionDirective
+    HasNotPermissionDirective,
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

@@ -24,9 +24,20 @@ export const ProcureAccessStore = signalStore(
         return {
             async init() {
                 // load necessary data:
-                // set settings
-                await state.loadSettings();
-                // set products
+                // set identity
+                let user = await state.loadIdentity();
+
+                // settings
+                if (user != null) {
+                    state.setUICustomization(user.uiCustomization);
+                    state.setLanguage(user.uiCustomization.language);
+                    state.removeSettingsFromLocalStorage();
+                } else {
+                    await state.reloadUICustomization();
+                }
+                state.activateMediaEventListeners();
+
+                // products
                 await state.loadProducts();
             }
         };

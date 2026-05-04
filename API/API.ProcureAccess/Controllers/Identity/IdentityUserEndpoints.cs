@@ -4,6 +4,12 @@ public static class IdentityUserEndpoints
 {
     public static IEndpointRouteBuilder MapIdentityUserEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapGet("/me", async (
+            IUserService service) =>
+        {
+            return await service.GetCurrentUser();
+        });
+
         app.MapPost("/signIn", async (
             IUserService service,
             LoginRequest request) =>
@@ -11,7 +17,10 @@ public static class IdentityUserEndpoints
             var result = await service.SignInAsync(request);
 
             return result == null
-                ? Results.BadRequest("Invalid login")
+                ? Results.BadRequest(new
+                    {
+                        code = "InvalidLogin"
+                    })
                 : Results.Ok(result);
         });
 
@@ -23,7 +32,11 @@ public static class IdentityUserEndpoints
 
             return result.Succeeded
                 ? Results.Ok(result)
-                : Results.BadRequest(result.Errors);
+                : Results.BadRequest(new 
+                    {
+                        code = "SignUpFailure",
+                        message = result.Errors
+                    });
         });
 
         app.MapPost("/forgot-password", async (
@@ -52,7 +65,10 @@ public static class IdentityUserEndpoints
             var result = await service.RefreshTokenAsync(refreshToken);
 
             return result == null
-                ? Results.BadRequest("Invalid refresh token")
+                ? Results.BadRequest(new
+                    {
+                        code = "InvalidRefreshToken"
+                    })
                 : Results.Ok(result);
         });
 
@@ -65,7 +81,10 @@ public static class IdentityUserEndpoints
 
             return result.Succeeded
                 ? Results.Ok("Email confirmed")
-                : Results.BadRequest(result.Errors);
+                : Results.BadRequest(new {
+                        code = "EmailConfirmFailure",
+                        message = result.Errors
+                    });
         });
 
         return app;

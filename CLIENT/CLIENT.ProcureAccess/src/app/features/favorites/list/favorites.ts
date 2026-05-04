@@ -8,6 +8,7 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-products-favorites',
@@ -17,7 +18,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     MatTabsModule,
     MatListModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './favorites.html',
   styleUrl: './favorites.scss'

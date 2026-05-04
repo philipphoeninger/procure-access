@@ -31,9 +31,8 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<Criterion> Criteria { get; set; }
     public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
     public virtual DbSet<Product> Products { get; set; }
-    public virtual DbSet<ProductType> ProductTypes { get; set; }
-    public virtual DbSet<ProductPart> ProductParts { get; set; }
-    public virtual DbSet<ProductTest> ProductTests { get; set; }
+    public virtual DbSet<ProductCriteriaFilter> ProductCriteriaFilters { get; set; }
+    public virtual DbSet<CriteriaFilterExclusion> CriteriaFilterExclusions { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     public virtual DbSet<Proposal> Proposals { get; set; }
     #endregion
@@ -55,12 +54,10 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new CriterionConfiguration().Configure(modelBuilder.Entity<Criterion>());
         new CriteriaFilterConfiguration().Configure(modelBuilder.Entity<CriteriaFilter>());
         new ProductConfiguration().Configure(modelBuilder.Entity<Product>());
-        new ProductPartConfiguration().Configure(modelBuilder.Entity<ProductPart>());
-        new ProductTestConfiguration().Configure(modelBuilder.Entity<ProductTest>());
-        new ProductTypeConfiguration().Configure(modelBuilder.Entity<ProductType>());
+        new CriteriaFilterExclusionConfiguration().Configure(modelBuilder.Entity<CriteriaFilterExclusion>());
+        new ProductCriteriaFilterConfiguration().Configure(modelBuilder.Entity<ProductCriteriaFilter>());
         new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
         new UserConfiguration().Configure(modelBuilder.Entity<User>());
-        // add more configurations ...
 
         OnModelCreatingPartial(modelBuilder);
     }

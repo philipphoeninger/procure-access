@@ -1,10 +1,10 @@
 @if (confirmationState() == EmailConfirmationState.confirming) {
-    <h1>Confirming email...</h1>
-    <p>Please wait... </p><mat-spinner ></mat-spinner>
+    <h1>{{ 'AUTH.EMAIL_CONFIRMING_HEADER' | translate }}</h1>
+    <p>{{ 'COMMON.PLEASE_WAIT' | translate }} </p><mat-spinner ></mat-spinner>
 } @else if (confirmationState() == EmailConfirmationState.success) {
-    <h1>Email confirmed</h1>
-    <p>Email confirmed successfully. You can now close this window.</p>
+    <h1>{{ 'AUTH.EMAIL_CONFIRMED_HEADER' | translate }}</h1>
+    <p>{{ 'AUTH.EMAIL_CONFIRMED_MSG' | translate }}</p>
 } @else {
-    <h1>Email confirmation failed</h1>
-    <p>Something went wrong confirming your email. Please contact the support via email.</p>
+    <h1>{{ 'AUTH.EMAIL_CONFIRM_FAILED_HEADER' | translate }}</h1>
+    <p>{{ 'AUTH.EMAIL_CONFIRM_FAILED_MSG' | translate }}</p>
 }

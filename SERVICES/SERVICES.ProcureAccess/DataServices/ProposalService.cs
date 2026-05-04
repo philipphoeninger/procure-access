@@ -309,8 +309,8 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     {
         var dto = Mapper.Map<ProposalDto>(proposal);
 
-        // If not yet approved → use snapshot
-        if (proposal.FinishedAt == null)
+        // If not yet approved or rejected → use snapshot
+        if (proposal.FinishedAt == null || proposal.Status == ProposalStatus.Rejected)
         {
             if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
             {

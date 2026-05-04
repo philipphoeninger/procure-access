@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON, jsonArrayMember } from 'typedjson';
-import { ProductPart } from './productPart.model';
-import { ProductTest } from './productTest.model';
 
 @jsonObject
 export class Product {
@@ -20,26 +18,16 @@ export class Product {
   @jsonMember
   typeId: number;
 
-  @jsonArrayMember(ProductPart)
-  parts: ProductPart[];
-
-  @jsonArrayMember(ProductTest)
-  tests: ProductTest[];
-
   constructor(
-    pId: number, 
-    pName: string, 
-    pType: number, 
-    pLink: string = "", 
-    pDescription: string = "", 
-    pParts: ProductPart[] = [],
-    pTests: ProductTest[] = []) {
+    pId: number,
+    pName: string,
+    pType: number,
+    pLink: string = "",
+    pDescription: string = "") {
       this.id = pId;
       this.name = pName;
       this.typeId = pType;
       this.link = pLink;
       this.description = pDescription;
-      this.parts = pParts;
-      this.tests = pTests;
   }
 }

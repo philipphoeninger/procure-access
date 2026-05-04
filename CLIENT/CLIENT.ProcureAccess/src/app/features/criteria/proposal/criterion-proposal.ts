@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { FormControl, FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,8 +9,6 @@ import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { catchError, finalize, map, throwError } from 'rxjs';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { ProposalApiService } from '@app/features/proposal/services/api/proposal-api.service';
@@ -22,6 +20,8 @@ import { CreateCriterionDto } from '../models/create-criterion.dto';
 import { ReviewProposal } from '@app/features/proposal/models/review-proposal-request.model';
 import { UpsertProposal } from '@app/features/proposal/models/upsert-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MarkdownEditor } from "@app/shared/components/markdown-editor/markdown-editor";
 
 @Component({
   selector: 'pa-criterion-proposal',
@@ -36,7 +36,9 @@ import { HasPermissionDirective } from '@app/features/identity/directives/has-pe
     MatCheckboxModule,
     RouterModule,
     MatListModule,
-    HasPermissionDirective
+    HasPermissionDirective,
+    TranslatePipe,
+    MarkdownEditor
 ],
   templateUrl: './criterion-proposal.html',
   styleUrl: './criterion-proposal.scss',
@@ -58,15 +60,17 @@ export class CriterionProposal {
     new CriterionDto(
       0,
       "",
-      ""
+      "",
+      1
     ),
     ProposalStatus.pending,
     undefined,
     new Date(),
     undefined
   ));
-
-  selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
+  productPartsControl = new FormControl<number[]>(
+     [this.proposal().criterion!.criteriaFilterId]
+  );
 
   public formErrorMessage?: string;
 
@@ -80,7 +84,10 @@ export class CriterionProposal {
     await this.store.loadProposals();
 
     let stateProposal = this.store.getProposalById(this.proposalId()!);
-    if (stateProposal) this.proposal.set(stateProposal);
+    if (stateProposal) {
+      this.proposal.set(stateProposal);
+      this.productPartsControl.setValue([stateProposal.criterion!.criteriaFilterId]);
+    }
   }
 
   onSubmit(form: NgForm, event: Event) {
@@ -89,7 +96,8 @@ export class CriterionProposal {
     
     let upsertCriterion: CreateCriterionDto = new CreateCriterionDto(
       this.proposal().criterion?.name!,
-      this.proposal().criterion?.description!
+      this.proposal().criterion?.description!,
+      this.productPartsControl.value![0]
     );
 
     // TODO: only send changed values

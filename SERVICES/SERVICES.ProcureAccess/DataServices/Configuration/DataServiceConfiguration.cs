@@ -9,12 +9,11 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriterionRepo, CriterionRepo>();
         services.AddScoped<ICriteriaFilterRepo, CriteriaFilterRepo>();
         services.AddScoped<IProductRepo, ProductRepo>();
-        services.AddScoped<IProductPartRepo, ProductPartRepo>();
-        services.AddScoped<IProductTestRepo, ProductTestRepo>();
-        services.AddScoped<IProductTypeRepo, ProductTypeRepo>();
+        services.AddScoped<IProductCriteriaFilterRepo, ProductCriteriaFilterRepo>();
         services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
         services.AddScoped<IUserRepo, UserRepo>();
         services.AddScoped<IProposalRepo, ProposalRepo>();
+        services.AddScoped<ICriteriaFilterExclusionRepo, CriteriaFilterExclusionRepo>();
         
         return services;
     }
@@ -25,14 +24,13 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriteriaFilterService, CriteriaFilterService>();
         services.AddScoped<ICriterionService, CriterionService>();
         services.AddScoped<IFilterTypeService, FilterTypeService>();
-        services.AddScoped<IProductPartService, ProductPartService>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IProductTestService, ProductTestService>();
-        services.AddScoped<IProductTypeService, ProductTypeService>();
+        services.AddScoped<IProductCriteriaFilterService, ProductCriteriaFilterService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<IProposalService, ProposalService>();
+        services.AddScoped<ICriteriaFilterExclusionService, CriteriaFilterExclusionService>();
         
         return services;
     }

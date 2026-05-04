@@ -46,6 +46,7 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
         {
             return BadRequest(new
             {
+                code = "CreateFailure",
                 message = ex.Message
             });
         }
@@ -119,6 +120,7 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
             // TODO: handle more gracefully
             return BadRequest(new
             {
+                code = "UpdateFailure",
                 message = ex.Message
             });
         }
@@ -126,6 +128,7 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
         {
             return BadRequest(new
             {
+                code = "UpdateFailure",
                 message = ex.Message
             });
         }
@@ -160,6 +163,9 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
             // TODO: handle more gracefully
             return new BadRequestObjectResult(ex.GetBaseException()?.Message);
         }
-        return result != null ? Ok(result) : BadRequest("Deletion failed");
+        return result != null ? Ok(result) : BadRequest(new
+            {
+                code = "DeleteFailure"
+            });
     }
 }

@@ -6,22 +6,18 @@
     </div>
 
     <h1>403</h1>
-    <h2>Access Denied</h2>
+    <h2>{{ 'AUTH.ACCESS_DENIED_LABEL' | translate }}</h2>
 
-    <p>
-      You don’t have permission to view this page.
-      If you believe this is a mistake, please contact your administrator.
-    </p>
+    <p>{{ 'AUTH.ACCESS_DENIED_MSG' | translate }}</p>
 
     <div class="actions">
       <button mat-raised-button color="primary" [routerLink]="'/home'">
-        Go Home
+        {{ 'COMMON.GO_TO_HOME' | translate }}
       </button>
 
       <button mat-stroked-button color="accent" (click)="authService.showLogin()">
-        Login
+        {{ 'AUTH.LOGIN' | translate }}
       </button>
     </div>
-
   </mat-card>
 </div>

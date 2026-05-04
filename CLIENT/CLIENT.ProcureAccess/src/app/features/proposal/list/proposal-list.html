@@ -3,19 +3,19 @@
   <table
       mat-table
       matSort
-      class="proposal-table" 
+      class="proposal-table"
       [dataSource]="dataSource"
       class="mat-elevation-z8"
       (matSortChange)="announceSortChange($event)">
     <!-- Position Column -->
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by position"> No. </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by position"> {{ 'COMMON.NUMBER' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.position}} </td>
     </ng-container>
 
     <!-- Actions Column -->
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.ACTIONS' | translate }} </th>
       <td mat-cell *matCellDef="let element" style="padding-left: 8px;">
         <!--TODO <button
           mat-icon-button
@@ -31,7 +31,7 @@
             mat-icon-button
             class="proposal-edit-btn"
             aria-label="Proposal edit icon-button"
-            matTooltip="Edit" 
+            [matTooltip]="'COMMON.EDIT' | translate" 
             matTooltipPosition="right"
             (click)="openProposal(element.id, element.product != null)">
             <mat-icon>edit</mat-icon>
@@ -41,55 +41,55 @@
 
     <!-- Id Column -->
     <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id"> Id </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id"> {{ 'COMMON.ID' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.id}} </td>
     </ng-container>
 
     <!-- ProposerId Column -->
     <ng-container matColumnDef="proposerId">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by proposer id"> Proposer </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by proposer id"> {{ 'PROPOSALS.PROPOSER' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.proposerId}} </td>
     </ng-container>
 
     <!-- ApproverId Column -->
     <ng-container matColumnDef="approverId">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by approver id"> Approver </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by approver id"> {{ 'PROPOSALS.APPROVER' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.approverId}} </td>
     </ng-container>
 
     <!-- Product name Column -->
     <ng-container matColumnDef="productName">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by product name"> Product </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by product name"> {{ 'PRODUCTS.PRODUCT_LABEL' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.product?.name}} </td>
     </ng-container>
 
     <!-- CriterionName Column -->
     <ng-container matColumnDef="criterionName">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by criterion name"> Criterion </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by criterion name"> {{ 'CRITERIA.CRITERION_LABEL' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.criterion?.name}} </td>
     </ng-container>
 
     <!-- Status Column -->
     <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> Status </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> {{ 'PROPOSALS.STATUS' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{ ProposalStatus[element.status] }} </td>
     </ng-container>
 
     <!-- Note Column -->
     <ng-container matColumnDef="note">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by note"> Note </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by note"> {{ 'PROPOSALS.NOTE' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.note}} </td>
     </ng-container>
 
     <!-- CreatedAt Column -->
     <ng-container matColumnDef="createdAt">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by created at"> Created At </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by created at"> {{ 'PROPOSALS.CREATED_AT' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
     </ng-container>
 
     <!-- FinishedAt Column -->
     <ng-container matColumnDef="finishedAt">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by finished at"> Finished At </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by finished at"> {{ 'PROPOSALS.FINISHED_AT' | translate }} </th>
       <td mat-cell *matCellDef="let element"> {{element.finishedAt}} </td>
     </ng-container>
 
@@ -97,7 +97,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
     @if (dataSource._filterData.length == 0) {
-        <p>No open proposals found</p>
+        <p>{{ 'PROPOSALS.NON_OPEN_FOUND' | translate }}</p>
     }
   </table>
 </div>

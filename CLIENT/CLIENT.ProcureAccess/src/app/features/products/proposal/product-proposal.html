@@ -1,38 +1,37 @@
-<p>Please enter information about the product.</p>
-<p>Not all fields have to be filled out. The more information you can provide, 
-    the easier it is for our admin to recheck everything.</p>
+<p>{{ 'PRODUCTS.ENTER_INFO_MSG' | translate }}</p>
+<p>{{ 'PROPOSALS.NOT_ALL_FIELDS_MSG' | translate }}</p>
 
 <!--
 Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
 -->
 <div class="container">
   <div class="header">
-    <div class="title"><mat-icon>add_2</mat-icon> <span>Product</span></div>
+    <div class="title"><mat-icon>add_2</mat-icon> <span>{{ 'PRODUCTS.PRODUCT_LABEL' | translate }}</span></div>
   </div>
   <form class="product-form" #addProductForm="ngForm" (ngSubmit)="onSubmit(addProductForm, $event)">
     <mat-form-field>
-      <mat-label>Name</mat-label>
+      <mat-label>{{ 'COMMON.NAME' | translate }}</mat-label>
       <input matInput type="text" name="name" [(ngModel)]="proposal().product!.name" required #nameInput="ngModel"
         maxlength="50" />
       @if (nameInput.invalid && nameInput.touched) {
-      <mat-error>Name is required.</mat-error>
+        <mat-error>{{ 'COMMON.NAME' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="link-field">
-      <mat-label>Link</mat-label>
+      <mat-label>{{ 'COMMON.LINK' | translate }}</mat-label>
       <input matInput type="text" name="link" [(ngModel)]="proposal().product!.link" required #linkInput="ngModel"
         minlength="6" maxlength="200" />
       @if (linkInput.invalid && linkInput.touched) {
-      <mat-error>Link is required.</mat-error>
+        <mat-error>{{ 'COMMON.LINK' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="description-field">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ 'COMMON.DESCRIPTION' | translate }}</mat-label>
       <!-- TODO: make text area markdown input -->
       <textarea matInput type="text" name="description" [(ngModel)]="proposal().product!.description" required #descriptionInput="ngModel"
         minlength="6" maxlength="2000"></textarea>
       @if (descriptionInput.invalid && descriptionInput.touched) {
-        <mat-error>Description is required.</mat-error>
+        <mat-error>{{ 'COMMON.DESCRIPTION' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
 
@@ -40,17 +39,17 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
     ></pa-filters-selection>
 
     @if (formErrorMessage) {
-        <span class="error-message ng-touched ng-invalid">{{ formErrorMessage }}</span>
+      <span class="error-message ng-touched ng-invalid">{{ formErrorMessage }}</span>
     }
     <div class="buttons">
       <div>
-        <button mat-button color="primary" (click)="null" type="button">Reset</button>
+        <button mat-button color="primary" (click)="null" type="button">{{ 'COMMON.RESET' | translate }}</button>
         <button id="send-button" mat-flat-button color="primary" type="submit" [disabled]="addProductForm.invalid">
-          {{ proposalId() ? "Save" : "Send" }}
+          {{ proposalId() ? ('COMMON.SAVE' | translate) : ('COMMON.SEND' | translate) }}
         </button>
       </div>
       <div *appHasPermission="'objects:approve'" id="approval-btns">
-        <button mat-button color="warn" (click)="approve(false)" type="button">Reject</button>
+        <button mat-button color="warn" (click)="approve(false)" type="button">{{ 'COMMON.REJECT' | translate }}</button>
         <button
           id="approve-button"
           mat-flat-button
@@ -58,7 +57,7 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
           type="button"
           [disabled]="addProductForm.dirty"
           (click)="approve(true)">
-          Approve
+          {{ 'COMMON.APPROVE' | translate }}
         </button>
       </div>
     </div>

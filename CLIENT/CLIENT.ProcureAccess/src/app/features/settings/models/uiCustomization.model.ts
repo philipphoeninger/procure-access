@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import { EnLanguage } from '@core/models/language.enum';
 
 @jsonObject
 export class UICustomization {
@@ -21,6 +22,9 @@ export class UICustomization {
   @jsonMember
   highContrastOn: boolean;
 
+  @jsonMember
+  language: EnLanguage;
+
   constructor(
     pForegroundColor: string,
     pBackgroundColor: string,
@@ -28,6 +32,7 @@ export class UICustomization {
     pDarkModeOn: boolean,
     pOrientationVertical: boolean,
     pHighContrastOn: boolean,
+    pLanguage: EnLanguage,
   ) {
     this.foregroundColor = pForegroundColor;
     this.backgroundColor = pBackgroundColor;
@@ -35,6 +40,7 @@ export class UICustomization {
     this.darkModeOn = pDarkModeOn;
     this.orientationVertical = pOrientationVertical;
     this.highContrastOn = pHighContrastOn;
+    this.language = pLanguage;
   }
 }
 

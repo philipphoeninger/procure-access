@@ -94,6 +94,36 @@ namespace DAL.ProcureAccess.Migrations
                             }));
                 });
 
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilterExclusion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CriteriaFilterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExclusionId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("TimeStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExclusionId");
+
+                    b.HasIndex("CriteriaFilterId", "ExclusionId")
+                        .IsUnique();
+
+                    b.ToTable("CriteriaFilterExclusions", "dbo");
+                });
+
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
                 {
                     b.Property<int>("Id")
@@ -107,7 +137,7 @@ namespace DAL.ProcureAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GetDate()");
 
-                    b.Property<int?>("CriteriaFilterId")
+                    b.Property<int>("CriteriaFilterId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -307,7 +337,7 @@ namespace DAL.ProcureAccess.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductPart", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductCriteriaFilter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -333,65 +363,7 @@ namespace DAL.ProcureAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductParts", "dbo");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductTest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CriteriaFilterId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("TimeStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.HasKey("Id", "ProductId", "CriteriaFilterId");
-
-                    b.HasIndex("CriteriaFilterId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductTests", "dbo");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CriteriaFilterId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("TimeStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.HasKey("Id", "ProductId", "CriteriaFilterId");
-
-                    b.HasIndex("CriteriaFilterId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductTypes", "dbo");
+                    b.ToTable("ProductCriteriaFilters", "dbo");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Proposal", b =>
@@ -831,63 +803,46 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("FilterType");
                 });
 
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilterExclusion", b =>
+                {
+                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
+                        .WithMany("Exclusions")
+                        .HasForeignKey("CriteriaFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "Exclusion")
+                        .WithMany("ParentExclusions")
+                        .HasForeignKey("ExclusionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CriteriaFilter");
+
+                    b.Navigation("Exclusion");
+                });
+
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
                 {
                     b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
                         .WithMany("Criteria")
-                        .HasForeignKey("CriteriaFilterId");
+                        .HasForeignKey("CriteriaFilterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("CriteriaFilter");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductPart", b =>
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductCriteriaFilter", b =>
                 {
                     b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
-                        .WithMany("ProductParts")
+                        .WithMany("Products")
                         .HasForeignKey("CriteriaFilterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithMany("Parts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CriteriaFilter");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductTest", b =>
-                {
-                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
-                        .WithMany("ProductTests")
-                        .HasForeignKey("CriteriaFilterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithMany("Tests")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CriteriaFilter");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.ProductType", b =>
-                {
-                    b.HasOne("MODELS.ProcureAccess.Entities.CriteriaFilter", "CriteriaFilter")
-                        .WithMany("ProductTypes")
-                        .HasForeignKey("CriteriaFilterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithMany("Types")
+                        .WithMany("ProductCriteriaFilters")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -960,6 +915,9 @@ namespace DAL.ProcureAccess.Migrations
 
                             b1.Property<bool>("HighContrastOn")
                                 .HasColumnType("bit");
+
+                            b1.Property<int>("Language")
+                                .HasColumnType("int");
 
                             b1.Property<bool>("OrientationVertical")
                                 .HasColumnType("bit");
@@ -1038,11 +996,11 @@ namespace DAL.ProcureAccess.Migrations
                 {
                     b.Navigation("Criteria");
 
-                    b.Navigation("ProductParts");
+                    b.Navigation("Exclusions");
 
-                    b.Navigation("ProductTests");
+                    b.Navigation("ParentExclusions");
 
-                    b.Navigation("ProductTypes");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
@@ -1057,13 +1015,9 @@ namespace DAL.ProcureAccess.Migrations
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Product", b =>
                 {
-                    b.Navigation("Parts");
+                    b.Navigation("ProductCriteriaFilters");
 
                     b.Navigation("Proposal");
-
-                    b.Navigation("Tests");
-
-                    b.Navigation("Types");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>

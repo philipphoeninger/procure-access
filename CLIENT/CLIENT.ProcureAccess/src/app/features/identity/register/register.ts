@@ -20,6 +20,9 @@ import { AuthService } from '../services/auth.service';
 import { LoginModel } from '../models/login.model';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { EnLanguage } from '@app/core/models/language.enum';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LANGUAGES } from '@app/core/models/languages.map';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -47,6 +50,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     MatInputModule,
     MatButtonModule,
     MatCheckboxModule,
+    TranslatePipe
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss'
@@ -58,12 +62,9 @@ export class Register {
 
   protected logoPath = '/werte_it_logo.jpg';
 
-  public languages = [
-    { value: 'en', label: 'English' },
-    { value: 'de', label: 'Deutsch' },
-    { value: 'fr', label: 'Français' },
-  ];
-  public selectedLanguage = 'en';
+  protected languages = Object.values(EnLanguage);
+  protected languageLabels = LANGUAGES;
+  protected updateUICustomization = model(this.store.uiCustomization());
 
   protected password = model('');
   protected confirmPassword = model('');

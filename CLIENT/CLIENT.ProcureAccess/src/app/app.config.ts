@@ -12,11 +12,17 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { headersInterceptor } from './core/interceptors/headers.interceptor';
 import { provideMarkdown } from 'ngx-markdown';
 import { environment } from '../environments/environment';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EnLanguage } from './core/models/language.enum';
+import { languageInterceptor } from './core/interceptors/language.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
 export const JWT_NAME = new InjectionToken<string>('JWT_NAME');
 export const REFRESH_TOKEN_NAME = new InjectionToken<string>('REFRESH_TOKEN_NAME');
+export const DEFAULT_LANGUAGE = EnLanguage.de;
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,7 +32,11 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, headersInterceptor]),
+      withInterceptors([
+        authInterceptor, 
+        headersInterceptor, 
+        languageInterceptor,
+        errorInterceptor]),
     ),
     provideMarkdown(),
     { provide: APP_NAME, useValue: 'ProcureAccess'},
@@ -42,6 +52,12 @@ export const appConfig: ApplicationConfig = {
         const appName = inject(APP_NAME);
         return appName.toLowerCase() + '-refresh-token';
       }
-    }
+    },
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: './i18n/',
+        suffix: '.json'
+      })
+    })
   ]
 };

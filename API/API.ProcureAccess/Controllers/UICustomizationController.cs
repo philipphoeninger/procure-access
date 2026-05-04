@@ -46,6 +46,7 @@ public class UICustomizationController : ControllerBase
             // TODO: handle more gracefully
             return BadRequest(new
             {
+                code = "UICustomizationNotFound",
                 message = ex.Message
             });
         }
@@ -53,6 +54,7 @@ public class UICustomizationController : ControllerBase
         {
             return BadRequest(new
             {
+                code = "UICustomizationNotFound",
                 message = ex.Message
             });
         }
@@ -91,6 +93,7 @@ public class UICustomizationController : ControllerBase
             // TODO: handle more gracefully
             return BadRequest(new
             {
+                code = "UpdateFailure",
                 message = ex.Message
             });
         }
@@ -98,6 +101,7 @@ public class UICustomizationController : ControllerBase
         {
             return BadRequest(new
             {
+                code = "UpdateFailure",
                 message = ex.Message
             });
         }

@@ -17,11 +17,7 @@ public partial class Product : BaseEntity
     [StringLength(6000)]
     public string? Description { get; set; }
 
-    public ICollection<ProductType> Types { get; set; } = new List<ProductType>();
-
-    public ICollection<ProductPart> Parts { get; set; } = new List<ProductPart>();
-
-    public ICollection<ProductTest> Tests { get; set; } = new List<ProductTest>();
+    public ICollection<ProductCriteriaFilter> ProductCriteriaFilters { get; set; } = new List<ProductCriteriaFilter>();
 
     public Proposal? Proposal { get; set; }
 

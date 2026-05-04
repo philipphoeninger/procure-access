@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; }
 
 .list-item-container {
     .mat-mdc-slide-toggle {
@@ -17,4 +17,44 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
             }
         }
     }
+}
+
+// easymde
+.EasyMDEContainer {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  border: none;
+}
+
+.CodeMirror {
+  min-height: 300px;
+  font-family: inherit;
+}
+
+.CodeMirror,
+.editor-toolbar,
+.editor-preview {
+    background: var(--mat-sys-surface-variant) !important;
+    color: var(--mat-sys-on-surface) !important;
+    border-color: var(--mat-sys-outline) !important;
+}
+
+.editor-toolbar {
+  border-color: var(--mat-sys-outline) !important;
+}
+
+.CodeMirror-gutters {
+  background-color: var(--mat-sys-surface) !important;
+  border-right: 1px solid var(--mat-sys-outline) !important;
+}
+
+.editor-toolbar button {
+    color: var(--mat-sys-on-surface) !important;
+}
+
+.CodeMirror-cursor {
+  border-left: 1px solid currentColor !important;
 }

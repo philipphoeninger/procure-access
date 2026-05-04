@@ -1,23 +1,24 @@
-import { ChangeDetectionStrategy, Component, inject, input, model, output, signal, viewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal, viewChild, ViewChildren, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
+import { MatListModule, MatListOption } from '@angular/material/list';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AsyncPipe } from '@angular/common';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { map, Observable, startWith } from 'rxjs';
+import { map, Observable, startWith, tap } from 'rxjs';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { FiltersApiService } from '../services/api/filters-api.service';
-import { EnFilterType } from '../models/filterTypes.enum';
-import { FilterType } from '../models/filterType.model';
+import { EnFilterTypeName } from '../models/filterTypes.enum';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ProductType } from '@app/features/products/models/productType.model';
+import { unionDistinct } from '../util/union-distinct';
 
 @Component({
   selector: 'pa-filters-selection',
@@ -31,9 +32,9 @@ import { CriteriaFilter } from '../models/criteriaFilter.model';
     MatFormFieldModule,
     MatAutocompleteModule,
     AsyncPipe,
-    MatChipsModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslatePipe
   ],
   templateUrl: './filters-selection.html',
   styleUrl: './filters-selection.scss',
@@ -43,17 +44,58 @@ export class FiltersSelection {
     protected store = inject(ProcureAccessStore);
     protected filtersApiService = inject(FiltersApiService);
 
-    EnFilterType = EnFilterType;
+    protected listOptions = ViewChildren(MatListOption);
+
+    EnFilterTypeName = EnFilterTypeName;
 
     accordion = viewChild.required(MatAccordion);
 
+    myControl = new FormControl('');
+    allProductTypes = this.store.productTypes;
     filteredProductTypes: Observable<string[]>;
 
+    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+    readonly currentProductType: WritableSignal<ProductType | null> 
+        = signal(null);
+    // readonly productTypes: WritableSignal<string[]> = signal([]);
+    // allProductTypes: string[] = [];
+
+    allFilterTypes = signal<Record<string, CriteriaFilter[]>>({});
+
+    // remaining filters:
+    readonly selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
+    selectedFilterTypeIdsOut = output<number[]>();
+    unavailableOptionIds = computed(() => {
+        let selectedCriteriaFilterIds = this.selectedCriteriaFilterIds();
+        let unavailableOptions = 
+            this.store.getCriteriaFilterExclusionsByFilterIds(
+                selectedCriteriaFilterIds);
+        return unionDistinct(unavailableOptions);
+    });
+
+    //   readonly filteredProductTypes = computed(() => {
+    //     const currentProductType = this.myControl.value.toLowerCase();
+    //     return currentProductType
+    //       ? this.allProductTypes.filter(productType => productType.toLowerCase().includes(currentProductType))
+    //       : this.allProductTypes.slice();
+    //   });
+
+    readonly announcer = inject(LiveAnnouncer);
 
     constructor() {
         this.filteredProductTypes = this.myControl.valueChanges.pipe(
             startWith(''),
             map(value => this._filter(value || '')),
+            tap(() => {
+                if (!this.currentProductType()) return; //gate
+                let selectedCriteriaFilterIds = this.selectedCriteriaFilterIds();
+                let index = selectedCriteriaFilterIds.findIndex(x => x == this.currentProductType()!.id);
+                selectedCriteriaFilterIds.splice(index, 1);
+                this.selectedCriteriaFilterIds.set(selectedCriteriaFilterIds);
+                this.currentProductType.set(null);
+                // this.listOptions.forEach(x => x.selected = false);
+                console.log(this.selectedCriteriaFilterIds());
+            }),
         );
     }
 
@@ -87,71 +129,40 @@ export class FiltersSelection {
 
     // ------
 
-    myControl = new FormControl('');
-
-    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-    readonly currentProductType = model('');
-    readonly productTypes: WritableSignal<string[]> = signal([]);
-    allProductTypes: string[] = [];
-
-    allFilterTypes = signal<Record<string, CriteriaFilter[]>>({});
-
-    // remaining filters:
-    readonly selectedFilterTypeIds: WritableSignal<number[]> = signal([]);
-    selectedFilterTypeIdsOut = output<number[]>();
-
-    //   readonly filteredProductTypes = computed(() => {
-    //     const currentProductType = this.myControl.value.toLowerCase();
-    //     return currentProductType
-    //       ? this.allProductTypes.filter(productType => productType.toLowerCase().includes(currentProductType))
-    //       : this.allProductTypes.slice();
-    //   });
-
-    readonly announcer = inject(LiveAnnouncer);
-
     private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();
 
-        return this.allProductTypes.filter(productType => productType.toLowerCase().includes(filterValue));
-    }
-
-    add(event: MatChipInputEvent): void {
-        const value = (event.value || '').trim();
-
-        // Add our fruit
-        if (value) {
-            this.productTypes.update(productTypes => [...productTypes, value]);
-        }
-
-        // Clear the input value
-        this.currentProductType.set('');
-    }
-
-    remove(productType: string): void {
-        this.productTypes.update(productTypes => {
-            const index = productTypes.indexOf(productType);
-            if (index < 0) {
-                return productTypes;
-            }
-
-            productTypes.splice(index, 1);
-            this.announcer.announce(`Removed ${productType}`);
-            return [...productTypes];
-        });
+        return this.allProductTypes()
+            .filter(productType => 
+                productType.name
+                    .toLowerCase()
+                    .includes(filterValue))
+            .map(x => x.name);
     }
 
     selected(event: MatAutocompleteSelectedEvent): void {
-        this.productTypes.update(productTypes => [...productTypes, event.option.viewValue]);
-        this.currentProductType.set('');
-        event.option.deselect();
+        let selectedCriteriaFilterIds = this.selectedCriteriaFilterIds();
+        let productType = this.store.getCriteriaFilterByName(event.option.value);
+        if (!productType) return; //gate
+        if (!event.option.selected) {
+            let index = selectedCriteriaFilterIds.findIndex(x => x == productType.id);
+            selectedCriteriaFilterIds.splice(index, 1);
+            this.selectedCriteriaFilterIds.set(selectedCriteriaFilterIds);
+            this.currentProductType.set(null);
+        } else {
+            this.selectedCriteriaFilterIds.set([productType.id]);
+            // this.listOptions.forEach(x => x.selected = false);
+            this.currentProductType.set(productType);
+        }
+        console.log(this.selectedCriteriaFilterIds());
     }
 
-    changeFilterTypeSelection(event: boolean, filterTypeId: number) {
+    changeCriteriaFilterSelection(event: boolean, filterTypeId: number) {
         if (!event) {
-            this.selectedFilterTypeIds.update(asdf => asdf.filter(i => i !== filterTypeId));
+            this.selectedCriteriaFilterIds.update(asdf => asdf.filter(i => i !== filterTypeId));
         } else {
-            this.selectedFilterTypeIds.update(asdf => [...asdf, filterTypeId]);
+            this.selectedCriteriaFilterIds.update(asdf => [...asdf, filterTypeId]);
         }
-        this.selectedFilterTypeIdsOut.emit(this.selectedFilterTypeIds());
+        this.selectedFilterTypeIdsOut.emit(this.selectedCriteriaFilterIds());
     }
 }

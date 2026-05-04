@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UpdateUserDialog } from './update-user-dialog';
+import { DeleteAccountDialog } from './delete-account-dialog';
 
-describe('UpdateUserDialog', () => {
-  let component: UpdateUserDialog;
-  let fixture: ComponentFixture<UpdateUserDialog>;
+describe('DeleteAccountDialog', () => {
+  let component: DeleteAccountDialog;
+  let fixture: ComponentFixture<DeleteAccountDialog>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UpdateUserDialog]
+      imports: [DeleteAccountDialog]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UpdateUserDialog);
+    fixture = TestBed.createComponent(DeleteAccountDialog);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

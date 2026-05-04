@@ -12,6 +12,7 @@ import { SaveSearchDialog } from '../dialogs/save-search-dialog/save-search-dial
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { RouterModule } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'pa-products-list',
@@ -23,7 +24,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSortModule,
     MatIconModule,
     RouterModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './products-list.html',
   styleUrl: './products-list.scss'
@@ -73,7 +75,7 @@ export class ProductsList {
     document.body.appendChild(link);
     link.click();
     link.remove();
-}
+  }
 
   openProductsSearchDialog(): void {
     const dialogRef = this.dialog.open(SaveSearchDialog, {

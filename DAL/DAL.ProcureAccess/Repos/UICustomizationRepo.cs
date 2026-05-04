@@ -35,12 +35,16 @@ public class UICustomizationRepo : IUICustomizationRepo
     {
         var user = await Context.Users.FirstAsync(u => u.Id == userId);
 
+        var uiCustomizationEntity = _mapper.Map<UICustomization>(dto);
+
         if (dto.BackgroundColor != null)
             user.UICustomization.BackgroundColor = dto.BackgroundColor;
         if (dto.ForegroundColor != null)
             user.UICustomization.ForegroundColor = dto.ForegroundColor;
         if (dto.TextColor != null)
             user.UICustomization.TextColor = dto.TextColor;
+        if (dto.Language != null)
+            user.UICustomization.Language = uiCustomizationEntity.Language;
 
         if (dto.DarkModeOn.HasValue)
             user.UICustomization.DarkModeOn = dto.DarkModeOn.Value;
