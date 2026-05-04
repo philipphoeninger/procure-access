@@ -33,10 +33,8 @@ services:
       DB_USER: sa
       MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
-    expose:
-      - "8080"
     ports:
-      - "${API_PORT_OUTER}:${API_PORT_INNER}"
+      - 5000:8080
     # volumes:
     #   - ./API/API.ProcureAccess:/src
     networks:
