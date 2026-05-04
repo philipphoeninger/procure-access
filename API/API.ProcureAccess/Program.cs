@@ -20,11 +20,22 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddRepositories()
                 .AddDataServices()
                 .AddAutoMapper(cfg => {},
-                    typeof(MappingProfile).Assembly);
+                    typeof(MappingProfile).Assembly)
+                .AddLocalization(options => options.ResourcesPath = "Resources");
 
 // Configure logging
 builder.ConfigureSerilog();
 builder.Services.RegisterLoggingInterfaces();
+
+// Configure localization
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { "en", "de" };
+
+    options.SetDefaultCulture("de")
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures);
+});
 
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
@@ -72,6 +83,7 @@ using (var scope = app.Services.CreateScope())
 // }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization();
 
 app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
