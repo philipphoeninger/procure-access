@@ -10,7 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { SaveSearchDialog } from '../../dialogs/save-search-dialog/save-search-dialog';
 import { CriteriaList } from '@app/features/criteria/list/criteria-list';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { FiltersContainer } from '@app/features/filters/pages/filters-container/filters-container';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -51,7 +51,10 @@ export class ProductsContainer {
     secondCtrl: ['', Validators.required],
   });
 
-  constructor(protected snackbarService: SnackbarService) {}
+  constructor(
+    protected snackbarService: SnackbarService,
+    private router: Router
+  ) {}
 
   ngOnInit() {}
 
@@ -89,6 +92,11 @@ export class ProductsContainer {
 
     asdf() {
       this.store.setSelectedCriteriaFilters(this.selectedCriteriaFilterIds());
-      this.store.getCriteriaBySelectedCriteriaFilterIds();
+      this.store.getCriteriaBySelectedCriteriaFilterIds(this.selectedCriteriaFilterIds());
+    }
+
+    async showProductsByCriteriaFilters() {
+      await this.store.getProductsBySelectedCriteriaFilterIds(this.selectedCriteriaFilterIds());
+      this.router.navigateByUrl('/products');
     }
 }

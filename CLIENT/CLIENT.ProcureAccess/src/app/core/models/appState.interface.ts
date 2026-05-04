@@ -28,6 +28,7 @@ export const initialAppState: AppState = {
     filters: {
         filterTypes: [],
         criteriaFilters: [],
+        criteriaFilterExclusions: [],
         selectedCriteriaFilters: []
     },
     criteria: [],

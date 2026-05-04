@@ -19,6 +19,18 @@ export class ProductsApiService {
     );
   }
 
+  getProductsByCriteriaFilterIds(selectedFilterTypeIds: number[]): Promise<TResult<Product[]>> {
+    return lastValueFrom(
+      this.http.get<TResult<Product[]>>(
+        `${this.apiUrl}/Products/byCriteriaFilterIds`, {
+          params: {
+            criteriaFilterIds: selectedFilterTypeIds
+          }
+        }
+      )
+    );
+  }
+
 //   getProductById(productId: number): Observable<Product> {
 //     return this.http.get<FileItemResponseModel>(
 //       `${httpAppConfig.apiEndpoint}/FileItems/withPath/${productId}`,

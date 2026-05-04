@@ -10,19 +10,16 @@ import {
 import { Criterion } from '../models/criterion.model';
 import { CriteriaApiService } from '../services/api/criteria-api.service';
 import { withLoading } from '@app/shared/state/with-loading';
-import { withFilters } from '@app/features/filters/state/with-filters';
 
 export type CriteriaState = { criteria: Criterion[] };
 
 export const withCriteria = () => signalStoreFeature(
     withState<CriteriaState>({ criteria: initialAppState.criteria }),
     withLoading(),
-    withFilters(),
     withMethods((state, criteriaApiService = inject(CriteriaApiService)) => ({
-      async getCriteriaBySelectedCriteriaFilterIds() {
+      async getCriteriaBySelectedCriteriaFilterIds(selectedCriteriaFilterIds: number[]) {
           state.incrementLoadingCount();
-          
-          let criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(state.selectedCriteriaFilters());
+          let criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(selectedCriteriaFilterIds);
           this.setCriteria(criteria);
 
           state.decrementLoadingCount();

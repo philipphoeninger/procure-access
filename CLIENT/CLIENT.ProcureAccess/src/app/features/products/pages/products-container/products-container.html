@@ -84,7 +84,7 @@
                 aria-label="Products page button"
                 [matTooltip]="'PRODUCTS.SHOW_TOOLTIP' | translate" 
                 matTooltipPosition="above"
-                [routerLink]="'/products'">
+                (click)="showProductsByCriteriaFilters()">
                 {{ 'PRODUCTS.SHOW' | translate }}
             </button>
         </div>
