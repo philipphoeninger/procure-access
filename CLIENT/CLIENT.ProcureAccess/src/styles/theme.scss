@@ -1,7 +1,24 @@
 @use '@angular/material' as mat;
 @use './theme-colors' as custom-colors;
 
+// following not working in M3, documentation unclear for M3 for now...
+// $my-typography: mat.define-typography-config(
+//   $font-family: 'Poppins, sans-serif',
+
+//   $headline-large: mat.define-typography-level(32px, 40px, 600),
+//   $headline-medium: mat.define-typography-level(28px, 36px, 600),
+
+//   $title-large: mat.define-typography-level(20px, 28px, 500),
+
+//   $body-large: mat.define-typography-level(16px, 24px, 400),
+//   $body-medium: mat.define-typography-level(14px, 20px, 400),
+
+//   $label-large: mat.define-typography-level(14px, 20px, 500)
+// );
+
 html {
+  font-family: 'Poppins', sans-serif; // TODO: remove and uncomment hierarchy
+
   color-scheme: light dark;
   @include mat.theme((
     color: (
@@ -10,8 +27,8 @@ html {
         theme-type: color-scheme
     ),
     typography: (
-        plain-family: Poppins,
-        brand-family: Poppins,
+        plain-family: 'Poppins, sans-serif', // $my-typography,
+        brand-family: 'Poppins, sans-serif', // $my-typography,
         bold-weight: 700,
         medium-weight: 500,
         regular-weight: 400,
@@ -19,6 +36,18 @@ html {
     )
   ));
 }
+
+// hierarchy
+// @include mat.typography-hierarchy(
+//   mat.define-theme(
+//     (
+//       typography: (
+//         use-system-variables: true,
+//         system-variables-prefix: mat-sys
+//       )
+//     )
+//   )
+// );
 
 .tertiary {
   @include mat.theme((color: custom-colors.$tertiary-palette));

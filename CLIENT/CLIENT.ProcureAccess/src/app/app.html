@@ -6,3 +6,9 @@
 }
 
 <router-outlet (activate)="showHeader = false" (deactivate)="showHeader = true" name="login" />
+
+@if (store.isLoading()) {
+  <mat-spinner 
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+    ></mat-spinner>
+}

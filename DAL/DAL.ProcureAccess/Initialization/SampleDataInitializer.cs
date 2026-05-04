@@ -136,6 +136,8 @@ public static class SampleDataInitializer
                     allSucceeded = false;
                     break;
                 }
+                await userManager.AddToRoleAsync(user, Roles.Member);
+                await userManager.AddToRoleAsync(user, Roles.Approver);
             }
             return allSucceeded;
         }

@@ -12,7 +12,8 @@ import { SaveSearchDialog } from '../dialogs/save-search-dialog/save-search-dial
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { RouterModule } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'pa-products-list',
@@ -33,6 +34,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class ProductsList {
   protected store = inject(ProcureAccessStore);
   private _liveAnnouncer = inject(LiveAnnouncer);
+  protected translate = inject(TranslateService);
 
   displayedColumns: string[] = ['actions', 'id', 'name', 'link', 'description', 'type'];
   dataSource = new MatTableDataSource(this.store.products());
@@ -91,6 +93,9 @@ export class ProductsList {
 
   addProductFavorite(productId: string) {
     this.store.addProductFavorite(productId);
-    this.snackbarService.showInfo('Saved the product to your favorites!')
+    this.translate
+          .get('FAVORITES.SAVED_PRODUCT')
+          .pipe(tap(message => this.snackbarService.showInfo(message)))
+          .subscribe();
   }
 }

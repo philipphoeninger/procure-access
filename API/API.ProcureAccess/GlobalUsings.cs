@@ -5,7 +5,6 @@ global using API.ProcureAccess.Swagger.Models;
 global using API.ProcureAccess.Controllers;
 global using API.ProcureAccess.Controllers.Base;
 global using API.ProcureAccess.Controllers.Identity;
-global using API.ProcureAccess.Controllers.Models;
 global using API.ProcureAccess.Extensions;
 //global using API.ProcureAccess.Filters;
 //global using API.ProcureAccess.Security;
@@ -20,8 +19,12 @@ global using DAL.ProcureAccess.Repos.Base;
 global using DAL.ProcureAccess.Repos.Interfaces;
 
 global using MODELS.ProcureAccess.Entities;
+global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Dto;
+global using MODELS.ProcureAccess.Entities.Identity;
+global using MODELS.ProcureAccess.Entities.Mapping;
+global using MODELS.ProcureAccess.Entities.Requests;
 global using MODELS.ProcureAccess.Settings;
 
 global using SERVICES.ProcureAccess.DataServices;
@@ -58,4 +61,3 @@ global using System.Net.Http.Headers;
 global using System.Security.Claims;
 global using System.Text;
 global using System.Text.Encodings.Web;
-global using System.IdentityModel.Tokens.Jwt;

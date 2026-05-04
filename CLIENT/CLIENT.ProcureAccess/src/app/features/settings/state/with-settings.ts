@@ -16,6 +16,8 @@ import { withLocalStorage } from '@app/shared/state/with-local-storage';
 import { EnLanguage } from '../../../core/models/language.enum';
 import { LanguageService } from '@app/features/settings/services/language.service';
 import { DEFAULT_LANGUAGE } from '@app/app.config';
+import { TranslateService } from '@ngx-translate/core';
+import { tap } from 'rxjs';
 
 export type SettingsState = { 
     uiCustomization: UICustomization
@@ -47,6 +49,7 @@ export const withSettings = () => signalStoreFeature(
       settingsApiService = inject(SettingsApiService),
       snackbarService = inject(SnackbarService),
       languageService = inject(LanguageService),
+      translateService = inject(TranslateService),
       rendererFactory = inject(RendererFactory2)
     ) => {
       let renderer = rendererFactory.createRenderer(null, null);
@@ -162,7 +165,10 @@ export const withSettings = () => signalStoreFeature(
           if (!state.isAuthenticated()) {
             this.setUICustomization(uiCustomization);
             state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
-            snackbarService.showInfo('Settings saved as cookie');
+            translateService
+              .get('SETTINGS.SAVED_AS_COOKIE')
+              .pipe(tap(message => snackbarService.showInfo(message)))
+              .subscribe();
             return; //gate
           }
 
@@ -170,9 +176,10 @@ export const withSettings = () => signalStoreFeature(
           let success = await settingsApiService.updateUICustomization(uiCustomization);
           if (success) {
             this.setUICustomization(uiCustomization);
-            snackbarService.showInfo('Settings saved permanently');
-          } else {
-            snackbarService.showError('Error occured on saving settings. Please try again later.');
+            translateService
+              .get('SETTINGS.SAVED_PERMANENTLY')
+              .pipe(tap(message => snackbarService.showInfo(message)))
+              .subscribe();
           }
           state.decrementLoadingCount();
         },
