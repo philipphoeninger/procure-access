@@ -125,7 +125,7 @@
     "NON_OPEN": "Aucune ouverte",
     "NON_OPEN_FOUND": "Aucune trouvée",
     "NON_CLOSED": "Aucune fermée",
-    "NOT_ALL_FIELDS_MSG": "Tous les champs ne sont pas requis.",
+    "NOT_ALL_FIELDS_MSG": "Tous les champs ne sont pas requis. Plus vous fournirez d'informations, plus il sera facile pour notre équipe administrative de tout revérifier.",
     "PROPOSER": "Proposant",
     "APPROVER": "Approbateur",
     "NOTE": "Note",

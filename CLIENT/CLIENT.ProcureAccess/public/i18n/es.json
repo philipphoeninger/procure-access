@@ -125,7 +125,7 @@
     "NON_OPEN": "Sin propuestas abiertas",
     "NON_OPEN_FOUND": "No se encontraron propuestas abiertas",
     "NON_CLOSED": "Sin propuestas cerradas",
-    "NOT_ALL_FIELDS_MSG": "No todos los campos son obligatorios.",
+    "NOT_ALL_FIELDS_MSG": "No todos los campos son obligatorios. Cuanta más información nos facilites, más fácil le resultará a nuestro administrador volver a comprobarlo todo.",
     "PROPOSER": "Proponente",
     "APPROVER": "Aprobador",
     "NOTE": "Nota",
