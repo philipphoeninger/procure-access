@@ -8,7 +8,16 @@ public static class SampleData
         {
             UserName = "hoeninger@werte.it",
             Email = "hoeninger@werte.it",
-            UICustomization = new(),
+            UICustomization =
+            {
+                ForegroundColor = "#111111",
+                BackgroundColor = "#dbdedf",
+                TextColor = "#111111",
+                DarkModeOn = true,
+                OrientationVertical = true,
+                HighContrastOn = false,
+                Language = Language.German
+            },
             PasswordHash = "AQAAAAIAAYagAAAAEIXWOPxH++T/W4r8ji4Kl9oOMkl4YhnN+mpMYFOdKhGugALVkLTBv5N+tVf9Zz2YUA==",
             SecurityStamp = "JFL3OXKFWI23KPP5DGEJ62HFZ4T2TRMR",
             ConcurrencyStamp = "b01be0de-8be0-45c3-9fda-152bfb9804d9",

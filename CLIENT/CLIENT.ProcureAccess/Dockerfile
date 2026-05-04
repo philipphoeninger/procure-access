@@ -13,4 +13,4 @@ RUN npm run build --configuration=development
 FROM nginx:stable-alpine AS final
 EXPOSE 80
 COPY --from=build /app/dist/procure-access/browser /usr/share/nginx/html
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
