@@ -53,6 +53,22 @@ public static class SampleData
         new() { Id = 27, Name = "BIK BITV-Test (App)", Description = "", FilterTypeId = 4, IsDeleted = false },
     };
 
+    public static List<CriteriaFilterExclusion> CriteriaFilterExclusions => new()
+    {
+        // HR application - Application Types
+        new() { Id = 1, CriteriaFilterId = 17, ExclusionId = 9 },
+        new() { Id = 2, CriteriaFilterId = 17, ExclusionId = 12 },
+        new() { Id = 3, CriteriaFilterId = 17, ExclusionId = 13 },
+        new() { Id = 4, CriteriaFilterId = 17, ExclusionId = 14 },
+        new() { Id = 5, CriteriaFilterId = 17, ExclusionId = 15 },
+        // HR application - Test Types
+        new() { Id = 6, CriteriaFilterId = 17, ExclusionId = 25 },
+        // Website / Webapp - Test Types
+        new() { Id = 7, CriteriaFilterId = 8, ExclusionId = 24 },
+        new() { Id = 8, CriteriaFilterId = 8, ExclusionId = 25 },
+        new() { Id = 9, CriteriaFilterId = 8, ExclusionId = 27 }
+    };
+
     public static List<Criterion> Criteria => new()
     {
         new() { Id = 1, CriteriaFilterId = 1, Name = "5.2 Aktivierung von Barrierefreiheitsfunktionen", Description = "Bietet die Software eigene assistive Unterstützungen an, so müssen die Funktionen für die jeweilige Zielgruppe barrierefrei auffindbar und aktivierbar sein. Nachdem verschiedene Funktionen für verschiedene Nutzergruppen bereitgestellt werden können, deren Anforderungen unterschiedlich sind, kann kein allgemein gültiges Vorgehen definiert werden.\n\nBeispiele für individuelle Funktionen:\n\n- Die Software bietet eine Vorlesefunktion an.\n- Die Software bietet Inhalte in leichter Sprache oder Gebärdensprache an.\n- Die Software bietet das Verändern von Farben oder Kontrasten an.\n- Die Software bietet das Verändern von Schriftart, Schriftgröße oder Zeilenabstand an.\n- Die Software bietet Funktionen zum Vergrößern oder Verkleinern von Inhalten an.", IsDeleted = false},
@@ -200,7 +216,7 @@ public static class SampleData
         new() { Id = 17, Name = "AquilaWare", Link = "www.aquilaware.com", Description = "A description for...", IsDeleted = false },
     };
 
-    public static List<ProductPart> ProductParts => new()
+    public static List<ProductCriteriaFilter> ProductCriteriaFilters => new()
     {
         new() { Id = 1, ProductId = 1, CriteriaFilterId = 1 },
         new() { Id = 2, ProductId = 2, CriteriaFilterId = 1 },
@@ -240,48 +256,41 @@ public static class SampleData
         new() { Id = 36, ProductId = 12, CriteriaFilterId = 5 },
         new() { Id = 37, ProductId = 12, CriteriaFilterId = 6 },
         new() { Id = 38, ProductId = 13, CriteriaFilterId = 7 },
-    };
-
-    public static List<ProductTest> ProductTests => new()
-    {
-        new() { Id = 1, ProductId = 1, CriteriaFilterId = 23 },
-        new() { Id = 2, ProductId = 1, CriteriaFilterId = 24 },
-        new() { Id = 3, ProductId = 2, CriteriaFilterId = 24 },
-        new() { Id = 4, ProductId = 3, CriteriaFilterId = 23 },
-        new() { Id = 5, ProductId = 3, CriteriaFilterId = 24 },
-        new() { Id = 6, ProductId = 3, CriteriaFilterId = 25 },
-        new() { Id = 7, ProductId = 4, CriteriaFilterId = 26 },
-        new() { Id = 8, ProductId = 5, CriteriaFilterId = 23 },
-        new() { Id = 9, ProductId = 7, CriteriaFilterId = 25 },
-        new() { Id = 10, ProductId = 7, CriteriaFilterId = 26 },
-        new() { Id = 11, ProductId = 10, CriteriaFilterId = 24 },
-        new() { Id = 12, ProductId = 10, CriteriaFilterId = 26 },
-        new() { Id = 13, ProductId = 11, CriteriaFilterId = 26 },
-        new() { Id = 14, ProductId = 12, CriteriaFilterId = 25 },
-        new() { Id = 15, ProductId = 14, CriteriaFilterId = 23 },
-        new() { Id = 16, ProductId = 15, CriteriaFilterId = 24 },
-        new() { Id = 17, ProductId = 17, CriteriaFilterId = 23 },
-        new() { Id = 18, ProductId = 17, CriteriaFilterId = 26 },
-    };
-
-    public static List<ProductType> ProductTypes => new()
-    {
-        new() { Id = 1, ProductId = 1, CriteriaFilterId = 8 },
-        new() { Id = 2, ProductId = 2, CriteriaFilterId = 14 },
-        new() { Id = 3, ProductId = 3, CriteriaFilterId = 15 },
-        new() { Id = 4, ProductId = 4, CriteriaFilterId = 11 },
-        new() { Id = 5, ProductId = 5, CriteriaFilterId = 12 },
-        new() { Id = 6, ProductId = 6, CriteriaFilterId = 8 },
-        new() { Id = 7, ProductId = 7, CriteriaFilterId = 9 },
-        new() { Id = 8, ProductId = 8, CriteriaFilterId = 15 },
-        new() { Id = 9, ProductId = 9, CriteriaFilterId = 8 },
-        new() { Id = 10, ProductId = 10, CriteriaFilterId = 8 },
-        new() { Id = 11, ProductId = 11, CriteriaFilterId = 8 },
-        new() { Id = 12, ProductId = 12, CriteriaFilterId = 13 },
-        new() { Id = 13, ProductId = 13, CriteriaFilterId = 10 },
-        new() { Id = 14, ProductId = 14, CriteriaFilterId = 8 },
-        new() { Id = 15, ProductId = 15, CriteriaFilterId = 8 },
-        new() { Id = 16, ProductId = 16, CriteriaFilterId = 14 },
-        new() { Id = 17, ProductId = 17, CriteriaFilterId = 9 },
+        new() { Id = 39, ProductId = 1, CriteriaFilterId = 23 },
+        new() { Id = 40, ProductId = 1, CriteriaFilterId = 24 },
+        new() { Id = 41, ProductId = 2, CriteriaFilterId = 24 },
+        new() { Id = 42, ProductId = 3, CriteriaFilterId = 23 },
+        new() { Id = 43, ProductId = 3, CriteriaFilterId = 24 },
+        new() { Id = 44, ProductId = 3, CriteriaFilterId = 25 },
+        new() { Id = 45, ProductId = 4, CriteriaFilterId = 26 },
+        new() { Id = 46, ProductId = 5, CriteriaFilterId = 23 },
+        new() { Id = 47, ProductId = 7, CriteriaFilterId = 25 },
+        new() { Id = 48, ProductId = 7, CriteriaFilterId = 26 },
+        new() { Id = 49, ProductId = 10, CriteriaFilterId = 24 },
+        new() { Id = 50, ProductId = 10, CriteriaFilterId = 26 },
+        new() { Id = 51, ProductId = 11, CriteriaFilterId = 26 },
+        new() { Id = 52, ProductId = 12, CriteriaFilterId = 25 },
+        new() { Id = 53, ProductId = 14, CriteriaFilterId = 23 },
+        new() { Id = 54, ProductId = 15, CriteriaFilterId = 24 },
+        new() { Id = 55, ProductId = 17, CriteriaFilterId = 23 },
+        new() { Id = 56, ProductId = 17, CriteriaFilterId = 26 },
+        new() { Id = 57, ProductId = 1, CriteriaFilterId = 8 },
+        new() { Id = 58, ProductId = 2, CriteriaFilterId = 14 },
+        new() { Id = 59, ProductId = 3, CriteriaFilterId = 15 },
+        new() { Id = 60, ProductId = 4, CriteriaFilterId = 11 },
+        new() { Id = 61, ProductId = 5, CriteriaFilterId = 12 },
+        new() { Id = 62, ProductId = 6, CriteriaFilterId = 8 },
+        new() { Id = 63, ProductId = 7, CriteriaFilterId = 9 },
+        new() { Id = 64, ProductId = 8, CriteriaFilterId = 15 },
+        new() { Id = 65, ProductId = 9, CriteriaFilterId = 8 },
+        new() { Id = 66, ProductId = 10, CriteriaFilterId = 8 },
+        new() { Id = 67, ProductId = 11, CriteriaFilterId = 8 },
+        new() { Id = 68, ProductId = 12, CriteriaFilterId = 13 },
+        new() { Id = 69, ProductId = 13, CriteriaFilterId = 10 },
+        new() { Id = 70, ProductId = 14, CriteriaFilterId = 8 },
+        new() { Id = 71, ProductId = 15, CriteriaFilterId = 8 },
+        new() { Id = 72, ProductId = 16, CriteriaFilterId = 14 },
+        new() { Id = 73, ProductId = 17, CriteriaFilterId = 9 },
+        new() { Id = 74, ProductId = 13, CriteriaFilterId = 17 },
     };
 }

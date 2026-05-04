@@ -20,14 +20,12 @@ public class MappingProfile : Profile
         CreateMap<CriteriaFilter, CriteriaFilterDto>().ReverseMap();
         CreateMap<FilterType, FilterTypeDto>();
         CreateMap<FilterType, FilterTypeDto>().ReverseMap();
-        CreateMap<ProductPart, ProductPartDto>();
-        CreateMap<ProductPart, ProductPartDto>().ReverseMap();
-        CreateMap<ProductTest, ProductTestDto>();
-        CreateMap<ProductTest, ProductTestDto>().ReverseMap();
-        CreateMap<ProductType, ProductTypeDto>();
-        CreateMap<ProductType, ProductTypeDto>().ReverseMap();
+        CreateMap<ProductCriteriaFilter, ProductCriteriaFilterDto>();
+        CreateMap<ProductCriteriaFilter, ProductCriteriaFilterDto>().ReverseMap();
         CreateMap<Proposal, ProposalDto>();
         // CreateMap<Proposal, ProposalDto>().ReverseMap();
+        CreateMap<CriteriaFilterExclusion, CriteriaFilterExclusionDto>();
+        CreateMap<CriteriaFilterExclusion, CriteriaFilterExclusionDto>().ReverseMap();
 
         CreateMap<User, UserDto>();
         CreateMap<UICustomization, UICustomizationDto>()

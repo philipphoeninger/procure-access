@@ -21,11 +21,10 @@ public partial class CriteriaFilter : BaseEntity
 
     public ICollection<Criterion> Criteria { get; set; } = new List<Criterion>();
 
-    public ICollection<ProductType> ProductTypes { get; set; } = new List<ProductType>();
-
-    public ICollection<ProductPart> ProductParts { get; set; } = new List<ProductPart>();
-
-    public ICollection<ProductTest> ProductTests { get; set; } = new List<ProductTest>();
+    public ICollection<ProductCriteriaFilter> Products { get; set; } = new List<ProductCriteriaFilter>();
+    
+    public ICollection<CriteriaFilterExclusion> Exclusions { get; set; } = new List<CriteriaFilterExclusion>();
+    public ICollection<CriteriaFilterExclusion> ParentExclusions { get; set; } = new List<CriteriaFilterExclusion>();
 
     [Required]
     public DateTime CreatedAt { get; set; }

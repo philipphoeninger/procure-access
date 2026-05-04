@@ -83,11 +83,10 @@ public static class SampleDataInitializer
             var succeeded = await ProcessUserInsert(dbContext, userManager, SampleData.Users);
             ProcessInsert(dbContext, dbContext.FilterTypes, SampleData.FilterTypes); // SampleData.SomeEntities(userManager.Users.First())
             ProcessInsert(dbContext, dbContext.CriteriaFilters, SampleData.CriteriaFilters);
+            ProcessInsert(dbContext, dbContext.CriteriaFilterExclusions, SampleData.CriteriaFilterExclusions);
             ProcessInsert(dbContext, dbContext.Criteria, SampleData.Criteria);
             ProcessInsert(dbContext, dbContext.Products, SampleData.Products);
-            ProcessInsert(dbContext, dbContext.ProductParts, SampleData.ProductParts);
-            ProcessInsert(dbContext, dbContext.ProductTests, SampleData.ProductTests);
-            ProcessInsert(dbContext, dbContext.ProductTypes, SampleData.ProductTypes);
+            ProcessInsert(dbContext, dbContext.ProductCriteriaFilters, SampleData.ProductCriteriaFilters);
             // insert more Entities...
         }
         catch (Exception ex)
