@@ -16,39 +16,39 @@ public static class SampleData
 
     public static List<FilterType> FilterTypes => new()
     {
-        new() { Id = 1, Name = "Product Types", Description = "", IsDeleted = false },
-        new() { Id = 2, Name = "Application Types", Description = "", IsDeleted = false },
-        new() { Id = 3, Name = "Product Parts", Description = "", IsDeleted = false },
-        new() { Id = 4, Name = "Test Types", Description = "", IsDeleted = false }
+        new() { Id = 1, Name = "Produkt-Typen", Description = "", IsDeleted = false },
+        new() { Id = 2, Name = "App-Typen", Description = "", IsDeleted = false },
+        new() { Id = 3, Name = "Produkt-Teile", Description = "", IsDeleted = false },
+        new() { Id = 4, Name = "Test-Typen", Description = "", IsDeleted = false }
     };
 
     public static List<CriteriaFilter> CriteriaFilters => new()
     {
-        new() { Id = 1, Name = "Core Functionality", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 1, Name = "Basisfunktionalität", Description = "", FilterTypeId = 3, IsDeleted = false },
         new() { Id = 2, Name = "Audio", Description = "", FilterTypeId = 3, IsDeleted = false },
         new() { Id = 3, Name = "Video", Description = "", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 4, Name = "Two-Way Voice Communication", Description = "", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 5, Name = "Real-Time Text", Description = "", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 6, Name = "Biometrics", Description = "", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 7, Name = "Authoring Tools", Description = "", FilterTypeId = 3, IsDeleted = false },
-        new() { Id = 8, Name = "Website / Webapp", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 9, Name = "Document", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 10, Name = "Software (Open-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 11, Name = "Software (Closed-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 12, Name = "Mobile App (Open-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 13, Name = "Mobile App (Closed-Source)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 4, Name = "Zweiwege-Sprachkommunikation", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 5, Name = "Echtzeittext (RTT)", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 6, Name = "Biometrie", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 7, Name = "Autorenwerkzeug", Description = "", FilterTypeId = 3, IsDeleted = false },
+        new() { Id = 8, Name = "Website / Webanwendung", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 9, Name = "Dokument", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 10, Name = "Software (offen)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 11, Name = "Software (geschlossen)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 12, Name = "Mobile Anwendung (offen)", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 13, Name = "Mobile Anwendung (geschlossen)", Description = "", FilterTypeId = 2, IsDeleted = false },
         new() { Id = 14, Name = "Hardware", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 15, Name = "Dispatch / Emergency Service", Description = "", FilterTypeId = 2, IsDeleted = false },
-        new() { Id = 16, Name = "Database-supported specialist application", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 17, Name = "HR application", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 18, Name = "Reporting application", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 19, Name = "Training management", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 20, Name = "Travel expense claims", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 21, Name = "Payroll statements", Description = "", FilterTypeId = 1, IsDeleted = false },
-        new() { Id = 22, Name = "Internal communication and data exchange platform", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 15, Name = "Vermittlungs-/Notrufdienst", Description = "", FilterTypeId = 2, IsDeleted = false },
+        new() { Id = 16, Name = "Datenbankgestützte Fachanwendung", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 17, Name = "HR-Anwendung", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 18, Name = "Reporting-Anwendung", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 19, Name = "Fortbildungsmanagement", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 20, Name = "Dienstreiseanträge", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 21, Name = "Gehaltsabrechnungen", Description = "", FilterTypeId = 1, IsDeleted = false },
+        new() { Id = 22, Name = "Interne Kommunikations- und Datenaustausch-Plattform", Description = "", FilterTypeId = 1, IsDeleted = false },
         new() { Id = 23, Name = "BIT inklusiv Software-Test", Description = "", FilterTypeId = 4, IsDeleted = false },
         new() { Id = 24, Name = "BIT inklusiv App-Test", Description = "", FilterTypeId = 4, IsDeleted = false },
-        new() { Id = 25, Name = "BIT inklusiv PDF-Test ", Description = "", FilterTypeId = 4, IsDeleted = false },
+        new() { Id = 25, Name = "BIT inklusiv PDF-Test", Description = "", FilterTypeId = 4, IsDeleted = false },
         new() { Id = 26, Name = "BIK BITV-Test (Web)", Description = "", FilterTypeId = 4, IsDeleted = false },
         new() { Id = 27, Name = "BIK BITV-Test (App)", Description = "", FilterTypeId = 4, IsDeleted = false },
     };
@@ -193,6 +193,11 @@ public static class SampleData
         new() { Id = 120, CriteriaFilterId = 7, Name = "12.2.2 Informationen zu Barrierefreiheits- und Kompatibilitätsfunktionen", Description = "Die durch den Produktsupport übermittelten Informationen zur Software entsprechen mindestens dem Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können.\n\nAls Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung).", IsDeleted = false },
         new() { Id = 121, CriteriaFilterId = 7, Name = "12.2.3 Effektive Kommunikation", Description = "Die Erreichbarkeit des Produktsupports soll den Bedürfnissen von Menschen mit Beeinträchtigungen gerecht werden, indem mindestens zwei Supportkanäle angeboten werden, die unterschiedliche Sinne ansprechen. Dabei ist es irrelevant, ob der Produktsupport durch den Hersteller selbst, oder durch einen Dienstleister erbracht wird.\n\nDie Anforderung ist bei jedem Niveau der Unterstützung verschiedener Kommunikationsarten erfüllt. Anbieter können angeben, in welchem Umfang die Kommunikationsarten unterstützt werden, um eine aussagekräftigere Bewertung der Angemessenheit und Qualität der Unterstützung zu ermöglichen.\n\nAls Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung).", IsDeleted = false },
         new() { Id = 122, CriteriaFilterId = 7, Name = "12.2.4 Barrierefreie Dokumentation durch den Produktsupport", Description = "Die durch den Produktsupport übermittelte Dokumentation zur Software muss in mindestens einem der folgenden Formate übermittelt werden. Weiterhin muss sie den Anforderungen der jeweils relevanten Kapitel der EN 301549 entsprechen:\n\n- Webformat, konform mit Kapitel 9 der EN 301549.\n- Nicht-Web-Format (als Datei), konform mit Kapitel 10 der EN 301 549.\n\nAls Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung).\n\nWeitere, abweichende Formate für die Dokumentation, auch in nicht barrierefreien Formaten, können zusätzlich bereitgestellt werden.\n\nEine vollumfängliche Prüfung von Web-Formaten (geöffnet außerhalb der Software im Browser des Endgeräts) und von Nicht-Web-Formaten (bereitgestellt als Datei) ist im Rahmen dieses Testvorgehens nicht vorgesehen. Sie benötigen gegebenenfalls eine eigene Prüfung.\n\nIst die Dokumentation im Dateiformat PDF verfügbar, kann mit Hilfe der Anwendung PAC eine erste Analyse zur Barrierefreiheit des Dokuments durchgeführt werden ( https://pac.pdf-accessibility.org/de ).", IsDeleted = false },
+        new() { Id = 123, CriteriaFilterId = 23, Name = "BIT inklusiv Software-Test", Description = "Alle Kriterien des BIT inklusiv Software-Tests sind unter dem folgenden Link zu finden:\n\n [https://www.softwaretest.bit-inklusiv.de/](https://www.softwaretest.bit-inklusiv.de/)", IsDeleted = false },
+        new() { Id = 124, CriteriaFilterId = 24, Name = "BIT inklusiv App-Test", Description = "Alle Kriterien des BIT inklusiv App-Tests sind unter dem folgenden Link zu finden:\n\n [https://www.apptest.bit-inklusiv.de/](https://www.apptest.bit-inklusiv.de/)", IsDeleted = false },
+        new() { Id = 125, CriteriaFilterId = 25, Name = "BIT inklusiv PDF-Test", Description = "Alle Kriterien des BIT inklusiv PDF-Tests sind unter dem folgenden Link zu finden:\n\n [https://www.pdftest.bit-inklusiv.de/](https://www.pdftest.bit-inklusiv.de/)", IsDeleted = false },
+        new() { Id = 126, CriteriaFilterId = 26, Name = "BIK BITV-Test (Web)", Description = "Alle Kriterien des BIK BITV-Tests (Web) sind unter dem folgenden Link zu finden:\n\n [https://www.bitvtest.de/pruefverfahren/bitv-20-web](https://www.bitvtest.de/pruefverfahren/bitv-20-web)", IsDeleted = false },
+        new() { Id = 127, CriteriaFilterId = 27, Name = "BIK BITV-Test (App)", Description = "Alle Kriterien des BIK BITV-Tests (App) sind unter dem folgenden Link zu finden:\n\n [https://www.bitvtest.de/pruefverfahren/bitv-20-app](https://www.bitvtest.de/pruefverfahren/bitv-20-app)", IsDeleted = false }
     };
 
     public static List<Product> Products => new()
