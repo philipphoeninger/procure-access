@@ -14,3 +14,14 @@
 
 # DB runtime data (do NOT exclude DB entirely!)
 DB/data/*
+
+**/bin
+**/obj
+**/node_modules
+**/.git
+**/.vs
+**/.vscode
+**/dist
+**/build
+**/*.log
+DB/data
