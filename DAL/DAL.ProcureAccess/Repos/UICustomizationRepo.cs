@@ -50,8 +50,6 @@ public class UICustomizationRepo : IUICustomizationRepo
             user.UICustomization.DarkModeOn = dto.DarkModeOn.Value;
         if (dto.HighContrastOn.HasValue)
             user.UICustomization.HighContrastOn = dto.HighContrastOn.Value;
-        if (dto.OrientationVertical.HasValue)
-            user.UICustomization.OrientationVertical = dto.OrientationVertical.Value;
 
         await Context.SaveChangesAsync();
     }

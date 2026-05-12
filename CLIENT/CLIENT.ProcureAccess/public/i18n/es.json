@@ -137,7 +137,6 @@
   },
   "SETTINGS": {
     "LABEL": "Configuración",
-    "ORIENTATION_VERTICAL": "Orientación vertical",
     "CONTRAST_MODE": "Modo de contraste",
     "DARK_MODE": "Modo oscuro",
     "SAVED_AS_COOKIE": "Configuración guardada en una cookie",

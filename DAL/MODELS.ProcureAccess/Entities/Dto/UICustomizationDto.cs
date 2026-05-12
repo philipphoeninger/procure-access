@@ -7,6 +7,5 @@ public class UICustomizationDto : BaseDto
     public string? TextColor { get; set; }
     public bool? DarkModeOn { get; set; }
     public bool? HighContrastOn { get; set; }
-    public bool? OrientationVertical { get; set; }
     public string? Language { get; set; }
 }

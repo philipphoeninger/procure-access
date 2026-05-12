@@ -11,8 +11,6 @@ public class UICustomization
 
     public bool DarkModeOn { get; set; } = false;
 
-    public bool OrientationVertical { get; set; } = true;
-
     public bool HighContrastOn { get; set; } = false;
 
     public Language Language { get; set; } = Language.German;

@@ -29,7 +29,6 @@ export const initialSettingsState: SettingsState = {
         backgroundColor: "#dbdedf",
         textColor: "#111111",
         darkModeOn: false,
-        orientationVertical: true,
         highContrastOn: false,
         language: DEFAULT_LANGUAGE
     }

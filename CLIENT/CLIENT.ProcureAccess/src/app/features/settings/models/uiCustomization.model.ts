@@ -17,9 +17,6 @@ export class UICustomization {
   darkModeOn: boolean;
 
   @jsonMember
-  orientationVertical: boolean;
-
-  @jsonMember
   highContrastOn: boolean;
 
   @jsonMember
@@ -30,7 +27,6 @@ export class UICustomization {
     pBackgroundColor: string,
     pTextColor: string,
     pDarkModeOn: boolean,
-    pOrientationVertical: boolean,
     pHighContrastOn: boolean,
     pLanguage: EnLanguage,
   ) {
@@ -38,7 +34,6 @@ export class UICustomization {
     this.backgroundColor = pBackgroundColor;
     this.textColor = pTextColor;
     this.darkModeOn = pDarkModeOn;
-    this.orientationVertical = pOrientationVertical;
     this.highContrastOn = pHighContrastOn;
     this.language = pLanguage;
   }
