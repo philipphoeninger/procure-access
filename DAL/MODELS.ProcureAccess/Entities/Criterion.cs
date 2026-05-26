@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("Criteria", Schema = "dbo")]
+[Table("Criteria", Schema = "public")]
 [EntityTypeConfiguration(typeof(CriterionConfiguration))]
 public partial class Criterion : BaseEntity
 {

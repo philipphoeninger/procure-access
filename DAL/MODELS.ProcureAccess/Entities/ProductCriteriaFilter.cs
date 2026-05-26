@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("ProductCriteriaFilters", Schema = "dbo")]
+[Table("ProductCriteriaFilters", Schema = "public")]
 [EntityTypeConfiguration(typeof(ProductCriteriaFilterConfiguration))]
 public class ProductCriteriaFilter : BaseEntity
 {

@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("FilterTypes", Schema = "dbo")]
+[Table("FilterTypes", Schema = "public")]
 [EntityTypeConfiguration(typeof(FilterTypeConfiguration))]
 public partial class FilterType : BaseEntity
 {

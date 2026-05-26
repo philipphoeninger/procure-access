@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("Products", Schema = "dbo")]
+[Table("Products", Schema = "public")]
 [EntityTypeConfiguration(typeof(ProductConfiguration))]
 public partial class Product : BaseEntity
 {
