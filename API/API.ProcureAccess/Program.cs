@@ -9,7 +9,7 @@ builder.Services.AddControllers()
                 });
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
-                .AddSqlServerConnection(builder.Configuration)
+                .AddPostgreSQLConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
                 .AddEmailConfig(builder.Configuration)
                 .AddCors()
