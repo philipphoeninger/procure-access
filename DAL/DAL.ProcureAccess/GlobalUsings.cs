@@ -19,7 +19,6 @@ global using MODELS.ProcureAccess.ViewModels.Interfaces;
 global using System.Data;
 global using System.Linq.Expressions;
 
-global using Microsoft.Data.SqlClient;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Microsoft.EntityFrameworkCore.Design;

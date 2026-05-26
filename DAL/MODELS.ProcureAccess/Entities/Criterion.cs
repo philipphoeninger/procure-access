@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("Criteria", Schema = "dbo")]
+[Table("Criteria", Schema = "public")]
 [EntityTypeConfiguration(typeof(CriterionConfiguration))]
 public partial class Criterion : BaseEntity
 {
@@ -10,7 +10,6 @@ public partial class Criterion : BaseEntity
     public string Name { get; set; }
 
     [Required]
-    [Column(TypeName = "nvarchar(max)")]
     [StringLength(6000)]
     public string Description { get; set; } = string.Empty;
 
@@ -20,27 +19,19 @@ public partial class Criterion : BaseEntity
     public Proposal? Proposal { get; set; }
 
     [Required]
-    public DateTime CreatedAt { get; set; }
+    public bool IsDeleted { get; set; } = false;
 
-    [Required]
-    public bool IsDeleted { get; set; }
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string? Display { get; set; }
+    [NotMapped]
+    public string Display => Name;
     #endregion
 
     #region ctors
-    public Criterion()
-    {
-        // TODO: generate Name
-    }
+    public Criterion() { }
 
-    public Criterion(string pName, string pDescription)
+    public Criterion(string pName, string pDescription) : this()
     {
         Name = pName;
         Description = pDescription;
-        CreatedAt = DateTime.UtcNow;
-        IsDeleted = false;
     }
     #endregion
 

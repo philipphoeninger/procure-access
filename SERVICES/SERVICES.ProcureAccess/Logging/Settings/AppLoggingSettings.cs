@@ -4,14 +4,14 @@ public class AppLoggingSettings
 {
     public GeneralSettings General { get; set; }
     public FileSettings File { get; set; }
-    public SqlServerSettings MSSqlServer { get; set; }
+    //public SqlServerSettings MSSqlServer { get; set; }
 
     public class GeneralSettings
     {
         public string RestrictedToMinimumLevel { get; set; }
     }
 
-    public class SqlServerSettings
+    public class PostgreSQLSettings
     {
         public string TableName { get; set; }
         public string Schema { get; set; }

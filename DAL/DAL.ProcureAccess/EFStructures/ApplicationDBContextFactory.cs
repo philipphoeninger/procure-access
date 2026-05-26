@@ -5,7 +5,7 @@ public class ApplicationDBContextFactory : IDesignTimeDbContextFactory<Applicati
     public ApplicationDBContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDBContext>();
-        var connectionString = @"Server=db;Database=ProcureAccessDb;User Id=sa;Password=YourStrongPassw0rd_h3r3;Encrypt=False;TrustServerCertificate=True;";
+        var connectionString = @"Host=db;Database=ProcureAccessDb;Username=postgres;Password=YourStrongPassw0rd_h3r3;";
 
         // var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 
@@ -19,7 +19,11 @@ public class ApplicationDBContextFactory : IDesignTimeDbContextFactory<Applicati
         // ?? "Server=localhost,14333;Database=ProcureAccessDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;";
 
         
-        optionsBuilder.UseSqlServer(connectionString, options => options.EnableRetryOnFailure());
+        optionsBuilder.UseNpgsql(connectionString, options =>
+        {
+            options.EnableRetryOnFailure();
+            options.CommandTimeout(60);
+        });
         Console.WriteLine(connectionString);
         return new ApplicationDBContext(optionsBuilder.Options);
     }

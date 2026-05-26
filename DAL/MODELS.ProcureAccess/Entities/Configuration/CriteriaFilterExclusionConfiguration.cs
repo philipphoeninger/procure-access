@@ -1,9 +1,12 @@
 namespace MODELS.ProcureAccess.Entities.Configuration;
 
-public class CriteriaFilterExclusionConfiguration : IEntityTypeConfiguration<CriteriaFilterExclusion>
+public class CriteriaFilterExclusionConfiguration
+    : BaseEntityConfiguration<CriteriaFilterExclusion>
 {
     public void Configure(EntityTypeBuilder<CriteriaFilterExclusion> builder)
     {
+        base.Configure(builder);
+        
         // Query Filters
         builder.HasQueryFilter(x => 
             !x.CriteriaFilter.FilterType.IsDeleted && !x.Exclusion.FilterType.IsDeleted);

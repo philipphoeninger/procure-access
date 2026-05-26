@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("SeriLogs", Schema = "Logging")]
+[Table("SeriLogs", Schema = "logging")]
 [EntityTypeConfiguration(typeof(SeriLogEntryConfiguration))]
 public class SeriLogEntry
 {

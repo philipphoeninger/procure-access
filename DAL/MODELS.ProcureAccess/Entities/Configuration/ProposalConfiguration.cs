@@ -1,9 +1,11 @@
 namespace MODELS.ProcureAccess.Entities.Configuration;
 
-public class ProposalConfiguration : IEntityTypeConfiguration<Proposal>
+public class ProposalConfiguration : BaseEntityConfiguration<Proposal>
 {
     public void Configure(EntityTypeBuilder<Proposal> builder)
     {
+        base.Configure(builder);
+
         // Query Filters
         builder.HasQueryFilter(x => !x.IsDeleted);
  
@@ -12,8 +14,8 @@ public class ProposalConfiguration : IEntityTypeConfiguration<Proposal>
             x => new { x.ProductId, x.CriterionId }).IsUnique();
 
         // Properties
-        builder.Property(x => x.CreatedAt).HasDefaultValueSql("GetDate()");
-
+        builder.Property(x => x.Note).HasColumnType("text");
+        
         builder
             .HasOne(x => x.Product)
             .WithOne(p => p.Proposal)
@@ -35,9 +37,8 @@ public class ProposalConfiguration : IEntityTypeConfiguration<Proposal>
             .IsRequired(false);
         
         // Check Constraints
-        builder
-            .ToTable(b => b.HasCheckConstraint(
-                "CK_Proposal_Snapshot_NN", 
-                "([ProductSnapshot] IS NOT NULL AND [CriterionSnapshot] IS NULL) OR ([ProductSnapshot] IS NULL AND [CriterionSnapshot] IS NOT NULL)"));
+        builder.ToTable(b => b.HasCheckConstraint(
+            "CK_Proposal_Snapshot_NN",
+            @"(""ProductSnapshot"" IS NULL) <> (""CriterionSnapshot"" IS NULL)"));
     }
 }

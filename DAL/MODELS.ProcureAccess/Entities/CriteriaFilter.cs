@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("CriteriaFilters", Schema = "dbo")]
+[Table("CriteriaFilters", Schema = "public")]
 [EntityTypeConfiguration(typeof(CriteriaFilterConfiguration))]
 public partial class CriteriaFilter : BaseEntity
 {
@@ -9,7 +9,6 @@ public partial class CriteriaFilter : BaseEntity
     [StringLength(200)]
     public string Name { get; set; }
 
-    [Column(TypeName = "nvarchar(max)")]
     [StringLength(2000)]
     public string Description { get; set; } = string.Empty;
 
@@ -27,29 +26,21 @@ public partial class CriteriaFilter : BaseEntity
     public ICollection<CriteriaFilterExclusion> ParentExclusions { get; set; } = new List<CriteriaFilterExclusion>();
 
     [Required]
-    public DateTime CreatedAt { get; set; }
+    public bool IsDeleted { get; set; } = false;
 
-    [Required]
-    public bool IsDeleted { get; set; }
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string? Display { get; set; }
-
+    [NotMapped]
+    public string Display => Name;
     #endregion
 
     #region ctors
-    public CriteriaFilter()
-    {
-        // TODO: generate Name
-    }
+    public CriteriaFilter() { }
 
     public CriteriaFilter(string pName, int pFilterTypeId, string pDescription)
+        : this()
     {
         Name = pName;
         Description = pDescription;
         FilterTypeId = pFilterTypeId;
-        CreatedAt = DateTime.UtcNow;
-        IsDeleted = false;
     }
     #endregion
 

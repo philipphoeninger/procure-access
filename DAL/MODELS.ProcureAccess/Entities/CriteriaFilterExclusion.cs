@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("CriteriaFilterExclusions", Schema = "dbo")]
+[Table("CriteriaFilterExclusions", Schema = "public")]
 [EntityTypeConfiguration(typeof(CriteriaFilterExclusionConfiguration))]
 public partial class CriteriaFilterExclusion : BaseEntity
 {
@@ -19,7 +19,7 @@ public partial class CriteriaFilterExclusion : BaseEntity
 
     public CriteriaFilterExclusion(
         int pCriteriaFilterId,
-        int pExclusionId)
+        int pExclusionId) : this()
     {
         CriteriaFilterId = pCriteriaFilterId;
         ExclusionId = pExclusionId;

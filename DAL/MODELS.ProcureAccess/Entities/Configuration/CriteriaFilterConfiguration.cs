@@ -1,19 +1,19 @@
 namespace MODELS.ProcureAccess.Entities.Configuration;
 
-public class CriteriaFilterConfiguration : IEntityTypeConfiguration<CriteriaFilter>
+public class CriteriaFilterConfiguration : BaseEntityConfiguration<CriteriaFilter>
 {
     public void Configure(EntityTypeBuilder<CriteriaFilter> builder)
     {
+        base.Configure(builder);
+        
         // Query Filters
         builder.HasQueryFilter(x => !x.FilterType.IsDeleted);
 
         // properties
-        builder.Property(c => c.CreatedAt).HasDefaultValueSql("GetDate()");
-        builder.Property(c => c.Display)
-            .HasComputedColumnSql("[Name]", stored: true);
-
         builder.HasIndex(
             c => new { c.Name }).IsUnique();
+        
+        builder.Property(x => x.Description).HasColumnType("text");
 
         builder
             .HasOne(x => x.FilterType)
@@ -22,11 +22,11 @@ public class CriteriaFilterConfiguration : IEntityTypeConfiguration<CriteriaFilt
             .OnDelete(DeleteBehavior.Restrict);
 
         // temporal
-        builder.ToTable(b => b.IsTemporal(tb =>
-        {
-            tb.HasPeriodEnd("ValidTo");
-            tb.HasPeriodStart("ValidFrom");
-            tb.UseHistoryTable("CriteriaFiltersAudit");
-        }));
+        // builder.ToTable(b => b.IsTemporal(tb =>
+        // {
+        //     tb.HasPeriodEnd("ValidTo");
+        //     tb.HasPeriodStart("ValidFrom");
+        //     tb.UseHistoryTable("CriteriaFiltersAudit");
+        // }));
     }
 }

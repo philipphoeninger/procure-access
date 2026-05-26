@@ -51,23 +51,24 @@ public static class SampleDataInitializer
             string? tableName = entity.GetTableName();
             string? schemaName = entity.GetSchema();
             dbContext.Database.ExecuteSqlRaw($"DELETE FROM {schemaName}.{tableName}");
-            dbContext.Database.ExecuteSqlRaw($"DBCC CHECKIDENT (\"{schemaName}.{tableName}\", RESEED, 1);");
-            if (entity.IsTemporal())
-            {
-                IExecutionStrategy strategy = dbContext.Database.CreateExecutionStrategy();
-                strategy.Execute(() =>
-                {
-                    using var trans = dbContext.Database.BeginTransaction();
-                    IEntityType? designTimeEntity = designTimeModel.FindEntityType(entityName);
-                    string? historySchema = designTimeEntity.GetHistoryTableSchema();
-                    string? historyTable = designTimeEntity.GetHistoryTableName();
-                    dbContext.Database.ExecuteSqlRaw($"ALTER TABLE {schemaName}.{tableName} SET (SYSTEM_VERSIONING = OFF)");
-                    dbContext.Database.ExecuteSqlRaw($"DELETE FROM {historySchema}.{historyTable}");
-                    dbContext.Database.ExecuteSqlRaw(
-                        $"ALTER TABLE {schemaName}.{tableName} SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE={historySchema}.{historyTable}))");
-                    trans.Commit();
-                });
-            }
+            //dbContext.Database.ExecuteSqlRaw($"DBCC CHECKIDENT (\"{schemaName}.{tableName}\", RESEED, 1);");
+            await dbContext.Database.ExecuteSqlRawAsync($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH 1");
+            //if (entity.IsTemporal())
+            //{
+            //IExecutionStrategy strategy = dbContext.Database.CreateExecutionStrategy();
+            //strategy.Execute(() =>
+            //{
+            //using var trans = dbContext.Database.BeginTransaction();
+            //IEntityType? designTimeEntity = designTimeModel.FindEntityType(entityName);
+            //string? historySchema = designTimeEntity.GetHistoryTableSchema();
+            //string? historyTable = designTimeEntity.GetHistoryTableName();
+                    //dbContext.Database.ExecuteSqlRaw($"ALTER TABLE {schemaName}.{tableName} SET (SYSTEM_VERSIONING = OFF)");
+                    //dbContext.Database.ExecuteSqlRaw($"DELETE FROM {historySchema}.{historyTable}");
+                    //dbContext.Database.ExecuteSqlRaw(
+                    //    $"ALTER TABLE {schemaName}.{tableName} SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE={historySchema}.{historyTable}))");
+                    //trans.Commit();
+                    //});
+                    //}
         }
 
         foreach (User user in userManager.Users)
@@ -109,10 +110,10 @@ public static class SampleDataInitializer
                 try
                 {
                     var metaData = dbContext.Model.FindEntityType(typeof(TEntity).FullName);
-                    dbContext.Database.ExecuteSqlRaw($"SET IDENTITY_INSERT {metaData.GetSchema()}.{metaData.GetTableName()} ON");
+                    //dbContext.Database.ExecuteSqlRaw($"SET IDENTITY_INSERT {metaData.GetSchema()}.{metaData.GetTableName()} ON");
                     table.AddRange(records);
                     dbContext.SaveChanges();
-                    dbContext.Database.ExecuteSqlRaw($"SET IDENTITY_INSERT {metaData.GetSchema()}.{metaData.GetTableName()} OFF");
+                    //dbContext.Database.ExecuteSqlRaw($"SET IDENTITY_INSERT {metaData.GetSchema()}.{metaData.GetTableName()} OFF");
                     transaction.Commit();
                 }
                 catch (Exception ex)

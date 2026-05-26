@@ -1,6 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[Table("RefreshTokens", Schema = "dbo")]
+[Table("RefreshTokens", Schema = "public")]
 [EntityTypeConfiguration(typeof(RefreshTokenConfiguration))]
 public class RefreshToken
 {
