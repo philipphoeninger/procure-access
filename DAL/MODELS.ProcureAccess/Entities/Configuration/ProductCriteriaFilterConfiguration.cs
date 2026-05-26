@@ -1,9 +1,11 @@
 namespace MODELS.ProcureAccess.Entities.Configuration;
 
-public class ProductCriteriaFilterConfiguration : IEntityTypeConfiguration<ProductCriteriaFilter>
+public class ProductCriteriaFilterConfiguration : BaseEntityConfiguration<ProductCriteriaFilter>
 {
     public void Configure(EntityTypeBuilder<ProductCriteriaFilter> builder)
     {
+        base.Configure(builder);
+
         // Query Filters
         builder.HasQueryFilter(x => !x.Product.IsDeleted);
 

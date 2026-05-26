@@ -54,8 +54,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
                 {
                     entity = new Proposal
                     {
-                        ProposerId = userId,
-                        CreatedAt = DateTime.UtcNow
+                        ProposerId = userId
                     };
 
                     MainRepo.Context.Proposals.Add(entity);
@@ -176,9 +175,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
             proposalEntity.ProposerId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return -1; //gate
 
         // delete
-        long binaryNow = DateTime.Now.ToBinary();
-        byte[] arrayNow = BitConverter.GetBytes(binaryNow);
-        return MainRepo.Delete(id, arrayNow);
+        return MainRepo.Delete(id);
     }
 
     // REVIEW (approver/proposer edits snapshot)

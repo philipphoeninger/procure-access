@@ -19,7 +19,7 @@ public partial class CriteriaFilterExclusion : BaseEntity
 
     public CriteriaFilterExclusion(
         int pCriteriaFilterId,
-        int pExclusionId)
+        int pExclusionId) : this()
     {
         CriteriaFilterId = pCriteriaFilterId;
         ExclusionId = pExclusionId;

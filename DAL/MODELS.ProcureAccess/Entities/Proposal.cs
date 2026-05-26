@@ -15,24 +15,18 @@ public partial class Proposal : BaseEntity
     [ForeignKey("Product")]
     public int? ProductId { get; set; }
     public Product? Product { get; set; }
-    [Column(TypeName = "nvarchar(max)")]
     public string? ProductSnapshot { get; set; }
 
     [ForeignKey("Criterion")]
     public int? CriterionId { get; set; }
     public Criterion? Criterion { get; set; }
-    [Column(TypeName = "nvarchar(max)")]
     public string? CriterionSnapshot { get; set; }
 
     [Required]
     public ProposalStatus Status { get; set; } = ProposalStatus.Pending;
 
-    [Column(TypeName = "nvarchar(max)")]
     [StringLength(5000)]
     public string? Note { get; set; }
-
-    [Required]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? FinishedAt { get; set; }
 
@@ -41,11 +35,7 @@ public partial class Proposal : BaseEntity
     #endregion
 
     #region ctors
-    public Proposal()
-    {
-        CreatedAt = DateTime.UtcNow;
-        IsDeleted = false;
-    }
+    public Proposal() { }
     #endregion
 
     #region methods

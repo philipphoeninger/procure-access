@@ -13,7 +13,6 @@ public partial class Product : BaseEntity
     [StringLength(500)]
     public string? Link { get; set; }
 
-    [Column(TypeName = "nvarchar(max)")]
     [StringLength(6000)]
     public string? Description { get; set; }
 
@@ -22,26 +21,18 @@ public partial class Product : BaseEntity
     public Proposal? Proposal { get; set; }
 
     [Required]
-    public DateTime CreatedAt { get; set; }
+    public bool IsDeleted { get; set; } = false;
 
-    [Required]
-    public bool IsDeleted { get; set; }
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string? Display { get; set; }
+    [NotMapped]
+    public string Display => Name;
     #endregion
 
     #region ctors
-    public Product()
-    {
-        // TODO: generate Name
-    }
+    public Product() { }
 
     public Product(string pName)
     {
         Name = pName;
-        CreatedAt = DateTime.UtcNow;
-        IsDeleted = false;
     }
     #endregion
 

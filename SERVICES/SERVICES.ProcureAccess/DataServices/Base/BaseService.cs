@@ -54,9 +54,7 @@ public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
 
     public virtual int Delete(int id)
     {
-        long binaryNow = DateTime.Now.ToBinary();
-        byte[] arrayNow = BitConverter.GetBytes(binaryNow);
-        return MainRepo.Delete(id, arrayNow);
+        return MainRepo.Delete(id);
     }
     #endregion
 }

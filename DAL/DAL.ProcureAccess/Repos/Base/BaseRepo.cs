@@ -75,10 +75,12 @@ public abstract class BaseRepo<T> : BaseViewRepo<T>, IBaseRepo<T> where T : Base
         return persist ? SaveChanges() : 0;
     }
 
-    public int Delete(int id, byte[] timeStamp, bool persist = true)
+    public int Delete(int id, bool persist = true)
     {
-        var entity = new T { Id = id, TimeStamp = timeStamp };
-        Context.Entry(entity).State = EntityState.Deleted;
+        var entity = Find(id);
+        if (entity == null) return 0; //gate
+
+        Table.Remove(entity);
         return persist ? SaveChanges() : 0;
     }
     #endregion
