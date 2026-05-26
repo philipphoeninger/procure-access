@@ -24,4 +24,6 @@ DB/data/*
 **/dist
 **/build
 **/*.log
+**/.angular
+npm-debug.log
 DB/data

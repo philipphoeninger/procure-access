@@ -1,19 +1,30 @@
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: postgres:17-alpine
     container_name: procureaccess-db
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=YourStrongPassw0rd_h3r3
+      POSTGRES_DB: ProcureAccessDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YourStrongPassw0rd_h3r3
+    #environment: # ms sql server
+      #- ACCEPT_EULA=Y
+      #- MSSQL_SA_PASSWORD=YourStrongPassw0rd_h3r3
       #- MSSQL_PID=Developer
     #user: "0:0"
     ports:
       - "${DB_PORT_OUTER}:${DB_PORT_INNER}"
     volumes:
-      - mssql_data:/var/opt/mssql
+      - postgres_data:/var/lib/postgresql/data
+    # volumes:
+    #   - mssql_data:/var/opt/mssql
       # - mssql_data:/var/opt/mssql/data
       #- ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
       #- ./DB/init:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - procureaccess-net
 
@@ -22,16 +33,18 @@ services:
       context: .
       dockerfile: ./API/API.ProcureAccess/Dockerfile
     depends_on:
-      - db
-        #condition: service_healthy
+      db:
+        condition: service_healthy
     environment:
       #- ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       #- ConnectionStrings__ProcureAccess=Server=${DB_HOST};User Id=${DB_USER};Password=YourStrongPassw0rd_h3r3;TrustServerCertificate=True;
       ASPNETCORE_ENVIRONMENT: Development
       DB_HOST: db
+      DB_PORT: 5432
       DB_NAME: ProcureAccessDb
-      DB_USER: sa
-      MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
+      DB_USER: postgres
+      DB_PASSWORD: YourStrongPassw0rd_h3r3
+      #MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
       #MSSQL_PID: Developer
     ports:
       - "${API_PORT_OUTER}:${API_PORT_INNER}"
@@ -65,4 +78,4 @@ networks:
     driver: bridge
 
 volumes:
-  mssql_data:
+  postgres_data:
