@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON, jsonArrayMember } from 'typedjson';
+import { Lookup } from '@core/models/lookup.model';
 
 @jsonObject
 export class ProductDto {
@@ -15,12 +16,8 @@ export class ProductDto {
   @jsonMember
   description?: string;
 
-  // TODO
-  // @jsonMember
-  // typeId: number;
-
-  // @jsonArrayMember(ProductPart)
-  // parts: ProductPart[];
+  @jsonArrayMember(Lookup)
+  criteriaFilters: Lookup[];
 
   // @jsonArrayMember(ProductTest)
   // tests: ProductTest[];
@@ -28,18 +25,14 @@ export class ProductDto {
   constructor(
     pId: number,
     pName: string,
-    // pType: number, 
-    pLink: string | undefined, 
-    pDescription: string | undefined, 
-    // pParts: ProductPart[] = [],
-    // pTests: ProductTest[] = []
+    pLink: string | undefined,
+    pDescription: string | undefined,
+    pCriteriaFilters: Lookup[] = []
   ) {
       this.id = pId;
       this.name = pName;
-      // this.typeId = pType;
       this.link = pLink;
       this.description = pDescription;
-      // this.parts = pParts;
-      // this.tests = pTests;
+      this.criteriaFilters = pCriteriaFilters;
   }
 }

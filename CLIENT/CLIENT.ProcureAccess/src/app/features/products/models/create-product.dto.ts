@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 import { jsonObject, jsonMember, TypedJSON, jsonArrayMember } from 'typedjson';
-import { ProductPart } from './productPart.model';
-import { ProductTest } from './productTest.model';
 
 @jsonObject
 export class CreateProductDto {
@@ -14,29 +12,18 @@ export class CreateProductDto {
   @jsonMember
   description?: string;
 
-  // TODO
-  // @jsonMember
-  // typeId: number;
-
-  // @jsonArrayMember(ProductPart)
-  // parts: ProductPart[];
-
-  // @jsonArrayMember(ProductTest)
-  // tests: ProductTest[];
+  @jsonArrayMember(Number)
+  criteriaFilterIds?: number[];
 
   constructor(
-    pName: string, 
-    // pType: number, 
-    pLink: string | undefined, 
-    pDescription: string | undefined, 
-    // pParts: ProductPart[] = [],
-    // pTests: ProductTest[] = []
+    pName: string,
+    pLink: string | undefined,
+    pDescription: string | undefined,
+    pCriteriaFilterIds: number[] | undefined
   ) {
       this.name = pName;
-      // this.typeId = pType;
       this.link = pLink;
       this.description = pDescription;
-      // this.parts = pParts;
-      // this.tests = pTests;
+      this.criteriaFilterIds = pCriteriaFilterIds;
   }
 }

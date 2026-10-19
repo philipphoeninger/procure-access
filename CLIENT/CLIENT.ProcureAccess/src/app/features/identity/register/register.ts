@@ -89,6 +89,8 @@ export class Register {
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
 
+    // TODO: save browser preferred modes as uiCustomization
+    // TODO: save language
     let registerCommand = new LoginModel(
       this.emailFormControl.value!,
       this.password()!

@@ -5,7 +5,6 @@ import { lastValueFrom } from "rxjs";
 import { CriteriaFilter } from "../../models/criteriaFilter.model";
 import { FilterType } from "../../models/filterType.model";
 import { TResult } from "@app/core/models/result.model";
-import { CriteriaFilterExclusion } from "../../models/criteriaFilterExclusion.model";
 
 @Injectable({ providedIn:'root' })
 export class FiltersApiService {
@@ -22,12 +21,6 @@ export class FiltersApiService {
   getAllCriteriaFilters(): Promise<TResult<CriteriaFilter[]>> {
     return lastValueFrom(
       this.http.get<TResult<CriteriaFilter[]>>(`${this.apiUrl}/CriteriaFilters`)
-    );
-  }
-
-  getAllCriteriaFilterExclusions(): Promise<TResult<CriteriaFilterExclusion[]>> {
-    return lastValueFrom(
-      this.http.get<TResult<CriteriaFilterExclusion[]>>(`${this.apiUrl}/CriteriaFilterExclusions`)
     );
   }
 }

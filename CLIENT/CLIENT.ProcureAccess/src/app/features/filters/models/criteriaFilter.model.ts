@@ -1,7 +1,8 @@
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import {jsonObject, jsonMember, TypedJSON, jsonArrayMember} from 'typedjson';
 import { FilterType } from './filterType.model';
 import { Criterion } from '@app/features/criteria/models/criterion.model';
+import { Lookup } from '@core/models/lookup.model';
 
 @jsonObject
 export class CriteriaFilter {
@@ -17,10 +18,19 @@ export class CriteriaFilter {
   @jsonMember
   filterTypeId: number;
 
-  constructor(pId: number, pName: string, pDescription: string, pFilterTypeId: number) {
+  @jsonArrayMember(Lookup)
+  exclusions: Lookup[];
+
+  constructor(
+    pId: number,
+    pName: string,
+    pDescription: string,
+    pFilterTypeId: number,
+    pExclusions: Lookup[]) {
     this.id = pId;
     this.name = pName;
     this.description = pDescription;
     this.filterTypeId = pFilterTypeId;
+    this.exclusions = pExclusions;
   }
 }

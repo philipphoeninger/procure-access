@@ -12,61 +12,44 @@ import { withLoading } from '@app/shared/state/with-loading';
 import { FiltersApiService } from '../services/api/filters-api.service';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
 import { EnFilterTypeId } from '../models/filterTypes.enum';
-import { CriteriaFilterExclusion } from '../models/criteriaFilterExclusion.model';
 
-export type FiltersState = { 
-  filterTypes: FilterType[], 
+export type FiltersState = {
+  filterTypes: FilterType[],
   criteriaFilters: CriteriaFilter[],
-  criteriaFilterExclusions: CriteriaFilterExclusion[],
-  selectedCriteriaFilters: number[]
+  selectedCriteriaFilters: CriteriaFilter[]
 };
 
 export const withFilters = () => signalStoreFeature(
     withState<FiltersState>({
       filterTypes: initialAppState.filters.filterTypes,
       criteriaFilters: initialAppState.filters.criteriaFilters,
-      criteriaFilterExclusions: initialAppState.filters.criteriaFilterExclusions,
       selectedCriteriaFilters: initialAppState.filters.selectedCriteriaFilters
     }),
     withLoading(),
     withMethods((state, filtersApiService = inject(FiltersApiService)) => ({
         async loadFilters() {
           state.incrementLoadingCount();
-          // get Filter Types, Criteria Filters & Criteria Filter Exclusions
+          // get Filter Types & Criteria Filters
           const [
             filterTypesResult,
-            criteriaFiltersResult,
-            criteriaFilterExclusionsResult] =
+            criteriaFiltersResult] =
             await Promise.all([
               filtersApiService.getAllFilterTypes(),
-              filtersApiService.getAllCriteriaFilters(),
-              filtersApiService.getAllCriteriaFilterExclusions()
+              filtersApiService.getAllCriteriaFilters()
             ]);
           // set Criteria Filters
           this.setCriteriaFilters(criteriaFiltersResult.value ?? []);
           // set Criteria Filters of each Filter Type & set Filter Types
           filterTypesResult.value?.forEach(filterType => {
-            filterType.criteriaFilters = 
+            filterType.criteriaFilters =
               state.criteriaFilters().filter(cf => cf.filterTypeId === filterType.id);
           });
           this.setFilterTypes(filterTypesResult.value ?? []);
-          // set Criteria Filter Exclusions
-          this.setCriteriaFilterExclusions(criteriaFilterExclusionsResult.value ?? []);
 
           state.decrementLoadingCount();
         },
         getCriteriaFilterByName(name: string) {
           return state.criteriaFilters().find(x => x.name == name);
-        },
-        getCriteriaFilterExclusionsByFilterIds(criteriaFilterIds: number[]) {
-          let result: number[][] = [];
-          criteriaFilterIds.forEach(x => {
-            let exclusions = state.criteriaFilterExclusions()
-              .filter(y => y.criteriaFilterId == x)
-              .map(x => x.exclusionId);
-            result.push(exclusions);
-          })
-          return result;
         },
         setFilterTypes(filterTypes: FilterType[]) {
           patchState(state, {
@@ -78,12 +61,7 @@ export const withFilters = () => signalStoreFeature(
             criteriaFilters
           })
         },
-        setCriteriaFilterExclusions(criteriaFilterExclusions: CriteriaFilterExclusion[]) {
-          patchState(state, {
-            criteriaFilterExclusions
-          })
-        },
-        setSelectedCriteriaFilters(selectedCriteriaFilters: number[]) {
+        setSelectedCriteriaFilters(selectedCriteriaFilters: CriteriaFilter[]) {
           patchState(state, {
             selectedCriteriaFilters
           });
@@ -93,13 +71,16 @@ export const withFilters = () => signalStoreFeature(
       selectedCriteriaFiltersCount: computed(() => {
         return state.selectedCriteriaFilters().length;
       }),
+      selectedCriteriaFiltersIds: computed(() =>
+        state.selectedCriteriaFilters().map(x => x.id)
+      ),
       productTypes: computed(() =>
         state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.productType)),
       appTypes: computed(() =>
         state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.appType)),
-      productParts: computed(() => 
+      productParts: computed(() =>
         state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.productPart)),
-      testTypes: computed(() => 
+      testTypes: computed(() =>
         state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.testType))
     }))
 );

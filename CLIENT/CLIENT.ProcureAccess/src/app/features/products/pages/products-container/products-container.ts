@@ -12,10 +12,10 @@ import { SaveSearchDialog } from '../../dialogs/save-search-dialog/save-search-d
 import { CriteriaList } from '@app/features/criteria/list/criteria-list';
 import { Router, RouterModule } from '@angular/router';
 import { SnackbarService } from '@app/core/services/snackbar.service';
-import { FiltersContainer } from '@app/features/filters/pages/filters-container/filters-container';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CriteriaFilter } from '@app/features/filters/models/criteriaFilter.model';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FiltersSelection } from '@features/filters/selection/filters-selection';
 
 @Component({
   selector: 'pa-products-container',
@@ -30,9 +30,9 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatInputModule,
     CriteriaList,
     RouterModule,
-    FiltersContainer,
     MatTooltipModule,
-    TranslatePipe
+    TranslatePipe,
+    FiltersSelection
   ],
   templateUrl: './products-container.html',
   styleUrl: './products-container.scss'
@@ -61,7 +61,7 @@ export class ProductsContainer {
     linkCopied() {
       this.snackbarService.showInfo('Link was copied to clipboard!');
     }
-  
+
     exportProductsFile(){
       const link = document.createElement('a');
       link.setAttribute('target', '_blank');
@@ -71,12 +71,12 @@ export class ProductsContainer {
       link.click();
       link.remove();
   }
-  
+
     openProductsSearchDialog(): void {
       const dialogRef = this.dialog.open(SaveSearchDialog, {
         width: '420px'
       });
-  
+
       dialogRef.afterClosed().subscribe((name: string) => {
         if (name !== undefined) {
           this.snackbarService.showInfo('The products were saved under: ' + name);
@@ -84,19 +84,15 @@ export class ProductsContainer {
       });
     }
 
-    selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
+    markedCriteriaFilters: WritableSignal<CriteriaFilter[]> = signal([]);
 
-    fdsa(event: number[]) {
-      this.selectedCriteriaFilterIds.set(event);
-    }
-
-    asdf() {
-      this.store.setSelectedCriteriaFilters(this.selectedCriteriaFilterIds());
-      this.store.getCriteriaBySelectedCriteriaFilterIds(this.selectedCriteriaFilterIds());
+    enterFilters() {
+      this.store.setSelectedCriteriaFilters(this.markedCriteriaFilters());
+      this.store.getCriteriaBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds());
     }
 
     async showProductsByCriteriaFilters() {
-      await this.store.getProductsBySelectedCriteriaFilterIds(this.selectedCriteriaFilterIds());
+      await this.store.getProductsBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds());
       this.router.navigateByUrl('/products');
     }
 }

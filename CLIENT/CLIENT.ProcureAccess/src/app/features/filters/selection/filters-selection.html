@@ -39,11 +39,11 @@
                     <div>
                         <mat-selection-list #filterTypes1>
                             @for (criteriaFilter of filterType.criteriaFilters.slice(0, (filterType.criteriaFilters.length + 1) / 2); track criteriaFilter) {
-                                <mat-list-option 
-                                    togglePosition="before" 
-                                    [disabled]="selectedCriteriaFilterIds().length > 0 
-                                        && unavailableOptionIds().includes(criteriaFilter.id)" 
-                                    (selectedChange)="changeCriteriaFilterSelection($event, criteriaFilter.id)">
+                                <mat-list-option
+                                    togglePosition="before"
+                                    [disabled]="markedCriteriaFilters().length > 0
+                                        && unavailableOptionIds().includes(criteriaFilter.id)"
+                                    (selectedChange)="changeCriteriaFilterMark($event, criteriaFilter)">
                                         {{ criteriaFilter.name }}
                                 </mat-list-option>
                             }
@@ -52,11 +52,11 @@
                     <div>
                         <mat-selection-list #filterTypes2>
                             @for (criteriaFilter of filterType.criteriaFilters.slice((filterType.criteriaFilters.length + 1) / 2, filterType.criteriaFilters.length); track criteriaFilter) {
-                                <mat-list-option 
-                                    togglePosition="before" 
-                                    [disabled]="selectedCriteriaFilterIds().length > 0 
-                                        && unavailableOptionIds().includes(criteriaFilter.id)" 
-                                    (selectedChange)="changeCriteriaFilterSelection($event, criteriaFilter.id)">
+                                <mat-list-option
+                                    togglePosition="before"
+                                    [disabled]="markedCriteriaFilters().length > 0
+                                        && unavailableOptionIds().includes(criteriaFilter.id)"
+                                    (selectedChange)="changeCriteriaFilterMark($event, criteriaFilter)">
                                         {{ criteriaFilter.name }}
                                 </mat-list-option>
                             }
@@ -68,4 +68,4 @@
     }
 </mat-accordion>
 
-<p style="margin-left: auto; text-align: right;">{{ selectedCriteriaFilterIds().length }} {{ 'COMMON.SELECTED' | translate }}</p>
+<p style="margin-left: auto; text-align: right;">{{ markedCriteriaFilters().length }} {{ 'COMMON.SELECTED' | translate }}</p>

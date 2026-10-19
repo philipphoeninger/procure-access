@@ -7,7 +7,15 @@
         <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
       </mat-form-field> -->
       <!--<pa-products-filters></pa-products-filters> [formGroup1]="criteriaFiltersFormGroup"-->
-      <pa-filters-container (selectedFilterTypeIdsOut)="fdsa($event)"></pa-filters-container>
+      <div id="filters-container">
+        <p>{{ 'FILTERS.ENTER_FILTERS_INFO' | translate }}</p>
+
+        <pa-filters-selection
+          (markedFilterTypesOut)="markedCriteriaFilters.set($event)"
+        ></pa-filters-selection>
+      </div>
+
+
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
         @if (store.isAuthenticated()) {
@@ -17,7 +25,7 @@
             [routerLink]="'/criterion-proposal/0'"
           >{{ 'CRITERIA.PROPOSE' | translate }}</button>
         }
-        <button matButton matStepperNext (click)="asdf()">{{ 'COMMON.ENTER' | translate }}</button>
+        <button matButton matStepperNext (click)="enterFilters()">{{ 'COMMON.ENTER' | translate }}</button>
       </div>
     </form>
   </mat-step>
@@ -48,11 +56,11 @@
                   <mat-icon>link</mat-icon>
               </button>
             }
-            <button 
+            <button
                 mat-icon-button
                 class="products-export-btn"
                 aria-label="Products export button"
-                [matTooltip]="'COMMON.DOWNLOAD' | translate" 
+                [matTooltip]="'COMMON.DOWNLOAD' | translate"
                 matTooltipPosition="above"
                 (click)="exportProductsFile()">
                 <mat-icon>arrow_downward</mat-icon>
@@ -71,18 +79,18 @@
         </div>
         <div>
             @if (store.isAuthenticated()) {
-                <button 
+                <button
                   matButton="elevated"
-                  aria-label="Criterion proposal button" 
+                  aria-label="Criterion proposal button"
                   [routerLink]="'/criterion-proposal/0'"
                   style="margin-right: 8px">{{ 'CRITERIA.PROPOSE' | translate }}
                 </button>
             }
-            <button 
+            <button
                 matButton="filled"
                 class="products-page-btn"
                 aria-label="Products page button"
-                [matTooltip]="'PRODUCTS.SHOW_TOOLTIP' | translate" 
+                [matTooltip]="'PRODUCTS.SHOW_TOOLTIP' | translate"
                 matTooltipPosition="above"
                 (click)="showProductsByCriteriaFilters()">
                 {{ 'PRODUCTS.SHOW' | translate }}

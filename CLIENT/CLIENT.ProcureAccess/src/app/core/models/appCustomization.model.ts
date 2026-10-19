@@ -1,4 +1,4 @@
-export class AppCustomization {
+export class AppCustomization { // TODO: use this
     foregroundColor: string;
     backgroundColor: string;
     textColor: string;

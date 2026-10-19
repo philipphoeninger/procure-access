@@ -57,168 +57,195 @@ export const filterTypes: FilterType[] = [
 ];
 
 export const productTypeCriteriaFilters: CriteriaFilter[] = [
-    {
-        id: 0,
-        name: "Datenbankgestützte Fachanwendung",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    },
-    {
-        id: 1,
-        name: "Human Resources",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    },
-    {
-        id: 2,
-        name: "Reporting",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    },
-    {
-        id: 3,
-        name: "Fortbildungsmanagement",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    },
-    {
-        id: 4,
-        name: "Dienstreiseanträge",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    },
-    {
-        id: 5,
-        name: "Gehaltsabrechnungen",
-        description: "",
-        filterTypeId: filterTypes[0].id
-    }
+  {
+    id: 0,
+    name: "Datenbankgestützte Fachanwendung",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  },
+  {
+    id: 1,
+    name: "Human Resources",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  },
+  {
+    id: 2,
+    name: "Reporting",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  },
+  {
+    id: 3,
+    name: "Fortbildungsmanagement",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  },
+  {
+    id: 4,
+    name: "Dienstreiseanträge",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  },
+  {
+    id: 5,
+    name: "Gehaltsabrechnungen",
+    description: "",
+    filterTypeId: filterTypes[0].id,
+    exclusions: []
+  }
 ];
 
 export const appTypeCriteriaFilters: CriteriaFilter[] = [
-    {
-        id: 6,
-        name: "Website / Webapp",
-        description: "",
-        filterTypeId: filterTypes[1].id
-        // criteria: appTypeFilterTypeValue6Criteria
-    },
-    {
-        id: 7,
-        name: "Software (open-source)",
-        description: "",
-        filterTypeId: filterTypes[1].id
-        // criteria: appTypeFilterTypeValue7Criteria
-    },
-    {
-        id: 8,
-        name: "Software (closed-source)",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    },
-    {
-        id: 9,
-        name: "Mobile App (open-source)",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    },
-    {
-        id: 10,
-        name: "Mobile App (closed-source)",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    },
-    {
-        id: 11,
-        name: "Document",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    },
-    {
-        id: 12,
-        name: "Hardware",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    },
-    {
-        id: 13,
-        name: "Dispatch / Emergency Service",
-        description: "",
-        filterTypeId: filterTypes[1].id
-    }
+  {
+    id: 6,
+    name: "Website / Webapp",
+    description: "",
+    filterTypeId: filterTypes[1].id
+    // criteria: appTypeFilterTypeValue6Criteria
+    ,
+    exclusions: []
+  },
+  {
+    id: 7,
+    name: "Software (open-source)",
+    description: "",
+    filterTypeId: filterTypes[1].id
+    // criteria: appTypeFilterTypeValue7Criteria
+    ,
+    exclusions: []
+  },
+  {
+    id: 8,
+    name: "Software (closed-source)",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  },
+  {
+    id: 9,
+    name: "Mobile App (open-source)",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  },
+  {
+    id: 10,
+    name: "Mobile App (closed-source)",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  },
+  {
+    id: 11,
+    name: "Document",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  },
+  {
+    id: 12,
+    name: "Hardware",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  },
+  {
+    id: 13,
+    name: "Dispatch / Emergency Service",
+    description: "",
+    filterTypeId: filterTypes[1].id,
+    exclusions: []
+  }
 ];
 
 export const productPartCriteriaFilters: CriteriaFilter[] = [
-    {
-        id: 14,
-        name: "Core functionality",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 15,
-        name: "Audio",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 16,
-        name: "Video",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 17,
-        name: "Two-way voice communication",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 18,
-        name: "Real-time text",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 19,
-        name: "Biometrics",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    },
-    {
-        id: 20,
-        name: "Authoring tools",
-        description: "",
-        filterTypeId: filterTypes[2].id
-    }
+  {
+    id: 14,
+    name: "Core functionality",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 15,
+    name: "Audio",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 16,
+    name: "Video",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 17,
+    name: "Two-way voice communication",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 18,
+    name: "Real-time text",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 19,
+    name: "Biometrics",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  },
+  {
+    id: 20,
+    name: "Authoring tools",
+    description: "",
+    filterTypeId: filterTypes[2].id,
+    exclusions: []
+  }
 ];
 
 
 export const testTypeCriteriaFilters: CriteriaFilter[] = [
-    {
-        id: 21,
-        name: "BITV",
-        description: "",
-        filterTypeId: filterTypes[3].id
-    },
-    {
-        id: 22,
-        name: "Automated",
-        description: "",
-        filterTypeId: filterTypes[3].id
-    },
-    {
-        id: 23,
-        name: "In-Person",
-        description: "",
-        filterTypeId: filterTypes[3].id
-    },
-    {
-        id: 24,
-        name: "Manual",
-        description: "",
-        filterTypeId: filterTypes[3].id
-    }
+  {
+    id: 21,
+    name: "BITV",
+    description: "",
+    filterTypeId: filterTypes[3].id,
+    exclusions: []
+  },
+  {
+    id: 22,
+    name: "Automated",
+    description: "",
+    filterTypeId: filterTypes[3].id,
+    exclusions: []
+  },
+  {
+    id: 23,
+    name: "In-Person",
+    description: "",
+    filterTypeId: filterTypes[3].id,
+    exclusions: []
+  },
+  {
+    id: 24,
+    name: "Manual",
+    description: "",
+    filterTypeId: filterTypes[3].id,
+    exclusions: []
+  }
 ];
 
 export const criteriaFilters: CriteriaFilter[] = [

@@ -69,8 +69,6 @@ export class ProductProposal {
     undefined
   ));
 
-  selectedCriteriaFilterIds: WritableSignal<number[]> = signal([]);
-
   public formErrorMessage?: string;
 
   constructor(protected snackbarService: SnackbarService) {
@@ -89,11 +87,12 @@ export class ProductProposal {
   onSubmit(form: NgForm, event: Event) {
     let productId = this.proposal().product?.id;
     productId = productId != undefined && productId > 0 ? productId : undefined;
-    
+
     let upsertProduct: CreateProductDto = new CreateProductDto(
       this.proposal().product?.name!,
       this.proposal().product?.link,
-      this.proposal().product?.description
+      this.proposal().product?.description,
+      this.store.selectedCriteriaFiltersIds()
     );
 
     // TODO: only send changed values
@@ -115,7 +114,7 @@ export class ProductProposal {
       this.store.upsertProposal(upsertCommand);
     }
 
-    // event.preventDefault();
+    event.preventDefault();
     // let loginCommand = new LoginModel(this.email!(), this.password!());
 
     // this.store.incrementLoadingCount();
@@ -142,10 +141,6 @@ export class ProductProposal {
     //     }),
     //   )
     //   .subscribe();
-  }
-
-  fdsa(event: number[]) {
-    this.selectedCriteriaFilterIds.set(event);
   }
 
   approve(isApproved: boolean) {
