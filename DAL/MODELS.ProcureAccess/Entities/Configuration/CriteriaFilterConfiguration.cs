@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class CriteriaFilterConfiguration : BaseEntityConfiguration<CriteriaFilter>
 {
-    public void Configure(EntityTypeBuilder<CriteriaFilter> builder)
+    public override void Configure(EntityTypeBuilder<CriteriaFilter> builder)
     {
         base.Configure(builder);
         
@@ -20,6 +20,9 @@ public class CriteriaFilterConfiguration : BaseEntityConfiguration<CriteriaFilte
             .WithMany(ft => ft.CriteriaFilters)
             .HasForeignKey(x => x.FilterTypeId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Data
+        builder.HasData(CriteriaFilterSeed.Data);
 
         // temporal
         // builder.ToTable(b => b.IsTemporal(tb =>

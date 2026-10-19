@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("Proposals", Schema = "public")]
-[EntityTypeConfiguration(typeof(ProposalConfiguration))]
 public partial class Proposal : BaseEntity
 {
     #region fields

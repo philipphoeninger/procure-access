@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("Criteria", Schema = "public")]
-[EntityTypeConfiguration(typeof(CriterionConfiguration))]
 public partial class Criterion : BaseEntity
 {
     #region fields
@@ -14,7 +13,7 @@ public partial class Criterion : BaseEntity
     public string Description { get; set; } = string.Empty;
 
     public int CriteriaFilterId { get; set; }
-    public CriteriaFilter CriteriaFilter { get; set; }
+    public CriteriaFilter? CriteriaFilter { get; set; }
 
     public Proposal? Proposal { get; set; }
 

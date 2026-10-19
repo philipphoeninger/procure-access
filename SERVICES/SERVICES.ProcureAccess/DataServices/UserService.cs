@@ -89,7 +89,7 @@ public class UserService : IUserService
 
         await _userManager.AddToRoleAsync(user, Roles.Member);
 
-        await this.SendConfirmationEmailAsync(user.Email);
+        await SendConfirmationEmailAsync("ok@testing.lettermint.co"); //user.Email
 
         return IdentityResult.Success;
     }

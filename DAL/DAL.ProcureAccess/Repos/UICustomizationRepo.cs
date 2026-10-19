@@ -54,6 +54,21 @@ public class UICustomizationRepo : IUICustomizationRepo
         await Context.SaveChangesAsync();
     }
 
+    // public async Task UpdateDarkModeAsync(string userId, bool enabled)
+    // {
+    //     var user = new User { Id = userId };
+
+    //     _context.Attach(user);
+
+    //     user.UISettings = new UISettings { DarkMode = enabled };
+
+    //     _context.Entry(user)
+    //         .Property(u => u.UISettings)
+    //         .IsModified = true;
+
+    //     await _context.SaveChangesAsync();
+    // }
+
     public virtual void Dispose()
     {
         Dispose(true);

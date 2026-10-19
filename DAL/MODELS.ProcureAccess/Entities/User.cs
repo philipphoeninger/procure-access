@@ -1,6 +1,5 @@
 namespace MODELS.ProcureAccess.Entities;
 
-[EntityTypeConfiguration(typeof(UserConfiguration))]
 public class User : IdentityUser
 {
     #region fields

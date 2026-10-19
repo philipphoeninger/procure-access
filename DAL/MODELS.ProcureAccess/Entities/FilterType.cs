@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("FilterTypes", Schema = "public")]
-[EntityTypeConfiguration(typeof(FilterTypeConfiguration))]
 public partial class FilterType : BaseEntity
 {
     #region fields

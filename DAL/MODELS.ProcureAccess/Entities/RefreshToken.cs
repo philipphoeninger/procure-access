@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("RefreshTokens", Schema = "public")]
-[EntityTypeConfiguration(typeof(RefreshTokenConfiguration))]
 public class RefreshToken
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

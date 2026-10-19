@@ -1,12 +1,17 @@
 namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class CriteriaFilterExclusionConfiguration
-    : BaseEntityConfiguration<CriteriaFilterExclusion>
+    : IEntityTypeConfiguration<CriteriaFilterExclusion>
 {
     public void Configure(EntityTypeBuilder<CriteriaFilterExclusion> builder)
-    {
-        base.Configure(builder);
-        
+    {        
+        // Key
+        builder.HasKey(x => new
+        {
+            x.CriteriaFilterId,
+            x.ExclusionId
+        });
+
         // Query Filters
         builder.HasQueryFilter(x => 
             !x.CriteriaFilter.FilterType.IsDeleted && !x.Exclusion.FilterType.IsDeleted);
@@ -29,5 +34,8 @@ public class CriteriaFilterExclusionConfiguration
             .HasForeignKey(x => x.ExclusionId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // Data
+        builder.HasData(CriteriaFilterExclusionSeed.Data);
     }
 }

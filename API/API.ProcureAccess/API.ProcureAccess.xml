@@ -58,6 +58,13 @@
             <param name="id">Primary key of the record</param>
             <returns>Single record</returns>
         </member>
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.ByCriteriaFilterIds(System.Int32[])">
+            <summary>
+            Gets all records, that have the provided Criteria Filter Id(s).
+            </summary>
+            <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
+            <returns>Criteria</returns>
+        </member>
         <member name="M:API.ProcureAccess.Controllers.ProposalsController.Upsert(MODELS.ProcureAccess.Entities.Requests.UpsertProposalCommand)">
             <summary>
             Creates/Updates a single record

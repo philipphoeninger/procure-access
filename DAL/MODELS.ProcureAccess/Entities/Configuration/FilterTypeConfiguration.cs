@@ -2,18 +2,21 @@ namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class FilterTypeConfiguration : BaseEntityConfiguration<FilterType>
 {
-    public void Configure(EntityTypeBuilder<FilterType> builder)
+    public override void Configure(EntityTypeBuilder<FilterType> builder)
     {
         base.Configure(builder);
 
         // Query Filters
         builder.HasQueryFilter(x => !x.IsDeleted);
 
-        // properties
+        // Properties
         builder.HasIndex(
             x => new { x.Name }).IsUnique();
 
         builder.Property(x => x.Description).HasColumnType("text");
+        
+        // Data
+        builder.HasData(FilterTypeSeed.Data);
         
         // temporal
         // builder.ToTable(b => b.IsTemporal(tb =>

@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("Products", Schema = "public")]
-[EntityTypeConfiguration(typeof(ProductConfiguration))]
 public partial class Product : BaseEntity
 {
     #region fields

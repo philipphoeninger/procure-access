@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class CriterionConfiguration : BaseEntityConfiguration<Criterion>
 {
-    public void Configure(EntityTypeBuilder<Criterion> builder)
+    public override void Configure(EntityTypeBuilder<Criterion> builder)
     {
         base.Configure(builder);
 
@@ -20,6 +20,9 @@ public class CriterionConfiguration : BaseEntityConfiguration<Criterion>
             .WithMany(cf => cf.Criteria)
             .HasForeignKey(x => x.CriteriaFilterId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // Data
+        builder.HasData(CriterionSeed.Data);
 
         // temporal
         // builder.ToTable(b => b.IsTemporal(tb =>

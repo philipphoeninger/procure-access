@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class ProposalConfiguration : BaseEntityConfiguration<Proposal>
 {
-    public void Configure(EntityTypeBuilder<Proposal> builder)
+    public override void Configure(EntityTypeBuilder<Proposal> builder)
     {
         base.Configure(builder);
 

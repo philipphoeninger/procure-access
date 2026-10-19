@@ -29,61 +29,45 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
                         .Where(x => x.Type == CustomClaimTypes.Permission)
                         .Select(x => x.Value);
 
-        var strategy = MainRepo.Context.Database.CreateExecutionStrategy();
+        ValidateCommand(cmd);
 
-        return await strategy.ExecuteAsync(async () =>
+        Proposal entity;
+
+        if (cmd.Id.HasValue)
         {
-            await using var tx = await MainRepo.Context.Database.BeginTransactionAsync();
-
-            try
+            entity = await MainRepo.Context.Proposals
+                .FirstAsync(p => p.Id == cmd.Id.Value);
+            
+            if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
+                entity.ProposerId != userId)
+                throw new Exception("User is not authorized to update this proposal.");
+        }
+        else
+        {
+            entity = new Proposal
             {
-                ValidateCommand(cmd);
+                ProposerId = userId
+            };
 
-                Proposal entity;
+            MainRepo.Context.Proposals.Add(entity);
+        }
 
-                if (cmd.Id.HasValue)
-                {
-                    entity = await MainRepo.Context.Proposals
-                        .FirstAsync(p => p.Id == cmd.Id.Value);
-                    
-                    if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
-                        entity.ProposerId != userId)
-                        throw new Exception("User is not authorized to update this proposal.");
-                }
-                else
-                {
-                    entity = new Proposal
-                    {
-                        ProposerId = userId
-                    };
+        // Store snapshot instead of real entity
+        if (cmd.Product != null)
+        {
+            entity.ProductSnapshot = JsonSerializer.Serialize(cmd.Product);
+            entity.CriterionSnapshot = null;
+        }
 
-                    MainRepo.Context.Proposals.Add(entity);
-                }
+        if (cmd.Criterion != null)
+        {
+            entity.CriterionSnapshot = JsonSerializer.Serialize(cmd.Criterion);
+            entity.ProductSnapshot = null;
+        }
 
-                // Store snapshot instead of real entity
-                if (cmd.Product != null)
-                {
-                    entity.ProductSnapshot = JsonSerializer.Serialize(cmd.Product);
-                    entity.CriterionSnapshot = null;
-                }
+        await MainRepo.Context.SaveChangesAsync();
 
-                if (cmd.Criterion != null)
-                {
-                    entity.CriterionSnapshot = JsonSerializer.Serialize(cmd.Criterion);
-                    entity.ProductSnapshot = null;
-                }
-
-                await MainRepo.Context.SaveChangesAsync();
-                await tx.CommitAsync();
-
-                return await MapToDtoAsync(entity);
-            }
-            catch
-            {
-                await tx.RollbackAsync();
-                throw;
-            }
-        });
+        return await MapToDtoAsync(entity);
     }
 
     // GET SINGLE PROPOSAL (with snapshot)
@@ -229,77 +213,61 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
 
         string userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var strategy = MainRepo.Context.Database.CreateExecutionStrategy();
+        var proposal = await MainRepo.Context.Proposals
+            .Include(p => p.Product)
+            .Include(p => p.Criterion)
+            .FirstOrDefaultAsync(p => p.Id == cmd.ProposalId);
 
-        return await strategy.ExecuteAsync(async () =>
+        if (proposal == null)
+            throw new Exception("Proposal not found.");
+
+        if (proposal.FinishedAt != null)
+            throw new Exception("Proposal already processed.");
+
+        proposal.Status = cmd.IsApproved 
+            ? ProposalStatus.Approved 
+            : ProposalStatus.Rejected;
+        proposal.Note = cmd.Note;
+        proposal.ApproverId = userId;
+        proposal.FinishedAt = DateTime.UtcNow;
+
+        if (cmd.IsApproved)
         {
-            await using var tx = await MainRepo.Context.Database.BeginTransactionAsync();
-        
-            try
-            {
-                var proposal = await MainRepo.Context.Proposals
-                    .Include(p => p.Product)
-                    .Include(p => p.Criterion)
-                    .FirstOrDefaultAsync(p => p.Id == cmd.ProposalId);
+            await ApplyApprovalSideEffects(proposal);
+        }
 
-                if (proposal == null)
-                    throw new Exception("Proposal not found.");
+        await MainRepo.Context.SaveChangesAsync();
 
-                if (proposal.FinishedAt != null)
-                    throw new Exception("Proposal already processed.");
-
-                proposal.Status = cmd.IsApproved 
-                    ? ProposalStatus.Approved 
-                    : ProposalStatus.Rejected;
-                proposal.Note = cmd.Note;
-                proposal.ApproverId = userId;
-                proposal.FinishedAt = DateTime.UtcNow;
-
-                if (cmd.IsApproved)
-                {
-                    await ApplyApprovalSideEffects(proposal);
-                }
-
-                await MainRepo.Context.SaveChangesAsync();
-                await tx.CommitAsync();
-
-                return await MapToDtoAsync(proposal);
-            }
-            catch
-            {
-                await tx.RollbackAsync();
-                throw;
-            }
-        });
+        return await MapToDtoAsync(proposal);
     }
 
     // APPLY SNAPSHOT → REAL ENTITY
-    private async Task ApplyApprovalSideEffects(Proposal proposal)
-    {
-        if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
-        {
-            var dto = JsonSerializer.Deserialize<CreateProductDto>(proposal.ProductSnapshot);
+	private async Task ApplyApprovalSideEffects(Proposal proposal)
+	{
+    	if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
+    	{
+        	var dto = JsonSerializer.Deserialize<CreateProductDto>(proposal.ProductSnapshot);
 
-            var product = Mapper.Map<Product>(dto);
+        	var product = Mapper.Map<Product>(dto);
 
-            MainRepo.Context.Products.Add(product);
+        	MainRepo.Context.Products.Add(product);
 
-            proposal.Product = product;
-            proposal.Criterion = null;
-        }
+        	proposal.Product = product;
+        	proposal.Criterion = null;
+    	}
 
-        if (!string.IsNullOrEmpty(proposal.CriterionSnapshot))
-        {
-            var dto = JsonSerializer.Deserialize<CreateCriterionDto>(proposal.CriterionSnapshot);
+    	if (!string.IsNullOrEmpty(proposal.CriterionSnapshot))
+    	{
+        	var dto = JsonSerializer.Deserialize<CreateCriterionDto>(proposal.CriterionSnapshot);
 
-            var criterion = Mapper.Map<Criterion>(dto);
+        	var criterion = Mapper.Map<Criterion>(dto);
 
-            MainRepo.Context.Criteria.Add(criterion);
+        	MainRepo.Context.Criteria.Add(criterion);
 
-            proposal.Criterion = criterion;
-            proposal.Product = null;
-        }
-    }
+        	proposal.Criterion = criterion;
+        	proposal.Product = null;
+    	}
+	}
 
     // MAPPING (entity → DTO + snapshot restore)
     private async Task<ProposalDto> MapToDtoAsync(Proposal proposal)

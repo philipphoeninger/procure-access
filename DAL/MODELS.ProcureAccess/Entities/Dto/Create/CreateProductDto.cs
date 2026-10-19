@@ -1,15 +1,17 @@
 namespace MODELS.ProcureAccess.Entities.Dto;
 
-public class ProductDto : BaseDto
+public class CreateProductDto
 {
     [Required]
     [StringLength(200)]
     public string Name { get; set; }
-    
+
     [Url]
     [StringLength(500)]
     public string? Link { get; set; }
     
     [StringLength(6000)]
     public string? Description { get; set; }
+
+    public List<int> CriteriaFilterIds { get; set; } = [];
 }

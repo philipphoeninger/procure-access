@@ -58,6 +58,10 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new ProductCriteriaFilterConfiguration().Configure(modelBuilder.Entity<ProductCriteriaFilter>());
         new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
         new UserConfiguration().Configure(modelBuilder.Entity<User>());
+        new RefreshTokenConfiguration().Configure(modelBuilder.Entity<RefreshToken>());
+
+		//modelBuilder.ApplyConfigurationsFromAssembly(
+        //	typeof(ApplicationDBContext).Assembly);
 
         OnModelCreatingPartial(modelBuilder);
     }

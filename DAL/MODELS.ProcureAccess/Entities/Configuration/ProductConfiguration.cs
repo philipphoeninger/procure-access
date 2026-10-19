@@ -2,7 +2,7 @@ namespace MODELS.ProcureAccess.Entities.Configuration;
 
 public class ProductConfiguration : BaseEntityConfiguration<Product>
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public override void Configure(EntityTypeBuilder<Product> builder)
     {
         base.Configure(builder);
 
@@ -21,6 +21,9 @@ public class ProductConfiguration : BaseEntityConfiguration<Product>
             .WithOne(pcf => pcf.Product)
             .HasForeignKey(pcf => pcf.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // Data
+        builder.HasData(ProductSeed.Data);
 
         // temporal
         // builder.ToTable(b => b.IsTemporal(tb =>

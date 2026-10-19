@@ -8,6 +8,6 @@ public class ProposalDto : BaseDto
     public CriterionDto? Criterion { get; set; }
     public ProposalStatus Status { get; set; }
     public string? Note { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
     public DateTime? FinishedAt { get; set; }
 }

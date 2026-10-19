@@ -29,9 +29,9 @@ public class CriteriaController : BaseCrudController<Criterion, CriterionDto, Cr
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public ActionResult<List<CriterionDto>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
+    public async Task<ActionResult<List<CriterionDto>>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
     {
-        var filteredCriteria = _criterionService.GetByCriteriaFilterIds(criteriaFilterIds);
+        var filteredCriteria = await _criterionService.GetByCriteriaFilterIds(criteriaFilterIds);
         return Ok(filteredCriteria);
     }
 }

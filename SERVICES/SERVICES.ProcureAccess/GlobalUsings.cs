@@ -1,4 +1,5 @@
 ﻿global using AutoMapper;
+global using AutoMapper.QueryableExtensions;
 
 global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Exceptions;

@@ -1,7 +1,6 @@
 namespace MODELS.ProcureAccess.Entities;
 
 [Table("SeriLogs", Schema = "logging")]
-[EntityTypeConfiguration(typeof(SeriLogEntryConfiguration))]
 public class SeriLogEntry
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
