@@ -84,9 +84,12 @@ Angular features follow `src/app/features/<name>/{models,services/api,state,page
 ## 5. Commands
 
 ```bash
-docker-compose up --build                 # full stack (DB + API + client)
+cp .env.example .env                      # once; fill in the secrets (never commit .env)
+docker-compose up --build                 # full stack (DB + API + client), reads .env
 
-# API (run from API/API.ProcureAccess)
+# API (run from API/API.ProcureAccess). Secrets come only from environment variables:
+export ConnectionStrings__ProcureAccess="Host=localhost;Port=5432;Database=ProcureAccessDb;Username=postgres;Password=<from .env>"
+export JWTSettings__Key="<from .env>"     # dotnet run also needs Email__Username / Email__Password to send mail
 dotnet build && dotnet run
 dotnet ef migrations add <Name> --project ../../DAL/DAL.ProcureAccess --startup-project .
 dotnet ef database update     --project ../../DAL/DAL.ProcureAccess --startup-project .
@@ -98,6 +101,8 @@ npm run build:release
 
 From migration step 0 on (update this section when they exist): `dotnet test ProcureAccess.sln`, `npx ng test` (Vitest), `npx playwright test` (in `e2e/`), `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`.
 
+Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reuse`). New files get a header with `reuse annotate --copyright "Blinden- und Sehbehindertenverein Hamburg e.V." --year <year> --license MIT <file>`; files without comment syntax (JSON, binaries, generated files) are covered in `REUSE.toml`.
+
 `RebuildDatabase` / `SampleDataInitializer` must never run outside `Development` (SEC-06). Migrations apply on startup (single instance only).
 
 ## 6. How to work here
@@ -108,7 +113,7 @@ From migration step 0 on (update this section when they exist): `dotnet test Pro
 4. **Tests come with the code.** Starting a migration step flips its invariants in `TESTING §4` from `planned` to `active`; the CI gate then requires a test tagged `INV:<ID>` for each. Name tests `Scenario_Condition_ExpectedOutcome` and add `[Trait("Invariant","<ID>")]` plus `INV:<ID>` in the name (`TESTING §8.1`).
 5. **UI strings only by key.** Never hard-code German text in templates or code; add missing keys to `de.json` with the exact wording from the UX copy. If a needed key is missing in the UX copy, stop and report it — do not invent wording.
 6. **Open decisions stay open.** Open points (SPEC §13, ARCHITECTURE §16.5) and ⚖️ texts may be implemented as written but must not be decided by you. 🔧 values are confirmed defaults (SPEC SD23): always read them from configuration, never hard-code them, and do not change them on your own.
-7. **Before each push:** run the code-review checklist (security, correctness, N+1 queries, missing edge cases, a11y), and the invariant and Figma-link scripts.
+7. **Before each push:** run the code-review checklist (security, correctness, N+1 queries, missing edge cases, a11y), the invariant and Figma-link scripts, and `reuse lint`.
 
 ## 7. Architecture rules (enforced by tests — do not work around them)
 

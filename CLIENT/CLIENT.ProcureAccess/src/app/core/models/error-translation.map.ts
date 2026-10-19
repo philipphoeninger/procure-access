@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 export const ERROR_TRANSLATIONS: Record<string, string> = {
   'UserNotFound': 'ERROR.USER_NOT_FOUND',
   'InvalidPassword': 'ERROR.INVALID_PASSWORD',

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
 # Secrets and settings come from .env (copy .env.example to .env and fill it in).
 # ${VAR:?...} stops docker-compose with an error if a required variable is missing.
 services:

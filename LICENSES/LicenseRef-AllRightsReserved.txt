@@ -1,0 +1,13 @@
+All rights reserved.
+
+The files marked with this licence identifier are NOT covered by the MIT
+licence of this repository. No permission is granted to copy, modify or
+distribute them outside this repository without the prior permission of
+the respective rights holder.
+
+This applies in particular to:
+
+- the texts of BIT inklusiv quoted verbatim in the criteria catalog
+  documents (docs/kriterienkatalog_bit_inklusiv_v1*.md). They are used in
+  the project WERTE.IT with the permission of Detlef Girke;
+- images and logos whose origin or licence is not documented.

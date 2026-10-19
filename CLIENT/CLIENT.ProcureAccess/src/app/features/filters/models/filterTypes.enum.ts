@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 export enum EnFilterTypeName { // TODO: i18n
     productType = 'Produkt-Typen',
     appType = 'App-Typen',

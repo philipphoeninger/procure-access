@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 import { signalStore, withHooks, withMethods, withState } from "@ngrx/signals";
 import { AppState, initialAppState } from "../models/appState.interface";
 import { withLoading } from "@app/shared/state/with-loading";

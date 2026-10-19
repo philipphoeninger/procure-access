@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 // call this from main.ts only in development
 function startApiHealthWatcher() {
   const checkUrl = 'https://api.procureaccess.tech/health';

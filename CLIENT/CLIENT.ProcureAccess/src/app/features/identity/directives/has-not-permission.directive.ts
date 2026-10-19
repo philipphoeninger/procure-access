@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 import { Directive, Input, TemplateRef, ViewContainerRef } from "@angular/core";
 import { AuthService } from "../services/auth.service";
 

@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+# SPDX-License-Identifier: MIT
+#
+# Licence information for files that cannot carry an SPDX comment header
+# (JSON, binaries, Markdown documents, generated files). Source files carry
+# their own header. Check with `reuse lint` (https://reuse.software).
+
+version = 1
+
+# Project documents, README files and AI onboarding.
+[[annotations]]
+path = ["docs/**", "**/README.md", "CLAUDE.md", "components/notes.txt", "**/todo.txt"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# Criteria catalog documents: they quote BIT inklusiv texts verbatim, used with
+# permission of Detlef Girke (see the document header). Not MIT.
+[[annotations]]
+path = "docs/kriterienkatalog_bit_inklusiv_v1*.md"
+precedence = "override"
+SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
+SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+
+# JSON configuration, translations and other files without comment syntax.
+[[annotations]]
+path = [
+  "**/*.json",
+  "**/*.sln",
+  "**/*.csproj.user",
+  "**/.nvmrc",
+  "CLIENT/CLIENT.ProcureAccess/public/products.csv",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# E-mail templates: sent as raw HTML, so a header comment would end up in
+# every e-mail.
+[[annotations]]
+path = "DAL/MODELS.ProcureAccess/EmailTemplates/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# Generated files: EF Core migrations and the API XML documentation file.
+[[annotations]]
+path = ["DAL/DAL.ProcureAccess/Migrations/**", "API/API.ProcureAccess/API.ProcureAccess.xml"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# Shared IDE settings (Rider/IntelliJ); the IDE rewrites these files.
+[[annotations]]
+path = ".idea/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# Images and logos: origin and licence not documented. Not MIT.
+[[annotations]]
+path = [
+  "CLIENT/CLIENT.ProcureAccess/public/*.jpeg",
+  "CLIENT/CLIENT.ProcureAccess/public/*.jpg",
+  "CLIENT/CLIENT.ProcureAccess/public/*.png",
+  "CLIENT/CLIENT.ProcureAccess/public/favicon.ico",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+
+# Poppins font (Google Fonts), self-hosted.
+[[annotations]]
+path = "CLIENT/CLIENT.ProcureAccess/src/assets/fonts/poppins/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)"
+SPDX-License-Identifier = "OFL-1.1"

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
 # optionally ignore test project folders (they're not needed at runtime)
 # API.TESTS.ProcureAccess/
 # DAL.TESTS.ProcureAccess/

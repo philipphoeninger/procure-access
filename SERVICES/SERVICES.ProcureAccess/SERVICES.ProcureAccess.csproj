@@ -1,4 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
