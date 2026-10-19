@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
 # stage 1: build angular client
 FROM node:22-alpine AS build
 WORKDIR /app

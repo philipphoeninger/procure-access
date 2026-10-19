@@ -1,4 +1,8 @@
-﻿global using AutoMapper;
+﻿// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+global using AutoMapper;
 global using AutoMapper.QueryableExtensions;
 
 global using DAL.ProcureAccess.EFStructures;

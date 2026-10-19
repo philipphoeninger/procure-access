@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
 // import { inject, Injectable } from "@angular/core";
 // import { MatDialog } from "@angular/material/dialog";
 // import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
