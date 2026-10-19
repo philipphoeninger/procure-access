@@ -91,7 +91,7 @@ Also noticed, out of scope for M0: `DateTime.Now`/`UtcNow` in 5 files (CLAUDE §
 **Recommendation: replace** — tracked in **issue #31**.
 - **S1-04:** pin AutoMapper **14.0.0** in all four projects (a downgrade from 15.0.1; check the `AddAutoMapper(cfg => {}, …)` overload still compiles), suppress the advisory with `NuGetAuditSuppress` and a comment linking #31. ARC-06 (S1-14) tests this interim setup.
 - **M1:** replace AutoMapper after an ADR (new dependency, CLAUDE §11), and decide in TESTING what replaces ARC-06.
-- **Owner decision needed:** accept the interim pin to 14.0.0 with the suppressed advisory.
+- **Owner decision (2026-10-19): accepted.** Interim pin to 14.0.0 with the suppressed advisory in S1-04; AutoMapper is replaced in M1.
 
 ## 5. Sources
 
