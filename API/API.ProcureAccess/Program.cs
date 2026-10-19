@@ -12,7 +12,16 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddPostgreSQLConnection(builder.Configuration)
                 .AddAppConfig(builder.Configuration)
                 .AddEmailConfig(builder.Configuration)
-                .AddCors()
+                .AddCors(options =>
+                    {
+                        options.AddPolicy("frontend", policy =>
+                        {
+                            policy
+                                .WithOrigins("https://procureaccess.tech")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        });
+                    })
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
@@ -82,11 +91,13 @@ using (var scope = app.Services.CreateScope())
     app.ConfigureSwaggerExplorer();
 // }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseRequestLocalization();
 
 app.ConfigureCORS(builder.Configuration)
    .AddIdentityAuthMiddlewares();
+
+app.UseCors("frontend");
 
 app.MapControllers();
 app.MapGroup("/api")
