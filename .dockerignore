@@ -12,6 +12,10 @@
 # docker
 **/.dockerignore
 
+# local secrets (never bake them into an image)
+**/.env
+**/.env.*
+
 # DB runtime data (do NOT exclude DB entirely!)
 DB/data/*
 

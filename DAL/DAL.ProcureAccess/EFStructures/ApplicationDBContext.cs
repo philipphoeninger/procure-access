@@ -6,15 +6,14 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
         : base(options)
     {
+        // Never log the connection string: it contains the database password.
         SavingChanges += (sender, args) =>
         {
-            string cs = ((ApplicationDBContext)sender).Database!.GetConnectionString();
-            Console.WriteLine($"Saving changes for {cs}");
+            Console.WriteLine("Saving changes");
         };
         SavedChanges += (sender, args) =>
         {
-            string cs = ((ApplicationDBContext)sender).Database!.GetConnectionString();
-            Console.WriteLine($"Saved {args!.EntitiesSavedCount} changes for {cs}");
+            Console.WriteLine($"Saved {args!.EntitiesSavedCount} changes");
         };
         SaveChangesFailed += (sender, args) =>
         {
