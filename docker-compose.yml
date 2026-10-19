@@ -1,27 +1,22 @@
+# Secrets and settings come from .env (copy .env.example to .env and fill it in).
+# ${VAR:?...} stops docker-compose with an error if a required variable is missing.
 services:
   db:
     image: postgres:17-alpine
     container_name: procureaccess-db
     environment:
-      POSTGRES_DB: ProcureAccessDb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: YourStrongPassw0rd_h3r3
-    #environment: # ms sql server
-      #- ACCEPT_EULA=Y
-      #- MSSQL_SA_PASSWORD=YourStrongPassw0rd_h3r3
-      #- MSSQL_PID=Developer
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
     #user: "0:0"
     ports:
       - "${DB_PORT_OUTER}:${DB_PORT_INNER}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # volumes:
-    #   - mssql_data:/var/opt/mssql
-      # - mssql_data:/var/opt/mssql/data
       #- ./DB/init/01-create-db.sql:/docker-entrypoint-initdb.d/init.sql
       #- ./DB/init:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -37,15 +32,11 @@ services:
         condition: service_healthy
     environment:
       #- ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      #- ConnectionStrings__ProcureAccess=Server=${DB_HOST};User Id=${DB_USER};Password=YourStrongPassw0rd_h3r3;TrustServerCertificate=True;
       ASPNETCORE_ENVIRONMENT: Development
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ProcureAccessDb
-      DB_USER: postgres
-      DB_PASSWORD: YourStrongPassw0rd_h3r3
-      #MSSQL_SA_PASSWORD: YourStrongPassw0rd_h3r3
-      #MSSQL_PID: Developer
+      ConnectionStrings__ProcureAccess: "Host=${DB_HOST:-db};Port=${DB_PORT_INNER:-5432};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"
+      JWTSettings__Key: ${JWT_KEY:?set JWT_KEY in .env}
+      Email__Username: ${SMTP_USERNAME:-}
+      Email__Password: ${SMTP_PASSWORD:-}
     ports:
       - 5000:8080
     # volumes:

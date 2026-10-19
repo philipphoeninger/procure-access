@@ -84,9 +84,12 @@ Angular features follow `src/app/features/<name>/{models,services/api,state,page
 ## 5. Commands
 
 ```bash
-docker-compose up --build                 # full stack (DB + API + client)
+cp .env.example .env                      # once; fill in the secrets (never commit .env)
+docker-compose up --build                 # full stack (DB + API + client), reads .env
 
-# API (run from API/API.ProcureAccess)
+# API (run from API/API.ProcureAccess). Secrets come only from environment variables:
+export ConnectionStrings__ProcureAccess="Host=localhost;Port=5432;Database=ProcureAccessDb;Username=postgres;Password=<from .env>"
+export JWTSettings__Key="<from .env>"     # dotnet run also needs Email__Username / Email__Password to send mail
 dotnet build && dotnet run
 dotnet ef migrations add <Name> --project ../../DAL/DAL.ProcureAccess --startup-project .
 dotnet ef database update     --project ../../DAL/DAL.ProcureAccess --startup-project .
