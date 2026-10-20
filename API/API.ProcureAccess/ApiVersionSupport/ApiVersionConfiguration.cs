@@ -32,7 +32,10 @@ public static class ApiVersionConfiguration
                     new MediaTypeApiVersionReader(), //defaults to "v"
                     new MediaTypeApiVersionReader("api-version")
                     );
-            }).AddApiExplorer(
+            })
+            // Asp.Versioning 10 expects MVC (controller) versioning to be registered explicitly (AV0013).
+            .AddMvc()
+            .AddApiExplorer(
             options =>
             {
                 // note: the specified format code will format the version as "'v'major[.minor][-status]"
