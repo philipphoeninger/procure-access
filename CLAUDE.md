@@ -93,6 +93,7 @@ export JWTSettings__Key="<from .env>"     # dotnet run also needs Email__Usernam
 dotnet build && dotnet run
 dotnet ef migrations add <Name> --project ../../DAL/DAL.ProcureAccess --startup-project .
 dotnet ef database update     --project ../../DAL/DAL.ProcureAccess --startup-project .
+dotnet ef migrations has-pending-model-changes --project ../../DAL/DAL.ProcureAccess --startup-project .   # exit 0 = model matches the last migration (OPS-03)
 
 # Client (run from CLIENT/CLIENT.ProcureAccess)
 npm install && npm start                  # http://localhost:4200
