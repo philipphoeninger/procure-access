@@ -1,0 +1,22 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- Settings shared by every .NET project in this repository. -->
+<Project>
+
+  <ItemGroup>
+    <!--
+      AutoMapper is pinned to 14.0.0, the last MIT-licensed version (15+ is RPL-1.5 or commercial,
+      which breaks the licence rule in CLAUDE.md §10). 14.0.0 is affected by CVE-2026-32933
+      (stack overflow on deeply nested object graphs) and will not be patched.
+      Accepted as an interim risk by the owner on 2026-10-19 (docs/sprints/S1-03_backend_inventory.md §4).
+      Remove this suppression together with AutoMapper:
+      https://github.com/philipphoeninger/procure-access/issues/31
+    -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+  </ItemGroup>
+
+</Project>
