@@ -1,6 +1,6 @@
 # S1-06 — Docker on .NET 10 and smoke test of the compose stack
 
-> **Sprint:** 01, task S1-06 (milestone M0.1). **Status:** API checks done (2026-10-22); manual browser smoke test: see §4.
+> **Sprint:** 01, task S1-06 (milestone M0.1). **Status:** done (2026-10-22) — API checks (§3) and manual browser smoke test (§4) passed.
 > **Scope:** API Docker image on the .NET 10 base images; CORS origins from configuration so the local client can reach the API. The client image is unchanged (S1-11).
 
 ## 1. Changes
@@ -50,27 +50,29 @@ docker compose down              # stop; add -v to drop the database volume
 
 Note: in `Development` the API clears and re-seeds the database on every start (`RebuildDatabase`), so accounts from earlier runs are gone.
 
+Run by the project owner (Philipp) on the compose stack, 2026-10-22. Reported result: every step as expected.
+
 | # | Step | Expected | Result |
 |---|---|---|---|
-| 1 | `docker compose ps`; `docker compose logs api` | db healthy, api + client up; no exception after startup (see §5 for known log lines) | |
-| 2 | Open `http://localhost:4200`, DevTools console open | Home page loads; no CORS error in the console | |
-| 3 | Register a new account (any address, e.g. `smoke@example.test`) | Account is created; a mail error may be shown (no SMTP locally, §5) | |
-| 4 | Sign in with that account; reload the page; sign out; sign in again | Signed-in state in the header; survives reload; sign-out works | |
-| 5 | Sign in with a wrong password | Error message, no sign-in | |
-| 6 | Criteria filter (`/filters`): select filters of different types | Criteria list changes with the selection | |
-| 7 | Products (`/products`) with a filter selected | As before the upgrade — known 500 from the API, §5 | |
-| 8 | Export button on the products page | As before the upgrade — note what is downloaded | |
-| 9 | `docker compose restart api`, reload the client | API starts again; the app works | |
+| 1 | `docker compose ps`; `docker compose logs api` | db healthy, api + client up; no exception after startup (see §5 for known log lines) | ✅ as expected |
+| 2 | Open `http://localhost:4200`, DevTools console open | Home page loads; no CORS error in the console | ✅ as expected |
+| 3 | Register a new account (any address, e.g. `smoke@example.test`) | Account is created; a mail error may be shown (no SMTP locally, §5) | ✅ as expected |
+| 4 | Sign in with that account; reload the page; sign out; sign in again | Signed-in state in the header; survives reload; sign-out works | ✅ as expected |
+| 5 | Sign in with a wrong password | Error message, no sign-in | ✅ as expected |
+| 6 | Criteria filter (`/filters`): select filters of different types | Criteria list changes with the selection | ✅ as expected |
+| 7 | Products (`/products`) with a filter selected | As before the upgrade — known 500 from the API, §5 | ✅ as expected (unchanged behaviour, #37) |
+| 8 | Export button on the products page | As before the upgrade — note what is downloaded | ✅ as expected (unchanged behaviour, K2) |
+| 9 | `docker compose restart api`, reload the client | API starts again; the app works | ✅ as expected |
 
 ## 5. Known behaviour that is not caused by the upgrade
 
 | # | Observation | Evidence | Proposed follow-up |
 |---|---|---|---|
-| K1 | `GET /api/Products/byCriteriaFilterIds` returns **500** (`System.Text.Json` cannot serialize a `Task`): `ProductsController.ByCriteriaFilterIds` does not `await` the service call | Same 500 on .NET 8 (commit `c255e4a`) | Issue; fix is one `await`. Not changed here because S1-06 must keep behaviour unchanged |
+| K1 | `GET /api/Products/byCriteriaFilterIds` returns **500** (`System.Text.Json` cannot serialize a `Task`): `ProductsController.ByCriteriaFilterIds` does not `await` the service call | Same 500 on .NET 8 (commit `c255e4a`) | Issue #37; fix is one `await`. Not changed here because S1-06 must keep behaviour unchanged |
 | K2 | Products export link points at `./` and downloads the page, not product data | `products-container.ts`, `products-list.ts` | Replaced by the export pipeline in step 2 |
 | K3 | API log: `Cannot load library libgssapi_krb5.so.2` at startup | Library is missing in `aspnet:8.0` as well; Npgsql falls back to no GSS encryption | None needed |
 | K4 | API log: `ERR … Failed executing DbCommand … __EFMigrationsHistory` on an empty database | EF probes the history table before creating it (same as S1-05) | None |
 | K5 | Sign-up sends the confirmation mail to a fixed test address via Lettermint; without SMTP credentials the mail fails | `UserService.SignUpAsync` | Mailpit and real confirmation in M3 |
-| K6 | The API crashes on startup with `ASPNETCORE_ENVIRONMENT=Production` (NullReferenceException in `ConfigureSerilog`, `AppLoggingSettings` missing in `appsettings.Production.json`) | Same on .NET 8 (commit `c255e4a`) and on the new .NET 10 image | Issue; logging is reworked in step 1 (S1-22) |
+| K6 | The API crashes on startup with `ASPNETCORE_ENVIRONMENT=Production` (NullReferenceException in `ConfigureSerilog`, `AppLoggingSettings` missing in `appsettings.Production.json`) | Same on .NET 8 (commit `c255e4a`) and on the new .NET 10 image | Issue #38; logging is reworked in step 1 (S1-22) |
 | K7 | Client container: nginx forwards `/api/` to `api:5000`, but the API listens on 8080. Unused, because the client calls `http://localhost:5000/api` directly | `CLIENT/CLIENT.ProcureAccess/nginx.conf` | S1-11 |
 | K8 | `docker-compose.yml` sets `ASPNETCORE_ENVIRONMENT: Development` (and therefore `RebuildDatabase=true`) unconditionally | `docker-compose.yml` | SEC-06 guard in step 1 (S1-22); check the Dokploy deployment |
