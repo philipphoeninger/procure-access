@@ -49,7 +49,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Tests | xUnit v3, Shouldly, NSubstitute, Testcontainers (PostgreSQL 17), Respawn, NetArchTest, `FakeTimeProvider`; Vitest + Angular Testing Library; Playwright + axe-core |
 | Packaging | Docker / docker-compose; GitHub Actions |
 
-**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04; the API Docker image follows in S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 20, JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
+**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 20, JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
 
 ## 4. Repository layout
 
@@ -85,6 +85,7 @@ Angular features follow `src/app/features/<name>/{models,services/api,state,page
 
 ```bash
 cp .env.example .env                      # once; fill in the secrets (never commit .env)
+docker network create dokploy-network     # once; the compose file uses it as an external network
 docker-compose up --build                 # full stack (DB + API + client), reads .env
 
 # API (run from API/API.ProcureAccess). Secrets come only from environment variables:

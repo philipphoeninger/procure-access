@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# copy files
+# copy files (Directory.Build.props carries settings shared by all projects, e.g. the NuGet audit suppression)
+COPY Directory.Build.props ./
 COPY DAL/ DAL/
 COPY SERVICES/ SERVICES/
 COPY API/ API/
@@ -19,7 +20,7 @@ RUN dotnet restore API/API.ProcureAccess/API.ProcureAccess.csproj
 WORKDIR /src/API/API.ProcureAccess
 RUN dotnet publish -c Debug -o /app/publish /p:UseAppHost=false
 # Debug -> Release
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:8080

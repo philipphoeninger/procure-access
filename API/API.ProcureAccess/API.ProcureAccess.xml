@@ -100,6 +100,19 @@
             <param name="dto">Dto to update</param>
             <returns>Single record</returns>
         </member>
+        <member name="M:API.ProcureAccess.Extensions.AppConfigExtensions.AddFrontendCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Registers the CORS policy for the Angular client. Allowed origins come from
+            the configuration key <c>Cors:AllowedOrigins</c> (array). No configured origin
+            means no cross-origin request is allowed.
+            </summary>
+        </member>
+        <member name="M:API.ProcureAccess.Extensions.AppConfigExtensions.ConfigureCORS(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Applies the CORS policy registered by <see cref="M:API.ProcureAccess.Extensions.AppConfigExtensions.AddFrontendCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"/>.
+            Must run before authentication so preflight requests are answered.
+            </summary>
+        </member>
         <member name="M:API.ProcureAccess.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
             <summary>
             loops through the API’s versions, generating a Swagger document for each version

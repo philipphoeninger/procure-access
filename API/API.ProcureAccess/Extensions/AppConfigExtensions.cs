@@ -6,9 +6,32 @@ namespace API.ProcureAccess.Extensions;
 
 public static class AppConfigExtensions
 {
-    public static WebApplication ConfigureCORS(this WebApplication app, IConfiguration config)
+    private const string FrontendCorsPolicy = "frontend";
+
+    /// <summary>
+    /// Registers the CORS policy for the Angular client. Allowed origins come from
+    /// the configuration key <c>Cors:AllowedOrigins</c> (array). No configured origin
+    /// means no cross-origin request is allowed.
+    /// </summary>
+    public static IServiceCollection AddFrontendCors(this IServiceCollection services, IConfiguration config)
     {
-        app.UseCors(options => options.WithOrigins("https://procureaccess.tech").AllowAnyMethod().AllowAnyHeader());
+        var allowedOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+        services.AddCors(options =>
+            options.AddPolicy(FrontendCorsPolicy, policy => policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()));
+        return services;
+    }
+
+    /// <summary>
+    /// Applies the CORS policy registered by <see cref="AddFrontendCors"/>.
+    /// Must run before authentication so preflight requests are answered.
+    /// </summary>
+    public static WebApplication ConfigureCORS(this WebApplication app)
+    {
+        app.UseCors(FrontendCorsPolicy);
         return app;
     }
 
