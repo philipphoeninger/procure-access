@@ -8,9 +8,11 @@ import {
   effect,
   ElementRef,
   EventEmitter,
-  model,
   Output,
   ViewChild,
+  ChangeDetectionStrategy,
+  input,
+  linkedSignal
 } from '@angular/core';
 
 import EasyMDE from 'easymde';
@@ -18,13 +20,15 @@ import EasyMDE from 'easymde';
 @Component({
   selector: 'app-markdown-editor',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './markdown-editor.html'
 //   encapsulation: ViewEncapsulation.None
 })
 export class MarkdownEditor implements AfterViewInit {
   @ViewChild('editor') editorElement!: ElementRef;
 
-  value = model('');
+  valueInput = input('', {alias: 'value'});
+  value = linkedSignal(this.valueInput);
 //   darkModeOn = input(false);
   @Output() valueChange = new EventEmitter<string>();
 

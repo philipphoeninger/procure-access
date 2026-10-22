@@ -49,7 +49,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Tests | xUnit v3, Shouldly, NSubstitute, Testcontainers (PostgreSQL 17), Respawn, NetArchTest, `FakeTimeProvider`; Vitest + Angular Testing Library; Playwright + axe-core |
 | Packaging | Docker / docker-compose; GitHub Actions |
 
-**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 21 (S1-08; until Node 24 arrives in S1-09, add or update npm packages with `npx npm@11 install …`, because npm 10 crashes on this dependency tree), JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
+**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version; components carry an explicit `changeDetection`, `Eager` where the migration added it, until S1-10), JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
 
 ## 4. Repository layout
 
