@@ -49,7 +49,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Tests | xUnit v3, Shouldly, NSubstitute, Testcontainers (PostgreSQL 17), Respawn, NetArchTest, `FakeTimeProvider`; Vitest + Angular Testing Library; Playwright + axe-core |
 | Packaging | Docker / docker-compose; GitHub Actions |
 
-**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
+**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), client Docker image serves the release build through nginx (S1-11; `CLIENT_BUILD_CONFIGURATION` in `.env` picks the API: `production` or `production,local`), JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
 
 ## 4. Repository layout
 
@@ -86,7 +86,7 @@ Angular features follow `src/app/features/<name>/{models,services/api,state,page
 ```bash
 cp .env.example .env                      # once; fill in the secrets (never commit .env)
 docker network create dokploy-network     # once; the compose file uses it as an external network
-docker-compose up --build                 # full stack (DB + API + client), reads .env
+docker-compose up --build                 # full stack (DB + API + client), reads .env; locally CLIENT_BUILD_CONFIGURATION=production,local
 
 # API (run from API/API.ProcureAccess). Secrets come only from environment variables:
 export ConnectionStrings__ProcureAccess="Host=localhost;Port=5432;Database=ProcureAccessDb;Username=postgres;Password=<from .env>"
