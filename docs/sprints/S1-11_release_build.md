@@ -96,7 +96,7 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 
 | # | Observation | Evidence | Proposed follow-up |
 |---|---|---|---|
-| O1 | The browser loads Material Icons and Material Symbols from `fonts.googleapis.com` / `fonts.gstatic.com`, which CLAUDE §8 ("no third-party requests from the browser") does not allow | `src/index.html` lines 15–16 (since commit `b6b5134`) | Issue; self-host the icon fonts with the theme foundation (M1.5) |
+| O1 | The browser loads Material Icons and Material Symbols from `fonts.googleapis.com` / `fonts.gstatic.com`, which CLAUDE §8 ("no third-party requests from the browser") does not allow | `src/index.html` lines 15–16 (since commit `b6b5134`) | Issue #43; self-host the icon fonts with the theme foundation (M1.5) |
 | O2 | The dev-only health watcher polls `https://api.procureaccess.tech/health`, also in local development | `src/dev/dev-reload-health.ts` | Point it at `environment.apiUrl` or remove it in M1. With the `local` configuration the local stack no longer runs it (`production: true`) |
 | O3 | nginx resolves `api` at startup, so the client container only starts where an `api` host exists | `nginx -t` outside compose | None while the client runs next to the API; revisit with the same-origin setup in M3 |
 
@@ -104,7 +104,7 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 
 | # | Point | When |
 |---|---|---|
-| P1 | Tighten the bundle budget once the screens are rebuilt (lazy routes, fewer Material modules) | M1/M2 — issue proposed |
+| P1 | Tighten the bundle budget once the screens are rebuilt (lazy routes, fewer Material modules) | M1/M2 — issue #42 |
 | P2 | **Dokploy:** set `CLIENT_BUILD_CONFIGURATION=production` in the Dokploy environment **before** this branch is deployed; without it the compose build stops (by design). Until now Dokploy built the development image, which called `http://localhost:5000/api` | Owner, before merge/deploy |
 | P3 | npm install scripts (S1-09 N1): approve or deny `esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher` | S1-20 (decision 3) |
 | P4 | Same-origin API (`/api` behind nginx) instead of a separate API host | M3 (cookie auth, ARCH §8.3, §10.1) |
