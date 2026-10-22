@@ -53,6 +53,9 @@ services:
     build:
       context: ./CLIENT/CLIENT.ProcureAccess
       dockerfile: Dockerfile
+      args:
+        # Angular build configuration: "production" (Dokploy) or "production,local" (local stack)
+        NG_CONFIGURATION: ${CLIENT_BUILD_CONFIGURATION:?set CLIENT_BUILD_CONFIGURATION in .env}
     depends_on:
       - api
     ports:
