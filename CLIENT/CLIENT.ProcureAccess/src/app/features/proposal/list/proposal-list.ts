@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProposalApiService } from '../services/api/proposal-api.service';
@@ -61,7 +61,12 @@ export class ProposalList implements OnInit {
 
   ProposalStatus = ProposalStatus;
 
-  constructor(protected snackbarService: SnackbarService) {}
+  constructor(protected snackbarService: SnackbarService) {
+    // Proposals load asynchronously; keep the table in sync with the store.
+    effect(() => {
+      this.dataSource.data = this.store.proposals();
+    });
+  }
 
   ngOnInit() {}
 

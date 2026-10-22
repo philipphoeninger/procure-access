@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule} from '@angular/material/list';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -50,18 +50,23 @@ export class Profile {
   ProposalStatus = ProposalStatus;
 
   displayedColumns: string[] = ['name', 'value', 'actions'];
-  userInformation: UserInformation[] = [
+  userInformation = computed<UserInformation[]>(() => [
       { position: 1, name: 'Email', value: this.store.user()?.email, actions: '' },
       { position: 2, name: 'Password', value: '********', actions: '' }
       // { position: 3, name: '2FA enabled', value: this.store.user()?.twoFAEnabled ? 'Yes' : 'No', actions: '' }
-    ];
-  dataSource = new MatTableDataSource<UserInformation>(this.userInformation);
+    ]);
+  dataSource = new MatTableDataSource<UserInformation>(this.userInformation());
 
   readonly dialog = inject(MatDialog);
 
   constructor(
       protected snackbarService: SnackbarService
-  ) {}
+  ) {
+    // The user loads asynchronously; keep the table in sync with the store.
+    effect(() => {
+      this.dataSource.data = this.userInformation();
+    });
+  }
 
   ngOnInit() {}
 

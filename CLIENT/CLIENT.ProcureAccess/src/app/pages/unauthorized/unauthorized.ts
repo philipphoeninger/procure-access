@@ -20,7 +20,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
 ],
   templateUrl: './unauthorized.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './unauthorized.scss'
 })
 export class Unauthorized {

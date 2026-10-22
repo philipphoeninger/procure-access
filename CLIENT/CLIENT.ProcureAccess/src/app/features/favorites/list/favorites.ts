@@ -26,7 +26,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
   ],
   templateUrl: './favorites.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './favorites.scss'
 })
 export class Favorites {

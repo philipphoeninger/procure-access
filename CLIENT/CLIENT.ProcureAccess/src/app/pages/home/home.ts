@@ -23,7 +23,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
 ],
   templateUrl: './home.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './home.scss'
 })
 export class Home {
