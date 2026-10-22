@@ -32,7 +32,8 @@ export class LanguageService {
 
   get(): EnLanguage {
     let currentLang = this.translate.getCurrentLang();
-    let validLang = EnLanguage[currentLang];
+    // ngx-translate 18: getCurrentLang() returns null before the first use()
+    let validLang = currentLang === null ? undefined : EnLanguage[currentLang];
     return validLang || DEFAULT_LANGUAGE;
   }
 }

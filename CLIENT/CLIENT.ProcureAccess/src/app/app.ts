@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '@features/identity/services/auth.service';
@@ -13,6 +13,7 @@ import { ProcureAccessStore } from './core/state/app.store';
   selector: 'app-root',
   imports: [RouterOutlet, Header, MatProgressSpinnerModule],
   templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss'
 })
 export class App {

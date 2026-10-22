@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # stage 1: build angular client
-FROM node:22-alpine AS build
+FROM node:24.22-alpine AS build
 WORKDIR /app
 RUN npm install -g @angular/cli
 COPY package*.json ./

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, inject, signal, ViewChild, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -39,6 +39,7 @@ import { FiltersSelection } from '@features/filters/selection/filters-selection'
     FiltersSelection
   ],
   templateUrl: './products-container.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './products-container.scss'
 })
 export class ProductsContainer {

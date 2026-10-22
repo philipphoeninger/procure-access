@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
@@ -17,6 +17,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
   ],
   templateUrl: './product-details.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-details.scss'
 })
 export class ProductDetails {

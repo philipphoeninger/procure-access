@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, computed, inject, model } from '@angular/core';
+import { Component, computed, inject, model, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormControl,
   FormGroupDirective,
@@ -57,6 +57,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     TranslatePipe
   ],
   templateUrl: './register.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './register.scss'
 })
 export class Register {
