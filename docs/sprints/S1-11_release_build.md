@@ -105,6 +105,6 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 | # | Point | When |
 |---|---|---|
 | P1 | Tighten the bundle budget once the screens are rebuilt (lazy routes, fewer Material modules) | M1/M2 — issue #42 |
-| P2 | **Dokploy:** set `CLIENT_BUILD_CONFIGURATION=production` in the Dokploy environment **before** this branch is deployed; without it the compose build stops (by design). Until now Dokploy built the development image, which called `http://localhost:5000/api` | Owner, before merge/deploy |
+| P2 | **Dokploy:** set `CLIENT_BUILD_CONFIGURATION=production` in the Dokploy environment **before** this branch is deployed; without it the compose build stops (by design). Until now Dokploy built the development image, which called `http://localhost:5000/api` | ✅ Done by the owner, 2026-10-22 |
 | P3 | npm install scripts (S1-09 N1): approve or deny `esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher` | S1-20 (decision 3) |
 | P4 | Same-origin API (`/api` behind nginx) instead of a separate API host | M3 (cookie auth, ARCH §8.3, §10.1) |
