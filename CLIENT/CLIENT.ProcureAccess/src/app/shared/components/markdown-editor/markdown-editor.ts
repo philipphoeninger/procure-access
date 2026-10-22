@@ -20,7 +20,7 @@ import EasyMDE from 'easymde';
 @Component({
   selector: 'app-markdown-editor',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './markdown-editor.html'
 //   encapsulation: ViewEncapsulation.None
 })

@@ -57,7 +57,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     TranslatePipe
   ],
   templateUrl: './register.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './register.scss'
 })
 export class Register {

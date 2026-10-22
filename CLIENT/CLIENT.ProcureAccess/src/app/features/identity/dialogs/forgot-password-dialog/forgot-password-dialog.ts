@@ -32,7 +32,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
   ],
   templateUrl: './forgot-password-dialog.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './forgot-password-dialog.scss'
 })
 export class ForgotPasswordDialog {

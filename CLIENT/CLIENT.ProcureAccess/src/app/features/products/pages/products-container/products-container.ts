@@ -39,7 +39,7 @@ import { FiltersSelection } from '@features/filters/selection/filters-selection'
     FiltersSelection
   ],
   templateUrl: './products-container.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './products-container.scss'
 })
 export class ProductsContainer {

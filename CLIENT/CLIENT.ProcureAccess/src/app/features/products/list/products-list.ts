@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -33,7 +33,7 @@ import { tap } from 'rxjs/operators';
     TranslatePipe
   ],
   templateUrl: './products-list.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './products-list.scss'
 })
 export class ProductsList {
@@ -49,7 +49,12 @@ export class ProductsList {
 
   readonly dialog = inject(MatDialog);
 
-  constructor(protected snackbarService: SnackbarService) {}
+  constructor(protected snackbarService: SnackbarService) {
+    // Products load asynchronously; keep the table in sync with the store.
+    effect(() => {
+      this.dataSource.data = this.store.products();
+    });
+  }
 
   ngOnInit() {}
 

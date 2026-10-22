@@ -13,7 +13,7 @@ import { ProcureAccessStore } from './core/state/app.store';
   selector: 'app-root',
   imports: [RouterOutlet, Header, MatProgressSpinnerModule],
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './app.scss'
 })
 export class App {
