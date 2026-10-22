@@ -49,19 +49,21 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Tests | xUnit v3, Shouldly, NSubstitute, Testcontainers (PostgreSQL 17), Respawn, NetArchTest, `FakeTimeProvider`; Vitest + Angular Testing Library; Playwright + axe-core |
 | Packaging | Docker / docker-compose; GitHub Actions |
 
-**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), client Docker image serves the release build through nginx (S1-11; `CLIENT_BUILD_CONFIGURATION` in `.env` picks the API: `production` or `production,local`), JWT in `localStorage`, Karma/Jasmine, no tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
+**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), client Docker image serves the release build through nginx (S1-11; `CLIENT_BUILD_CONFIGURATION` in `.env` picks the API: `production` or `production,local`), root solution `ProcureAccess.sln` with the four backend test projects under `tests/` on xUnit v3 and Microsoft.Testing.Platform (S1-12; only the builders skeleton and its unit test so far), JWT in `localStorage`, Karma/Jasmine without tests. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
 
 ## 4. Repository layout
 
 Current:
 
 ```
+ProcureAccess.sln, global.json      Root solution (all projects incl. tests); global.json only selects the test runner
 API/API.ProcureAccess/              ASP.NET Core Web API (controllers, Program.cs, Identity endpoints)
 DAL/DAL.ProcureAccess/              EF Core DbContext, repositories, migrations
 DAL/MODELS.ProcureAccess/           Entities, DTOs, AutoMapper profile
 SERVICES/SERVICES.ProcureAccess/    Data services
 CLIENT/CLIENT.ProcureAccess/        Angular SPA
 docker-compose.yml, .env            Local full stack (API 5000, client 4200, PostgreSQL 5432)
+tests/ProcureAccess.Tests.{Unit,Architecture,Integration,Shared}/   Backend tests; Shared = builders (`TestData.ACriterion()` …), not a test project
 docs/                               Project documents (§2)
 ```
 
@@ -99,9 +101,12 @@ dotnet ef migrations has-pending-model-changes --project ../../DAL/DAL.ProcureAc
 # Client (run from CLIENT/CLIENT.ProcureAccess)
 npm install && npm start                  # http://localhost:4200
 npm run build:release
+
+# Backend tests (run from the repository root). Microsoft.Testing.Platform (global.json) needs --solution
+dotnet test --solution ProcureAccess.sln
 ```
 
-From migration step 0 on (update this section when they exist): `dotnet test ProcureAccess.sln`, `npx ng test` (Vitest), `npx playwright test` (in `e2e/`), `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`.
+From migration step 0 on (update this section when they exist): `npx ng test` (Vitest), `npx playwright test` (in `e2e/`), `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`.
 
 Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reuse`). New files get a header with `reuse annotate --copyright "Blinden- und Sehbehindertenverein Hamburg e.V." --year <year> --license MIT <file>`; files without comment syntax (JSON, binaries, generated files) are covered in `REUSE.toml`.
 

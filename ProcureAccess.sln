@@ -11,6 +11,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MODELS.ProcureAccess", "DAL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SERVICES.ProcureAccess", "SERVICES\SERVICES.ProcureAccess\SERVICES.ProcureAccess.csproj", "{1C14AA24-A033-4345-8864-24C927CC06F1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcureAccess.Tests.Shared", "tests\ProcureAccess.Tests.Shared\ProcureAccess.Tests.Shared.csproj", "{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcureAccess.Tests.Unit", "tests\ProcureAccess.Tests.Unit\ProcureAccess.Tests.Unit.csproj", "{6697D991-D961-4A8E-9C25-1E5B4290FFD3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcureAccess.Tests.Architecture", "tests\ProcureAccess.Tests.Architecture\ProcureAccess.Tests.Architecture.csproj", "{C41D171B-BBCF-4C1E-8285-BDE77F443813}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcureAccess.Tests.Integration", "tests\ProcureAccess.Tests.Integration\ProcureAccess.Tests.Integration.csproj", "{4A167E00-1DA2-4605-A023-2544F3477CE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +46,27 @@ Global
 		{1C14AA24-A033-4345-8864-24C927CC06F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C14AA24-A033-4345-8864-24C927CC06F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C14AA24-A033-4345-8864-24C927CC06F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6697D991-D961-4A8E-9C25-1E5B4290FFD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6697D991-D961-4A8E-9C25-1E5B4290FFD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6697D991-D961-4A8E-9C25-1E5B4290FFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6697D991-D961-4A8E-9C25-1E5B4290FFD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C41D171B-BBCF-4C1E-8285-BDE77F443813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C41D171B-BBCF-4C1E-8285-BDE77F443813}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C41D171B-BBCF-4C1E-8285-BDE77F443813}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C41D171B-BBCF-4C1E-8285-BDE77F443813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A167E00-1DA2-4605-A023-2544F3477CE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A167E00-1DA2-4605-A023-2544F3477CE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A167E00-1DA2-4605-A023-2544F3477CE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A167E00-1DA2-4605-A023-2544F3477CE4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{37F13CB0-7BB4-47E8-8A48-92DBB907DEC9} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{6697D991-D961-4A8E-9C25-1E5B4290FFD3} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{C41D171B-BBCF-4C1E-8285-BDE77F443813} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{4A167E00-1DA2-4605-A023-2544F3477CE4} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
