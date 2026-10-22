@@ -1,6 +1,6 @@
 # S1-11 — Release build and client Docker image
 
-> **Sprint:** 01, task S1-11 (milestone M0.2, ARCH C37 / §10.1 / §12 step 0). **Status:** done by Claude Code (2026-10-22); manual smoke test by the owner pending (§5).
+> **Sprint:** 01, task S1-11 (milestone M0.2, ARCH C37 / §10.1 / §12 step 0). **Status:** done by Claude Code (2026-10-22); manual smoke test by the owner passed (2026-10-22, §5).
 > **Scope:** `npm run build:release` passes; the client Docker image builds and serves the release build; smoke test on the compose stack. Items handed over by earlier tasks: production budget (S1-08 – S1-10), Dockerfile build command (S1-09 N3), global CLI install (S1-07), nginx proxy port (S1-06 K7), stale `main.js` after a redeploy (S1-10 O6).
 > **Owner decisions 2026-10-22:** **1a** raise the bundle budget to the measured size instead of lazy-loading routes; **2a** separate `local` build configuration for the compose stack, chosen through a `.env` variable because Dokploy builds from `docker-compose.yml`; **3** npm install scripts (S1-09 N1) stay open for S1-20.
 
@@ -80,17 +80,17 @@ docker compose down                      # stop; add -v to drop the database vol
 
 The API re-seeds the database on every start (`Development`), so accounts from earlier runs are gone.
 
-| # | Step | Expected | Result |
+| # | Step | Expected | Result (owner, 2026-10-22) |
 |---|---|---|---|
-| 1 | `curl -sI http://localhost:4200/filters` | 200, `Cache-Control: no-cache` | |
-| 2 | Open `http://localhost:4200`, DevTools → Network and Console open | Home page loads `main-<HASH>.js` (hashed name); no errors in the console | |
-| 3 | Register a new account; sign in with a wrong password; sign in correctly; reload | Error message for the wrong password; signed in after the reload | |
-| 4 | `/filters`: tick filters of each type, "Enter", expand a criterion | Counter follows; criteria list with priorities; markdown text formatted | |
-| 5 | `/products` and a product's details by URL | Table filled; details show name and website | |
-| 6 | `/settings`: dark mode, language | Theme switches; language "Deutsch" | |
-| 7 | Network tab, filter `procureaccess.tech` | No requests (all API calls go to `localhost:5000`) | |
-| 8 | *Optional (redeploy, S1-10 O6):* change a visible text locally (e.g. a value in `public/i18n/de.json` or a template), `docker compose up --build -d client`, then a **normal** reload (no hard reload); revert the change afterwards | The change is visible; the page loads the new `main-<HASH>.js` if a template changed (compare with `curl -s http://localhost:4200/ \| grep -o 'main-[A-Z0-9]*\.js'`) | |
-| 9 | Sign out | Header shows "Anmelden" | |
+| 1 | `curl -sI http://localhost:4200/filters` | 200, `Cache-Control: no-cache` | ✅ |
+| 2 | Open `http://localhost:4200`, DevTools → Network and Console open | Home page loads `main-<HASH>.js` (hashed name); no errors in the console | ✅ |
+| 3 | Register a new account; sign in with a wrong password; sign in correctly; reload | Error message for the wrong password; signed in after the reload | ✅ |
+| 4 | `/filters`: tick filters of each type, "Enter", expand a criterion | Counter follows; criteria list with priorities; markdown text formatted | ✅ |
+| 5 | `/products` and a product's details by URL | Table filled; details show name and website | ✅ |
+| 6 | `/settings`: dark mode, language | Theme switches; language "Deutsch" | ✅ |
+| 7 | Network tab, filter `procureaccess.tech` | No requests (all API calls go to `localhost:5000`) | ✅ |
+| 8 | *Optional (redeploy, S1-10 O6):* change a visible text locally (e.g. a value in `public/i18n/de.json` or a template), `docker compose up --build -d client`, then a **normal** reload (no hard reload); revert the change afterwards | The change is visible; the page loads the new `main-<HASH>.js` if a template changed (compare with `curl -s http://localhost:4200/ \| grep -o 'main-[A-Z0-9]*\.js'`) | – optional, not reported |
+| 9 | Sign out | Header shows "Anmelden" | ✅ |
 
 ## 6. Observations — existing behaviour, not changed
 
