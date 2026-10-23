@@ -52,14 +52,14 @@ Node 24.22.1 / npm 11.19.1 from `.nvmrc`.
 | N5 | `[disabled]` binding removed from the template | ✅ fails; restored |
 | 3 | `npm run build:release` / `npm run build` | ✅ both; release 1.81 MB initial (373.37 kB transferred), unchanged; only the known EasyMDE selector warning |
 | 4 | `npm audit` | 2 (1 high, 1 low), dev only, unchanged from S1-16 P2; `--omit=dev`: 0 |
-| 5 | `dotnet test --solution ProcureAccess.sln` | ⚠️ Unit and Architecture ✅ (3/3); Integration 19/19 fail because the PostgreSQL container cannot start: `initdb: … No space left on device` (root file system 100 % full, S1-13 P1). No backend file is touched by this task |
+| 5 | `dotnet test --solution ProcureAccess.sln` | ✅ 22/22. A first run failed all 19 integration tests because PostgreSQL could not start in Docker (`initdb: … No space left on device`, root file system 100 % full, S1-13 P1); after the owner freed space (4.5 GB free) all passed |
 | 6 | `reuse lint` (6.2.0, temporary venv) | ✅ compliant |
 
 ## 5. Open points
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | **Disk space:** the root file system is now at 0 bytes free; Docker cannot start PostgreSQL, so the integration tests cannot run locally (S1-13 P1, S1-15 P6). Re-run `dotnet test --solution ProcureAccess.sln` after freeing space | Philipp, now |
+| P1 | **Disk space:** the root file system ran full during this task and blocked the integration tests; with 4.5 GB free they pass again. Keep an eye on it (S1-13 P1, S1-15 P6) | ✅ Freed by the owner, 2026-10-23 |
 | P2 | `@testing-library/user-event` would make interactions closer to a browser (refuses disabled elements, real keyboard sequences, focus). Reconsider with the first keyboard-interaction tests (K-components, A11Y-04); it is a new dependency → owner decision | M1/M2 |
 | P3 | The next TESTING version should take over the convention of §3 (TESTING §5.3 currently only names the role queries) and S1-16 P1 (zoneless via `providersFile`) | Next TESTING version |
 | P4 | S1-20: stage 8 runs `npm run test:coverage` (or `npx ng test --coverage`) and merges `coverage/procure-access/lcov.info` with the backend coverage | S1-20 |
