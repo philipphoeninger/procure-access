@@ -8,13 +8,6 @@
       "request": "launch",
       "preLaunchTask": "npm: start",
       "url": "http://procureaccess.tech:4200/"
-    },
-    {
-      "name": "ng test",
-      "type": "chrome",
-      "request": "launch",
-      "preLaunchTask": "npm: test",
-      "url": "http://procureaccess.tech:9876/debug.html"
     }
   ]
 }

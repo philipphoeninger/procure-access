@@ -96,27 +96,11 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
+            "runner": "vitest",
             "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets/",
-                "output": "/assets/"
-              },
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles/theme.scss",
-              "src/styles/main.scss",
-              "node_modules/easymde/dist/easymde.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
-            ]
+            "providersFile": "src/test-providers.ts"
           }
         }
       }
