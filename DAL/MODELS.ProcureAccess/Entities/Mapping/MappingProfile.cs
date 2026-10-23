@@ -15,17 +15,31 @@ public class MappingProfile : Profile
             		src => src.ProductCriteriaFilters
                 		.Select(x => x.CriteriaFilter)));
 
-		CreateMap<CreateProductDto, Product>()
-    		.ForMember(dest => dest.ProductCriteriaFilters,
-        		opt => opt.MapFrom(src =>
-            		src.CriteriaFilterIds.Select(id =>
-                		new ProductCriteriaFilter
-                		{
-                    		CriteriaFilterId = id
-                		})));
+        // Create DTOs carry only client input. Members set by the server or by EF (key, audit
+        // fields, concurrency token, navigations) are ignored explicitly, so that
+        // AssertConfigurationIsValid (ARC-06) flags any other destination member left unmapped.
+        CreateMap<CreateProductDto, Product>()
+            .ForMember(dest => dest.ProductCriteriaFilters,
+                opt => opt.MapFrom(src =>
+                    src.CriteriaFilterIds.Select(id =>
+                        new ProductCriteriaFilter
+                        {
+                            CriteriaFilterId = id
+                        })))
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+            .ForMember(dest => dest.xmin, opt => opt.Ignore())
+            .ForMember(dest => dest.Proposal, opt => opt.Ignore());
 
         CreateMap<Criterion, CriterionDto>();
-        CreateMap<CreateCriterionDto, Criterion>();
+        CreateMap<CreateCriterionDto, Criterion>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+            .ForMember(dest => dest.xmin, opt => opt.Ignore())
+            .ForMember(dest => dest.CriteriaFilter, opt => opt.Ignore())
+            .ForMember(dest => dest.Proposal, opt => opt.Ignore());
 
         CreateMap<CriteriaFilter, LookupDto>();
 		CreateMap<CriteriaFilter, CriteriaFilterDto>()
