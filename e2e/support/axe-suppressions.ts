@@ -26,7 +26,16 @@ export interface AxeSuppression {
 
 export const ISSUE_URL_PATTERN = /^https:\/\/github\.com\/philipphoeninger\/procure-access\/issues\/\d+$/;
 
-export const axeSuppressions: readonly AxeSuppression[] = [];
+export const axeSuppressions: readonly AxeSuppression[] = [
+  {
+    rule: 'aria-tab-name',
+    selector: 'pa-products-container mat-step-header',
+    issue: 'https://github.com/philipphoeninger/procure-access/issues/52',
+    reason:
+      'The two stepper steps on /filters have no label, and the UX copy has no wording for them; ' +
+      'the criteria selection is rebuilt as S10 in migration step 2.',
+  },
+];
 
 /** Throws if an entry is incomplete, has no issue link, or repeats another entry. */
 export function validateAxeSuppressions(suppressions: readonly AxeSuppression[]): void {

@@ -26,6 +26,6 @@ Browser projects: `chromium`, `firefox`, `webkit`, `mobile-chrome` (Pixel 7), `m
 | `support/axe-suppressions.ts` | The **only** place to suppress an axe violation: one rule on one selector, with an issue link and a reason. Reviewed at the end of every migration step; must be empty before the pilot |
 | `support/axe-helper.spec.ts` | Self-test of the helper and the suppression rules |
 | `smoke/` | Smoke test of the stack |
-| `journeys/` | Journeys J1–J7 (from S1-19) |
+| `journeys/` | Journeys J1–J7 (TESTING §5.4). Today: `j1-configurator.spec.ts`, J1 in its current form (characterisation of the criteria filter on `/filters`; the expected criteria come from the CAT-10 fixture in `tests/ProcureAccess.Tests.Integration/Catalog/Fixtures/`) |
 
 Tests that cover an invariant carry `INV:<ID>` in the `describe` or `test` title (TESTING §8.1).

@@ -167,5 +167,10 @@
     "UPDATE": "Beim Ändern/Speichern ist ein Fehler aufgetreten.",
     "DELETE": "Beim Löschen/Entfernen ist ein Fehler aufgetreten.",
     "GENERIC": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support."
+  },
+  "shell": {
+    "nav": {
+      "menu": "Menü"
+    }
   }
 }
