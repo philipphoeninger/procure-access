@@ -49,7 +49,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Tests | xUnit v3, Shouldly, NSubstitute, Testcontainers (PostgreSQL 17), Respawn, NetArchTest, `FakeTimeProvider`; Vitest + Angular Testing Library; Playwright + axe-core |
 | Packaging | Docker / docker-compose; GitHub Actions |
 
-**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), client Docker image serves the release build through nginx (S1-11; `CLIENT_BUILD_CONFIGURATION` in `.env` picks the API: `production` or `production,local`), root solution `ProcureAccess.sln` with the four backend test projects under `tests/` on xUnit v3 and Microsoft.Testing.Platform (S1-12); integration fixture with Testcontainers PostgreSQL 17, Respawn, `WebApplicationFactory`, test authentication handler (`X-Test-User` header) and `FakeTimeProvider`; the API registers `TimeProvider.System`, but only `HealthController` reads it so far (S1-13); tagged tests for ARC-06 (Unit) and OPS-03 (Integration), still `planned` in TESTING §4 until the gate (S1-21) (S1-14); CAT-10 API characterisation of the criteria filter on the `AddSeedData` seed, expected sets in `tests/ProcureAccess.Tests.Integration/Catalog/Fixtures/cat-10-criteria-filter.json` (S1-15), frontend tests on Vitest (`@angular/build:unit-test`, jsdom) with Angular Testing Library; every `TestBed` gets zoneless change detection from `src/test-providers.ts` (`providersFile`); the generated Karma specs are deleted (S1-16); the first component test `delete-account-dialog.spec.ts` is the example of the convention in §9, with the real German texts from `src/app/testing/provide-test-translations.ts`, and `npm run test:coverage` writes a coverage report (`@vitest/coverage-v8`, text summary + lcov in `coverage/`, not gated) (S1-17), JWT in `localStorage`. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
+**Current state of the code (during migration step 0):** backend projects on .NET 10 / EF Core 10 / Npgsql 10 (S1-04) and the API Docker image on the 10.0 base images (S1-06; AutoMapper pinned to 14.0.0 until issue #31), Angular 22 with TypeScript 6.0 on Node 24 LTS / npm 11 (S1-09; `.nvmrc` and the client `Dockerfile` carry the same Node version), zoneless with every component `OnPush` (S1-10), client Docker image serves the release build through nginx (S1-11; `CLIENT_BUILD_CONFIGURATION` in `.env` picks the API: `production` or `production,local`), root solution `ProcureAccess.sln` with the four backend test projects under `tests/` on xUnit v3 and Microsoft.Testing.Platform (S1-12); integration fixture with Testcontainers PostgreSQL 17, Respawn, `WebApplicationFactory`, test authentication handler (`X-Test-User` header) and `FakeTimeProvider`; the API registers `TimeProvider.System`, but only `HealthController` reads it so far (S1-13); tagged tests for ARC-06 (Unit) and OPS-03 (Integration), still `planned` in TESTING §4 until the gate (S1-21) (S1-14); CAT-10 API characterisation of the criteria filter on the `AddSeedData` seed, expected sets in `tests/ProcureAccess.Tests.Integration/Catalog/Fixtures/cat-10-criteria-filter.json` (S1-15), frontend tests on Vitest (`@angular/build:unit-test`, jsdom) with Angular Testing Library; every `TestBed` gets zoneless change detection from `src/test-providers.ts` (`providersFile`); the generated Karma specs are deleted (S1-16); the first component test `delete-account-dialog.spec.ts` is the example of the convention in §9, with the real German texts from `src/app/testing/provide-test-translations.ts`, and `npm run test:coverage` writes a coverage report (`@vitest/coverage-v8`, text summary + lcov in `coverage/`, not gated) (S1-17); Playwright with `@axe-core/playwright` in `e2e/` (own `package.json`), axe helper `e2e/support/axe.ts` with the central suppression list `e2e/support/axe-suppressions.ts` (every entry links an issue), E2E stack = `docker-compose.yml` + `docker-compose.e2e.yml` (database in memory, API still `Development`, same host ports as the dev stack), smoke test and helper self-test, no journey yet (S1-18), JWT in `localStorage`. The upgrade to .NET 10 and Angular 22 is migration step 0 and comes before any new feature code.
 
 ## 4. Repository layout
 
@@ -64,6 +64,8 @@ SERVICES/SERVICES.ProcureAccess/    Data services
 CLIENT/CLIENT.ProcureAccess/        Angular SPA
 docker-compose.yml, .env            Local full stack (API 5000, client 4200, PostgreSQL 5432)
 tests/ProcureAccess.Tests.{Unit,Architecture,Integration,Shared}/   Backend tests; Shared = builders (`TestData.ACriterion()` …), not a test project
+e2e/                                Playwright + axe (own package.json): support/ (axe helper, suppressions, global setup), smoke/; journeys/ from S1-19
+docker-compose.e2e.yml              E2E override of docker-compose.yml (used by e2e/ npm scripts)
 docs/                               Project documents (§2)
 ```
 
@@ -106,9 +108,15 @@ npm run test:coverage                     # same, plus coverage summary and lcov
 
 # Backend tests (run from the repository root). Microsoft.Testing.Platform (global.json) needs --solution
 dotnet test --solution ProcureAccess.sln   # integration tests need a running Docker (Testcontainers starts postgres:17-alpine)
+
+# E2E + axe (run from e2e/; Node from .nvmrc). Needs .env like the dev stack; stop the dev stack first (same ports)
+npm install && npx playwright install chromium firefox webkit   # once
+npm run stack:up                          # E2E stack: fresh in-memory database, waits until client and API answer
+npx playwright test                       # all browsers; e.g. --project=chromium for one
+npm run stack:down                        # stop and remove the E2E stack
 ```
 
-From migration step 0 on (update this section when they exist): `npx playwright test` (in `e2e/`), `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`.
+From migration step 0 on (update this section when they exist): `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`.
 
 Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reuse`). New files get a header with `reuse annotate --copyright "Blinden- und Sehbehindertenverein Hamburg e.V." --year <year> --license MIT <file>`; files without comment syntax (JSON, binaries, generated files) are covered in `REUSE.toml`.
 

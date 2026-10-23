@@ -6,6 +6,9 @@
 .git
 .gitignore
 
+# E2E tests (own package, not part of any image)
+e2e/
+
 # node
 **/node_modules
 **/dist

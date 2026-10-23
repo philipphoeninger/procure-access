@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# E2E stack for Playwright (TESTING §3.3). Applied on top of docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --build -d --wait
+# or, from e2e/: npm run stack:up / npm run stack:down
+#
+# Differences from the development stack:
+# - own project name, so containers, network and images do not mix with the dev stack;
+# - database in memory (tmpfs): every start begins with an empty database, nothing persists;
+# - stack-local network instead of the external dokploy-network (CI has none);
+# - SMTP credentials cleared, so no e-mail can leave an E2E run;
+# - client healthcheck through the nginx proxy, so --wait returns only when client and API answer.
+#
+# The client bundle calls http://localhost:5000/api (build configuration "production,local"),
+# so the E2E stack uses the same host ports 5000 and 4200 as the dev stack: stop one before
+# starting the other.
+#
+# Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment with its own
+# seeder, Mailpit, the test clock endpoint and the relaxed export rate limit. Until then the API
+# runs as Development, like the dev stack.
+name: procureaccess-e2e
+
+services:
+  db:
+    container_name: !reset null
+    ports: !reset []
+    volumes: !reset []
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  api:
+    environment:
+      Email__Username: ""
+      Email__Password: ""
+
+  client:
+    healthcheck:
+      # 127.0.0.1, not localhost: in the Alpine image localhost resolves to ::1 first, and nginx listens on IPv4 only
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://127.0.0.1/api/Health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+networks:
+  dokploy-network:
+    external: false
