@@ -7,8 +7,8 @@ namespace API.ProcureAccess.Controllers;
 [ApiController]
 [AllowAnonymous]
 [Route("api/[controller]")]
-public class HealthController : ControllerBase
+public class HealthController(TimeProvider timeProvider) : ControllerBase
 {
    [HttpGet]
-   public IActionResult Get() => Ok(new { status = "ok", time = DateTime.UtcNow });
+   public IActionResult Get() => Ok(new { status = "ok", time = timeProvider.GetUtcNow().UtcDateTime });
 }

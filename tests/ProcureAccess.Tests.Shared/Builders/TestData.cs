@@ -23,4 +23,7 @@ public static class TestData
 
     /// <summary>A criterion of the existing data model (before catalog versioning, migration step 2).</summary>
     public static CriterionBuilder ACriterion() => new();
+
+    /// <summary>A filter type of the existing data model (before catalog versioning, migration step 2).</summary>
+    public static FilterTypeBuilder AFilterType() => new();
 }
