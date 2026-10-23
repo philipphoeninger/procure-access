@@ -50,6 +50,8 @@
 | 3 | Same run with a temporary failing test in the Integration project | ✅ exit 2 (the run fails; test removed again) |
 | 4 | `dotnet format <project> --verify-no-changes` for the four test projects | ✅ no changes |
 | 5 | `reuse lint` | ✅ compliant (REUSE 3.3). Note: while `tests/` was still untracked, `reuse` listed the ignored `bin/`/`obj/` files; after `git add` they are skipped |
+| 6 | `npx ng test` (Karma, Node 24 from `.nvmrc`) | ❌ does not compile (`save-search-dialog.spec.ts` imports a missing `./update-user-dialog`): same as on `main` (S1-10, S1-11), client not touched; specs are replaced in S1-16 |
+| 7 | `dotnet restore --force`: NuGet audit | ✅ no new `NU1xxx` warnings from the test packages |
 
 ## 4. Open points
 
