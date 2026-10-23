@@ -31,4 +31,9 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../../API/API.ProcureAccess/API.ProcureAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Recorded expectations of characterisation tests (CAT-10), read at run time. -->
+    <None Update="Catalog/Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
