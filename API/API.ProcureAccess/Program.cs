@@ -27,6 +27,9 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                     typeof(MappingProfile).Assembly)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
+// The application reads time only through TimeProvider (CLAUDE.md §7); tests replace it with FakeTimeProvider.
+builder.Services.AddSingleton(TimeProvider.System);
+
 // Configure logging
 builder.ConfigureSerilog();
 builder.Services.RegisterLoggingInterfaces();
