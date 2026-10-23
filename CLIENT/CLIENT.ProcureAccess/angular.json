@@ -100,7 +100,10 @@
           "options": {
             "runner": "vitest",
             "tsConfig": "tsconfig.spec.json",
-            "providersFile": "src/test-providers.ts"
+            "providersFile": "src/test-providers.ts",
+            "coverageInclude": ["src/app/**/*.ts"],
+            "coverageExclude": ["src/app/**/*.spec.ts", "src/app/testing/**"],
+            "coverageReporters": ["text-summary", "lcov"]
           }
         }
       }
