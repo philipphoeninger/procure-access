@@ -7,8 +7,7 @@
     "build": "ng build --configuration development",
     "build:release": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "test:headless": "ng test"
+    "test": "ng test"
   },
   "prettier": {
     "printWidth": 100,
@@ -51,17 +50,13 @@
     "@angular/build": "^22.2.3",
     "@angular/cli": "^22.2.3",
     "@angular/compiler-cli": "^22.2.3",
-    "@types/jasmine": "~5.1.0",
-    "istanbul-lib-instrument": "^6.0.3",
-    "jasmine-core": "~5.9.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "@testing-library/angular": "^19.6.0",
+    "@testing-library/dom": "^10.4.2",
+    "jsdom": "^30.1.3",
     "prettier": "^3.6.2",
     "reflect-metadata": "^0.2.2",
     "typedjson": "^1.8.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5"
   }
 }
