@@ -43,7 +43,7 @@ SPDX-License-Identifier: MIT
             } @else {
                 <div class="list-selection-container">
                     <div>
-                        <mat-selection-list #filterTypes1>
+                        <mat-selection-list #filterTypes1 [attr.aria-label]="filterType.name">
                             @for (criteriaFilter of filterType.criteriaFilters.slice(0, (filterType.criteriaFilters.length + 1) / 2); track criteriaFilter) {
                                 <mat-list-option
                                     togglePosition="before"
@@ -56,7 +56,7 @@ SPDX-License-Identifier: MIT
                         </mat-selection-list>
                     </div>
                     <div>
-                        <mat-selection-list #filterTypes2>
+                        <mat-selection-list #filterTypes2 [attr.aria-label]="filterType.name">
                             @for (criteriaFilter of filterType.criteriaFilters.slice((filterType.criteriaFilters.length + 1) / 2, filterType.criteriaFilters.length); track criteriaFilter) {
                                 <mat-list-option
                                     togglePosition="before"

@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 -->
 
 <mat-toolbar id="pa-header">
-  <button id="menu-btn" mat-icon-button [matMenuTriggerFor]="menu">
+  <button id="menu-btn" mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'shell.nav.menu' | translate">
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
       <mat-icon>home</mat-icon>
       <span>{{ 'MENU.HOME_LABEL' | translate }}</span></button>
   </mat-menu>
-  <button matButton class="home-btn" aria-label="Home button" [routerLink]="'/home'">
+  <button matButton class="home-btn" [routerLink]="'/home'">
     <h1 id="app-name"><img class="pa-logo" [src]="logoPath" alt="WERTE.IT Logo" />ProcureAccess</h1>
   </button>
   <div class="tools">
