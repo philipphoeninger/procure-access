@@ -15,8 +15,9 @@ SPDX-License-Identifier: MIT
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <!--
-      Exit code 8 = "no tests ran". Allowed while this project is still empty (S1-12);
-      remove this line together with the first test (S1-14).
+      Exit code 8 = "no tests ran". Allowed while this project is still empty (S1-12).
+      ARC-06 is a unit test (TESTING §4.10, S1-14), so the first tests here are the module
+      rules ARC-01–03 of migration step 1; remove this line together with them.
     -->
     <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
   </PropertyGroup>

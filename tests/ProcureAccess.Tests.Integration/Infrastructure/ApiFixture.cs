@@ -97,6 +97,17 @@ public sealed class ApiFixture : IAsyncLifetime
         await context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Connection string for a database with a new, unique name on the same server. The database
+    /// does not exist yet; a test that creates it also drops it. Used where the shared, already
+    /// migrated database does not fit, e.g. migrating an empty database (OPS-03).
+    /// </summary>
+    public string ConnectionStringForNewDatabase() =>
+        new NpgsqlConnectionStringBuilder(_database.GetConnectionString())
+        {
+            Database = $"test_{Guid.NewGuid():N}",
+        }.ConnectionString;
+
     public async ValueTask DisposeAsync()
     {
         if (_factory is not null)
