@@ -1,0 +1,31 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- Unit tests: no I/O, no database, no HTTP (TESTING §2, §3.4). -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- xUnit v3 test projects are executables running on Microsoft.Testing.Platform (see global.json). -->
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSubstitute" Version="6.2.0" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ProcureAccess.Tests.Shared/ProcureAccess.Tests.Shared.csproj" />
+    <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
+    <ProjectReference Include="../../SERVICES/SERVICES.ProcureAccess/SERVICES.ProcureAccess.csproj" />
+  </ItemGroup>
+
+</Project>

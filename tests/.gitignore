@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# .NET build output and test results of the test projects
+bin/
+obj/
+TestResults/

@@ -1,0 +1,35 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- Integration and contract tests: WebApplicationFactory + Testcontainers PostgreSQL 17 (TESTING §3.4, §5.2). -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- xUnit v3 test projects are executables running on Microsoft.Testing.Platform (see global.json). -->
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!--
+      Exit code 8 = "no tests ran". Allowed while this project is still empty (S1-12);
+      remove this line together with the first test (S1-13).
+    -->
+    <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSubstitute" Version="6.2.0" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ProcureAccess.Tests.Shared/ProcureAccess.Tests.Shared.csproj" />
+    <ProjectReference Include="../../API/API.ProcureAccess/API.ProcureAccess.csproj" />
+  </ItemGroup>
+
+</Project>
