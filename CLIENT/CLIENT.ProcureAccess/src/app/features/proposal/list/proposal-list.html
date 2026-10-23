@@ -101,7 +101,7 @@ SPDX-License-Identifier: MIT
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-    @if (dataSource._filterData.length == 0) {
+    @if (dataSource._filterData.length === 0) {
         <p>{{ 'PROPOSALS.NON_OPEN_FOUND' | translate }}</p>
     }
   </table>

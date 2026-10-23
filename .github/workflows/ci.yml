@@ -1,0 +1,285 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# CI pipeline, stages 1–8 of TESTING §8.2 (ARCHITECTURE §10.3). Stage 9 (CodeQL, Dependabot)
+# is configured in the repository settings. One job per stage; the job names carry the stage
+# number. Actions are pinned by commit SHA (public repository); the comment names the release.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_VERSION: 10.0.x
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NG_CLI_ANALYTICS: false
+  CI: true
+  REUSE_VERSION: 6.2.0
+  REPORTGENERATOR_VERSION: 5.5.11
+
+jobs:
+  lint:
+    name: 1. Lint & licences
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Whole solution: whitespace and code style. Analyzer rules only on the test projects:
+      # the production projects still have analyzer findings whose fixes rename methods
+      # (VSTHRD200), which is a refactor for migration step 1 (docs/sprints/S1-20_ci.md).
+      - name: dotnet format (whitespace, style)
+        run: |
+          dotnet format whitespace ProcureAccess.sln --verify-no-changes
+          dotnet format style ProcureAccess.sln --verify-no-changes
+      - name: dotnet format (test projects, incl. analyzers)
+        run: |
+          for project in tests/*/*.csproj; do
+            echo "::group::$project"
+            dotnet format "$project" --verify-no-changes
+            echo "::endgroup::"
+          done
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            CLIENT/CLIENT.ProcureAccess/package-lock.json
+            e2e/package-lock.json
+      - name: ESLint (client templates, incl. accessibility rules)
+        working-directory: CLIENT/CLIENT.ProcureAccess
+        run: |
+          npm ci
+          npm run lint
+      - name: TypeScript check (e2e)
+        working-directory: e2e
+        run: |
+          npm ci
+          npm run typecheck
+      - name: REUSE / SPDX licence check
+        run: pipx run "reuse==${REUSE_VERSION}" lint
+      - name: Figma link check (placeholder until S1-21)
+        run: echo "::notice title=Figma link check::scripts/check-figma-links.mjs is added in S1-21, which replaces this step."
+
+  build:
+    name: 2. Build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Build .NET solution
+        run: dotnet build ProcureAccess.sln
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc
+          cache: npm
+          cache-dependency-path: CLIENT/CLIENT.ProcureAccess/package-lock.json
+      - name: Build Angular client (release)
+        working-directory: CLIENT/CLIENT.ProcureAccess
+        run: |
+          npm ci
+          npm run build:release
+
+  dotnet-tests:
+    name: ${{ matrix.stage }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - stage: 3. Unit (.NET)
+            project: ProcureAccess.Tests.Unit
+          - stage: 4. Architecture
+            project: ProcureAccess.Tests.Architecture
+          # Testcontainers starts postgres:17-alpine on the runner's Docker.
+          - stage: 5. Integration
+            project: ProcureAccess.Tests.Integration
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Coverage (coverlet.MTP) covers only the four production assemblies; migrations excluded.
+      - name: Test ${{ matrix.project }}
+        run: >-
+          dotnet test --project "tests/${{ matrix.project }}"
+          --results-directory "coverage/${{ matrix.project }}"
+          --coverlet --coverlet-output-format cobertura
+          --coverlet-include "[API.ProcureAccess]*"
+          --coverlet-include "[DAL.ProcureAccess]*"
+          --coverlet-include "[MODELS.ProcureAccess]*"
+          --coverlet-include "[SERVICES.ProcureAccess]*"
+          --coverlet-exclude-by-file "**/Migrations/*.cs"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-${{ matrix.project }}
+          path: coverage/${{ matrix.project }}/*.cobertura*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+  client-tests:
+    name: 3. Unit (Angular)
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc
+          cache: npm
+          cache-dependency-path: CLIENT/CLIENT.ProcureAccess/package-lock.json
+      - name: Vitest with coverage
+        working-directory: CLIENT/CLIENT.ProcureAccess
+        run: |
+          npm ci
+          npm run test:coverage
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-client
+          path: CLIENT/CLIENT.ProcureAccess/coverage/procure-access/lcov.info
+          if-no-files-found: warn
+          retention-days: 14
+
+  e2e:
+    name: 6. E2E + a11y
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # docker-compose.yml needs a .env. Take the template and replace its two placeholder
+      # secrets with random values for this run only (masked in the log, never uploaded).
+      - name: Write .env for the E2E stack
+        run: |
+          cp .env.example .env
+          db_password="$(openssl rand -hex 24)"
+          jwt_key="$(openssl rand -base64 64 | tr -d '\n')"
+          echo "::add-mask::$db_password"
+          echo "::add-mask::$jwt_key"
+          sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${db_password}|; s|^JWT_KEY=.*|JWT_KEY=${jwt_key}|" .env
+          if grep -q "change-me" .env; then echo "::error::.env still contains a placeholder"; exit 1; fi
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: e2e/.nvmrc
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      - name: Install e2e dependencies
+        working-directory: e2e
+        run: npm ci
+      - name: Read Playwright version
+        id: playwright
+        working-directory: e2e
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: browser-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - name: Install Playwright browsers
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Install Playwright system dependencies
+        if: steps.browser-cache.outputs.cache-hit == 'true'
+        working-directory: e2e
+        run: npx playwright install-deps chromium firefox webkit
+      - name: Start E2E stack
+        working-directory: e2e
+        run: npm run stack:up
+      - name: Playwright (all five browser projects)
+        working-directory: e2e
+        run: npx playwright test
+      - name: Collect stack logs
+        if: failure()
+        run: $COMPOSE logs --no-color > e2e/compose.log 2>&1 || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+            e2e/compose.log
+          retention-days: 14
+      - name: Stop E2E stack
+        if: always()
+        working-directory: e2e
+        run: npm run stack:down
+
+  invariants:
+    name: 7. Invariant gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Invariant gate (placeholder until S1-21)
+        run: echo "::notice title=Invariant gate::scripts/check-invariants.mjs is added in S1-21, which replaces this step."
+
+  coverage:
+    name: 8. Coverage report
+    needs: [dotnet-tests, client-tests]
+    if: ${{ !cancelled() }}
+    # Reported, not gated (TESTING §8.4).
+    continue-on-error: true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: coverage-*
+          path: coverage
+      - name: Merge coverage (ReportGenerator)
+        run: |
+          dotnet tool install dotnet-reportgenerator-globaltool --version "$REPORTGENERATOR_VERSION" --tool-path .tools
+          .tools/reportgenerator \
+            "-reports:coverage/**/*.cobertura*.xml;coverage/**/lcov.info" \
+            "-targetdir:coverage-report" \
+            "-reporttypes:Html;MarkdownSummaryGithub" \
+            "-sourcedirs:CLIENT/CLIENT.ProcureAccess" \
+            "-title:ProcureAccess"
+          cat coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-report
+          path: coverage-report/
+          retention-days: 14

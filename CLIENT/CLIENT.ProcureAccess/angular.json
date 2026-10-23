@@ -105,6 +105,12 @@
             "coverageExclude": ["src/app/**/*.spec.ts", "src/app/testing/**"],
             "coverageReporters": ["text-summary", "lcov"]
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }
