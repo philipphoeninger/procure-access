@@ -9,6 +9,6 @@ namespace API.ProcureAccess.Controllers;
 [Route("api/[controller]")]
 public class HealthController(TimeProvider timeProvider) : ControllerBase
 {
-   [HttpGet]
-   public IActionResult Get() => Ok(new { status = "ok", time = timeProvider.GetUtcNow().UtcDateTime });
+    [HttpGet]
+    public IActionResult Get() => Ok(new { status = "ok", time = timeProvider.GetUtcNow().UtcDateTime });
 }

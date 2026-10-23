@@ -12,19 +12,19 @@ public class CriterionConfiguration : BaseEntityConfiguration<Criterion>
 
         // Query Filters
         builder.HasQueryFilter(x => !x.IsDeleted);
-        
+
         // properties
         builder.HasIndex(
             x => new { x.Name }).IsUnique();
 
         builder.Property(x => x.Description).HasColumnType("text");
-        
+
         builder
             .HasOne(x => x.CriteriaFilter)
             .WithMany(cf => cf.Criteria)
             .HasForeignKey(x => x.CriteriaFilterId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         // Data
         builder.HasData(CriterionSeed.Data);
 

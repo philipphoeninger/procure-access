@@ -15,13 +15,13 @@ public class ProductCriteriaFilterConfiguration
             x.ProductId,
             x.CriteriaFilterId
         });
-        
+
         // Query Filters
         builder.HasQueryFilter(x => !x.Product.IsDeleted);
 
         builder.HasIndex(x => new
         {
-            x.ProductId, 
+            x.ProductId,
             x.CriteriaFilterId
         }).IsUnique();
 
@@ -30,7 +30,7 @@ public class ProductCriteriaFilterConfiguration
             .WithMany(cf => cf.Products)
             .HasForeignKey(x => x.CriteriaFilterId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         // Data
         builder.HasData(ProductCriteriaFilterSeed.Data);
     }

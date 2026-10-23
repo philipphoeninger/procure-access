@@ -24,7 +24,7 @@ public partial class CriteriaFilter : BaseEntity
     public ICollection<Criterion> Criteria { get; set; } = new List<Criterion>();
 
     public ICollection<ProductCriteriaFilter> Products { get; set; } = new List<ProductCriteriaFilter>();
-    
+
     public ICollection<CriteriaFilterExclusion> Exclusions { get; set; } = new List<CriteriaFilterExclusion>();
     public ICollection<CriteriaFilterExclusion> ParentExclusions { get; set; } = new List<CriteriaFilterExclusion>();
 

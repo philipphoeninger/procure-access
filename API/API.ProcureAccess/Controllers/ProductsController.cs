@@ -11,7 +11,7 @@ public class ProductsController : BaseCrudController<Product, ProductDto, Produc
     private readonly IProductService _productService;
 
     public ProductsController(
-        IAppLogging<ProductsController> logger, 
+        IAppLogging<ProductsController> logger,
         IProductService service) : base(logger, service)
     {
         _productService = service;

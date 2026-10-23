@@ -8,12 +8,12 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-		CreateMap<Product, ProductDto>()
-    		.ForMember(
-        		dest => dest.CriteriaFilters,
-        		opt => opt.MapFrom(
-            		src => src.ProductCriteriaFilters
-                		.Select(x => x.CriteriaFilter)));
+        CreateMap<Product, ProductDto>()
+            .ForMember(
+                dest => dest.CriteriaFilters,
+                opt => opt.MapFrom(
+                    src => src.ProductCriteriaFilters
+                        .Select(x => x.CriteriaFilter)));
 
         // Create DTOs carry only client input. Members set by the server or by EF (key, audit
         // fields, concurrency token, navigations) are ignored explicitly, so that
@@ -42,12 +42,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Proposal, opt => opt.Ignore());
 
         CreateMap<CriteriaFilter, LookupDto>();
-		CreateMap<CriteriaFilter, CriteriaFilterDto>()
-    		.ForMember(
-        		dest => dest.Exclusions,
-        		opt => opt.MapFrom(
-            		src => src.Exclusions
-                		.Select(x => x.Exclusion)));
+        CreateMap<CriteriaFilter, CriteriaFilterDto>()
+            .ForMember(
+                dest => dest.Exclusions,
+                opt => opt.MapFrom(
+                    src => src.Exclusions
+                        .Select(x => x.Exclusion)));
 
         CreateMap<FilterType, FilterTypeDto>();
         CreateMap<Proposal, ProposalDto>();

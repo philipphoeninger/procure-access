@@ -9,7 +9,7 @@ namespace API.ProcureAccess.Controllers;
 public class FilterTypesController : BaseCrudController<FilterType, FilterTypeDto, FilterTypesController>
 {
     public FilterTypesController(
-        IAppLogging<FilterTypesController> logger, 
+        IAppLogging<FilterTypesController> logger,
         IFilterTypeService service) : base(logger, service)
     {
     }

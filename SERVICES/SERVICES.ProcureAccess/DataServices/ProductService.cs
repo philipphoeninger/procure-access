@@ -7,7 +7,7 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class ProductService : BaseService<Product, ProductDto>, IProductService
 {
     public ProductService(
-        IProductRepo repo, 
+        IProductRepo repo,
         IMapper mapper) : base(repo, mapper)
     { }
 
@@ -37,7 +37,7 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
                 p.ProductCriteriaFilters
                     .Any(x => x.CriteriaFilterId == criteriaFilterId));
         }
-        
+
         return Result<IEnumerable<ProductDto>>.Success(
                 await query
                     .OrderBy(x => x.Id)

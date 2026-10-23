@@ -9,13 +9,13 @@ public class ProductDto : BaseDto
     [Required]
     [StringLength(200)]
     public string Name { get; set; }
-    
+
     [Url]
     [StringLength(500)]
     public string? Link { get; set; }
-    
+
     [StringLength(6000)]
     public string? Description { get; set; }
-    
+
     public List<LookupDto> CriteriaFilters { get; set; } = [];
 }

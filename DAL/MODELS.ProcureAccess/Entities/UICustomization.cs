@@ -21,6 +21,6 @@ public class UICustomization
     #endregion
 
     #region ctors
-    public UICustomization() {}
+    public UICustomization() { }
     #endregion
 }

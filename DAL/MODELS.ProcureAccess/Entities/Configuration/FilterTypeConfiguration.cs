@@ -18,10 +18,10 @@ public class FilterTypeConfiguration : BaseEntityConfiguration<FilterType>
             x => new { x.Name }).IsUnique();
 
         builder.Property(x => x.Description).HasColumnType("text");
-        
+
         // Data
         builder.HasData(FilterTypeSeed.Data);
-        
+
         // temporal
         // builder.ToTable(b => b.IsTemporal(tb =>
         // {

@@ -18,14 +18,14 @@ public class ProductConfiguration : BaseEntityConfiguration<Product>
             x => new { x.Name }).IsUnique();
         builder.HasIndex(
             x => new { x.Link }).IsUnique();
-        
+
         builder.Property(x => x.Description).HasColumnType("text");
-        
+
         builder.HasMany(x => x.ProductCriteriaFilters)
             .WithOne(pcf => pcf.Product)
             .HasForeignKey(pcf => pcf.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         // Data
         builder.HasData(ProductSeed.Data);
 

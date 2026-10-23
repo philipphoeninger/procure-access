@@ -22,9 +22,9 @@ public static class IdentityUserEndpoints
 
             return result == null
                 ? Results.BadRequest(new
-                    {
-                        code = "InvalidLogin"
-                    })
+                {
+                    code = "InvalidLogin"
+                })
                 : Results.Ok(result);
         });
 
@@ -36,11 +36,11 @@ public static class IdentityUserEndpoints
 
             return result.Succeeded
                 ? Results.Ok(result)
-                : Results.BadRequest(new 
-                    {
-                        code = "SignUpFailure",
-                        message = result.Errors
-                    });
+                : Results.BadRequest(new
+                {
+                    code = "SignUpFailure",
+                    message = result.Errors
+                });
         });
 
         app.MapPost("/forgot-password", async (
@@ -70,9 +70,9 @@ public static class IdentityUserEndpoints
 
             return result == null
                 ? Results.BadRequest(new
-                    {
-                        code = "InvalidRefreshToken"
-                    })
+                {
+                    code = "InvalidRefreshToken"
+                })
                 : Results.Ok(result);
         });
 
@@ -85,10 +85,11 @@ public static class IdentityUserEndpoints
 
             return result.Succeeded
                 ? Results.Ok("Email confirmed")
-                : Results.BadRequest(new {
-                        code = "EmailConfirmFailure",
-                        message = result.Errors
-                    });
+                : Results.BadRequest(new
+                {
+                    code = "EmailConfirmFailure",
+                    message = result.Errors
+                });
         });
 
         return app;

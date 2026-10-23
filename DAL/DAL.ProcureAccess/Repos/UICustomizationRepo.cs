@@ -31,7 +31,7 @@ public class UICustomizationRepo : IUICustomizationRepo
             .Where(u => u.Id == userId)
             .Select(u => u.UICustomization)
             .FirstAsync();
-        
+
         return _mapper.Map<UICustomizationDto>(entity);
     }
 

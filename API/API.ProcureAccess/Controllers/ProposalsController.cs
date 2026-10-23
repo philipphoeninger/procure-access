@@ -10,9 +10,9 @@ namespace API.ProcureAccess.Controllers;
 public class ProposalsController : BaseCrudController<Proposal, ProposalDto, ProposalsController>
 {
     private readonly IProposalService _proposalService;
- 
+
     public ProposalsController(
-        IAppLogging<ProposalsController> logger, 
+        IAppLogging<ProposalsController> logger,
         IProposalService service) : base(logger, service)
     {
         _proposalService = service;

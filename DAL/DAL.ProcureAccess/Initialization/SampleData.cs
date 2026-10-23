@@ -8,7 +8,7 @@ public static class SampleData
 {
     public static List<User> Users => new()
     {
-        new() 
+        new()
         {
             UserName = "hoeninger@werte.it",
             Email = "hoeninger@werte.it",

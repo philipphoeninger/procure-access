@@ -11,6 +11,6 @@ public class UpdateCriterionDto : BaseDto
 
     [StringLength(6000)]
     public string? Description { get; set; }
-    
+
     public int? CriteriaFilterId { get; set; }
 }

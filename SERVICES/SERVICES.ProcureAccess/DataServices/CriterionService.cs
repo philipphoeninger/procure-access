@@ -7,7 +7,7 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterionService
 {
     public CriterionService(
-        ICriterionRepo repo, 
+        ICriterionRepo repo,
         IMapper mapper) : base(repo, mapper)
     { }
 

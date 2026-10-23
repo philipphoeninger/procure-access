@@ -11,7 +11,7 @@ public class User : IdentityUser
 
     public ICollection<Proposal> Proposals { get; set; } = new List<Proposal>();
     public ICollection<Proposal> Approvals { get; set; } = new List<Proposal>();
-    
+
     [Required]
     public bool IsDeleted { get; set; } = false;
 

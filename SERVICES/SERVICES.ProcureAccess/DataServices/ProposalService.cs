@@ -11,7 +11,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     private readonly ICriterionService _criterionService;
 
     public ProposalService(
-        IProposalRepo repo, 
+        IProposalRepo repo,
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
         IProductService productService,
@@ -41,7 +41,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         {
             entity = await MainRepo.Context.Proposals
                 .FirstAsync(p => p.Id == cmd.Id.Value);
-            
+
             if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
                 entity.ProposerId != userId)
                 throw new Exception("User is not authorized to update this proposal.");
@@ -118,9 +118,9 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
             entities = MainRepo.Context.Proposals
                 .Include(x => x.Product)
                 .Include(x => x.Criterion)
-                .Where(x => 
+                .Where(x =>
                 !(
-                    (x.Product != null && x.Product.IsDeleted) || 
+                    (x.Product != null && x.Product.IsDeleted) ||
                     (x.Criterion != null && x.Criterion.IsDeleted)
                 )).ToList();
         }
@@ -129,16 +129,17 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
             entities = MainRepo.Context.Proposals
                 .Include(x => x.Product)
                 .Include(x => x.Criterion)
-                .Where(x => 
+                .Where(x =>
                 !(
-                    (x.Product != null && x.Product.IsDeleted) || 
+                    (x.Product != null && x.Product.IsDeleted) ||
                     (x.Criterion != null && x.Criterion.IsDeleted)
-                ) && 
+                ) &&
                 x.ProposerId == user.FindFirstValue(ClaimTypes.NameIdentifier)).ToList();
         }
 
         var dtos = new List<ProposalDto>();
-        entities.ForEach(async x => {
+        entities.ForEach(async x =>
+        {
             var dto = await MapToDtoAsync(x);
             dtos.Add(dto);
         });
@@ -185,8 +186,8 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
 
         if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
             proposal.ProposerId != userId)
-                throw new Exception("User is not authorized to update this proposal.");
-                
+            throw new Exception("User is not authorized to update this proposal.");
+
         if (cmd.Product != null)
         {
             proposal.ProductSnapshot = JsonSerializer.Serialize(cmd.Product);
@@ -228,8 +229,8 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         if (proposal.FinishedAt != null)
             throw new Exception("Proposal already processed.");
 
-        proposal.Status = cmd.IsApproved 
-            ? ProposalStatus.Approved 
+        proposal.Status = cmd.IsApproved
+            ? ProposalStatus.Approved
             : ProposalStatus.Rejected;
         proposal.Note = cmd.Note;
         proposal.ApproverId = userId;
@@ -246,32 +247,32 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     }
 
     // APPLY SNAPSHOT → REAL ENTITY
-	private async Task ApplyApprovalSideEffects(Proposal proposal)
-	{
-    	if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
-    	{
-        	var dto = JsonSerializer.Deserialize<CreateProductDto>(proposal.ProductSnapshot);
+    private async Task ApplyApprovalSideEffects(Proposal proposal)
+    {
+        if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
+        {
+            var dto = JsonSerializer.Deserialize<CreateProductDto>(proposal.ProductSnapshot);
 
-        	var product = Mapper.Map<Product>(dto);
+            var product = Mapper.Map<Product>(dto);
 
-        	MainRepo.Context.Products.Add(product);
+            MainRepo.Context.Products.Add(product);
 
-        	proposal.Product = product;
-        	proposal.Criterion = null;
-    	}
+            proposal.Product = product;
+            proposal.Criterion = null;
+        }
 
-    	if (!string.IsNullOrEmpty(proposal.CriterionSnapshot))
-    	{
-        	var dto = JsonSerializer.Deserialize<CreateCriterionDto>(proposal.CriterionSnapshot);
+        if (!string.IsNullOrEmpty(proposal.CriterionSnapshot))
+        {
+            var dto = JsonSerializer.Deserialize<CreateCriterionDto>(proposal.CriterionSnapshot);
 
-        	var criterion = Mapper.Map<Criterion>(dto);
+            var criterion = Mapper.Map<Criterion>(dto);
 
-        	MainRepo.Context.Criteria.Add(criterion);
+            MainRepo.Context.Criteria.Add(criterion);
 
-        	proposal.Criterion = criterion;
-        	proposal.Product = null;
-    	}
-	}
+            proposal.Criterion = criterion;
+            proposal.Product = null;
+        }
+    }
 
     // MAPPING (entity → DTO + snapshot restore)
     private async Task<ProposalDto> MapToDtoAsync(Proposal proposal)
