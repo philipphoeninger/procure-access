@@ -74,8 +74,8 @@ jobs:
           npm run typecheck
       - name: REUSE / SPDX licence check
         run: pipx run "reuse==${REUSE_VERSION}" lint
-      - name: Figma link check (placeholder until S1-21)
-        run: echo "::notice title=Figma link check::scripts/check-figma-links.mjs is added in S1-21, which replaces this step."
+      - name: Figma link check
+        run: node scripts/check-figma-links.mjs
 
   build:
     name: 2. Build
@@ -246,8 +246,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Invariant gate (placeholder until S1-21)
-        run: echo "::notice title=Invariant gate::scripts/check-invariants.mjs is added in S1-21, which replaces this step."
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc
+      # Reads the catalogue from the highest docs/TESTING_v<n>.md (TESTING §8.3).
+      - name: Invariant gate
+        run: node scripts/check-invariants.mjs
 
   coverage:
     name: 8. Coverage report
