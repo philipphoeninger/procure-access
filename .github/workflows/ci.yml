@@ -278,6 +278,8 @@ jobs:
             "-sourcedirs:CLIENT/CLIENT.ProcureAccess" \
             "-title:ProcureAccess"
           cat coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          # lcov carries no assembly name, so ReportGenerator lists the Angular client as "Default".
+          echo "_\"Default\" is the Angular client (Vitest lcov). Reported, not gated (TESTING §8.4)._" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
