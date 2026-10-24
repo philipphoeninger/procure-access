@@ -19,7 +19,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  // In CI (GitHub Actions) the `github` reporter adds failures as annotations to the pull request.
+  reporter: process.env['CI']
+    ? [['github'], ['list'], ['html', { open: 'never' }]]
+    : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: process.env['E2E_BASE_URL'] ?? 'http://localhost:4200',
     locale: 'de-DE',

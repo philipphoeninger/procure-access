@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
             </mat-expansion-panel-header>
 
             <p>{{ filterType.description }}</p>
-            @if (filterType.name == EnFilterTypeName.productType) {
+            @if (filterType.name === EnFilterTypeName.productType) {
                 <form> <!-- [formGroup]="formGroup1()"-->
                     <mat-form-field class="example-chip-list">
                         <mat-label>{{ filterType.name }}</mat-label>
