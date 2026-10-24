@@ -17,7 +17,7 @@ public abstract class BaseEntityConfiguration<T>
         builder.Property(c => c.CreatedAt)
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-        
+
         // PostgreSQL system column xmin as optimistic concurrency token. Npgsql 10 removed
         // UseXminAsConcurrencyToken(); this is the mapping it used to create (same model snapshot).
         builder.Property<uint>("xmin")

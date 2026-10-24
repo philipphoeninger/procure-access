@@ -16,7 +16,7 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
     protected readonly IAppLogging<TController> Logger;
 
     protected BaseCrudController(
-        IAppLogging<TController> logger, 
+        IAppLogging<TController> logger,
         IBaseService<TEntity, TDto> service)
     {
         MainService = service;
@@ -168,8 +168,8 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
             return new BadRequestObjectResult(ex.GetBaseException()?.Message);
         }
         return result != null ? Ok(result) : BadRequest(new
-            {
-                code = "DeleteFailure"
-            });
+        {
+            code = "DeleteFailure"
+        });
     }
 }

@@ -51,8 +51,8 @@ public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
         int success = MainRepo.Update(entity);
         TEntity updatedEntity = MainRepo.Find(dto.Id);
 
-        return Convert.ToBoolean(success) 
-            ? Result<TDto?>.Success(Mapper.Map<TDto>(updatedEntity)) 
+        return Convert.ToBoolean(success)
+            ? Result<TDto?>.Success(Mapper.Map<TDto>(updatedEntity))
             : Result<TDto?>.Failure("Entity could not be updated.");
     }
 

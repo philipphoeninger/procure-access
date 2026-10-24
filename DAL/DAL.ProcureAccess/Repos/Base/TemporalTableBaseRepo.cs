@@ -7,9 +7,9 @@ namespace DAL.ProcureAccess.Repos.Base;
 public abstract class TemporalTableBaseRepo<T> : BaseRepo<T>, ITemporalTableBaseRepo<T> where T : BaseEntity, new()
 {
     #region ctors
-    protected TemporalTableBaseRepo(ApplicationDBContext context) 
+    protected TemporalTableBaseRepo(ApplicationDBContext context)
         : base(context) { }
-    protected TemporalTableBaseRepo(DbContextOptions<ApplicationDBContext> options) 
+    protected TemporalTableBaseRepo(DbContextOptions<ApplicationDBContext> options)
         : this(new ApplicationDBContext(options)) { }
     #endregion
 

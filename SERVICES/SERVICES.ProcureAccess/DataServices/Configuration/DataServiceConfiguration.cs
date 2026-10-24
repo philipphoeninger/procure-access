@@ -16,7 +16,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
         services.AddScoped<IUserRepo, UserRepo>();
         services.AddScoped<IProposalRepo, ProposalRepo>();
-        
+
         return services;
     }
 
@@ -31,7 +31,7 @@ public static class DataServiceConfiguration
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<IProposalService, ProposalService>();
-        
+
         return services;
     }
 }

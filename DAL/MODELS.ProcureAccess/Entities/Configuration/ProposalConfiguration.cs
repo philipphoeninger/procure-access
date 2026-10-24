@@ -12,14 +12,14 @@ public class ProposalConfiguration : BaseEntityConfiguration<Proposal>
 
         // Query Filters
         builder.HasQueryFilter(x => !x.IsDeleted);
- 
+
         // Indices
         builder.HasIndex(
             x => new { x.ProductId, x.CriterionId }).IsUnique();
 
         // Properties
         builder.Property(x => x.Note).HasColumnType("text");
-        
+
         builder
             .HasOne(x => x.Product)
             .WithOne(p => p.Proposal)
@@ -39,7 +39,7 @@ public class ProposalConfiguration : BaseEntityConfiguration<Proposal>
             .WithMany(u => u.Approvals)
             .HasForeignKey(x => x.ApproverId)
             .IsRequired(false);
-        
+
         // Check Constraints
         builder.ToTable(b => b.HasCheckConstraint(
             "CK_Proposal_Snapshot_NN",

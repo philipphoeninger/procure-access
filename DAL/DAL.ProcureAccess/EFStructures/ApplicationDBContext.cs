@@ -63,7 +63,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new UserConfiguration().Configure(modelBuilder.Entity<User>());
         new RefreshTokenConfiguration().Configure(modelBuilder.Entity<RefreshToken>());
 
-		//modelBuilder.ApplyConfigurationsFromAssembly(
+        //modelBuilder.ApplyConfigurationsFromAssembly(
         //	typeof(ApplicationDBContext).Assembly);
 
         OnModelCreatingPartial(modelBuilder);

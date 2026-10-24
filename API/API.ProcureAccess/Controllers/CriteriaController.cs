@@ -11,7 +11,7 @@ public class CriteriaController : BaseCrudController<Criterion, CriterionDto, Cr
     private readonly ICriterionService _criterionService;
 
     public CriteriaController(
-        IAppLogging<CriteriaController> logger, 
+        IAppLogging<CriteriaController> logger,
         ICriterionService service) : base(logger, service)
     {
         _criterionService = service;

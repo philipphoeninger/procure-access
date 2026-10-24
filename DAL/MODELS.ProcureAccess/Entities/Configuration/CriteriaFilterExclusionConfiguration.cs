@@ -8,7 +8,7 @@ public class CriteriaFilterExclusionConfiguration
     : IEntityTypeConfiguration<CriteriaFilterExclusion>
 {
     public void Configure(EntityTypeBuilder<CriteriaFilterExclusion> builder)
-    {        
+    {
         // Key
         builder.HasKey(x => new
         {
@@ -17,7 +17,7 @@ public class CriteriaFilterExclusionConfiguration
         });
 
         // Query Filters
-        builder.HasQueryFilter(x => 
+        builder.HasQueryFilter(x =>
             !x.CriteriaFilter.FilterType.IsDeleted && !x.Exclusion.FilterType.IsDeleted);
 
         // Indices
@@ -38,7 +38,7 @@ public class CriteriaFilterExclusionConfiguration
             .HasForeignKey(x => x.ExclusionId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         // Data
         builder.HasData(CriteriaFilterExclusionSeed.Data);
     }

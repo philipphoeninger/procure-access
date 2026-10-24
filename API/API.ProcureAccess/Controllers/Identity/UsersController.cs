@@ -73,7 +73,8 @@ public class UsersController : ControllerBase
             request.NewEmail);
 
         if (!result.Succeeded)
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 code = "ChangeEmailFailure",
                 message = result.Errors
             });
@@ -101,7 +102,8 @@ public class UsersController : ControllerBase
             request.NewPassword);
 
         if (!result.Succeeded)
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 code = "ChangePasswordFailure",
                 message = result.Errors
             });
@@ -127,7 +129,8 @@ public class UsersController : ControllerBase
             request.NewPassword);
 
         if (!result.Succeeded)
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 code = "ResetPasswordFailure",
                 message = result.Errors
             });
@@ -150,7 +153,8 @@ public class UsersController : ControllerBase
         var result = await Repo.RevokeSessionsAsync(userId);
 
         if (!result.Succeeded)
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 code = "RevokeSessionsFailure",
                 message = result.Errors
             });
@@ -173,7 +177,8 @@ public class UsersController : ControllerBase
         var result = await Repo.DeleteUserAsync(userId);
 
         if (!result.Succeeded)
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 code = "UserDeleteFailure",
                 message = result.Errors
             });

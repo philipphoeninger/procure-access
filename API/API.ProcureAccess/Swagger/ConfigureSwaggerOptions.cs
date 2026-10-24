@@ -53,7 +53,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
             info.Description += "<p><font color='red'>This API version has been deprecated.</font></p> ";
         }
-        
+
         return info;
     }
 }

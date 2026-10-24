@@ -12,7 +12,7 @@ public class UICustomizationController : ControllerBase
     protected readonly UserManager<User> UserManager;
 
     public UICustomizationController(
-        IAppLogging<UICustomizationController> logger, 
+        IAppLogging<UICustomizationController> logger,
         IUICustomizationRepo repo,
         UserManager<User> userManager)
     {

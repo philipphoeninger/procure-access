@@ -7,10 +7,10 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class CriteriaFilterService : BaseService<CriteriaFilter, CriteriaFilterDto>, ICriteriaFilterService
 {
     public CriteriaFilterService(
-        ICriteriaFilterRepo repo, 
+        ICriteriaFilterRepo repo,
         IMapper mapper) : base(repo, mapper)
     { }
-    
+
     public override async Task<Result<IEnumerable<CriteriaFilterDto>>> ReadAll()
     {
         return Result<IEnumerable<CriteriaFilterDto>>.Success(

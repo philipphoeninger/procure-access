@@ -13,7 +13,7 @@ public class CreateProductDto
     [Url]
     [StringLength(500)]
     public string? Link { get; set; }
-    
+
     [StringLength(6000)]
     public string? Description { get; set; }
 
