@@ -30,6 +30,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
 
     #region fields
     public virtual DbSet<SeriLogEntry> SeriLogEntries { get; set; }
+    public virtual DbSet<UsageEvent> UsageEvents { get; set; }
     public virtual DbSet<FilterType> FilterTypes { get; set; }
     public virtual DbSet<Criterion> Criteria { get; set; }
     public virtual DbSet<CriteriaFilter> CriteriaFilters { get; set; }
@@ -53,6 +54,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "identity");
 
         new SeriLogEntryConfiguration().Configure(modelBuilder.Entity<SeriLogEntry>());
+        new UsageEventConfiguration().Configure(modelBuilder.Entity<UsageEvent>());
         new FilterTypeConfiguration().Configure(modelBuilder.Entity<FilterType>());
         new CriterionConfiguration().Configure(modelBuilder.Entity<Criterion>());
         new CriteriaFilterConfiguration().Configure(modelBuilder.Entity<CriteriaFilter>());

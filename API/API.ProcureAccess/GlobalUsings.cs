@@ -31,6 +31,7 @@ global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.Entities.Requests;
 global using MODELS.ProcureAccess.Settings;
 
+global using SERVICES.ProcureAccess.Analytics;
 global using SERVICES.ProcureAccess.DataServices;
 global using SERVICES.ProcureAccess.DataServices.Configuration;
 global using SERVICES.ProcureAccess.DataServices.Interfaces;

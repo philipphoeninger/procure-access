@@ -36,6 +36,9 @@ builder.ConfigureSerilog();
 builder.Services.RegisterLoggingInterfaces()
                 .AddLogRetention();
 
+// Usage events in the analytics schema, date only (ARCHITECTURE §5.7); nothing writes them yet (S1-23)
+builder.Services.AddUsageEvents();
+
 // /health/live and /health/ready (ARCHITECTURE §9.5)
 builder.Services.AddProcureAccessHealthChecks();
 
