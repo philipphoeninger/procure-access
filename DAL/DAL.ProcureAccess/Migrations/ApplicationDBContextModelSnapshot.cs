@@ -17,7 +17,7 @@ namespace DAL.ProcureAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.21")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -2519,86 +2519,53 @@ namespace DAL.ProcureAccess.Migrations
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.SeriLogEntry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("ApplicationName")
-                        .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Exception")
-                        .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("LogEvent")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.Property<string>("MachineName")
-                        .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("MemberName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MessageTemplate")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Properties")
-                        .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("Xml");
-
-                    b.Property<string>("RequestPath")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("SourceContext")
-                        .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("TimeStamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TimeStamp");
 
                     b.ToTable("SeriLogs", "logging");
                 });
@@ -2933,38 +2900,33 @@ namespace DAL.ProcureAccess.Migrations
                     b.OwnsOne("MODELS.ProcureAccess.Entities.UICustomization", "UICustomization", b1 =>
                         {
                             b1.Property<string>("UserId")
-                                .HasMaxLength(200)
-                                .HasColumnType("character varying(200)");
+                                .HasMaxLength(200);
 
                             b1.Property<string>("BackgroundColor")
                                 .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)");
+                                .HasMaxLength(10);
 
-                            b1.Property<bool>("DarkModeOn")
-                                .HasColumnType("boolean");
+                            b1.Property<bool>("DarkModeOn");
 
                             b1.Property<string>("ForegroundColor")
                                 .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)");
+                                .HasMaxLength(10);
 
-                            b1.Property<bool>("HighContrastOn")
-                                .HasColumnType("boolean");
+                            b1.Property<bool>("HighContrastOn");
 
-                            b1.Property<int>("Language")
-                                .HasColumnType("integer");
+                            b1.Property<int>("Language");
 
                             b1.Property<string>("TextColor")
                                 .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)");
+                                .HasMaxLength(10);
 
                             b1.HasKey("UserId");
 
                             b1.ToTable("Users", "identity");
 
-                            b1.ToJson("UICustomization");
+                            b1
+                                .ToJson("UICustomization")
+                                .HasColumnType("jsonb");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

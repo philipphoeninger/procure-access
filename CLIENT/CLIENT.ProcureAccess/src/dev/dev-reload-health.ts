@@ -4,7 +4,7 @@
 
 // call this from main.ts only in development
 function startApiHealthWatcher() {
-  const checkUrl = 'https://api.procureaccess.tech/health';
+  const checkUrl = 'https://api.procureaccess.tech/health/live';
   setInterval(async () => {
     try {
       const res = await fetch(checkUrl, { method: 'GET', cache: 'no-cache' });

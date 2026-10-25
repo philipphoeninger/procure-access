@@ -19,14 +19,23 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// Hosts the real API in the <c>Testing</c> environment against the test container
 /// (TESTING §3.1, §5.2). Created once per test run by <see cref="ApiFixture"/>.
 /// </summary>
-public sealed class ProcureAccessApiFactory(string connectionString, FakeTimeProvider clock)
+/// <remarks>
+/// Tests of startup behaviour create their own instance with another
+/// <paramref name="environmentName"/> or extra host <paramref name="settings"/>
+/// (e.g. SEC-06) and dispose it themselves.
+/// </remarks>
+public sealed class ProcureAccessApiFactory(
+    string connectionString,
+    FakeTimeProvider clock,
+    string environmentName = ProcureAccessApiFactory.EnvironmentName,
+    IReadOnlyDictionary<string, string?>? settings = null)
     : WebApplicationFactory<Program>
 {
     public const string EnvironmentName = "Testing";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment(EnvironmentName);
+        builder.UseEnvironment(environmentName);
 
         // Program.cs reads these values while the builder is still being set up, so they must be
         // host settings (UseSetting); values added through ConfigureAppConfiguration arrive too late.
@@ -36,13 +45,10 @@ public sealed class ProcureAccessApiFactory(string connectionString, FakeTimePro
         // Secrets never live in the repository (CLAUDE.md §10): a fresh random key per test run.
         builder.UseSetting("JWTSettings:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));
 
-        // ConfigureSerilog needs AppLoggingSettings (only in appsettings.Development.json) and,
-        // outside Development, writes to "<Drive><volume separator><dir separator><FilePath>/<FileName>".
-        var (drive, filePath) = LogDirectory();
-        builder.UseSetting("AppLoggingSettings:General:RestrictedToMinimumLevel", "Warning");
-        builder.UseSetting("AppLoggingSettings:File:Drive", drive);
-        builder.UseSetting("AppLoggingSettings:File:FilePath", filePath);
-        builder.UseSetting("AppLoggingSettings:File:FileName", "log_ProcureAccess_tests.txt");
+        foreach (var (key, value) in settings ?? new Dictionary<string, string?>())
+        {
+            builder.UseSetting(key, value);
+        }
 
         builder.ConfigureTestServices(services =>
         {
@@ -66,25 +72,5 @@ public sealed class ProcureAccessApiFactory(string connectionString, FakeTimePro
                     .Build();
             });
         });
-    }
-
-    /// <summary>
-    /// Splits <c>&lt;temp&gt;/procureaccess-tests</c> into the two settings the log path is built
-    /// from. On Linux and macOS the volume separator is "/", so the drive is the temp directory.
-    /// </summary>
-    private static (string Drive, string FilePath) LogDirectory()
-    {
-        const string folder = "procureaccess-tests";
-        var temp = Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar);
-
-        if (OperatingSystem.IsWindows())
-        {
-            // "C:\Users\…\Temp" → drive "C", path "Users\…\Temp\procureaccess-tests"
-            var root = Path.GetPathRoot(temp)!;
-            return (root.TrimEnd(Path.DirectorySeparatorChar, Path.VolumeSeparatorChar),
-                    Path.Combine(temp[root.Length..], folder));
-        }
-
-        return (temp, folder);
     }
 }

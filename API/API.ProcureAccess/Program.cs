@@ -31,9 +31,13 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
 // The application reads time only through TimeProvider (CLAUDE.md §7); tests replace it with FakeTimeProvider.
 builder.Services.AddSingleton(TimeProvider.System);
 
-// Configure logging
+// Configure logging: console + PostgreSQL sink in the logging schema, with retention (ARCHITECTURE §9.5)
 builder.ConfigureSerilog();
-builder.Services.RegisterLoggingInterfaces();
+builder.Services.RegisterLoggingInterfaces()
+                .AddLogRetention();
+
+// /health/live and /health/ready (ARCHITECTURE §9.5)
+builder.Services.AddProcureAccessHealthChecks();
 
 // Configure localization
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -68,27 +72,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-// Initialize the database
-if (app.Configuration.GetValue<bool>("RebuildDatabase"))
-{
-    Console.WriteLine("Initializing DB...");
+// Sample data only in Development, whatever the configuration says (SEC-06)
+await app.RebuildDatabaseIfAllowedAsync();
 
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    //SampleDataInitializer.InitializeData(dbContext, userManager);
-    await SampleDataInitializer.ClearDatabase(dbContext, userManager);
-    // add role management
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await app.AddRolesAndPermissions(roleManager);
-
-    await SampleDataInitializer.InitializeData(dbContext, userManager);
-}
 app.ConfigureSwaggerExplorer();
-// }
 
 //app.UseHttpsRedirection();
 app.UseRequestLocalization();
@@ -100,14 +87,6 @@ app.MapControllers();
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();
 
-
-// add anonymously available health check endpoint
-if (app.Environment.IsDevelopment())
-{
-    app.MapGet("/health", () => Results.Ok(new { status = "Healthy", time = DateTime.UtcNow }))
-       .AllowAnonymous();
-    // .WithName("GetHealth")
-    // .WithOpenApi();
-}
+app.MapProcureAccessHealthChecks();
 
 app.Run();

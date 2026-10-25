@@ -29,7 +29,7 @@ public sealed class ApiFixture : IAsyncLifetime
     /// Same image as <c>docker-compose.yml</c>, which the deployment uses: PostgreSQL 17 on Alpine
     /// (TESTING §3.1 asks for the production major version).
     /// </summary>
-    private const string PostgresImage = "postgres:17-alpine";
+    public const string PostgresImage = "postgres:17-alpine";
 
     /// <summary>Start time of <see cref="Clock"/>.</summary>
     public static readonly DateTimeOffset ClockStart = new(2026, 3, 2, 9, 0, 0, TimeSpan.Zero);
