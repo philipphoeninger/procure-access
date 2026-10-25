@@ -2570,6 +2570,37 @@ namespace DAL.ProcureAccess.Migrations
                     b.ToTable("SeriLogs", "logging");
                 });
 
+            modelBuilder.Entity("MODELS.ProcureAccess.Entities.UsageEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Dimension1")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Dimension2")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateOnly>("OccurredOn")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventType", "OccurredOn");
+
+                    b.ToTable("UsageEvents", "analytics");
+                });
+
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
                 {
                     b.Property<string>("Id")
