@@ -4,18 +4,22 @@
 
 namespace DAL.ProcureAccess.Initialization;
 
+/// <summary>
+/// Sample users for the local Development stack. The repository is public: no real addresses
+/// and no password hashes here. The password comes from configuration (see
+/// <see cref="SampleDataInitializer"/>).
+/// </summary>
 public static class SampleData
 {
+    public const string SampleUserEmail = "sample.user@example.org";
+
     public static List<User> Users => new()
     {
         new()
         {
-            UserName = "hoeninger@werte.it",
-            Email = "hoeninger@werte.it",
+            UserName = SampleUserEmail,
+            Email = SampleUserEmail,
             UICustomization = new(),
-            PasswordHash = "AQAAAAIAAYagAAAAEIXWOPxH++T/W4r8ji4Kl9oOMkl4YhnN+mpMYFOdKhGugALVkLTBv5N+tVf9Zz2YUA==",
-            SecurityStamp = "JFL3OXKFWI23KPP5DGEJ62HFZ4T2TRMR",
-            ConcurrencyStamp = "b01be0de-8be0-45c3-9fda-152bfb9804d9",
             EmailConfirmed = true
         }
     };
