@@ -46,6 +46,7 @@ services:
       # Sample user for the local stack; empty = no sample user (only used in Development)
       SampleData__UserPassword: ${SAMPLE_USER_PASSWORD:-}
     ports:
+      # Fixed: the client build "production,local" calls http://localhost:5000/api
       - 5000:8080
     # volumes:
     #   - ./API/API.ProcureAccess:/src

@@ -6,6 +6,9 @@ namespace API.ProcureAccess.Extensions;
 
 public static class IdentityExtensions
 {
+    /// <summary>HMAC-SHA256 needs a key of at least 256 bits; shorter keys fail at the first sign-in.</summary>
+    public const int MinimumJwtKeyBytes = 32;
+
     public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
     {
         services.AddIdentityCore<User>(options =>
@@ -40,6 +43,16 @@ public static class IdentityExtensions
     // Auth = Authentication + Authorization
     public static IServiceCollection AddIdentityAuth(this IServiceCollection services, IConfiguration config)
     {
+        // Checked at startup like the connection string, so a missing or placeholder key stops
+        // the API instead of failing every sign-in (legacy until migration step 3, roadmap M3.1).
+        string? jwtKey = config["JWTSettings:Key"];
+        if (jwtKey is null || Encoding.UTF8.GetByteCount(jwtKey) < MinimumJwtKeyBytes)
+        {
+            throw new InvalidOperationException(
+                $"JWTSettings:Key must be at least {MinimumJwtKeyBytes} bytes. " +
+                "Set the environment variable JWTSettings__Key (JWT_KEY in .env), e.g. openssl rand -base64 64.");
+        }
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme =
@@ -57,7 +70,7 @@ public static class IdentityExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = config["JWTSettings:Issuer"],
                 ValidAudience = config["JWTSettings:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWTSettings:Key"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                 ClockSkew = TimeSpan.FromMinutes(2)
             };
         });
