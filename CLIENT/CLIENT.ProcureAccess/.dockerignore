@@ -12,3 +12,7 @@ coverage
 src/**/*.spec.*
 
 .angular
+
+# local secrets (never bake them into an image)
+**/.env
+**/.env.*
