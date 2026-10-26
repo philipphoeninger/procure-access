@@ -7,20 +7,20 @@ namespace DAL.ProcureAccess.Initialization;
 public static class SampleDataInitializer
 {
     #region public
-    public static async Task InitializeData(ApplicationDBContext dbContext, UserManager<User> userManager)
+    /// <summary>
+    /// Seeds the sample users with <paramref name="sampleUserPassword"/>. Without a password no
+    /// user is created: a fixed password or hash would be public in the repository.
+    /// </summary>
+    /// <returns><c>true</c> if the sample users were created.</returns>
+    public static async Task<bool> InitializeData(
+        ApplicationDBContext dbContext, UserManager<User> userManager, string? sampleUserPassword)
     {
-        await SeedData(dbContext, userManager);
+        return await SeedData(dbContext, userManager, sampleUserPassword);
     }
 
     public static async Task ClearDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
     {
         await ClearData(dbContext, userManager);
-    }
-
-    public static async Task ClearAndReseedDatabase(ApplicationDBContext dbContext, UserManager<User> userManager)
-    {
-        await ClearData(dbContext, userManager);
-        await SeedData(dbContext, userManager);
     }
     #endregion
 
@@ -32,36 +32,27 @@ public static class SampleDataInitializer
         }
     }
 
-    internal static async Task SeedData(ApplicationDBContext dbContext, UserManager<User> userManager)
+    internal static async Task<bool> SeedData(
+        ApplicationDBContext dbContext, UserManager<User> userManager, string? sampleUserPassword)
     {
-        try
+        if (string.IsNullOrEmpty(sampleUserPassword))
         {
-            var succeeded = await ProcessUserInsert(dbContext, userManager, SampleData.Users);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            throw;
+            return false;
         }
 
-        static async Task<bool> ProcessUserInsert(
-            ApplicationDBContext dbContext,
-            UserManager<User> userManager,
-            List<User> users)
+        foreach (User user in SampleData.Users)
         {
-            var allSucceeded = true;
-            foreach (User user in users)
+            var result = await userManager.CreateAsync(user, sampleUserPassword);
+            if (!result.Succeeded)
             {
-                var result = await userManager.CreateAsync(user);
-                if (!result.Succeeded)
-                {
-                    allSucceeded = false;
-                    break;
-                }
-                await userManager.AddToRoleAsync(user, Roles.Member);
-                await userManager.AddToRoleAsync(user, Roles.Approver);
+                // Error codes only: the descriptions may repeat the password rules, never the password.
+                throw new InvalidOperationException(
+                    "Creating the sample user failed: " +
+                    string.Join(", ", result.Errors.Select(e => e.Code)) +
+                    ". The sample user password must meet the Identity password rules.");
             }
-            return allSucceeded;
+            await userManager.AddToRoleAsync(user, Roles.Member);
         }
+        return true;
     }
 }
