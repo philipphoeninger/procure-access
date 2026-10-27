@@ -1,6 +1,10 @@
-// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+// SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+// SPDX-FileCopyrightText: BIT inklusiv
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND LicenseRef-AllRightsReserved
+//
+// The code is MIT. The criterion texts are quoted verbatim from BIT inklusiv,
+// used with permission of Detlef Girke, and are not MIT (see REUSE.toml).
 
 namespace MODELS.ProcureAccess.SeedData;
 

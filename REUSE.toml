@@ -14,13 +14,14 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# Criteria catalog documents: they quote BIT inklusiv texts verbatim, used with
-# permission of Detlef Girke (see the document header). Not MIT.
+# Criteria catalog documents: the project team's own sections (filter layers,
+# exclusions, rating scale) are MIT; the BIT inklusiv texts they quote verbatim,
+# used with permission of Detlef Girke (see the document header), are not.
 [[annotations]]
 path = "docs/kriterienkatalog_bit_inklusiv_v1*.md"
 precedence = "override"
 SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
-SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+SPDX-License-Identifier = "MIT AND LicenseRef-AllRightsReserved"
 
 # JSON configuration, translations and other files without comment syntax.
 [[annotations]]
@@ -50,6 +51,23 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
+# BIT inklusiv texts outside the criteria catalog documents: the migrations
+# that carry the criteria seed data (EF Core repeats it in every designer file
+# and in the model snapshot, so new migrations are covered by the glob) and the
+# catalog release data (SPEC SD20). The code is MIT, the quoted texts are not.
+# The seed data itself (SeedData/CriteronSeed.cs) carries the same in its header.
+# Must stay below the migrations and JSON blocks: the last matching block wins.
+[[annotations]]
+path = [
+  "DAL/DAL.ProcureAccess/Migrations/*_AddSeedData.cs",
+  "DAL/DAL.ProcureAccess/Migrations/*.Designer.cs",
+  "DAL/DAL.ProcureAccess/Migrations/ApplicationDBContextModelSnapshot.cs",
+  "catalog/releases/**",
+]
+precedence = "override"
+SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
+SPDX-License-Identifier = "MIT AND LicenseRef-AllRightsReserved"
+
 # Shared IDE settings (Rider/IntelliJ); the IDE rewrites these files.
 [[annotations]]
 path = ".idea/**"
@@ -57,17 +75,56 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# Images and logos: origin and licence not documented. Not MIT.
+# Files of the blocks above that already existed in 2025 (git history): same
+# licence, copyright years 2025-2026. A fixed list; new files never go here.
+# Must stay below the MIT blocks above: the last matching block wins.
 [[annotations]]
 path = [
-  "CLIENT/CLIENT.ProcureAccess/public/*.jpeg",
-  "CLIENT/CLIENT.ProcureAccess/public/*.jpg",
-  "CLIENT/CLIENT.ProcureAccess/public/*.png",
-  "CLIENT/CLIENT.ProcureAccess/public/favicon.ico",
+  "API/API.ProcureAccess/API.ProcureAccess.csproj.user",
+  "API/API.ProcureAccess/API.ProcureAccess.xml",
+  "API/API.ProcureAccess/Properties/launchSettings.json",
+  "API/API.ProcureAccess/appsettings.Development.json",
+  "API/API.ProcureAccess/appsettings.Production.json",
+  "API/API.ProcureAccess/appsettings.json",
+  "CLIENT/CLIENT.ProcureAccess/.nvmrc",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/extensions.json",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/launch.json",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/tasks.json",
+  "CLIENT/CLIENT.ProcureAccess/README.md",
+  "CLIENT/CLIENT.ProcureAccess/angular.json",
+  "CLIENT/CLIENT.ProcureAccess/package-lock.json",
+  "CLIENT/CLIENT.ProcureAccess/package.json",
+  "CLIENT/CLIENT.ProcureAccess/public/products.csv",
+  "CLIENT/CLIENT.ProcureAccess/src/app/core/utils/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/features/feature-1/**/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/layout/sidebar/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/shared/directives/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/shared/pipes/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.app.json",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.json",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.spec.json",
+  "README.md",
+  "components/notes.txt",
 ]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
+# WERTE.IT logo: created by a designer of the project WERTE.IT; the legal
+# rights holder is BSVH. Not MIT. Name new images explicitly with their own
+# owner and licence (no glob), so that reuse lint flags any image that has none.
+[[annotations]]
+path = "CLIENT/CLIENT.ProcureAccess/public/werte_it_logo.jpg"
 precedence = "override"
-SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-FileCopyrightText = "2025 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+
+# Favicon: the unchanged default icon of the Angular CLI (Angular licence).
+[[annotations]]
+path = "CLIENT/CLIENT.ProcureAccess/public/favicon.ico"
+precedence = "override"
+SPDX-FileCopyrightText = "2010-2025 Google LLC (https://angular.dev/license)"
+SPDX-License-Identifier = "MIT"
 
 # Poppins font (Google Fonts), self-hosted.
 [[annotations]]
