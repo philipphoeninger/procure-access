@@ -14,13 +14,14 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# Criteria catalog documents: they quote BIT inklusiv texts verbatim, used with
-# permission of Detlef Girke (see the document header). Not MIT.
+# Criteria catalog documents: the project team's own sections (filter layers,
+# exclusions, rating scale) are MIT; the BIT inklusiv texts they quote verbatim,
+# used with permission of Detlef Girke (see the document header), are not.
 [[annotations]]
 path = "docs/kriterienkatalog_bit_inklusiv_v1*.md"
 precedence = "override"
 SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
-SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+SPDX-License-Identifier = "MIT AND LicenseRef-AllRightsReserved"
 
 # JSON configuration, translations and other files without comment syntax.
 [[annotations]]
