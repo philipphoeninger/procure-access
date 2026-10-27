@@ -113,4 +113,16 @@ Code review of PR #41. Fixed in `sprint01/S1-10-review-fixes`:
 | R4 | Z1 keeps the table in sync with the store, so a slow `loadProducts()` of `init()` could replace a filtered list asked for later | `withProducts` numbers its requests; only the newest one writes its result |
 | R5 | Z3 showed "Kein Produkt … gefunden" while products were still loading | `productsLoaded` in `withProducts`; the text only shows once a product request has answered. A failed request still ends in the not-found text (no UX-copy key for a load error) |
 
+Smoke test of R1–R5 (browser, Claude in Chrome, 2026-10-28). The dev stack did not start (the database volume was created with a different password than the one in `.env`; volume left alone), so the test ran on the E2E stack (`e2e/`, `npm run stack:up`, in-memory database, built from this branch). Throwaway account `smoke-s110-review@example.test`, registered in the UI; Approver role and one product proposal added directly in the E2E database.
+
+| # | Check | Result |
+|---|---|---|
+| R1 | Register by URL with `language: "en"` in local storage: select shows "English", page in English; choosing Deutsch switches both | ✅ |
+| R2 | `/settings` by URL while signed in, account saved as English: select shows "English"; choosing Deutsch switches page and header; "Speichern" stores German (`Language` 2) | ✅ |
+| R3 | Approver signs in, header button → `/proposals` lists the proposal. Logout without reload: the button is still shown, clicking it leads to `/unauthorized` | ✅ |
+| R4 | Not testable: the filtered request ("Produkte anzeigen") still returns 500 (#37), so no filtered result can arrive | – |
+| R5 | `/product/2` by URL with the API container paused (`docker pause`): only the spinner, no not-found text; after `docker unpause` the product (IntraSphere) is shown. `/product/1` shows the not-found text after loading, because the API hides products with an open proposal | ✅ |
+
+Side effect of R4 while #37 is open: if the user clicks "Produkte anzeigen" before the full list of `init()` has arrived, the full list is now dropped (a newer request exists) and the failed filter request writes nothing, so `/products` stays empty instead of showing all products. Only on a slow first load, where the spinner already hangs (S1-08 N1); to be handled with #37.
+
 Regression tests for Z1–Z5 and R1–R5: issue #82. Won't fix: `Profile` table setup, duplicated "effect writes into `dataSource`" code, `ProposalList` empty state (O11) — all on screens rebuilt or retired in M1–M3.
