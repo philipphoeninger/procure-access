@@ -98,7 +98,7 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 |---|---|---|---|
 | O1 | The browser loads Material Icons and Material Symbols from `fonts.googleapis.com` / `fonts.gstatic.com`, which CLAUDE §8 ("no third-party requests from the browser") does not allow | `src/index.html` lines 15–16 (since commit `b6b5134`) | Issue #43; self-host the icon fonts with the theme foundation (M1.5) |
 | O2 | The dev-only health watcher polls `https://api.procureaccess.tech/health`, also in local development | `src/dev/dev-reload-health.ts` | Point it at `environment.apiUrl` or remove it in M1. With the `local` configuration the local stack no longer runs it (`production: true`) |
-| O3 | nginx resolves `api` at startup, so the client container only starts where an `api` host exists | `nginx -t` outside compose | None while the client runs next to the API; revisit with the same-origin setup in M3 |
+| O3 | nginx resolves `api` at startup, so the client container only starts where an `api` host exists | `nginx -t` outside compose | ✅ Resolved in the review follow-up (§8.1, R3): `api` is resolved at request time |
 
 ## 7. Open points
 
@@ -131,4 +131,25 @@ Checks (Claude Code, 2026-10-28, Node 24.22.1):
 | 5 | `npx playwright test` (5 browser projects) | ✅ 45 passed |
 | 6 | `reuse lint`, invariant gate, Figma link check | ✅ |
 
-**Dokploy (before deploying this branch):** the client now calls `https://procureaccess.tech/api/…`, which its nginx forwards to the `api` service. The domain `procureaccess.tech` must point at the client service (port 80), as today; `api.procureaccess.tech` is no longer used by the client. `CLIENT_BUILD_CONFIGURATION` can be removed from the Dokploy environment (it is ignored now). As before (O3), nginx finds the API by the service name `api` on `dokploy-network`; a second service named `api` on that shared network would clash, like `db` for the API.
+**Dokploy (before deploying this branch):** the client now calls `https://procureaccess.tech/api/…`, which its nginx forwards to the `api` service. The domain `procureaccess.tech` must point at the client service (port 80), as today; the release build no longer uses `api.procureaccess.tech` (only the dev-only health watcher still polls it, O2). `CLIENT_BUILD_CONFIGURATION` can be removed from the Dokploy environment (it is ignored now). nginx finds the API by the service name `api` on `dokploy-network`; a second service named `api` on that shared network would clash, like `db` for the API.
+
+### 8.1 Second review round (PR #85, 2026-10-28)
+
+10 findings. Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| R3 | nginx resolved `api` once at startup. Now that every API call goes through it, a redeployed API container with a new IP would get 502 until the client restarts; a missing `api` at startup stopped nginx (O3) | `resolver 127.0.0.11 valid=10s` (Docker DNS) and the upstream in a variable, so `api` is resolved at request time. `proxy_pass` without a URI part, so the request URI is passed on unchanged (also covers the review point on path normalisation) |
+| R4 | The refresh token (`POST /api/refresh?refreshToken=…`) and the e-mail confirmation token (`/confirm-email?…&token=…`, `/api/confirm-email?…`) travel in the query string; nginx's default `main` log writes it to stdout, i.e. the container log | Access log format `no_query` for the whole server: `$request_method $uri $server_protocol` instead of `$request`, otherwise like `main` |
+
+Checks on the E2E stack: `nginx -t` ✅; `POST /api/refresh?refreshToken=SECRET…` and `/confirm-email?…token=SECRET…`: no `SECRET` in `docker logs` (log line `"POST /api/refresh HTTP/1.1" 400`) ✅; API container removed, its old IP taken by another container, API started again with a new IP (172.19.0.3 → .5): `/api/Health` through the unchanged client container 200 after about 4 s ✅; `npx playwright test` 45 passed ✅.
+
+Won't fix (current behaviour unaffected):
+- nginx defaults `client_max_body_size` 1 MB and 60 s proxy timeouts: no request today comes near either; the anonymous export body is capped at 1 MB by SPEC §7.2 anyway. Revisit with the conformance-report upload (R-P1-03, P1).
+- `ng serve -c production` calls `/api` on the dev server: not a documented workflow (`npm start` uses `development`). A dev-server proxy that would also drop the last absolute URL can come with the M3 same-origin cookie work.
+- No `X-Forwarded-Proto` / `UseForwardedHeaders`: the API already saw http and the proxy's IP behind Traefik before; nothing reads scheme or client IP yet. Needed for the cookie session and the rate limits (M3, SPEC §7.3).
+- Dev health watcher polls `api.procureaccess.tech`: existing, O2 (M1).
+- `text/plain`/`text/csv` not gzipped, no precompression: two small files; on-the-fly gzip is enough at this scale.
+- E2E global setup no longer checks port 5000 directly: the bundle and the tests use the proxy path; Swagger on 5000 is not part of the E2E run.
+- `docs/CLAUDE_v3.md` not updated: a snapshot that is no longer kept in step (it also lacks §6.8); the root `CLAUDE.md` is the live file.
+
