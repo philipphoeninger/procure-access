@@ -54,8 +54,8 @@ public sealed class ApiFixture : IAsyncLifetime
     {
         await _database.StartAsync();
 
-        // Migrate here rather than relying on Program.cs: Program.cs logs migration errors
-        // and starts anyway, which would hide a broken migration behind unrelated test failures.
+        // Migrate here as well as in Program.cs: a broken migration then fails the fixture with
+        // the migration error itself, before any API host or test runs.
         await using (var context = CreateDbContext())
         {
             await context.Database.MigrateAsync();

@@ -4,37 +4,77 @@
 
 namespace API.ProcureAccess.Swagger;
 
-public class SwaggerDefaultValues : IOperationFilter
+/// <summary>
+/// Completes each operation with what the API explorer knows: deprecation, the response content
+/// types an action really produces, and parameter descriptions, defaults and required flags.
+/// </summary>
+/// <remarks>
+/// Microsoft.OpenApi 2.x exposes parameters and schemas as interfaces. Only the generated objects
+/// (<see cref="OpenApiParameter"/>, <see cref="OpenApiSchema"/>) are writable; references point to
+/// shared components, and OpenAPI 3.0 ignores every property next to a <c>$ref</c>. Such
+/// parameters and schemas are left unchanged and logged, so a missing value can be traced.
+/// </remarks>
+public class SwaggerDefaultValues(ILogger<SwaggerDefaultValues> logger) : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var apiDescription = context.ApiDescription;
         operation.Deprecated |= apiDescription.IsDeprecated;
-        foreach (var responseType in context.ApiDescription.SupportedResponseTypes)
+
+        if (operation.Responses is not null)
         {
-            var responseKey = responseType.IsDefaultResponse ? "default" : responseType.StatusCode.ToString();
-            var response = operation.Responses![responseKey];
-            if (response.Content is null) continue;
-            foreach (var contentType in response.Content.Keys)
+            foreach (var responseType in apiDescription.SupportedResponseTypes)
             {
-                if (responseType.ApiResponseFormats.All(x => x.MediaType != contentType))
+                var responseKey = responseType.IsDefaultResponse ? "default" : responseType.StatusCode.ToString();
+                if (!operation.Responses.TryGetValue(responseKey, out var response) || response.Content is null)
                 {
-                    response.Content.Remove(contentType);
+                    continue;
+                }
+
+                // copy the keys: the content map is changed inside the loop
+                foreach (var contentType in response.Content.Keys.ToList())
+                {
+                    if (responseType.ApiResponseFormats.All(x => x.MediaType != contentType))
+                    {
+                        response.Content.Remove(contentType);
+                    }
                 }
             }
         }
 
-        if (operation.Parameters == null) return;
-
-        // Microsoft.OpenApi 2.x exposes parameters and schemas as read-only interfaces;
-        // the generated (non-reference) objects are the concrete, writable types.
-        foreach (var parameter in operation.Parameters.OfType<OpenApiParameter>())
+        if (operation.Parameters is null)
         {
-            var description = apiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
-            parameter.Description ??= description.ModelMetadata?.Description;
-            if (parameter.Schema is OpenApiSchema schema && schema.Default == null && description.DefaultValue != null && description.ModelMetadata != null)
+            return;
+        }
+
+        foreach (var parameter in operation.Parameters)
+        {
+            var description = apiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
+            if (description is null)
             {
-                if (description.DefaultValue != DBNull.Value)
+                continue;
+            }
+
+            if (parameter is not OpenApiParameter writableParameter)
+            {
+                logger.LogWarning(
+                    "Swagger: parameter {Parameter} of {Path} is a reference; description, default and required flag are not applied.",
+                    parameter.Name,
+                    apiDescription.RelativePath);
+                continue;
+            }
+
+            writableParameter.Description ??= description.ModelMetadata?.Description;
+            writableParameter.Required |= description.IsRequired;
+
+            if (description.DefaultValue is null || description.DefaultValue == DBNull.Value || description.ModelMetadata is null)
+            {
+                continue;
+            }
+
+            if (writableParameter.Schema is OpenApiSchema schema)
+            {
+                if (schema.Default is null)
                 {
                     var options = new JsonSerializerOptions
                     {
@@ -44,7 +84,13 @@ public class SwaggerDefaultValues : IOperationFilter
                     schema.Default = JsonNode.Parse(json);
                 }
             }
-            parameter.Required |= description.IsRequired;
+            else if (writableParameter.Schema is not null)
+            {
+                logger.LogWarning(
+                    "Swagger: the schema of parameter {Parameter} of {Path} is a reference; its default value is not applied.",
+                    parameter.Name,
+                    apiDescription.RelativePath);
+            }
         }
     }
 }

@@ -56,7 +56,8 @@ Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
 var app = builder.Build();
 
-// Automatically apply migrations
+// Automatically apply migrations. A failure stops the startup: the API must not serve requests
+// against a schema that does not match the model.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
@@ -70,13 +71,22 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-        Console.WriteLine("An error occurred while migrating the database.");
+        logger.LogCritical(ex, "Applying the database migrations failed; the API stops.");
+        throw;
     }
 }
 
 // Sample data only in Development, whatever the configuration says (SEC-06)
 await app.RebuildDatabaseIfAllowedAsync();
+
+// Endpoints are mapped before the Swagger UI is configured, because the UI lists the API versions
+// of the mapped endpoints (app.DescribeApiVersions). The position of Map* calls does not change the
+// middleware order: WebApplication runs routing first and the endpoints last.
+app.MapControllers();
+app.MapGroup("/api")
+   .MapIdentityUserEndpoints();
+
+app.MapProcureAccessHealthChecks();
 
 app.ConfigureSwaggerExplorer();
 
@@ -85,11 +95,5 @@ app.UseRequestLocalization();
 
 app.ConfigureCORS()
    .AddIdentityAuthMiddlewares();
-
-app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityUserEndpoints();
-
-app.MapProcureAccessHealthChecks();
 
 app.Run();
