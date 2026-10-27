@@ -25,8 +25,7 @@
       "@layout/*": ["./src/app/layout/*"],
       "@core/*": ["./src/app/core/*"],
       "@pages/*": ["./src/app/pages/*"],
-      "@assets/*": ["./src/app/assets/*"],
-      "@tests": ["./"]
+      "@assets/*": ["./src/app/assets/*"]
     }
   },
   "angularCompilerOptions": {

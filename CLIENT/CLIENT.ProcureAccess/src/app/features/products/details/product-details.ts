@@ -29,6 +29,13 @@ export class ProductDetails {
   protected product = computed<Product | null>(() =>
     this.store.getProductById(this.productId()!)
   );
+  // Links are stored with or without a scheme. Add https:// only when none is given;
+  // without a link there is nothing to link to.
+  protected websiteUrl = computed<string | null>(() => {
+    const link = this.product()?.link?.trim();
+    if (!link) return null;
+    return /^https?:\/\//i.test(link) ? link : `https://${link}`;
+  });
 
   constructor(protected snackbarService: SnackbarService) {
     let routeId = this.route.snapshot.paramMap.get('id');
