@@ -212,6 +212,8 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright browsers
         if: steps.browser-cache.outputs.cache-hit != 'true'
+        # Downloads three browsers plus the apt packages; has taken up to 8 minutes.
+        timeout-minutes: 15
         working-directory: e2e
         run: npx playwright install --with-deps chromium firefox webkit
       - name: Install Playwright system dependencies
