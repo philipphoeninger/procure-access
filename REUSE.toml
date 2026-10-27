@@ -50,6 +50,23 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
+# BIT inklusiv texts outside the criteria catalog documents: the migrations
+# that carry the criteria seed data (EF Core repeats it in every designer file
+# and in the model snapshot, so new migrations are covered by the glob) and the
+# catalog release data (SPEC SD20). The code is MIT, the quoted texts are not.
+# The seed data itself (SeedData/CriteronSeed.cs) carries the same in its header.
+# Must stay below the migrations and JSON blocks: the last matching block wins.
+[[annotations]]
+path = [
+  "DAL/DAL.ProcureAccess/Migrations/*_AddSeedData.cs",
+  "DAL/DAL.ProcureAccess/Migrations/*.Designer.cs",
+  "DAL/DAL.ProcureAccess/Migrations/ApplicationDBContextModelSnapshot.cs",
+  "catalog/releases/**",
+]
+precedence = "override"
+SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
+SPDX-License-Identifier = "MIT AND LicenseRef-AllRightsReserved"
+
 # Shared IDE settings (Rider/IntelliJ); the IDE rewrites these files.
 [[annotations]]
 path = ".idea/**"
@@ -63,11 +80,17 @@ path = [
   "CLIENT/CLIENT.ProcureAccess/public/*.jpeg",
   "CLIENT/CLIENT.ProcureAccess/public/*.jpg",
   "CLIENT/CLIENT.ProcureAccess/public/*.png",
-  "CLIENT/CLIENT.ProcureAccess/public/favicon.ico",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
+
+# Favicon: the unchanged default icon of the Angular CLI (Angular licence).
+[[annotations]]
+path = "CLIENT/CLIENT.ProcureAccess/public/favicon.ico"
+precedence = "override"
+SPDX-FileCopyrightText = "2010-2025 Google LLC (https://angular.dev/license)"
+SPDX-License-Identifier = "MIT"
 
 # Poppins font (Google Fonts), self-hosted.
 [[annotations]]
