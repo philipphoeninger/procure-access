@@ -2,7 +2,7 @@
 
 This file guides Claude Code (and any other AI assistant) when working in this repository. It is the project's AI onboarding document: read it at the start of every session.
 
-> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`; licence rule in §10 aligned with `ARCHITECTURE_v13.md` D12 on 2026-10-27. Keep it updated whenever a migration step changes structure, commands or conventions.
+> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`; licence rule in §10 aligned with `ARCHITECTURE_v13.md` D12 and rule for review findings added to §6 on 2026-10-27. Keep it updated whenever a migration step changes structure, commands or conventions.
 
 ---
 
@@ -144,6 +144,7 @@ Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reu
 5. **UI strings only by key.** Never hard-code German text in templates or code; add missing keys to `de.json` with the exact wording from the UX copy. If a needed key is missing in the UX copy, stop and report it — do not invent wording.
 6. **Open decisions stay open.** Open points (SPEC §13, ARCHITECTURE §16.5) and ⚖️ texts may be implemented as written but must not be decided by you. 🔧 values are confirmed defaults (SPEC SD23): always read them from configuration, never hard-code them, and do not change them on your own.
 7. **Before each push:** run the code-review checklist (security, correctness, N+1 queries, missing edge cases, a11y), the invariant and Figma-link scripts, and `reuse lint`.
+8. **Review findings: sort them, don't fix everything.** Put every finding of a code review into *fix* (correctness or security, affects behaviour today), *won't fix* (reason in the PR) or *follow-up issue*, and list that sorting in the PR — also when asked to "fix all points". Keep fixes minimal, add no mechanism the fix does not need, and check the side effects of your own proposals before making them. A review round is enough when it finds no correctness or security bug that affects current behaviour, only style, matters of opinion or "what if later" cases: then recommend merging, not another round.
 
 ## 7. Architecture rules (enforced by tests — do not work around them)
 
