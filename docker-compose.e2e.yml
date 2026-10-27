@@ -13,9 +13,8 @@
 # - SMTP credentials cleared, so no e-mail can leave an E2E run;
 # - client healthcheck through the nginx proxy, so --wait returns only when client and API answer.
 #
-# The client bundle calls http://localhost:5000/api (build configuration "production,local"),
-# so the E2E stack uses the same host ports 5000 and 4200 as the dev stack: stop one before
-# starting the other.
+# The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml):
+# stop one before starting the other.
 #
 # Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment with its own
 # seeder, Mailpit, the test clock endpoint and the relaxed export rate limit. Until then the API

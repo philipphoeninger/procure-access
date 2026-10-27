@@ -8,10 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . ./
-# Angular build configuration(s), set through CLIENT_BUILD_CONFIGURATION in .env:
-# "production" calls the production API, "production,local" the local API (localhost:5000).
-ARG NG_CONFIGURATION=production
-RUN npm run ng -- build --configuration="${NG_CONFIGURATION}"
+# Release build. It calls the API on the same origin (/api), so the image is the same everywhere.
+RUN npm run build:release
 
 # stage 2: serve with nginx
 FROM nginx:1.30-alpine AS final

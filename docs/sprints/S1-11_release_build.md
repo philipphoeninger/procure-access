@@ -98,7 +98,7 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 |---|---|---|---|
 | O1 | The browser loads Material Icons and Material Symbols from `fonts.googleapis.com` / `fonts.gstatic.com`, which CLAUDE §8 ("no third-party requests from the browser") does not allow | `src/index.html` lines 15–16 (since commit `b6b5134`) | Issue #43; self-host the icon fonts with the theme foundation (M1.5) |
 | O2 | The dev-only health watcher polls `https://api.procureaccess.tech/health`, also in local development | `src/dev/dev-reload-health.ts` | Point it at `environment.apiUrl` or remove it in M1. With the `local` configuration the local stack no longer runs it (`production: true`) |
-| O3 | nginx resolves `api` at startup, so the client container only starts where an `api` host exists | `nginx -t` outside compose | None while the client runs next to the API; revisit with the same-origin setup in M3 |
+| O3 | nginx resolves `api` at startup, so the client container only starts where an `api` host exists | `nginx -t` outside compose | ✅ Resolved in the review follow-up (§8.1, R3): `api` is resolved at request time |
 
 ## 7. Open points
 
@@ -107,4 +107,49 @@ The API re-seeds the database on every start (`Development`), so accounts from e
 | P1 | Tighten the bundle budget once the screens are rebuilt (lazy routes, fewer Material modules) | M1/M2 — issue #42 |
 | P2 | **Dokploy:** set `CLIENT_BUILD_CONFIGURATION=production` in the Dokploy environment **before** this branch is deployed; without it the compose build stops (by design). Until now Dokploy built the development image, which called `http://localhost:5000/api` | ✅ Done by the owner, 2026-10-22 |
 | P3 | npm install scripts (S1-09 N1): approve or deny `esbuild`, `lmdb`, `msgpackr-extract`, `@parcel/watcher` | S1-20 (decision 3) |
-| P4 | Same-origin API (`/api` behind nginx) instead of a separate API host | M3 (cookie auth, ARCH §8.3, §10.1) |
+| P4 | Same-origin API (`/api` behind nginx) instead of a separate API host | ✅ Brought forward by the owner after the code review (§8, 2026-10-28) |
+
+## 8. Review follow-up (2026-10-28)
+
+Code review of PR #44 (8 findings). The owner chose to fix the two follow-ups instead of opening issues. Fixed in `sprint01/S1-11-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | The `local` build configuration and the required `CLIENT_BUILD_CONFIGURATION` only switched an absolute API URL, although nginx already forwards `/api/`. Each environment needed its own image, and an image built with the wrong value called the wrong API without any build error (also the template default `production,local`) | `environment.prod.ts`: `apiUrl: '/api'` (same origin, the planned topology of ARCH §10.1 / D8; open point P4). `environment.local.ts`, the `local` configuration, the Dockerfile `ARG` and the `.env` variable are gone; the Dockerfile runs `npm run build:release`. `npm start` keeps `http://localhost:5000/api` (`environment.ts`, no nginx there), so the API port 5000 and the CORS origin `localhost:4200` stay. The E2E global setup checks the API through the client (`<baseURL>/api/Health`) |
+| R2 | No gzip: the stock `nginx:alpine` config leaves it off, so about 1.5 MB of JS were downloaded uncompressed. Missing files under `/i18n/` or `/assets/` were answered with `index.html` and 200, so a wrong translation path ended in a JSON parse error | `gzip on` for CSS, JS, JSON and SVG (`gzip_proxied any`, so it also works behind the Dokploy proxy); `/i18n/` and `/assets/` answer a missing file with 404 (`no-cache` as before). API responses stay uncompressed (`gzip off` in `/api/`): they carry the sign-in token, and compressing a secret next to user input is what BREACH-style attacks need |
+
+Findings 4 (compose stops without the variable), 5 (hard-coded port 5000) and 7 (template default) are resolved by R1; findings 6 (`local` on its own) and 8 (hash regex not anchored) no longer apply or stay *won't fix* (no file outside the build output matches; a changed hash format only loses the long cache).
+
+Checks (Claude Code, 2026-10-28, Node 24.22.1):
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `npm run build:release` | ✅ `apiUrl:"/api"` in `main`; no `localhost:5000`; `api.procureaccess.tech` only in the dev-only health-watcher chunk (O2) |
+| 2 | `docker compose config` with an `.env` without `CLIENT_BUILD_CONFIGURATION` | ✅ |
+| 3 | E2E stack from this branch, `nginx -t` in the client container | ✅ |
+| 4 | HTTP on `http://localhost:4200` | ✅ `/`, `/filters`: 200, `no-cache`; `main-*.js`, `styles-*.css`: `immutable`, `Content-Encoding: gzip` (`main` 1.51 MB → 459 kB); `/i18n/de.json`: JSON, `no-cache`, gzip; `/i18n/xx.json`, `/assets/fonts/missing.woff2`, `main-AAAAAAAA.js`: 404; existing font under `/assets/`: 200; `/api/CriteriaFilters`, `/api/Health`: 200, not compressed |
+| 5 | `npx playwright test` (5 browser projects) | ✅ 45 passed |
+| 6 | `reuse lint`, invariant gate, Figma link check | ✅ |
+
+**Dokploy (before deploying this branch):** the client now calls `https://procureaccess.tech/api/…`, which its nginx forwards to the `api` service. The domain `procureaccess.tech` must point at the client service (port 80), as today; the release build no longer uses `api.procureaccess.tech` (only the dev-only health watcher still polls it, O2). `CLIENT_BUILD_CONFIGURATION` can be removed from the Dokploy environment (it is ignored now). nginx finds the API by the service name `api` on `dokploy-network`; a second service named `api` on that shared network would clash, like `db` for the API.
+
+### 8.1 Second review round (PR #85, 2026-10-28)
+
+10 findings. Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| R3 | nginx resolved `api` once at startup. Now that every API call goes through it, a redeployed API container with a new IP would get 502 until the client restarts; a missing `api` at startup stopped nginx (O3) | `resolver 127.0.0.11 valid=10s` (Docker DNS) and the upstream in a variable, so `api` is resolved at request time. `proxy_pass` without a URI part, so the request URI is passed on unchanged (also covers the review point on path normalisation) |
+| R4 | The refresh token (`POST /api/refresh?refreshToken=…`) and the e-mail confirmation token (`/confirm-email?…&token=…`, `/api/confirm-email?…`) travel in the query string; nginx's default `main` log writes it to stdout, i.e. the container log | Access log format `no_query` for the whole server: `$request_method $uri $server_protocol` instead of `$request`, otherwise like `main` |
+
+Checks on the E2E stack: `nginx -t` ✅; `POST /api/refresh?refreshToken=SECRET…` and `/confirm-email?…token=SECRET…`: no `SECRET` in `docker logs` (log line `"POST /api/refresh HTTP/1.1" 400`) ✅; API container removed, its old IP taken by another container, API started again with a new IP (172.19.0.3 → .5): `/api/Health` through the unchanged client container 200 after about 4 s ✅; `npx playwright test` 45 passed ✅.
+
+Won't fix (current behaviour unaffected):
+- nginx defaults `client_max_body_size` 1 MB and 60 s proxy timeouts: no request today comes near either; the anonymous export body is capped at 1 MB by SPEC §7.2 anyway. Revisit with the conformance-report upload (R-P1-03, P1).
+- `ng serve -c production` calls `/api` on the dev server: not a documented workflow (`npm start` uses `development`). A dev-server proxy that would also drop the last absolute URL can come with the M3 same-origin cookie work.
+- No `X-Forwarded-Proto` / `UseForwardedHeaders`: the API already saw http and the proxy's IP behind Traefik before; nothing reads scheme or client IP yet. Needed for the cookie session and the rate limits (M3, SPEC §7.3).
+- Dev health watcher polls `api.procureaccess.tech`: existing, O2 (M1).
+- `text/plain`/`text/csv` not gzipped, no precompression: two small files; on-the-fly gzip is enough at this scale.
+- E2E global setup no longer checks port 5000 directly: the bundle and the tests use the proxy path; Swagger on 5000 is not part of the E2E run.
+- `docs/CLAUDE_v3.md` not updated: a snapshot that is no longer kept in step (it also lacks §6.8); the root `CLAUDE.md` is the live file.
+
