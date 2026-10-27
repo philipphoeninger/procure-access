@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API.ProcureAccess</name>
+    </assembly>
+    <members>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.AddOne(`1)">
+            <summary>
+            Adds a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="dto">Record to add</param>
+            <returns>Added record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.GetOne(System.Int32)">
+            <summary>
+            Gets a single record
+            </summary>
+            <param name="id">Primary key of the record</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.GetAll">
+            <summary>
+            Gets all records
+            </summary>
+            <returns>All records</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.UpdateOne(`1)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="dto">Dto of Entity to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Base.BaseCrudController`3.DeleteOne(System.Int32)">
+            <summary>
+            Deletes a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.CriteriaController.ByCriteriaFilterIds(System.Int32[])">
+            <summary>
+            Gets all records, that have the provided Criteria Filter Id(s).
+            </summary>
+            <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
+            <returns>Criteria</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.Identity.UsersController.ChangeEmail(MODELS.ProcureAccess.Entities.Identity.ChangeEmailRequest)">
+            <summary>
+            Gets a single record
+            </summary>
+            <param name="id">Primary key of the record</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProductsController.ByCriteriaFilterIds(System.Int32[])">
+            <summary>
+            Gets all records, that have the provided Criteria Filter Id(s).
+            </summary>
+            <param name="criteriaFilterIds">To filter Criterias by Criteria Filter Ids.</param>
+            <returns>Criteria</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProposalsController.Upsert(MODELS.ProcureAccess.Entities.Requests.UpsertProposalCommand)">
+            <summary>
+            Creates/Updates a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="request">Request with Entities to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.ProposalsController.Review(MODELS.ProcureAccess.Entities.Requests.ReviewProposalCommand)">
+            <summary>
+            Updates proposal object of a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="request">Request with object to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.GetOne">
+            <summary>
+            Gets a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Controllers.UICustomizationController.UpdateOne(MODELS.ProcureAccess.Entities.Dto.UICustomizationDto)">
+            <summary>
+            Updates a single record
+            </summary>
+            <remarks>
+            </remarks>
+            <param name="dto">Dto to update</param>
+            <returns>Single record</returns>
+        </member>
+        <member name="M:API.ProcureAccess.Extensions.AppConfigExtensions.AddFrontendCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Registers the CORS policy for the Angular client. Allowed origins come from
+            the configuration key <c>Cors:AllowedOrigins</c> (array). No configured origin
+            means no cross-origin request is allowed.
+            </summary>
+        </member>
+        <member name="M:API.ProcureAccess.Extensions.AppConfigExtensions.ConfigureCORS(Microsoft.AspNetCore.Builder.WebApplication)">
+            <summary>
+            Applies the CORS policy registered by <see cref="M:API.ProcureAccess.Extensions.AppConfigExtensions.AddFrontendCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"/>.
+            Must run before authentication so preflight requests are answered.
+            </summary>
+        </member>
+        <member name="T:API.ProcureAccess.Extensions.DatabaseRebuildExtensions">
+            <summary>
+            The <c>RebuildDatabase</c> switch deletes every user and reseeds the sample data. It runs only
+            in the <c>Development</c> environment, whatever the configuration says (ARCHITECTURE §9.7,
+            invariant SEC-06): a misconfigured production deployment must not wipe data.
+            </summary>
+        </member>
+        <member name="F:API.ProcureAccess.Extensions.DatabaseRebuildExtensions.SampleUserPasswordKey">
+            <summary>
+            Password of the sample user (environment variable <c>SampleData__UserPassword</c>,
+            <c>SAMPLE_USER_PASSWORD</c> in <c>.env</c>). Without it the sample user is not created.
+            </summary>
+        </member>
+        <member name="M:API.ProcureAccess.Extensions.DatabaseRebuildExtensions.IsDatabaseRebuildAllowed(Microsoft.Extensions.Hosting.IHostEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>True only in <c>Development</c> with <c>RebuildDatabase</c> set to <c>true</c>.</summary>
+        </member>
+        <member name="T:API.ProcureAccess.Extensions.HealthCheckExtensions">
+            <summary>
+            Health endpoints for the reverse proxy and uptime monitoring (ARCHITECTURE §9.5, OPS-01):
+            <c>/health/live</c> answers as long as the process serves requests and checks nothing else;
+            <c>/health/ready</c> runs the checks tagged <see cref="F:API.ProcureAccess.Extensions.HealthCheckExtensions.ReadyTag"/>. Healthy is 200, unhealthy 503.
+            </summary>
+            <remarks>The file store check joins the ready checks once the file store exists (step 7).</remarks>
+        </member>
+        <member name="F:API.ProcureAccess.Extensions.HealthCheckExtensions.CheckTimeout">
+            <summary>A ready check that takes longer counts as unhealthy, so the probe never hangs.</summary>
+        </member>
+        <member name="T:API.ProcureAccess.Extensions.HealthCheckExtensions.DatabaseHealthCheck">
+            <summary>Healthy when the application database accepts a connection.</summary>
+        </member>
+        <member name="M:API.ProcureAccess.Extensions.HealthCheckExtensions.DatabaseHealthCheck.#ctor(DAL.ProcureAccess.EFStructures.ApplicationDBContext)">
+            <summary>Healthy when the application database accepts a connection.</summary>
+        </member>
+        <member name="F:API.ProcureAccess.Extensions.IdentityExtensions.MinimumJwtKeyBytes">
+            <summary>HMAC-SHA256 needs a key of at least 256 bits; shorter keys fail at the first sign-in.</summary>
+        </member>
+        <member name="M:API.ProcureAccess.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
+            <summary>
+            loops through the API’s versions, generating a Swagger document for each version
+            </summary>
+            <param name="options"></param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="F:Program.StartupFailedMessage">
+            <summary>Message template of the log entry written when the startup fails.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
+        </member>
+    </members>
+</doc>

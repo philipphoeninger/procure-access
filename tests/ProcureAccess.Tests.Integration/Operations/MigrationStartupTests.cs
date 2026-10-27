@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Security.Cryptography;
+using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using MODELS.ProcureAccess.Entities.Configuration;
 using Npgsql;
@@ -34,7 +35,7 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
         // connects as a role that may read the migration history and write the log table, but not
         // change the schema. One migration is left pending, so Migrate() has work to do.
         string lastMigration;
-        await using (var context = ApiFixture.CreateDbContext(_adminConnectionString))
+        await using (var context = CreateDbContext(_adminConnectionString))
         {
             await context.Database.MigrateAsync(cancellationToken);
             lastMigration = context.Database.GetMigrations().Last();
@@ -70,7 +71,7 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
 
         // No waiting: the entry must be there as soon as the startup has failed, i.e. the batched
         // sink was flushed before the exception left Program.cs.
-        await using (var context = ApiFixture.CreateDbContext(_adminConnectionString))
+        await using (var context = CreateDbContext(_adminConnectionString))
         {
             var entry = await context.SeriLogEntries.AsNoTracking()
                 .SingleOrDefaultAsync(e => e.MessageTemplate == Program.StartupFailedMessage, cancellationToken);
@@ -86,7 +87,7 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
     {
         // Pooled connections of the failed API would keep the database in use.
         NpgsqlConnection.ClearAllPools();
-        await using (var context = ApiFixture.CreateDbContext(_adminConnectionString))
+        await using (var context = CreateDbContext(_adminConnectionString))
         {
             await context.Database.EnsureDeletedAsync();
         }
@@ -101,4 +102,9 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
         await using var command = new NpgsqlCommand($"DROP ROLE IF EXISTS {_role}", connection);
         await command.ExecuteNonQueryAsync();
     }
+
+    private static ApplicationDBContext CreateDbContext(string connectionString) =>
+        new(new DbContextOptionsBuilder<ApplicationDBContext>()
+            .UseNpgsql(connectionString)
+            .Options);
 }

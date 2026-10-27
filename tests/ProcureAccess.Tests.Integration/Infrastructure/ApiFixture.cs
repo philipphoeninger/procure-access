@@ -56,7 +56,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
         // Migrate here as well as in Program.cs: a broken migration then fails the fixture with
         // the migration error itself, before any API host or test runs.
-        await using (var context = CreateDbContext(_database.GetConnectionString()))
+        await using (var context = CreateDbContext())
         {
             await context.Database.MigrateAsync();
         }
@@ -118,13 +118,9 @@ public sealed class ApiFixture : IAsyncLifetime
         await _database.DisposeAsync();
     }
 
-    /// <summary>
-    /// The application's <see cref="ApplicationDBContext"/> on a database of the test container,
-    /// e.g. one from <see cref="ConnectionStringForNewDatabase"/>, for setup and checks outside the API.
-    /// </summary>
-    public static ApplicationDBContext CreateDbContext(string connectionString) =>
+    private ApplicationDBContext CreateDbContext() =>
         new(new DbContextOptionsBuilder<ApplicationDBContext>()
-            .UseNpgsql(connectionString)
+            .UseNpgsql(_database.GetConnectionString())
             .Options);
 
     private async Task<NpgsqlConnection> OpenConnectionAsync()

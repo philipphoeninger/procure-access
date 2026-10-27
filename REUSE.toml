@@ -44,9 +44,9 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# Generated files: EF Core migrations.
+# Generated files: EF Core migrations and the API XML documentation file.
 [[annotations]]
-path = "DAL/DAL.ProcureAccess/Migrations/**"
+path = ["DAL/DAL.ProcureAccess/Migrations/**", "API/API.ProcureAccess/API.ProcureAccess.xml"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
@@ -81,6 +81,7 @@ SPDX-License-Identifier = "MIT"
 [[annotations]]
 path = [
   "API/API.ProcureAccess/API.ProcureAccess.csproj.user",
+  "API/API.ProcureAccess/API.ProcureAccess.xml",
   "API/API.ProcureAccess/Properties/launchSettings.json",
   "API/API.ProcureAccess/appsettings.Development.json",
   "API/API.ProcureAccess/appsettings.Production.json",

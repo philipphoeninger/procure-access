@@ -73,17 +73,6 @@ try
     // Sample data only in Development, whatever the configuration says (SEC-06)
     await app.RebuildDatabaseIfAllowedAsync();
 
-    // Endpoints are mapped before the Swagger UI is configured: the UI lists the API versions
-    // through app.DescribeApiVersions(), which finds controllers anyway but minimal APIs only once
-    // they are mapped. SwaggerUiTests fails when a versioned minimal API is mapped too late. The
-    // position of Map* calls does not change the middleware order: WebApplication runs routing
-    // first and the endpoints last.
-    app.MapControllers();
-    app.MapGroup("/api")
-       .MapIdentityUserEndpoints();
-
-    app.MapProcureAccessHealthChecks();
-
     app.ConfigureSwaggerExplorer();
 
     //app.UseHttpsRedirection();
@@ -91,20 +80,17 @@ try
 
     app.ConfigureCORS()
        .AddIdentityAuthMiddlewares();
+
+    app.MapControllers();
+    app.MapGroup("/api")
+       .MapIdentityUserEndpoints();
+
+    app.MapProcureAccessHealthChecks();
 }
 catch (Exception ex)
 {
     app.Logger.LogCritical(ex, Program.StartupFailedMessage);
-    try
-    {
-        // Bounded: when the database itself is unreachable, the sink's last write attempt must
-        // not hold up the exit. The entry is on the console in any case.
-        await app.DisposeAsync().AsTask().WaitAsync(Program.StartupFailureFlushTimeout);
-    }
-    catch (Exception)
-    {
-        // A timeout or an error while disposing must not hide the startup error.
-    }
+    await app.DisposeAsync();
     throw;
 }
 
@@ -114,6 +100,4 @@ public partial class Program
 {
     /// <summary>Message template of the log entry written when the startup fails.</summary>
     public const string StartupFailedMessage = "The API failed to start and stops.";
-
-    internal static readonly TimeSpan StartupFailureFlushTimeout = TimeSpan.FromSeconds(5);
 }

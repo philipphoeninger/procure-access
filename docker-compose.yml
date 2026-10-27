@@ -52,9 +52,6 @@ services:
     #   - ./API/API.ProcureAccess:/src
     networks:
       - dokploy-network
-    # No retry limit: Docker counts restarts over the container's lifetime, so a limit would leave
-    # the API down after a few unrelated crashes. A start that keeps failing (e.g. a migration
-    # error, which stops the API) is retried with Docker's backoff, at most once a minute.
     restart: on-failure
 
   client:

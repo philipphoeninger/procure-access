@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>API.ProcureAccess.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,6 +34,7 @@ SPDX-License-Identifier: MIT
     -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -47,11 +49,6 @@ SPDX-License-Identifier: MIT
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-    <!--
-      Swashbuckle brings Microsoft.OpenApi (the OpenAPI object model) at the version it requires,
-      2.7.5 for 10.3.1. Until 2026-10-27 the unused Microsoft.AspNetCore.OpenApi raised it to 2.12.2;
-      removing that package (PR #71) left the generated Swagger document byte-identical.
-    -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.3.1" />

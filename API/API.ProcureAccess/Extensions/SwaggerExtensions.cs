@@ -24,10 +24,10 @@ public static class SwaggerExtensions
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
-            // build a swagger endpoint for each API version of the controllers and the mapped minimal
-            // APIs; minimal APIs must be mapped before this method is called (for a versioned minimal
-            // API mapped later, SwaggerUiTests fails)
-            foreach (var description in app.DescribeApiVersions())
+            using var scope = app.Services.CreateScope();
+            var versionProvider = scope.ServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
+            // build a swagger endpoint for each discovered API version
+            foreach (var description in versionProvider.ApiVersionDescriptions)
             {
                 options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
             }
