@@ -17,7 +17,7 @@
 | `istanbul-lib-instrument` (new dev dependency) | – | 6.0.3 | Added by the CLI migration because Karma is still configured; goes with Karma in S1-16 |
 | Node (`.nvmrc`) | 22.20.0 | **24.22.1** | Angular 22 needs `^22.22.3 \|\| ^24.15`; owner decision S1-07 (Node 24 LTS) and 2026-10-22 (24.22.1) |
 | npm | 10.9.3 | 11.19.1 | Bundled with Node 24.22.1 |
-| Client `Dockerfile` build stage | `node:22-alpine` (floating) | `node:24.22-alpine` (resolves to 24.22.1 / npm 11.19.1 today) | Same minor as `.nvmrc` (S1-07) |
+| Client `Dockerfile` build stage | `node:22-alpine` (floating) | `node:24.22-alpine` (resolves to 24.22.1 / npm 11.19.1 today) | Same minor as `.nvmrc` (S1-07). *Since 2026-10-27 pinned to `node:24.22.1-alpine`, the exact `.nvmrc` version (§7, F2)* |
 
 Unchanged on purpose: `marked` 17.0.6, `ngx-color-picker` 20.1.1 (peer `>=19`; not imported, S1-08), `@auth0/angular-jwt` 5.2.0, `typedjson`/`reflect-metadata`, Karma/Jasmine. Font Awesome 7.2.0, easymde 2.20.0 and prettier 3.6.2 were pinned back in the lockfile after regeneration (B2).
 
@@ -30,9 +30,9 @@ Unchanged on purpose: `marked` 17.0.6, `ngx-color-picker` 20.1.1 (peer `>=19`; n
 | B3 | Angular CLI 22 runs Prettier over every file a migration touches; that reformatted unrelated lines in 15 files | Migrations re-run with a temporary `.prettierignore` containing `**` (the CLI calls Prettier with `--ignore-unknown`, which honours it); file removed afterwards. Diff now contains only the migration changes |
 | B4 | Components without `changeDetection` are **OnPush by default** in Angular 22 | Migration `change-detection-eager` added `changeDetection: ChangeDetectionStrategy.Eager` to the 14 components that had none (the other 10 were already OnPush). Behaviour unchanged; moving them to OnPush is S1-10 |
 | B5 | The compiler rejects duplicate outputs: `MarkdownEditor` had `value = model('')` (implicit output `valueChange`) **and** `@Output() valueChange` | Migration `model-output` replaced the model with `valueInput = input('', {alias: 'value'})` + `value = linkedSignal(this.valueInput)`. The component never called `value.set()`, so it only ever emitted through the hand-written output; `[(value)]` in `criterion-proposal.html` binds unchanged |
-| B6 | `?.` in templates now returns `undefined` instead of `null` | Migration `safe-optional-chaining` wrapped one expression in `$safeNavigationMigration(...)` (`product-details.html`, link href) to keep the old result |
-| B7 | Extended diagnostics `nullishCoalescingNotNullable` / `optionalChainNotNullable` now fire on existing code | Migration `strict-safe-navigation-narrow` set both to `suppress` in `tsconfig.app.json` and `tsconfig.spec.json` |
-| B8 | TypeScript 6: `baseUrl` is deprecated and fails the build (`TS5101`) | `baseUrl` removed from `tsconfig.json`; `paths` targets made relative (`./src/app/*`, …). The unused alias `@tests` keeps its old target (project root) as `./`. `ignoreDeprecations` not needed |
+| B6 | `?.` in templates now returns `undefined` instead of `null` | Migration `safe-optional-chaining` wrapped one expression in `$safeNavigationMigration(...)` (`product-details.html`, link href) to keep the old result. *The wrapper kept an older bug in that link; removed on 2026-10-27 (§7, F1)* |
+| B7 | Extended diagnostics `nullishCoalescingNotNullable` / `optionalChainNotNullable` now fire on existing code | Migration `strict-safe-navigation-narrow` set both to `suppress` in `tsconfig.app.json` and `tsconfig.spec.json`. *No template triggers them on `main` any more; suppression removed on 2026-10-27 (§7, F3)* |
+| B8 | TypeScript 6: `baseUrl` is deprecated and fails the build (`TS5101`) | `baseUrl` removed from `tsconfig.json`; `paths` targets made relative (`./src/app/*`, …). The unused alias `@tests` keeps its old target (project root) as `./`. `ignoreDeprecations` not needed. *`@tests` removed on 2026-10-27 (§7, F4)* |
 | B9 | ngx-translate 18: `TranslateService.getCurrentLang()` returns `Language \| null`; `EnLanguage[currentLang]` fails with `TS2538` | `LanguageService.get()` checks for `null` first; the fallback to `DEFAULT_LANGUAGE` is unchanged |
 | B10 | Angular 22 refuses Node 22.20 | Node 24.22.1 in `.nvmrc` and `node:24.22-alpine` in the Dockerfile |
 
@@ -108,6 +108,20 @@ Note on step 16: the API restart in step 14 rebuilt the database (`RebuildDataba
 ## 6. Open points for S1-10 and later
 
 - **S1-10:** 14 components now carry `ChangeDetectionStrategy.Eager`. Moving them to OnPush (and checking each screen) belongs to the zoneless task, together with S1-08 N2 (`/products` by URL).
-- **S1-10 or later:** remove the `$safeNavigationMigration()` wrapper and the two suppressed diagnostics once the template is reworked.
+- **S1-10 or later:** remove the `$safeNavigationMigration()` wrapper and the two suppressed diagnostics once the template is reworked. *Done on 2026-10-27 (§7).*
 - **S1-11:** production budget, Dockerfile build command (N3), global CLI install; npm install scripts (N1).
 - **S1-16:** Karma, the broken spec and `istanbul-lib-instrument` go away with Vitest.
+
+## 7. Review follow-ups (2026-10-27)
+
+The review of PR #40 found one bug that users hit today (F1, older than this task, kept by the B6 migration) and no security issue. Two Dockerfile points of the review (global CLI install, `--configuration` going to npm) were already fixed by S1-11. Four points were fixed afterwards (owner decision):
+
+| # | Point | Change |
+|---|---|---|
+| F1 | Product detail page: the website link was always `'https://' + link`, so a product without a link pointed to `https://null` and a link with a scheme became `https://https://…` | `ProductDetails.websiteUrl` adds `https://` only when the link has no `http://` or `https://`; without a link the "Webseite" line is not shown. Any other scheme also gets the prefix, so `javascript:` cannot reach the `href`. Component test `product-details.spec.ts` (two of its three cases fail on the old template) |
+| F2 | The Dockerfile used the floating `node:24.22-alpine` while `.nvmrc` pins 24.22.1 (CLAUDE §3 says both carry the same version) | `node:24.22.1-alpine` |
+| F3 | `nullishCoalescingNotNullable` and `optionalChainNotNullable` were suppressed for the whole app and specs (B7) | Suppression removed from `tsconfig.app.json` and `tsconfig.spec.json`. Development and production builds show no NG8102/NG8107 warning; a deliberate `?.`/`??` on a non-nullable value warns again |
+| F4 | Unused path alias `@tests` (B8) | Removed from `tsconfig.json` |
+
+Checks (Node 24.22.1): `npx ng test` 8/8, `npm run lint` clean, `ng build` (development and production) without template warnings.
+
