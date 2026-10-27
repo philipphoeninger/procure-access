@@ -2,7 +2,7 @@
 
 This file guides Claude Code (and any other AI assistant) when working in this repository. It is the project's AI onboarding document: read it at the start of every session.
 
-> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`. Keep it updated whenever a migration step changes structure, commands or conventions.
+> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`; licence rule in §10 aligned with `ARCHITECTURE_v13.md` D12 on 2026-10-27. Keep it updated whenever a migration step changes structure, commands or conventions.
 
 ---
 
@@ -186,7 +186,8 @@ Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reu
 - Antiforgery on every non-GET endpoint except the anonymous export (SEC-02, SEC-09).
 - E-mail confirmation gates saving, organisations, invitations, contributor profiles and publishing (SEC-10); lockout and token rules per SEC-11.
 - Rate limits per `SPEC §7.3`; field limits per `SPEC §7.2` (server authoritative).
-- Secrets only from environment variables — the repository is public. Licence headers (REUSE/SPDX) on new files; only OSI-licensed dependencies without commercial-use restrictions.
+- Secrets only from environment variables — the repository is public. Licence headers (REUSE/SPDX) on new files.
+- Dependency licences (`ARCHITECTURE` D12): **shipped dependencies** (API or client image, browser bundle) must be OSI-approved, without commercial-use restriction and **without strong copyleft or reciprocal licence** (GPL, AGPL, RPL, OSL …). Weak, file-level copyleft (MPL-2.0, LGPL as a separate library) is allowed if used unmodified. A dual licence counts by the option the project would use. **Development and test tools that are not shipped:** OSI-approved, no commercial-use restriction.
 
 ## 11. Do / don't
 
