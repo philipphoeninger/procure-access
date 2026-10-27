@@ -32,6 +32,6 @@ All commands ran from `API/API.ProcureAccess` with `ConnectionStrings__ProcureAc
 ## 3. Notes
 
 - **Expected noise:** before the database exists, EF logs "An error occurred using the connection to database 'ProcureAccessDb'" while probing for it; it then creates the database. Not an error.
-- **Migration lock:** EF Core 10 logs "Acquiring an exclusive lock for migration application" during `database update`. This is the new migration lock, not a hang.
+- **Migration lock:** EF Core 10 logs "Acquiring an exclusive lock for migration application" during `database update`. This is the migration lock introduced in EF Core 9, not a hang.
 - **`ProductVersion`:** migration designers and the model snapshot still say `8.0.21`. No new migration is needed for the upgrade; the annotation changes with the next real migration (S1-03 §3, item 12).
 - **Startup path unchanged:** `Program.cs` still swallows exceptions from `Migrate()` (S1-03 §3, item 1). Since the model has no pending changes, `Migrate()` does not throw on EF Core 10 today. OPS-03 (S1-14) makes this a regression test, so model drift is caught in CI instead of at startup.
