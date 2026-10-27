@@ -74,15 +74,13 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# Images and logos: origin and licence not documented. Not MIT.
+# WERTE.IT logo: origin and licence not documented. Not MIT. Name new images
+# explicitly with their own owner and licence (no glob), so that reuse lint
+# flags any image that has none.
 [[annotations]]
-path = [
-  "CLIENT/CLIENT.ProcureAccess/public/*.jpeg",
-  "CLIENT/CLIENT.ProcureAccess/public/*.jpg",
-  "CLIENT/CLIENT.ProcureAccess/public/*.png",
-]
+path = "CLIENT/CLIENT.ProcureAccess/public/werte_it_logo.jpg"
 precedence = "override"
-SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-FileCopyrightText = "2025 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
 
 # Favicon: the unchanged default icon of the Angular CLI (Angular licence).
