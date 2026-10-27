@@ -16,7 +16,7 @@
 
 ### 2.1 Eager → OnPush (decision A)
 
-All 14 components that S1-09 marked `ChangeDetectionStrategy.Eager` are now `OnPush`, so **all 24 components are OnPush**. Each one was read before the switch: none shows a plain (non-signal) field in its template that changes after async work. The one plain field that does change, `App.showHeader`, is set from the router outlet's `(activate)`/`(deactivate)` outputs; template listeners mark the view dirty, and the smoke test confirms the header hides and returns around the login outlet.
+All 14 components that S1-09 marked `ChangeDetectionStrategy.Eager` are now `OnPush`, so **all 24 components are OnPush**. Each one was read before the switch: none shows a plain (non-signal) field in its template that changes after async work. *(Not quite: Register had the Z5 pattern, and `ProposalList` reads `dataSource._filterData` for its empty state, which is never shown, O11. See §7.)* The one plain field that does change, `App.showHeader`, is set from the router outlet's `(activate)`/`(deactivate)` outputs; template listeners mark the view dirty, and the smoke test confirms the header hides and returns around the login outlet.
 
 ### 2.2 Async results into signals (decision B)
 
@@ -100,3 +100,17 @@ Approver screens (rows 19–20) were only tested after the change: the role was 
 
 - **Later:** the `$safeNavigationMigration()` wrapper and the two suppressed diagnostics from S1-09 stay until the templates are reworked; `provideAnimationsAsync()` stays (S1-09 N4).
 - **S1-16:** the Karma specs (check 3/4) are replaced by Vitest; the TESTING §3.2 rule "every `TestBed` configuration includes `provideZonelessChangeDetection()`" applies from then on.
+
+## 7. Review follow-up (2026-10-27)
+
+Code review of PR #41. Fixed in `sprint01/S1-10-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | Register had the same copy-once language field as Z5 (`model(this.store.uiCustomization())`); by URL it could show "Deutsch" while the app ran in English | `[ngModel]="store.language()"`; the existing `(selectionChange)` → `setLanguage` writes the store |
+| R2 | The `[(ngModel)]` of Z5 wrote `.language` straight into the store's state object. Harmless today (NgRx Signals 22.0.1 does not freeze state, and `setLanguage` copies it right after), but it bypasses `patchState` | Same one-way binding in Settings; the `linkedSignal` is gone. "Speichern" already saves `store.uiCustomization()` |
+| R3 | Logout cleared neither `AuthService.permissions` nor `store.proposals`: on a shared browser the next person could open `/proposals` and see the previous Approver's list until a reload (existing behaviour, made visible by Z2) | `AuthService.logout()` empties the permissions (covers header, account deletion, failed refresh); the header logout also empties the proposals. The header button stays until the header is rebuilt (`appHasPermission` checks once) but leads to `/unauthorized` |
+| R4 | Z1 keeps the table in sync with the store, so a slow `loadProducts()` of `init()` could replace a filtered list asked for later | `withProducts` numbers its requests; only the newest one writes its result |
+| R5 | Z3 showed "Kein Produkt … gefunden" while products were still loading | `productsLoaded` in `withProducts`; the text only shows once a product request has answered. A failed request still ends in the not-found text (no UX-copy key for a load error) |
+
+Regression tests for Z1–Z5 and R1–R5: issue #82. Won't fix: `Profile` table setup, duplicated "effect writes into `dataSource`" code, `ProposalList` empty state (O11) — all on screens rebuilt or retired in M1–M3.
