@@ -75,6 +75,41 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
+# Files of the blocks above that already existed in 2025 (git history): same
+# licence, copyright years 2025-2026. A fixed list; new files never go here.
+# Must stay below the MIT blocks above: the last matching block wins.
+[[annotations]]
+path = [
+  "API/API.ProcureAccess/API.ProcureAccess.csproj.user",
+  "API/API.ProcureAccess/API.ProcureAccess.xml",
+  "API/API.ProcureAccess/Properties/launchSettings.json",
+  "API/API.ProcureAccess/appsettings.Development.json",
+  "API/API.ProcureAccess/appsettings.Production.json",
+  "API/API.ProcureAccess/appsettings.json",
+  "CLIENT/CLIENT.ProcureAccess/.nvmrc",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/extensions.json",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/launch.json",
+  "CLIENT/CLIENT.ProcureAccess/.vscode/tasks.json",
+  "CLIENT/CLIENT.ProcureAccess/README.md",
+  "CLIENT/CLIENT.ProcureAccess/angular.json",
+  "CLIENT/CLIENT.ProcureAccess/package-lock.json",
+  "CLIENT/CLIENT.ProcureAccess/package.json",
+  "CLIENT/CLIENT.ProcureAccess/public/products.csv",
+  "CLIENT/CLIENT.ProcureAccess/src/app/core/utils/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/features/feature-1/**/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/layout/sidebar/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/shared/directives/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/src/app/shared/pipes/todo.txt",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.app.json",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.json",
+  "CLIENT/CLIENT.ProcureAccess/tsconfig.spec.json",
+  "README.md",
+  "components/notes.txt",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V."
+SPDX-License-Identifier = "MIT"
+
 # WERTE.IT logo: origin and licence not documented. Not MIT. Name new images
 # explicitly with their own owner and licence (no glob), so that reuse lint
 # flags any image that has none.

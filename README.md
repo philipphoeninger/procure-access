@@ -3,7 +3,7 @@
 
 # LICENSE
 
-Copyright (c) 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+Copyright (c) 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 
 Source code and documentation are licensed under the MIT licence, see [`LICENSE`](LICENSE).
 
