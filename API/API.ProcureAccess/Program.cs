@@ -56,40 +56,48 @@ Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
 var app = builder.Build();
 
-// Automatically apply migrations
-using (var scope = app.Services.CreateScope())
+// Every error between Build() and Run() stops the API. It is logged, and disposing the app flushes
+// the batched PostgreSQL log sink before the process ends (app.Run() disposes the app itself).
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
-    try
+    // Automatically apply migrations: the API must not serve requests against a schema that does
+    // not match the model.
+    using (var scope = app.Services.CreateScope())
     {
-        logger.LogInformation("Applying pending migrations...");
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        app.Logger.LogInformation("Applying pending migrations...");
         db.Database.Migrate(); // creates DB if missing
-        logger.LogInformation("Migrations applied successfully!");
+        app.Logger.LogInformation("Migrations applied successfully!");
     }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-        Console.WriteLine("An error occurred while migrating the database.");
-    }
+
+    // Sample data only in Development, whatever the configuration says (SEC-06)
+    await app.RebuildDatabaseIfAllowedAsync();
+
+    app.ConfigureSwaggerExplorer();
+
+    //app.UseHttpsRedirection();
+    app.UseRequestLocalization();
+
+    app.ConfigureCORS()
+       .AddIdentityAuthMiddlewares();
+
+    app.MapControllers();
+    app.MapGroup("/api")
+       .MapIdentityUserEndpoints();
+
+    app.MapProcureAccessHealthChecks();
+}
+catch (Exception ex)
+{
+    app.Logger.LogCritical(ex, Program.StartupFailedMessage);
+    await app.DisposeAsync();
+    throw;
 }
 
-// Sample data only in Development, whatever the configuration says (SEC-06)
-await app.RebuildDatabaseIfAllowedAsync();
-
-app.ConfigureSwaggerExplorer();
-
-//app.UseHttpsRedirection();
-app.UseRequestLocalization();
-
-app.ConfigureCORS()
-   .AddIdentityAuthMiddlewares();
-
-app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityUserEndpoints();
-
-app.MapProcureAccessHealthChecks();
-
 app.Run();
+
+public partial class Program
+{
+    /// <summary>Message template of the log entry written when the startup fails.</summary>
+    public const string StartupFailedMessage = "The API failed to start and stops.";
+}

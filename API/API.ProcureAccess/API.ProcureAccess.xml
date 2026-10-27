@@ -156,10 +156,8 @@
             <param name="options"></param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="T:Program">
-            <summary>
-            Auto-generated public partial Program class for top-level statement apps.
-            </summary>
+        <member name="F:Program.StartupFailedMessage">
+            <summary>Message template of the log entry written when the startup fails.</summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
             <summary>
