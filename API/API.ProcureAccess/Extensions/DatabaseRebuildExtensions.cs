@@ -51,8 +51,8 @@ public static class DatabaseRebuildExtensions
             dbContext, userManager, app.Configuration[SampleUserPasswordKey]);
         if (!seeded)
         {
-            app.Logger.LogWarning(
-                "{SettingKey} is not set: no sample user was created", SampleUserPasswordKey);
+            // The setting name as a literal: CodeQL treats a logged value named *Password* as a secret.
+            app.Logger.LogWarning("SampleData:UserPassword is not set: no sample user was created");
         }
     }
 }
