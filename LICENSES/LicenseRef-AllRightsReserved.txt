@@ -13,5 +13,11 @@ This applies to:
   documents (docs/kriterienkatalog_bit_inklusiv_v1*.md), the criteria seed
   data and the database migrations that carry it, and the catalog release
   data (catalog/releases/). Detlef Girke has given permission to use them in
-  ProcureAccess, its deployments and its exports;
-- images and logos whose origin or licence is not documented.
+  ProcureAccess, its deployments and its exports. This permission does not
+  extend to forks or other copies of this repository;
+- the WERTE.IT logo (CLIENT/CLIENT.ProcureAccess/public/werte_it_logo.jpg),
+  created for and owned by the project WERTE.IT.
+
+Forks of this repository on GitHub (as GitHub's Terms of Service allow for
+public repositories) may contain these parts, but grant no permission to use
+them.
