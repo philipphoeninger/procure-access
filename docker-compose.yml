@@ -46,7 +46,8 @@ services:
       # Sample user for the local stack; empty = no sample user (only used in Development)
       SampleData__UserPassword: ${SAMPLE_USER_PASSWORD:-}
     ports:
-      # Fixed: the client build "production,local" calls http://localhost:5000/api
+      # Direct access for Swagger and the dev server (npm start); the client image calls the API
+      # through its nginx proxy (/api/ → api:8080)
       - 5000:8080
     # volumes:
     #   - ./API/API.ProcureAccess:/src
@@ -58,9 +59,6 @@ services:
     build:
       context: ./CLIENT/CLIENT.ProcureAccess
       dockerfile: Dockerfile
-      args:
-        # Angular build configuration: "production" (Dokploy) or "production,local" (local stack)
-        NG_CONFIGURATION: ${CLIENT_BUILD_CONFIGURATION:?set CLIENT_BUILD_CONFIGURATION in .env}
     depends_on:
       - api
     ports:

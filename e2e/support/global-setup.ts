@@ -8,12 +8,12 @@ import type { FullConfig } from '@playwright/test';
  * Fails the run at once with a clear message when the E2E stack is not running,
  * instead of letting every test time out on its own.
  *
- * The client bundle calls the API directly at http://localhost:5000/api
- * (build configuration "production,local"), so both addresses are checked.
+ * The client bundle calls the API on its own origin (/api, forwarded by the client's
+ * nginx), so the API is checked through the client by default.
  */
 export default async function globalSetup(config: FullConfig): Promise<void> {
   const clientUrl = config.projects[0]?.use.baseURL ?? 'http://localhost:4200';
-  const apiUrl = process.env['E2E_API_URL'] ?? 'http://localhost:5000/api';
+  const apiUrl = process.env['E2E_API_URL'] ?? `${clientUrl}/api`;
 
   for (const url of [clientUrl, `${apiUrl}/Health`]) {
     try {
