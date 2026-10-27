@@ -50,6 +50,7 @@ export class AuthService {
   }
 
   public logout() {
+    this.permissions = [];
     localStorage.removeItem(this.jwtName);
     localStorage.removeItem(this.refreshTokenName);
     this.router.navigateByUrl('/home'); // /(login:auth)

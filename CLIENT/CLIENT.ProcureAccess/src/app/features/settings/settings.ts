@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, inject, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // import { ColorPickerDirective } from 'ngx-color-picker';
@@ -40,9 +40,6 @@ export class Settings {
   protected store = inject(ProcureAccessStore);
   protected snackbarService = inject(SnackbarService);
 
-  // The user's settings load asynchronously; follow the store instead of copying it once.
-  protected updateUICustomization = linkedSignal(() => this.store.uiCustomization());
-  
   protected languages = Object.values(EnLanguage);
   protected languageLabels = LANGUAGES;
 

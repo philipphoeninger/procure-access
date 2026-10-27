@@ -7,7 +7,9 @@ SPDX-License-Identifier: MIT
 @if (productId() == null) {
     <p>{{ 'PRODUCTS.NO_ID_FOUND_MSG' | translate }}</p>
 } @else if (product() == null) {
-    <p>{{ 'PRODUCTS.NO_PRODUCT_FOUND_MSG_1' | translate }}: {{ productId() }} {{ 'PRODUCTS.NO_PRODUCT_FOUND_MSG_2' | translate }}</p>
+    @if (store.productsLoaded()) {
+        <p>{{ 'PRODUCTS.NO_PRODUCT_FOUND_MSG_1' | translate }}: {{ productId() }} {{ 'PRODUCTS.NO_PRODUCT_FOUND_MSG_2' | translate }}</p>
+    }
 } @else {
     <div class="product-info-container">
         <img mat-card-image src="document_stock_img.jpeg" alt="Stock image of an accessible document">

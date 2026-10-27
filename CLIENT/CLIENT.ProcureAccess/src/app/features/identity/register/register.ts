@@ -70,7 +70,6 @@ export class Register {
 
   protected languages = Object.values(EnLanguage);
   protected languageLabels = LANGUAGES;
-  protected updateUICustomization = model(this.store.uiCustomization());
 
   protected password = model('');
   protected confirmPassword = model('');

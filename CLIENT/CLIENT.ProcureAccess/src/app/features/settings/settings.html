@@ -54,7 +54,7 @@ SPDX-License-Identifier: MIT
       <label for="language-select">{{ 'COMMON.LANGUAGE' | translate }}</label>
       <mat-select 
         id="language-select" 
-        [(ngModel)]="updateUICustomization().language" 
+        [ngModel]="store.language()" 
         (selectionChange)="store.setLanguage($event.value)" 
         name="selectedLanguage">
           @for (language of languages; track language) {

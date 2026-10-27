@@ -46,6 +46,7 @@ export class Header {
   logout() {
     this.authService.logout();
     this.store.setUser(null);
+    this.store.setProposals([]);
     this.store.reloadUICustomization();
   }
 }
