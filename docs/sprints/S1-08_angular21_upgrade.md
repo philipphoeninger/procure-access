@@ -19,7 +19,7 @@
 
 **Kept, correcting S1-07:**
 - `@angular/animations` is **not** unused. `app.config.ts` calls `provideAnimationsAsync()` from `@angular/platform-browser/animations/async`, which needs the package. Updated to 21.
-- `ngx-color-picker` is **not** used. The import in `settings.ts` and the markup in `settings.html` are commented out, so it is not in the bundle and S1-07 risk 3 does not apply. Kept in `package.json` (owner decision in S1-07); removing it is a one-line change whenever wanted.
+- `ngx-color-picker` is **not** used. The import in `settings.ts` and the markup in `settings.html` are commented out, so it is not in the bundle and S1-07 risk 3 does not apply. Kept in `package.json` (owner decision in S1-07); removing it is a one-line change whenever wanted. *Removed on 2026-10-27 (owner decision after the review of PR #39, §7).*
 
 ## 2. Breaking changes and how they were fixed
 
@@ -29,9 +29,9 @@ No breaking change needed a change to application code. All Angular, Material, C
 |---|---|---|
 | B1 | `ng update @angular/core@21 @angular/cli@21` updates `package.json` but the install fails: Material/CDK 20, `@ngrx/signals` 20, `@ngrx/store*` 20 and `ngx-markdown` 20 declare peer `@angular/core ^20` | Raised Material/CDK, `@ngrx/signals`, `ngx-markdown` + `marked` in the same step; removed the unused `@ngrx/store*` packages |
 | B2 | npm 10.9.3 (also the latest 10.9.9) crashes while resolving the new tree: `Cannot read properties of null (reading 'edgesOut')` in arborist `#loadPeerSet`, on the optional `vitest` peer group of `@angular/build` 21. Also happens without a lockfile | Lockfile generated with npm 11 (`npx npm@11 install --package-lock-only`, lockfile version 3 as before). npm 10.9.3 can `npm ci` and `npm install` from this lockfile without changing it, locally and in the `node:22-alpine` image. Only *adding or changing* packages with npm 10 still crashes → use `npx npm@11 install …` until Node 24 (npm 11) arrives in S1-09 |
-| B3 | Regenerating the lockfile also moved unrelated direct packages (Font Awesome 7.3.1, easymde 2.21.0, prettier 3.9.10) | Pinned back to the versions on `main` (7.2.0, 2.20.0, 3.6.2) in the lockfile; `package.json` ranges unchanged. Transitive packages are re-resolved within their ranges (that is what fixes most of the audit findings, §3). `@types/jasmine` moved 5.1.9 → 5.1.15 (patch, test-only, replaced in S1-16) |
+| B3 | Regenerating the lockfile also moved unrelated direct packages (Font Awesome 7.3.1, easymde 2.21.0, prettier 3.9.10) | Pinned back to the versions on `main` (7.2.0, 2.20.0, 3.6.2) in the lockfile; `package.json` ranges unchanged. *That pin did not last (the next lockfile regeneration would undo it); since 2026-10-27 `package.json` pins the three exactly (§7).* Transitive packages are re-resolved within their ranges (that is what fixes most of the audit findings, §3). `@types/jasmine` moved 5.1.9 → 5.1.15 (patch, test-only, replaced in S1-16) |
 | B4 | `ng update` runs the *latest* CLI (22) to perform the update when the local CLI is not the latest; CLI 22 refuses Node 22.20 (`^22.22.3 \|\| ^24.15`) | Migrations run with the installed CLI 21: `NG_DISABLE_VERSION_CHECK=1 npx ng update <pkg> --migrate-only --from=20.0.0 --to=21.2.27 --allow-dirty` (`--allow-dirty` because `.ai/` is untracked) |
-| B5 | Migration "Updates the 'lib' property in tsconfig files" removed `"lib": ["ES2022", "dom"]` from `tsconfig.json` | Accepted: without `lib`, TypeScript uses the default for `target: ES2022`, which includes ES2022 and DOM. Build output unchanged |
+| B5 | Migration "Updates the 'lib' property in tsconfig files" removed `"lib": ["ES2022", "dom"]` from `tsconfig.json` | Accepted: without `lib`, TypeScript uses the default library of `target: ES2022` (`lib.es2022.full.d.ts`): ES2022, DOM, DOM.Iterable, DOM.AsyncIterable, ScriptHost and WebWorker.ImportScripts. That is a superset of the old `["ES2022", "dom"]`, so the code is now type-checked against a few more APIs (e.g. iterating a `NodeList` with `for…of`). Emitted JavaScript and build output unchanged. *(Corrected 2026-10-27; the first version called the default equivalent.)* |
 
 ### Migrations that ran
 
@@ -100,3 +100,13 @@ The only failed API requests in the session were the expected 400 (step 4) and 5
 - **`ng update` to 22** needs Node 24 first (S1-07 blocker 1); B4 does not occur then.
 - **Production build** still fails on the bundle budget (S1-11).
 - **Karma specs** do not compile and all fail (S1-16).
+
+## 7. Review follow-ups (2026-10-27)
+
+The review of PR #39 found no security or correctness bug. Three points were fixed afterwards (owner decision):
+
+| # | Point | Change |
+|---|---|---|
+| F1 | B3 pinned Font Awesome, easymde and prettier only in the lockfile; the `^` ranges in `package.json` let the next regeneration move them again (it happened again in S1-09, B2) | `package.json` pins `@fortawesome/fontawesome-free` 7.2.0, `easymde` 2.20.0 and `prettier` 3.6.2 exactly; installed versions unchanged |
+| F2 | `ngx-color-picker` was unused but shipped as a runtime dependency | Removed from `package.json` and the lockfile. The commented-out colour pickers in `features/settings/settings.ts` and `settings.html` still name it; re-enabling them needs the package (or a replacement) again |
+| F3 | B5 called the TypeScript default `lib` equivalent to `["ES2022", "dom"]` | B5 corrected |
