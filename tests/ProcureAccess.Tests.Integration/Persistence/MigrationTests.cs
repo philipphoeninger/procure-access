@@ -19,10 +19,7 @@ namespace ProcureAccess.Tests.Integration.Persistence;
 /// </summary>
 public sealed class MigrationTests(ApiFixture api) : IAsyncDisposable
 {
-    private readonly ApplicationDBContext _context = new(
-        new DbContextOptionsBuilder<ApplicationDBContext>()
-            .UseNpgsql(api.ConnectionStringForNewDatabase())
-            .Options);
+    private readonly ApplicationDBContext _context = ApiFixture.CreateDbContext(api.ConnectionStringForNewDatabase());
 
     [Fact(DisplayName = "INV:OPS-03 " + nameof(Migrate_EmptyDatabase_AppliesAllMigrations))]
     [Trait("Invariant", "OPS-03")]

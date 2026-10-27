@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.ExceptionServices;
-
 [assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,54 +56,64 @@ Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
 var app = builder.Build();
 
-// Automatically apply migrations. A failure stops the startup: the API must not serve requests
-// against a schema that does not match the model.
-ExceptionDispatchInfo? migrationFailure = null;
-using (var scope = app.Services.CreateScope())
+// Every error between Build() and Run() stops the API. It is logged, and disposing the app flushes
+// the batched PostgreSQL log sink before the process ends (app.Run() disposes the app itself).
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    // Automatically apply migrations: the API must not serve requests against a schema that does
+    // not match the model.
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        app.Logger.LogInformation("Applying pending migrations...");
+        db.Database.Migrate(); // creates DB if missing
+        app.Logger.LogInformation("Migrations applied successfully!");
+    }
 
+    // Sample data only in Development, whatever the configuration says (SEC-06)
+    await app.RebuildDatabaseIfAllowedAsync();
+
+    // Endpoints are mapped before the Swagger UI is configured: the UI lists the API versions
+    // through app.DescribeApiVersions(), which finds controllers anyway but minimal APIs only once
+    // they are mapped. SwaggerUiTests fails when a versioned minimal API is mapped too late. The
+    // position of Map* calls does not change the middleware order: WebApplication runs routing
+    // first and the endpoints last.
+    app.MapControllers();
+    app.MapGroup("/api")
+       .MapIdentityUserEndpoints();
+
+    app.MapProcureAccessHealthChecks();
+
+    app.ConfigureSwaggerExplorer();
+
+    //app.UseHttpsRedirection();
+    app.UseRequestLocalization();
+
+    app.ConfigureCORS()
+       .AddIdentityAuthMiddlewares();
+}
+catch (Exception ex)
+{
+    app.Logger.LogCritical(ex, Program.StartupFailedMessage);
     try
     {
-        logger.LogInformation("Applying pending migrations...");
-        db.Database.Migrate(); // creates DB if missing
-        logger.LogInformation("Migrations applied successfully!");
+        // Bounded: when the database itself is unreachable, the sink's last write attempt must
+        // not hold up the exit. The entry is on the console in any case.
+        await app.DisposeAsync().AsTask().WaitAsync(Program.StartupFailureFlushTimeout);
     }
-    catch (Exception ex)
+    catch (Exception)
     {
-        logger.LogCritical(ex, "Applying the database migrations failed; the API stops.");
-        migrationFailure = ExceptionDispatchInfo.Capture(ex);
+        // A timeout or an error while disposing must not hide the startup error.
     }
+    throw;
 }
-
-if (migrationFailure is not null)
-{
-    // Disposing the app flushes the batched PostgreSQL log sink, so the entry above is stored
-    // before the process ends.
-    await app.DisposeAsync();
-    migrationFailure.Throw();
-}
-
-// Sample data only in Development, whatever the configuration says (SEC-06)
-await app.RebuildDatabaseIfAllowedAsync();
-
-// Endpoints are mapped before the Swagger UI is configured: the UI lists the API versions through
-// app.DescribeApiVersions(), which finds controllers anyway but minimal APIs only once they are
-// mapped (checked by SwaggerUiTests). The position of Map* calls does not change the middleware
-// order: WebApplication runs routing first and the endpoints last.
-app.MapControllers();
-app.MapGroup("/api")
-   .MapIdentityUserEndpoints();
-
-app.MapProcureAccessHealthChecks();
-
-app.ConfigureSwaggerExplorer();
-
-//app.UseHttpsRedirection();
-app.UseRequestLocalization();
-
-app.ConfigureCORS()
-   .AddIdentityAuthMiddlewares();
 
 app.Run();
+
+public partial class Program
+{
+    /// <summary>Message template of the log entry written when the startup fails.</summary>
+    public const string StartupFailedMessage = "The API failed to start and stops.";
+
+    internal static readonly TimeSpan StartupFailureFlushTimeout = TimeSpan.FromSeconds(5);
+}

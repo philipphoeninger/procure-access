@@ -52,10 +52,10 @@ services:
     #   - ./API/API.ProcureAccess:/src
     networks:
       - dokploy-network
-    # At most 5 restarts after a failure. A failed start (e.g. a migration error, which stops the
-    # API) then leaves the container exited instead of restarting it endlessly. Docker counts the
-    # restarts over the container's lifetime; recreating it (a new deployment) resets the count.
-    restart: on-failure:5
+    # No retry limit: Docker counts restarts over the container's lifetime, so a limit would leave
+    # the API down after a few unrelated crashes. A start that keeps failing (e.g. a migration
+    # error, which stops the API) is retried with Docker's backoff, at most once a minute.
+    restart: on-failure
 
   client:
     build:

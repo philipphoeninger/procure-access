@@ -68,7 +68,7 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
 
         await StartApiWithRebuildFlagAsync("Development", SampleUserPassword);
 
-        await using var db = CreateDbContext();
+        await using var db = ApiFixture.CreateDbContext(_connectionString);
         var user = await db.Users.SingleAsync(TestContext.Current.CancellationToken);
         user.Email.ShouldBe(SampleData.SampleUserEmail);
         new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash!, SampleUserPassword)
@@ -94,7 +94,7 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
     private async Task<User> CreateDatabaseWithUserAsync()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        await using var db = CreateDbContext();
+        await using var db = ApiFixture.CreateDbContext(_connectionString);
         await db.Database.MigrateAsync(cancellationToken);
 
         var user = new User
@@ -130,18 +130,13 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
 
     private async Task<List<string>> UserIdsAsync()
     {
-        await using var db = CreateDbContext();
+        await using var db = ApiFixture.CreateDbContext(_connectionString);
         return await db.Users.IgnoreQueryFilters().Select(u => u.Id).ToListAsync(TestContext.Current.CancellationToken);
     }
 
-    private ApplicationDBContext CreateDbContext() =>
-        new(new DbContextOptionsBuilder<ApplicationDBContext>()
-            .UseNpgsql(_connectionString)
-            .Options);
-
     public async ValueTask DisposeAsync()
     {
-        await using var db = CreateDbContext();
+        await using var db = ApiFixture.CreateDbContext(_connectionString);
         await db.Database.EnsureDeletedAsync();
     }
 }

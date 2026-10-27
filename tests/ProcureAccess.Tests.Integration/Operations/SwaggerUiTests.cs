@@ -17,8 +17,10 @@ namespace ProcureAccess.Tests.Integration.Operations;
 /// <summary>
 /// The Swagger UI lists its versions through <c>app.DescribeApiVersions()</c> when the pipeline is
 /// built, the Swagger documents come from <c>IApiVersionDescriptionProvider</c>. Both lists must
-/// match: a versioned minimal API mapped after <c>ConfigureSwaggerExplorer()</c> gets a document
-/// but no entry in the UI (checked with a temporary v2 endpoint when this test was written).
+/// match. A versioned minimal API mapped after <c>ConfigureSwaggerExplorer()</c> gets a document
+/// but no entry in the UI, so this test fails (checked with a temporary v2 endpoint when it was
+/// written). Today all versions come from controllers, which are found in any order; moving the
+/// unversioned minimal APIs changes nothing this test can see.
 /// </summary>
 public sealed partial class SwaggerUiTests(ApiFixture api) : IntegrationTest(api)
 {
