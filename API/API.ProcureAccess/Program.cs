@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Runtime.ExceptionServices;
+
 [assembly: ApiController]
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +60,7 @@ var app = builder.Build();
 
 // Automatically apply migrations. A failure stops the startup: the API must not serve requests
 // against a schema that does not match the model.
+ExceptionDispatchInfo? migrationFailure = null;
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
@@ -72,16 +75,25 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         logger.LogCritical(ex, "Applying the database migrations failed; the API stops.");
-        throw;
+        migrationFailure = ExceptionDispatchInfo.Capture(ex);
     }
+}
+
+if (migrationFailure is not null)
+{
+    // Disposing the app flushes the batched PostgreSQL log sink, so the entry above is stored
+    // before the process ends.
+    await app.DisposeAsync();
+    migrationFailure.Throw();
 }
 
 // Sample data only in Development, whatever the configuration says (SEC-06)
 await app.RebuildDatabaseIfAllowedAsync();
 
-// Endpoints are mapped before the Swagger UI is configured, because the UI lists the API versions
-// of the mapped endpoints (app.DescribeApiVersions). The position of Map* calls does not change the
-// middleware order: WebApplication runs routing first and the endpoints last.
+// Endpoints are mapped before the Swagger UI is configured: the UI lists the API versions through
+// app.DescribeApiVersions(), which finds controllers anyway but minimal APIs only once they are
+// mapped (checked by SwaggerUiTests). The position of Map* calls does not change the middleware
+// order: WebApplication runs routing first and the endpoints last.
 app.MapControllers();
 app.MapGroup("/api")
    .MapIdentityUserEndpoints();

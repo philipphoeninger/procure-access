@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Concurrent;
+
 namespace API.ProcureAccess.Swagger;
 
 /// <summary>
@@ -12,10 +14,14 @@ namespace API.ProcureAccess.Swagger;
 /// Microsoft.OpenApi 2.x exposes parameters and schemas as interfaces. Only the generated objects
 /// (<see cref="OpenApiParameter"/>, <see cref="OpenApiSchema"/>) are writable; references point to
 /// shared components, and OpenAPI 3.0 ignores every property next to a <c>$ref</c>. Such
-/// parameters and schemas are left unchanged and logged, so a missing value can be traced.
+/// parameters and schemas, and parameters the API explorer does not describe, are left unchanged
+/// and logged as a warning, so a missing value can be traced. Swashbuckle generates the document
+/// on every request, so each case is logged once per process.
 /// </remarks>
 public class SwaggerDefaultValues(ILogger<SwaggerDefaultValues> logger) : IOperationFilter
 {
+    private static readonly ConcurrentDictionary<string, byte> Reported = new();
+
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var apiDescription = context.ApiDescription;
@@ -49,18 +55,29 @@ public class SwaggerDefaultValues(ILogger<SwaggerDefaultValues> logger) : IOpera
 
         foreach (var parameter in operation.Parameters)
         {
+            var path = $"{apiDescription.HttpMethod} /{apiDescription.RelativePath}";
             var description = apiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
             if (description is null)
             {
+                if (FirstReport("undescribed", path, parameter.Name))
+                {
+                    logger.LogWarning(
+                        "Swagger: parameter {Parameter} of {Path} has no API explorer description; description, default and required flag are not applied.",
+                        parameter.Name,
+                        path);
+                }
                 continue;
             }
 
             if (parameter is not OpenApiParameter writableParameter)
             {
-                logger.LogWarning(
-                    "Swagger: parameter {Parameter} of {Path} is a reference; description, default and required flag are not applied.",
-                    parameter.Name,
-                    apiDescription.RelativePath);
+                if (FirstReport("parameter-reference", path, parameter.Name))
+                {
+                    logger.LogWarning(
+                        "Swagger: parameter {Parameter} of {Path} is a reference; description, default and required flag are not applied.",
+                        parameter.Name,
+                        path);
+                }
                 continue;
             }
 
@@ -84,13 +101,16 @@ public class SwaggerDefaultValues(ILogger<SwaggerDefaultValues> logger) : IOpera
                     schema.Default = JsonNode.Parse(json);
                 }
             }
-            else if (writableParameter.Schema is not null)
+            else if (writableParameter.Schema is not null && FirstReport("schema-reference", path, parameter.Name))
             {
                 logger.LogWarning(
                     "Swagger: the schema of parameter {Parameter} of {Path} is a reference; its default value is not applied.",
                     parameter.Name,
-                    apiDescription.RelativePath);
+                    path);
             }
         }
     }
+
+    private static bool FirstReport(string reason, string path, string? parameter) =>
+        Reported.TryAdd($"{reason}|{path}|{parameter}", 0);
 }
