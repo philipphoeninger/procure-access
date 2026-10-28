@@ -68,3 +68,28 @@ Node 24.22.1 / npm 11.19.1 from `.nvmrc`; Docker 29.9.1 / Compose 5.6.0.
 | P6 | The E2E and dev stacks share host ports 5000/4200 (F3). A same-origin API (`/api` behind nginx, S1-11 P4) would remove the API port and let the browser tests run inside a container | M3 |
 | P7 | Disk: the E2E images (`procureaccess-e2e-api`, `-client`) take space on the root file system (2.0 GB free after the build). Remove with `docker image rm` if needed; `stack:up` rebuilds them | Philipp |
 | P8 | Home page: `label-content-name-mismatch` (check 8); S1-09 N5 expected more. S1-19 records the real list | S1-19 |
+
+## 5. Review follow-up (2026-10-28)
+
+Code review of PR #51 (10 findings), sorted per CLAUDE §6.8. None affects the product: #51 changed no production code. Fixed in `sprint01/S1-18-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | Suppression matching looked the reported element up again (`document.querySelector(target)` in a separate `page.evaluate`) after `analyze()` had finished. A re-render in between finds no element, so a suppressed violation blocks intermittently, or a positional selector finds a different element and the wrong node is suppressed | `e2e/support/axe.ts`: for a blocking violation whose rule has entries, axe runs that one rule again with the entries' selectors excluded (`AxeBuilder.withRules([rule]).exclude(…)`). axe resolves the selectors in the same run in which it checks the elements; the nodes of that run block. Semantics unchanged: excluded elements' descendants are excluded too; selectors apply to the top document only. The extra run happens only when a suppressed rule fires (today `aria-tab-name`, #52). Nodes of the first run that the rerun no longer reports are listed as suppressed (report only); with several entries for one rule, their issues are listed together |
+
+Already fixed after the merge (S1-11 review fixes, same-origin API):
+- R2 — the E2E client build took its API address from `CLIENT_BUILD_CONFIGURATION` in `.env`, so a production value would point the tests at the live API. The variable no longer exists; the bundle calls `/api` on its own origin, and `global-setup.ts` checks the API through the client.
+- R3 — `E2E_BASE_URL` other than `http://localhost:4200` failed CORS. Same cause, same fix.
+
+Won't fix:
+- R4 — `Email:Host` stays `smtp.lettermint.co` with cleared credentials. No E2E test sends mail yet (J1 needs no account), and without credentials nothing can be sent. Mailpit for the E2E stack is planned (P4, TESTING §6.3).
+- R5 — a selector like `body` would suppress a rule on the whole page. Already P5: the rule "never a rule globally" is documented, and entries are reviewed.
+- R6 — an invalid selector fails with a raw `SyntaxError` instead of the list error. Still a loud failure.
+- R7 — entries that match nothing are not reported. The list is reviewed at the end of every migration step.
+- R8 — one browser round-trip per violating node (now: one axe run per suppressed rule that fires). Only rules with entries are affected, today one rule on two elements.
+- R9 — `e2e/.nvmrc` repeats the client's Node version (both `24.22.1`, CI uses each on purpose). Drift risk at the next Node bump, not a bug.
+- R10 — the helper self-test needs the running stack (global setup) and runs once per browser project. Convenience and run time only.
+
+Checks: `npx tsc --noEmit` in `e2e/` ✅; full suite on the E2E stack: chromium, firefox, mobile-chrome 45/45 ✅ (webkit and mobile-safari cannot start on this Arch host, P1; CI runs them); J1 still lists both stepper headers as suppressed (#52) ✅. J1 with `--repeat-each` on branch and `main` (52 runs each, up to 6 workers): all passed.
+
+Observed once, not caused by this change: in one J1 run the first axe run reported `label-content-name-mismatch` on the toolbar button `.filters-btn` (`aria-label="Filters icon-button"`, visible content a Material icon ligature). axe ignores icon ligatures only once the icon font has rendered, so the finding appears only while the font is still loading. The English `aria-label` is a legacy defect like #53; not reproduced in 104 further runs.
