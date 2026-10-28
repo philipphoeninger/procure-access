@@ -46,7 +46,7 @@ npx ng test
 
 In a terminal the run stays in watch mode; without a terminal (CI) it runs once and exits. Every `TestBed` gets the providers from `src/test-providers.ts` (zoneless change detection).
 
-`npm run test:coverage` adds a coverage summary and writes an lcov/HTML report to `coverage/procure-access/` (reported, not gated). How to write a component test: see `src/app/features/identity/dialogs/delete-account-dialog/delete-account-dialog.spec.ts` and the root `CLAUDE.md` §9.
+`npm run test:coverage` always runs once (no watch mode, also in a terminal), prints a coverage summary and writes an lcov/HTML report to `coverage/procure-access/` (reported, not gated). How to write a component test: see `src/app/features/identity/dialogs/delete-account-dialog/delete-account-dialog.spec.ts` and the root `CLAUDE.md` §9.
 
 ## Running end-to-end tests
 
