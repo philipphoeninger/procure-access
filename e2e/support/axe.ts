@@ -54,17 +54,25 @@ export async function expectNoAxeViolations(
 
   for (const violation of results.violations) {
     const isBlocking = violation.tags.some((tag) => (BLOCKING_TAGS as readonly string[]).includes(tag));
+    if (!isBlocking) {
+      reported.push(...violation.nodes.map((node) => toFinding(violation, node)));
+      continue;
+    }
+    const entries = suppressions.filter((entry) => entry.rule === violation.id);
+    if (entries.length === 0) {
+      blocking.push(...violation.nodes.map((node) => toFinding(violation, node)));
+      continue;
+    }
+
+    // The nodes of the rerun block. The nodes of the first run that the rerun no longer reports
+    // are listed as suppressed (for the report only).
+    const remaining = await nodesOutsideSuppressions(page, violation.id, entries);
+    const remainingTargets = new Set(remaining.map((node) => JSON.stringify(node.target)));
+    const issues = entries.map((entry) => entry.issue).join(', ');
+    blocking.push(...remaining.map((node) => toFinding(violation, node)));
     for (const node of violation.nodes) {
-      const finding = toFinding(violation, node);
-      if (!isBlocking) {
-        reported.push(finding);
-        continue;
-      }
-      const suppression = await findSuppression(page, violation.id, node, suppressions);
-      if (suppression) {
-        suppressed.push({ ...finding, issue: suppression.issue });
-      } else {
-        blocking.push(finding);
+      if (!remainingTargets.has(JSON.stringify(node.target))) {
+        suppressed.push({ ...toFinding(violation, node), issue: issues });
       }
     }
   }
@@ -101,30 +109,23 @@ function toFinding(violation: Result, node: NodeResult): Finding {
 }
 
 /**
- * A node is suppressed when an entry has the same rule and the node's element matches the
- * entry's selector or lies inside a match. Nodes inside iframes or shadow roots are never
- * suppressed (their target is not a single document selector).
+ * Runs the one rule again with the entries' selectors excluded, and returns the nodes it still
+ * reports. axe resolves the selectors in the same run in which it checks the elements, so a
+ * re-render between the runs cannot make the wrong element suppressed. An excluded element's
+ * descendants are excluded too ("matches the selector or lies inside a match"). The selectors
+ * are resolved in the top document only, so nodes inside iframes are never suppressed.
  */
-async function findSuppression(
+async function nodesOutsideSuppressions(
   page: Page,
   rule: string,
-  node: NodeResult,
-  suppressions: readonly AxeSuppression[],
-): Promise<AxeSuppression | undefined> {
-  const candidates = suppressions.filter((entry) => entry.rule === rule);
-  const target = node.target;
-  if (candidates.length === 0 || target.length !== 1 || typeof target[0] !== 'string') {
-    return undefined;
+  entries: readonly AxeSuppression[],
+): Promise<NodeResult[]> {
+  let builder = new AxeBuilder({ page }).withRules([rule]);
+  for (const entry of entries) {
+    builder = builder.exclude(entry.selector);
   }
-
-  const matches = await page.evaluate(
-    ({ elementSelector, selectors }) => {
-      const element = document.querySelector(elementSelector);
-      return selectors.map((selector) => element !== null && element.closest(selector) !== null);
-    },
-    { elementSelector: target[0], selectors: candidates.map((entry) => entry.selector) },
-  );
-  return candidates.find((_, index) => matches[index]);
+  const results = await builder.analyze();
+  return results.violations.find((violation) => violation.id === rule)?.nodes ?? [];
 }
 
 function formatFailure(state: string, url: string, blocking: readonly Finding[]): string {
