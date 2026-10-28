@@ -14,7 +14,7 @@
 | F4 | Respawn removes the seed before each class (S1-13 decision 1A); the seed rows carry fixed ids | The test class resets and stores the seed **per test** (S1-13 P4), so theory rows cannot collide |
 | F5 | The seed arrays are the static instances used by `HasData` | `ExistingCatalogSeed` copies scalar values into new entities, so EF never fixes up the shared instances |
 | F6 | Descriptions are BIT inklusiv–style texts that step 2 replaces with the imported BIT inklusiv texts (REUSE.toml: not MIT) | Not stable and not copied into the MIT-annotated fixture file |
-| F7 | Unlike `ReadAll`, the filter ignores `IsDeleted` and proposal status; the server does not enforce exclusions | **Not** pinned: step 2 changes both on purpose (CAT-12). The seed has no deleted or proposal criteria |
+| F7 | Like `ReadAll`, the filter drops deleted criteria (query filter `!IsDeleted` on `Criterion`). Unlike `ReadAll`, it ignores proposal status. It never reads `CriteriaFilter`, so criteria of a deleted criteria filter or filter type are still returned (and `CriteriaFilter`'s own query filter checks only `FilterType.IsDeleted`, not its own `IsDeleted`). The server does not enforce exclusions *(corrected 2026-10-28, §5)* | **Not** pinned: step 2 changes these on purpose (CAT-12). The seed has no deleted rows and no proposal criteria |
 
 ## 2. Changes
 
@@ -61,3 +61,22 @@
 | P4 | Storing rows with fixed ids does not advance PostgreSQL identity sequences. This is harmless as long as no test mixes seed rows and generated ids in one table within one class | Whoever does that first |
 | P5 | CAT-10 stays `planned` in TESTING §4 until the gate exists (S1-21) | S1-21 |
 | P6 | Disk space: still 305 MB free on the root file system (S1-13 P1) | Philipp |
+
+## 5. Review follow-up (2026-10-28)
+
+Code review of PR #48 (8 findings), sorted per CLAUDE §6.8. None changes current behaviour: #48 added only a test, a fixture and this note. Fixed in `sprint01/S1-15-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | F7 said the filter ignores `IsDeleted`. `CriterionConfiguration` has `HasQueryFilter(x => !x.IsDeleted)`, so deleted criteria are already dropped, as in `ReadAll`. The gap is elsewhere: the filter never reads `CriteriaFilter`, so deleted criteria filters and filter types are not checked. Step 2 (CAT-12) could otherwise add a filter that exists and miss the gap | F7 corrected (§1). The PR body of #48 still has the old wording |
+
+Open, owner decision:
+- R2 — TESTING §4 calls CAT-10 a "subset comparison on stable fields"; the test compares the sets exactly (fails on extra and on missing criteria), and this note gives no reason. Either "subset" means a subset of the *fields* (then the test fits), or the response only has to *contain* the recorded criteria (then the test is too strict and fails when release 2026.1 adds criteria in step 2). TESTING or the test changes accordingly.
+- R3 — F6 cites REUSE.toml for "not MIT", but REUSE.toml marks only `docs/kriterienkatalog_bit_inklusiv_v1*.md` as non-MIT. `CriteronSeed.cs` and the fixture (which copies the BIT inklusiv criterion titles) are annotated MIT. Either the reason in F6 or the annotations are wrong.
+
+Follow-up issues: R4 — the comparison key uses `JsonElement.ToString()` and ignores the JSON type (`1` = `"1"`, `null` = `""`): #91. R5 — `ExistingCatalogSeed` copies properties by hand and can drift from the `HasData` seed: #92.
+
+Won't fix (test-only, cheap):
+- R6 — the fixture loader throws a bare `NullReferenceException` when `comparedFields`, `cases` or a case's `expected` is missing, and duplicate case names are not checked: the fixture is edited rarely and by hand; the stack trace points at the loader.
+- R7 — the duplicate-count message always blames the response, also when the recording contains a duplicate: the recording was checked for duplicates when it was made (§2).
+- R8 — one Respawn reset and full seed per theory row: six rows, and the per-test reset is the documented choice of F4 (S1-13 P4).
