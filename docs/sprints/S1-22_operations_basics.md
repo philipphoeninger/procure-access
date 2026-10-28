@@ -2,7 +2,7 @@
 
 > **Sprint:** 01, stretch task S1-22 (roadmap M1.2; SPEC R-ADM-04 part; ARCHITECTURE §9.5, §9.7, §12 step 1; TESTING §4.7, §4.10). **Status:** done by Claude Code (2026-10-25).
 > **Scope:** Serilog writes to the `logging` schema, with a retention job; `/health/live` and `/health/ready`; `RebuildDatabase` only in `Development`; OPS-01, OPS-02 and SEC-06 set to `active`. Not in scope: the correlation ID and the log privacy rules of §9.5 (second bullet), the file-store check in `/health/ready` (the file store comes in step 7), retiring `/api/Health`, the other step-1 invariants.
-> **Owner decisions 2026-10-25:** **D1** use the package `Serilog.Sinks.Postgresql.Alternative` (MIT) instead of a sink of our own (ARCHITECTURE §9.5 names "the PostgreSQL sink"). **D2** a new `TESTING_v12.md` with a "Changes from v11" table, as in S1-21. **D3** `docker-compose.yml` takes `ASPNETCORE_ENVIRONMENT` from `.env`, default `Development`. **D4** retention default 90 days (the example of ARCHITECTURE §9.5), read from configuration.
+> **Owner decisions 2026-10-25:** **D1** use the package `Serilog.Sinks.Postgresql.Alternative` (MIT) instead of a sink of our own (ARCHITECTURE §9.5 names "the PostgreSQL sink"). **D2** a new `TESTING_v12.md` with a "Changes from v11" table, as in S1-21. **D3** `docker-compose.yml` takes `ASPNETCORE_ENVIRONMENT` from `.env`, default `Development` (*reversed 2026-10-28, review of #61, PR #114: default `Production`; `.env.example` sets `Development` for the local and CI stacks*). **D4** retention default 90 days (the example of ARCHITECTURE §9.5), read from configuration.
 
 ## 1. Starting point
 
@@ -33,7 +33,7 @@
 | `API/…/Program.cs` | Wires the three parts; the inline rebuild block and the `Development`-only `/health` removed | – |
 | `API/…/API.ProcureAccess.xml` | Regenerated XML documentation of the new public types | – |
 | `CLIENT/…/src/dev/dev-reload-health.ts` | Dev watcher polls `/health/live` (the old `/health` is gone) | F5 |
-| `docker-compose.yml`, `.env.example` | `ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}`; the template explains the two values | D3, F4 |
+| `docker-compose.yml`, `.env.example` | `ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}` (since #114; `Development` until then); the template explains the two values | D3, F4 |
 | `tests/…/Infrastructure/ProcureAccessApiFactory.cs`, `ApiFixture.cs` | The factory takes an environment name and extra host settings; the file-log workaround is gone; the image name is public for tests with a container of their own | SEC-06, OPS-01 |
 | `tests/…/Operations/HealthCheckTests.cs` (new) | **INV:OPS-01** ×2: both endpoints healthy against the shared database; against a container of its own that the test stops after startup, `/live` 200 `Healthy`, `/ready` 503 `Unhealthy` | OPS-01, F6 |
 | `tests/…/Operations/LogRetentionTests.cs` (new) | **INV:OPS-02** ×2: the job keeps rows at the limit, one minute newer and now, and removes one minute older; advancing the fake clock by the run interval makes the hosted service remove a row that aged out. Rows are marked per test, because the sink writes into the same table | OPS-02 |
@@ -73,7 +73,7 @@
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | **Deployment:** the compose stack still defaults to `Development`, where `appsettings.Development.json` sets `RebuildDatabase: true`. A deployment that uses this compose file without `ASPNETCORE_ENVIRONMENT=Production` in its environment still deletes all users on every restart. Set the variable in Dokploy; then `Production` starts since this task (#38) | Philipp, before the next deployment |
+| P1 | **Deployment:** the compose stack still defaults to `Development`, where `appsettings.Development.json` sets `RebuildDatabase: true`. A deployment that uses this compose file without `ASPNETCORE_ENVIRONMENT=Production` in its environment still deletes all users on every restart. Set the variable in Dokploy; then `Production` starts since this task (#38) | **Done 2026-10-28:** Dokploy sets `Production`; since #114 the compose stack also falls back to `Production` |
 | P2 | `/api/Health` stays because the E2E healthcheck (through nginx, which proxies only `/api/`), `global-setup.ts` and `ClockTests` use it. Moving them to `/health/ready` needs an nginx location or an API-container healthcheck (the aspnet image has no `curl`/`wget`) | Step 1 shell or later |
 | P3 | `/health/ready` checks only the database; the file-store check joins in step 7 | Step 7 |
 | P4 | Record in the next ARCHITECTURE version: sink package (D1), table owned by the migrations, own retention job instead of the sink's `retentionTime` (F7). The 90 days are not a 🔧 value in SPEC §7; add them to the confirmed defaults if wanted | Next ARCHITECTURE / SPEC version |
