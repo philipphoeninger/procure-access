@@ -60,3 +60,19 @@ Node 24.22.1 / npm 11.19.1 from `.nvmrc`.
 | P4 | `@vitest/coverage-v8` is not installed yet | S1-17 |
 | P5 | `vitest-axe` (TESTING §3.2) is not installed; it is needed with the first component that gets a unit-level axe check (always for K1–K6) | First K-component, M1/M2 |
 | P6 | The smoke test's host component uses an English button text; it is test-only markup, not UI text, so CLAUDE §9 (UI strings by key) does not apply | – |
+
+## 5. Review follow-up (2026-10-28)
+
+Code review of PR #49 (5 findings), sorted per CLAUDE §6.8. None affects the product: #49 changed no production code. Fixed in `sprint01/S1-16-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | `CLIENT/…/.vscode/tasks.json` still had the `npm: test` background task, whose problem matcher waits for Karma's "bundle generation complete". §2 said "No Karma traces left"; nothing uses the task | Task removed; `npm: start` (used by `launch.json`) stays |
+
+Already fixed on `main`:
+- R2 — `tsconfig.app.json` did not exclude `src/app/testing/**`, so non-spec test helpers there would be compiled into the app: excluded since S1-17.
+- R3 — removing `istanbul-lib-instrument` left `ng test --coverage` without a provider until `@vitest/coverage-v8` came (P4): done in S1-17.
+
+Won't fix:
+- R4 — no test shows that `test-providers.ts` takes effect; with zone.js absent the smoke test also passes without it (F6). It only matters if zone.js returns, and the "runs without Zone.js" test fails exactly then.
+- R5 — that test is said to contradict F6 ("keeps the rule if Zone.js ever returns"). The two are layers, not a contradiction: the test reports zone.js coming back (unwanted in a zoneless app); the provider keeps every `TestBed` zoneless until it is removed again.
