@@ -18,7 +18,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR runs are cancelled; every merge commit on main keeps its own result.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   DOTNET_VERSION: 10.0.x
