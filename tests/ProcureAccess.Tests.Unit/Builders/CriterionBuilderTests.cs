@@ -20,10 +20,12 @@ public class CriterionBuilderTests
         first.Name.ShouldNotBeNullOrWhiteSpace();
         first.IsDeleted.ShouldBeFalse();
         first.CreatedAt.ShouldBe(DefaultCreatedAt);
+        var firstFilter = first.CriteriaFilter.ShouldNotBeNull();
+        firstFilter.FilterType.ShouldNotBeNull();
         second.ShouldSatisfyAllConditions(
             () => second.Name.ShouldBe(first.Name),
             () => second.Description.ShouldBe(first.Description),
-            () => second.CriteriaFilterId.ShouldBe(first.CriteriaFilterId));
+            () => second.CriteriaFilter.ShouldNotBeNull().Name.ShouldBe(firstFilter.Name));
     }
 
     [Fact]
@@ -35,6 +37,7 @@ public class CriterionBuilderTests
 
         criterion.Name.ShouldBe("Kontrast");
         criterion.CriteriaFilterId.ShouldBe(7);
+        criterion.CriteriaFilter.ShouldBeNull();
         criterion.IsDeleted.ShouldBeTrue();
         criterion.Description.ShouldBe(defaults.Description);
     }

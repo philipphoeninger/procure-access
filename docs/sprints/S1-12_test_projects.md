@@ -61,3 +61,21 @@
 | P2 | TESTING §3.1 and the sprint's "Done when" say `dotnet test`; with xUnit v3 on the .NET 10 SDK this means Microsoft.Testing.Platform and `dotnet test --solution ProcureAccess.sln`. Record this in the next TESTING version, together with risk R4 (S1-21) | Next TESTING version |
 | P3 | Remove `--ignore-exit-code 8` from the Architecture (S1-14) and Integration (S1-13) projects together with their first test | S1-13, S1-14 |
 | P4 | S1-20 (CI): call `dotnet test --solution ProcureAccess.sln`; coverage with MTP needs the MTP coverage extension or coverlet's MTP integration instead of `coverlet.collector` (VSTest only) — check when S1-20 starts | S1-20 |
+
+## 5. Review follow-up (2026-10-28)
+
+Code review of PR #45 (9 findings), checked against `main` after S1-23. The owner chose to fix the follow-up instead of opening an issue. Fixed in `sprint01/S1-12-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | `CriterionBuilder` defaulted to `CriteriaFilterId = 1`, a filter it never created. The defaults were valid only in memory: storing `ACriterion().Build()` in the empty test database fails with a foreign-key violation (TESTING §6.1, §6.4) | By default the criterion gets its own new `CriteriaFilter` with a new `FilterType` (navigation properties, fixed values), so storing it inserts the whole chain. `InCriteriaFilter(id)` still points it at an existing filter. New integration test `BuilderPersistenceTests` stores a default criterion and reads it back through `/api/Criteria`; with the old builder it fails with `23503 … FK_Criteria_CriteriaFilters_CriteriaFilterId` |
+
+Already resolved by later tasks: `--ignore-exit-code 8` (removed in S1-13 and S1-23, P3), the test command in `docs/CLAUDE_v3.md` (now `--solution`), the Karma note in `CLAUDE.md` (specs deleted in S1-16), the unused SERVICES reference of the Unit project (used since S1-22/S1-23).
+
+Won't fix (current behaviour unaffected):
+- The default test compares only some fields: enough for a builder with four values; the new integration test covers what matters (the defaults can be stored).
+- The implicit `Builder<T>` → `T` conversion builds a new object on each conversion: intended and documented in `TestData`; no test passes one builder twice.
+- `.dockerignore` pattern `**/*.Tests/` no longer matches `tests/`: the API `Dockerfile` copies only `DAL/`, `SERVICES/` and `API/`, so test files never reach the image or its layer cache; only the build context is larger. Change to `tests/` when the file is next touched.
+- Redundant project references (MODELS, DAL via other projects) and NSubstitute in the Integration project without a user yet: style only.
+
+Checks (Claude Code, 2026-10-28): `dotnet test --solution ProcureAccess.sln` ✅ all passed; same new test with the old builder ❌ `23503` as expected (builder restored); `dotnet format` for the solution and the test projects, `reuse lint`, invariant gate, Figma link check ✅.
