@@ -37,8 +37,9 @@ services:
       db:
         condition: service_healthy
     environment:
-      # From .env; Development if unset. Sample data (RebuildDatabase) runs only in Development (SEC-06).
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      # From .env (.env.example sets Development); Production if unset, so a deployment that misses
+      # the variable never reseeds. Sample data (RebuildDatabase) runs only in Development (SEC-06).
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       ConnectionStrings__ProcureAccess: "Host=${DB_HOST:-db};Port=${DB_PORT_INNER:-5432};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"
       JWTSettings__Key: ${JWT_KEY:?set JWT_KEY in .env}
       Email__Username: ${SMTP_USERNAME:-}

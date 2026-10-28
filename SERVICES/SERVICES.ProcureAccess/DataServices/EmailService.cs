@@ -54,7 +54,8 @@ public class EmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Email sending failed to {Email}", to);
+            // No recipient address: Error logs are stored in the database (ARCHITECTURE §9.5, no PII in logs).
+            _logger.LogError(ex, "Email sending failed");
             throw; // let upper layer handle retry/logging
         }
 
