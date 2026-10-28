@@ -107,7 +107,7 @@ dotnet ef migrations has-pending-model-changes --project ../../DAL/DAL.ProcureAc
 npm install && npm start                  # http://localhost:4200
 npm run build:release
 npx ng test                               # Vitest; watch mode in a terminal, single run without one (CI)
-npm run test:coverage                     # same, plus coverage summary and lcov report in coverage/procure-access/
+npm run test:coverage                     # single run (also in a terminal), plus coverage summary and lcov report in coverage/procure-access/
 npm run lint                              # ESLint: Angular template rules incl. accessibility (CI stage 1)
 
 # Backend tests (run from the repository root). Microsoft.Testing.Platform (global.json) needs --solution

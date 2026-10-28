@@ -64,3 +64,22 @@ Node 24.22.1 / npm 11.19.1 from `.nvmrc`.
 | P3 | The next TESTING version should take over the convention of §3 (TESTING §5.3 currently only names the role queries) and S1-16 P1 (zoneless via `providersFile`) | Next TESTING version |
 | P4 | S1-20: stage 8 runs `npm run test:coverage` (or `npx ng test --coverage`) and merges `coverage/procure-access/lcov.info` with the backend coverage | S1-20 |
 | P5 | Excluding generated code and DTOs from measurement (TESTING §8.4) is not configured: model and DTO files are part of `src/app/**/*.ts` and show 0 %. Narrow `coverageExclude` once the target structure (`features/<name>/models`) exists | M1 |
+
+## 6. Review follow-up (2026-10-28)
+
+Code review of PR #50 (9 findings), sorted per CLAUDE §6.8. None affects the product: #50 changed no production code. Fixed in `sprint01/S1-17-review-fixes`:
+
+| # | Finding | Fix |
+|---|---|---|
+| R1 | `npm run test:coverage` (`ng test --coverage`) stays in watch mode in a terminal and never exits, although it is documented as the report command; only CI (no terminal) ran it once | Script is now `ng test --coverage --watch=false`; CLAUDE §5 and the client README say it always runs once. CI stage 8 is unchanged (it ran once before as well) |
+
+Follow-up issues:
+- R2 — an empty account e-mail makes the input match at once, so "Löschen" starts enabled (legacy dialog code, not from #50): #95.
+- R3 — two findings: the example spec doesn't test "Abbrechen" from the start, nor near-miss e-mails (case, trailing space, prefix): #96.
+- R4 — `coverageInclude` counts models, DTOs and environment files as 0 % (= P5, now tracked): #97.
+- R5 — `vitest` and `@vitest/coverage-v8` use separate caret ranges but must stay on the same version: #98.
+
+Won't fix:
+- R6 — `deleteButton().click()` on the disabled button can never close the dialog, so that assertion can't fail; the `disabled === true` assertion before it carries the check (N5). Harmless; removing it is noted in #96. The switch to `aria-disabled` (CLAUDE §9) is part of #95.
+- R7 — `provideTestTranslations()` sets no fallback language, unlike `LanguageService`. With only `de.json` loaded the output is identical; revisit when a test needs the fallback.
+- R8 — the spec contains German UI strings, said to conflict with CLAUDE §6.5. Intended: §9 asks tests to query by the real German texts; §6.5 is about templates and app code.
