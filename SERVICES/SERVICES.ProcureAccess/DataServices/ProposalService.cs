@@ -138,11 +138,10 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         }
 
         var dtos = new List<ProposalDto>();
-        entities.ForEach(async x =>
+        foreach (var entity in entities)
         {
-            var dto = await MapToDtoAsync(x);
-            dtos.Add(dto);
-        });
+            dtos.Add(await MapToDtoAsync(entity));
+        }
 
         return Result<IEnumerable<ProposalDto>>.Success(dtos);
     }
