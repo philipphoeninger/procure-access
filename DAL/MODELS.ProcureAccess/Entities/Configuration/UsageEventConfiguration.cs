@@ -20,7 +20,10 @@ public class UsageEventConfiguration : IEntityTypeConfiguration<UsageEvent>
     {
         builder.ToTable(Table, Schema);
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).UseIdentityByDefaultColumn();
+        // gen_random_uuid() is a random UUID v4 (PostgreSQL 13+). With a default value EF leaves
+        // the key to the database; without it Npgsql would generate time-ordered UUIDv7 keys,
+        // which show the order of the events again (#124).
+        builder.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()");
 
         builder.Property(x => x.EventType).HasConversion<string>().HasMaxLength(64);
         builder.Property(x => x.OccurredOn).HasColumnType("date");

@@ -2572,11 +2572,10 @@ namespace DAL.ProcureAccess.Migrations
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.UsageEvent", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Dimension1")
                         .HasMaxLength(32)

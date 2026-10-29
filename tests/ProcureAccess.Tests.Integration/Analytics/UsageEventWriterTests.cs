@@ -55,6 +55,24 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
     }
 
     [Fact]
+    public async Task Write_SeveralEvents_StoresRandomVersion4Keys()
+    {
+        await DeleteAllEventsAsync();
+
+        for (var i = 0; i < 5; i++)
+        {
+            await Writer.CriteriaListShownAsync(signedIn: false);
+        }
+
+        // A random key must not show the order of the events (#124). UUIDv7, which Npgsql
+        // generates for Guid keys by default, is time-ordered; an identity is sequential.
+        var ids = (await AllEventsAsync()).Select(stored => stored.Id).ToList();
+        ids.Count.ShouldBe(5);
+        ids.ShouldAllBe(id => id.Version == 4);
+        ids.Distinct().Count().ShouldBe(5);
+    }
+
+    [Fact]
     public async Task Write_ShortlyBeforeAndAfterMidnightUtc_StoresTheUtcDay()
     {
         await DeleteAllEventsAsync();
