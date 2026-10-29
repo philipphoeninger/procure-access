@@ -198,6 +198,41 @@ body { margin: 0; }
     color: var(--mat-sys-on-surface) !important;
 }
 
+// EasyMDE draws its toolbar icons as <i class="fa fa-…">, made for Font Awesome. Font Awesome is
+// not shipped (#78: its icons are CC-BY-4.0, which D12 does not allow), so these rules show
+// Material Symbols glyphs for the default toolbar buttons instead. The buttons keep EasyMDE's own
+// aria-label. A button added to the toolbar later needs its own entry here.
+$easymde-toolbar-icons: (
+  'fa-bold': 'format_bold',
+  'fa-italic': 'format_italic',
+  'fa-heading': 'title',
+  'fa-quote-left': 'format_quote',
+  'fa-list-ul': 'format_list_bulleted',
+  'fa-list-ol': 'format_list_numbered',
+  'fa-link': 'link',
+  'fa-image': 'image',
+  'fa-eye': 'visibility',
+  'fa-columns': 'vertical_split',
+  'fa-arrows-alt': 'fullscreen',
+  'fa-question-circle': 'help',
+);
+
+.editor-toolbar button i.fa {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  vertical-align: middle;
+  font-feature-settings: 'liga';
+}
+
+@each $class, $glyph in $easymde-toolbar-icons {
+  .editor-toolbar button i.#{$class}::before {
+    content: '#{$glyph}';
+  }
+}
+
 .CodeMirror-cursor {
   border-left: 1px solid currentColor !important;
 }

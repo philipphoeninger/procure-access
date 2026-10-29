@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ApplicationConfig, inject, InjectionToken, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, InjectionToken, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -34,6 +35,10 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),
+    // Every mat-icon uses the self-hosted Material Symbols Outlined font (design handoff §1.8).
+    provideAppInitializer(() => {
+      inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');
+    }),
     provideHttpClient(
       withFetch(),
       withInterceptors([

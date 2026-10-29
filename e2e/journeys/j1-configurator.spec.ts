@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
+import { recordThirdPartyRequests, thirdPartyLinksInDocument } from '../support/third-party-requests';
 
 /**
  * J1 in its current form (TESTING §5.4, §9 step 0): characterisation of today's criteria filter
@@ -69,13 +70,24 @@ function option(page: Page, name: string) {
 }
 
 test.describe('J1 configurator without account (current form)', () => {
-  test('INV:CAT-10 INV:A11Y-01 anonymous visitor filters criteria and gets the recorded list', async ({ page }, testInfo) => {
+  test('INV:CAT-10 INV:A11Y-01 anonymous visitor filters criteria and gets the recorded list', async ({ page, baseURL }, testInfo) => {
     // Seven axe runs take 1–3 s each; under parallel load (Firefox) the default 30 s is too short.
     test.slow();
+    // CLAUDE §8: fonts, icons and the API all come from the app's own origin (#43).
+    const appOrigin = new URL(baseURL!).origin;
+    const thirdPartyRequests = recordThirdPartyRequests(page, appOrigin);
 
     await test.step('open the criteria filter', async () => {
       await page.goto('/filters');
       await expect(page.getByRole('button', { name: 'Produkt-Typen' })).toBeVisible();
+      // The header icons are drawn with the self-hosted Material Symbols font (design handoff §1.8).
+      const iconFontLoaded = () =>
+        page.evaluate(() =>
+          [...document.fonts].some(
+            (face) => face.family.replaceAll('"', '') === 'Material Symbols Outlined' && face.status === 'loaded',
+          ),
+        );
+      await expect.poll(iconFontLoaded).toBe(true);
       await expectNoAxeViolations(page, testInfo, 'filters loaded');
     });
 
@@ -142,6 +154,11 @@ test.describe('J1 configurator without account (current form)', () => {
       // Today every criterion shows the same fixed priority; step 2 replaces it (CAT-02).
       await expect(header).toContainText('Priorität: 1');
       await expectNoAxeViolations(page, testInfo, 'criterion expanded');
+    });
+
+    await test.step('no request and no link went to a third-party origin', async () => {
+      expect(thirdPartyRequests).toEqual([]);
+      expect(await thirdPartyLinksInDocument(page, appOrigin)).toEqual([]);
     });
   });
 
