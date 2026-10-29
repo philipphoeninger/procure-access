@@ -113,7 +113,7 @@ No correctness or security bug in this PR (a document); R1 and R2 are owner deci
 | # | Point | Owner / when |
 |---|---|---|
 | P1 | #140: `dependabot.yml` — ignore `@types/node` majors in `/e2e` (and in `/CLIENT/CLIENT.ProcureAccess`, should `@types/node` become a direct dependency there), with the comment that it follows the Node version in `.nvmrc` | Any CI/config PR (S2-20 fits) |
-| P2 | #141: EasyMDE check-list glyph (`'fa-check-square-o': 'checklist'` in `styles/main.scss`) — needed for #138 (D-2 = A) | Right after #138 is merged |
+| P2 | #141: EasyMDE check-list glyph (`'fa-check-square-o': 'checklist'` in `styles/main.scss`) — needed for #138 (D-2 = A). **Done** in the follow-up PR that closes #141 (branch `sprint02/S2-04-easymde-checklist-glyph`): release build contains `fa-check-square-o:before{content:"checklist"}`; the 13 default buttons of EasyMDE 2.21.0 (markup with their classes injected into the release build, Chromium, light and dark) each show one Material Symbols glyph; lint and Vitest (17/17) green | Merge right after #138 (the line is unused, but harmless, on EasyMDE 2.20.0) |
 | P3 | D-1 = B and D-2 = A, taken 2026-10-30 (header) | – done |
 | P4 | Merge or close #129, #131, #138 per §1.4; the sprint row's "Done when" (merged or closed with a reason) is met only then | Owner |
 | P5 | Dependabot rebased #131 and rebuilt #130 overnight. If another rebase happens before the merge, the CI result in §4 is for an older head | Owner: check the head commit at merge time |
