@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2 (2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3.
+> **Status:** v2.1 (2026-10-29; v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -28,7 +28,7 @@
   - `FA-xx` feature area · `US-<AREA>-nn` user story · `R-<AREA>-nn` requirement.
   - Priority: **P0** = MVP, **P1** = fast follow (short spec only, detailed in SPEC_v3), **P2** = future, design must not block it.
   - Acceptance criteria use **Given/When/Then** for stateful flows and **checklists** otherwise.
-- **Placeholders** marked ⚖️ depend on the bundled legal review (PRD §11, ARCH O-4); marked 🔧 are configurable values whose defaults the owner confirmed on 2026-10-19 (SD23).
+- **Placeholders** marked ⚖️ depend on the bundled legal review (PRD §11, ARCH O-4); marked 🔧 are configurable values whose defaults the owner confirmed on 2026-10-19 (SD23) and 2026-10-29 (SD24).
 
 ### Versioning of this document
 
@@ -40,6 +40,15 @@
 v2 (2026-10-19) was created for the owner's confirmation of the proposals (SD19–SD23); because of it, the P1 version in item 1 is SPEC_v3.
 
 Minor clarifications that do not change behaviour are recorded as "v1.x" in the change table of the same file only when the owner asks for it; otherwise a new version is created.
+
+#### Changes in v2.1 (2026-10-29)
+
+Recorded in this file at the owner's request; SPEC_v3 stays the P1 version of item 1. Source: the sprint-01 findings in `TECH_DEBT_v1.md` (TD-11, issue #123).
+
+| # | Change | Driver |
+|---|---|---|
+| v2.1-1 | R-MET-01 names the table as built: `analytics."UsageEvents"` (entity `UsageEvent`); wording only, no behaviour change | Sprint 01, S1-23 (P2); `ARCHITECTURE_v14.md` C91 |
+| v2.1-2 | Log retention **90 days 🔧**, confirmed as a default (SD24); R-ADM-04 names it | Owner, 2026-10-29; sprint 01, S1-22 (D4, P4) |
 
 ---
 
@@ -70,6 +79,7 @@ Minor clarifications that do not change behaviour are recorded as "v1.x" in the 
 | SD21 | Removing candidates (2026-10-19, closes O-S3) | Part of v1 (R-CAN-09); a published entry from the removed candidate stays published |
 | SD22 | Product-identity administration (2026-10-19, closes O-S2) | Minimal admin pages as proposed (R-ADM-02); the owner (Philipp) holds the `PlatformAdmin` role in operation |
 | SD23 | 🔧 default values (2026-10-19, closes O-S6) | All proposed defaults adopted (password length, lockout, token and invitation lifetimes, 5 working days, 18 months, weight, rate limits §7.3); they stay configurable; the anonymous-export limit is reviewed after the pilot (UX-O11) |
+| SD24 | 🔧 log retention (2026-10-29, v2.1) | Log entries are deleted after **90 days** 🔧, configurable (`AppLoggingSettings:Retention:RetentionDays`) like the defaults of SD23. How often the job runs is an operations setting, not a 🔧 value |
 
 **Proposals of v1** (catalog maintenance without an editor UI, minimal administration screens for product identities, removal of candidate products, supported browsers, 🔧 defaults) were confirmed by the owner on 2026-10-19 as SD19–SD23; none is open any more.
 
@@ -469,7 +479,7 @@ See §9 for the event list. Requirement:
 
 | ID | Prio | Requirement | Acceptance criteria |
 |---|---|---|---|
-| R-MET-01 | P0 | Write exactly the events of §9.1 into `analytics.UsageEvent` with date granularity and no personal reference | PRV-05 ☐ no third-party analytics, no client-side tracking script ☐ writing an event never fails the user's request (fire-and-forget with error log) |
+| R-MET-01 | P0 | Write exactly the events of §9.1 into the table `analytics."UsageEvents"` (entity `UsageEvent`) with date granularity and no personal reference | PRV-05 ☐ no third-party analytics, no client-side tracking script ☐ writing an event never fails the user's request (fire-and-forget with error log) |
 | R-MET-02 | P0 | The indicators of §9.2 are reproducible by documented SQL queries in `TECHNICAL.md` | ☐ queries return aggregates only |
 
 ### FA-17 Operation and administration (SD20, SD22)
@@ -481,7 +491,7 @@ The handoff and the UX copy contain no administration screens. Platform roles ex
 | R-ADM-01 | P0 | **Catalog releases from data files** (SD20; no editor UI): each release is a folder in the repository (`catalog/releases/<version>/`, JSON) with criteria revisions, procedure texts, applicability, priorities, exclusions, procedure mapping; a CLI command `catalog import <version>` validates and imports it as an immutable release; `catalog activate <version>` sets the active release | CAT-05, CAT-06, CAT-07, CAT-13, CAT-19, CAT-21 ☐ import fails on any validation error (no partial release) ☐ the release folder is the review artefact for the project team (diff in a pull request) ☐ release 2026.1 is produced from Kriterienkatalog Teil A/B plus the priority document (O-1) |
 | R-ADM-02 | P0 | **Product identity administration** (SD22) for `PlatformAdmin` (held by the owner in operation): a minimal list of open product-identity requests (accept → creates the product and notifies the requester; reject with reason) and a merge action for duplicates (`MergedIntoId`) | PUB-07 ☐ built from Angular Material defaults (Handoff §5.3), German strings to be added to the UX copy (§14) ☐ every action is logged with user and timestamp |
 | R-ADM-03 | P0 | Role assignment for platform roles via a CLI command (no UI) | TEN-06 |
-| R-ADM-04 | P0 | Operations per `ARCH §9.5`, §10: health endpoints, log retention, nightly backup, restore rehearsal documented | OPS-01, OPS-02 ☐ `RebuildDatabase` guard (SEC-06) |
+| R-ADM-04 | P0 | Operations per `ARCH §9.5`, §10: health endpoints, log retention (90 days 🔧, SD24), nightly backup, restore rehearsal documented | OPS-01, OPS-02 ☐ `RebuildDatabase` guard (SEC-06) |
 
 ### FA-18 P1 outline (detailed in SPEC_v3)
 
