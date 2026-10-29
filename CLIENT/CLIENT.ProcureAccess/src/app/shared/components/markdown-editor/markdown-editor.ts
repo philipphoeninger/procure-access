@@ -59,6 +59,8 @@ export class MarkdownEditor implements AfterViewInit {
       element: this.editorElement.nativeElement,
       initialValue: this.value(),
       spellChecker: false,
+      // Must stay false: otherwise EasyMDE loads Font Awesome from a CDN (CLAUDE §8). The toolbar
+      // glyphs come from Material Symbols (styles/main.scss).
       autoDownloadFontAwesome: false,
       status: false
     });

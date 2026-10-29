@@ -35,7 +35,7 @@
               "src/styles/theme.scss",
               "src/styles/main.scss",
               "node_modules/easymde/dist/easymde.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+              "node_modules/material-symbols/outlined.css"
             ],
             "allowedCommonJsDependencies": [
               "easymde",
