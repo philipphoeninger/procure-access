@@ -24,17 +24,19 @@ import { DeleteAccountDialog } from './delete-account-dialog';
 
 const accountEmail = 'anna.beispiel@example.org';
 
-async function renderDialog() {
+async function renderDialog(email = accountEmail) {
   const dialogRef = { close: vi.fn() };
   const { fixture } = await render(DeleteAccountDialog, {
     providers: [
       provideTestTranslations(),
       { provide: MatDialogRef, useValue: dialogRef },
-      { provide: MAT_DIALOG_DATA, useValue: { email: accountEmail } },
+      { provide: MAT_DIALOG_DATA, useValue: { email } },
     ],
   });
   return { fixture, dialogRef };
 }
+
+const deleteButton = () => screen.getByRole('button', { name: 'Löschen' });
 
 async function typeEmail(fixture: ComponentFixture<DeleteAccountDialog>, value: string) {
   fireEvent.input(screen.getByRole('textbox', { name: 'E-Mail' }), { target: { value } });
@@ -53,12 +55,9 @@ describe('DeleteAccountDialog', () => {
   // The dialog uses native `disabled`. CLAUDE §9 asks for `aria-disabled` with a visible reason;
   // this test describes today's behaviour and does not set the pattern (screen rebuilt in M1/M2).
   it('keeps "Löschen" unavailable until the account e-mail is typed', async () => {
-    const { fixture, dialogRef } = await renderDialog();
-    const deleteButton = () => screen.getByRole('button', { name: 'Löschen' });
+    const { fixture } = await renderDialog();
 
     expect(deleteButton()).toHaveProperty('disabled', true);
-    deleteButton().click();
-    expect(dialogRef.close).not.toHaveBeenCalled();
 
     await typeEmail(fixture, 'someone.else@example.org');
     expect(deleteButton()).toHaveProperty('disabled', true);
@@ -67,15 +66,43 @@ describe('DeleteAccountDialog', () => {
     expect(deleteButton()).toHaveProperty('disabled', false);
   });
 
-  it('closes with true after "Löschen" and with false after "Abbrechen"', async () => {
+  // The match is exact: no case folding, no trimming, no prefix match.
+  it.each([
+    ['other upper/lower case', 'Anna.Beispiel@example.org'],
+    ['a trailing space', `${accountEmail} `],
+    ['a prefix of the address', 'anna.beispiel@example'],
+  ])('keeps "Löschen" unavailable for %s', async (_case, typed) => {
+    const { fixture } = await renderDialog();
+
+    await typeEmail(fixture, typed);
+
+    expect(deleteButton()).toHaveProperty('disabled', true);
+  });
+
+  it('keeps "Löschen" unavailable when the account e-mail is empty (#95)', async () => {
+    const { fixture } = await renderDialog('');
+
+    expect(deleteButton()).toHaveProperty('disabled', true);
+
+    await typeEmail(fixture, 'x');
+    await typeEmail(fixture, '');
+    expect(deleteButton()).toHaveProperty('disabled', true);
+  });
+
+  it('closes with true after "Löschen"', async () => {
     const { fixture, dialogRef } = await renderDialog();
 
     await typeEmail(fixture, accountEmail);
-    screen.getByRole('button', { name: 'Löschen' }).click();
-    expect(dialogRef.close).toHaveBeenLastCalledWith(true);
+    deleteButton().click();
+
+    expect(dialogRef.close).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it('closes with false after "Abbrechen" with nothing typed', async () => {
+    const { dialogRef } = await renderDialog();
 
     screen.getByRole('button', { name: 'Abbrechen' }).click();
-    expect(dialogRef.close).toHaveBeenLastCalledWith(false);
-    expect(dialogRef.close).toHaveBeenCalledTimes(2);
+
+    expect(dialogRef.close).toHaveBeenCalledExactlyOnceWith(false);
   });
 });

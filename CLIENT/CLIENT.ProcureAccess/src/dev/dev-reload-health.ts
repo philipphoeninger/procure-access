@@ -2,9 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { environment } from '../environments/environment';
+
+/**
+ * Liveness URL of the API that the build calls. The health endpoints sit at the API root,
+ * not under `/api`, so `http://localhost:5000/api` becomes `http://localhost:5000/health/live`.
+ */
+function apiHealthUrl(apiUrl: string): string {
+  return new URL('/health/live', apiUrl).href;
+}
+
 // call this from main.ts only in development
 function startApiHealthWatcher() {
-  const checkUrl = 'https://api.procureaccess.tech/health/live';
+  const checkUrl = apiHealthUrl(environment.apiUrl);
   setInterval(async () => {
     try {
       const res = await fetch(checkUrl, { method: 'GET', cache: 'no-cache' });
@@ -19,4 +29,4 @@ function startApiHealthWatcher() {
   }, 5000); // every 5s
 }
 
-export { startApiHealthWatcher };
+export { apiHealthUrl, startApiHealthWatcher };

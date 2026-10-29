@@ -133,7 +133,7 @@ node scripts/check-figma-links.mjs        # CI stage 1: mapped components carry 
 
 CI (`.github/workflows/ci.yml`) runs the commands above on every pull request; every stage except coverage (stage 8) must be green before a merge (sprint Definition of done). When a migration step starts, flip its invariants in the highest `TESTING_v*.md` (CLAUDE §6.4); the gate reads only that file.
 
-Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reuse`). New files get a header with `reuse annotate --copyright "Blinden- und Sehbehindertenverein Hamburg e.V." --year <year> --license MIT <file>`; files without comment syntax (JSON, binaries, generated files) are covered in `REUSE.toml`.
+Licence check (REUSE, CLAUDE §10): `reuse lint` (install with `pipx install reuse`; without it, from the repository root: `docker run --rm --user $(id -u):$(id -g) -v "$PWD":/data fsfe/reuse:latest lint`). New files get a header with `reuse annotate --copyright "Blinden- und Sehbehindertenverein Hamburg e.V." --year <year> --license MIT <file>`; files without comment syntax (JSON, binaries, generated files) are covered in `REUSE.toml`.
 
 `RebuildDatabase` / `SampleDataInitializer` must never run outside `Development` (SEC-06); `DatabaseRebuildExtensions` checks `IHostEnvironment`, not only the flag. Migrations apply on startup (single instance only); so does the log-retention job, which assumes one API instance.
 
