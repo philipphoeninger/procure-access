@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
       AutoMapper is pinned to 14.0.0, the last MIT-licensed version (15+ is RPL-1.5 or commercial,
       which breaks the licence rule in CLAUDE.md §10). 14.0.0 is affected by CVE-2026-32933
       (stack overflow on deeply nested object graphs) and will not be patched.
-      Accepted as an interim risk by the owner on 2026-10-19 (docs/sprints/S1-03_backend_inventory.md §4).
+      Accepted as an interim risk by the owner on 2026-10-19 (docs/sprints/sprint_01/S1-03_backend_inventory.md §4).
       Remove this suppression together with AutoMapper:
       https://github.com/philipphoeninger/procure-access/issues/31
     -->

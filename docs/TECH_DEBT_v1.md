@@ -1,7 +1,7 @@
 # ProcureAccess — Tech-debt register
 
 > **Status:** v1 (2026-10-29) — output of Phase 4, step 14 ("Manage tech debt continuously") of `ai_development_process.md`, at the end of sprint 01. The skill `Engineering/tech-debt` was not installed in Claude Code; the register follows the same method by hand (inventory → categorise → score → plan).
-> **Sources:** open GitHub issues (2026-10-29), the "Open points" and review sections of `docs/sprints/S1-*.md`, a scan of the code (TODOs, suppressed warnings, `DateTime.UtcNow`), `dotnet build` warnings, `dotnet list package --vulnerable/--outdated`, `npm audit`, Dependabot alerts and the repository settings.
+> **Sources:** open GitHub issues (2026-10-29), the "Open points" and review sections of `docs/sprints/sprint_01/S1-*.md`, a scan of the code (TODOs, suppressed warnings, `DateTime.UtcNow`), `dotnet build` warnings, `dotnet list package --vulnerable/--outdated`, `npm audit`, Dependabot alerts and the repository settings.
 > **Next review:** end of sprint 02. Each review writes a new version (`TECH_DEBT_v2.md` …) and moves done items out.
 
 ---
@@ -188,7 +188,7 @@ Created on 2026-10-29 for the **TD-** items that need one (owner actions and §5
 
 ## 9. Fix plan — when to fix what
 
-Every open finding of sprint 01, by the moment it should be fixed: the issues of §3, the planned debt of §5, the decisions of §6, and the open points of `docs/sprints/S1-*.md` that have no issue (named by protocol and point, e.g. S1-13 P4). The GitHub milestones carry the same plan for the issues: at the start of a step, the milestone shows what belongs to it.
+Every open finding of sprint 01, by the moment it should be fixed: the issues of §3, the planned debt of §5, the decisions of §6, and the open points of `docs/sprints/sprint_01/S1-*.md` that have no issue (named by protocol and point, e.g. S1-13 P4). The GitHub milestones carry the same plan for the issues: at the start of a step, the milestone shows what belongs to it.
 
 Already resolved by the pull requests of this review (once merged): #116 and #98 (dependency PR #126), #123 (documentation PR #127, incl. SPEC v2.1), #124 (random key, PR #128).
 

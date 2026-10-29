@@ -44,7 +44,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       # Whole solution: whitespace and code style. Analyzer rules only on the test projects:
       # the production projects still have analyzer findings whose fixes rename methods
-      # (VSTHRD200), which is a refactor for migration step 1 (docs/sprints/S1-20_ci.md).
+      # (VSTHRD200), which is a refactor for migration step 1 (docs/sprints/sprint_01/S1-20_ci.md).
       - name: dotnet format (whitespace, style)
         run: |
           dotnet format whitespace ProcureAccess.sln --verify-no-changes

@@ -28,6 +28,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Architecture | `ARCHITECTURE_v*.md` | Modules, flows A–E, domain model, API, ADRs, migration steps §12, open points §16.5 |
 | Tests | `TESTING_v*.md` | Invariant catalogue (CI gate), tooling, test levels |
 | Tech debt | `TECH_DEBT_v*.md` | Known debt with scores and when it is resolved; check its *When* column when a migration step starts; new version at the end of each sprint (process step 14) |
+| Sprints | `docs/sprints/sprint_NN/SPRINT_NN.md` and the task protocols `docs/sprints/sprint_NN/S<N>-nn_<topic>.md` | Sprint goal, task list with IDs (`S2-nn` …), owner decisions `O-S<N>-n`, Definition of done; what each task found, changed and left open |
 | UI texts | `ux_copy_procureaccess_v*.md` (German) | Every UI string and its key; terminology (§2) |
 | UI behaviour | `design_handoff_procureaccess_v1.md` (internal version 1.x) | Tokens, layout, components K1–K6, screens |
 | Figma ↔ code | `figma_code_mapping_procureaccess_v1.md` | Component paths, `@figma` tags, CI link check |
