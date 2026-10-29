@@ -2,7 +2,7 @@
 
 > **Sprint:** 02, P0 task S2-04 (debt, 0.5 points). **Pull requests:** #129 (e2e group), #130 (client `other` group, closed by Dependabot and replaced by **#138**), #131 (`marked` major). **Requirements / invariants:** none activated; CLAUDE §10 and ARCHITECTURE_v14 D12 (licence rule); A11Y-01 and CAT-10 must stay green. **Status:** review done by Claude Code (2026-10-30); this protocol in its own pull request; **none of the Dependabot PRs merged or closed** (task instruction).
 > **Scope:** for each PR: the licence of every new version, the changelog for breaking changes, the CI result, and a recommendation (merge or close, with the reason). Not in scope: changing a Dependabot branch, `dependabot.yml` or client code (→ §5).
-> **Owner decisions:** none were given for this task. Decisions needed now: **D-1** (#129, `@types/node`) and **D-2** (#138, toolbar glyph), see §1.4.
+> **Owner decisions 2026-10-30** (taken after the review, §1.4): **D-1 = B** — `@types/node` stays on the Node major; Claude Code commented `@dependabot ignore @types/node major version` on #129, the rebuilt PR (TypeScript 7 only) is merged after green CI; the `dependabot.yml` rule follows in #140. **D-2 = A** — #138 is merged together with the one-line glyph fix in its own PR (#141). The three proposed issues were created: #140, #141, #142.
 
 ## 1. Starting point
 
@@ -62,9 +62,9 @@ Test coverage: J1 opens one criterion, so `marked` 18 renders one seed descripti
 
 | PR | Recommendation | Reason in one line | Decision |
 |---|---|---|---|
-| #129 | Rebuild without `@types/node` (`@dependabot ignore @types/node major version`), then merge TypeScript 7 | Types should match the Node 24 runtime; TypeScript 7 fits the e2e tsconfig | **D-1** (A / B / C, §1.1) |
+| #129 | Rebuild without `@types/node` (`@dependabot ignore @types/node major version`), then merge TypeScript 7 | Types should match the Node 24 runtime; TypeScript 7 fits the e2e tsconfig | **D-1 = B** (§1.1) |
 | #130 | No action (closed by Dependabot) | Superseded by #138 after S2-03 removed Font Awesome | – |
-| #138 | Merge together with the one-line glyph fix | EasyMDE 2.21 adds a default toolbar button that our glyph map lacks | **D-2** (A / B / C, §1.2) |
+| #138 | Merge together with the one-line glyph fix | EasyMDE 2.21 adds a default toolbar button that our glyph map lacks | **D-2 = A** (§1.2, #141) |
 | #131 | Merge | Breaking changes of `marked` 18 do not touch this code; `ngx-markdown` supports 18 | – |
 
 Merge order: #131 and #138 both change `CLIENT/…/package-lock.json`. After the first merge Dependabot rebases the other (as long as nobody pushed to its branch); wait for its CI before merging. With D-2 = A, a commit pushed onto the #138 branch stops Dependabot from rebasing it, so the fix is better its own PR.
@@ -75,7 +75,7 @@ Merge order: #131 and #138 both change `CLIENT/…/package-lock.json`. After the
 |---|---|
 | `docs/sprints/sprint_02/S2-04_dependabot_prs.md` (new) | This protocol |
 
-No Dependabot branch, no `dependabot.yml`, no code changed. The only action on GitHub besides this PR: the failed E2E job of #131 was re-run once (§4, check 1). No document besides this protocol is affected: CLAUDE.md §3 names the client's TypeScript 6.0, which stays; if #129 is merged with TypeScript 7, CLAUDE.md does not name the e2e TypeScript version, so nothing goes stale.
+No Dependabot branch, no `dependabot.yml`, no code changed. Actions on GitHub besides this PR: the failed E2E job of #131 was re-run once (§4, check 1); after the owner decisions, the ignore comment on #129 (D-1 = B) and issues #140 – #142. No document besides this protocol is affected: CLAUDE.md §3 names the client's TypeScript 6.0, which stays; if #129 is merged with TypeScript 7, CLAUDE.md does not name the e2e TypeScript version, so nothing goes stale.
 
 ## 3. Self-review (CLAUDE §6.7)
 
@@ -83,13 +83,13 @@ Sorted per CLAUDE §6.8. The review subject is three dependency PRs, not code of
 
 | # | Finding | Sorting |
 |---|---|---|
-| R1 | #138: EasyMDE 2.21.0 adds a default toolbar button without a glyph (§1.2). Visible defect in a live (legacy) screen, no a11y name loss | **Fix** before or with the merge of #138 (D-2, proposed issue P2); not in this PR (scope: protocol only) |
-| R2 | #129: `@types/node` 26 against the Node 24 runtime (§1.1) | **Follow-up** (D-1; proposed issue P1 for the `dependabot.yml` rule) |
+| R1 | #138: EasyMDE 2.21.0 adds a default toolbar button without a glyph (§1.2). Visible defect in a live (legacy) screen, no a11y name loss | **Fix** before or with the merge of #138 (D-2 = A, #141); not in this PR (scope: protocol only) |
+| R2 | #129: `@types/node` 26 against the Node 24 runtime (§1.1) | **Follow-up** (D-1 = B; #140 for the `dependabot.yml` rule) |
 | R3 | Two TypeScript majors in the repository if #129 is merged (client 6.0, e2e 7.0) | Won't fix: e2e uses TypeScript only for the type check; the client follows Angular. Option C of D-1 if the owner prefers one major |
 | R4 | No test would catch a broken proposal editor (R1 went through green CI) or wrong Markdown output (J1 only renders and runs axe) | Won't fix now: the proposal editor is legacy (ARCHITECTURE §8.1); a Markdown rendering test belongs to the legal pages (GP.3), where `marked` starts to matter |
 | R5 | Security: `marked` output is still sanitised by `ngx-markdown` (Angular `DomSanitizer` with `SecurityContext.HTML` unless configured otherwise; `provideMarkdown()` has no options and no template sets `disableSanitizer`); no changed package declares an install script (`hasInstallScript` absent in all three lockfile diffs; `e2e/` has no `allowScripts` list, the client's is unchanged) | – |
 | R6 | Licences: every new version is MIT or Apache-2.0, OSI-approved, permissive; shipped ones (`easymde`, `marked`) meet D12 | – |
-| R7 | J1 is flaky on Chromium: axe can catch the Material tooltip of the "Produkte anzeigen" button (`PRODUCTS.SHOW_TOOLTIP`, `products-container.html`) while it fades in and reports `color-contrast` (serious) on `.mat-mdc-tooltip-surface`. The button appears with the criteria list, so it can end up under the pointer of the preceding "Enter" click. CI runs with `retries: 0`, so a flake fails the PR (§4, check 1) | **Follow-up issue** (proposed P6); not caused by any of the Dependabot PRs |
+| R7 | J1 is flaky on Chromium: axe can catch the Material tooltip of the "Produkte anzeigen" button (`PRODUCTS.SHOW_TOOLTIP`, `products-container.html`) while it fades in and reports `color-contrast` (serious) on `.mat-mdc-tooltip-surface`. The button appears with the criteria list, so it can end up under the pointer of the preceding "Enter" click. CI runs with `retries: 0`, so a flake fails the PR (§4, check 1) | **Follow-up issue** #142; not caused by any of the Dependabot PRs |
 
 No correctness or security bug in this PR (a document); R1 and R2 are owner decisions on the Dependabot PRs.
 
@@ -112,9 +112,9 @@ No correctness or security bug in this PR (a document); R1 and R2 are owner deci
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | Proposed issue: `dependabot.yml` — ignore `@types/node` majors in `/e2e` (and in `/CLIENT/CLIENT.ProcureAccess`, should `@types/node` become a direct dependency there), with the comment that it follows the Node version in `.nvmrc` | Owner OK for the issue; any CI/config PR (S2-20 fits) |
-| P2 | Proposed issue: EasyMDE check-list glyph (`'fa-check-square-o': 'checklist'` in `styles/main.scss`) — needed for #138 (D-2) | Owner; before #138 is merged |
-| P3 | D-1 (#129) and D-2 (#138) | Owner |
+| P1 | #140: `dependabot.yml` — ignore `@types/node` majors in `/e2e` (and in `/CLIENT/CLIENT.ProcureAccess`, should `@types/node` become a direct dependency there), with the comment that it follows the Node version in `.nvmrc` | Any CI/config PR (S2-20 fits) |
+| P2 | #141: EasyMDE check-list glyph (`'fa-check-square-o': 'checklist'` in `styles/main.scss`) — needed for #138 (D-2 = A) | Right after #138 is merged |
+| P3 | D-1 = B and D-2 = A, taken 2026-10-30 (header) | – done |
 | P4 | Merge or close #129, #131, #138 per §1.4; the sprint row's "Done when" (merged or closed with a reason) is met only then | Owner |
 | P5 | Dependabot rebased #131 and rebuilt #130 overnight. If another rebase happens before the merge, the CI result in §4 is for an older head | Owner: check the head commit at merge time |
-| P6 | Proposed issue: J1 tooltip flake (R7). Minimal fix in the test: move the pointer away (`page.mouse.move(0, 0)`) before the axe check of "criteria list", or wait until no `.mat-mdc-tooltip-surface` is animating. The legacy tooltip itself goes away with the configurator rebuild (step 2); its content is not lost meanwhile, the button has its own visible text | Owner OK for the issue; S2-20 (CI one-liners) or the next J1 change |
+| P6 | #142: J1 tooltip flake (R7). Minimal fix in the test: move the pointer away (`page.mouse.move(0, 0)`) before the axe check of "criteria list", or wait until no `.mat-mdc-tooltip-surface` is animating. The legacy tooltip itself goes away with the configurator rebuild (step 2); its content is not lost meanwhile, the button has its own visible text | S2-20 (CI one-liners) or the next J1 change |
