@@ -26,12 +26,17 @@ export const withProducts = () => signalStoreFeature(
       let latestRequest = 0;
 
       return {
+        // The loading count goes down in `finally`, so a failed request does not leave the
+        // spinner on (S1-08 N1). The error still reaches the caller.
         async loadProducts() {
           const request = ++latestRequest;
           state.incrementLoadingCount();
-          let result = await productsApiService.getAllProducts();
-          if (request === latestRequest) this.setProducts(result.value ?? []);
-          state.decrementLoadingCount();
+          try {
+            const result = await productsApiService.getAllProducts();
+            if (request === latestRequest) this.setProducts(result.value ?? []);
+          } finally {
+            state.decrementLoadingCount();
+          }
         },
         setProducts(products: Product[]) {
           patchState(state, {
@@ -45,11 +50,12 @@ export const withProducts = () => signalStoreFeature(
         async getProductsBySelectedCriteriaFilterIds(selectedCriteriaFilterIds: number[]) {
           const request = ++latestRequest;
           state.incrementLoadingCount();
-          
-          let products = await productsApiService.getProductsByCriteriaFilterIds(selectedCriteriaFilterIds);
-          if (request === latestRequest) this.setProducts(products.value ?? []);
-
-          state.decrementLoadingCount();
+          try {
+            const products = await productsApiService.getProductsByCriteriaFilterIds(selectedCriteriaFilterIds);
+            if (request === latestRequest) this.setProducts(products.value ?? []);
+          } finally {
+            state.decrementLoadingCount();
+          }
         },
       };
     }),

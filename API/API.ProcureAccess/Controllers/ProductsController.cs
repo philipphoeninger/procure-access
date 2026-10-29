@@ -31,9 +31,9 @@ public class ProductsController : BaseCrudController<Product, ProductDto, Produc
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
-    public ActionResult<List<ProductDto>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
+    public async Task<ActionResult<Result<IEnumerable<ProductDto>>>> ByCriteriaFilterIds([FromQuery] int[] criteriaFilterIds)
     {
-        var filteredProducts = _productService.GetByCriteriaFilterIds(criteriaFilterIds);
+        var filteredProducts = await _productService.GetByCriteriaFilterIds(criteriaFilterIds);
         return Ok(filteredProducts);
     }
 }
