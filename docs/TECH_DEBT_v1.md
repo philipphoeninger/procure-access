@@ -62,7 +62,7 @@
 
 | ID | Item | Category | I | R | E | Prio | When |
 |---|---|---|---:|---:|---:|---:|---|
-| TD-07 (#119) | ESLint checks templates only; no TypeScript rules (`typescript-eslint` is a dev tool, licence fine) (S1-20) | Code | 2 | 2 | 2 | 16 | step 1 |
+| TD-07 (#119) | ESLint checks templates only: `typescript-eslint` is installed, but `.ts` files load only its parser (`configs.base`), no rules (S1-20) | Code | 2 | 2 | 2 | 16 | step 1 |
 | #115 | Usage events: write fire-and-forget, without retries on the request path (R-MET-01) | Code | 2 | 2 | 2 | 16 | step 2 (first caller) |
 | #101 | UX copy key `shell.nav.menu` cannot coexist with `shell.nav.menu.close` in `de.json` | Documentation | 1 | 2 | 1 | 15 | step 1 shell |
 | TD-06 (#118) | Production build warnings: about 80 nullable (`CS86xx`, 53 of them `CS8618`), 25 `VSTHRD200`, `AV0027`, a few `CS0168`/`CS0105`/`CS157x`; the CI analyzer check covers only `tests/` (S1-20 P3, P8) | Code | 2 | 2 | 3 | 12 | step 1 (most warnings sit in legacy entities that step 2 replaces) |
@@ -179,7 +179,7 @@ Created on 2026-10-29 for the **TD-** items that need one (owner actions and §5
 | TD-02 – TD-04 | #116 Dependency updates: `@angular/build` 22.2.5 (vite advisory), .NET 10.0.14, `dependabot.yml` | dependencies, tech-debt | M1 |
 | TD-05 | #117 Check NetArchTest.Rules on .NET 10 before the module rules (ARC-01–03) | tech-debt, .NET | M1 |
 | TD-06 | #118 Clean up production build warnings and extend the CI analyzer check to all projects | tech-debt, .NET | M1 |
-| TD-07 | #119 ESLint: add TypeScript rules (`typescript-eslint`) | tech-debt | M1 |
+| TD-07 | #119 ESLint: turn on the TypeScript rules (`typescript-eslint` recommended) | tech-debt | M1 |
 | TD-08 | #120 a11y: English accessible names on the header icon buttons and `COMMON.ENTER` | a11y, bug | M1 |
 | TD-09 | #121 Logs: `ApplicationName` is always `Unknown` (`AppName` vs `ApplicationName`) | bug | M1 |
 | TD-10 | #122 Move the E2E readiness checks to `/health/ready` and remove `/api/Health` | tech-debt | M1 |
