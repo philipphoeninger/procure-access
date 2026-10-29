@@ -16,7 +16,12 @@ namespace MODELS.ProcureAccess.Entities;
 /// </remarks>
 public class UsageEvent
 {
-    public long Id { get; set; }
+    /// <summary>
+    /// Random key (UUID version 4) set by the database, so that the key does not reveal the order
+    /// of events within a day (owner decision 2026-10-29, #124). Never use a sequential or
+    /// time-ordered key (identity, UUIDv7) here.
+    /// </summary>
+    public Guid Id { get; set; }
 
     public UsageEventType EventType { get; set; }
 
