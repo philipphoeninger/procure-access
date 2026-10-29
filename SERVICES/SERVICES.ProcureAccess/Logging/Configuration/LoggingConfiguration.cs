@@ -72,9 +72,11 @@ in method {MemberName} at {FilePath}:{LineNumber}
 
             .Enrich.FromLogContext()
 
+            // "AppName", not "ApplicationName": that key is the host's own application name
+            // (keys ignore case), which WebApplicationFactory sets in tests but production does not.
             .Enrich.With(new PropertyEnricher(
                 "ApplicationName",
-                config.GetValue<string>("ApplicationName") ?? "Unknown"))
+                config.GetValue<string>("AppName") ?? "Unknown"))
 
             .Enrich.WithMachineName()
 
