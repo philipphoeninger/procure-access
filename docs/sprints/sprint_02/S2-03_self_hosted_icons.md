@@ -47,7 +47,7 @@ Sorted per CLAUDE §6.8.
 | R1 | Privacy: the J1 request log misses a `preconnect` and declared-but-unused fonts (F8); the check would not have caught the exact #43 regression | **Fix** (done): `thirdPartyLinksInDocument` in J1 + self-test. Negative check in §4 |
 | R2 | Licence: the Apache-2.0 notice (and all other notices) never reached users (F7); D1 relies on it | **Fix** (done): one `COPY` line. Affects all bundled packages, so it also fixes an older gap |
 | R3 | Performance: the full font is 4.0 MB; `font-display: block` from the package CSS hides icons for up to 3 s on the first visit, then shows ligature names as text until it arrives; cached for a year afterwards | **Follow-up issue** #135 (O-S2-5: full font for now) |
-| R4 | A11y: the legacy `<span class="material-symbols-outlined">` icons are not `aria-hidden`. In the header and settings their buttons have their own name (`aria-label`, `<label for>`), but in the profile list „box“ is read as text. Unchanged by this PR (the Google font rendered the same text) | **Follow-up** (P3) |
+| R4 | A11y: the legacy `<span class="material-symbols-outlined">` icons are not `aria-hidden`. In the header and settings their buttons have their own name (`aria-label`, `<label for>`), but in the profile list „box“ is read as text. Unchanged by this PR (the Google font rendered the same text) | **Follow-up issue** #137 (P3) |
 | R5 | The toolbar map covers only EasyMDE's default buttons; an added button would show no glyph | Won't fix: the comment says so; the editor belongs to the legacy proposal, which ARCHITECTURE §8.1 retires |
 | R6 | EasyMDE's „guide“ button opens markdownguide.org in a new tab on click | Won't fix: user-initiated navigation, not a request of the page; legacy editor |
 | R7 | Component tests do not use `appConfig`, so `mat-icon` keeps the `material-icons` class there | Won't fix: no test queries icons; they are `aria-hidden` and found by role/name only |
@@ -81,5 +81,5 @@ No finding left is a correctness or security bug in the change; no further revie
 |---|---|---|
 | P1 | Font size 4.0 MB (R3) | #135, owner decision on the options there |
 | P2 | WebKit/mobile Safari only in CI (check 5) | CI of this PR |
-| P3 | **Proposed issue:** legacy icons as `<span class="material-symbols-outlined">` (header ×2, settings, profile ×2) are not `aria-hidden` (Handoff §1.8: icons always `aria-hidden`); „box“ is read as text in the profile list. Fix: use `<mat-icon>` (aria-hidden by default). The header part goes away with the shell (S2-15) | Owner: create issue? Settings/profile with their rebuild |
+| P3 | #137: legacy icons as `<span class="material-symbols-outlined">` (header ×2, settings, profile ×2) are not `aria-hidden` (Handoff §1.8: icons always `aria-hidden`); „box“ is read as text in the profile list. Fix: use `<mat-icon>` (aria-hidden by default). The header part goes away with the shell (S2-15) | #137 (created 2026-10-29 on the owner's OK); settings/profile with their rebuild |
 | P4 | The API image: whether the licence notices of its NuGet packages reach users was not checked (outside this task) | Note for the next licence review |
