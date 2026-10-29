@@ -2,7 +2,7 @@
 
 This file guides Claude Code (and any other AI assistant) when working in this repository. It is the project's AI onboarding document: read it at the start of every session.
 
-> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`; licence rule in §10 aligned with `ARCHITECTURE_v13.md` D12 and rule for review findings added to §6 on 2026-10-27. Keep it updated whenever a migration step changes structure, commands or conventions.
+> **Version:** v3 (2026-10-19) — step 9 of `docs/ai_development_process.md`, generated from `SPEC_v1.md` and `ARCHITECTURE_v11.md` (v2, 2026-10-15) and aligned with `SPEC_v2.md` / `ARCHITECTURE_v12.md` (v3: the former proposals O-S1–O-S4 and O-S6 are decided; supported browsers added). v1 only described the existing codebase. Updated during sprint 01 (S1-01 – S1-23) with the current state of the code, layout and commands; merged on 2026-10-26 from the repository-root `CLAUDE.md` and `docs/CLAUDE_v3.md`; licence rule in §10 aligned with `ARCHITECTURE_v13.md` D12 and rule for review findings added to §6 on 2026-10-27; tech-debt register added to §2 on 2026-10-29. Keep it updated whenever a migration step changes structure, commands or conventions.
 
 ---
 
@@ -27,6 +27,7 @@ All in `docs/`. File names carry versions; **always use the highest version** of
 | Feature spec | `SPEC_v*.md` | Requirements `R-<AREA>-nn`, acceptance criteria, limits, rate limits, contracts §8, open questions §13 |
 | Architecture | `ARCHITECTURE_v*.md` | Modules, flows A–E, domain model, API, ADRs, migration steps §12, open points §16.5 |
 | Tests | `TESTING_v*.md` | Invariant catalogue (CI gate), tooling, test levels |
+| Tech debt | `TECH_DEBT_v*.md` | Known debt with scores and when it is resolved; check its *When* column when a migration step starts; new version at the end of each sprint (process step 14) |
 | UI texts | `ux_copy_procureaccess_v*.md` (German) | Every UI string and its key; terminology (§2) |
 | UI behaviour | `design_handoff_procureaccess_v1.md` (internal version 1.x) | Tokens, layout, components K1–K6, screens |
 | Figma ↔ code | `figma_code_mapping_procureaccess_v1.md` | Component paths, `@figma` tags, CI link check |
