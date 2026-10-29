@@ -25,7 +25,7 @@
 | # | Change | Driver |
 |---|---|---|
 | C90 | **Logging as built (§9.5):** the sink is the package `Serilog.Sinks.Postgresql.Alternative` (MIT), not a sink of our own; it writes to `logging."SeriLogs"` in batches with a bounded queue. The **migrations own the table** — the sink never creates it — so every environment starts with the same schema. Retention is an **own job** (`LogRetentionJob`) on `TimeProvider`, not the sink's `retentionTime`, which runs on the system clock and could not be tested with `FakeTimeProvider`. Retention 90 days and run interval 1 day are read from `AppLoggingSettings:Retention`; the 90 days are a 🔧 default since SPEC v2.1 (SD24). The job assumes one API instance, as the startup migrations do | Owner decisions D1, D4 of sprint 01, S1-22 (2026-10-25); S1-22 F7 |
-| C91 | **Usage events as built (§5.7):** table `analytics."UsageEvents"` with a surrogate key `Id` (EF needs one); `OccurredOn` is the **UTC** day from `TimeProvider`. `IUsageEventWriter` has one typed method per event of SPEC_v2 §9.1. The writer **awaits** the insert in a DI scope and `DbContext` of its own and logs and swallows every failure, so a failure never fails the caller; there is no queue or background service. SPEC R-MET-01 says "fire-and-forget"; whether the request should also not wait (and not retry) is open in #115. Whether the sequential `Id` should become a random key is an owner decision before pilot data (#124) | Owner decisions D2, D3 of sprint 01, S1-23 (2026-10-25); S1-23 P1, P3 |
+| C91 | **Usage events as built (§5.7):** table `analytics."UsageEvents"` with a surrogate key `Id` (EF needs one), a **random UUID v4** set by the database (`gen_random_uuid()`), so the key does not show the order of events within a day (owner, 2026-10-29, #124; never an identity or a time-ordered UUIDv7); `OccurredOn` is the **UTC** day from `TimeProvider`. `IUsageEventWriter` has one typed method per event of SPEC_v2 §9.1. The writer **awaits** the insert in a DI scope and `DbContext` of its own and logs and swallows every failure, so a failure never fails the caller; there is no queue or background service. SPEC R-MET-01 says "fire-and-forget"; whether the request should also not wait (and not retry) is open in #115. | Owner decisions D2, D3 of sprint 01, S1-23 (2026-10-25); key: owner, 2026-10-29 (#124, PR #128); S1-23 P1, P3 |
 
 ### Changes from v12
 
@@ -720,7 +720,7 @@ All three reference `PublishedEntry` (the stable identity, C42) and, since v10 (
 |---|---|
 | `UsageEvent` | `EventType`, `OccurredOn` (date, not timestamp), `Dimension1?`, `Dimension2?` |
 
-*As built (C91):* table `analytics."UsageEvents"` with a surrogate key `Id`; `OccurredOn` is the UTC day. PRV-05 allows exactly these columns. Writing goes through `IUsageEventWriter` (one method per event), which awaits the insert in its own scope and never lets a failure reach the caller.
+*As built (C91):* table `analytics."UsageEvents"` with a random UUID v4 key `Id`; `OccurredOn` is the UTC day. PRV-05 allows exactly these columns. Writing goes through `IUsageEventWriter` (one method per event), which awaits the insert in its own scope and never lets a failure reach the caller.
 
 No user ID, no organisation ID, no IP address, no session identifier — date granularity only. Sufficient for the PRD §10 indicators, including anonymous exports (`ExportCreated`).
 
