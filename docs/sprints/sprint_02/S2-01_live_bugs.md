@@ -28,7 +28,7 @@
 | `CLIENT/…/src/dev/dev-reload-health.ts` | `apiHealthUrl(apiUrl)` = `new URL('/health/live', apiUrl)`; the watcher uses `environment.apiUrl` | #113 |
 | `CLIENT/…/src/dev/dev-reload-health.spec.ts` (new) | The dev configuration (`environment.ts`, `production: false`) resolves to `http://localhost:5000/health/live` | #113 |
 
-No document needed a change: no structure, command or convention changed (CLAUDE.md §3/§4), no invariant was activated (no new TESTING version), no UI text or `@figma` component was added. `TECH_DEBT_v1.md` stays as it is; the sprint-end review writes v2 and moves the closed items out.
+Documents: `CLAUDE.md` §5 names the Docker command for `reuse lint` (P4, owner request). Otherwise no document needed a change: no structure or convention changed (CLAUDE.md §3/§4), no invariant was activated (no new TESTING version), no UI text or `@figma` component was added. `TECH_DEBT_v1.md` stays as it is; the sprint-end review writes v2 and moves the closed items out.
 
 ## 3. Self-review (CLAUDE §6.7, `/engineering:code-review`)
 
@@ -73,4 +73,4 @@ No finding is a correctness or security bug in the change; no further review rou
 | P1 | The legacy `GetByCriteriaFilterIds` lacks the proposal filter of `ReadAll` (R3). Harmless today; matters only if products with a pending proposal become possible before the directory replaces the endpoint | Directory step; no issue proposed |
 | P2 | Legacy product reads ignore `Product.IsDeleted` (R4) | Directory step; no issue proposed |
 | P3 | "Löschen" uses native `disabled`; CLAUDE §9 wants `aria-disabled` with a visible reason and the gate checked in the click handler. Needs a UX copy text | Identity rework (step 1/3), noted in #95 |
-| P4 | `reuse` is not installed in Claude's shell; the FSFE Docker image works. Optional: name it in CLAUDE.md §5 | Philipp |
+| P4 | `reuse` is not installed in Claude's shell; the FSFE Docker image works | Done: CLAUDE.md §5 names the Docker command (owner request, 2026-10-29) |
