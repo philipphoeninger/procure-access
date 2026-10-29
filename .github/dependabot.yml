@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+# SPDX-License-Identifier: MIT
+#
+# Version updates (TESTING §8.2 stage 9; issue #116). Security alerts and security
+# updates are switched on in the repository settings and do not depend on this file.
+#
+# Groups keep the number of pull requests small for a single maintainer. Every pull
+# request runs the full CI; check the licence of new versions (CLAUDE §10) before merging.
+
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, .NET]
+    groups:
+      dotnet:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # v14 is the last MIT version; v15+ is RPL/commercial. Replaced in step 1 (#31).
+      - dependency-name: AutoMapper
+      # .NET stays on the LTS line (ADR-013); a new major is a migration, not an update.
+      - dependency-name: "Microsoft.*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "Npgsql*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "System.*"
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: npm
+    directory: /CLIENT/CLIENT.ProcureAccess
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+    groups:
+      # Angular packages must stay on one version; majors go through `ng update`.
+      angular:
+        patterns: ["@angular/*", "@angular-devkit/*", "angular-eslint", "@angular-eslint/*"]
+        update-types: [minor, patch]
+      # vitest and @vitest/coverage-v8 must be bumped together (#98).
+      vitest:
+        patterns: ["vitest", "@vitest/*"]
+      other:
+        patterns: ["*"]
+        exclude-patterns: ["@angular/*", "@angular-devkit/*", "angular-eslint", "@angular-eslint/*", "vitest", "@vitest/*"]
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "@angular/*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "@angular-devkit/*"
+        update-types: [version-update:semver-major]
+      # The TypeScript version is set by the Angular release.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major, version-update:semver-minor]
+
+  - package-ecosystem: npm
+    directory: /e2e
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+    groups:
+      e2e:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories: [/API/API.ProcureAccess, /CLIENT/CLIENT.ProcureAccess]
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+    ignore:
+      # The Node version lives in the client Dockerfile and both .nvmrc files and is
+      # updated by hand in one commit (CLAUDE §3).
+      - dependency-name: node
+      # .NET stays on the LTS line; the 10.0 tags already pull the latest patch.
+      - dependency-name: "dotnet/*"
+        update-types: [version-update:semver-major]
