@@ -41,5 +41,6 @@ export class DeleteAccountDialog {
 
   inputEmail = model('');
 
-  deletionDisabled = computed(() => this.inputEmail() !== this.email());
+  // An empty input never confirms, also when the account e-mail is empty (#95).
+  deletionDisabled = computed(() => this.inputEmail() === '' || this.inputEmail() !== this.email());
 }
