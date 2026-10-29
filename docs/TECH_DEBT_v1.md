@@ -145,7 +145,7 @@ These are not debt to fix but open choices; CLAUDE §6.6 says Claude Code must n
 
 | Decision | Source | Needed by |
 |---|---|---|
-| TD-13 (#124): `UsageEvents` uses a sequential `Id`, which orders events within a day; switch to `uuid`? | S1-23 P3 | before the first pilot data (step 2) |
+| ~~TD-13 (#124): `UsageEvents` uses a sequential `Id`, which orders events within a day; switch to `uuid`?~~ **Decided 2026-10-29:** random UUID v4 (PR #128) | S1-23 P3 | ✅ done |
 | Severity (`blocker`/`major`/`minor`) on the a11y issues, especially #52 | S1-19 P1 | sprint 02 planning |
 | Does tapping the product-type field open the autocomplete on phones? | #102 | manual pass (TESTING §7.2) |
 | UX copy wording for the English header names and `COMMON.ENTER` | TD-08 | step 1 shell |
@@ -190,7 +190,7 @@ Created on 2026-10-29 for the **TD-** items that need one (owner actions and §5
 
 Every open finding of sprint 01, by the moment it should be fixed: the issues of §3, the planned debt of §5, the decisions of §6, and the open points of `docs/sprints/S1-*.md` that have no issue (named by protocol and point, e.g. S1-13 P4). The GitHub milestones carry the same plan for the issues: at the start of a step, the milestone shows what belongs to it.
 
-Already resolved by the pull requests of this review (once merged): #116 and #98 (dependency PR #126), #123 (documentation PR #127, incl. SPEC v2.1).
+Already resolved by the pull requests of this review (once merged): #116 and #98 (dependency PR #126), #123 (documentation PR #127, incl. SPEC v2.1), #124 (random key, PR #128).
 
 ### 9.1 Sprint 02 — first M1 sprint, debt budget ≈ 6 points
 
@@ -218,7 +218,7 @@ Already resolved by the pull requests of this review (once merged): #116 and #98
 
 | Fix | Items | Why then |
 |---|---|---|
-| Before the writer gets its first caller | #124 decision (key type), then #115 (fire-and-forget, retry delay S1-23 P4) | No pilot data exists yet |
+| Before the writer gets its first caller | #115 (fire-and-forget, retry delay S1-23 P4); the key type is decided (#124, PR #128) | No pilot data exists yet |
 | With the configurator rebuild | #52 (stepper), J1 rewrite (S1-19 P5), CAT-10 rewrite incl. #91, #92 and the optional empty-selection case (S1-15 P1, P3; S1-21 P6) | The screens and the filter are replaced |
 | With the first rate limit (export, M2.7) | #112 incl. the health timeout (S1-22 P9, P10) | Same mechanism |
 | With the export | No request bodies of the anonymous export in the logs (S1-22 P7, EXP-05); relaxed E2E rate limit and E2E seeder (S1-18 P4) | Needed by the export and its journey |
