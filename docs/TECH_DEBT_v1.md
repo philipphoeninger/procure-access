@@ -107,7 +107,7 @@
 
 ## 4. Recommended for sprint 02
 
-Reserve about **15–20 % of the capacity (≈ 6 points)** for debt, in this order:
+Reserve about **15–20 % of the capacity (≈ 6 points)** for debt. §9 has the full plan; the order for sprint 02 was:
 
 | # | Work | Items | Pts |
 |---|---|---|---:|
@@ -185,3 +185,81 @@ Created on 2026-10-29 for the **TD-** items that need one (owner actions and §5
 | TD-10 | #122 Move the E2E readiness checks to `/health/ready` and remove `/api/Health` | tech-debt | M1 |
 | TD-11 | #123 Carry the sprint-01 findings into TESTING, ARCHITECTURE, SPEC and the Figma mapping | documentation, tech-debt | M1 |
 | TD-13 (§6) | #124 Decide: random key for `UsageEvents` before pilot data | question | M2 |
+
+## 9. Fix plan — when to fix what
+
+Every open finding of sprint 01, by the moment it should be fixed: the issues of §3, the planned debt of §5, the decisions of §6, and the open points of `docs/sprints/S1-*.md` that have no issue (named by protocol and point, e.g. S1-13 P4). The GitHub milestones carry the same plan for the issues: at the start of a step, the milestone shows what belongs to it.
+
+Already resolved by the pull requests of this review (once merged): #116 and #98 (dependency PR #126), #123 (documentation PR #127, incl. SPEC v2.1).
+
+### 9.1 Sprint 02 — first M1 sprint, debt budget ≈ 6 points
+
+| Do | Items | Pts |
+|---|---|---:|
+| Fix the live bugs | #37 (+ spinner S1-08 N1), #95 with #96, #113 | 1 |
+| Self-host the icon fonts and settle Font Awesome in one PR | #43, #78 | 2 |
+| Quick fix in any logging PR | #121 | 0.5 |
+| NetArchTest spike **before** the module rules | #117 | 0.5 |
+| Owner: set the severity of the a11y issues; plan the phone check | §6: #52, #102 | 0 |
+| Merge the PRs of this review; review the first Dependabot PRs (licence check, CLAUDE §10) | #125 – #127 | 0.5 |
+
+### 9.2 M1 — step 1, together with the work package that touches the code
+
+| Work package | Fix with it | Why then |
+|---|---|---|
+| M1.1 Module projects | #31 AutoMapper (and say in TESTING what replaces ARC-06), #90 with it; #118 build warnings + analyzer check on all projects; #109, #111 gate tightening and removing `--ignore-exit-code 8` when ARC-01–03 arrive (§5); move `UsageEvent` and its writer to the Platform module (S1-23 P6) | The code moves anyway; the gate gets its first architecture tests |
+| M1.2 / ops | #77 Dockerfile hardening; #74; #73 | Small, same files |
+| M1.3 Problem Details | Ad-hoc error objects in `BaseCrudController` / `UICustomizationController` (§5) | Replaced by the middleware |
+| M1.4 Shell | #120 (needs UX copy wording first), #101, #110 and the `PENDING` header entry (S1-21 P4), #122 (`/api/Health` → `/health/ready`) | The legacy header and its E2E checks are replaced |
+| First new client code | #119 TypeScript lint rules; #97 coverage exclusions; `vitest-axe` with the first K-component (§5); decide on `@testing-library/user-event` with the first keyboard tests (S1-17 P2) | New code should start clean |
+| Any CI pull request | #104, #105, #106, #107 | One-liners in `ci.yml` |
+
+### 9.3 M2 — step 2 (catalog, configurator, export)
+
+| Fix | Items | Why then |
+|---|---|---|
+| Before the writer gets its first caller | #124 decision (key type), then #115 (fire-and-forget, retry delay S1-23 P4) | No pilot data exists yet |
+| With the configurator rebuild | #52 (stepper), J1 rewrite (S1-19 P5), CAT-10 rewrite incl. #91, #92 and the optional empty-selection case (S1-15 P1, P3; S1-21 P6) | The screens and the filter are replaced |
+| With the first rate limit (export, M2.7) | #112 incl. the health timeout (S1-22 P9, P10) | Same mechanism |
+| With the export | No request bodies of the anonymous export in the logs (S1-22 P7, EXP-05); relaxed E2E rate limit and E2E seeder (S1-18 P4) | Needed by the export and its journey |
+| End of M2 | #42 bundle budget | After the screen rebuild |
+
+### 9.4 M3 – M7
+
+| Milestone | Fix | Items |
+|---|---|---|
+| M3 | Cookie session replaces the JWT; `Identity.UI`, the `DateTime.UtcNow` calls in `UserService`/`UserRepo` and the legacy account pages go with it (§5) | §5 |
+| M3 | Integration host for the real cookie flow; session probe; `TestUsers` as stored rows (S1-13 P5) | #87, #88, #89 |
+| M3 | Mailpit and real secrets in the E2E stack: check the `compose.log` artefact (TD-12); dev and E2E stacks share host ports (S1-18 P6) | TD-12 |
+| M3 | Correlation ID and the logging rules of PRV-04 (S1-22 P7) | — |
+| M1 – M3 | Regression tests for the zoneless fixes, screen by screen as it is rebuilt | #82 |
+| M4 | First time-dependent tests: the fake clock is shared and only moves forward (S1-13 P4); E2E clock endpoint for J5 (S1-18 P4) | — |
+| M5 | Proposal retirement: `ProposalService` (`DateTime.UtcNow`, `VSTHRD101`), `withProposal()`, `Approver` (§5) | §5 |
+| M7 | File-store check in `/health/ready` (S1-22 P3) | — |
+
+### 9.5 Before the pilot (G-P)
+
+| Fix | Items |
+|---|---|
+| README and `TECHNICAL.md` (process step 16), incl. the indicator queries of R-MET-02 (S1-23 P5) | #4 |
+| The axe suppression list is empty (TESTING §12.4) | #52 and any later entry |
+| Manual accessibility pass (TESTING §7.2) | #102 |
+
+### 9.6 Watch items — act only when the trigger happens
+
+| Trigger | Then | Source |
+|---|---|---|
+| E2E timeouts show up in CI | Raise `workers` or timeouts, not before | S1-19 P7, S1-20 P6 |
+| CI run times hurt | NuGet and Docker layer caches | S1-20 P4 |
+| A test mixes seed rows with fixed ids and generated ids in one table | Advance the identity sequence in the test | S1-15 P4 |
+| Model drift makes all integration tests red | Accepted: the log names the cause; suppress the warning in the fixture only if the noise matters | S1-14 P1 |
+| Docker builds fail on the developer machine | Free disk space (E2E images ≈ 2 GB) | S1-13 P1, S1-18 P7 |
+| WebKit is needed locally on Arch | Run it in the Playwright container image | S1-18 P1 |
+| The next version of SPEC, ARCHITECTURE, handoff or UX copy is written | Update its reference to the current TESTING version | S1-21 P2 |
+
+### 9.7 Recurring
+
+- **End of every sprint:** process step 14 → `TECH_DEBT_v<n+1>.md`: move done items out, add new findings from the sprint protocols and reviews, re-score.
+- **Start of every migration step:** open its GitHub milestone and plan its debt together with the step's invariants (§9.2 – §9.4).
+- **End of every migration step:** review the axe suppression list (TESTING §12.4).
+- **Weekly:** Dependabot pull requests — check the licence of new versions before merging (CLAUDE §10).
