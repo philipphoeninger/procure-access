@@ -30,7 +30,7 @@ This is the larger part of roadmap milestone **M1** (M1.1, M1.3, M1.4, M1.6) plu
 
 - [ ] #37, #95 (+ #96), #113, #121 are closed; no icon font or other asset is loaded from a third-party origin, and no Font Awesome asset is in the bundle (#43, #78).
 - [ ] Every module of ARCHITECTURE §4.3 exists as `ProcureAccess.Modules.<Name>` with its `.Contracts` project and `Add<Name>Module` registration; the platform code built ahead in sprint 01 (logging, health, usage events) lives in Platform.
-- [ ] **ARC-01, ARC-02, ARC-03, API-01, API-02, A11Y-03, A11Y-05** are `active` with tagged, passing tests; the architecture test project runs without `--ignore-exit-code 8`; the gate also enforces the .NET `Invariant` trait (#109, #111).
+- [ ] **ARC-01, ARC-02, ARC-03, API-01, API-02, A11Y-03, A11Y-05** are `active` with tagged, passing tests; the gate also enforces the .NET `Invariant` trait (#109, #111).
 - [ ] The new shell (R-SHL-01, -04, -05, -06, -08, -09, -10) replaces the legacy layout; the legacy feature screens still work inside it; J1 and CAT-10 stay green; A11Y-01 passes on every shell page; the legacy header is off the `PENDING` list of the Figma link check.
 - [ ] UX-O9 is decided and `de.json` is built from `ux_copy_procureaccess_v14.md` (or its successor); no hard-coded German text in new code.
 
@@ -71,7 +71,7 @@ Points use the roadmap scale; task estimates add up to the package estimate, deb
 |---|---|---:|---|
 | S2-06 | Design note + skeleton: a short note in the PR that maps today's projects (`API`, `DAL`, `MODELS`, `SERVICES`) onto the target layout and states what moves now and what stays legacy until its step (**owner decision O-S2-1** before any code moves); then `src/ProcureAccess.Modules.<Name>` and `.Contracts` for Catalog, Configurator, Workspace, Directory, Moderation, Export, IdentityAccess and Platform, project references exactly per ARCHITECTURE §4.3, `Add<Name>Module` extensions called from `Program.cs`, SPDX headers | 3 | Solution builds; `CLAUDE.md` §4 shows the new layout; the app behaves as before (smoke test) |
 | S2-07 | Move the platform code built ahead into Platform: Serilog sink set-up and `LogRetentionJob` (S1-22), health checks, `IUsageEventWriter` and its entity (S1-23 P6), `TimeProvider` registration; only controllers and the registration extension stay public | 2 | OPS-01, OPS-02, PRV-05, SEC-06 still green; no new public type outside `Contracts` |
-| S2-08 | **ARC-01, ARC-02, ARC-03** as tagged architecture tests (one rule per row of §4.3; project-reference check plus NetArchTest, or the tool decided in O-S2-2); remove `--ignore-exit-code 8` from CI (TECH_DEBT §5) | 3 | The three rules fail on a deliberate wrong reference and pass without it |
+| S2-08 | **ARC-01, ARC-02, ARC-03** as tagged architecture tests (one rule per row of §4.3; project-reference check plus NetArchTest, or the tool decided in O-S2-2); confirm the architecture test project still runs without `--ignore-exit-code 8` (already removed in S1-23 with PRV-05; S2-05 P2) | 3 | The three rules fail on a deliberate wrong reference and pass without it |
 | S2-09 | Gate tightening #109 (fail on catalogue header drift, count only test files, require a protocol file) and #111 (count only tests that run, require the `Invariant` trait) | 1 | Gate fails on each of the new cases in a scratch branch, passes on `main` |
 
 #### M1.3 Problem Details — 3 points
