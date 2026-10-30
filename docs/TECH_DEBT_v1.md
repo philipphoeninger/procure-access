@@ -131,11 +131,12 @@ This code is legacy by design. Do not fix it on its own; replace it with the ste
 | `Microsoft.AspNetCore.Identity.UI` only for the `IEmailSender` interface (S1-03) | step 3 |
 | Ad-hoc error objects in `BaseCrudController` and `UICustomizationController` ("TODO: handle more gracefully") instead of Problem Details | step 1 (M1.3) |
 | ~25 TODOs in legacy client features (favorites, proposal, settings, register, profile, filters) and DAL repos | features retired or rebuilt in M1–M3 (`ARCHITECTURE §8.1`) |
-| Architecture test project empty, `--ignore-exit-code 8` (S1-12, S1-20 P7) | step 1 (ARC-01–03) |
 | `vitest-axe` not installed (S1-16 P5) | first K-component (M1/M2) |
 | E2E without `E2E` environment, seeder, Mailpit, clock endpoint, relaxed rate limit (S1-18 P4) | steps 2–4 |
 | CAT-10 on `ExistingCatalogSeed` and the old filter (S1-15 P1) | step 2 (catalog release import) |
 | `Approver` role, `withProposal()`, `withProducts()`/`withFavorites()` | per `ARCHITECTURE §8.1` |
+
+Correction 2026-10-30 (S2-05 P2): the row "Architecture test project empty, `--ignore-exit-code 8` (S1-12, S1-20 P7)" was removed; it was already resolved in S1-23, when PRV-05 became the project's first test and the setting was removed.
 
 Not tracked on purpose: CI has no NuGet/Docker cache (S1-20 P4, add when run times hurt); Serilog stamps with the system clock (S1-22 P6, same clock in production).
 
@@ -207,7 +208,7 @@ Already resolved by the pull requests of this review (once merged): #116 and #98
 
 | Work package | Fix with it | Why then |
 |---|---|---|
-| M1.1 Module projects | #31 AutoMapper (and say in TESTING what replaces ARC-06), #90 with it; #118 build warnings + analyzer check on all projects; #109, #111 gate tightening and removing `--ignore-exit-code 8` when ARC-01–03 arrive (§5); move `UsageEvent` and its writer to the Platform module (S1-23 P6) | The code moves anyway; the gate gets its first architecture tests |
+| M1.1 Module projects | #31 AutoMapper (and say in TESTING what replaces ARC-06), #90 with it; #118 build warnings + analyzer check on all projects; #109, #111 gate tightening when ARC-01–03 arrive; move `UsageEvent` and its writer to the Platform module (S1-23 P6) | The code moves anyway; the gate gets its first architecture tests |
 | M1.2 / ops | #77 Dockerfile hardening; #74; #73 | Small, same files |
 | M1.3 Problem Details | Ad-hoc error objects in `BaseCrudController` / `UICustomizationController` (§5) | Replaced by the middleware |
 | M1.4 Shell | #120 (needs UX copy wording first), #101, #110 and the `PENDING` header entry (S1-21 P4), #122 (`/api/Health` → `/health/ready`) | The legacy header and its E2E checks are replaced |
