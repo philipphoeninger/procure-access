@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- IdentityAccess module (ARCHITECTURE §4.3). Only controllers and AddIdentityAccessModule are public; ARC-03. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
+  <ItemGroup>
+    <ProjectReference Include="../ProcureAccess.Modules.IdentityAccess.Contracts/ProcureAccess.Modules.IdentityAccess.Contracts.csproj" />
+    <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

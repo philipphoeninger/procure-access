@@ -28,6 +28,17 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                     typeof(MappingProfile).Assembly)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
+// Module projects (ARCHITECTURE §4.3). They register nothing yet: the legacy code in API, DAL, MODELS
+// and SERVICES moves into them with the migration step that replaces it (S2-06, owner decision O-S2-1).
+builder.Services.AddPlatformModule()
+                .AddIdentityAccessModule()
+                .AddCatalogModule()
+                .AddConfiguratorModule()
+                .AddExportModule()
+                .AddDirectoryModule()
+                .AddWorkspaceModule()
+                .AddModerationModule();
+
 // The application reads time only through TimeProvider (CLAUDE.md §7); tests replace it with FakeTimeProvider.
 builder.Services.AddSingleton(TimeProvider.System);
 

@@ -1,0 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- Public contracts of the Directory module: interfaces and DTOs other modules may use (ARCHITECTURE §4.3). -->
+<Project Sdk="Microsoft.NET.Sdk">
+</Project>

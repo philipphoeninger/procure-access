@@ -13,6 +13,15 @@ global using API.ProcureAccess.Extensions;
 //global using API.ProcureAccess.Filters;
 //global using API.ProcureAccess.Security;
 
+global using ProcureAccess.Modules.Catalog;
+global using ProcureAccess.Modules.Configurator;
+global using ProcureAccess.Modules.Directory;
+global using ProcureAccess.Modules.Export;
+global using ProcureAccess.Modules.IdentityAccess;
+global using ProcureAccess.Modules.Moderation;
+global using ProcureAccess.Modules.Platform;
+global using ProcureAccess.Modules.Workspace;
+
 global using AutoMapper;
 
 global using DAL.ProcureAccess.EFStructures;

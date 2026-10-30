@@ -10,6 +10,8 @@ COPY Directory.Build.props ./
 COPY DAL/ DAL/
 COPY SERVICES/ SERVICES/
 COPY API/ API/
+# module projects (ARCHITECTURE §4.3); restoring the API restores them too
+COPY src/ src/
 
 # restore
 RUN dotnet restore DAL/DAL.ProcureAccess/DAL.ProcureAccess.csproj
