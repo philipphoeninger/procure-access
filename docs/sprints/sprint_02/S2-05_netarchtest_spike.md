@@ -92,6 +92,6 @@ No correctness or security finding; no further review round needed.
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | #117 asks to note the result "in the next TESTING version". This PR adds no TESTING version (documentation-only spike); S2-08 creates the next one when it flips ARC-01 – ARC-03 and should add to §3.1 (NetArchTest row): "1.3.2 verified on .NET 10 (S2-05); limits L1, L2" | S2-08 |
+| P1 | #117 asks to note the result "in the next TESTING version". This PR adds no TESTING version (documentation-only spike); S2-08 creates the next one when it flips ARC-01 – ARC-03 and should add to §3.1 (NetArchTest row): "1.3.2 verified on .NET 10 (S2-05); limits L1, L2" | **Done 2026-10-30** in TESTING_v16 §3.1 (V75, S2-08) |
 | P2 | SPRINT_02 (S2-08 row, success criteria), TASK_PROMPTS (S2-08) and TECH_DEBT_v1 (§5 row, M1.1 row) still say `--ignore-exit-code 8` has to be removed; it is gone since S1-23. S2-08 only needs to confirm it; the sprint close-out and TECH_DEBT_v2 should drop the item | S2-08; sprint 02 close-out |
 | P3 | NetArchTest stays unmaintained (no release since 2021). Today that costs nothing; if a future SDK changes the metadata format, the fork `NetArchTest.eNhancedEdition` is the fallback (needs an ADR, CLAUDE §11). The ARC tests themselves would show it, because each rule has a deliberate-violation check | Watch; no issue proposed |
