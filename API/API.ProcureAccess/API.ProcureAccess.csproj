@@ -62,4 +62,16 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../../SERVICES/SERVICES.ProcureAccess/SERVICES.ProcureAccess.csproj" />
   </ItemGroup>
 
+  <!-- Module projects (ARCHITECTURE §4.3). The host references only the modules; their contracts come with them. -->
+  <ItemGroup>
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Platform/ProcureAccess.Modules.Platform.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.IdentityAccess/ProcureAccess.Modules.IdentityAccess.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Catalog/ProcureAccess.Modules.Catalog.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Configurator/ProcureAccess.Modules.Configurator.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Export/ProcureAccess.Modules.Export.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Directory/ProcureAccess.Modules.Directory.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Workspace/ProcureAccess.Modules.Workspace.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Moderation/ProcureAccess.Modules.Moderation.csproj" />
+  </ItemGroup>
+
 </Project>
