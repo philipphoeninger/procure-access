@@ -5,8 +5,9 @@
 using System.Security.Cryptography;
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
-using MODELS.ProcureAccess.Entities.Configuration;
 using Npgsql;
+using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -71,14 +72,18 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
 
         // No waiting: the entry must be there as soon as the startup has failed, i.e. the batched
         // sink was flushed before the exception left Program.cs.
-        await using (var context = CreateDbContext(_adminConnectionString))
+        await using (var platform = CreatePlatformDbContext(_adminConnectionString))
         {
-            var entry = await context.SeriLogEntries.AsNoTracking()
+            var entry = await platform.SeriLogEntries.AsNoTracking()
                 .SingleOrDefaultAsync(e => e.MessageTemplate == Program.StartupFailedMessage, cancellationToken);
 
             entry.ShouldNotBeNull("the startup failure was not stored in logging.\"SeriLogs\"");
             entry.Level.ShouldBe("Fatal");
             entry.Exception.ShouldNotBeNull().ShouldContain(nameof(PostgresException));
+        }
+
+        await using (var context = CreateDbContext(_adminConnectionString))
+        {
             (await context.Database.GetAppliedMigrationsAsync(cancellationToken)).ShouldNotContain(lastMigration);
         }
     }
@@ -105,6 +110,11 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
 
     private static ApplicationDBContext CreateDbContext(string connectionString) =>
         new(new DbContextOptionsBuilder<ApplicationDBContext>()
+            .UseNpgsql(connectionString)
+            .Options);
+
+    private static PlatformDbContext CreatePlatformDbContext(string connectionString) =>
+        new(new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(connectionString)
             .Options);
 }

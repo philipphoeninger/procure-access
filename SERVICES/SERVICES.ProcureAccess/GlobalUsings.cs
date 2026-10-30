@@ -44,8 +44,6 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 global using Serilog;
 global using Serilog.Context;
-global using Serilog.Core.Enrichers;
-global using Serilog.Events;
 
 global using System.Data;
 global using System.IdentityModel.Tokens.Jwt;
@@ -64,7 +62,6 @@ global using SERVICES.ProcureAccess.DataServices.Interfaces;
 //global using SERVICES.ProcureAccess.DataServices.Api.Base;
 global using SERVICES.ProcureAccess.Logging.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Configuration;
-global using SERVICES.ProcureAccess.Logging.Settings;
 global using SERVICES.ProcureAccess.Utilities;
 
 global using MailKit.Net.Smtp;

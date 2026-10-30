@@ -2,16 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using SERVICES.ProcureAccess.Logging.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Platform.Logging;
 using Shouldly;
 using Xunit;
 
 namespace ProcureAccess.Tests.Unit.Logging;
 
 /// <summary>
-/// <see cref="LoggingConfiguration.ConfigureSerilog"/> rejects settings that would crash later or
+/// <see cref="LoggingRegistration.AddPlatformLogging"/> rejects settings that would crash later or
 /// fill the log table unnoticed (ARCHITECTURE §9.5). Building the logger does not connect to the
 /// database, so these tests need none.
 /// </summary>
@@ -26,19 +26,19 @@ public class LoggingConfigurationTests
     };
 
     [Fact]
-    public void ConfigureSerilog_ValidSettings_Succeeds()
+    public void AddPlatformLogging_ValidSettings_Succeeds()
     {
-        var builder = CreateBuilder(ValidSettings);
+        var configuration = CreateConfiguration(ValidSettings);
 
-        Should.NotThrow(builder.ConfigureSerilog);
+        Should.NotThrow(() => new ServiceCollection().AddPlatformLogging(configuration));
     }
 
     [Fact]
-    public void ConfigureSerilog_SectionMissing_ThrowsNamingTheSection()
+    public void AddPlatformLogging_SectionMissing_ThrowsNamingTheSection()
     {
-        var builder = CreateBuilder(new Dictionary<string, string?>());
+        var configuration = CreateConfiguration(new Dictionary<string, string?>());
 
-        Should.Throw<InvalidOperationException>(builder.ConfigureSerilog)
+        Should.Throw<InvalidOperationException>(() => new ServiceCollection().AddPlatformLogging(configuration))
             .Message.ShouldContain("AppLoggingSettings");
     }
 
@@ -46,11 +46,11 @@ public class LoggingConfigurationTests
     [InlineData("Verbos")]
     [InlineData("")]
     [InlineData("42")]
-    public void ConfigureSerilog_UnknownMinimumLevel_Throws(string level)
+    public void AddPlatformLogging_UnknownMinimumLevel_Throws(string level)
     {
-        var builder = CreateBuilder(With("AppLoggingSettings:General:RestrictedToMinimumLevel", level));
+        var configuration = CreateConfiguration(With("AppLoggingSettings:General:RestrictedToMinimumLevel", level));
 
-        Should.Throw<InvalidOperationException>(builder.ConfigureSerilog)
+        Should.Throw<InvalidOperationException>(() => new ServiceCollection().AddPlatformLogging(configuration))
             .Message.ShouldContain("RestrictedToMinimumLevel");
     }
 
@@ -58,11 +58,11 @@ public class LoggingConfigurationTests
     [InlineData(null)]
     [InlineData("0")]
     [InlineData("-1")]
-    public void ConfigureSerilog_QueueLimitMissingOrNotPositive_Throws(string? queueLimit)
+    public void AddPlatformLogging_QueueLimitMissingOrNotPositive_Throws(string? queueLimit)
     {
-        var builder = CreateBuilder(With("AppLoggingSettings:PostgreSQL:QueueLimit", queueLimit));
+        var configuration = CreateConfiguration(With("AppLoggingSettings:PostgreSQL:QueueLimit", queueLimit));
 
-        Should.Throw<InvalidOperationException>(builder.ConfigureSerilog)
+        Should.Throw<InvalidOperationException>(() => new ServiceCollection().AddPlatformLogging(configuration))
             .Message.ShouldContain("QueueLimit");
     }
 
@@ -81,11 +81,7 @@ public class LoggingConfigurationTests
         return settings;
     }
 
-    private static WebApplicationBuilder CreateBuilder(Dictionary<string, string?> settings)
-    {
-        // No appsettings files and no environment variables: only the given settings count.
-        var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions { EnvironmentName = "Testing" });
-        builder.Configuration.AddInMemoryCollection(settings);
-        return builder;
-    }
+    // No appsettings files and no environment variables: only the given settings count.
+    private static IConfiguration CreateConfiguration(Dictionary<string, string?> settings) =>
+        new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
 }

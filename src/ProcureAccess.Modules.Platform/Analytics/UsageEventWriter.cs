@@ -2,10 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace SERVICES.ProcureAccess.Analytics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ProcureAccess.Modules.Platform.Contracts.Analytics;
+using ProcureAccess.Modules.Platform.Persistence;
+
+namespace ProcureAccess.Modules.Platform.Analytics;
 
 /// <inheritdoc cref="IUsageEventWriter"/>
-public sealed class UsageEventWriter(
+internal sealed class UsageEventWriter(
     IServiceScopeFactory scopeFactory,
     TimeProvider timeProvider,
     ILogger<UsageEventWriter> logger) : IUsageEventWriter
@@ -32,7 +37,7 @@ public sealed class UsageEventWriter(
             var (dimension1, dimension2) = dimensions();
 
             await using var scope = scopeFactory.CreateAsyncScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
 
             db.UsageEvents.Add(new UsageEvent
             {

@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace SERVICES.ProcureAccess.Logging.Retention;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+namespace ProcureAccess.Modules.Platform.Logging;
 
 /// <summary>
 /// Runs <see cref="LogRetentionJob"/> once at startup and then every
@@ -14,7 +19,7 @@ namespace SERVICES.ProcureAccess.Logging.Retention;
 /// between instances. A failed run is logged and retried at the next interval; it never stops
 /// the host.
 /// </remarks>
-public sealed class LogRetentionService(
+internal sealed class LogRetentionService(
     IServiceScopeFactory scopeFactory,
     TimeProvider timeProvider,
     IOptions<AppLoggingSettings.RetentionSettings> options,

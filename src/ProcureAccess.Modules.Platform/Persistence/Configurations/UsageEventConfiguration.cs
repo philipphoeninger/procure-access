@@ -2,13 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace MODELS.ProcureAccess.Entities.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ProcureAccess.Modules.Platform.Analytics;
+
+namespace ProcureAccess.Modules.Platform.Persistence.Configurations;
 
 /// <summary>
 /// Table of the usage events in the <c>analytics</c> schema (ARCHITECTURE §5.7). Date only and no
 /// personal reference (PRV-05).
 /// </summary>
-public class UsageEventConfiguration : IEntityTypeConfiguration<UsageEvent>
+internal sealed class UsageEventConfiguration : IEntityTypeConfiguration<UsageEvent>
 {
     public const string Schema = "analytics";
     public const string Table = "UsageEvents";

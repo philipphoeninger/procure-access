@@ -4,16 +4,34 @@ SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-<!-- Platform module (ARCHITECTURE §4.3). Only controllers and AddPlatformModule are public; ARC-03. -->
+<!-- Platform module (ARCHITECTURE §4.3). Only controllers and PlatformModule (registration) are public; ARC-03. -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!-- Moved with the platform code from SERVICES and DAL (S2-07); versions unchanged. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.3.0" />
+  </ItemGroup>
+
   <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
   <ItemGroup>
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
+  </ItemGroup>
+
+  <!-- The tests use the internal types; DynamicProxyGenAssembly2 lets NSubstitute create ILogger<T> for internal T. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Integration" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Architecture" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
 </Project>

@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace MODELS.ProcureAccess.Entities;
+namespace ProcureAccess.Modules.Platform.Analytics;
 
 /// <summary>
 /// The usage events of v1 (SPEC §9.1). The list is final (ARCHITECTURE §5.7, C82): adding an
 /// event needs a SPEC change first. Stored as text, so the indicator queries (R-MET-02) stay
 /// readable.
 /// </summary>
-public enum UsageEventType
+internal enum UsageEventType
 {
     /// <summary>S11 shown for a complete selection. Dimension 1: <c>anonymous</c> / <c>signedIn</c>.</summary>
     CriteriaListShown,

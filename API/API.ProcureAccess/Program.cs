@@ -28,9 +28,10 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                     typeof(MappingProfile).Assembly)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
-// Module projects (ARCHITECTURE §4.3). They register nothing yet: the legacy code in API, DAL, MODELS
-// and SERVICES moves into them with the migration step that replaces it (S2-06, owner decision O-S2-1).
-builder.Services.AddPlatformModule()
+// Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events and
+// the health checks (S2-07); the others register nothing yet: the legacy code in API, DAL, MODELS and
+// SERVICES moves into them with the migration step that replaces it (S2-06, owner decision O-S2-1).
+builder.Services.AddPlatformModule(builder.Configuration)
                 .AddIdentityAccessModule()
                 .AddCatalogModule()
                 .AddConfiguratorModule()
@@ -39,19 +40,8 @@ builder.Services.AddPlatformModule()
                 .AddWorkspaceModule()
                 .AddModerationModule();
 
-// The application reads time only through TimeProvider (CLAUDE.md §7); tests replace it with FakeTimeProvider.
-builder.Services.AddSingleton(TimeProvider.System);
-
-// Configure logging: console + PostgreSQL sink in the logging schema, with retention (ARCHITECTURE §9.5)
-builder.ConfigureSerilog();
-builder.Services.RegisterLoggingInterfaces()
-                .AddLogRetention();
-
-// Usage events in the analytics schema, date only (ARCHITECTURE §5.7); nothing writes them yet (S1-23)
-builder.Services.AddUsageEvents();
-
-// /health/live and /health/ready (ARCHITECTURE §9.5)
-builder.Services.AddProcureAccessHealthChecks();
+// Legacy logging wrapper of the legacy controllers; Serilog itself is set up by the Platform module
+builder.Services.RegisterLoggingInterfaces();
 
 // Configure localization
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -72,12 +62,18 @@ var app = builder.Build();
 try
 {
     // Automatically apply migrations: the API must not serve requests against a schema that does
-    // not match the model.
+    // not match the model. The legacy context first (it creates the database if missing), then the
+    // module contexts in registration order (ADR-014).
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         app.Logger.LogInformation("Applying pending migrations...");
         db.Database.Migrate(); // creates DB if missing
+        foreach (var migrator in scope.ServiceProvider.GetServices<IModuleDatabaseMigrator>())
+        {
+            app.Logger.LogInformation("Applying pending migrations of module {Module}...", migrator.ModuleName);
+            await migrator.MigrateAsync(CancellationToken.None);
+        }
         app.Logger.LogInformation("Migrations applied successfully!");
     }
 
@@ -96,7 +92,7 @@ try
     app.MapGroup("/api")
        .MapIdentityUserEndpoints();
 
-    app.MapProcureAccessHealthChecks();
+    app.MapPlatformEndpoints();
 }
 catch (Exception ex)
 {

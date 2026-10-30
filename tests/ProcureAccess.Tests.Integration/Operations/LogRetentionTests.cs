@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MODELS.ProcureAccess.Entities;
+using ProcureAccess.Modules.Platform.Logging;
+using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
-using SERVICES.ProcureAccess.Logging.Retention;
-using SERVICES.ProcureAccess.Logging.Settings;
 using Shouldly;
 using Xunit;
 
@@ -92,7 +90,7 @@ public sealed class LogRetentionTests(ApiFixture api) : IntegrationTest(api)
     private async Task<List<string>> RemainingAsync(string marker)
     {
         using var scope = Api.Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
         return await db.SeriLogEntries
             .Where(entry => entry.MessageTemplate == marker)
             .Select(entry => entry.Message)

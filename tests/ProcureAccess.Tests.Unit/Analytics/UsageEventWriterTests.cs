@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using SERVICES.ProcureAccess.Analytics;
+using ProcureAccess.Modules.Platform.Analytics;
+using ProcureAccess.Modules.Platform.Contracts.Analytics;
 using Shouldly;
 using Xunit;
 

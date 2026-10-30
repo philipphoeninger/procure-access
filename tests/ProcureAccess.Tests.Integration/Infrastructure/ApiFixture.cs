@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Npgsql;
+using ProcureAccess.Modules.Platform.Persistence;
 using Respawn.Graph;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -16,11 +17,12 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 
 /// <summary>
 /// Assembly fixture (TESTING §5.2): starts one PostgreSQL 17 container, applies the migrations
-/// once and hosts the API once for the whole test run.
+/// of every context once (legacy first, then the modules, as <c>Program.cs</c> does) and hosts the
+/// API once for the whole test run.
 /// </summary>
 /// <remarks>
 /// Test classes derive from <see cref="IntegrationTest"/>, which empties the database before
-/// each class. Respawn deletes every row except the migration history, including the reference
+/// each class. Respawn deletes every row except the migration histories, including the reference
 /// data that migration <c>AddSeedData</c> inserts: each test stores the data it needs.
 /// </remarks>
 public sealed class ApiFixture : IAsyncLifetime
@@ -61,19 +63,28 @@ public sealed class ApiFixture : IAsyncLifetime
             await context.Database.MigrateAsync();
         }
 
+        await using (var context = CreatePlatformDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
         await using (var connection = await OpenConnectionAsync())
         {
             _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
-                TablesToIgnore = [new Table("public", "__EFMigrationsHistory")],
+                TablesToIgnore =
+                [
+                    new Table("public", "__EFMigrationsHistory"),
+                    new Table(PlatformDbContext.HistorySchema, PlatformDbContext.HistoryTable),
+                ],
             });
         }
 
         _factory = new ProcureAccessApiFactory(_database.GetConnectionString(), Clock);
     }
 
-    /// <summary>Deletes all rows except the migration history.</summary>
+    /// <summary>Deletes all rows except the migration histories.</summary>
     public async Task ResetDatabaseAsync()
     {
         if (_respawner is null)
@@ -86,15 +97,24 @@ public sealed class ApiFixture : IAsyncLifetime
     }
 
     /// <summary>
-    /// Stores entities through the application's own <see cref="ApplicationDBContext"/>, never
-    /// through raw SQL, so the EF configuration is exercised (TESTING §6.1).
+    /// Stores entities through the application's own context that maps them, never through raw
+    /// SQL, so the EF configuration is exercised (TESTING §6.1): the Platform module's
+    /// <see cref="PlatformDbContext"/> for its entities, the legacy <see cref="ApplicationDBContext"/>
+    /// for all others.
     /// </summary>
     public async Task StoreAsync(params object[] entities)
     {
         using var scope = Factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-        context.AddRange(entities);
-        await context.SaveChangesAsync();
+        var legacy = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var platform = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
+        foreach (var entity in entities)
+        {
+            DbContext context = platform.Model.FindEntityType(entity.GetType()) is null ? legacy : platform;
+            context.Add(entity);
+        }
+
+        await platform.SaveChangesAsync();
+        await legacy.SaveChangesAsync();
     }
 
     /// <summary>
@@ -120,6 +140,11 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private ApplicationDBContext CreateDbContext() =>
         new(new DbContextOptionsBuilder<ApplicationDBContext>()
+            .UseNpgsql(_database.GetConnectionString())
+            .Options);
+
+    private PlatformDbContext CreatePlatformDbContext() =>
+        new(new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(_database.GetConnectionString())
             .Options);
 

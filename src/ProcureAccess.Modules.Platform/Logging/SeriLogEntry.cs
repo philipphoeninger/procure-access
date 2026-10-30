@@ -1,16 +1,16 @@
-// SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 //
 // SPDX-License-Identifier: MIT
 
-namespace MODELS.ProcureAccess.Entities;
+namespace ProcureAccess.Modules.Platform.Logging;
 
 /// <summary>
 /// One row of the Serilog PostgreSQL sink in the <c>logging</c> schema (ARCHITECTURE §9.5).
 /// The sink writes the rows; the application only reads and deletes them (log retention, OPS-02).
-/// Table and columns are defined in <see cref="Configuration.SeriLogEntryConfiguration"/>, which
-/// also holds the names the sink is configured with.
+/// Table and columns are defined in <see cref="Persistence.Configurations.SeriLogEntryConfiguration"/>,
+/// which also holds the names the sink is configured with.
 /// </summary>
-public class SeriLogEntry
+internal sealed class SeriLogEntry
 {
     public long Id { get; set; }
 

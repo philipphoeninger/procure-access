@@ -20,6 +20,7 @@ global using ProcureAccess.Modules.Export;
 global using ProcureAccess.Modules.IdentityAccess;
 global using ProcureAccess.Modules.Moderation;
 global using ProcureAccess.Modules.Platform;
+global using ProcureAccess.Modules.Platform.Contracts.Persistence;
 global using ProcureAccess.Modules.Workspace;
 
 global using AutoMapper;
@@ -40,7 +41,6 @@ global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.Entities.Requests;
 global using MODELS.ProcureAccess.Settings;
 
-global using SERVICES.ProcureAccess.Analytics;
 global using SERVICES.ProcureAccess.DataServices;
 global using SERVICES.ProcureAccess.DataServices.Configuration;
 global using SERVICES.ProcureAccess.DataServices.Interfaces;

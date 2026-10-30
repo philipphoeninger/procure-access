@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using MODELS.ProcureAccess.Entities;
-using MODELS.ProcureAccess.Entities.Configuration;
+using ProcureAccess.Modules.Platform.Analytics;
+using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using Shouldly;
 using Xunit;
 
@@ -77,15 +77,15 @@ public class UsageEventPrivacyTests
     }
 
     /// <summary>
-    /// The design-time model of the real DbContext, the one the migrations are built from. Building
-    /// it needs no database connection.
+    /// The design-time model of the real DbContext, the one the migrations are built from: the
+    /// Platform module's own context since S2-07 (ADR-014). Building it needs no database connection.
     /// </summary>
     private static IEntityType UsageEventEntityType()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDBContext>()
+        var options = new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql("Host=unused")
             .Options;
-        using var context = new ApplicationDBContext(options);
+        using var context = new PlatformDbContext(options);
 
         var model = context.GetService<IDesignTimeModel>().Model;
         return model.FindEntityType(typeof(UsageEvent))
