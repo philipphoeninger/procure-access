@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace MODELS.ProcureAccess.Entities;
+namespace ProcureAccess.Modules.Platform.Analytics;
 
 /// <summary>
 /// One usage event in the <c>analytics</c> schema (ARCHITECTURE §5.7, SPEC R-MET-01). The table
@@ -12,9 +12,9 @@ namespace MODELS.ProcureAccess.Entities;
 /// <b>Privacy (invariant PRV-05):</b> never add a user, organisation, IP address, session or any
 /// other identifying field, and keep <see cref="OccurredOn"/> a date, not a timestamp. The
 /// architecture test <c>UsageEventPrivacyTests</c> fails on any column beyond the ones below.
-/// Rows are written only through <c>IUsageEventWriter</c>.
+/// Rows are written only through <see cref="UsageEventWriter"/>.
 /// </remarks>
-public class UsageEvent
+internal sealed class UsageEvent
 {
     /// <summary>
     /// Random key (UUID version 4) set by the database, so that the key does not reveal the order

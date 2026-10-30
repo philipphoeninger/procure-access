@@ -46,7 +46,11 @@ SPDX-License-Identifier = "MIT"
 
 # Generated files: EF Core migrations and the API XML documentation file.
 [[annotations]]
-path = ["DAL/DAL.ProcureAccess/Migrations/**", "API/API.ProcureAccess/API.ProcureAccess.xml"]
+path = [
+  "DAL/DAL.ProcureAccess/Migrations/**",
+  "src/ProcureAccess.Modules.*/Persistence/Migrations/**",
+  "API/API.ProcureAccess/API.ProcureAccess.xml",
+]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"

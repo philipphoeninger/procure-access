@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace SERVICES.ProcureAccess.Logging.Settings;
+namespace ProcureAccess.Modules.Platform.Logging;
 
 /// <summary>
 /// Configuration section <c>AppLoggingSettings</c> (appsettings.json, overridable per environment
 /// and through environment variables such as <c>AppLoggingSettings__Retention__RetentionDays</c>).
 /// </summary>
-public class AppLoggingSettings
+internal sealed class AppLoggingSettings
 {
     public const string SectionName = nameof(AppLoggingSettings);
 
@@ -16,13 +16,13 @@ public class AppLoggingSettings
     public PostgreSQLSettings PostgreSQL { get; set; } = new();
     public RetentionSettings Retention { get; set; } = new();
 
-    public class GeneralSettings
+    public sealed class GeneralSettings
     {
         /// <summary>Minimum level for all sinks (Serilog level name, e.g. <c>Warning</c>).</summary>
         public string RestrictedToMinimumLevel { get; set; } = string.Empty;
     }
 
-    public class PostgreSQLSettings
+    public sealed class PostgreSQLSettings
     {
         /// <summary>Name of the connection string the sink writes with (same database as the app).</summary>
         public string ConnectionStringName { get; set; } = string.Empty;
@@ -35,7 +35,7 @@ public class AppLoggingSettings
     }
 
     /// <summary>Log retention in the <c>logging</c> schema (ARCHITECTURE §9.5, OPS-02).</summary>
-    public class RetentionSettings
+    public sealed class RetentionSettings
     {
         public const string SectionName = $"{AppLoggingSettings.SectionName}:Retention";
 

@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text.Json;
-using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MODELS.ProcureAccess.Entities;
+using ProcureAccess.Modules.Platform.Logging;
+using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -67,7 +67,7 @@ public sealed class LogSinkTests(ApiFixture api) : IntegrationTest(api)
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         using var scope = services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
         var deadline = DateTime.UtcNow.AddSeconds(30);
         var entry = await db.SeriLogEntries.AsNoTracking()
             .SingleOrDefaultAsync(e => e.Message.Contains(marker), cancellationToken);

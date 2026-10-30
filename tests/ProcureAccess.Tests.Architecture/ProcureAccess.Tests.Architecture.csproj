@@ -29,6 +29,7 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../../DAL/DAL.ProcureAccess/DAL.ProcureAccess.csproj" />
     <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
     <ProjectReference Include="../../SERVICES/SERVICES.ProcureAccess/SERVICES.ProcureAccess.csproj" />
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Platform/ProcureAccess.Modules.Platform.csproj" />
   </ItemGroup>
 
 </Project>

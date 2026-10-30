@@ -1,14 +1,18 @@
-// SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 //
 // SPDX-License-Identifier: MIT
 
-namespace MODELS.ProcureAccess.Entities.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ProcureAccess.Modules.Platform.Logging;
+
+namespace ProcureAccess.Modules.Platform.Persistence.Configurations;
 
 /// <summary>
 /// Log table of the Serilog PostgreSQL sink (ARCHITECTURE §9.5). The migrations own the table;
 /// the sink is configured with the names below and never creates tables itself.
 /// </summary>
-public class SeriLogEntryConfiguration : IEntityTypeConfiguration<SeriLogEntry>
+internal sealed class SeriLogEntryConfiguration : IEntityTypeConfiguration<SeriLogEntry>
 {
     public const string Schema = "logging";
     public const string Table = "SeriLogs";
@@ -23,7 +27,7 @@ public class SeriLogEntryConfiguration : IEntityTypeConfiguration<SeriLogEntry>
 
         builder.Property(x => x.Level).HasMaxLength(32);
 
-        // Log texts have no natural length limit: text instead of the context-wide default of 200.
+        // Log texts have no natural length limit.
         builder.Property(x => x.Message).HasColumnType("text");
         builder.Property(x => x.MessageTemplate).HasColumnType("text");
         builder.Property(x => x.Exception).HasColumnType("text");

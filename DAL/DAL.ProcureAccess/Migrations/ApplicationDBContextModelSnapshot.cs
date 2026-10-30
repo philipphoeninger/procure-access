@@ -17,7 +17,7 @@ namespace DAL.ProcureAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -2515,89 +2515,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens", "public");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.SeriLogEntry", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ApplicationName")
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<string>("Exception")
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("MachineName")
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<string>("MessageTemplate")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<string>("Properties")
-                        .HasMaxLength(200)
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("SourceContext")
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TimeStamp");
-
-                    b.ToTable("SeriLogs", "logging");
-                });
-
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.UsageEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Dimension1")
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("Dimension2")
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<DateOnly>("OccurredOn")
-                        .HasColumnType("date");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventType", "OccurredOn");
-
-                    b.ToTable("UsageEvents", "analytics");
                 });
 
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace SERVICES.ProcureAccess.Analytics;
+namespace ProcureAccess.Modules.Platform.Contracts.Analytics;
 
 /// <summary>
 /// Writes the usage events of SPEC §9.1 into <c>analytics."UsageEvents"</c> (R-MET-01). One method

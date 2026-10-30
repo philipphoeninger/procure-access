@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MODELS.ProcureAccess.Entities;
+using ProcureAccess.Modules.Platform.Analytics;
+using ProcureAccess.Modules.Platform.Contracts.Analytics;
+using ProcureAccess.Modules.Platform.Logging;
+using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
-using SERVICES.ProcureAccess.Analytics;
 using Shouldly;
 using Xunit;
 
@@ -96,7 +97,7 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
         await DeleteAllEventsAsync();
         var marker = $"usage-event-test-{Guid.NewGuid():N}";
         using var requestScope = Api.Factory.Services.CreateScope();
-        var requestDb = requestScope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var requestDb = requestScope.ServiceProvider.GetRequiredService<PlatformDbContext>();
         var unsaved = new SeriLogEntry
         {
             TimeStamp = Clock.GetUtcNow().UtcDateTime,
@@ -111,7 +112,7 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
         (await AllEventsAsync()).ShouldHaveSingleItem();
         requestDb.Entry(unsaved).State.ShouldBe(EntityState.Added);
         using var checkScope = Api.Factory.Services.CreateScope();
-        (await checkScope.ServiceProvider.GetRequiredService<ApplicationDBContext>().SeriLogEntries
+        (await checkScope.ServiceProvider.GetRequiredService<PlatformDbContext>().SeriLogEntries
             .AnyAsync(entry => entry.MessageTemplate == marker, TestContext.Current.CancellationToken))
             .ShouldBeFalse();
     }
@@ -131,14 +132,14 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
     private async Task DeleteAllEventsAsync()
     {
         using var scope = Api.Factory.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<ApplicationDBContext>().UsageEvents
+        await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
             .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
     }
 
     private async Task<List<UsageEvent>> AllEventsAsync()
     {
         using var scope = Api.Factory.Services.CreateScope();
-        return await scope.ServiceProvider.GetRequiredService<ApplicationDBContext>().UsageEvents
+        return await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
             .AsNoTracking()
             .ToListAsync(TestContext.Current.CancellationToken);
     }

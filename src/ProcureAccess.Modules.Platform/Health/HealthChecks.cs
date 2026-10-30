@@ -2,10 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using ProcureAccess.Modules.Platform.Persistence;
 
-namespace API.ProcureAccess.Extensions;
+namespace ProcureAccess.Modules.Platform.Health;
 
 /// <summary>
 /// Health endpoints for the reverse proxy and uptime monitoring (ARCHITECTURE §9.5, OPS-01):
@@ -13,7 +17,7 @@ namespace API.ProcureAccess.Extensions;
 /// <c>/health/ready</c> runs the checks tagged <see cref="ReadyTag"/>. Healthy is 200, unhealthy 503.
 /// </summary>
 /// <remarks>The file store check joins the ready checks once the file store exists (step 7).</remarks>
-public static class HealthCheckExtensions
+internal static class HealthChecks
 {
     public const string LivePath = "/health/live";
     public const string ReadyPath = "/health/ready";
@@ -22,7 +26,7 @@ public static class HealthCheckExtensions
     /// <summary>A ready check that takes longer counts as unhealthy, so the probe never hangs.</summary>
     private static readonly TimeSpan CheckTimeout = TimeSpan.FromSeconds(5);
 
-    public static IServiceCollection AddProcureAccessHealthChecks(this IServiceCollection services)
+    public static IServiceCollection AddPlatformHealthChecks(this IServiceCollection services)
     {
         services.AddHealthChecks()
                 .AddCheck<DatabaseHealthCheck>("database", tags: [ReadyTag], timeout: CheckTimeout);
@@ -30,19 +34,19 @@ public static class HealthCheckExtensions
         return services;
     }
 
-    public static WebApplication MapProcureAccessHealthChecks(this WebApplication app)
+    public static IEndpointRouteBuilder MapPlatformHealthChecks(this IEndpointRouteBuilder endpoints)
     {
-        app.MapHealthChecks(LivePath, new HealthCheckOptions { Predicate = _ => false })
-           .AllowAnonymous();
+        endpoints.MapHealthChecks(LivePath, new HealthCheckOptions { Predicate = _ => false })
+                 .AllowAnonymous();
 
-        app.MapHealthChecks(ReadyPath, new HealthCheckOptions { Predicate = check => check.Tags.Contains(ReadyTag) })
-           .AllowAnonymous();
+        endpoints.MapHealthChecks(ReadyPath, new HealthCheckOptions { Predicate = check => check.Tags.Contains(ReadyTag) })
+                 .AllowAnonymous();
 
-        return app;
+        return endpoints;
     }
 
     /// <summary>Healthy when the application database accepts a connection.</summary>
-    internal sealed class DatabaseHealthCheck(ApplicationDBContext db) : IHealthCheck
+    private sealed class DatabaseHealthCheck(PlatformDbContext db) : IHealthCheck
     {
         public async Task<HealthCheckResult> CheckHealthAsync(
             HealthCheckContext context,

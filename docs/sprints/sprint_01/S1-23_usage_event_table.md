@@ -74,4 +74,4 @@ During check 6 the root file system was full (0 bytes free; the database contain
 | P3 | Sequential `Id` orders events within a day (R2). If that matters, a random key (`uuid`) removes the order; decide before the first pilot data | Philipp / step 2 |
 | P4 | Delay with an unreachable database through the retry policy (R1) | Step 2, when S11 and the export call the writer |
 | P5 | The indicator queries (R-MET-02) go into `TECHNICAL.md`, which does not exist yet | R-MET-02 task |
-| P6 | M1.1 moves `UsageEvent` and the writer into the Platform module | M1.1 |
+| P6 | M1.1 moves `UsageEvent` and the writer into the Platform module | **Done 2026-10-30** in S2-07 (`PlatformDbContext`, ADR-014) |

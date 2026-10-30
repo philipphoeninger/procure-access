@@ -129,23 +129,6 @@
         <member name="M:API.ProcureAccess.Extensions.DatabaseRebuildExtensions.IsDatabaseRebuildAllowed(Microsoft.Extensions.Hosting.IHostEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>True only in <c>Development</c> with <c>RebuildDatabase</c> set to <c>true</c>.</summary>
         </member>
-        <member name="T:API.ProcureAccess.Extensions.HealthCheckExtensions">
-            <summary>
-            Health endpoints for the reverse proxy and uptime monitoring (ARCHITECTURE §9.5, OPS-01):
-            <c>/health/live</c> answers as long as the process serves requests and checks nothing else;
-            <c>/health/ready</c> runs the checks tagged <see cref="F:API.ProcureAccess.Extensions.HealthCheckExtensions.ReadyTag"/>. Healthy is 200, unhealthy 503.
-            </summary>
-            <remarks>The file store check joins the ready checks once the file store exists (step 7).</remarks>
-        </member>
-        <member name="F:API.ProcureAccess.Extensions.HealthCheckExtensions.CheckTimeout">
-            <summary>A ready check that takes longer counts as unhealthy, so the probe never hangs.</summary>
-        </member>
-        <member name="T:API.ProcureAccess.Extensions.HealthCheckExtensions.DatabaseHealthCheck">
-            <summary>Healthy when the application database accepts a connection.</summary>
-        </member>
-        <member name="M:API.ProcureAccess.Extensions.HealthCheckExtensions.DatabaseHealthCheck.#ctor(DAL.ProcureAccess.EFStructures.ApplicationDBContext)">
-            <summary>Healthy when the application database accepts a connection.</summary>
-        </member>
         <member name="F:API.ProcureAccess.Extensions.IdentityExtensions.MinimumJwtKeyBytes">
             <summary>HMAC-SHA256 needs a key of at least 256 bits; shorter keys fail at the first sign-in.</summary>
         </member>
