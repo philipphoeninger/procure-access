@@ -85,7 +85,7 @@ No correctness or security finding that affects current behaviour; no further re
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | S2-08 (ARC-03): count `PlatformModule.MapPlatformEndpoints` as part of the module registration (the class `PlatformModule` is the registration; ARC-03 checks public *types*); a generated `public` migration must fail the check (R3); plus S2-06 P2 | S2-08 |
+| P1 | S2-08 (ARC-03): count `PlatformModule.MapPlatformEndpoints` as part of the module registration (the class `PlatformModule` is the registration; ARC-03 checks public *types*); a generated `public` migration must fail the check (R3); plus S2-06 P2 | **Done 2026-10-30** in S2-08 (visibility rule; violation case C13) |
 | P2 | ADR-014: the owner accepted the principle (option A); rules 1–6 are this task's proposal and are confirmed with the review of this pull request (status in ARCHITECTURE §14) | **Done 2026-10-30:** the owner confirmed rules 1–6 with the review of PR #148; ADR-014 is **accepted** (ARCHITECTURE_v15 §10.5, §14) |
 | P3 | `Serilog.Settings.Configuration` in `SERVICES` is unused (R7) | #118 or a new issue |
 | P4 | `TECH_DEBT_v1.md` §9.2 lists "move `UsageEvent` and its writer to the Platform module (S1-23 P6)" for M1.1: done here; record it in `TECH_DEBT_v2.md` | Sprint 02 close-out |
