@@ -52,7 +52,7 @@ All temporary edits were reverted; `git status` showed only the intended files a
 |---|---|---|
 | P1 | The other "next TESTING version" items (S1-12 P2, S1-13 P2, S1-16 P1, S1-17 P3, S1-18 P4/P5, S1-20 D1–D6) are still open; v11 covers only this task (A1) | Philipp / documentation session |
 | P2 | Older documents still name `TESTING_v10.md` (SPEC_v2, ARCHITECTURE_v12, handoff, UX copy v14, SPRINT_01). Left as they are: they name the version they were aligned with, and CLAUDE §2 says to use the highest version | Next version of each document |
-| P3 | The gate counts `INV:` tags, not tests: a tag in a comment counts, a `[Theory]` counts once, and a .NET test with `INV:` but without the `Invariant` trait passes (§8.1 asks for both). A trait check could follow when the Architecture project gets its first tests | Step 1, if wanted |
+| P3 | The gate counts `INV:` tags, not tests: a tag in a comment counts, a `[Theory]` counts once, and a .NET test with `INV:` but without the `Invariant` trait passes (§8.1 asks for both). A trait check could follow when the Architecture project gets its first tests | **Done 2026-10-30** in S2-09 (#109, #111; TESTING_v17 §8.3, V76, V77); a `[Theory]` still counts once |
 | P4 | The `PENDING` entry for the header must be removed by the step-1 shell PR; the check prints a notice once the tag is there | Step 1 |
 | P5 | `figma_code_mapping_procureaccess_v1.md` §4 still shows the script without `PENDING` and the exact node match; it should point to `scripts/check-figma-links.mjs` as the source in its next version | Next mapping version |
 | P6 | CAT-10 is `active` with step `0→2`: step 2 replaces the filter and has to keep or rewrite the characterisation tests, never drop the tag | Step 2 |
