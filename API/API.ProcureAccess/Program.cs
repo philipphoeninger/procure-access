@@ -28,9 +28,10 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                     typeof(MappingProfile).Assembly)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
-// Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events and
-// the health checks (S2-07); the others register nothing yet: the legacy code in API, DAL, MODELS and
-// SERVICES moves into them with the migration step that replaces it (S2-06, owner decision O-S2-1).
+// Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,
+// the health checks (S2-07) and Problem Details (S2-10); the others register nothing yet: the
+// legacy code in API, DAL, MODELS and SERVICES moves into them with the migration step that
+// replaces it (S2-06, owner decision O-S2-1).
 builder.Services.AddPlatformModule(builder.Configuration)
                 .AddIdentityAccessModule()
                 .AddCatalogModule()
@@ -79,6 +80,9 @@ try
 
     // Sample data only in Development, whatever the configuration says (SEC-06)
     await app.RebuildDatabaseIfAllowedAsync();
+
+    // First in the pipeline: errors of every later middleware become Problem Details (S2-10)
+    app.UsePlatformMiddleware();
 
     app.ConfigureSwaggerExplorer();
 

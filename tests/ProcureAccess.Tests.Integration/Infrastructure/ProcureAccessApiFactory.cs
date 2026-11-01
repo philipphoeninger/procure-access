@@ -22,13 +22,15 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// <remarks>
 /// Tests of startup behaviour create their own instance with another
 /// <paramref name="environmentName"/> or extra host <paramref name="settings"/>
-/// (e.g. SEC-06) and dispose it themselves.
+/// (e.g. SEC-06) and dispose it themselves. <paramref name="configureServices"/> adds test-only
+/// services to such an instance, e.g. a controller of the test assembly.
 /// </remarks>
 public sealed class ProcureAccessApiFactory(
     string connectionString,
     FakeTimeProvider clock,
     string environmentName = ProcureAccessApiFactory.EnvironmentName,
-    IReadOnlyDictionary<string, string?>? settings = null)
+    IReadOnlyDictionary<string, string?>? settings = null,
+    Action<IServiceCollection>? configureServices = null)
     : WebApplicationFactory<Program>
 {
     public const string EnvironmentName = "Testing";
@@ -71,6 +73,8 @@ public sealed class ProcureAccessApiFactory(
                     .RequireAuthenticatedUser()
                     .Build();
             });
+
+            configureServices?.Invoke(services);
         });
     }
 }

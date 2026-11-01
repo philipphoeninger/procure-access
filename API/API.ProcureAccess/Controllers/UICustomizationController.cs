@@ -10,6 +10,7 @@ public class UICustomizationController : ControllerBase
 {
     protected readonly IUICustomizationRepo Repo;
     protected readonly UserManager<User> UserManager;
+    protected readonly IAppLogging<UICustomizationController> Logger;
 
     public UICustomizationController(
         IAppLogging<UICustomizationController> logger,
@@ -18,6 +19,7 @@ public class UICustomizationController : ControllerBase
     {
         Repo = repo;
         UserManager = userManager;
+        Logger = logger;
     }
 
     /// <summary>
@@ -45,22 +47,9 @@ public class UICustomizationController : ControllerBase
         {
             dto = await Repo.GetAsync(userId);
         }
-        catch (CustomException ex)
-        {
-            // TODO: handle more gracefully
-            return BadRequest(new
-            {
-                code = "UICustomizationNotFound",
-                message = ex.Message
-            });
-        }
         catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "UICustomizationNotFound",
-                message = ex.Message
-            });
+            return Failure(ex, "The UI settings could not be read.");
         }
         return Ok(dto);
     }
@@ -92,23 +81,20 @@ public class UICustomizationController : ControllerBase
         {
             await Repo.UpdateAsync(userId, dto);
         }
-        catch (CustomException ex)
-        {
-            // TODO: handle more gracefully
-            return BadRequest(new
-            {
-                code = "UpdateFailure",
-                message = ex.Message
-            });
-        }
         catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "UpdateFailure",
-                message = ex.Message
-            });
+            return Failure(ex, "The UI settings could not be updated.");
         }
         return Ok(dto);
+    }
+
+    /// <summary>
+    /// A failed read or write as 400 Problem Details (TECH_DEBT_v1 §5, S2-10). The exception is
+    /// logged and its text never reaches the client. Legacy: preferences are rebuilt in step 3.
+    /// </summary>
+    private ObjectResult Failure(Exception exception, string detail)
+    {
+        Logger.LogAppError(exception, detail);
+        return Problem(statusCode: StatusCodes.Status400BadRequest, detail: detail);
     }
 }

@@ -48,11 +48,7 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "CreateFailure",
-                message = ex.Message
-            });
+            return Failure(ex, "The record could not be created.");
         }
         return CreatedAtAction(nameof(GetOne), new { id = dto.Id });
     }
@@ -119,22 +115,9 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
         {
             await MainService.Update(dto);
         }
-        catch (CustomException ex)
-        {
-            // TODO: handle more gracefully
-            return BadRequest(new
-            {
-                code = "UpdateFailure",
-                message = ex.Message
-            });
-        }
         catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "UpdateFailure",
-                message = ex.Message
-            });
+            return Failure(ex, "The record could not be updated.");
         }
         return Ok(dto);
     }
@@ -164,12 +147,19 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
         }
         catch (Exception ex)
         {
-            // TODO: handle more gracefully
-            return new BadRequestObjectResult(ex.GetBaseException()?.Message);
+            return Failure(ex, "The record could not be deleted.");
         }
-        return result != null ? Ok(result) : BadRequest(new
-        {
-            code = "DeleteFailure"
-        });
+        return result != null ? Ok(result) : Problem(statusCode: StatusCodes.Status400BadRequest, detail: "The record could not be deleted.");
+    }
+
+    /// <summary>
+    /// A failed write as 400 Problem Details (TECH_DEBT_v1 §5, S2-10). The exception is logged and
+    /// its text never reaches the client. Legacy: the generic CRUD endpoints are rebuilt for catalog
+    /// administration in migration step 2, with status codes per failure.
+    /// </summary>
+    protected ObjectResult Failure(Exception exception, string detail)
+    {
+        Logger.LogAppError(exception, detail);
+        return Problem(statusCode: StatusCodes.Status400BadRequest, detail: detail);
     }
 }
