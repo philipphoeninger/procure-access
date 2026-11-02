@@ -39,7 +39,7 @@ export function withLocalStorage(storageKeys: string[]) {
 
           // get from state
           const sliceSignal = (<Record<string, unknown>>state)[stateKey];
-          let stateValue: any = null;
+          let stateValue: unknown = null;
           if (isSignal(sliceSignal)) stateValue = sliceSignal();
           if (!stateValue) return false; //gate
 
@@ -57,7 +57,7 @@ export function withLocalStorage(storageKeys: string[]) {
           );
           if (!storageValue) return false; //gate
 
-          let updatedState: Record<string, unknown> = {};
+          const updatedState: Record<string, unknown> = {};
           updatedState[storageKey] = JSON.parse(storageValue);
 
           patchState(state, updatedState);

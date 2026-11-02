@@ -12,7 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { ResetPasswordModel } from '../models/reset-password.model';
-import { finalize, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
 
 enum PasswordResetState {
@@ -67,7 +67,7 @@ export class ResetPassword {
     onSubmit(form: NgForm, event: Event) {
         event.preventDefault();
 
-        let resetCommand = new ResetPasswordModel(
+        const resetCommand = new ResetPasswordModel(
             this.email(),
             this.token(),
             this.password()

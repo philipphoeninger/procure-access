@@ -95,9 +95,9 @@ export class Register {
 
     // TODO: save browser preferred modes as uiCustomization
     // TODO: save language
-    let registerCommand = new LoginModel(
+    const registerCommand = new LoginModel(
       this.emailFormControl.value!,
-      this.password()!
+      this.password()
     );
 
     this.store.incrementLoadingCount();

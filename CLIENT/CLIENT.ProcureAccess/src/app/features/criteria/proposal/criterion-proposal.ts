@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormControl, FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,7 +48,7 @@ import { MarkdownEditor } from "@app/shared/components/markdown-editor/markdown-
   styleUrl: './criterion-proposal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CriterionProposal {
+export class CriterionProposal implements OnInit {
   protected store = inject(ProcureAccessStore);
   protected proposalApiService = inject(ProposalApiService);
   private route = inject(ActivatedRoute);
@@ -79,7 +79,7 @@ export class CriterionProposal {
   public formErrorMessage?: string;
 
   constructor(protected snackbarService: SnackbarService) {
-    let routeId = this.route.snapshot.paramMap.get('id');
+    const routeId = this.route.snapshot.paramMap.get('id');
     if (routeId == null || !+routeId) return; //gate
     this.proposalId.set(+routeId);
   }
@@ -87,18 +87,18 @@ export class CriterionProposal {
   async ngOnInit() {
     await this.store.loadProposals();
 
-    let stateProposal = this.store.getProposalById(this.proposalId()!);
+    const stateProposal = this.store.getProposalById(this.proposalId()!);
     if (stateProposal) {
       this.proposal.set(stateProposal);
       this.productPartsControl.setValue([stateProposal.criterion!.criteriaFilterId]);
     }
   }
 
-  onSubmit(form: NgForm, event: Event) {
+  onSubmit() {
     let criterionId = this.proposal().criterion?.id;
     criterionId = criterionId != undefined && criterionId > 0 ? criterionId : undefined;
     
-    let upsertCriterion: CreateCriterionDto = new CreateCriterionDto(
+    const upsertCriterion: CreateCriterionDto = new CreateCriterionDto(
       this.proposal().criterion?.name!,
       this.proposal().criterion?.description!,
       this.productPartsControl.value![0]
@@ -106,14 +106,14 @@ export class CriterionProposal {
 
     // TODO: only send changed values
     if (this.proposalId()) {
-      let reviewCommand = new ReviewProposal(
+      const reviewCommand = new ReviewProposal(
         this.proposalId()!,
         undefined,
         upsertCriterion
       );
       this.store.reviewProposal(reviewCommand);
     } else {
-      let upsertCommand = new UpsertProposal(
+      const upsertCommand = new UpsertProposal(
         this.proposalId(),
         undefined,
         undefined,
@@ -153,7 +153,7 @@ export class CriterionProposal {
   }
 
   approve(isApproved: boolean) {
-    let approveCommand = new ApproveProposal(
+    const approveCommand = new ApproveProposal(
       this.proposalId()!,
       isApproved,
       ""

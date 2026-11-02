@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'reflect-metadata';
-import {jsonObject, jsonMember, TypedJSON, jsonArrayMember} from 'typedjson';
-import { FilterType } from './filterType.model';
-import { Criterion } from '@app/features/criteria/models/criterion.model';
+import {jsonObject, jsonMember, jsonArrayMember} from 'typedjson';
 import { Lookup } from '@core/models/lookup.model';
 
 @jsonObject

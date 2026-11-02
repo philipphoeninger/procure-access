@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, signal, ViewChild, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -60,8 +60,6 @@ export class ProductsContainer {
     protected snackbarService: SnackbarService,
     private router: Router
   ) {}
-
-  ngOnInit() {}
 
     linkCopied() {
       this.snackbarService.showInfo('Link was copied to clipboard!');

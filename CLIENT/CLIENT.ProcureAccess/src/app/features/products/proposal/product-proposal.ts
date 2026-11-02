@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { HttpContext } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -60,7 +60,7 @@ const SERVER_FIELDS: Record<string, { control: string; id: string; labelKey: str
   styleUrl: './product-proposal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProductProposal {
+export class ProductProposal implements OnInit {
   protected store = inject(ProcureAccessStore);
   protected proposalApiService = inject(ProposalApiService);
   private route = inject(ActivatedRoute);
@@ -90,7 +90,7 @@ export class ProductProposal {
   protected readonly errorSummary = signal<ErrorSummaryItem[]>([]);
 
   constructor(protected snackbarService: SnackbarService) {
-    let routeId = this.route.snapshot.paramMap.get('id');
+    const routeId = this.route.snapshot.paramMap.get('id');
     if (routeId == null || !+routeId) return; //gate
     this.proposalId.set(+routeId);
   }
@@ -98,7 +98,7 @@ export class ProductProposal {
   async ngOnInit() {
     await this.store.loadProposals();
 
-    let stateProposal = this.store.getProposalById(this.proposalId()!);
+    const stateProposal = this.store.getProposalById(this.proposalId()!);
     if (stateProposal) this.proposal.set(stateProposal);
   }
 
@@ -107,7 +107,7 @@ export class ProductProposal {
     let productId = this.proposal().product?.id;
     productId = productId != undefined && productId > 0 ? productId : undefined;
 
-    let upsertProduct: CreateProductDto = new CreateProductDto(
+    const upsertProduct: CreateProductDto = new CreateProductDto(
       this.proposal().product?.name!,
       this.proposal().product?.link,
       this.proposal().product?.description,
@@ -120,14 +120,14 @@ export class ProductProposal {
     try {
       // TODO: only send changed values
       if (this.proposalId()) {
-        let reviewCommand = new ReviewProposal(
+        const reviewCommand = new ReviewProposal(
           this.proposalId()!,
           upsertProduct,
           undefined
         );
         await this.store.reviewProposal(reviewCommand, context);
       } else {
-        let upsertCommand = new UpsertProposal(
+        const upsertCommand = new UpsertProposal(
           this.proposalId(),
           productId, // needed later, if user can make proposals for existing products
           upsertProduct,
@@ -176,7 +176,7 @@ export class ProductProposal {
   }
 
   approve(isApproved: boolean) {
-    let approveCommand = new ApproveProposal(
+    const approveCommand = new ApproveProposal(
       this.proposalId()!,
       isApproved,
       ""

@@ -48,7 +48,7 @@ export class TranslatePluralPipe implements PipeTransform {
   private readonly translate = inject(TranslateService);
 
   transform(key: string, count: number, params?: InterpolationParameters): string {
-    return this.translate.instant(pluralKey(this.translate, key, count), { ...params, count });
+    return this.translate.instant(pluralKey(this.translate, key, count), { ...params, count }) as string;
   }
 }
 

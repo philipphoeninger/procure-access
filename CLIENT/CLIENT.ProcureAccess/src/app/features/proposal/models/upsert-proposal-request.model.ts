@@ -5,7 +5,7 @@
 import { CreateCriterionDto } from '@app/features/criteria/models/create-criterion.dto';
 import { CreateProductDto } from '@app/features/products/models/create-product.dto';
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 
 @jsonObject
 export class UpsertProposal {

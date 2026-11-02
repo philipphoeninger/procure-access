@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, ViewChild, AfterViewInit } from '@angular/core';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProposalApiService } from '../services/api/proposal-api.service';
@@ -35,7 +35,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   styleUrl: './proposal-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProposalList implements OnInit {
+export class ProposalList implements AfterViewInit {
   protected store = inject(ProcureAccessStore);
   protected proposalApiService = inject(ProposalApiService);
   private router = inject(Router);
@@ -67,8 +67,6 @@ export class ProposalList implements OnInit {
       this.dataSource.data = this.store.proposals();
     });
   }
-
-  ngOnInit() {}
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;

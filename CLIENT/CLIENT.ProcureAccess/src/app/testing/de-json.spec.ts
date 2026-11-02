@@ -28,7 +28,7 @@ describe('de.json', () => {
     const translate = TestBed.inject(TranslateService);
     await firstValueFrom(translate.use('de'));
 
-    const texts = flatten(de as Texts);
+    const texts = flatten(de);
     const wrong = texts.filter(([key, text]) => translate.instant(key) !== text);
 
     expect(texts.length).toBeGreaterThan(200);

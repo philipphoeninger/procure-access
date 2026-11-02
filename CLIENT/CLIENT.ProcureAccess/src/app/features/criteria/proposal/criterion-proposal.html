@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
   <div class="header">
     <div class="title"><mat-icon>add_2</mat-icon> <span>{{ 'CRITERIA.CRITERION_LABEL' | translate }}</span></div>
   </div>
-  <form class="criterion-form" #addCriterionForm="ngForm" (ngSubmit)="onSubmit(addCriterionForm, $event)">
+  <form class="criterion-form" #addCriterionForm="ngForm" (ngSubmit)="onSubmit()">
     <mat-form-field>
       <mat-label>{{ 'COMMON.NAME' | translate }}</mat-label>
       <input matInput type="text" name="name" [(ngModel)]="proposal().criterion!.name" required #nameInput="ngModel"

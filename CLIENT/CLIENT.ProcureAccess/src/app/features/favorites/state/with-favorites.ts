@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { computed, inject } from '@angular/core';
+import { computed } from '@angular/core';
 import { initialAppState } from '@app/core/models/appState.interface';
 import {
   patchState,
@@ -32,8 +32,8 @@ export const withFavorites = () => signalStoreFeature(
         return {
             addProductFavorite(productId: string) {
                 // TODO: make api call
-                let highestId = state.productSaves().length - 1;
-                let productSave: ProductSave = {
+                const highestId = state.productSaves().length - 1;
+                const productSave: ProductSave = {
                     id: highestId + 1,
                     userId: state.user()?.email ?? '', // TODO
                     productId
@@ -48,8 +48,8 @@ export const withFavorites = () => signalStoreFeature(
             },
             removeProductFavorite(productSaveId: number) {
                 // TODO: make api call
-                let updateProductSaves = state.productSaves();
-                let productSaveIndex = 
+                const updateProductSaves = state.productSaves();
+                const productSaveIndex = 
                     updateProductSaves.findIndex(
                         productSave => productSave.id === productSaveId);
 

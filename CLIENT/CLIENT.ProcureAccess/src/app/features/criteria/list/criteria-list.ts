@@ -45,8 +45,6 @@ export class CriteriaList {
     protected criteriaApiService: CriteriaApiService
   ) {}
 
-  ngOnInit() {}
-
   setStep(index: number) {
     this.step.set(index);
   }
