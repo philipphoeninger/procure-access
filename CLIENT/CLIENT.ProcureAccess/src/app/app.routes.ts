@@ -21,7 +21,10 @@ import { PermissionGuard } from './features/identity/guards/permission.guard';
 import { ProposalList } from './features/proposal/list/proposal-list';
 import { Unauthorized } from './pages/unauthorized/unauthorized';
 import { LegalPage } from './pages/legal/legal-page';
+import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 
+// `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
+// matching key keep the app name as title until their screen is rebuilt (S2-16).
 export const routes: Routes = [
   {
     path: '',
@@ -30,7 +33,8 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    component: Home
+    component: Home,
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.home' },
   },
   {
     path: 'auth',
@@ -52,10 +56,12 @@ export const routes: Routes = [
     path: 'profile',
     component: Profile,
     canActivate: [AuthGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.account' },
   },
   {
     path: 'settings',
-    component: Settings
+    component: Settings,
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.settings' },
   },
   {
     path: 'filters',
@@ -94,10 +100,11 @@ export const routes: Routes = [
   },
   {
     path: 'unauthorized',
-    component: Unauthorized
+    component: Unauthorized,
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.forbidden' },
   },
   // S71 legal pages (R-SHL-07): placeholders until GP.3; reachable without an account (R-SHL-06)
-  { path: 'impressum', component: LegalPage, data: { legalPage: 'imprint' } },
-  { path: 'datenschutz', component: LegalPage, data: { legalPage: 'privacy' } },
-  { path: 'barrierefreiheit', component: LegalPage, data: { legalPage: 'accessibility' } },
+  { path: 'impressum', component: LegalPage, data: { legalPage: 'imprint', [PAGE_TITLE_KEY]: 'pageTitle.legal.imprint' } },
+  { path: 'datenschutz', component: LegalPage, data: { legalPage: 'privacy', [PAGE_TITLE_KEY]: 'pageTitle.legal.privacy' } },
+  { path: 'barrierefreiheit', component: LegalPage, data: { legalPage: 'accessibility', [PAGE_TITLE_KEY]: 'pageTitle.legal.accessibility' } },
 ];
