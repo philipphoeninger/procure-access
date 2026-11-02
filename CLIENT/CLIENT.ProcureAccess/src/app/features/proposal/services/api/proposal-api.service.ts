@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { API_URL } from "@app/app.config";
 import { lastValueFrom } from "rxjs";
@@ -30,15 +30,15 @@ export class ProposalApiService {
     );
   }
 
-  upsertProposal(request: UpsertProposal): Promise<ProposalDto> {
+  upsertProposal(request: UpsertProposal, context?: HttpContext): Promise<ProposalDto> {
     return lastValueFrom(
-        this.http.post<ProposalDto>(`${this.apiUrl}/Proposals/upsert`, request)
+        this.http.post<ProposalDto>(`${this.apiUrl}/Proposals/upsert`, request, { context })
     );
   }
 
-  reviewProposal(request: ReviewProposal): Promise<ProposalDto> {
+  reviewProposal(request: ReviewProposal, context?: HttpContext): Promise<ProposalDto> {
     return lastValueFrom(
-        this.http.post<ProposalDto>(`${this.apiUrl}/Proposals/review`, request)
+        this.http.post<ProposalDto>(`${this.apiUrl}/Proposals/review`, request, { context })
     );
   }
 

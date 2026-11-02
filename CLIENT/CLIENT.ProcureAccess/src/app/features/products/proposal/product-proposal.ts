@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpContext } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
@@ -26,6 +27,16 @@ import { ReviewProposal } from '@app/features/proposal/models/review-proposal-re
 import { ApproveProposal } from '@app/features/proposal/models/approve-proposal-request.model';
 import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ErrorSummaryItem } from '@app/core/errors/error-summary-item';
+import { applyServerErrors, FORM_SHOWS_FIELD_ERRORS, ServerErrorField } from '@app/core/errors/problem-details';
+import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
+
+// Server field path (as sent in the request body) → form field (API-02).
+const SERVER_FIELDS: Record<string, { control: string; id: string; labelKey: string }> = {
+  'product.name': { control: 'name', id: 'product-proposal-name', labelKey: 'COMMON.NAME' },
+  'product.link': { control: 'link', id: 'product-proposal-link', labelKey: 'COMMON.LINK' },
+  'product.description': { control: 'description', id: 'product-proposal-description', labelKey: 'COMMON.DESCRIPTION' },
+};
 
 @Component({
   selector: 'pa-product-proposal',
@@ -42,7 +53,8 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatListModule,
     FiltersSelection,
     HasPermissionDirective,
-    TranslatePipe
+    TranslatePipe,
+    ErrorSummary
 ],
   templateUrl: './product-proposal.html',
   styleUrl: './product-proposal.scss',
@@ -74,6 +86,8 @@ export class ProductProposal {
   ));
 
   public formErrorMessage?: string;
+  /** Lines of the error summary; replaced on every failed submit (Handoff §6.4). */
+  protected readonly errorSummary = signal<ErrorSummaryItem[]>([]);
 
   constructor(protected snackbarService: SnackbarService) {
     let routeId = this.route.snapshot.paramMap.get('id');
@@ -88,7 +102,8 @@ export class ProductProposal {
     if (stateProposal) this.proposal.set(stateProposal);
   }
 
-  onSubmit(form: NgForm, event: Event) {
+  async onSubmit(form: NgForm, event: Event) {
+    event.preventDefault();
     let productId = this.proposal().product?.id;
     productId = productId != undefined && productId > 0 ? productId : undefined;
 
@@ -99,26 +114,33 @@ export class ProductProposal {
       this.store.selectedCriteriaFiltersIds()
     );
 
-    // TODO: only send changed values
-    if (this.proposalId()) {
-      let reviewCommand = new ReviewProposal(
-        this.proposalId()!,
-        upsertProduct,
-        undefined
-      );
-      this.store.reviewProposal(reviewCommand);
-    } else {
-      let upsertCommand = new UpsertProposal(
-        this.proposalId(),
-        productId, // needed later, if user can make proposals for existing products
-        upsertProduct,
-        undefined,
-        undefined
-      );
-      this.store.upsertProposal(upsertCommand);
-    }
+    // The form shows validation errors itself, so the error interceptor shows no snackbar for them.
+    const context = new HttpContext().set(FORM_SHOWS_FIELD_ERRORS, true);
 
-    event.preventDefault();
+    try {
+      // TODO: only send changed values
+      if (this.proposalId()) {
+        let reviewCommand = new ReviewProposal(
+          this.proposalId()!,
+          upsertProduct,
+          undefined
+        );
+        await this.store.reviewProposal(reviewCommand, context);
+      } else {
+        let upsertCommand = new UpsertProposal(
+          this.proposalId(),
+          productId, // needed later, if user can make proposals for existing products
+          upsertProduct,
+          undefined,
+          undefined
+        );
+        await this.store.upsertProposal(upsertCommand, context);
+      }
+      this.errorSummary.set([]);
+    } catch (error) {
+      // Other failures: the error interceptor has shown them already.
+      this.errorSummary.set(applyServerErrors(error, path => this.serverField(form, path)));
+    }
     // let loginCommand = new LoginModel(this.email!(), this.password!());
 
     // this.store.incrementLoadingCount();
@@ -145,6 +167,12 @@ export class ProductProposal {
     //     }),
     //   )
     //   .subscribe();
+  }
+
+  private serverField(form: NgForm, path: string): ServerErrorField | undefined {
+    const field = SERVER_FIELDS[path];
+    const control = field && form.controls[field.control];
+    return control ? { control, id: field.id, labelKey: field.labelKey } : undefined;
   }
 
   approve(isApproved: boolean) {

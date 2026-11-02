@@ -15,28 +15,35 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
     <div class="title"><mat-icon>add_2</mat-icon> <span>{{ 'PRODUCTS.PRODUCT_LABEL' | translate }}</span></div>
   </div>
   <form class="product-form" #addProductForm="ngForm" (ngSubmit)="onSubmit(addProductForm, $event)">
+    <pa-error-summary [items]="errorSummary()" />
     <mat-form-field>
       <mat-label>{{ 'COMMON.NAME' | translate }}</mat-label>
-      <input matInput type="text" name="name" [(ngModel)]="proposal().product!.name" required #nameInput="ngModel"
+      <input matInput type="text" id="product-proposal-name" name="name" [(ngModel)]="proposal().product!.name" required #nameInput="ngModel"
         maxlength="50" />
-      @if (nameInput.invalid && nameInput.touched) {
+      @if (nameInput.hasError('server')) {
+        <mat-error>{{ 'errors.field.server' | translate: { message: nameInput.getError('server') } }}</mat-error>
+      } @else if (nameInput.invalid && nameInput.touched) {
         <mat-error>{{ 'COMMON.NAME' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="link-field">
       <mat-label>{{ 'COMMON.LINK' | translate }}</mat-label>
-      <input matInput type="text" name="link" [(ngModel)]="proposal().product!.link" required #linkInput="ngModel"
+      <input matInput type="text" id="product-proposal-link" name="link" [(ngModel)]="proposal().product!.link" required #linkInput="ngModel"
         minlength="6" maxlength="200" />
-      @if (linkInput.invalid && linkInput.touched) {
+      @if (linkInput.hasError('server')) {
+        <mat-error>{{ 'errors.field.server' | translate: { message: linkInput.getError('server') } }}</mat-error>
+      } @else if (linkInput.invalid && linkInput.touched) {
         <mat-error>{{ 'COMMON.LINK' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
     <mat-form-field id="description-field">
       <mat-label>{{ 'COMMON.DESCRIPTION' | translate }}</mat-label>
       <!-- TODO: make text area markdown input -->
-      <textarea matInput type="text" name="description" [(ngModel)]="proposal().product!.description" required #descriptionInput="ngModel"
+      <textarea matInput type="text" id="product-proposal-description" name="description" [(ngModel)]="proposal().product!.description" required #descriptionInput="ngModel"
         minlength="6" maxlength="2000"></textarea>
-      @if (descriptionInput.invalid && descriptionInput.touched) {
+      @if (descriptionInput.hasError('server')) {
+        <mat-error>{{ 'errors.field.server' | translate: { message: descriptionInput.getError('server') } }}</mat-error>
+      } @else if (descriptionInput.invalid && descriptionInput.touched) {
         <mat-error>{{ 'COMMON.DESCRIPTION' | translate }} <strong>{{ 'COMMON.IS_REQUIRED' | translate }}</strong></mat-error>
       }
     </mat-form-field>
