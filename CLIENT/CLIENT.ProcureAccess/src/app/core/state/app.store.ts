@@ -29,7 +29,7 @@ export const ProcureAccessStore = signalStore(
             async init() {
                 // load necessary data:
                 // set identity
-                let user = await state.loadIdentity();
+                const user = await state.loadIdentity();
 
                 // settings
                 if (user != null) {

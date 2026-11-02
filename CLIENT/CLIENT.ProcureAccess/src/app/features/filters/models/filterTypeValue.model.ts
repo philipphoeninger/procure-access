@@ -4,7 +4,7 @@
 
 import { Criterion } from '@app/features/criteria/models/criterion.model';
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 
 @jsonObject
 export class FilterTypeValue {

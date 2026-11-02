@@ -55,7 +55,7 @@ export const withSettings = () => signalStoreFeature(
       translateService = inject(TranslateService),
       rendererFactory = inject(RendererFactory2)
     ) => {
-      let renderer = rendererFactory.createRenderer(null, null);
+      const renderer = rendererFactory.createRenderer(null, null);
 
       return {
         activateMediaEventListeners() {
@@ -64,7 +64,7 @@ export const withSettings = () => signalStoreFeature(
             .matchMedia('(prefers-color-scheme: dark)')
             .addEventListener('change', event => {
               if (state.isAuthenticated()) {
-                let uiCustomization = state.uiCustomization();
+                const uiCustomization = state.uiCustomization();
                 uiCustomization.darkModeOn = event.matches;
                 this.setUICustomization(uiCustomization);
                 snackbarService.showInfo(
@@ -73,7 +73,7 @@ export const withSettings = () => signalStoreFeature(
               } else {
                 // drops unsaved setting changes
                 state.loadFromLocalStorage(LocalStorageKeys.uiCustomization);
-                let uiCustomization = state.uiCustomization();
+                const uiCustomization = state.uiCustomization();
                 uiCustomization.darkModeOn = event.matches;
                 this.setUICustomization(uiCustomization);
                 state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
@@ -85,7 +85,7 @@ export const withSettings = () => signalStoreFeature(
             .matchMedia('(prefers-contrast: more)')
             .addEventListener('change', event => {
               if (state.isAuthenticated()) {
-                let uiCustomization = state.uiCustomization();
+                const uiCustomization = state.uiCustomization();
                 uiCustomization.highContrastOn = event.matches;
                 this.setUICustomization(uiCustomization);
                 snackbarService.showInfo(
@@ -94,7 +94,7 @@ export const withSettings = () => signalStoreFeature(
               } else {
                 // drops unsaved setting changes
                 state.loadFromLocalStorage(LocalStorageKeys.uiCustomization);
-                let uiCustomization = state.uiCustomization();
+                const uiCustomization = state.uiCustomization();
                 uiCustomization.highContrastOn = event.matches;
                 this.setUICustomization(uiCustomization);
                 state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
@@ -125,7 +125,7 @@ export const withSettings = () => signalStoreFeature(
 
               return; //gate
             }
-            let initialSettings = initialAppState.settings.uiCustomization;
+            const initialSettings = initialAppState.settings.uiCustomization;
             initialSettings.darkModeOn =
                 window.matchMedia('(prefers-color-scheme: dark)').matches;
             initialSettings.highContrastOn =
@@ -138,7 +138,7 @@ export const withSettings = () => signalStoreFeature(
           } else {
             state.incrementLoadingCount();
             this.removeSettingsFromLocalStorage();
-            let uiCustomization = await settingsApiService.getUICustomization();
+            const uiCustomization = await settingsApiService.getUICustomization();
             languageService.init(uiCustomization.language);
             this.setUICustomization(uiCustomization ?? initialAppState.settings.uiCustomization);
             state.decrementLoadingCount();
@@ -176,7 +176,7 @@ export const withSettings = () => signalStoreFeature(
           }
 
           state.incrementLoadingCount();
-          let success = await settingsApiService.updateUICustomization(uiCustomization);
+          const success = await settingsApiService.updateUICustomization(uiCustomization);
           if (success) {
             this.setUICustomization(uiCustomization);
             translateService
@@ -187,17 +187,17 @@ export const withSettings = () => signalStoreFeature(
           state.decrementLoadingCount();
         },
         toggleDarkMode() {
-          let uiCustomization = state.uiCustomization();
+          const uiCustomization = state.uiCustomization();
           uiCustomization.darkModeOn = !uiCustomization.darkModeOn;
           this.setUICustomization(uiCustomization);
         },
         toggleContrastMode() {
-          let uiCustomization = state.uiCustomization();
+          const uiCustomization = state.uiCustomization();
           uiCustomization.highContrastOn = !uiCustomization.highContrastOn;
           this.setUICustomization(uiCustomization);
         },
         setLanguage(lang: EnLanguage) {
-          let uiCustomization = state.uiCustomization();
+          const uiCustomization = state.uiCustomization();
           uiCustomization.language = lang;
           languageService.set(uiCustomization.language);
           this.setUICustomization(uiCustomization);

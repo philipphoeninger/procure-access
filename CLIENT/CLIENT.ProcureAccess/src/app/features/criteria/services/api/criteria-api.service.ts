@@ -5,7 +5,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { API_URL } from "@app/app.config";
-import { lastValueFrom, Observable, of } from "rxjs";
+import { lastValueFrom } from "rxjs";
 import { Criterion } from "../../models/criterion.model";
 import { TResult } from "@app/core/models/result.model";
 

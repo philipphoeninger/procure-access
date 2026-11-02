@@ -68,8 +68,6 @@ export class Profile {
     });
   }
 
-  ngOnInit() {}
-
   openChangeUserDialog(element: any): void {
     const dialogRef = this.dialog.open(UpdateUserDialog, {
       data: { property: element.name, value: element.value },

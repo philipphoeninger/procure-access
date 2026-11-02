@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,10 +35,6 @@ export class Favorites {
   readonly dialog = inject(MatDialog);
 
   constructor(protected snackbarService: SnackbarService) {}
-
-  ngOnInit() {}
-
-  ngAfterViewInit() {}
 
   showSnackbar(message: string) {
     this.snackbarService.showInfo(message);

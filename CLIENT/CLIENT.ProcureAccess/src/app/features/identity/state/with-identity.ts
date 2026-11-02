@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { computed, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import {
   patchState,
   signalStoreFeature,
@@ -29,7 +29,7 @@ export const withIdentity = () => signalStoreFeature(
     ) => ({
       async loadIdentity() {
         if (this.isAuthenticated() && !state.user()) {
-          let user = await authService.me();
+          const user = await authService.me();
           this.setUser(user);
           return user;
         }
@@ -45,7 +45,7 @@ export const withIdentity = () => signalStoreFeature(
       },
       async deleteAccount() {
         state.incrementLoadingCount();
-        let error = await identityApiService.deleteAccount();
+        const error = await identityApiService.deleteAccount();
         if (!error) authService.logout();
         snackbarService.showInfo(
           error ? "Something went wrong.\nPlease try again." : "Account deleted"
@@ -53,5 +53,5 @@ export const withIdentity = () => signalStoreFeature(
         state.decrementLoadingCount();
       }
     })),
-    withComputed((state) => ({ }))
+    withComputed(() => ({ }))
   );

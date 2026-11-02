@@ -61,8 +61,6 @@ export class Login {
     protected snackbarService: SnackbarService
   ) {}
 
-  ngOnInit() {}
-
   openForgotPwDialog(): void {
     const dialogRef = this.dialog.open(ForgotPasswordDialog, {
       data: { email: this.email!() },
@@ -82,7 +80,7 @@ export class Login {
 
   onSubmit(form: NgForm, event: Event) {
     event.preventDefault();
-    let loginCommand = new LoginModel(this.email!(), this.password!());
+    const loginCommand = new LoginModel(this.email!(), this.password!());
 
     this.store.incrementLoadingCount();
     this.authService
@@ -93,7 +91,7 @@ export class Login {
           this.authService.loadUserFromToken(response.accessToken);
           localStorage.setItem(this.jwtName, response.accessToken);
           localStorage.setItem(this.refreshTokenName, response.refreshToken);
-          let user: UserDto = new UserDto(response.user.id, response.user.email);
+          const user: UserDto = new UserDto(response.user.id, response.user.email);
           this.store.setUser(user);
           // set settings
           this.store.setUICustomization(response.user.uiCustomization);

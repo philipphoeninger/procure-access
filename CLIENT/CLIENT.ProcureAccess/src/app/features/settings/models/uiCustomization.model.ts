@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 import { EnLanguage } from '@core/models/language.enum';
 
 @jsonObject

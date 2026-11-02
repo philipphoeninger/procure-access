@@ -5,7 +5,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { API_URL, JWT_NAME, REFRESH_TOKEN_NAME } from "@app/app.config";
-import { BehaviorSubject, catchError, filter, lastValueFrom, map, Observable, of, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, lastValueFrom, map, Observable, take } from 'rxjs';
 import { LoginModel } from '../models/login.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';

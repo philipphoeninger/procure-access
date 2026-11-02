@@ -6,7 +6,7 @@ import { CriterionDto } from '@app/features/criteria/models/criterion.dto';
 import { ProductDto } from '@app/features/products/models/product.dto';
 import { ProposalStatus } from '@app/features/proposal/models/proposal-status.enum';
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 
 @jsonObject
 export class ProposalDto {

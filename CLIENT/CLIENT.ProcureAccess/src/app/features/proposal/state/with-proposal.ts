@@ -28,7 +28,7 @@ export const withProposal = () => signalStoreFeature(
       async loadProposals() {
           state.incrementLoadingCount();
           
-          let result = await proposalApiService.getProposals();
+          const result = await proposalApiService.getProposals();
           this.setProposals(result.value ?? []);
 
           state.decrementLoadingCount();

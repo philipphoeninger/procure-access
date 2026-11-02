@@ -4,9 +4,9 @@
 
 import {
   ChangeDetectionStrategy, Component, computed,
-  effect, inject, output, signal, viewChild, ViewChildren, WritableSignal
+  effect, inject, OnInit, output, signal, viewChild, ViewChildren, WritableSignal
 } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,7 +25,6 @@ import { EnFilterTypeName } from '../models/filterTypes.enum';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProductType } from '@app/features/products/models/productType.model';
-import { unionDistinct } from '../util/union-distinct';
 
 @Component({
   selector: 'pa-filters-selection',
@@ -47,7 +46,7 @@ import { unionDistinct } from '../util/union-distinct';
   styleUrl: './filters-selection.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FiltersSelection {
+export class FiltersSelection implements OnInit {
     protected store = inject(ProcureAccessStore);
     protected filtersApiService = inject(FiltersApiService);
 
@@ -98,8 +97,8 @@ export class FiltersSelection {
         map(value => this._filter(value || '')),
         tap(() => {
           if (!this.currentProductType()) return; //gate
-          let selectedCriteriaFilterIds = this.markedCriteriaFilters();
-          let index = selectedCriteriaFilterIds.findIndex(x => x.id == this.currentProductType()!.id);
+          const selectedCriteriaFilterIds = this.markedCriteriaFilters();
+          const index = selectedCriteriaFilterIds.findIndex(x => x.id == this.currentProductType()!.id);
           selectedCriteriaFilterIds.splice(index, 1);
           this.markedCriteriaFilters.set(selectedCriteriaFilterIds);
           this.currentProductType.set(null);
@@ -155,11 +154,11 @@ export class FiltersSelection {
     }
 
     selected(event: MatAutocompleteSelectedEvent): void {
-        let selectedCriteriaFilterIds = this.markedCriteriaFilters();
-        let productType = this.store.getCriteriaFilterByName(event.option.value);
+        const selectedCriteriaFilterIds = this.markedCriteriaFilters();
+        const productType = this.store.getCriteriaFilterByName(event.option.value);
         if (!productType) return; //gate
         if (!event.option.selected) {
-            let index = selectedCriteriaFilterIds.findIndex(x => x.id == productType.id);
+            const index = selectedCriteriaFilterIds.findIndex(x => x.id == productType.id);
             selectedCriteriaFilterIds.splice(index, 1);
             this.markedCriteriaFilters.set(selectedCriteriaFilterIds);
             this.currentProductType.set(null);

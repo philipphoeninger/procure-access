@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'reflect-metadata';
-import { jsonObject, jsonMember, TypedJSON, jsonArrayMember } from 'typedjson';
-import { ProductPart } from './productPart.model';
-import { ProductTest } from './productTest.model';
+import { jsonObject, jsonMember } from 'typedjson';
 
 @jsonObject
 export class UpdateProductDto {

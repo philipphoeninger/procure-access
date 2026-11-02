@@ -10,6 +10,12 @@ import { SnackbarService } from '../services/snackbar.service';
 import { ERROR_TRANSLATIONS } from '../models/error-translation.map';
 import { FORM_SHOWS_FIELD_ERRORS, PROBLEM_TYPE_KEYS, problemTypeName } from '../errors/problem-details';
 
+/** Error body of the legacy identity endpoints (until migration step 3). */
+interface LegacyErrorBody {
+  code?: string;
+  errors?: { code?: string }[];
+}
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const translate = inject(TranslateService);
   const snackbar = inject(SnackbarService);
@@ -24,9 +30,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // Problem Details name a type (SPEC §8.6); the legacy identity endpoints still send `code`.
+      const legacyBody = error?.error as LegacyErrorBody | null | undefined;
       const errorCode =
-        error?.error?.code ||
-        error?.error?.errors?.[0]?.code ||
+        legacyBody?.code ||
+        legacyBody?.errors?.[0]?.code ||
         'Default';
       const key =
         (problemType && PROBLEM_TYPE_KEYS[problemType]) ||
@@ -34,7 +41,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         ERROR_TRANSLATIONS['Default'];
 
       return translate.get(key).pipe(
-        switchMap(message => {
+        switchMap((message: string) => {
           snackbar.showError(message);
 
           return throwError(() => error); // keep error flow

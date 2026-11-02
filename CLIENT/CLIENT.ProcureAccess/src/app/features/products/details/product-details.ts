@@ -38,7 +38,7 @@ export class ProductDetails {
   });
 
   constructor(protected snackbarService: SnackbarService) {
-    let routeId = this.route.snapshot.paramMap.get('id');
+    const routeId = this.route.snapshot.paramMap.get('id');
     if (routeId == null) return; //gate
     this.productId.set(+routeId);
   }

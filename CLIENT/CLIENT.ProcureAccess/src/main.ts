@@ -8,7 +8,9 @@ import { App } from './app/app';
 import { environment } from '../src/environments/environment';
 
 if (!environment.production) {
-  import('./dev/dev-reload-health').then(m => m.startApiHealthWatcher());
+  import('./dev/dev-reload-health')
+    .then(m => m.startApiHealthWatcher())
+    .catch((err) => console.error(err));
 }
 
 bootstrapApplication(App, appConfig)

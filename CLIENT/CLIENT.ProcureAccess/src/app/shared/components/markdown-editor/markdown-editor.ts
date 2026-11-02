@@ -11,8 +11,7 @@ import {
   Output,
   ViewChild,
   ChangeDetectionStrategy,
-  input,
-  linkedSignal
+  input
 } from '@angular/core';
 
 import EasyMDE from 'easymde';
@@ -25,10 +24,9 @@ import EasyMDE from 'easymde';
 //   encapsulation: ViewEncapsulation.None
 })
 export class MarkdownEditor implements AfterViewInit {
-  @ViewChild('editor') editorElement!: ElementRef;
+  @ViewChild('editor') editorElement!: ElementRef<HTMLTextAreaElement>;
 
-  valueInput = input('', {alias: 'value'});
-  value = linkedSignal(this.valueInput);
+  value = input('');
 //   darkModeOn = input(false);
   @Output() valueChange = new EventEmitter<string>();
 
