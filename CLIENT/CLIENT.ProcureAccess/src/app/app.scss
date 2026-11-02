@@ -4,24 +4,84 @@
  * SPDX-License-Identifier: MIT
  */
 
-#main {
+// The page scrolls, not the sidenav content: the container grows with the page.
+.pa-shell,
+.pa-shell__content {
+  overflow: visible;
+}
+
+.pa-shell__content {
   display: flex;
   flex-direction: column;
-  padding: 64px 1rem 1rem 1rem;
-  justify-content: start;
-  align-items: start;
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+}
 
-  pa-navbar {
-    display: none;
+// Skip link (Handoff §3.2): visually hidden until focused, then a filled button top left.
+.pa-skip-link {
+  position: absolute;
+  inset-block-start: var(--pa-space-xs);
+  inset-inline-start: var(--pa-space-xs);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--pa-space-xxl);
+  padding-inline: var(--pa-space-lg);
+  border-radius: var(--mat-sys-corner-full);
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+
+  &:not(:focus) {
+    width: 1px;
+    height: 1px;
+    min-block-size: 0;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--mat-sys-secondary);
+    outline-offset: 2px;
   }
 }
 
-/* -- MEDIA -- */
+// Content column (Handoff §2.1). The legacy screens rely on the column layout.
+.pa-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding: var(--pa-space-lg) var(--pa-space-md);
+}
 
-@media (min-width: 48em) {
-  #main {
-    pa-navbar {
-      display: block;
-    }
+.pa-shell__menu {
+  inline-size: min(20rem, 85vw);
+  padding: var(--pa-space-md);
+  box-sizing: border-box;
+}
+
+.pa-shell__menu-close {
+  --mat-button-text-container-height: var(--pa-space-xxl);
+  margin-block-end: var(--pa-space-md);
+}
+
+@media (min-width: 37.5em) {
+  .pa-main {
+    padding: var(--pa-space-xl) var(--pa-space-lg);
+  }
+}
+
+@media (min-width: 67em) {
+  .pa-main {
+    max-inline-size: 65rem;
+    margin-inline: auto;
   }
 }

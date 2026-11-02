@@ -1,0 +1,15 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1>
+  @switch (kind) {
+    @case ('imprint') { {{ 'legal.imprint.title' | translate }} }
+    @case ('privacy') { {{ 'legal.privacy.title' | translate }} }
+    @case ('accessibility') { {{ 'legal.accessibility.title' | translate }} }
+  }
+</h1>
+
+<pa-notice kind="info">{{ 'legal.placeholder' | translate }}</pa-notice>

@@ -20,6 +20,7 @@ import { EmailConfirmation } from './features/identity/pages/email-confirmed/ema
 import { PermissionGuard } from './features/identity/guards/permission.guard';
 import { ProposalList } from './features/proposal/list/proposal-list';
 import { Unauthorized } from './pages/unauthorized/unauthorized';
+import { LegalPage } from './pages/legal/legal-page';
 
 export const routes: Routes = [
   {
@@ -91,8 +92,12 @@ export const routes: Routes = [
     path: 'confirm-email', 
     component: EmailConfirmation
   },
-  { 
-    path: 'unauthorized', 
+  {
+    path: 'unauthorized',
     component: Unauthorized
-  }
+  },
+  // S71 legal pages (R-SHL-07): placeholders until GP.3; reachable without an account (R-SHL-06)
+  { path: 'impressum', component: LegalPage, data: { legalPage: 'imprint' } },
+  { path: 'datenschutz', component: LegalPage, data: { legalPage: 'privacy' } },
+  { path: 'barrierefreiheit', component: LegalPage, data: { legalPage: 'accessibility' } },
 ];
