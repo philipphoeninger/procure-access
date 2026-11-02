@@ -172,5 +172,11 @@
     "nav": {
       "menu": "Menü"
     }
+  },
+  "errors": {
+    "summary": {
+      "title": "{{count}} Angaben müssen noch korrigiert werden",
+      "title.one": "1 Angabe muss noch korrigiert werden"
+    }
   }
 }

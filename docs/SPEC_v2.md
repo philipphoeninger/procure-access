@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.1 (2026-10-29; v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version.
+> **Status:** v2.2 (2026-11-02; v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25).
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -50,6 +50,14 @@ Recorded in this file at the owner's request; SPEC_v3 stays the P1 version of it
 | v2.1-1 | R-MET-01 names the table as built: `analytics."UsageEvents"` (entity `UsageEvent`); wording only, no behaviour change | Sprint 01, S1-23 (P2); `ARCHITECTURE_v14.md` C91 |
 | v2.1-2 | Log retention **90 days 🔧**, confirmed as a default (SD24); R-ADM-04 names it | Owner, 2026-10-29; sprint 01, S1-22 (D4, P4) |
 
+#### Changes in v2.2 (2026-11-02)
+
+Recorded in this file like v2.1; the S2-12 task allowed recording the decision in §13. No behaviour or acceptance criterion changes.
+
+| # | Change | Driver |
+|---|---|---|
+| v2.2-1 | UX-O9 closed: plural forms are separate keys chosen with `Intl.PluralRules` (SD25); removed from §13 | Owner decision O-S2-3, 2026-11-02; sprint 02, S2-12 (`docs/sprints/sprint_02/S2-12_pluralisation.md`) |
+
 ---
 
 ## 0. Decisions for this spec (owner, 2026-10-15)
@@ -80,6 +88,7 @@ Recorded in this file at the owner's request; SPEC_v3 stays the P1 version of it
 | SD22 | Product-identity administration (2026-10-19, closes O-S2) | Minimal admin pages as proposed (R-ADM-02); the owner (Philipp) holds the `PlatformAdmin` role in operation |
 | SD23 | 🔧 default values (2026-10-19, closes O-S6) | All proposed defaults adopted (password length, lockout, token and invitation lifetimes, 5 working days, 18 months, weight, rate limits §7.3); they stay configurable; the anonymous-export limit is reviewed after the pilot (UX-O11) |
 | SD24 | 🔧 log retention (2026-10-29, v2.1) | Log entries are deleted after **90 days** 🔧, configurable (`AppLoggingSettings:Retention:RetentionDays`) like the defaults of SD23. How often the job runs is an operations setting, not a 🔧 value |
+| SD25 | Plural forms (2026-11-02, v2.2, closes UX-O9) | A text with a count has up to three keys: `<key>` = plural, `<key>.one` = singular, optional `<key>.zero` = count 0; the client picks one with `Intl.PluralRules` of the current language (pipe `translatePlural`). No ICU MessageFormat: no new dependency, no `'unsafe-eval'` in the Content Security Policy, the `{{…}}` placeholders stay. In the nested `de.json`, `.one` and `.zero` are property names with a dot next to the base key |
 
 **Proposals of v1** (catalog maintenance without an editor UI, minimal administration screens for product identities, removal of candidate products, supported browsers, 🔧 defaults) were confirmed by the owner on 2026-10-19 as SD19–SD23; none is open any more.
 
@@ -769,7 +778,6 @@ Legal pages (R-SHL-07), the dark theme release check (R-SET-03, O-S5) and the ac
 | O-13 | Carrying assessments over to a newer release | — (later) | Owner | ARCH O-13 |
 | O-14 | Priority terms A / B / Hinweis (provisional, SD6) | export column values before the pilot | Project team (accessibility expertise) | ARCH O-14 |
 | O-16 | Rating-level explanations (provisional, SD8) | before the pilot | Project team, possibly BIT inklusiv | ARCH O-16 |
-| UX-O9 | Pluralisation approach in ngx-translate | step 1 | Implementation | UX copy §8 |
 | UX-O11 | Final rate limit of the anonymous export (§7.3 defaults) | pilot | Implementation with pilot feedback | UX copy §8 |
 | H2 | High-contrast variant designed and reviewed | „Hoher Kontrast“ setting (P1) | Philipp | Handoff §9 |
 | O-S5 | Dark theme: Figma dark mode and accessibility review (§7.5) | release (development may start) | Philipp, accessibility tester | SD11 |
@@ -777,6 +785,8 @@ Legal pages (R-SHL-07), the dark theme release check (R-SET-03, O-S5) and the ac
 Closed by this spec: O-8 (§8.1), O-15 (SD7), H3 (SD11), H6 (SD9), UX-O8 (SD7).
 
 Closed in v2 (owner, 2026-10-19): O-S1 (SD20), O-S2 (SD22), O-S3 (SD21), O-S4 (SD19), O-S6 (SD23). O-S5 stays open.
+
+Closed in v2.2 (owner, 2026-11-02): UX-O9 (SD25).
 
 ## 14. Follow-ups for other documents
 
