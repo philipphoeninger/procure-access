@@ -1,0 +1,18 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+:host {
+  display: block;
+}
+
+.pa-error-summary__list {
+  margin: 0;
+  padding-left: var(--pa-space-md);
+}
+
+a {
+  color: inherit;
+}

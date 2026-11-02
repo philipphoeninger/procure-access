@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpContext } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { initialAppState } from '@app/core/models/appState.interface';
 import {
@@ -40,17 +41,24 @@ export const withProposal = () => signalStoreFeature(
       getProposalById(proposalId: number) {
           return state.proposals().find(proposal => proposal.id === proposalId) ?? null;
       },
-      async upsertProposal(command: UpsertProposal) {
+      // `context` marks the request, e.g. FORM_SHOWS_FIELD_ERRORS; a failure is re-thrown to the form.
+      async upsertProposal(command: UpsertProposal, context?: HttpContext) {
           state.incrementLoadingCount();
-          await proposalApiService.upsertProposal(command);
-          await this.loadProposals();
-          state.decrementLoadingCount();
+          try {
+              await proposalApiService.upsertProposal(command, context);
+              await this.loadProposals();
+          } finally {
+              state.decrementLoadingCount();
+          }
       },
-      async reviewProposal(command: ReviewProposal) {
+      async reviewProposal(command: ReviewProposal, context?: HttpContext) {
           state.incrementLoadingCount();
-          await proposalApiService.reviewProposal(command);
-          await this.loadProposals();
-          state.decrementLoadingCount();
+          try {
+              await proposalApiService.reviewProposal(command, context);
+              await this.loadProposals();
+          } finally {
+              state.decrementLoadingCount();
+          }
       },
       async approveProposal(command: ApproveProposal) {
           state.incrementLoadingCount();

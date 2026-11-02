@@ -1,0 +1,19 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<mat-icon class="pa-notice__icon" aria-hidden="true">{{ icon() }}</mat-icon>
+<div class="pa-notice__content">
+  @if (title(); as title) {
+    @if (focusOnShow()) {
+      <h2 class="pa-notice__title"><span class="cdk-visually-hidden">{{ prefixKey() | translate }}</span> {{ title }}</h2>
+    } @else {
+      <p class="pa-notice__title"><span class="cdk-visually-hidden">{{ prefixKey() | translate }}</span> {{ title }}</p>
+    }
+  } @else {
+    <span class="cdk-visually-hidden">{{ prefixKey() | translate }} </span>
+  }
+  <div class="pa-notice__text"><ng-content /></div>
+</div>

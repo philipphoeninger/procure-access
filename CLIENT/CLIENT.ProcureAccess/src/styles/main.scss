@@ -4,7 +4,23 @@
  * SPDX-License-Identifier: MIT
  */
 
+@use '@angular/cdk';
+
 /* You can add global styles to this file, and also import other style files */
+
+/* Spacing tokens (Handoff §1.4): the only custom token set; use them instead of px values */
+:root {
+  --pa-space-xxs: 0.25rem; //  4
+  --pa-space-xs:  0.5rem;  //  8
+  --pa-space-sm:  0.75rem; // 12
+  --pa-space-md:  1rem;    // 16
+  --pa-space-lg:  1.5rem;  // 24
+  --pa-space-xl:  2rem;    // 32
+  --pa-space-xxl: 3rem;    // 48
+}
+
+/* .cdk-visually-hidden: text only for screen readers, e.g. the prefix of pa-notice */
+@include cdk.a11y-visually-hidden();
 
 /* Poppins - all weights + italics */
 

@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (items().length) {
+  <pa-notice kind="error" [title]="'errors.summary.title' | translatePlural: items().length" [focusOnShow]="true">
+    <ul class="pa-error-summary__list">
+      @for (item of items(); track $index) {
+        <li>
+          @if (item.field; as field) {
+            <a [href]="'#' + field.id" (click)="focusField($event, field.id)">
+              {{ 'errors.summary.item' | translate: { field: (field.labelKey | translate), message: (item.message.key | translate: item.message.params) } }}
+            </a>
+          } @else {
+            {{ item.message.key | translate: item.message.params }}
+          }
+        </li>
+      }
+    </ul>
+  </pa-notice>
+}

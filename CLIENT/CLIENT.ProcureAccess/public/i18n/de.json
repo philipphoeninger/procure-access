@@ -173,10 +173,26 @@
       "menu": "Menü"
     }
   },
+  "common": {
+    "notice": {
+      "info": "Hinweis:",
+      "attention": "Achtung:",
+      "error": "Fehler:"
+    }
+  },
+  "auth": {
+    "confirm": {
+      "required": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Danach können Sie Listen speichern, Organisationen anlegen, Einladungen annehmen und Beiträge veröffentlichen."
+    }
+  },
   "errors": {
     "summary": {
       "title": "{{count}} Angaben müssen noch korrigiert werden",
-      "title.one": "1 Angabe muss noch korrigiert werden"
+      "title.one": "1 Angabe muss noch korrigiert werden",
+      "item": "{{field}}: {{message}}"
+    },
+    "field": {
+      "server": "{{message}}"
     }
   }
 }

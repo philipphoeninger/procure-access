@@ -1,0 +1,61 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Handoff §3.3: icon + content column, 4 px accent on the left, colours by kind.
+:host {
+  display: flex;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-sm) var(--pa-space-md);
+  border-left: var(--pa-space-xxs) solid var(--pa-notice-accent);
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--pa-notice-background);
+  color: var(--pa-notice-text);
+}
+
+:host(.pa-notice--info) {
+  --pa-notice-background: var(--mat-sys-surface-container-high);
+  --pa-notice-accent: var(--mat-sys-outline);
+  --pa-notice-icon: var(--mat-sys-on-surface-variant);
+  --pa-notice-text: var(--mat-sys-on-surface);
+}
+
+:host(.pa-notice--attention) {
+  --pa-notice-background: var(--mat-sys-secondary-container);
+  --pa-notice-accent: var(--mat-sys-primary);
+  --pa-notice-icon: var(--mat-sys-primary);
+  --pa-notice-text: var(--mat-sys-on-secondary-container);
+}
+
+:host(.pa-notice--error) {
+  --pa-notice-background: var(--mat-sys-error-container);
+  --pa-notice-accent: var(--mat-sys-error);
+  --pa-notice-icon: var(--mat-sys-error);
+  --pa-notice-text: var(--mat-sys-on-error-container);
+}
+
+.pa-notice__icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1.25rem;
+  color: var(--pa-notice-icon);
+}
+
+.pa-notice__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xxs);
+  min-width: 0;
+}
+
+.pa-notice__title {
+  margin: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-notice__text {
+  font: var(--mat-sys-body-medium);
+}
