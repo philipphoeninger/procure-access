@@ -170,7 +170,53 @@
   },
   "shell": {
     "nav": {
-      "menu": "Menü"
+      "menu": "Menü",
+      "label": "Hauptnavigation",
+      "menu.close": "Menü schließen",
+      "criteria": "Kriterien",
+      "projects": "Projekte",
+      "directory": "Produkte",
+      "contribute": "Beitragen",
+      "settings": "Einstellungen",
+      "account": "Konto",
+      "login": "Anmelden",
+      "logout": "Abmelden"
+    },
+    "skipLink": "Zum Inhalt springen",
+    "appName": "ProcureAccess",
+    "appClaim": "Barrierefreie Software beschaffen",
+    "userMenu": {
+      "label": "Menü für {{displayName}}"
+    },
+    "org": {
+      "active": "Organisation: {{name}}",
+      "switch": "Organisation wechseln"
+    },
+    "footer": {
+      "about": "Über ProcureAccess",
+      "werteit": "Projekt WERTE.IT",
+      "suggest": "Kriterium vorschlagen",
+      "accessibility": "Erklärung zur Barrierefreiheit",
+      "privacy": "Datenschutz",
+      "imprint": "Impressum",
+      "source": "Quellcode auf GitHub"
+    },
+    "pageTitle": "{{page}} – ProcureAccess",
+    "pageTitle.error": "Fehler: {{page}} – ProcureAccess",
+    "session": {
+      "warning": {
+        "title": "Ihre Sitzung endet bald",
+        "body": "Aus Sicherheitsgründen werden Sie in {{minutes}} Minuten abgemeldet. Danach melden Sie sich erneut an, bevor Sie weiterarbeiten. Ihre Eingaben auf dieser Seite bleiben erhalten.",
+        "stay": "Angemeldet bleiben",
+        "logout": "Jetzt abmelden",
+        "absolute": "Ihre Sitzung endet in {{minutes}} Minuten und kann nicht mehr verlängert werden. Speichern Sie Ihre Eingaben und melden Sie sich danach erneut an."
+      },
+      "extended": "Ihre Sitzung wurde verlängert.",
+      "expired": {
+        "title": "Sie wurden abgemeldet",
+        "body": "Ihre Sitzung ist aus Sicherheitsgründen abgelaufen. Bitte melden Sie sich erneut an. Ihre Eingaben auf dieser Seite bleiben erhalten."
+      },
+      "restored": "Sie sind wieder angemeldet. Ihre Eingaben sind erhalten."
     }
   },
   "common": {
@@ -178,6 +224,39 @@
       "info": "Hinweis:",
       "attention": "Achtung:",
       "error": "Fehler:"
+    },
+    "actions": {
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "close": "Schließen",
+      "edit": "Bearbeiten",
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen",
+      "retry": "Erneut versuchen"
+    },
+    "optional": "(optional)",
+    "loading": "Wird geladen …",
+    "loaded": "{{count}} Ergebnisse geladen.",
+    "date": {
+      "published": "Veröffentlicht am {{date}}",
+      "hint": "Format: TT.MM.JJJJ, zum Beispiel {{example}}",
+      "openCalendar": "Kalender öffnen"
+    },
+    "catalogRelease": "Katalogversion {{release}}",
+    "yes": "Ja",
+    "no": "Nein",
+    "requiredNote": "Alle Felder ohne „(optional)“ müssen ausgefüllt werden.",
+    "results": {
+      "shown": "{{count}} Kriterien angezeigt."
+    },
+    "multiSelect": {
+      "hint": "Mehrfachauswahl möglich"
+    },
+    "newTab": "(öffnet in neuem Tab)",
+    "stepper": {
+      "done": "erledigt"
     }
   },
   "auth": {
@@ -192,7 +271,32 @@
       "item": "{{field}}: {{message}}"
     },
     "field": {
-      "server": "{{message}}"
+      "server": "{{message}}",
+      "required": "Bitte geben Sie {{field}} an.",
+      "requiredChoice": "Bitte wählen Sie eine Option.",
+      "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@beispiel.de.",
+      "url": "Bitte geben Sie eine vollständige Webadresse ein, die mit https:// beginnt.",
+      "maxLength": "Bitte kürzen Sie den Text auf höchstens {{max}} Zeichen. Derzeit sind es {{current}}.",
+      "date": "Bitte geben Sie ein Datum im Format TT.MM.JJJJ ein.",
+      "dateFuture": "Das Datum liegt in der Zukunft. Bitte prüfen Sie es."
+    },
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "body": "Diese Seite gibt es nicht oder nicht mehr. Vielleicht wurde sie verschoben, oder der Link ist unvollständig."
+    },
+    "forbidden": {
+      "title": "Kein Zugriff",
+      "body": "Für diese Seite fehlen Ihnen die Rechte. Wenn Sie glauben, dass das ein Fehler ist, wenden Sie sich an ein Mitglied Ihrer Organisation mit der Rolle „Verwalten“."
+    },
+    "server": {
+      "title": "Etwas ist schiefgelaufen",
+      "body": "Das ist ein Fehler bei uns. Ihre Eingaben wurden nicht gespeichert. Bitte versuchen Sie es in einigen Minuten erneut."
+    },
+    "offline": "Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.",
+    "rateLimit": "Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie {{minutes}} Minuten und versuchen Sie es dann erneut.",
+    "home": "Zur Startseite",
+    "email": {
+      "sendFailed": "Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut."
     }
   }
 }
