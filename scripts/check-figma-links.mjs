@@ -30,10 +30,8 @@ const MAP = {
 
 // Mapped paths where a file exists that is not the mapped component yet (TESTING_v11 V60).
 // They get a notice instead of a failure. Remove an entry when the mapped component replaces it.
-const PENDING = {
-  'src/app/layout/header/header.ts':
-    'legacy header, not pa-app-header yet; the step-1 shell adds the @figma tag and removes this entry',
-};
+// Empty since S2-15 (the shell header carries its tag).
+const PENDING = {};
 
 const inActions = process.env.GITHUB_ACTIONS === 'true';
 let failed = false;

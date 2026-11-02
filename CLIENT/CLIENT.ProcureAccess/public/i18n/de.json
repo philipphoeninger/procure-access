@@ -9,7 +9,6 @@
     "UPDATE": "Aktualisieren",
     "REJECT": "Ablehnen",
     "APPROVE": "Genehmigen",
-    "ENTER": "Enter",
     "SEARCH": "Suchen",
     "REMOVE": "Entfernen",
     "EDIT": "Bearbeiten",
@@ -298,5 +297,17 @@
     "email": {
       "sendFailed": "Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut."
     }
+  },
+  "legal": {
+    "imprint": {
+      "title": "Impressum"
+    },
+    "privacy": {
+      "title": "Datenschutzhinweise"
+    },
+    "accessibility": {
+      "title": "Erklärung zur Barrierefreiheit"
+    },
+    "placeholder": "Platzhalter: Der Inhalt dieser Seite fehlt noch."
   }
 }

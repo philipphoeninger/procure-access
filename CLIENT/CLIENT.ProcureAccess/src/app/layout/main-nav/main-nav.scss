@@ -1,0 +1,68 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Base: the drawer of the compact menu (mobile-first). The bar modifier is the full header row.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-main-nav__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pa-main-nav__account {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-xxs);
+}
+
+// Nav items: text buttons, 48 px high (Handoff §3.1, touch targets §2.2).
+.pa-main-nav__item {
+  --mat-button-text-container-height: var(--pa-space-xxl);
+  --mat-button-text-container-shape: var(--mat-sys-corner-small) var(--mat-sys-corner-small) 0 0;
+  // The 3 px bottom border of the active item must not move the text.
+  border-bottom: 3px solid transparent;
+}
+
+:host(.pa-main-nav--drawer) .pa-main-nav__item {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+// Active item: background alone is 1.13 : 1, so the 3 px border is required (Handoff §3.1, 7f P1).
+.pa-main-nav__item--active {
+  background-color: var(--mat-sys-secondary-container);
+  border-bottom-color: var(--mat-sys-primary);
+}
+
+.pa-main-nav__login {
+  --mat-button-filled-container-height: var(--pa-space-xxl);
+}
+
+:host(.pa-main-nav--bar) {
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+
+  .pa-main-nav__nav {
+    flex: 1;
+  }
+
+  .pa-main-nav__list,
+  .pa-main-nav__account {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}

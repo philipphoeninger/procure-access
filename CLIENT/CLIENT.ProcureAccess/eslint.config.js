@@ -21,11 +21,6 @@ const angular = require('angular-eslint');
 // the tracking issue #158.
 /** @type {Record<string, string[]>} */
 const LEGACY_EXCEPTIONS = {
-  // M1 — shell (S2-15 – S2-17)
-  'src/app/layout/header/header.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-  ],
   // M2 — catalog and configurator (withCatalog replaces withCriteria / withFilters)
   'src/app/features/criteria/list/criteria-list.ts': [
     '@angular-eslint/prefer-inject',

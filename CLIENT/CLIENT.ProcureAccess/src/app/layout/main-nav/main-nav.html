@@ -1,0 +1,42 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<nav id="main-nav" class="pa-main-nav__nav" [attr.aria-label]="'shell.nav.label' | translate">
+  <ul class="pa-main-nav__list">
+    <li>
+      <!-- cdkFocusInitial: the compact menu moves the focus to the first item when it opens -->
+      <a matButton class="pa-main-nav__item" routerLink="/filters"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        [attr.cdkFocusInitial]="layout() === 'drawer' ? '' : null"
+        (click)="navigated.emit()">{{ 'shell.nav.criteria' | translate }}</a>
+    </li>
+    <li>
+      <a matButton class="pa-main-nav__item" routerLink="/products"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        (click)="navigated.emit()">{{ 'shell.nav.directory' | translate }}</a>
+    </li>
+    <li>
+      <!-- Legacy product proposal until the contribution screens of step 6 (owner, S2-15) -->
+      <a matButton class="pa-main-nav__item" routerLink="/product-proposal/0"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        (click)="navigated.emit()">{{ 'shell.nav.contribute' | translate }}</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="pa-main-nav__account">
+  @if (signedIn()) {
+    <a matButton class="pa-main-nav__item" routerLink="/profile"
+      routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+      (click)="navigated.emit()">{{ 'shell.nav.account' | translate }}</a>
+    <a matButton class="pa-main-nav__item" routerLink="/settings"
+      routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+      (click)="navigated.emit()">{{ 'shell.nav.settings' | translate }}</a>
+    <button matButton class="pa-main-nav__item" type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
+  } @else {
+    <button matButton="filled" class="pa-main-nav__login" type="button" (click)="login()">{{ 'shell.nav.login' | translate }}</button>
+  }
+</div>

@@ -4,87 +4,53 @@
  * SPDX-License-Identifier: MIT
  */
 
-@use "@angular/material" as mat;
-
 :host {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 64px;
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: block;
 }
 
-#app-name {
-  display: none;
-  margin-left: 0; //8px;
-  margin-right: 0; //16px;
-  cursor: pointer;
-}
-
-#header-search-field {
-  display: none;
-}
-
-#pa-header {
-  position: fixed;
-  z-index: 2;
-
-  form {
-    @include mat.form-field-density(minimum);
-    margin-right: 8px;
-
-    mat-form-field {
-      width: 155px;
-
-      mat-label {
-        height: 24px;
-        display: block;
-      }
-    }
-  }
-
-  .home-btn {
-    padding-inline: 0;
-    margin-right: 16px;
-
-    .pa-logo {
-      clip-path: circle();
-      width: 30px;
-      height: 31px;
-      margin-right: 8px;
-    }
-  }
-}
-
-.tools {
+// Base: compact header (app name + „Menü“), not sticky (Handoff §1.6).
+.pa-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--pa-space-md);
+  padding: var(--pa-space-xs) var(--pa-space-md);
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+.pa-header__brand {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  margin-left: auto;
-}
+  min-block-size: var(--pa-space-xxl);
+  color: inherit;
+  text-decoration: none;
 
-/* -- MEDIA -- */
-
-@media (min-width: 23em) {
-  #app-name {
-    display: flex;
+  &:focus-visible {
+    outline: 3px solid var(--mat-sys-secondary);
+    outline-offset: 2px;
   }
 }
 
-@media (min-width: 31em) {
-  #header-search-field {
-    display: block;
-  }
-
-  #header-search-icon {
-    display: none;
-  }
+.pa-header__name {
+  font: var(--mat-sys-title-large);
 }
 
-@media (min-width: 48em) {
-  #menu-btn {
-    display: none;
+.pa-header__claim {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pa-header__menu {
+  --mat-button-text-container-height: var(--pa-space-xxl);
+}
+
+// Full header from 600 px: app name, navigation, account.
+@media (min-width: 37.5em) {
+  .pa-header {
+    justify-content: flex-start;
+    gap: var(--pa-space-xl);
+    padding-inline: var(--pa-space-lg);
   }
 }

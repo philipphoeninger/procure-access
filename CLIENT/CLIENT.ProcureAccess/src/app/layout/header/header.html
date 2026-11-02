@@ -4,64 +4,21 @@ SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-<mat-toolbar id="pa-header">
-  <button id="menu-btn" mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'shell.nav.menu' | translate">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item [routerLink]="'/home'">
-      <mat-icon>home</mat-icon>
-      <span>{{ 'MENU.HOME_LABEL' | translate }}</span></button>
-  </mat-menu>
-  <button matButton class="home-btn" [routerLink]="'/home'">
-    <h1 id="app-name"><img class="pa-logo" [src]="logoPath" alt="WERTE.IT Logo" />ProcureAccess</h1>
-  </button>
-  <div class="tools">
-    <form id="header-search-field">
-      <mat-form-field class="ctn-form-field-size-small" subscriptSizing="dynamic" appearance="outline">
-        <mat-label>{{ 'COMMON.SEARCH' | translate }}</mat-label>
-        <input type="text" matInput />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </form>
-    <button mat-icon-button id="header-search-icon" class="search-btn" aria-label="Search icon-button">
-      <mat-icon>search</mat-icon>
-    </button>
-    <button mat-icon-button class="home-icon-btn" aria-label="Home icon-button" [routerLink]="'/home'" [matTooltip]="'MENU.HOME_LABEL' | translate" matTooltipPosition="below">
-      <mat-icon>home</mat-icon>
-    </button>
-    <button mat-icon-button class="filters-btn" aria-label="Filters icon-button" [routerLink]="'/filters'" [matTooltip]="'FILTERS.LABEL' | translate" matTooltipPosition="below">
-      <span class="material-symbols-outlined">action_key</span>
-    </button>
-    <button mat-icon-button class="products-btn" aria-label="Products icon-button" [routerLink]="'/products'" [matTooltip]="'PRODUCTS.PRODUCTS_LABEL' | translate" matTooltipPosition="below">
-      <mat-icon>warehouse</mat-icon>
-    </button>
-    @if (store.isAuthenticated()) {
-      <button mat-icon-button class="favorites-btn" aria-label="Favorites icon-button" [routerLink]="'/favorites'" [matTooltip]="'FAVORITES.LABEL' | translate" matTooltipPosition="below">
-        <mat-icon>favorite</mat-icon>
-      </button>
+<header class="pa-header">
+  <a class="pa-header__brand" routerLink="/home">
+    <span class="pa-header__name">{{ 'shell.appName' | translate }}</span>
+    @if (wide()) {
+      <!-- &ngsp; keeps a space between name and claim in the link's accessible name -->
+      &ngsp;<span class="pa-header__claim">{{ 'shell.appClaim' | translate }}</span>
     }
-    <button *appHasPermission="'objects:approve'" mat-icon-button class="proposals-btn" aria-label="Proposals icon-button" [routerLink]="'/proposals'" [matTooltip]="'PROPOSALS.LABEL' | translate" matTooltipPosition="below">
-      <span class="material-symbols-outlined">
-        tv_options_edit_channels
-      </span>
-    </button>
-    @if (store.isAuthenticated()) {
-      <button mat-icon-button class="profile-btn" aria-label="Profile icon-button" [routerLink]="'/profile'" [matTooltip]="'AUTH.PROFILE' | translate" matTooltipPosition="below">
-        <mat-icon>person</mat-icon>
-      </button>
-    }
-    <button mat-icon-button class="settings-btn" aria-label="Settings icon-button" [routerLink]="'/settings'" [matTooltip]="'SETTINGS.LABEL' | translate" matTooltipPosition="below">
-      <mat-icon>settings</mat-icon>
-    </button>
-    @if (store.isAuthenticated()) {
-      <button mat-icon-button class="logout-btn" aria-label="Logout icon-button" (click)="logout()" [matTooltip]="'AUTH.LOGOUT' | translate" matTooltipPosition="below">
-        <mat-icon>logout</mat-icon>
-      </button>
-    } @else {
-      <button mat-icon-button class="login-btn" aria-label="Login icon-button" (click)="authService.showLogin()" [matTooltip]="'AUTH.LOGIN' | translate" matTooltipPosition="below">
-        <mat-icon>login</mat-icon>
-      </button>
-    }
-  </div>
-</mat-toolbar>
+  </a>
+
+  @if (wide()) {
+    <pa-main-nav layout="bar" />
+  } @else {
+    <!-- pa-app-header-compact: the navigation opens in the shell's mat-sidenav (Handoff §2.2) -->
+    <button matButton class="pa-header__menu" type="button"
+      aria-controls="main-nav" [attr.aria-expanded]="menuOpen()"
+      (click)="menuToggle.emit()">{{ 'shell.nav.menu' | translate }}</button>
+  }
+</header>

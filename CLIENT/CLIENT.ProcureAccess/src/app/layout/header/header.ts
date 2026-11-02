@@ -2,51 +2,37 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '@features/identity/services/auth.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ProcureAccessStore } from '@app/core/state/app.store';
-import { HasPermissionDirective } from '@app/features/identity/directives/has-permission.directive';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MainNav } from '@layout/main-nav/main-nav';
+import { injectWideLayout } from '@layout/shell/wide-layout';
 
+/**
+ * pa-app-header · Kopfzeile — one component with two layouts (Handoff §3.1): below 600 px the
+ * compact header (app name + „Menü“, Figma `pa-app-header-compact` 2039:2131), from 600 px the
+ * full header with the main navigation. State Anonymous only; SignedIn and SignedInNoOrg come
+ * with step 3.
+ *
+ * The compact menu itself is the shell's `mat-sidenav` (it must be a child of the sidenav
+ * container), so this component only reports the toggle and shows its state.
+ *
+ * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2017-650
+ * @spec docs/design_handoff_procureaccess_v1.md §3.1, §2.2
+ */
 @Component({
   selector: 'pa-header',
-  imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatMenuModule,
-    RouterModule,
-    MatTooltipModule,
-    HasPermissionDirective,
-    TranslatePipe
-  ],
+  imports: [MatButtonModule, RouterLink, TranslatePipe, MainNav],
   templateUrl: './header.html',
+  styleUrl: './header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './header.scss'
 })
 export class Header {
-  protected logoPath = '/werte_it_logo.jpg';
-  protected store = inject(ProcureAccessStore);
+  /** The compact menu is open (`aria-expanded` of „Menü“). */
+  readonly menuOpen = input(false);
+  /** „Menü“ was pressed. */
+  readonly menuToggle = output();
 
-  constructor(
-    protected authService: AuthService,
-    private router: Router,
-  ) {}
-
-  logout() {
-    this.authService.logout();
-    this.store.setUser(null);
-    this.store.setProposals([]);
-    this.store.reloadUICustomization();
-  }
+  protected readonly wide = injectWideLayout();
 }

@@ -80,7 +80,7 @@ test.describe('J1 configurator without account (current form)', () => {
     await test.step('open the criteria filter', async () => {
       await page.goto('/filters');
       await expect(page.getByRole('button', { name: 'Produkt-Typen' })).toBeVisible();
-      // The header icons are drawn with the self-hosted Material Symbols font (design handoff §1.8).
+      // The icons are drawn with the self-hosted Material Symbols font (design handoff §1.8).
       const iconFontLoaded = () =>
         page.evaluate(() =>
           [...document.fonts].some(
@@ -131,7 +131,7 @@ test.describe('J1 configurator without account (current form)', () => {
 
     await test.step('confirm the selection and get the recorded criteria', async () => {
       const request = page.waitForRequest((candidate) => candidate.url().includes('/Criteria/byCriteriaFilterIds'));
-      await page.getByRole('button', { name: 'Enter' }).click();
+      await page.getByRole('button', { name: 'Weiter' }).click();
 
       // The client sends every marked filter id of all four layers (S1-15 F2).
       const sentIds = new URL((await request).url()).searchParams.getAll('criteriaFilterIds').map(Number);
@@ -168,7 +168,7 @@ test.describe('J1 configurator without account (current form)', () => {
     await expect(page.getByRole('button', { name: 'Produkt-Typen' })).toBeVisible();
     await expect(page.getByText('0 ausgewählt')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Enter' }).click();
+    await page.getByRole('button', { name: 'Weiter' }).click();
 
     await expect(page.getByText('Keine Kriterien gefunden. Bitte versuchen Sie es erneut...')).toBeVisible();
     await expectNoAxeViolations(page, testInfo, 'empty criteria list');
