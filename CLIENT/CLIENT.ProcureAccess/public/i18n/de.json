@@ -202,6 +202,7 @@
     },
     "pageTitle": "{{page}} – ProcureAccess",
     "pageTitle.error": "Fehler: {{page}} – ProcureAccess",
+    "pageTitle.home": "ProcureAccess – {{page}}",
     "session": {
       "warning": {
         "title": "Ihre Sitzung endet bald",
@@ -309,5 +310,16 @@
       "title": "Erklärung zur Barrierefreiheit"
     },
     "placeholder": "Platzhalter: Der Inhalt dieser Seite fehlt noch."
+  },
+  "pageTitle": {
+    "home": "Barrierefreie Software beschaffen",
+    "settings": "Einstellungen",
+    "account": "Konto",
+    "legal": {
+      "imprint": "Impressum",
+      "privacy": "Datenschutz",
+      "accessibility": "Erklärung zur Barrierefreiheit"
+    },
+    "forbidden": "Kein Zugriff"
   }
 }

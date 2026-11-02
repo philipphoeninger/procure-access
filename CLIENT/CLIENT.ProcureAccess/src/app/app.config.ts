@@ -4,7 +4,7 @@
 
 import { ApplicationConfig, inject, InjectionToken, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -22,6 +22,8 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EnLanguage } from './core/models/language.enum';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { provideDocumentLanguage } from './core/a11y/document-language';
+import { PageTitleStrategy } from './core/a11y/page-title.strategy';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
@@ -34,6 +36,8 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
+    // Page title, H1 focus and announcement on every route change (R-SHL-04, A11Y-03)
+    { provide: TitleStrategy, useClass: PageTitleStrategy },
     provideAnimationsAsync(),
     // Every mat-icon uses the self-hosted Material Symbols Outlined font (design handoff §1.8).
     provideAppInitializer(() => {
@@ -67,6 +71,7 @@ export const appConfig: ApplicationConfig = {
         prefix: './i18n/',
         suffix: '.json'
       })
-    })
+    }),
+    provideDocumentLanguage(),
   ]
 };

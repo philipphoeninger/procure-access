@@ -114,13 +114,8 @@ export const withSettings = () => signalStoreFeature(
               if (state.uiCustomization().highContrastOn)
                 renderer.addClass(document.documentElement, 'contrast-more');
               else renderer.removeClass(document.documentElement, 'contrast-more');
-              
-              renderer.setAttribute(
-                document.documentElement, 
-                'lang', 
-                state.uiCustomization().language);
 
-              // setup language service
+              // setup language service (<html lang> follows it: provideDocumentLanguage, A11Y-05)
               languageService.init(state.uiCustomization().language);
 
               return; //gate
@@ -161,8 +156,6 @@ export const withSettings = () => signalStoreFeature(
           if (state.uiCustomization().highContrastOn)
             renderer.addClass(document.documentElement, 'contrast-more');
           else renderer.removeClass(document.documentElement, 'contrast-more');
-
-          renderer.setAttribute(document.documentElement, 'lang', state.uiCustomization().language);
         },
         async updateUICustomization(uiCustomization: UICustomization) {
           if (!state.isAuthenticated()) {

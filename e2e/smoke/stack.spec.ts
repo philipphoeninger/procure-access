@@ -12,7 +12,8 @@ test.describe('E2E stack', () => {
   test('serves the client with its German texts', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle('ProcureAccess');
+    // The start page title (UX copy shell.pageTitle.home + pageTitle.home) is built from de.json.
+    await expect(page).toHaveTitle('ProcureAccess – Barrierefreie Software beschaffen');
     await expect(page.getByText('Willkommen zurück.')).toBeVisible();
   });
 
