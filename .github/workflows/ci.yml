@@ -282,8 +282,11 @@ jobs:
 
   coverage:
     name: 8. Coverage report
-    needs: [dotnet-tests, client-tests]
-    if: ${{ !cancelled() }}
+    needs: [build, dotnet-tests, client-tests]
+    # Also after failed tests (partial report), but not without a build: then stages 3–5 are
+    # skipped and there is nothing to merge (#106). A skipped job counts as passed for the ruleset;
+    # the failed build blocks the merge.
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     # Reported, not gated (TESTING §8.4).
     continue-on-error: true
     runs-on: ubuntu-24.04
