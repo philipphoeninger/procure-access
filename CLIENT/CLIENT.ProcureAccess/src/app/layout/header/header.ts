@@ -19,6 +19,7 @@ import { injectWideLayout } from '@layout/shell/wide-layout';
  * container), so this component only reports the toggle and shows its state.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2017-650
+ * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2131 (compact)
  * @spec docs/design_handoff_procureaccess_v1.md §3.1, §2.2
  */
 @Component({
