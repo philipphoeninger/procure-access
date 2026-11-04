@@ -18,9 +18,14 @@ const API = '**/api/**';
 
 const mainNav = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
 
-/** Waits until the transitions of a clicked element are over, so axe sees the settled colours. */
+/**
+ * Waits until the transitions of a clicked element are over, so axe sees the settled colours.
+ * A transition that is cancelled (e.g. the focus moved on) rejects `finished`: it is over too.
+ */
 async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) => Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished)));
+  await locator.evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
+  );
 }
 
 /**
