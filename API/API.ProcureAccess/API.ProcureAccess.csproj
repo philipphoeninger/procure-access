@@ -10,8 +10,8 @@ SPDX-License-Identifier: MIT
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Written to the build output only, where Swagger reads it (AppContext.BaseDirectory); publish includes it (#74). -->
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>API.ProcureAccess.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,7 +34,6 @@ SPDX-License-Identifier: MIT
     -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -49,6 +48,12 @@ SPDX-License-Identifier: MIT
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <!--
+      Swashbuckle brings Microsoft.OpenApi at the version it requires (2.7.5 for 10.3.1); there is no
+      direct reference on purpose (owner, 2026-11-04, #74). 2.7.5 is the first version patched for
+      CVE-2026-49451 (GHSA-v5pm-xwqc-g5wc, parsing of circular schema references); the API only writes
+      documents. Until #74 the unused Microsoft.AspNetCore.OpenApi raised it to 2.12.2.
+    -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.3.1" />
