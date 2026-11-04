@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Net;
-using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -17,16 +16,15 @@ namespace ProcureAccess.Tests.Integration.FixtureTests;
 public sealed class ClockTests(ApiFixture api) : IntegrationTest(api)
 {
     [Fact]
-    public async Task Health_AfterAdvancingFakeClock_ReturnsFakeClockTime()
+    public void TimeProvider_AfterAdvancingFakeClock_ReturnsFakeClockTime()
     {
         Clock.Advance(TimeSpan.FromMinutes(31));
         var expected = Clock.GetUtcNow();
-        using var client = CreateClient();
+        using var scope = Api.Factory.Services.CreateScope();
 
-        using var response = await client.GetAsync("/api/Health", TestContext.Current.CancellationToken);
+        var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
 
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-        json.RootElement.GetProperty("time").GetDateTimeOffset().ShouldBe(expected);
+        timeProvider.ShouldBeSameAs(Clock);
+        timeProvider.GetUtcNow().ShouldBe(expected);
     }
 }

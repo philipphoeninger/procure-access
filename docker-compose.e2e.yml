@@ -11,7 +11,8 @@
 # - database in memory (tmpfs): every start begins with an empty database, nothing persists;
 # - stack-local network instead of the external dokploy-network (CI has none);
 # - SMTP credentials cleared, so no e-mail can leave an E2E run;
-# - client healthcheck through the nginx proxy, so --wait returns only when client and API answer.
+# - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
+#   client answers and the API reaches its database.
 #
 # The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml):
 # stop one before starting the other.
@@ -36,8 +37,10 @@ services:
 
   client:
     healthcheck:
-      # 127.0.0.1, not localhost: in the Alpine image localhost resolves to ::1 first, and nginx listens on IPv4 only
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://127.0.0.1/api/Health"]
+      # 127.0.0.1, not localhost: in the Alpine image localhost resolves to ::1 first, and nginx listens on IPv4 only.
+      # The API is asked directly over the stack network: nginx forwards only /api/, and /health/ready
+      # stays off the public client origin (#112). The aspnet image has no wget for a check of its own.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://api:8080/health/ready"]
       interval: 5s
       timeout: 5s
       retries: 30
