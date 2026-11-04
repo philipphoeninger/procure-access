@@ -85,3 +85,9 @@
     margin-inline: auto;
   }
 }
+
+// Offline notice (Handoff §6.5): full width above the page.
+.pa-main__offline {
+  align-self: stretch;
+  margin-block-end: var(--pa-space-md);
+}

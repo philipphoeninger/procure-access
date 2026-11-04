@@ -2,31 +2,26 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
-import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatCardModule } from '@angular/material/card';
-import { MatDivider } from "@angular/material/divider";
-import { AuthService } from '@app/features/identity/services/auth.service';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Notice } from '@app/shared/components/notice/notice';
 
+/**
+ * S04 Startseite (R-SHL-05): H1, intro, entry cards, disclaimer. Only cards whose target exists
+ * are shown: „Kriterien zusammenstellen“ and „Produkte nachschlagen“ open the legacy screens; the
+ * cards for projects (S30) and contributions (S53) and the vendor link (S55) come with their
+ * migration steps (owner decision S2-17, 1A). No card needs an account.
+ *
+ * @spec docs/SPEC_v2.md R-SHL-05; docs/design_handoff_procureaccess_v1.md §5.3 (S04, no Figma frame)
+ */
 @Component({
-  selector: 'app-home',
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    RouterModule,
-    MatCardModule,
-    MatDivider,
-    TranslatePipe
-],
+  selector: 'pa-home',
+  imports: [MatButtonModule, MatCardModule, RouterLink, TranslatePipe, Notice],
   templateUrl: './home.html',
+  styleUrl: './home.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './home.scss'
 })
-export class Home {
-  protected store = inject(ProcureAccessStore);
-  protected authService = inject(AuthService);
-}
+export class Home {}

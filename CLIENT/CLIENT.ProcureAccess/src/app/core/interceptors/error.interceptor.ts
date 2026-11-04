@@ -2,13 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, tap, throwError } from 'rxjs';
 import { SnackbarService } from '../services/snackbar.service';
 import { ERROR_TRANSLATIONS } from '../models/error-translation.map';
 import { FORM_SHOWS_FIELD_ERRORS, PROBLEM_TYPE_KEYS, problemTypeName } from '../errors/problem-details';
+import { ConnectionStatus, SERVER_ERROR_PATH } from '../errors/system-errors';
 
 /** Error body of the legacy identity endpoints (until migration step 3). */
 interface LegacyErrorBody {
@@ -16,12 +18,33 @@ interface LegacyErrorBody {
   errors?: { code?: string }[];
 }
 
+/**
+ * System states of Handoff §6.5 for every request (R-SHL-08): no answer at all (status 0) shows
+ * the offline notice, any answer hides it again; a 5xx answer shows the S80 page „Etwas ist
+ * schiefgelaufen“ in place of the current page without changing the URL (owner decision S2-17,
+ * 3A). Neither gets a snackbar. Other errors keep the snackbar until their screen is rebuilt.
+ */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const translate = inject(TranslateService);
   const snackbar = inject(SnackbarService);
+  const connection = inject(ConnectionStatus);
+  const router = inject(Router);
 
   return next(req).pipe(
+    tap((event) => {
+      if (event instanceof HttpResponse) connection.answered();
+    }),
     catchError((error: HttpErrorResponse) => {
+      if (error.status === 0) {
+        connection.noAnswer();
+        return throwError(() => error);
+      }
+      connection.answered();
+      if (error.status >= 500) {
+        void router.navigate([SERVER_ERROR_PATH], { skipLocationChange: true });
+        return throwError(() => error);
+      }
+
       const problemType = problemTypeName(error);
 
       // The form shows these at its fields and in its error summary (API-02).

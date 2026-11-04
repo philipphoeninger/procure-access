@@ -5,11 +5,13 @@
 import { HttpClient, HttpContext, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
+import { ConnectionStatus } from '../errors/system-errors';
 import { SnackbarService } from '../services/snackbar.service';
 import { errorInterceptor } from './error.interceptor';
 
@@ -19,15 +21,18 @@ describe('errorInterceptor', () => {
   let http: HttpClient;
   let backend: HttpTestingController;
   let snackbar: { showError: ReturnType<typeof vi.fn> };
+  let router: { navigate: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     snackbar = { showError: vi.fn() };
+    router = { navigate: vi.fn().mockResolvedValue(true) };
     TestBed.configureTestingModule({
       providers: [
         provideTestTranslations(),
         provideHttpClient(withInterceptors([errorInterceptor])),
         provideHttpClientTesting(),
         { provide: SnackbarService, useValue: snackbar },
+        { provide: Router, useValue: router },
       ],
     });
     http = TestBed.inject(HttpClient);
@@ -72,5 +77,52 @@ describe('errorInterceptor', () => {
     await failWith({ code: 'UserNotFound' });
 
     expect(snackbar.showError).toHaveBeenCalledWith(TestBed.inject(TranslateService).instant('ERROR.USER_NOT_FOUND'));
+  });
+
+  describe('system states (Handoff §6.5)', () => {
+    const offline = () => TestBed.inject(ConnectionStatus).offline();
+
+    async function getAndFail(status: number) {
+      const request = firstValueFrom(http.get('/api/x'));
+      if (status === 0) {
+        backend.expectOne('/api/x').error(new ProgressEvent('error'), { status: 0, statusText: '' });
+      } else {
+        backend.expectOne('/api/x').flush({ status }, { status, statusText: 'Error' });
+      }
+      await expect(request).rejects.toBeDefined();
+    }
+
+    it.each([500, 502, 503])('shows the server error page in place for %i, without a snackbar', async (status) => {
+      await getAndFail(status);
+
+      expect(router.navigate).toHaveBeenCalledWith(['error'], { skipLocationChange: true });
+      expect(snackbar.showError).not.toHaveBeenCalled();
+    });
+
+    it('shows the offline notice when a request gets no answer, without a snackbar', async () => {
+      await getAndFail(0);
+
+      expect(offline()).toBe(true);
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(snackbar.showError).not.toHaveBeenCalled();
+    });
+
+    it('hides the offline notice with the next answer of the server', async () => {
+      await getAndFail(0);
+
+      const request = firstValueFrom(http.get('/api/y'));
+      backend.expectOne('/api/y').flush({});
+      await request;
+
+      expect(offline()).toBe(false);
+    });
+
+    it('hides the offline notice also when the next answer is an error', async () => {
+      await getAndFail(0);
+
+      await failWith({ type: `${base}validation` });
+
+      expect(offline()).toBe(false);
+    });
   });
 });

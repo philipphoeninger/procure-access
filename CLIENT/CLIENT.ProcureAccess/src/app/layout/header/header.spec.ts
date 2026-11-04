@@ -26,7 +26,7 @@ describe('Header', () => {
 
       expect(screen.getByRole('banner')).toBeTruthy();
       const home = screen.getByRole('link', { name: 'ProcureAccess Barrierefreie Software beschaffen' });
-      expect(home.getAttribute('href')).toBe('/home');
+      expect(home.getAttribute('href')).toBe('/');
       expect(screen.getByRole('navigation', { name: 'Hauptnavigation' })).toBeTruthy();
       expect(screen.queryByRole('button', { name: 'Menü' })).toBeNull();
     });
@@ -47,7 +47,7 @@ describe('Header', () => {
     it('shows the app name and „Menü“ instead of the navigation', async () => {
       await renderHeader(false);
 
-      expect(screen.getByRole('link', { name: 'ProcureAccess' }).getAttribute('href')).toBe('/home');
+      expect(screen.getByRole('link', { name: 'ProcureAccess' }).getAttribute('href')).toBe('/');
       expect(screen.queryByRole('navigation')).toBeNull();
       const menu = screen.getByRole('button', { name: 'Menü' });
       expect(menu.getAttribute('aria-controls')).toBe('main-nav');
