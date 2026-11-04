@@ -50,7 +50,7 @@ Checklist of CLAUDE §6.7 (security, correctness, N+1, edge cases, a11y) with th
 | R3 | With the queue, a burst of loads could queue several „Wird geladen …“ | **Won't fix:** probe of `/`, `/filters`, `/products`, `/settings` shows one per page visit; the per-key throttle of Handoff §3.4 comes with the first counter (step 2) |
 | R4 | A translation that never resolves would hold the announcement queue | **Won't fix:** then no text of the app is shown and no announcement was made before either |
 | R5 | A 5xx answer of a background request (e.g. the products loaded at start-up) replaces the page the user opened, also a legal page; a 5xx during the legacy login closes the login outlet | **Won't fix:** this is decision 3A (every 5xx); recorded here so it is not a surprise |
-| R6 | The legacy stores (`withFilters`, `withProducts`, `withSettings` …) do not decrement the loading counter when a load fails, so after a failed load the progress bar stays (the spinner did the same) | **Follow-up issue (proposed, P1):** the stores are rebuilt with their steps; the bar only makes the existing defect visible |
+| R6 | Several legacy stores (`withFilters`, `withCriteria`, `withSettings`, `withIdentity`, `withProposal`) do not decrement the loading counter when a load fails, so after a failed load the progress bar stays (the spinner did the same) | **Follow-up issue #168 (P1):** the stores are rebuilt with their steps; the bar only makes the existing defect visible |
 | R7 | `role="status"` on a notice that is inserted with its text is not announced by every screen reader | **Follow-up:** manual screen-reader check (A11Y-07, P2); the pattern is the one Handoff §6.5 and `pa-notice` prescribe |
 | — | Security: no new input, no new endpoint, no secrets; N+1: no backend change | – |
 
@@ -72,7 +72,7 @@ Checklist of CLAUDE §6.7 (security, correctness, N+1, edge cases, a11y) with th
 
 | # | Point | Where / when |
 |---|---|---|
-| P1 | Legacy loading counter is not decremented on a failed load, so the progress bar stays after an error (R6). Proposed issue | Rebuild of each store (M2/M3) or a small legacy fix |
+| P1 | Legacy loading counter is not decremented on a failed load, so the progress bar stays after an error (R6), #168 | Rebuild of each store (M2/M3) or a small legacy fix |
 | P2 | Manual screen-reader check of the offline notice (`role="status"` inserted with its text) and of the queued announcements (R7) | A11Y-07, before the pilot |
 | P3 | Start page cards for projects (S30), contributions (S53) and the vendor link (S55) (decision 1A); „no card needs an account“ then needs S30's anonymous state | Steps 5 – 7 |
 | P4 | `/favorites` has no link any more (decision 2) | Retirement of `withFavorites()` (ARCHITECTURE §8.1) |
