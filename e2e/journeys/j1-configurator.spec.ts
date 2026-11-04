@@ -143,6 +143,10 @@ test.describe('J1 configurator without account (current form)', () => {
       await expect(titles).toHaveCount(recorded.expected.length);
       const shown = (await titles.allTextContents()).map((title) => title.trim());
       expect([...shown].sort()).toEqual(recordedNames);
+      // The "Produkte anzeigen" button appears under the pointer of the "Weiter" click; axe would
+      // measure its tooltip while it fades in (#142). Move the pointer away and let it go.
+      await page.mouse.move(0, 0);
+      await expect(page.locator('.mat-mdc-tooltip-surface')).toHaveCount(0);
       await expectNoAxeViolations(page, testInfo, 'criteria list');
     });
 
