@@ -35,9 +35,7 @@
     "ACTIONS": "Aktionen",
     "TYPE": "Typ",
     "WEBSITE": "Webseite",
-    "FUNCTIONALITY": "Funktionalität",
-    "SEE_MORE": "Mehr anzeigen",
-    "GO_TO_HOME": "Zur Startseite"
+    "FUNCTIONALITY": "Funktionalität"
   },
   "MENU": {
     "HOME_LABEL": "Startseite"
@@ -67,8 +65,6 @@
     "REGISTER": "Registrieren",
     "REGISTER_HERE": "Hier registrieren",
     "LOGIN_HERE": "Hier anmelden",
-    "ACCESS_DENIED_LABEL": "Zugriff verweigert",
-    "ACCESS_DENIED_MSG": "Sie haben keine Berechtigung, diese Seite anzuzeigen. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an Ihren Administrator.",
     "PW_RESET_SUCCESS": "Ein Link zum Zurücksetzen des Passworts wurde an die angegebene E-Mail-Adresse gesendet.",
     "PW_RESET_ERROR": "Das Passwort konnte nicht zurückgesetzt werden. Bitte kontaktieren Sie den Support per E-Mail.",
     "LOGIN_FAIL_ERROR": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
@@ -140,14 +136,6 @@
     "DARK_MODE": "Dunkelmodus:",
     "SAVED_AS_COOKIE": "Einstellungen als Cookie gespeichert",
     "SAVED_PERMANENTLY": "Einstellungen dauerhaft gespeichert"
-  },
-  "HOME": {
-    "WELCOME_MSG": "Willkommen zurück.",
-    "FIND_A11Y_CTA": "Barrierefreiheit finden",
-    "FAVORITES_CTA": "Favoriten anzeigen",
-    "LOGIN_CTA": "Anmelden / Registrieren",
-    "HELP_CTA": "Hilfe benötigt? Kontaktieren Sie uns",
-    "RECENTLY_ADDED_PRODUCTS": "Kürzlich hinzugefügte Produkte"
   },
   "ERROR": {
     "USER_NOT_FOUND": "Der Benutzer konnte nicht gefunden werden.",
@@ -320,6 +308,38 @@
       "privacy": "Datenschutz",
       "accessibility": "Erklärung zur Barrierefreiheit"
     },
-    "forbidden": "Kein Zugriff"
+    "notFound": "Seite nicht gefunden",
+    "forbidden": "Kein Zugriff",
+    "server": "Etwas ist schiefgelaufen"
+  },
+  "home": {
+    "title": "Barrierefreie Software beschaffen – Schritt für Schritt",
+    "intro": "ProcureAccess hilft Ihnen, die passenden Barrierefreiheitsanforderungen für Ihre Software-Beschaffung zu finden – in verständlicher Sprache und ohne Vorwissen zu Normen.",
+    "card": {
+      "criteria": {
+        "title": "Kriterien zusammenstellen",
+        "text": "Wählen Sie Verwendungszweck und Anwendungstyp. Sie erhalten eine Liste mit empfohlenen Kriterien, die Sie anpassen und für Ihre Vergabeunterlagen exportieren können.",
+        "cta": "Kriterien zusammenstellen"
+      },
+      "directory": {
+        "title": "Produkte nachschlagen",
+        "text": "Sehen Sie, ob ein Produkt bereits auf Barrierefreiheit geprüft wurde und welche Erfahrungen andere damit gemacht haben.",
+        "cta": "Produktverzeichnis öffnen"
+      },
+      "projects": {
+        "title": "Produkte vergleichen im Beschaffungsprojekt",
+        "text": "Halten Sie fest, welche Produkte infrage kommen, und schätzen Sie diese gemeinsam mit Ihrem Team anhand Ihrer Kriterien ein.",
+        "cta": "Zu meinen Projekten"
+      },
+      "contribute": {
+        "title": "Erfahrungen teilen",
+        "text": "Sie nutzen eine Software selbst, zum Beispiel mit Screenreader oder Vergrößerung? Ihr Erfahrungsbericht hilft anderen bei der Auswahl. Sie können unter einem selbst gewählten Namen schreiben.",
+        "cta": "Erfahrungsbericht schreiben"
+      },
+      "vendor": {
+        "text": "Sie bieten Software an oder prüfen sie im Auftrag? Prüfergebnis veröffentlichen"
+      }
+    },
+    "disclaimer": "ProcureAccess ersetzt keine professionelle Barrierefreiheitsprüfung. Das Tool stellt Kriterien und veröffentlichte Angaben zusammen, prüft aber selbst keine Produkte."
   }
 }

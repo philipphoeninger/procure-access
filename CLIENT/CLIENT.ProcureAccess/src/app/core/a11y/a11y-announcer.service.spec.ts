@@ -35,4 +35,23 @@ describe('A11yAnnouncerService', () => {
 
     expect(liveAnnounce).toHaveBeenCalledWith('Konto – ProcureAccess', 'polite');
   });
+
+  it('Announce_WhileAnotherIsPending_WaitsInsteadOfReplacingIt', async () => {
+    let setFirst!: () => void;
+    liveAnnounce.mockReturnValueOnce(new Promise<void>((resolve) => (setFirst = resolve)));
+    const announcer = TestBed.inject(A11yAnnouncerService);
+
+    const first = announcer.announce('common.loading');
+    const second = announcer.announcePageTitle('Konto – ProcureAccess');
+    await vi.waitFor(() => expect(liveAnnounce).toHaveBeenCalledTimes(1));
+    await Promise.resolve();
+    expect(liveAnnounce).toHaveBeenCalledTimes(1);
+
+    setFirst();
+    await Promise.all([first, second]);
+    expect(liveAnnounce.mock.calls).toEqual([
+      ['Wird geladen …', 'polite'],
+      ['Konto – ProcureAccess', 'polite'],
+    ]);
+  });
 });

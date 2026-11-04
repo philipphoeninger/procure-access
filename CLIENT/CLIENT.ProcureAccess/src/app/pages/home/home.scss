@@ -4,64 +4,60 @@
  * SPDX-License-Identifier: MIT
  */
 
+// S04 (Handoff §5.3): one column at 360 px, two cards side by side from 600 px.
 :host {
-    width: 100%;
-    min-height: calc(100vh - 84px);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  inline-size: 100%;
 }
 
-.username {
-    font-weight: bold;
+.pa-home__title {
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
 }
 
-.home-text-container {
-    display: flex;
-    flex-direction: column;
+.pa-home__intro {
+  margin: 0;
+  max-inline-size: 40rem;
+  font: var(--mat-sys-body-large);
 }
 
-.recently-added-container {
-    display: flex;
-    flex-direction: column;
-    margin-top: auto;
+.pa-home__cards {
+  display: grid;
+  gap: var(--pa-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.recently-added-scroller {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    .product-card {
-        max-width: 250px;
-
-        img {
-            max-height: 143px;
-            object-fit: cover;
-        }
-
-        &:not(:last-child) {
-            margin-right: 16px;
-        }
-
-        mat-card-content {
-            font-size: 18px;
-        }
-
-        mat-card-actions {
-            margin-top: auto;
-
-            button {
-                margin-left: auto;
-            }
-        }
-    }
+.pa-home__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  block-size: 100%;
+  box-sizing: border-box;
+  padding: var(--pa-space-md);
 }
 
-.mat-mdc-card-title {
-    font-size: 24px;
+.pa-home__card-title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
 }
 
-.mat-mdc-card-subtitle {
-    font-size: 20px;
+.pa-home__card-text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+// The action sits at the bottom of each card, so both cards line up.
+.pa-home__card-cta {
+  align-self: start;
+  margin-block-start: auto;
+}
+
+@media (min-width: 37.5em) {
+  .pa-home__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

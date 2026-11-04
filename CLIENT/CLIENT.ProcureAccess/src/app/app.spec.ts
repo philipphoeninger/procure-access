@@ -2,17 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { TestBed } from '@angular/core/testing';
 import { render, screen } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 
+import { ConnectionStatus } from '@app/core/errors/system-errors';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { createShellDoubles, provideLayout, SHELL_TEST_ROUTES } from '@app/testing/shell-test-doubles';
 import { App } from './app';
 
-async function renderShell(wide: boolean) {
+async function renderShell(wide: boolean, doubles = createShellDoubles()) {
   const { fixture } = await render(App, {
     routes: SHELL_TEST_ROUTES,
-    providers: [provideTestTranslations(), provideLayout(wide), ...createShellDoubles().providers],
+    providers: [provideTestTranslations(), provideLayout(wide), ...doubles.providers],
   });
   return fixture;
 }
@@ -93,6 +95,35 @@ describe('App shell (R-SHL-01)', () => {
       await fixture.whenStable();
 
       expect(menu.getAttribute('aria-expanded')).toBe('false');
+    });
+  });
+
+  describe('system states at the top of main (Handoff §6.2, §6.5)', () => {
+    it('shows the loading bar in main while the legacy store loads', async () => {
+      const doubles = createShellDoubles();
+      const fixture = await renderShell(true, doubles);
+      expect(screen.queryByRole('progressbar')).toBeNull();
+
+      doubles.store.isLoading.set(true);
+      await fixture.whenStable();
+
+      expect(screen.getByRole('main').contains(screen.getByRole('progressbar', { name: 'Wird geladen …' }))).toBe(true);
+    });
+
+    it('shows the offline notice as a status in main until the server answers again', async () => {
+      const fixture = await renderShell(true);
+      const connection = TestBed.inject(ConnectionStatus);
+      expect(screen.queryByRole('status')).toBeNull();
+
+      connection.noAnswer();
+      await fixture.whenStable();
+      const notice = screen.getByRole('status');
+      expect(notice.textContent).toContain('Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.');
+      expect(screen.getByRole('main').firstElementChild?.nextElementSibling).toBe(notice);
+
+      connection.answered();
+      await fixture.whenStable();
+      expect(screen.queryByRole('status')).toBeNull();
     });
   });
 });

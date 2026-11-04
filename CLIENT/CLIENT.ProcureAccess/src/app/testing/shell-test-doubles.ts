@@ -17,7 +17,7 @@ class TestPage {}
 
 /** Every route the shell links to. */
 export const SHELL_TEST_ROUTES: Routes = [
-  'home',
+  '',
   'filters',
   'products',
   'product-proposal/:id',

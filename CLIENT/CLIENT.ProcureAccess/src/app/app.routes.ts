@@ -19,22 +19,25 @@ import { ResetPassword } from './features/identity/reset-password/reset-password
 import { EmailConfirmation } from './features/identity/pages/email-confirmed/email-confirmation';
 import { PermissionGuard } from './features/identity/guards/permission.guard';
 import { ProposalList } from './features/proposal/list/proposal-list';
-import { Unauthorized } from './pages/unauthorized/unauthorized';
+import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
+import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
 export const routes: Routes = [
+  // S04 start page (R-SHL-05); `/home` is the legacy address
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'home',
+    component: Home,
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.home' },
   },
   {
     path: 'home',
-    component: Home,
-    data: { [PAGE_TITLE_KEY]: 'pageTitle.home' },
+    pathMatch: 'full',
+    redirectTo: '',
   },
   {
     path: 'auth',
@@ -98,13 +101,21 @@ export const routes: Routes = [
     path: 'confirm-email', 
     component: EmailConfirmation
   },
+  // S80 error pages (R-SHL-08); the page title is the H1
   {
     path: 'unauthorized',
-    component: Unauthorized,
-    data: { [PAGE_TITLE_KEY]: 'pageTitle.forbidden' },
+    component: ErrorPage,
+    data: { [ERROR_PAGE_KEY]: 'forbidden', [PAGE_TITLE_KEY]: 'pageTitle.forbidden' },
+  },
+  {
+    path: SERVER_ERROR_PATH,
+    component: ErrorPage,
+    data: { [ERROR_PAGE_KEY]: 'server', [PAGE_TITLE_KEY]: 'pageTitle.server' },
   },
   // S71 legal pages (R-SHL-07): placeholders until GP.3; reachable without an account (R-SHL-06)
   { path: 'impressum', component: LegalPage, data: { legalPage: 'imprint', [PAGE_TITLE_KEY]: 'pageTitle.legal.imprint' } },
   { path: 'datenschutz', component: LegalPage, data: { legalPage: 'privacy', [PAGE_TITLE_KEY]: 'pageTitle.legal.privacy' } },
   { path: 'barrierefreiheit', component: LegalPage, data: { legalPage: 'accessibility', [PAGE_TITLE_KEY]: 'pageTitle.legal.accessibility' } },
+  // Every other address: „Seite nicht gefunden“ in place, the URL stays (must stay last)
+  { path: '**', component: ErrorPage, data: { [ERROR_PAGE_KEY]: 'notFound', [PAGE_TITLE_KEY]: 'pageTitle.notFound' } },
 ];

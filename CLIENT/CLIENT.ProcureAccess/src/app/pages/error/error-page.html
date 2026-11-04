@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@switch (kind) {
+  @case ('notFound') {
+    <h1 class="pa-error-page__title">{{ 'errors.notFound.title' | translate }}</h1>
+    <p class="pa-error-page__text">{{ 'errors.notFound.body' | translate }}</p>
+  }
+  @case ('forbidden') {
+    <h1 class="pa-error-page__title">{{ 'errors.forbidden.title' | translate }}</h1>
+    <p class="pa-error-page__text">{{ 'errors.forbidden.body' | translate }}</p>
+  }
+  @case ('server') {
+    <h1 class="pa-error-page__title">{{ 'errors.server.title' | translate }}</h1>
+    <p class="pa-error-page__text">{{ 'errors.server.body' | translate }}</p>
+  }
+}
+
+<!-- „Button“ in the UX copy, but it navigates: a link with the look of a filled button. -->
+<a matButton="filled" routerLink="/">{{ 'errors.home' | translate }}</a>

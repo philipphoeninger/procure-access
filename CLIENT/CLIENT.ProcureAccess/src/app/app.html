@@ -22,6 +22,11 @@ SPDX-License-Identifier: MIT
       <a class="pa-skip-link" href="#main" (click)="skipToMain($event)">{{ 'shell.skipLink' | translate }}</a>
       <pa-header [menuOpen]="menuOpen()" (menuToggle)="menuOpen.set(true)" />
       <main id="main" #main class="pa-main" tabindex="-1">
+        <!-- System states at the top of the content column (Handoff §6.2, §6.5) -->
+        <pa-loading-bar />
+        @if (offline()) {
+          <pa-notice class="pa-main__offline" kind="attention" live="polite">{{ 'errors.offline' | translate }}</pa-notice>
+        }
         <router-outlet />
       </main>
       <pa-footer />
@@ -30,9 +35,7 @@ SPDX-License-Identifier: MIT
 }
 
 <router-outlet (activate)="showShell.set(false)" (deactivate)="showShell.set(true)" name="login" />
-
-@if (store.isLoading()) {
-  <mat-spinner
-    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
-    ></mat-spinner>
+@if (!showShell()) {
+  <!-- The legacy login outlet replaces the shell: its requests still show the loading bar -->
+  <pa-loading-bar />
 }

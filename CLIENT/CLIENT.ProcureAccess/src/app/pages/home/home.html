@@ -4,102 +4,24 @@ SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-<div class="home-text-container">
-<p>{{ 'HOME.WELCOME_MSG' | translate }}</p>
-<p style="display: flex; align-items: center;">{{ 'HOME.FIND_A11Y_CTA' | translate }} 
-    <button
-        mat-icon-button
-        class="filters-btn"
-        aria-label="Filters icon-button"
-        [routerLink]="'/filters'">
-        <mat-icon>arrow_forward</mat-icon>
-    </button>
-</p>
-@if (store.isAuthenticated()) {
-    <p style="display: flex; align-items: center;">{{ 'HOME.FAVORITES_CTA' | translate }}
-        <button
-            mat-icon-button
-            class="favorites-btn"
-            aria-label="Favorites icon-button"
-            [routerLink]="'/favorites'">
-            <mat-icon>arrow_forward</mat-icon>
-        </button>
-    </p>
-} @else {
-    <p style="display: flex; align-items: center;">{{ 'HOME.LOGIN_CTA' | translate }}
-        <button 
-            mat-icon-button
-            class="login-btn" 
-            aria-label="Login icon-button" 
-            (click)="authService.showLogin()" >
-            <mat-icon>arrow_forward</mat-icon>
-        </button>
-    </p>
-}
-<p style="display: flex; align-items: center;">{{ 'HOME.HELP_CTA' | translate }}
-    <button 
-        mat-icon-button
-        class="contact-btn" 
-        aria-label="Contact icon-button" 
-        [routerLink]="'/settings'">
-        <mat-icon>arrow_forward</mat-icon>
-    </button>
-</p>
-</div>
-<div class="recently-added-container">
-<mat-divider></mat-divider>
-<h3>{{ 'HOME.RECENTLY_ADDED_PRODUCTS' | translate }}</h3>
-<div class="recently-added-scroller">
-    <mat-card class="product-card" appearance="outlined">
-        <mat-card-header>
-            <mat-card-title>AquilaWare</mat-card-title>
-            <mat-card-subtitle>Reporting-Anwendung</mat-card-subtitle>
-        </mat-card-header>
-        <img mat-card-image src="document_stock_img.jpeg" alt="Stock image of an accessible document">
-        <mat-card-content>
-            <p>
-                Typ: <span style="font-style: italic;">Dokument</span><br />
-                Ein leicht verständliches Dokument für die Ressourcenübersicht.
-            </p>
-        </mat-card-content>
-        <mat-card-actions>
-            <button matButton [routerLink]="['/product', 17]">{{ 'COMMON.DETAILS' | translate }}</button>
-        </mat-card-actions>
-    </mat-card>
-    <mat-card class="product-card" appearance="outlined">
-        <mat-card-header>
-            <mat-card-title>WorklineOS</mat-card-title>
-            <mat-card-subtitle>Fortbildungs-Management</mat-card-subtitle>
-        </mat-card-header>
-        <img mat-card-image src="hardware_stock_img.jpeg" alt="Photo of a Shiba Inu">
-        <mat-card-content>
-            <p>
-                Typ: <span style="font-style: italic;">Hardware</span><br />
-                Vorteil ist die detaillierte Oberflächengestaltung und gute Größe.
-            </p>
-        </mat-card-content>
-        <mat-card-actions>
-            <button matButton [routerLink]="['/product', 16]">{{ 'COMMON.DETAILS' | translate }}</button>
-        </mat-card-actions>
-    </mat-card>
-    <mat-card class="product-card" appearance="outlined">
-        <mat-card-header>
-            <mat-card-title>WorkBridge</mat-card-title>
-            <mat-card-subtitle>HR-Anwendung</mat-card-subtitle>
-        </mat-card-header>
-        <img mat-card-image src="webapp_stock_img.png" alt="Stock image of a web app">
-        <mat-card-content>
-            <p>
-                Typ: <span style="font-style: italic;">Website / Webanwendung</span><br />
-                Einfach zu bedienende Benutzeroberfläche und nahtloser Workflow.
-            </p>
-        </mat-card-content>
-        <mat-card-actions>
-            <button matButton [routerLink]="['/product', 15]">{{ 'COMMON.DETAILS' | translate }}</button>
-        </mat-card-actions>
-    </mat-card>
-    <button matButton [routerLink]="'/filters'">{{ 'COMMON.SEE_MORE' | translate }} ...</button>
-</div>
-<mat-divider style="margin-top: 16px"></mat-divider>
+<h1 class="pa-home__title">{{ 'home.title' | translate }}</h1>
+<p class="pa-home__intro">{{ 'home.intro' | translate }}</p>
 
-</div>
+<ul class="pa-home__cards">
+  <li>
+    <mat-card class="pa-home__card" appearance="outlined">
+      <h2 class="pa-home__card-title">{{ 'home.card.criteria.title' | translate }}</h2>
+      <p class="pa-home__card-text">{{ 'home.card.criteria.text' | translate }}</p>
+      <a matButton="filled" class="pa-home__card-cta" routerLink="/filters">{{ 'home.card.criteria.cta' | translate }}</a>
+    </mat-card>
+  </li>
+  <li>
+    <mat-card class="pa-home__card" appearance="outlined">
+      <h2 class="pa-home__card-title">{{ 'home.card.directory.title' | translate }}</h2>
+      <p class="pa-home__card-text">{{ 'home.card.directory.text' | translate }}</p>
+      <a matButton="filled" class="pa-home__card-cta" routerLink="/products">{{ 'home.card.directory.cta' | translate }}</a>
+    </mat-card>
+  </li>
+</ul>
+
+<pa-notice kind="info">{{ 'home.disclaimer' | translate }}</pa-notice>

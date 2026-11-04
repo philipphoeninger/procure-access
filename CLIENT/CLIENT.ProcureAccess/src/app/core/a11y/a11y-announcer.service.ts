@@ -14,8 +14,10 @@ export interface AnnounceOptions {
 
 /**
  * The only way to announce something to screen readers (CLAUDE §9, Handoff §3.4, §7): every
- * text is a UX copy key. The per-key throttle of Handoff §3.4 comes with its first user
- * (autosave, counters).
+ * text is a UX copy key. Announcements wait for each other: CDK `LiveAnnouncer` drops a message
+ * that is not yet in its live region when the next one comes (it sets each after 100 ms), so
+ * without the queue the page title of a route change would swallow `common.loading` (S2-17).
+ * The per-key throttle of Handoff §3.4 comes with its first user (autosave, counters).
  *
  * @spec docs/design_handoff_procureaccess_v1.md §3.4
  * @invariants A11Y-03
@@ -24,11 +26,13 @@ export interface AnnounceOptions {
 export class A11yAnnouncerService {
   private readonly liveAnnouncer = inject(LiveAnnouncer);
   private readonly translate = inject(TranslateService);
+  /** Settles when the last queued message is in the live region. */
+  private queue: Promise<void> = Promise.resolve();
 
   /** Announces the German text of `key` once the texts are loaded. */
   async announce(key: string, params?: InterpolationParameters, options: AnnounceOptions = {}): Promise<void> {
-    const text = (await firstValueFrom(this.translate.get(key, params))) as string;
-    await this.liveAnnouncer.announce(text, options.politeness ?? 'polite');
+    const text = firstValueFrom(this.translate.get(key, params)) as Promise<string>;
+    await this.enqueue(text, options.politeness ?? 'polite');
   }
 
   /**
@@ -36,6 +40,13 @@ export class A11yAnnouncerService {
    * `shell.pageTitle*` keys by `PageTitleStrategy`, or is the app name on a page without a key.
    */
   async announcePageTitle(title: string): Promise<void> {
-    await this.liveAnnouncer.announce(title, 'polite');
+    await this.enqueue(title, 'polite');
+  }
+
+  /** Queued in call order; a text that is still being translated holds the queue. */
+  private enqueue(text: string | Promise<string>, politeness: AriaLivePoliteness): Promise<void> {
+    const announced = this.queue.then(async () => this.liveAnnouncer.announce(await text, politeness));
+    this.queue = announced.catch(() => undefined);
+    return announced;
   }
 }

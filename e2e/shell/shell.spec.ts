@@ -13,14 +13,14 @@ import { expectNoAxeViolations } from '../support/axe';
  */
 const WIDE = { width: 1280, height: 800 };
 const COMPACT = { width: 360, height: 780 };
-// The compact tests start on a legal page: the legacy start page is wider than 360 px (its
-// product cards), which zooms the mobile viewports out, until S2-17 rebuilds it.
+// The compact tests start on a legal page, chosen while the legacy start page was wider than
+// 360 px; S2-17 rebuilt it, and S2-18 (320 px / 400 % check) decides where they start.
 const NARROW_PAGE = '/barrierefreiheit';
 
 test.describe('App shell', () => {
   test('INV:A11Y-01 skip link, landmarks and footer on the start page', async ({ page }, testInfo) => {
     await page.setViewportSize(WIDE);
-    await page.goto('/home');
+    await page.goto('/');
 
     await expect(page.getByRole('banner')).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Hauptnavigation' })).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('App shell', () => {
 
     await page.keyboard.press('Enter');
     await expect(page.getByRole('main')).toBeFocused();
-    await expect(page).toHaveURL(/\/home$/);
+    await expect(page).toHaveURL(/:\d+\/$/);
   });
 
   test('INV:A11Y-01 marks the current page in the main navigation', async ({ page }, testInfo) => {

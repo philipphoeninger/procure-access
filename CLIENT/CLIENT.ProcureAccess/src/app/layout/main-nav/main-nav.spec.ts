@@ -82,7 +82,7 @@ describe('MainNav', () => {
     expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
 
     signedIn = false;
-    await TestBed.inject(Router).navigateByUrl('/home');
+    await TestBed.inject(Router).navigateByUrl('/impressum');
     await fixture.whenStable();
 
     expect(screen.getByRole('button', { name: 'Anmelden' })).toBeTruthy();
