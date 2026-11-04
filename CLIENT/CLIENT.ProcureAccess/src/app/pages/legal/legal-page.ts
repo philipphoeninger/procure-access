@@ -20,6 +20,7 @@ export type LegalPageKind = 'imprint' | 'privacy' | 'accessibility';
   selector: 'pa-legal-page',
   imports: [TranslatePipe, Notice],
   templateUrl: './legal-page.html',
+  styleUrl: './legal-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LegalPage {

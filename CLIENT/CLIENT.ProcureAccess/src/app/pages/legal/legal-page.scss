@@ -1,0 +1,23 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// S71 (Handoff §5.3): content column; the H1 uses the doc-page headline (Handoff §1).
+// Full width of `main`, so the H1 wraps inside the column instead of sizing it.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  inline-size: 100%;
+}
+
+// A long compound word („Datenschutzhinweise“) is hyphenated (`<html lang>`), or broken where
+// the browser has no dictionary, instead of widening the page at 320 px / 400 % zoom (R-SHL-10).
+.pa-legal-page__title {
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
