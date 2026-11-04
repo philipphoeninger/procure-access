@@ -71,7 +71,9 @@ jobs:
       - name: REUSE / SPDX licence check
         run: pipx run "reuse==${REUSE_VERSION}" lint
       - name: Figma link check
-        run: node scripts/check-figma-links.mjs
+        run: |
+          node --test scripts/check-figma-links.test.mjs
+          node scripts/check-figma-links.mjs
       - name: i18n check (de.json against the UX copy and the templates)
         run: |
           node --test scripts/check-i18n.test.mjs

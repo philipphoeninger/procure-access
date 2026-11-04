@@ -1,6 +1,6 @@
 # ProcureAccess — Figma ↔ Code Mapping (step 7h)
 
-> **Status:** v1.13 — output of Phase 2, step 7h ("Connect Figma components to code") of `ai_development_process.md`; updated 2026-10-06 for the BIT inklusiv rating scale (K1, K6, entry row) and the new S10/S34a frames; `pa-rating-legend` and S34 Überblick added; critique 2: K5 `Show why button`, K1 `Scope=Workspace`, S10-M; 2026-10-12: Layout=Narrow|Wide for `pa-entry-card` and K3, K6 compact form, mobile-first frames; page tags mobile-first (360 px frame first), references to TESTING_v3; v1.6 (2026-10-12, consistency audit): K1 Scope adds `workspace`, K6 `kind` (procedure criteria, Ja/Nein) and allowed-ratings union, entry context on `pa-entry-card`, references to ARCHITECTURE_v6 / TESTING_v4 / UX copy v8, Angular 22; v1.7: procedure criteria derived (no K6 kind), references to ARCHITECTURE_v7 / TESTING_v5 / UX copy v9, `pa-product-result` property "Show use case line"; v1.8 (2026-10-13): references to ARCHITECTURE_v8 / TESTING_v6 / UX copy v10; new screen frames S34a-L, S55-1, S55-2 (see handoff §10); v1.9: references to ARCHITECTURE_v9 / TESTING_v7 / UX copy v11; S32 and S32-M are pages without new components; v1.10 (2026-10-13, review of the main documents `pruefung_hauptdokumente_v1.md`): K2 and K4 take a list of test evidences (`testEvidences[]`); component counts corrected (14 Figma components, 13 files in the CI map, because both header components are one Angular class); the CI script lives at `scripts/check-figma-links.mjs` in the repository root; references to ARCHITECTURE_v10 / TESTING_v8 / UX copy v12 / handoff 1.12. v1.11 (2026-10-29, sprint 01, `TECH_DEBT_v1.md` TD-11): §4 no longer copies the script; it describes the script that exists since task S1-21 (exact node match, `PENDING` list) and points to `scripts/check-figma-links.mjs` as the source. v1.12 (2026-11-02, sprint 02, task S2-11): `pa-notice` built, with its `@figma` tag (§2 status). v1.13 (2026-11-02, sprint 02, task S2-15): `pa-header` reworked into `pa-app-header` / `pa-app-header-compact` (state Anonymous), tag `2017-650` on `layout/header/header.ts`, `PENDING` list of the CI check empty (§2 status).
+> **Status:** v1.14 — output of Phase 2, step 7h ("Connect Figma components to code") of `ai_development_process.md`; updated 2026-10-06 for the BIT inklusiv rating scale (K1, K6, entry row) and the new S10/S34a frames; `pa-rating-legend` and S34 Überblick added; critique 2: K5 `Show why button`, K1 `Scope=Workspace`, S10-M; 2026-10-12: Layout=Narrow|Wide for `pa-entry-card` and K3, K6 compact form, mobile-first frames; page tags mobile-first (360 px frame first), references to TESTING_v3; v1.6 (2026-10-12, consistency audit): K1 Scope adds `workspace`, K6 `kind` (procedure criteria, Ja/Nein) and allowed-ratings union, entry context on `pa-entry-card`, references to ARCHITECTURE_v6 / TESTING_v4 / UX copy v8, Angular 22; v1.7: procedure criteria derived (no K6 kind), references to ARCHITECTURE_v7 / TESTING_v5 / UX copy v9, `pa-product-result` property "Show use case line"; v1.8 (2026-10-13): references to ARCHITECTURE_v8 / TESTING_v6 / UX copy v10; new screen frames S34a-L, S55-1, S55-2 (see handoff §10); v1.9: references to ARCHITECTURE_v9 / TESTING_v7 / UX copy v11; S32 and S32-M are pages without new components; v1.10 (2026-10-13, review of the main documents `pruefung_hauptdokumente_v1.md`): K2 and K4 take a list of test evidences (`testEvidences[]`); component counts corrected (14 Figma components, 13 files in the CI map, because both header components are one Angular class); the CI script lives at `scripts/check-figma-links.mjs` in the repository root; references to ARCHITECTURE_v10 / TESTING_v8 / UX copy v12 / handoff 1.12. v1.11 (2026-10-29, sprint 01, `TECH_DEBT_v1.md` TD-11): §4 no longer copies the script; it describes the script that exists since task S1-21 (exact node match, `PENDING` list) and points to `scripts/check-figma-links.mjs` as the source. v1.12 (2026-11-02, sprint 02, task S2-11): `pa-notice` built, with its `@figma` tag (§2 status). v1.13 (2026-11-02, sprint 02, task S2-15): `pa-header` reworked into `pa-app-header` / `pa-app-header-compact` (state Anonymous), tag `2017-650` on `layout/header/header.ts`, `PENDING` list of the CI check empty (§2 status). v1.14 (2026-11-04, sprint 02, task S2-22, issue #110): the CI check also maps the pages of §2.2 (their paths are now the ones it expects), finds a mapped component at another path and validates `PENDING` files (§4); `Header` carries one `@figma` line per Figma component it maps, so `pa-app-header-compact` has its own line (§2, §3); §6 adds a row for new pages.
 > **Figma file:** "ProcureAccess" (`rPeSyK8NNe3d8AnUEXW9mt`), page "Komponenten"
 > **Repository:** https://github.com/philipphoeninger/procure-access (branch `main`), Angular app in `CLIENT/CLIENT.ProcureAccess/`
 > **Related:** `design_handoff_procureaccess_v1.md` (1.12; component interfaces §3–§4), `ux_copy_procureaccess_v12.md` (strings), `ARCHITECTURE_v10.md`, `TESTING_v8.md`
@@ -44,7 +44,7 @@ Base path in the repo: `CLIENT/CLIENT.ProcureAccess/src/app/`. Folder and file n
 | `pa-contribution-item` | [`2056:593`](https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2056-593) | `features/directory/components/contribution-item/` | `ContributionItem` | `pa-contribution-item` | §4.10 | new |
 | `pa-rating-legend` | [`2099:760`](https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2099-760) | `shared/components/rating-legend/` | `RatingLegend` | `pa-rating-legend` | §4.11 | new |
 | `pa-app-header` | [`2017:650`](https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2017-650) | `layout/header/` | `Header` | `pa-header` | §3.1 | built (S2-15), state Anonymous; nav and account in `layout/main-nav/` (`pa-main-nav`, no Figma component of its own) |
-| `pa-app-header-compact` | [`2039:2131`](https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2131) | `layout/header/` (same component, narrow layout) | `Header` | `pa-header` | §3.1 | built (S2-15); the menu is the shell's `mat-sidenav` in `app.html` |
+| `pa-app-header-compact` | [`2039:2131`](https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2131) | `layout/header/` (same component, narrow layout) | `Header` | `pa-header` | §3.1 | built (S2-15), second `@figma` line of `header.ts` (S2-22); the menu is the shell's `mat-sidenav` in `app.html` |
 
 **Why these locations:**
 - K1–K4 are used in the directory (S41, S42), in contribution previews (S55 step 5) and in "Meine Beiträge" (S53). They cross feature boundaries, so they live in `shared/components/signals/`. Grouping them keeps the four rule-carrying components together for review (ARCHITECTURE §8.4).
@@ -96,7 +96,7 @@ These are the same rules that are written into each Figma description (section "
 
 ### 2.2 Screens → pages (proposal)
 
-Screens are not linked by Dev Mode documentation links. This table is the reference, and every page component carries the `@figma` tag (§3). **Bold** = 360 px base frame (mobile-first), first `@figma` line of the page.
+Screens are not linked by Dev Mode documentation links. This table is the reference, and every page component carries the `@figma` tag (§3). **Bold** = 360 px base frame (mobile-first), first `@figma` line of the page; a row without a bold node starts with its first node (S34 and S51: the first bold node). The CI check (§4) expects each page at `<folder><folder name>.ts` (e.g. `features/configurator/pages/criteria-select/criteria-select.ts`); a step that builds a page elsewhere changes this table and `PAGES` in the script in the same pull request.
 
 | Screen | Figma node(s) | Planned page component |
 |---|---|---|
@@ -140,7 +140,7 @@ export class FulfillmentBreakdown { … }
 ```
 
 **Rules:**
-- `@figma` on **components**: exactly one URL, pointing to the **component set** (not a variant, not an instance).
+- `@figma` on **components**: one URL per Figma component the class maps, pointing to the **component set** (not a variant, not an instance). Almost every class maps one component; `Header` maps `pa-app-header` and `pa-app-header-compact`, so it has two lines.
 - `@figma` on **pages (mobile-first)**: the **first** `@figma` line points to the 360 px base frame where one exists (S42-M, S40-M, S10-M1, S32-M, S34-M, S13-M, S34b-M, S51-M; see §2.2), the **second** to the desktop frame. Pages without a 360 px frame point to the desktop frame only. Further states (errors, 320 px zoom checks) may follow as additional lines with a short label, e.g. `@figma … (error)`.
 - `@spec`: the handoff section. The design documents move to `docs/design/` in the repository when the specification phase starts (step 8). Until then, the link stays as written.
 - `@invariants`: only for components that carry invariants from TESTING_v8. Tests for these components carry the same IDs (`INV:SIG-08` …), see TESTING_v8 §8.1.
@@ -150,17 +150,19 @@ export class FulfillmentBreakdown { … }
 
 ## 4. CI check
 
-A small script keeps the bridge from rotting: **`scripts/check-figma-links.mjs`** (Node, no dependencies; since sprint 01, task S1-21). The script is the source of truth; this section only describes it. It runs in stage 1 ("Lint & licences") of the pipeline (TESTING_v15 §8.2). Run it from anywhere: `node scripts/check-figma-links.mjs`.
+A small script keeps the bridge from rotting: **`scripts/check-figma-links.mjs`** (Node, no dependencies; since sprint 01, task S1-21; pages, moved components and `PENDING` checks since sprint 02, task S2-22). The script is the source of truth; this section only describes it. It runs in stage 1 ("Lint & licences") of the pipeline (TESTING_v23 §8.2), after its self-test `node --test scripts/check-figma-links.test.mjs`. Run it from anywhere: `node scripts/check-figma-links.mjs`.
 
-What it checks:
+What it checks (paths relative to `CLIENT/CLIENT.ProcureAccess/`):
 
-- **`MAP`** lists the mapped component files (paths relative to `CLIENT/CLIENT.ProcureAccess/`) with their Figma node IDs from §2. It has 13 entries for the 14 Figma components, because `pa-app-header` and `pa-app-header-compact` are one Angular class (`Header`).
-- A mapped file that exists must contain `@figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=<node>`. The node ID must end there, so node `2014-341` does not match a tag for `2014-3410`. A missing or wrong tag fails the build.
-- A mapped file that does not exist yet is skipped, so the check tightens itself as components appear during the migration.
-- **`PENDING`** lists mapped paths where a file exists that is not the mapped component yet (TESTING V60). They get a notice instead of a failure, and a notice asks to remove the entry once the file carries its tag. Today: `src/app/layout/header/header.ts`, the legacy header, until the step-1 shell. A `PENDING` entry that is not in `MAP` fails the build.
-- The script prints how many files it checked, skipped and kept pending.
+- **`COMPONENTS`** lists the 13 component files of §2 with their node IDs and selectors. A file that exists must contain `@figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=<node>` for **each** of its nodes; `layout/header/header.ts` has two (`2017-650`, `2039-2131`), because both header components are one Angular class.
+- **`PAGES`** lists the 13 page and dialog files of §2.2 with their base frame. The **first** `@figma` line of a page that exists must point to that frame; further lines (desktop, error, 320 px) are not checked.
+- A node ID must end where the tag says: node `2014-341` does not match a tag for `2014-3410`. A missing or wrong tag fails the build.
+- A mapped file that does not exist yet is skipped, so the check tightens itself as components and pages appear during the migration.
+- **Moved components:** a production `.ts` file under `src/app` (not `*.spec.ts`, not `src/app/testing/`) that declares the selector of a mapped component at another path fails the build, also when the mapped file exists. Pages are found by path only: their selectors are not in the mapping, and the legacy `pa-criteria-list` would collide with S11.
+- **`PENDING`** lists mapped paths where a file exists that is not the mapped component or page yet (TESTING V60), with the reason. Such a file gets a notice while it carries no tag of this Figma file; a notice asks to remove the entry once the file carries its tag; a tag with a wrong node fails. A `PENDING` entry that is in neither list, or whose file no longer exists, fails. The list is empty since S2-15.
+- The script prints how many files it checked, skipped as not built yet and kept pending.
 
-Changes to the mapping (§6) update `MAP` in the script and §2 in the same pull request.
+Changes to the mapping (§6) update `COMPONENTS` or `PAGES` in the script and §2 or §2.2 in the same pull request.
 
 ---
 
@@ -182,7 +184,8 @@ The accessibility annotations from 7f stay unchanged.
 
 | Event | Do |
 |---|---|
-| New domain component | Create it in Figma (page "Komponenten"), set documentation link + description as in §5, add a row to §2 and to `MAP` in `scripts/check-figma-links.mjs` (§4) |
-| Component renamed or moved in code | Update the Figma documentation link and description in the same PR; update §2 and `MAP` in the script |
+| New domain component | Create it in Figma (page "Komponenten"), set documentation link + description as in §5, add a row to §2 and to `COMPONENTS` in `scripts/check-figma-links.mjs` (§4) |
+| New page or screen | Add a row to §2.2 and to `PAGES` in the script, with the base frame first (§3) |
+| Component or page renamed or moved in code | Update the Figma documentation link and description in the same PR; update §2 or §2.2 and `COMPONENTS` or `PAGES` in the script |
 | Figma variant or property added | Update §2.1 and the component's inputs; the description section "Figma → Code" in Figma |
 | Switch to Organization plan | Publish the library; generate Code Connect templates (`*.figma.ts`) from §2.1; keep the `@figma` tags (they still serve code → Figma) |
