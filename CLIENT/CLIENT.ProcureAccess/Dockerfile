@@ -12,7 +12,7 @@ COPY . ./
 RUN npm run build:release
 
 # stage 2: serve with nginx
-FROM nginx:1.30-alpine AS final
+FROM nginx:1.31-alpine AS final
 EXPOSE 80
 COPY --from=build /app/dist/procure-access/browser /usr/share/nginx/html
 # Licence texts of the bundled packages (e.g. Apache-2.0 of the Material Symbols font), served as /3rdpartylicenses.txt
