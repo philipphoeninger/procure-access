@@ -13,9 +13,6 @@ import { expectNoAxeViolations } from '../support/axe';
  */
 const WIDE = { width: 1280, height: 800 };
 const COMPACT = { width: 360, height: 780 };
-// The compact tests start on a legal page, chosen while the legacy start page was wider than
-// 360 px; S2-17 rebuilt it, and S2-18 (320 px / 400 % check) decides where they start.
-const NARROW_PAGE = '/barrierefreiheit';
 
 test.describe('App shell', () => {
   test('INV:A11Y-01 skip link, landmarks and footer on the start page', async ({ page }, testInfo) => {
@@ -51,7 +48,7 @@ test.describe('App shell', () => {
 
   test('INV:A11Y-01 compact menu opens on the first item and Esc returns to „Menü“', async ({ page }, testInfo) => {
     await page.setViewportSize(COMPACT);
-    await page.goto(NARROW_PAGE);
+    await page.goto('/');
 
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: 'Zum Inhalt springen' })).toBeFocused();
@@ -62,7 +59,7 @@ test.describe('App shell', () => {
 
     await menu.click();
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByRole('link', { name: 'Kriterien' })).toBeFocused();
+    await expect(page.getByRole('link', { name: 'Kriterien', exact: true })).toBeFocused();
     await expectNoAxeViolations(page, testInfo, 'compact menu open');
 
     await page.keyboard.press('Escape');
@@ -77,7 +74,7 @@ test.describe('App shell', () => {
 
   test('INV:A11Y-01 legal pages are placeholders reachable from the footer', async ({ page }, testInfo) => {
     await page.setViewportSize(COMPACT);
-    await page.goto(NARROW_PAGE);
+    await page.goto('/');
 
     for (const [link, title] of [
       ['Impressum', 'Impressum'],
