@@ -14,7 +14,7 @@ npm run report                            # HTML report of the last run (traces 
 npm run stack:down
 ```
 
-`npm run stack:up` starts `docker-compose.yml` plus `docker-compose.e2e.yml`: a fresh in-memory database on every start, a stack-local network, SMTP credentials cleared, and `--wait` until client and API answer. If the stack is not reachable, the run stops at once (`support/global-setup.ts`).
+`npm run stack:up` starts `docker-compose.yml` plus `docker-compose.e2e.yml`: a fresh in-memory database on every start, a stack-local network, SMTP credentials cleared, and `--wait` until the client answers and the API's `/health/ready` is 200 (the API reaches its database). If the stack is not reachable, the run stops at once (`support/global-setup.ts`: client URL and `E2E_API_URL` + `/health/ready`; `E2E_API_URL` is the API origin, default `http://localhost:5000`).
 
 Browser projects: `chromium`, `firefox`, `webkit`, `mobile-chrome` (Pixel 7), `mobile-safari` (iPhone 15). WebKit needs the Ubuntu/Debian libraries Playwright lists (`npx playwright install-deps`); on other Linux distributions run the Chromium and Firefox projects locally and leave WebKit to CI.
 
