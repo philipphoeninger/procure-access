@@ -68,7 +68,7 @@ Findings, sorted per CLAUDE §6.8:
 | #107 | A, attempt 1, stage 1 | First `setup-node`: "Resolved CLIENT/CLIENT.ProcureAccess/.nvmrc as 24.22.1"; second: "Resolved e2e/.nvmrc as 24.22.1", then the e2e type check |
 | #104 | A, attempt 2 (re-run of stage 8 only) | "Found 6 artifact(s)" (incl. `coverage-report` of attempt 1 and `playwright-report`) → "Total of 4 artifact(s) downloaded"; `coverage-report` uploaded again without conflict |
 | #106 | [B](https://github.com/philipphoeninger/procure-access/actions/runs/41868669983) — one probe commit that breaks the .NET build | Stage 2 failure → stages 3–6 and **8 skipped** (check run conclusion `skipped`), no ReportGenerator error |
-| all | The run of this pull request | Normal path: cache hit, save skipped; stage 8 merges the report |
+| all | [PR #174](https://github.com/philipphoeninger/procure-access/actions/runs/41869555673) | Normal path, all checks green: "Cache restored from key: playwright-Linux-1.64.1", save skipped; 195 E2E tests passed; stage 8 merges the report |
 
 Attempt 1 of run A ran during a GitHub Actions incident ("Incident with Actions and Pages", 2026-11-04 from 16:05 UTC): stage 8 waited ≈ 25 min for a runner and stage 1 showed "in progress" after all its steps had finished. Neither is caused by this change.
 
