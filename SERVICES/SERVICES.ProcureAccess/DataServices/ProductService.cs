@@ -7,9 +7,10 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class ProductService : BaseService<Product, ProductDto>, IProductService
 {
     public ProductService(
-        IProductRepo repo,
-        IMapper mapper) : base(repo, mapper)
+        IProductRepo repo) : base(repo)
     { }
+
+    protected override ProductDto ToDto(Product entity) => entity.ToDto();
 
     public override async Task<Result<IEnumerable<ProductDto>>> ReadAll()
     {
@@ -20,7 +21,7 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
                     x.Proposal == null ||
                     x.Proposal.Status == ProposalStatus.Approved)
                 .OrderBy(x => x.Id)
-                .ProjectTo<ProductDto>(Mapper.ConfigurationProvider)
+                .Select(CatalogMappings.ProductProjection)
                 .ToListAsync());
     }
 
@@ -41,7 +42,7 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
         return Result<IEnumerable<ProductDto>>.Success(
                 await query
                     .OrderBy(x => x.Id)
-                    .ProjectTo<ProductDto>(Mapper.ConfigurationProvider)
+                    .Select(CatalogMappings.ProductProjection)
                     .ToListAsync());
     }
 }

@@ -7,9 +7,10 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class CriteriaFilterService : BaseService<CriteriaFilter, CriteriaFilterDto>, ICriteriaFilterService
 {
     public CriteriaFilterService(
-        ICriteriaFilterRepo repo,
-        IMapper mapper) : base(repo, mapper)
+        ICriteriaFilterRepo repo) : base(repo)
     { }
+
+    protected override CriteriaFilterDto ToDto(CriteriaFilter entity) => entity.ToDto();
 
     public override async Task<Result<IEnumerable<CriteriaFilterDto>>> ReadAll()
     {
@@ -17,7 +18,7 @@ public class CriteriaFilterService : BaseService<CriteriaFilter, CriteriaFilterD
             await MainRepo.Context.CriteriaFilters
                 .AsNoTracking()
                 .OrderBy(x => x.Id)
-                .ProjectTo<CriteriaFilterDto>(Mapper.ConfigurationProvider)
+                .Select(CatalogMappings.CriteriaFilterProjection)
                 .ToListAsync());
     }
 }

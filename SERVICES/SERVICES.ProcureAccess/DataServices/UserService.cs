@@ -12,7 +12,6 @@ public class UserService : IUserService
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly ApplicationDBContext _db;
-    private readonly IMapper _mapper;
     private readonly JWTSettings _jwt;
     private readonly IEmailService _emailService;
     private readonly IEmailTemplateService _templateService;
@@ -24,7 +23,6 @@ public class UserService : IUserService
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ApplicationDBContext db,
-        IMapper mapper,
         IOptions<JWTSettings> jwt,
         IEmailService emailService,
         IEmailTemplateService templateService,
@@ -34,7 +32,6 @@ public class UserService : IUserService
         _userManager = userManager;
         _signInManager = signInManager;
         _db = db;
-        _mapper = mapper;
         _jwt = jwt.Value;
         _emailService = emailService;
         _templateService = templateService;
@@ -52,7 +49,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null || user.IsDeleted)
             return null; //gate
-        return _mapper.Map<UserDto>(user);
+        return user.ToDto();
     }
 
     // SIGN IN (with lockout support)
@@ -210,7 +207,7 @@ public class UserService : IUserService
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            User = _mapper.Map<UserDto>(user)
+            User = user.ToDto()
         };
     }
 

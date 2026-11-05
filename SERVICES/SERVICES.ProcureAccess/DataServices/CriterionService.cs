@@ -7,9 +7,10 @@ namespace SERVICES.ProcureAccess.DataServices;
 public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterionService
 {
     public CriterionService(
-        ICriterionRepo repo,
-        IMapper mapper) : base(repo, mapper)
+        ICriterionRepo repo) : base(repo)
     { }
+
+    protected override CriterionDto ToDto(Criterion entity) => entity.ToDto();
 
     public override async Task<Result<IEnumerable<CriterionDto>>> ReadAll()
     {
@@ -19,7 +20,7 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
                 .Where(x => x.Proposal == null ||
                             x.Proposal.Status == ProposalStatus.Approved)
                 .OrderBy(x => x.Id)
-                .ProjectTo<CriterionDto>(Mapper.ConfigurationProvider)
+                .Select(CatalogMappings.CriterionProjection)
                 .ToListAsync());
     }
 
@@ -29,7 +30,7 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
             .AsNoTracking()
             .Where(x => criteriaFilterIds.Contains(x.CriteriaFilterId))
             .OrderBy(x => x.Id)
-            .ProjectTo<CriterionDto>(Mapper.ConfigurationProvider)
+            .Select(CatalogMappings.CriterionProjection)
             .ToListAsync();
     }
 }

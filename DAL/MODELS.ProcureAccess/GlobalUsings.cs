@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-global using AutoMapper;
 
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Base;
