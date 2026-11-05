@@ -71,9 +71,7 @@ SPDX-License-Identifier: MIT
         id="app-contrast-picker"
         mat-icon-button
         (click)="store.toggleContrastMode()">
-        <span class="material-symbols-outlined">
-            {{ store.highContrastOn() ? 'contrast_rtl_off' : 'contrast'}}
-        </span>
+        <mat-icon>{{ store.highContrastOn() ? 'contrast_rtl_off' : 'contrast' }}</mat-icon>
       </button>
     </div>
   </mat-list-item>

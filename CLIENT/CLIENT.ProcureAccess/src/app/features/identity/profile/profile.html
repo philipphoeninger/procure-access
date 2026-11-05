@@ -67,9 +67,7 @@ SPDX-License-Identifier: MIT
       @for (proposal of store.openProposals(); track proposal) {
         <mat-list-item role="listitem">
            @if (proposal.product) {
-            <span matListItemIcon class="material-symbols-outlined">
-              box
-            </span>
+            <mat-icon matListItemIcon>box</mat-icon>
           } @else {
             <mat-icon matListItemIcon>rule</mat-icon>
           }
@@ -102,9 +100,7 @@ SPDX-License-Identifier: MIT
       @for (proposal of store.closedProposals(); track proposal) {
         <mat-list-item role="listitem">
           @if (proposal.product) {
-            <span matListItemIcon class="material-symbols-outlined">
-              box
-            </span>
+            <mat-icon matListItemIcon>box</mat-icon>
           } @else {
             <mat-icon matListItemIcon>rule</mat-icon>
           }
