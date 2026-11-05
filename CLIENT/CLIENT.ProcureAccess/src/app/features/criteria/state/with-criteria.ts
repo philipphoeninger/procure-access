@@ -23,10 +23,12 @@ export const withCriteria = () => signalStoreFeature(
     withMethods((state, criteriaApiService = inject(CriteriaApiService)) => ({
       async getCriteriaBySelectedCriteriaFilterIds(selectedCriteriaFilterIds: number[]) {
           state.incrementLoadingCount();
-          const criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(selectedCriteriaFilterIds);
-          this.setCriteria(criteria);
-
-          state.decrementLoadingCount();
+          try {
+              const criteria = await criteriaApiService.getCriteriaByCriteriaFilterIds(selectedCriteriaFilterIds);
+              this.setCriteria(criteria);
+          } finally {
+              state.decrementLoadingCount();
+          }
       },
       setCriteria(criteria: Criterion[]) {
           patchState(state, {

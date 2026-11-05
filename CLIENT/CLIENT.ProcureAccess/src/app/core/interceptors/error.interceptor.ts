@@ -4,6 +4,7 @@
 
 import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { API_URL } from '@app/app.config';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, switchMap, tap, throwError } from 'rxjs';
@@ -20,26 +21,32 @@ interface LegacyErrorBody {
 
 /**
  * System states of Handoff §6.5 for every request (R-SHL-08): no answer at all (status 0) shows
- * the offline notice, any answer hides it again; a 5xx answer shows the S80 page „Etwas ist
- * schiefgelaufen“ in place of the current page without changing the URL (owner decision S2-17,
- * 3A). Neither gets a snackbar. Other errors keep the snackbar until their screen is rebuilt.
+ * the offline notice, and only an answer of the API (`API_URL`) hides it again, because static
+ * files such as `i18n/de.json` come from the web server even when the API is down (#171); a 5xx
+ * answer shows the S80 page „Etwas ist schiefgelaufen“ in place of the current page without
+ * changing the URL (owner decision S2-17, 3A). Neither gets a snackbar. Other errors keep the snackbar until their screen is rebuilt.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const translate = inject(TranslateService);
   const snackbar = inject(SnackbarService);
   const connection = inject(ConnectionStatus);
   const router = inject(Router);
+  const apiUrl = inject(API_URL);
+  const isApiRequest = req.url === apiUrl || req.url.startsWith(`${apiUrl}/`);
+  const answered = () => {
+    if (isApiRequest) connection.answered();
+  };
 
   return next(req).pipe(
     tap((event) => {
-      if (event instanceof HttpResponse) connection.answered();
+      if (event instanceof HttpResponse) answered();
     }),
     catchError((error: HttpErrorResponse) => {
       if (error.status === 0) {
         connection.noAnswer();
         return throwError(() => error);
       }
-      connection.answered();
+      answered();
       if (error.status >= 500) {
         void router.navigate([SERVER_ERROR_PATH], { skipLocationChange: true });
         return throwError(() => error);

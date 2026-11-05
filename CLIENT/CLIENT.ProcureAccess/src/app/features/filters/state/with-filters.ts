@@ -33,24 +33,26 @@ export const withFilters = () => signalStoreFeature(
     withMethods((state, filtersApiService = inject(FiltersApiService)) => ({
         async loadFilters() {
           state.incrementLoadingCount();
-          // get Filter Types & Criteria Filters
-          const [
-            filterTypesResult,
-            criteriaFiltersResult] =
-            await Promise.all([
-              filtersApiService.getAllFilterTypes(),
-              filtersApiService.getAllCriteriaFilters()
-            ]);
-          // set Criteria Filters
-          this.setCriteriaFilters(criteriaFiltersResult.value ?? []);
-          // set Criteria Filters of each Filter Type & set Filter Types
-          filterTypesResult.value?.forEach(filterType => {
-            filterType.criteriaFilters =
-              state.criteriaFilters().filter(cf => cf.filterTypeId === filterType.id);
-          });
-          this.setFilterTypes(filterTypesResult.value ?? []);
-
-          state.decrementLoadingCount();
+          try {
+            // get Filter Types & Criteria Filters
+            const [
+              filterTypesResult,
+              criteriaFiltersResult] =
+              await Promise.all([
+                filtersApiService.getAllFilterTypes(),
+                filtersApiService.getAllCriteriaFilters()
+              ]);
+            // set Criteria Filters
+            this.setCriteriaFilters(criteriaFiltersResult.value ?? []);
+            // set Criteria Filters of each Filter Type & set Filter Types
+            filterTypesResult.value?.forEach(filterType => {
+              filterType.criteriaFilters =
+                state.criteriaFilters().filter(cf => cf.filterTypeId === filterType.id);
+            });
+            this.setFilterTypes(filterTypesResult.value ?? []);
+          } finally {
+            state.decrementLoadingCount();
+          }
         },
         getCriteriaFilterByName(name: string) {
           return state.criteriaFilters().find(x => x.name == name);

@@ -132,11 +132,14 @@ export const withSettings = () => signalStoreFeature(
             state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
           } else {
             state.incrementLoadingCount();
-            this.removeSettingsFromLocalStorage();
-            const uiCustomization = await settingsApiService.getUICustomization();
-            languageService.init(uiCustomization.language);
-            this.setUICustomization(uiCustomization ?? initialAppState.settings.uiCustomization);
-            state.decrementLoadingCount();
+            try {
+              this.removeSettingsFromLocalStorage();
+              const uiCustomization = await settingsApiService.getUICustomization();
+              languageService.init(uiCustomization.language);
+              this.setUICustomization(uiCustomization ?? initialAppState.settings.uiCustomization);
+            } finally {
+              state.decrementLoadingCount();
+            }
           }
         },
         removeSettingsFromLocalStorage() {
@@ -169,15 +172,18 @@ export const withSettings = () => signalStoreFeature(
           }
 
           state.incrementLoadingCount();
-          const success = await settingsApiService.updateUICustomization(uiCustomization);
-          if (success) {
-            this.setUICustomization(uiCustomization);
-            translateService
-              .get('SETTINGS.SAVED_PERMANENTLY')
-              .pipe(tap(message => snackbarService.showInfo(message)))
-              .subscribe();
+          try {
+            const success = await settingsApiService.updateUICustomization(uiCustomization);
+            if (success) {
+              this.setUICustomization(uiCustomization);
+              translateService
+                .get('SETTINGS.SAVED_PERMANENTLY')
+                .pipe(tap(message => snackbarService.showInfo(message)))
+                .subscribe();
+            }
+          } finally {
+            state.decrementLoadingCount();
           }
-          state.decrementLoadingCount();
         },
         toggleDarkMode() {
           const uiCustomization = state.uiCustomization();
