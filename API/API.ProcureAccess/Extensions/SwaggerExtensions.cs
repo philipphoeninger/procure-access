@@ -19,8 +19,17 @@ public static class SwaggerExtensions
         return services;
     }
 
+    /// <summary>
+    /// Serves the Swagger UI and the OpenAPI documents in <c>Development</c> only (owner decision
+    /// O-S3-2, #183): elsewhere, staging included, <c>/swagger</c> answers 404.
+    /// </summary>
     public static WebApplication ConfigureSwaggerExplorer(this WebApplication app)
     {
+        if (!app.Environment.IsDevelopment())
+        {
+            return app;
+        }
+
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
