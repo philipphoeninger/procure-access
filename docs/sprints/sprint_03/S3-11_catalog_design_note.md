@@ -1,8 +1,9 @@
 # S3-11 — Catalog module: design note on persistence and the existing criteria
 
-> **Sprint:** 03, P0 task S3-11 (M2.1, 1 point, two runs: note → owner decision). **Issues:** none. **Requirements / invariants:** prepares CAT-05, CAT-07, CAT-13, CAT-23; CAT-10 stays green; SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014. No invariant changes status; no TESTING version. **Status:** design note written by Claude Code (2026-11-05), waiting for owner decision **O-S3-5**. This note is the draft of the protocol; the decision and any follow-up go into the header and §2.9 once taken.
+> **Sprint:** 03, P0 task S3-11 (M2.1, 1 point, two runs: note → owner decision). **Issues:** none. **Requirements / invariants:** prepares CAT-05, CAT-07, CAT-13, CAT-23; CAT-10 stays green; SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014. No invariant changes status; no TESTING version. **Status:** design note written by Claude Code (2026-11-05); owner decision **O-S3-5** taken on 2026-11-06 (below and §2.9); decisions e and f of §2.9 still open.
 > **Scope:** exactly the sprint row: `CatalogDbContext` and schema per ADR-014; what goes into `Catalog.Contracts`; how the existing criteria, the `CriteriaFilter` types 1–4 and their exclusions reach the versioned model; what that means for the order of S3-12 – S3-18; what the legacy endpoints read afterwards; how CAT-10 stays green with unchanged expected sets; dropping seed rows 2 and 3. Options with a recommendation, no code. Also in this branch, as a separate commit: the task prompts S3-11 – S3-27 cite `ARCHITECTURE_v17` and `TESTING_v29` (owner, 2026-11-05; `TESTING_v29` comes with S3-10, PR #207, which every later invariant task waits for).
 > **Owner decisions (2026-11-05, before the note):** **1** the conflict between ARCHITECTURE §12 („Migrate existing criteria into release 2026.1“), SPEC R-ADM-01 (2026.1 from Kriterienkatalog Teil A/B plus the priority document) and CAT-10 (unchanged sets) is handled inside this note as part of O-S3-5 (F1).
+> **O-S3-5 (owner, 2026-11-06):** **a** option **C**: no copy of the seed's criteria; the legacy endpoints stay on the legacy tables until S10 (sprint 04) and steps 5/6 retire them; S3-18 is reduced to seed rows 2 and 3 plus J1 (§2.7). **b** **D1**: the filter values are seeded in the catalog migration. **c** **Q2 (iii)**: `catalog import` accepts a release without priorities, `catalog activate` refuses it. **d** criterion proposals are **kept** as they are.
 
 ## 1. Starting point
 
@@ -132,14 +133,14 @@ A legacy migration removes the two entries from `CriteriaFilterExclusionSeed` (E
 
 *Changed from the plan:* the plan for this note leaned towards A. Writing out the consequences (the legacy filter can't be expressed with the new selection rules, legacy tables pinned by products and proposals, CAT-10 ending with 2026.1 anyway) moved the recommendation to C.
 
-| # | Decision | Options | Proposal |
-|---|---|---|---|
-| a | Path of the existing criteria (§2.4) | A · B · C | **C** |
-| b | Filter values (§2.3, Q1) | D1 · D2 | **D1**, Respawn ignores the four tables |
-| c | Release without priorities (Q2) | (i) · (ii) · (iii) · (iv) | **(iii)** |
-| d | Criterion proposals (Q3) | keep · stop approving | keep with C; stop approving with A/B |
-| e | If C: the documents of §2.4 C reworded; S3-27 moves to P0 with the freed points | yes · no | yes; ARCHITECTURE with S3-12 (first catalog task that changes ARCHITECTURE), the sprint plan and ROADMAP right after the decision |
-| f | `Catalog.Contracts` content (§2.2) | as proposed · other | as proposed; HTTP DTO placement follows O-S3-6 |
+| # | Decision | Options | Proposal | Owner, 2026-11-06 |
+|---|---|---|---|---|
+| a | Path of the existing criteria (§2.4) | A · B · C | **C** | **C** |
+| b | Filter values (§2.3, Q1) | D1 · D2 | **D1**, Respawn ignores the four tables | **D1** |
+| c | Release without priorities (Q2) | (i) · (ii) · (iii) · (iv) | **(iii)** | **(iii)** |
+| d | Criterion proposals (Q3) | keep · stop approving | keep with C; stop approving with A/B | **keep** |
+| e | If C: the documents of §2.4 C reworded; S3-27 moves to P0 with the freed points | yes · no | yes; ARCHITECTURE with S3-12 (first catalog task that changes ARCHITECTURE), the sprint plan and ROADMAP right after the decision | open |
+| f | `Catalog.Contracts` content (§2.2) | as proposed · other | as proposed; HTTP DTO placement follows O-S3-6 | open |
 
 Q4 (key scheme) is not part of O-S3-5; it is an open point for S3-15 (§5).
 
@@ -166,7 +167,7 @@ Q4 (key scheme) is not part of O-S3-5; it is an open point for S3-15 (§5).
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | O-S3-5 (§2.9 a–f) | Owner, before S3-12 |
+| P1 | O-S3-5 a–d decided (2026-11-06); e (rewording of the documents of §2.4 C, S3-27 to P0) and f (`Catalog.Contracts` content) open | Owner, before S3-12 |
 | P2 | Q4: key scheme of `Criterion.Key` | S3-15 |
 | P3 | S1-15 R3: the CAT-10 fixture copies BIT inklusiv titles but is annotated MIT through `**/*.json` (release folders, `CriteronSeed.cs` and the seed migrations are already dual-annotated) | Owner, with the CAT-10 rewrite (M2.5d) at the latest |
 | P4 | S1-15 R2: CAT-10 „subset comparison“ vs. exact sets; with F6 the wording changes in the M2.5d rewrite anyway | Owner, with M2.5d |
