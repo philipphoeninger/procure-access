@@ -159,9 +159,13 @@ export function flatten(dict, prefix = '') {
 /**
  * Sets `key` to `text`. Where a shorter key in `textKeys` holds a text, the rest of the key
  * goes into one property name with dots next to it (file header).
+ * A segment `__proto__`, `constructor` or `prototype` is rejected: it would write into the
+ * prototype of every object instead of into de.json (#182).
  */
 export function setText(dict, key, text, textKeys) {
   const segs = key.split('.');
+  const unsafe = segs.find((name) => name === '__proto__' || name === 'constructor' || name === 'prototype');
+  if (unsafe !== undefined) throw new Error(`${key}: the segment "${unsafe}" is not allowed in a key`);
   let cur = dict;
   for (let i = 0; i < segs.length; i++) {
     const name = segs[i];

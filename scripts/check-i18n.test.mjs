@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { check, flatten, keysOfCell, lookup, parseUxCopy, syncAreas, templateKeys } from './check-i18n.mjs';
+import { check, flatten, keysOfCell, lookup, parseUxCopy, setText, syncAreas, templateKeys } from './check-i18n.mjs';
 
 const ux = (rows) =>
   ['## 4. Before', '| Schlüssel | Element | Text | Hinweis |', '|---|---|---|---|', '| `shell.before` | x | not read | |',
@@ -71,6 +71,19 @@ test('--write stores a key that extends a text as a dotted name, in any order', 
   assert.deepEqual(syncAreas(de, texts, ['shell']), []); // nothing left to do
   assert.equal(run(['| `shell.x.long` | x | S | |', '| `shell.x.long.key` | x | L | |', '| `shell.nav.menu` | x | Menü | |',
     '| `shell.nav.menu.close` | x | Z | |'], de).length, 0);
+});
+
+test('--write rejects the key segments __proto__, constructor and prototype', () => {
+  for (const key of ['shell.__proto__.polluted', 'shell.constructor.prototype.polluted', 'shell.a.prototype']) {
+    const de = { shell: {} };
+    assert.throws(() => setText(de, key, 'x', new Set()), /is not allowed in a key/, key);
+    assert.deepEqual(de, { shell: {} }, key);
+  }
+  // Also where the rest of the key would become one dotted name next to a text (file header).
+  assert.throws(() => setText({ shell: { nav: 'N' } }, 'shell.nav.constructor', 'x', new Set(['shell.nav'])), /"constructor"/);
+  // Through --write: nothing written, Object.prototype untouched.
+  assert.throws(() => syncAreas({ shell: {} }, new Map([['shell.__proto__.polluted', 'x']]), ['shell']), /"__proto__"/);
+  assert.equal({}.polluted, undefined);
 });
 
 test('check 1 fails on a missing or different text of an area', () => {
