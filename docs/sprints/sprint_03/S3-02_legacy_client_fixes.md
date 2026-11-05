@@ -56,7 +56,7 @@ No correctness or security bug that affects current behaviour was found in the d
 | 5 | `e2e`: `npm run typecheck` | ✅ |
 | 6 | E2E, Chromium (`npm run stack:up`, `npx playwright test --project=chromium`) | ✅ 40 / 40 passed, incl. the new #171 case and A11Y-01 on every shell state; Firefox and mobile Chrome: 80 / 80 passed. WebKit and mobile Safari run only in CI (P2). The new #171 case was not run against an image of the old client; its reproduction is the one of the issue, and the unit test of §2 fails on the old interceptor |
 | 7 | `node scripts/check-invariants.mjs`, `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs` | ✅ gate passed; Figma 2 checked, 24 not built, 0 pending; i18n 0 errors (6 keys computed at runtime, as before) |
-| 8 | `reuse lint` (image `fsfe/reuse:latest`) | ✅ compliant, 680 / 680 files |
+| 8 | `reuse lint` (image `fsfe/reuse:latest`) | ✅ compliant, 681 / 681 files (with this protocol) |
 | 9 | Backend build and tests | – not touched |
 
 ## 5. Open points
