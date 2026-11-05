@@ -19,22 +19,26 @@ import { initialSettingsState, withSettings } from './with-settings';
 // #168: a failed request of a signed-in user must not leave the loading bar on
 // (pa-loading-bar, R-SHL-09). Signed-out users never call the API here.
 const SettingsTestStore = signalStore(withSettings());
+let media: FakeMediaMatcher;
+let showInfo: ReturnType<typeof vi.fn>;
 
 function setUp(
   apiService: Partial<SettingsApiService>,
   { signedIn = true, systemDark = false }: { signedIn?: boolean; systemDark?: boolean } = {},
 ) {
+  media = new FakeMediaMatcher({ [DARK_SCHEME]: systemDark });
+  showInfo = vi.fn();
   TestBed.configureTestingModule({
     providers: [
       provideTestTranslations(),
-      provideFakeMediaMatcher(new FakeMediaMatcher({ [DARK_SCHEME]: systemDark })),
+      provideFakeMediaMatcher(media),
       SettingsTestStore,
       { provide: APP_NAME, useValue: 'ProcureAccess' },
       { provide: SettingsApiService, useValue: apiService },
       { provide: AuthService, useValue: { isAuthenticated: () => signedIn } },
       { provide: IdentityApiService, useValue: {} },
       { provide: LanguageService, useValue: { init: vi.fn(), get: () => 'de' } },
-      { provide: SnackbarService, useValue: { showInfo: vi.fn() } },
+      { provide: SnackbarService, useValue: { showInfo } },
     ],
   });
   return TestBed.inject(SettingsTestStore);
@@ -96,6 +100,26 @@ describe('withSettings', () => {
       await store.reloadUICustomization();
 
       expect(appearance()).toBe('dark');
+    });
+
+    // S3-10: the legacy listener opened an English snackbar without duration on every system change.
+    describe('system appearance changes while the page is open', () => {
+      afterEach(() => vi.unstubAllGlobals());
+
+      it.each([
+        ['SignedOut', false],
+        ['SignedIn', true],
+      ])('SystemChange_%s_FollowsWithoutSnackbar', (_, signedIn) => {
+        const store = setUp({}, { signedIn, systemDark: false });
+        vi.stubGlobal('matchMedia', (query: string) => media.matchMedia(query));
+        store.activateMediaEventListeners();
+
+        media.set(DARK_SCHEME, true);
+        TestBed.tick();
+
+        expect(appearance()).toBe('dark');
+        expect(showInfo).not.toHaveBeenCalled();
+      });
     });
   });
 });

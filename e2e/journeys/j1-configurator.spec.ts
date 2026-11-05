@@ -70,7 +70,7 @@ function option(page: Page, name: string) {
 }
 
 test.describe('J1 configurator without account (current form)', () => {
-  test('INV:CAT-10 INV:A11Y-01 anonymous visitor filters criteria and gets the recorded list', async ({ page, baseURL }, testInfo) => {
+  test('INV:CAT-10 INV:A11Y-01 INV:A11Y-08 anonymous visitor filters criteria and gets the recorded list', async ({ page, baseURL }, testInfo) => {
     // Seven axe runs take 1–3 s each; under parallel load (Firefox) the default 30 s is too short.
     test.slow();
     // CLAUDE §8: fonts, icons and the API all come from the app's own origin (#43).
@@ -166,7 +166,7 @@ test.describe('J1 configurator without account (current form)', () => {
     });
   });
 
-  test('INV:A11Y-01 confirming without a selection shows the empty-list message', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 confirming without a selection shows the empty-list message', async ({ page }, testInfo) => {
     // S1-15 P3: the API returns [] for an empty selection; the client shows its empty-list text.
     await page.goto('/filters');
     await expect(page.getByRole('button', { name: 'Produkt-Typen' })).toBeVisible();

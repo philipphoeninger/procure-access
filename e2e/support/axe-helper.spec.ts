@@ -31,6 +31,20 @@ const cleanPage = `
     <body><main><h1>Fixture</h1><button type="button">Weiter</button></main></body>
   </html>`;
 
+/** Readable in light; in dark the text is grey on dark grey (about 1.4:1), a color-contrast violation. */
+const pageFailingOnlyInDark = `
+  <!doctype html>
+  <html lang="de">
+    <head>
+      <title>Axe helper fixture</title>
+      <style>
+        p { color: #000; background: #fff; }
+        @media (prefers-color-scheme: dark) { p#dark-only { color: #555; background: #333; } }
+      </style>
+    </head>
+    <body><main><h1>Fixture</h1><p id="dark-only">Nur im Dunkelmodus schwer lesbar</p></main></body>
+  </html>`;
+
 const issue = 'https://github.com/philipphoeninger/procure-access/issues/1';
 
 function suppression(rule: string, selector: string): AxeSuppression {
@@ -76,6 +90,28 @@ test.describe('axe helper', () => {
 
     await expect(check).rejects.toThrow(/button-name/);
     await expect(check).rejects.not.toThrow(/image-alt/);
+  });
+
+  test('INV:A11Y-08 fails on a contrast violation that only the dark appearance shows', async ({ page }, testInfo) => {
+    await page.setContent(pageFailingOnlyInDark);
+
+    const check = expectNoAxeViolations(page, testInfo, 'dark only', { suppressions: [] });
+
+    await expect(check).rejects.toThrow(/dark appearance[\s\S]*color-contrast[\s\S]*#dark-only/);
+    await expect(check).rejects.not.toThrow(/light appearance/);
+  });
+
+  test('INV:A11Y-08 starts in the appearance the page shows and returns to it', async ({ page }, testInfo) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.setContent(cleanPage);
+
+    await expectNoAxeViolations(page, testInfo, 'clean page', { suppressions: [] });
+
+    expect(await page.evaluate(() => matchMedia('(prefers-color-scheme: dark)').matches)).toBe(true);
+    expect(testInfo.attachments.map((attachment) => attachment.name)).toEqual([
+      'axe-clean-page-dark.json',
+      'axe-clean-page-light.json',
+    ]);
   });
 
   test('passes when every violation is suppressed', async ({ page }, testInfo) => {

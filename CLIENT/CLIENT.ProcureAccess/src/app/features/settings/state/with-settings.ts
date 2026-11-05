@@ -72,7 +72,8 @@ export const withSettings = () => signalStoreFeature(
 
       return {
         activateMediaEventListeners() {
-          // theme mode
+          // theme mode; no snackbar: a system change is not a choice to confirm, and the open
+          // snackbar covered the header (S3-10). The storage writes stay until S60 (step 3).
           window
             .matchMedia('(prefers-color-scheme: dark)')
             .addEventListener('change', event => {
@@ -80,9 +81,6 @@ export const withSettings = () => signalStoreFeature(
                 const uiCustomization = state.uiCustomization();
                 uiCustomization.darkModeOn = event.matches;
                 this.setUICustomization(uiCustomization);
-                snackbarService.showInfo(
-                  'You changed the preferred color scheme in your browser.\n' +
-                  'If you want to change the setting permanently, you must save it in the Settings page.');
               } else {
                 // drops unsaved setting changes
                 state.loadFromLocalStorage(LocalStorageKeys.uiCustomization);
@@ -91,7 +89,6 @@ export const withSettings = () => signalStoreFeature(
                 this.setUICustomization(uiCustomization);
                 appearance.setExplicit(null);
                 state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
-                snackbarService.showInfo('New color scheme saved as cookie.');
               }
             });
           // contrast mode

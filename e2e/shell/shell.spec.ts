@@ -15,7 +15,7 @@ const WIDE = { width: 1280, height: 800 };
 const COMPACT = { width: 360, height: 780 };
 
 test.describe('App shell', () => {
-  test('INV:A11Y-01 skip link, landmarks and footer on the start page', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 skip link, landmarks and footer on the start page', async ({ page }, testInfo) => {
     await page.setViewportSize(WIDE);
     await page.goto('/');
 
@@ -36,7 +36,7 @@ test.describe('App shell', () => {
     await expect(page).toHaveURL(/:\d+\/$/);
   });
 
-  test('INV:A11Y-01 marks the current page in the main navigation', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 marks the current page in the main navigation', async ({ page }, testInfo) => {
     await page.setViewportSize(WIDE);
     await page.goto('/products');
 
@@ -46,7 +46,7 @@ test.describe('App shell', () => {
     await expectNoAxeViolations(page, testInfo, 'products, nav item current');
   });
 
-  test('INV:A11Y-01 compact menu opens on the first item and Esc returns to „Menü“', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 compact menu opens on the first item and Esc returns to „Menü“', async ({ page }, testInfo) => {
     await page.setViewportSize(COMPACT);
     await page.goto('/');
 
@@ -72,7 +72,7 @@ test.describe('App shell', () => {
     await expect(menu).toBeFocused();
   });
 
-  test('INV:A11Y-01 legal pages are placeholders reachable from the footer', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 legal pages are placeholders reachable from the footer', async ({ page }, testInfo) => {
     await page.setViewportSize(COMPACT);
     await page.goto('/');
 
