@@ -1,9 +1,9 @@
 # S3-11 — Catalog module: design note on persistence and the existing criteria
 
-> **Sprint:** 03, P0 task S3-11 (M2.1, 1 point, two runs: note → owner decision). **Issues:** none. **Requirements / invariants:** prepares CAT-05, CAT-07, CAT-13, CAT-23; CAT-10 stays green; SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014. No invariant changes status; no TESTING version. **Status:** design note written by Claude Code (2026-11-05); owner decision **O-S3-5** taken on 2026-11-06 (below and §2.9); decisions e and f of §2.9 still open.
+> **Sprint:** 03, P0 task S3-11 (M2.1, 1 point, two runs: note → owner decision). **Issues:** none. **Requirements / invariants:** prepares CAT-05, CAT-07, CAT-13, CAT-23; CAT-10 stays green; SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014. No invariant changes status; no TESTING version. **Status:** design note written by Claude Code (2026-11-05); owner decision **O-S3-5** taken on 2026-11-06 (below and §2.9); sprint plan, ROADMAP and task prompts amended in the same pull request.
 > **Scope:** exactly the sprint row: `CatalogDbContext` and schema per ADR-014; what goes into `Catalog.Contracts`; how the existing criteria, the `CriteriaFilter` types 1–4 and their exclusions reach the versioned model; what that means for the order of S3-12 – S3-18; what the legacy endpoints read afterwards; how CAT-10 stays green with unchanged expected sets; dropping seed rows 2 and 3. Options with a recommendation, no code. Also in this branch, as a separate commit: the task prompts S3-11 – S3-27 cite `ARCHITECTURE_v17` and `TESTING_v29` (owner, 2026-11-05; `TESTING_v29` comes with S3-10, PR #207, which every later invariant task waits for).
 > **Owner decisions (2026-11-05, before the note):** **1** the conflict between ARCHITECTURE §12 („Migrate existing criteria into release 2026.1“), SPEC R-ADM-01 (2026.1 from Kriterienkatalog Teil A/B plus the priority document) and CAT-10 (unchanged sets) is handled inside this note as part of O-S3-5 (F1).
-> **O-S3-5 (owner, 2026-11-06):** **a** option **C**: no copy of the seed's criteria; the legacy endpoints stay on the legacy tables until S10 (sprint 04) and steps 5/6 retire them; S3-18 is reduced to seed rows 2 and 3 plus J1 (§2.7). **b** **D1**: the filter values are seeded in the catalog migration. **c** **Q2 (iii)**: `catalog import` accepts a release without priorities, `catalog activate` refuses it. **d** criterion proposals are **kept** as they are.
+> **O-S3-5 (owner, 2026-11-06):** **a** option **C**: no copy of the seed's criteria; the legacy endpoints stay on the legacy tables until S10 (sprint 04) and steps 5/6 retire them; S3-18 is reduced to seed rows 2 and 3 plus J1 (§2.7). **b** **D1**: the filter values are seeded in the catalog migration. **c** **Q2 (iii)**: `catalog import` accepts a release without priorities, `catalog activate` refuses it. **d** criterion proposals are **kept** as they are. **e** documents reworded split: `SPRINT_03.md` (S3-18 reduced to 1 point, S3-27 moved to P0), `ROADMAP_v3.md` (v3.1: M2.1 13 → 11) and `TASK_PROMPTS.md` (v1.2: O-S3-5 filled in, S3-18 rewritten, S3-27 in P0) in this pull request; ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. **f** `Catalog.Contracts` as in §2.2.
 
 ## 1. Starting point
 
@@ -139,8 +139,8 @@ A legacy migration removes the two entries from `CriteriaFilterExclusionSeed` (E
 | b | Filter values (§2.3, Q1) | D1 · D2 | **D1**, Respawn ignores the four tables | **D1** |
 | c | Release without priorities (Q2) | (i) · (ii) · (iii) · (iv) | **(iii)** | **(iii)** |
 | d | Criterion proposals (Q3) | keep · stop approving | keep with C; stop approving with A/B | **keep** |
-| e | If C: the documents of §2.4 C reworded; S3-27 moves to P0 with the freed points | yes · no | yes; ARCHITECTURE with S3-12 (first catalog task that changes ARCHITECTURE), the sprint plan and ROADMAP right after the decision | open |
-| f | `Catalog.Contracts` content (§2.2) | as proposed · other | as proposed; HTTP DTO placement follows O-S3-6 | open |
+| e | If C: the documents of §2.4 C reworded; S3-27 moves to P0 with the freed points | yes · no | yes; ARCHITECTURE with S3-12 (first catalog task that changes ARCHITECTURE), the sprint plan and ROADMAP right after the decision | **as proposed** (split; S3-27 to P0) |
+| f | `Catalog.Contracts` content (§2.2) | as proposed · other | as proposed; HTTP DTO placement follows O-S3-6 | **as proposed** |
 
 Q4 (key scheme) is not part of O-S3-5; it is an open point for S3-15 (§5).
 
@@ -167,11 +167,11 @@ Q4 (key scheme) is not part of O-S3-5; it is an open point for S3-15 (§5).
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | O-S3-5 a–d decided (2026-11-06); e (rewording of the documents of §2.4 C, S3-27 to P0) and f (`Catalog.Contracts` content) open | Owner, before S3-12 |
+| P1 | O-S3-5 decided (2026-11-06). Rewording left for S3-12: ARCHITECTURE §12 step 2 (and P7), S1-15 decision 1A (a dated note, the protocol itself stays), the CAT-10 fixture description | S3-12 |
 | P2 | Q4: key scheme of `Criterion.Key` | S3-15 |
 | P3 | S1-15 R3: the CAT-10 fixture copies BIT inklusiv titles but is annotated MIT through `**/*.json` (release folders, `CriteronSeed.cs` and the seed migrations are already dual-annotated) | Owner, with the CAT-10 rewrite (M2.5d) at the latest |
 | P4 | S1-15 R2: CAT-10 „subset comparison“ vs. exact sets; with F6 the wording changes in the M2.5d rewrite anyway | Owner, with M2.5d |
 | P5 | Kriterienkatalog §3.1 names `SampleData.cs` for rows 2 and 3; they are in `CriteriaFilterExclusionSeed.cs` (German document) | Owner, next Kriterienkatalog version |
 | P6 | Respawn ignore list gets `catalog."__EFMigrationsHistory"` (and, with D1, the four filter-value tables) | S3-12 / S3-13 |
 | P7 | ARCHITECTURE §5.1 / §16.3.2 say „seed rows `CriteriaFilterExclusion` Id 2 and 3“; the table has a composite key (F7). Reword when §12 step 2 is amended | With decision e |
-| P8 | With D1, the product-part explanations (quoted from the Standardanforderungskatalog) land in a catalog migration that `REUSE.toml` annotates as MIT: extend the BIT inklusiv block to the catalog migrations, or keep the explanations out of the seed | Owner, before S3-13 |
+| P8 | **Needs an owner decision before S3-13.** With D1, the product-part explanations (quoted from the Standardanforderungskatalog) land in a catalog migration that `REUSE.toml` annotates as MIT: extend the BIT inklusiv block to the catalog migrations, or keep the explanations out of the seed | Owner, before S3-13 |

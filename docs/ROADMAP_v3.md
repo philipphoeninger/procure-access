@@ -1,6 +1,6 @@
 # ProcureAccess — Roadmap
 
-> **Status:** v3 (2026-11-05) — update after sprint 02, created with the skill *Product Management/roadmap-update*: M1 almost done, M2 re-estimated with its debt rows at its first sprint planning, measured velocity of sprint 02. v2 (2026-10-29) was the update after sprint 01, v1 (2026-10-19) the output of Phase 3, step 10 ("Create the roadmap") of `ai_development_process.md`. What changed: §8.
+> **Status:** v3.1 (2026-11-06; v3.1: owner decision O-S3-5, see §8) — v3 (2026-11-05) — update after sprint 02, created with the skill *Product Management/roadmap-update*: M1 almost done, M2 re-estimated with its debt rows at its first sprint planning, measured velocity of sprint 02. v2 (2026-10-29) was the update after sprint 01, v1 (2026-10-19) the output of Phase 3, step 10 ("Create the roadmap") of `ai_development_process.md`. What changed: §8.
 > **Based on:** `SPEC_v2.md` (v2.1; feature areas FA-01–FA-18, requirements `R-…`, mapping §11, phasing §12, open questions §13), `ARCHITECTURE_v15.md` (module rules §4.3, migration path §12, ADR-014), `TESTING_v23.md` (invariants per step §9), `TECH_DEBT_v2.md` (debt per migration step §9), `docs/sprints/sprint_02/SPRINT_02.md` and the sprint-02 task protocols, `docs/sprints/sprint_03/SPRINT_03.md`.
 > **Language:** English (owner decision, 2026-10-19).
 > **Input for:** sprint planning (step 11). Each sprint takes work packages from the current milestone; a work package is the unit that is sliced into tasks.
@@ -38,7 +38,7 @@ Relative effort on a Fibonacci scale, estimated for **one developer working with
 |---|---|---|---:|---|---|---|
 | **M0** | Platform upgrade and test foundation | Done | 28 | – | **Done** (sprint 01) | – |
 | **M1** | Foundations: modules, shell, theme, errors | Now | 44 | high | **In Progress** (34 done; rest in sprint 03) | M0 ✓ |
-| **M2** | Catalog versioning, configurator, anonymous export | Now | **79** (v2: 69) | medium | **Starts in sprint 03** (M2.1, M2.2, M2.4, M2.8) | M1; catalog content O-1, K-1; UX copy session #181 |
+| **M2** | Catalog versioning, configurator, anonymous export | Now | **77** (v3: 79, v2: 69) | medium | **Starts in sprint 03** (M2.1, M2.2, M2.4, M2.8) | M1; catalog content O-1, K-1; UX copy session #181 |
 | **M3** | Accounts, organisations, session, saved lists | Next | 59 | medium | Not Started | M2; Lettermint domain set-up |
 | **M4** | Session warning and hardening | Next | 8 | high | Not Started | M3 |
 | **M5** | Workspace: projects, candidates, assessment | Next | 40 | medium | Not Started | M3, M4 |
@@ -119,9 +119,9 @@ The arrows are the only order that is fixed. Two things may be pulled forward: t
 
 | # | Work package | Requirements / sources | Points | Planned |
 |---|---|---|---:|---|
-| M2.1 | Catalog domain model and migrations: releases, revisions, applicability, priorities, standards, procedure texts, app types, product parts, use cases, test types, exclusions; migration of existing criteria | ARCH §5.1, §12 step 2 | 13 | Sprint 03 (S3-11 – S3-14, S3-18) |
+| M2.1 | Catalog domain model and migrations: releases, revisions, applicability, priorities, standards, procedure texts, app types, product parts, use cases, test types, exclusions; seed rows 2 and 3 dropped. The existing criteria are not copied: they reach the catalog as part of release 2026.1 (M2.3), and the legacy filter stays on the legacy tables until S10 (O-S3-5) | ARCH §5.1, §12 step 2 | 11 | Sprint 03 (S3-11 – S3-14, S3-18) |
 | M2.2 | Release data format and CLI `catalog import` / `catalog activate`, atomic with full validation | R-ADM-01 | 8 | Sprint 03 (S3-15 – S3-17) |
-| M2.3 | Release 2026.1 as data folder from Kriterienkatalog Teil A/B, BIT inklusiv texts, one procedure criterion per test type; priorities and plain-language texts from the project team | R-ADM-01, O-1, K-1 | 8 | Texts: sprint 03 stretch (S3-27); priorities and titles when O-1/K-1 arrive |
+| M2.3 | Release 2026.1 as data folder from Kriterienkatalog Teil A/B, BIT inklusiv texts, one procedure criterion per test type; priorities and plain-language texts from the project team | R-ADM-01, O-1, K-1 | 8 | Texts: sprint 03 (S3-27, P0 since O-S3-5; imported, not activated); priorities and titles when O-1/K-1 arrive |
 | M2.4 | Catalog endpoints: filter options with exclusions, criteria with resolved priority, rationale, allowed ratings, procedure texts | SPEC §8.1, §8.2 | 5 | Sprint 03 (S3-19, S3-20) |
 | M2.4d | *(debt)* Versioned routes `/api/v1` and the duplicate Swagger parameters #153; #176 if the first versioned minimal API comes here | TECH_DEBT_v2 §9.2 | 1 | Sprint 03 (S3-19) |
 | M2.5 | Configurator S10: four steps, exclusions with reason, reset of lower layers, „Bisherige Auswahl“, in-memory draft | R-CON-01 – R-CON-10 | 13 | Sprint 04 |
@@ -131,7 +131,7 @@ The arrows are the only order that is fixed. Two things may be pulled forward: t
 | M2.7 | Export: pipeline with `AdHocSelectionSource`, XLSX (ClosedXML) and CSV per SPEC §8.3, dialog S13, rate limit; `ExportCreated` and `CriteriaListShown` events | R-LST-11, R-LST-12, SPEC §9.1 | 8 | Sprint 05 |
 | M2.7d | *(debt)* #115 usage-event writes before the first caller (sprint 03 stretch S3-23); #112 with the first rate limit; anonymous export out of the logs (EXP-05); E2E seeder and relaxed E2E rate limit; ARC-03 rule for `AdHocSelectionSource`; #42 bundle budget at the end of M2 | TECH_DEBT_v2 §9.2 | 4 | with M2.7 |
 | M2.8 | „Kriterium vorschlagen“ link with configurable channel | R-LST-13, R-SUG-01 | 1 | Sprint 03 (S3-21: footer part); the S11 part with M2.6 |
-| | **Sum** | | **79** (packages 69 + debt 10) | |
+| | **Sum** | | **77** (packages 67 + debt 10) | |
 
 **Exit criteria:** journey J1 (anonymous part) passes keyboard-only and with axe; an exported file passes the screen-reader check (TESTING §7.2).
 **Dependency:** M2.3 cannot be finished without the priorities and plain-language titles from the project team (O-1, K-1). Development can start with a reduced test catalog; the data folder is the review artefact for the team.
@@ -308,3 +308,4 @@ All P0 requirements of `SPEC_v2.md` are assigned to a work package above (checke
 | v1 | 2026-10-19 | First version, from SPEC_v2 and ARCHITECTURE_v12 |
 | v2 | 2026-10-29 | After sprint 01: M0 done; M1.2, M1.7, M1.8 done ahead; M1 re-estimated 33 → 44 with its debt rows (*(debt)*, TECH_DEBT_v1 §9.2) and a status column; debt riding with M2 listed; D7 resolved, D11, D12 added; measured velocity and tentative forecast in §6; references to ARCHITECTURE_v14, TESTING_v15, SPEC v2.1, CLAUDE.md |
 | v3 | 2026-11-05 | After sprint 02: M1.1, M1.3, M1.4, M1.6 and their debt done (34 of 44 points); M1 rest and the start of M2 planned for sprint 03; M2 re-estimated 69 → 79 with *(debt)* rows (TECH_DEBT_v2 §9.2) and a "Planned" column; P0 total 363 → 373; D12 resolved, D13 (UX copy session), D14 (AutoMapper ADR) added; measured velocity of sprint 02 (≈ 8 points per development day) and a new forecast; references to ARCHITECTURE_v15, TESTING_v23, TECH_DEBT_v2 |
+| v3.1 | 2026-11-06 | Owner decision O-S3-5 (sprint 03, S3-11): no copy of the existing criteria into the catalog (option C); M2.1 13 → 11, M2 79 → 77; the M2.3 texts (S3-27) are P0 in sprint 03 |
