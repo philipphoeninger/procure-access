@@ -35,7 +35,7 @@ describe('provideAppearance', () => {
     expect(html().contains('theme-light')).toBe(false);
   });
 
-  it('SystemSettingChanges_ClassFollowsWithoutReload', () => {
+  it('INV:A11Y-08 SystemSettingChanges_ClassFollowsWithoutReload', () => {
     setUp({ [DARK_SCHEME]: false });
     expect(html().contains('theme-light')).toBe(true);
 

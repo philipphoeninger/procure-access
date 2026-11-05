@@ -30,12 +30,22 @@ interface SuppressedFinding extends Finding {
   readonly issue: string;
 }
 
+/** The two appearances of SPEC §7.5; every axe check runs in both (A11Y-08). */
+export type Appearance = 'light' | 'dark';
+
 /**
- * Runs axe on the current state of the page and fails if a WCAG 2.0/2.1 A/AA violation is left
- * after the suppressions (TESTING §5.4: call it after every significant state change).
+ * Runs axe on the current state of the page in both appearances and fails if a WCAG 2.0/2.1 A/AA
+ * violation is left after the suppressions in either of them (TESTING §5.4: call it after every
+ * significant state change; A11Y-01 and A11Y-08).
  *
- * The full result (blocking, suppressed, WCAG 2.2 findings) is attached to the test as
- * `axe-<state>.json`; suppressed and WCAG 2.2 findings are also listed as annotations.
+ * The first run uses the appearance the page shows; then the helper switches the emulated
+ * `prefers-color-scheme` to the other one, waits until the page has followed it, runs axe again,
+ * and switches back, so the test goes on in the state it was in. The same suppressions apply
+ * in both appearances.
+ *
+ * The full result of each run (blocking, suppressed, WCAG 2.2 findings) is attached to the test
+ * as `axe-<state>-<appearance>.json`; suppressed and WCAG 2.2 findings are also listed as
+ * annotations.
  */
 export async function expectNoAxeViolations(
   page: Page,
@@ -46,6 +56,27 @@ export async function expectNoAxeViolations(
   const suppressions = options.suppressions ?? axeSuppressions;
   validateAxeSuppressions(suppressions);
 
+  const current = await shownAppearance(page);
+  const other: Appearance = current === 'light' ? 'dark' : 'light';
+
+  const failures: string[] = [];
+  for (const appearance of [current, other]) {
+    if (appearance !== current) await showAppearance(page, appearance);
+    const blocking = await checkOneAppearance(page, testInfo, state, appearance, suppressions);
+    if (blocking.length > 0) failures.push(formatFailure(state, appearance, page.url(), blocking));
+  }
+  await showAppearance(page, current);
+
+  expect(failures, failures.join('\n')).toEqual([]);
+}
+
+async function checkOneAppearance(
+  page: Page,
+  testInfo: TestInfo,
+  state: string,
+  appearance: Appearance,
+  suppressions: readonly AxeSuppression[],
+): Promise<Finding[]> {
   const results = await new AxeBuilder({ page }).withTags([...BLOCKING_TAGS, ...REPORTED_TAGS]).analyze();
 
   const blocking: Finding[] = [];
@@ -77,24 +108,56 @@ export async function expectNoAxeViolations(
     }
   }
 
-  await testInfo.attach(`axe-${slug(state)}.json`, {
-    body: JSON.stringify({ state, url: page.url(), blocking, suppressed, reported }, null, 2),
+  await testInfo.attach(`axe-${slug(state)}-${appearance}.json`, {
+    body: JSON.stringify({ state, appearance, url: page.url(), blocking, suppressed, reported }, null, 2),
     contentType: 'application/json',
   });
   for (const finding of suppressed) {
     testInfo.annotations.push({
       type: 'axe-suppressed',
-      description: `${state}: ${finding.rule} on ${finding.target} (${finding.issue})`,
+      description: `${state} (${appearance}): ${finding.rule} on ${finding.target} (${finding.issue})`,
     });
   }
   for (const finding of reported) {
     testInfo.annotations.push({
       type: 'axe-wcag22',
-      description: `${state}: ${finding.rule} on ${finding.target}`,
+      description: `${state} (${appearance}): ${finding.rule} on ${finding.target}`,
     });
   }
 
-  expect(blocking, formatFailure(state, page.url(), blocking)).toEqual([]);
+  return blocking;
+}
+
+/** The appearance the page shows: its `prefers-color-scheme` as the page sees it. */
+async function shownAppearance(page: Page): Promise<Appearance> {
+  const dark = await page.evaluate(() => matchMedia('(prefers-color-scheme: dark)').matches);
+  return dark ? 'dark' : 'light';
+}
+
+/**
+ * Emulates the appearance and waits until the page shows it: the app's class on `<html>`
+ * (`theme-light`/`theme-dark`, set by `AppearanceService`; pages without it, such as the helper's
+ * fixtures, only follow the media query) and the end of the colour transitions it started, so
+ * axe never measures a colour halfway.
+ */
+async function showAppearance(page: Page, appearance: Appearance): Promise<void> {
+  await page.emulateMedia({ colorScheme: appearance });
+  await expect
+    .poll(
+      () =>
+        page.evaluate((wanted) => {
+          const classes = document.documentElement.classList;
+          const themed = classes.contains('theme-light') || classes.contains('theme-dark');
+          return !themed || classes.contains(`theme-${wanted}`);
+        }, appearance),
+      { message: `the page did not switch to the ${appearance} appearance` },
+    )
+    .toBe(true);
+  await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const transitions = document.getAnimations().filter((animation) => animation instanceof CSSTransition);
+    await Promise.all(transitions.map((transition) => transition.finished.catch(() => undefined)));
+  });
 }
 
 function toFinding(violation: Result, node: NodeResult): Finding {
@@ -128,14 +191,14 @@ async function nodesOutsideSuppressions(
   return results.violations.find((violation) => violation.id === rule)?.nodes ?? [];
 }
 
-function formatFailure(state: string, url: string, blocking: readonly Finding[]): string {
+function formatFailure(state: string, appearance: Appearance, url: string, blocking: readonly Finding[]): string {
   const lines = blocking.map(
     (finding) =>
       `- ${finding.rule} (${finding.impact ?? 'n/a'}): ${finding.help}\n` +
       `    target ${finding.target}\n    html   ${finding.html}\n    ${finding.helpUrl}`,
   );
   return (
-    `axe found ${blocking.length} WCAG 2.0/2.1 A/AA violation(s) in state "${state}" (${url}).\n` +
+    `axe found ${blocking.length} WCAG 2.0/2.1 A/AA violation(s) in state "${state}", ${appearance} appearance (${url}).\n` +
     'Fix them, or suppress by rule and selector with an issue link in e2e/support/axe-suppressions.ts.\n' +
     lines.join('\n')
   );

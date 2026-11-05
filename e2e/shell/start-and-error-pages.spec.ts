@@ -46,7 +46,7 @@ async function recordAnnouncements(page: Page): Promise<() => Promise<string[]>>
 
 test.describe('Start page', () => {
   for (const [layout, viewport] of [['wide', WIDE], ['360 px', COMPACT]] as const) {
-    test(`INV:A11Y-01 shows H1, entry cards and disclaimer (${layout})`, async ({ page }, testInfo) => {
+    test(`INV:A11Y-01 INV:A11Y-08 shows H1, entry cards and disclaimer (${layout})`, async ({ page }, testInfo) => {
       await page.setViewportSize(viewport);
       await page.goto('/');
 
@@ -83,7 +83,7 @@ test.describe('Error pages S80', () => {
     await page.setViewportSize(WIDE);
   });
 
-  test('INV:A11Y-01 an unknown address shows „Seite nicht gefunden“ and keeps the URL', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 an unknown address shows „Seite nicht gefunden“ and keeps the URL', async ({ page }, testInfo) => {
     await page.goto('/gibt-es-nicht');
 
     await expect(page).toHaveTitle('Seite nicht gefunden – ProcureAccess');
@@ -95,7 +95,7 @@ test.describe('Error pages S80', () => {
     await expect(page).toHaveTitle('ProcureAccess – Barrierefreie Software beschaffen');
   });
 
-  test('INV:A11Y-01 a page without the permission shows „Kein Zugriff“', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 a page without the permission shows „Kein Zugriff“', async ({ page }, testInfo) => {
     // The legacy approver list: the permission guard sends visitors without the role here.
     await page.goto('/proposals');
 
@@ -105,7 +105,7 @@ test.describe('Error pages S80', () => {
     await expectNoAxeViolations(page, testInfo, '403 page');
   });
 
-  test('INV:A11Y-01 a server error shows „Etwas ist schiefgelaufen“ in place, with the focus on the H1', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 a server error shows „Etwas ist schiefgelaufen“ in place, with the focus on the H1', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.route(API, (route) => route.fulfill({ status: 500, contentType: 'application/problem+json', body: '{"status":500}' }));
 
@@ -126,7 +126,7 @@ test.describe('System states', () => {
     await page.setViewportSize(WIDE);
   });
 
-  test('INV:A11Y-01 without an answer from the server the offline notice appears until it answers again', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 without an answer from the server the offline notice appears until it answers again', async ({ page }, testInfo) => {
     await page.goto('/');
     await page.route(API, (route) => route.abort('internetdisconnected'));
 
@@ -163,7 +163,7 @@ test.describe('System states', () => {
     await expect(page.getByRole('progressbar')).toBeHidden();
   });
 
-  test('INV:A11Y-01 a slow answer shows the progress bar and announces „Wird geladen …“', async ({ page }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 a slow answer shows the progress bar and announces „Wird geladen …“', async ({ page }, testInfo) => {
     const announcements = await recordAnnouncements(page);
     await page.goto('/');
     let release!: () => void;

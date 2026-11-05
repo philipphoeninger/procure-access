@@ -13,7 +13,7 @@ import { expectNoAxeViolations } from '../support/axe';
 const START_PAGE = '/barrierefreiheit';
 
 test.describe('Route change', () => {
-  test('INV:A11Y-03 title, H1 focus and announcement after following a link', async ({ page }, testInfo) => {
+  test('INV:A11Y-03 INV:A11Y-08 title, H1 focus and announcement after following a link', async ({ page }, testInfo) => {
     await page.goto(START_PAGE);
     await expect(page).toHaveTitle('Erklärung zur Barrierefreiheit – ProcureAccess');
     // The first page load moves no focus: the skip link stays the first stop of the Tab key.
