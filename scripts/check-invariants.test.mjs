@@ -264,7 +264,8 @@ for (const [name, reference, message] of PROTOCOL_CASES) {
       'docs/sprints/S2-08_x.md': '# Not a protocol\n',
       'docs/a11y-reports/.gitkeep': '',
     });
-    fails(result, new RegExp(`A11Y-07: protocol ${reference.replace(/[.]/g, '\\.')} ${message.source}`));
+    assert.ok(result.output.includes(`A11Y-07: protocol ${reference} `), result.output);
+    fails(result, message);
   });
 }
 

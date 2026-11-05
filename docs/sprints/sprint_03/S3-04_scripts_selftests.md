@@ -1,6 +1,6 @@
 # S3-04 — Scripts: CodeQL alert 3 and a permanent self-test of the invariant gate
 
-> **Sprint:** 03, P0 task S3-04 (debt, 0.5 points). **Issues:** #182 (TD-16, CodeQL alert 3), #185 (TD-20; S2-09 P2, S2-20 P3). **Requirements / invariants:** none (CI stage 1); no invariant activated. New `TESTING_v25.md` (V86) for the stage-1 and §8.3 text only. **Status:** done by Claude Code (2026-11-05), pull request open.
+> **Sprint:** 03, P0 task S3-04 (debt, 0.5 points). **Issues:** #182 (TD-16, CodeQL alert 3), #185 (TD-20; S2-09 P2, S2-20 P3). **Requirements / invariants:** none (CI stage 1); no invariant activated. New `TESTING_v25.md` (V86) for the stage-1 and §8.3 text only. **Status:** done by Claude Code (2026-11-05), pull request #198.
 > **Scope:** exactly the sprint row: `setText` of `scripts/check-i18n.mjs` rejects prototype keys, with a self-test case; a `node:test` self-test of `scripts/check-invariants.mjs` that runs in CI stage 1 like the Figma and i18n self-tests. What the gate accepts is unchanged.
 > **Owner decisions** (asked before the start, 2026-11-05):
 > 1. **(1a) Test the gate from outside:** each case copies the unchanged `check-invariants.mjs` into a small fake repository in a temp folder and runs it there; the gate gets no exports and no refactor.
@@ -37,6 +37,7 @@ Checklist: security, correctness, N+1, edge cases, a11y; plus whether the self-t
 | R2 | The guard checks all segments before the write loop. CodeQL may not count a check on the split array as a barrier for the variable it writes with, so alert 3 could stay open even though the code is safe | Check on the PR's CodeQL run (§4 check 7); if the alert stays, guard `name` inside the loop as well (P1) |
 | R3 | `spawnSync` has no timeout: a lexer regression that loops forever would hold stage 1 until the job's 20-minute timeout | Won't fix: the stage still fails, and the job timeout bounds it |
 | R4 | The fake repository tests the gate's rules, not the shape of the real repository (e.g. a moved `tests/` folder) | Won't fix: stage 7 runs the gate on the real repository |
+| R6 | CI on the PR: CodeQL alert 4 (`js/incomplete-sanitization`, high) on the self-test: the protocol cases built a regular expression from the reference and escaped only dots. Harmless with the fixed references, but it fails the `CodeQL` check | Fixed: the reference is compared as plain text (`includes`), the message pattern stays a literal; the protocol mutations of §4 check 3 are still caught |
 | R5 | Scope: the status line of TESTING lacked the v24 clause (S3-03); added with v25 so "Supersedes v24" makes sense. Its "v15 —" start stays for S3-05 (#180) | – (P2) |
 
 No correctness or security finding that affects behaviour today; no further review round needed.
@@ -51,14 +52,14 @@ No correctness or security finding that affects behaviour today; no further revi
 | 4 | `node scripts/check-invariants.mjs` | ✅ passed, reads `docs/TESTING_v25.md` |
 | 5 | `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs`, `node --test scripts/check-figma-links.test.mjs` | ✅ unchanged (2 checked, 24 not built, 0 pending; 0 errors; 10/10) |
 | 6 | `reuse lint` (image `fsfe/reuse:latest`) | ✅ compliant, 686/686 |
-| 7 | CI on the pull request (stage 1 with the new step; CodeQL `Analyze (javascript-typescript)` and alert 3 on the PR ref) | see the PR |
+| 7 | CI on the pull request (stage 1 with the new step; CodeQL `Analyze (javascript-typescript)` and alert 3 on the PR ref) | First run: stages 1–4 and 7 and the three `Analyze` jobs green, the new step ran in stage 1; alert 3 no longer on `refs/pull/198/merge`, so the guard counts as a fix (R2); the `CodeQL` check failed on the new alert 4 (R6), fixed in the second commit |
 | 8 | Build, .NET tests, Vitest, ESLint, E2E | – no code of these touched |
 
 ## 5. Open points
 
 | # | Point | Owner / when |
 |---|---|---|
-| P1 | Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge. If the PR's CodeQL run still reports it (R2), a follow-up commit adds the guard on `name` inside the loop | Claude Code, on this PR |
+| P1 | Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge; the PR's analysis no longer reports it (§4 check 7) | Owner, check after the merge |
 | P2 | The TESTING status line still starts with "v15 —" in every version since v15 | S3-05 (#180) |
 | P3 | `scripts/*.mjs`, including the new self-test, is not linted | S3-26 (#161) |
 | P4 | TD-16 and TD-20 are closed by this PR; the register records it in its next version | Sprint 03 close-out (TECH_DEBT_v3) |
