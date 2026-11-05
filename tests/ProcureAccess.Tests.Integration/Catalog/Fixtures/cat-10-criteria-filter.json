@@ -1,6 +1,6 @@
 {
   "invariant": "CAT-10",
-  "description": "Characterisation of the existing criteria filter GET /api/Criteria/byCriteriaFilterIds (API part, S1-15). Seed: the filter types, criteria filters and criteria of migration AddSeedData (tests/ProcureAccess.Tests.Shared/Fixtures/ExistingCatalogSeed.cs). Expected sets recorded from the endpoint on 2026-10-23, before migration step 2; step 2 must keep them true for catalog release 2026.1. Order is ignored; only comparedFields are compared. Descriptions are left out: step 2 replaces them with the imported BIT inklusiv texts.",
+  "description": "Characterisation of the existing criteria filter GET /api/Criteria/byCriteriaFilterIds (API part, S1-15). Seed: the filter types, criteria filters and criteria of migration AddSeedData (tests/ProcureAccess.Tests.Shared/Fixtures/ExistingCatalogSeed.cs). Expected sets recorded from the endpoint on 2026-10-23, before migration step 2. The legacy filter keeps reading the legacy tables during step 2 (owner decision O-S3-5 C, ARCHITECTURE_v18 C102), so the sets stay true until the configurator S10 replaces it and CAT-10 is rewritten (M2.5d). Order is ignored; only comparedFields are compared. Descriptions are left out: they are BIT inklusiv texts, which this MIT-annotated file does not copy (S1-15 F6).",
   "comparedFields": ["id", "name", "criteriaFilterId"],
   "cases": [
     {

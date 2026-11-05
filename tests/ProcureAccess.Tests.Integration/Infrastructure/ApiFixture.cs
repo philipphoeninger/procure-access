@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Npgsql;
+using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Platform.Persistence;
 using Respawn.Graph;
 using Respawn;
@@ -68,6 +69,11 @@ public sealed class ApiFixture : IAsyncLifetime
             await context.Database.MigrateAsync();
         }
 
+        await using (var context = CreateCatalogDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
         await using (var connection = await OpenConnectionAsync())
         {
             _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
@@ -77,6 +83,7 @@ public sealed class ApiFixture : IAsyncLifetime
                 [
                     new Table("public", "__EFMigrationsHistory"),
                     new Table(PlatformDbContext.HistorySchema, PlatformDbContext.HistoryTable),
+                    new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
                 ],
             });
         }
@@ -98,22 +105,30 @@ public sealed class ApiFixture : IAsyncLifetime
 
     /// <summary>
     /// Stores entities through the application's own context that maps them, never through raw
-    /// SQL, so the EF configuration is exercised (TESTING §6.1): the Platform module's
-    /// <see cref="PlatformDbContext"/> for its entities, the legacy <see cref="ApplicationDBContext"/>
-    /// for all others.
+    /// SQL, so the EF configuration is exercised (TESTING §6.1): the module contexts
+    /// (<see cref="PlatformDbContext"/>, <see cref="CatalogDbContext"/>) for their entities, the
+    /// legacy <see cref="ApplicationDBContext"/> for all others.
     /// </summary>
     public async Task StoreAsync(params object[] entities)
     {
         using var scope = Factory.Services.CreateScope();
         var legacy = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-        var platform = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
+        DbContext[] modules =
+        [
+            scope.ServiceProvider.GetRequiredService<PlatformDbContext>(),
+            scope.ServiceProvider.GetRequiredService<CatalogDbContext>(),
+        ];
         foreach (var entity in entities)
         {
-            DbContext context = platform.Model.FindEntityType(entity.GetType()) is null ? legacy : platform;
+            var context = modules.FirstOrDefault(m => m.Model.FindEntityType(entity.GetType()) is not null) ?? legacy;
             context.Add(entity);
         }
 
-        await platform.SaveChangesAsync();
+        foreach (var module in modules)
+        {
+            await module.SaveChangesAsync();
+        }
+
         await legacy.SaveChangesAsync();
     }
 
@@ -147,6 +162,12 @@ public sealed class ApiFixture : IAsyncLifetime
         new(new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(_database.GetConnectionString())
             .Options);
+
+    private CatalogDbContext CreateCatalogDbContext() =>
+        new(new DbContextOptionsBuilder<CatalogDbContext>()
+                .UseNpgsql(_database.GetConnectionString())
+                .Options,
+            Clock);
 
     private async Task<NpgsqlConnection> OpenConnectionAsync()
     {

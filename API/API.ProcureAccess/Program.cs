@@ -27,12 +27,12 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
 // Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,
-// the health checks (S2-07) and Problem Details (S2-10); the others register nothing yet: the
-// legacy code in API, DAL, MODELS and SERVICES moves into them with the migration step that
-// replaces it (S2-06, owner decision O-S2-1).
+// the health checks (S2-07) and Problem Details (S2-10); Catalog its database context (S3-12). The
+// others register nothing yet: the legacy code in API, DAL, MODELS and SERVICES moves into them
+// with the migration step that replaces it (S2-06, owner decision O-S2-1).
 builder.Services.AddPlatformModule(builder.Configuration)
                 .AddIdentityAccessModule()
-                .AddCatalogModule()
+                .AddCatalogModule(builder.Configuration)
                 .AddConfiguratorModule()
                 .AddExportModule()
                 .AddDirectoryModule()
