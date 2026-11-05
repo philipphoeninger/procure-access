@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-# CI pipeline, stages 1–8 of TESTING §8.2 (ARCHITECTURE §10.3). Stage 9 (CodeQL, Dependabot)
-# is configured in the repository settings. One job per stage; the job names carry the stage
+# CI pipeline, stages 1–8 of TESTING §8.2 (ARCHITECTURE §10.3). Stage 9 is codeql.yml (CodeQL)
+# and .github/dependabot.yml (Dependabot). One job per stage; the job names carry the stage
 # number. Actions are pinned by commit SHA (public repository); the comment names the release.
 name: CI
 

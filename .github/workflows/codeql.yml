@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# CodeQL code scanning, stage 9 of TESTING §8.2 (advanced setup, issue #144). It replaces
+# GitHub's default setup, which never started on Dependabot pull requests; the two cannot run
+# side by side, so default setup stays off in the repository settings. The job names
+# "Analyze (<language>)" are required checks of the ruleset of main: rename them only together
+# with the ruleset. Actions are pinned by commit SHA like ci.yml; the comment names the release.
+name: CodeQL
+
+on:
+  pull_request:
+    branches: [main]
+  # Only main: a push to a dependabot/** branch gets a read-only token and cannot upload.
+  push:
+    branches: [main]
+  # Weekly scan with the current queries, also when nothing was merged (Monday, 04:27 UTC).
+  schedule:
+    - cron: "27 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # Dependabot runs get a read-only token by default; the permissions key raises it.
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # The three languages of the former default setup. No build (build-mode none), as
+        # default setup did; the category keeps the alerts of default setup on the same key.
+        language: [actions, csharp, javascript-typescript]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          # No `queries` input: the default suite, as default setup used.
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
