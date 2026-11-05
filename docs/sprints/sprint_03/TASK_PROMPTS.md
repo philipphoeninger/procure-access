@@ -1,6 +1,6 @@
 # Sprint 03 — task prompts for Claude Code
 
-> **Status:** v1 (2026-11-05). Companion to `SPRINT_03.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_02/TASK_PROMPTS.md` (repeated at the end of this file). Claude Code implements; the owner's control chat for sprint 03 takes the decisions and reviews the reports.
+> **Status:** v1.2 (2026-11-06; v1.2: O-S3-5 filled in, S3-18 reduced and S3-27 moved to P0 after the decision; v1.1: the prompts S3-11 – S3-27 cite `ARCHITECTURE_v17` and `TESTING_v29`, the highest versions after S3-10, instead of v15 and v23; the sections they name are unchanged except ARCHITECTURE §9 caching → §9.6). Companion to `SPRINT_03.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_02/TASK_PROMPTS.md` (repeated at the end of this file). Claude Code implements; the owner's control chat for sprint 03 takes the decisions and reviews the reports.
 > **How to use:** copy the block of the task into a new Claude Code session. Replace only the placeholders in `<…>` after "Owner decisions for this task" (decisions not yet taken, see "Open placeholders"). `<invariant ID>`, `<NN>`, `<n>` or `<Name>` elsewhere in a prompt are naming patterns for Claude Code, not placeholders for you. Everything else is filled in from `SPRINT_03.md`, `TECH_DEBT_v2.md` and the GitHub issues and pull requests as of 2026-11-05.
 > **Changes to the template since sprint 02:** reads `TECH_DEBT_v2.md`; step 4 also runs `node scripts/check-i18n.mjs`; step 3 asks for the owner's OK also before adding a project; the protocol header names issues and requirements / invariants, as the sprint-02 protocols did.
 
@@ -27,7 +27,7 @@
 | S3-15 | Release data format and validation | none | after S3-14 |
 | S3-16 | CLI catalog import | none | after S3-15 |
 | S3-17 | CLI catalog activate, active release and cache | none | after S3-16 |
-| S3-18 | The existing criteria in the catalog model | none | after S3-17 (or S3-13, per O-S3-5) |
+| S3-18 | Seed rows 2 and 3 dropped, J1 updated (O-S3-5 C) | none | ready once S3-11 is merged |
 | S3-19 | GET /api/v1/catalog/filter-options | #153, #176 (milestone per O-S3-6) | after S3-18 and O-S3-6 |
 | S3-20 | GET /api/v1/catalog/criteria with resolved priorities | none | after S3-19 |
 | S3-21 | Footer link „Kriterium vorschlagen“ | none | ready |
@@ -36,7 +36,7 @@
 | S3-24 | Persist the Data Protection keys outside the container | #186 | stretch, ready |
 | S3-25 | Material Symbols font subsetting | #135 | stretch, after O-S3-7 |
 | S3-26 | ESLint for e2e/ and scripts | #161 | stretch (O-S3-8 for the plugin) |
-| S3-27 | Release 2026.1, part 1: texts without priorities | none | stretch, after S3-15 |
+| S3-27 | Release 2026.1, part 1: texts without priorities (P0 since O-S3-5) | none | after S3-16 |
 
 ## Open placeholders
 
@@ -46,7 +46,7 @@
 | O-S3-2 (Swagger in Production) | S3-06 | owner choice (any time) |
 | O-S3-3 (reflow invariant ID) | S3-05 | owner choice (any time) |
 | O-S3-4 (AutoMapper replacement, ARC-06 successor) | S3-07 run 2 | the ADR options of S3-07 run 1 |
-| O-S3-5 (catalog persistence, path of the existing criteria) | S3-12, S3-13, S3-15, S3-18 | the design note of S3-11 |
+| ~~O-S3-5 (catalog persistence, path of the existing criteria)~~ | S3-12, S3-13, S3-15, S3-18 | **filled 2026-11-06** |
 | O-S3-6 (endpoint style, #176) | S3-19 | owner choice, best after S3-11 |
 | O-S3-7 (font subsetting) | S3-25 | owner choice (options in #135) |
 | O-S3-8 (eslint-plugin-playwright) | S3-26 | owner choice |
@@ -56,7 +56,7 @@
 - **One new TESTING version at a time.** S3-05, S3-07, S3-10, S3-12, S3-13, S3-16, S3-17, S3-19 and S3-20 flip or replace invariants. If two of them run on parallel branches, both would create the same `TESTING_v<n>.md`. Start such a task only after the previous one is merged. Tasks without an invariant change (S3-01 – S3-04, S3-06, S3-08, S3-09, S3-11, S3-14, S3-15, S3-18, S3-21) can run in between.
 - **Order:** as in `SPRINT_03.md` (Sequence). S3-18 comes after S3-17 although it belongs to M2.1. Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21) may alternate when one side waits.
 - **Two-run tasks:** S3-07 and S3-11 stop after their first run (options / design note) for the owner's decision.
-- **Stretch tasks** (S3-22 – S3-27) only after all P0 tasks are done.
+- **Stretch tasks** (S3-22 – S3-26) only after all P0 tasks are done. S3-27 is P0 since O-S3-5 (2026-11-06).
 - **After each task:** the report and the protocol go to the control chat, which checks them against the row and the Definition of done, settles open decisions and fills the placeholders of the next task.
 - **End of sprint:** close-out table in `SPRINT_03.md` and `TECH_DEBT_v3.md` (process step 14), prepared in the control chat.
 
@@ -323,7 +323,7 @@ Requirements / invariants: prepares CAT-05, CAT-07, CAT-10 (stays green), CAT-13
 Depends on: nothing
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-11 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §4.3, §5.1, §12 step 2, ADR-014; SPEC_v2 R-ADM-01, SD20; TESTING_v23 §4.2 (CAT-*), §6, §9 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; the legacy Criteria, CriteriaFilter, FilterType and CriteriaFilterExclusion entities in DAL/MODELS and their controllers
+Also read: ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014; SPEC_v2 R-ADM-01, SD20; TESTING_v29 §4.2 (CAT-*), §6, §9 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; the legacy Criteria, CriteriaFilter, FilterType and CriteriaFilterExclusion entities in DAL/MODELS and their controllers
 
 Owner decisions for this task: none (O-S3-5 is taken after this note)
 Additional instructions: Write only the design note, as the draft of the protocol, and stop. It answers: CatalogDbContext and schema per ADR-014; which entities and DTOs go into Catalog.Contracts (O-22 interim rule); how the existing criteria and the CriteriaFilter types 1–4 with their exclusions reach the versioned model — (a) a generated legacy release folder imported by the CLI of S3-16, or (b) an EF data migration — and what that means for the order of S3-12 – S3-18; what the legacy endpoints read afterwards and how CAT-10 stays green with unchanged expected sets; dropping seed rows 2 and 3. Options with a recommendation. No code. The PR contains only the note.
@@ -348,9 +348,9 @@ Requirements / invariants: proposal CAT-05 (unit part) → active; OPS-03 covers
 Depends on: S3-11 decided (O-S3-5); no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-12 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §5.1 (catalog), ADR-014; TESTING_v23 §4.2; the protocol of S3-11
+Also read: ARCHITECTURE_v17 §5.1 (catalog), ADR-014; TESTING_v29 §4.2; the protocol of S3-11
 
-Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
+Owner decisions for this task: O-S3-5 (owner, 2026-11-06; S3-11 §2.9): (a) C — the existing criteria are not copied into the catalog; the legacy endpoints keep reading the legacy tables until S10 (sprint 04) and steps 5/6 retire them. (b) D1 — UseCaseTemplate, AppType, ProductPart and TestType are seeded in the catalog migration (HasData, every field of ARCHITECTURE §5.1, values from Kriterienkatalog §2); Respawn ignores these four tables; release folders reference them by key. (c) Q2 (iii) — catalog import accepts a release without priorities, catalog activate refuses it. (d) Criterion proposals are kept as they are. (e) The documents of S3-11 §2.4 C are reworded: sprint plan and ROADMAP already (PR #208); ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. (f) Catalog.Contracts as in S3-11 §2.2.
 Additional instructions: CatalogDbContext with its own migration history, schema catalog. Entities CatalogRelease, Criterion (Key, Kind), CriterionRevision, CatalogReleaseCriterion, StandardReference; Fluent API configurations only. A published release and its revisions cannot be changed in the domain (domain error, not silent). Register through AddCatalogModule; only controllers and the registration are public. Confirm in the plan which invariants this task activates.
 
 Way of working:
@@ -373,9 +373,9 @@ Requirements / invariants: proposal CAT-13 → active
 Depends on: S3-12 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-13 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §5.1 (filter layers, exclusions, procedure mapping, priority rules); kriterienkatalog_bit_inklusiv_v1.md (filter layers, exclusions, rating scale); TESTING_v23 §4.2
+Also read: ARCHITECTURE_v17 §5.1 (filter layers, exclusions, procedure mapping, priority rules); kriterienkatalog_bit_inklusiv_v1.md (filter layers, exclusions, rating scale); TESTING_v29 §4.2
 
-Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
+Owner decisions for this task: O-S3-5 (owner, 2026-11-06; S3-11 §2.9): (a) C — the existing criteria are not copied into the catalog; the legacy endpoints keep reading the legacy tables until S10 (sprint 04) and steps 5/6 retire them. (b) D1 — UseCaseTemplate, AppType, ProductPart and TestType are seeded in the catalog migration (HasData, every field of ARCHITECTURE §5.1, values from Kriterienkatalog §2); Respawn ignores these four tables; release folders reference them by key. (c) Q2 (iii) — catalog import accepts a release without priorities, catalog activate refuses it. (d) Criterion proposals are kept as they are. (e) The documents of S3-11 §2.4 C are reworded: sprint plan and ROADMAP already (PR #208); ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. (f) Catalog.Contracts as in S3-11 §2.2.
 Additional instructions: AppType, ProductPart (IsAlwaysSelected), UseCaseTemplate (IsActive), TestType, FilterExclusion, CatalogReleaseFilterExclusion, CatalogReleaseAppTypeProcedure, CriterionApplicability, PriorityRecommendation, CriterionProcedureText, with a migration. A FilterExclusion whose target layer is not lower than its source layer cannot be created (CAT-13). No resolution logic yet (S3-20).
 
 Way of working:
@@ -398,7 +398,7 @@ Requirements / invariants: none activated (test data)
 Depends on: S3-13 merged
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-14 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: TESTING_v23 §6 (builders, canonical fixtures), §9 step 2 (MiniCatalog); tests/ProcureAccess.Tests.Shared; ARCHITECTURE_v15 §5.1
+Also read: TESTING_v29 §6 (builders, canonical fixtures), §9 step 2 (MiniCatalog); tests/ProcureAccess.Tests.Shared; ARCHITECTURE_v17 §5.1
 
 Owner decisions for this task: none
 Additional instructions: A MiniCatalog fixture in Tests.Shared: two use cases (one inactive), app types incl. one without requirement criteria (Hardware), product parts incl. Basisfunktionalität (IsAlwaysSelected), two test types, exclusions across layers, priority rules on all four levels incl. a case with several app types, procedure texts with allowed ratings. Builders in the style of TestData.ACriterion(). Use it in at least one test of S3-12/S3-13 and document it in TESTING §6 in the next TESTING version only if another task writes one anyway; otherwise note it as an open point.
@@ -423,9 +423,9 @@ Requirements / invariants: prepares CAT-23
 Depends on: S3-12 – S3-14 merged
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-15 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v15 C74, §5.1; TESTING_v23 CAT-23
+Also read: SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 C74, §5.1; TESTING_v29 CAT-23
 
-Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
+Owner decisions for this task: O-S3-5 (owner, 2026-11-06; S3-11 §2.9): (a) C — the existing criteria are not copied into the catalog; the legacy endpoints keep reading the legacy tables until S10 (sprint 04) and steps 5/6 retire them. (b) D1 — UseCaseTemplate, AppType, ProductPart and TestType are seeded in the catalog migration (HasData, every field of ARCHITECTURE §5.1, values from Kriterienkatalog §2); Respawn ignores these four tables; release folders reference them by key. (c) Q2 (iii) — catalog import accepts a release without priorities, catalog activate refuses it. (d) Criterion proposals are kept as they are. (e) The documents of S3-11 §2.4 C are reworded: sprint plan and ROADMAP already (PR #208); ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. (f) Catalog.Contracts as in S3-11 §2.2.
 Additional instructions: Folder layout and JSON files of catalog/releases/<version>/ (criteria revisions, procedure texts, applicability, priorities, exclusions, procedure mapping, filter dimensions); a loader and a validator for the whole folder: references, exclusion layers (CAT-13), procedure mapping, allowed ratings. Errors name the file and the JSON path. A small test release folder for the tests (built from the MiniCatalog shape). JSON files need REUSE coverage (REUSE.toml). Document the format for the project team (it is the review artefact of M2.3) in the protocol and in the next ARCHITECTURE version only if another task writes one anyway; otherwise note it.
 
 Way of working:
@@ -448,7 +448,7 @@ Requirements / invariants: proposal CAT-23 (import part), CAT-05 (integration pa
 Depends on: S3-15 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-16 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01; TESTING_v23 CAT-05, CAT-07, CAT-23; CLAUDE.md §5 (how the CLI should be run, add the command there)
+Also read: SPEC_v2 R-ADM-01; TESTING_v29 CAT-05, CAT-07, CAT-23; CLAUDE.md §5 (how the CLI should be run, add the command there)
 
 Owner decisions for this task: none
 Additional instructions: catalog import <version>: validates the whole folder (S3-15) and imports it atomically as an immutable release — any error leaves the database unchanged. Unchanged criteria share their revision with the previous release (CAT-07). Decide in the plan where the CLI lives (e.g. a command mode of the API host or a small console project) and ask before adding a project or a dependency.
@@ -473,7 +473,7 @@ Requirements / invariants: proposal CAT-23 (activate part), CAT-09 → active
 Depends on: S3-16 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-17 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01; TESTING_v23 CAT-09, CAT-23; ARCHITECTURE_v15 §9 (caching)
+Also read: SPEC_v2 R-ADM-01; TESTING_v29 CAT-09, CAT-23; ARCHITECTURE_v17 §9.6 (caching)
 
 Owner decisions for this task: none
 Additional instructions: catalog activate <version> switches the active release; the next catalog request returns it. Catalog cache keyed by CatalogReleaseId (CAT-09). Add both commands to CLAUDE.md §5.
@@ -489,26 +489,26 @@ Way of working:
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
 ```
 
-### S3-18 — The existing criteria in the catalog model
+### S3-18 — Seed rows 2 and 3 dropped, J1 updated
 
 ```text
-Task S3-18 from docs/sprints/sprint_03/SPRINT_03.md — The existing criteria in the catalog model
+Task S3-18 from docs/sprints/sprint_03/SPRINT_03.md — Seed rows 2 and 3 dropped, J1 updated
 Issues: none
-Requirements / invariants: CAT-10 stays green (API and E2E part, expected sets unchanged)
-Depends on: S3-17 merged (import path) or S3-13 (data-migration path), per O-S3-5
+Requirements / invariants: CAT-10 stays green (API and E2E part, expected sets unchanged); OPS-03 stays green; ARCHITECTURE §16.3.2
+Depends on: S3-11 merged (O-S3-5 decided); no catalog task
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-18 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: the protocol of S3-11; ARCHITECTURE_v15 §12 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; tests/…/Catalog/Fixtures/cat-10-criteria-filter.json; e2e/journeys/j1-configurator.spec.ts
+Also read: the protocol of S3-11 (§2.7, F7); ARCHITECTURE_v17 §5.1, §16.3.2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; tests/…/Catalog/Fixtures/cat-10-criteria-filter.json; e2e/journeys/j1-configurator.spec.ts
 
-Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
-Additional instructions: Bring the existing criteria and the CriteriaFilter types 1–4 with their exclusions into the catalog model on the path of O-S3-5; drop seed rows 2 and 3; the legacy filter endpoints keep working against the extended contract. CAT-10's expected sets never change: if they would, stop and report. J1 green on all five browser projects.
+Owner decisions for this task: O-S3-5 (owner, 2026-11-06; S3-11 §2.9): (a) C — the existing criteria are not copied into the catalog; the legacy endpoints keep reading the legacy tables until S10 (sprint 04) and steps 5/6 retire them. (b) D1 — UseCaseTemplate, AppType, ProductPart and TestType are seeded in the catalog migration (HasData, every field of ARCHITECTURE §5.1, values from Kriterienkatalog §2); Respawn ignores these four tables; release folders reference them by key. (c) Q2 (iii) — catalog import accepts a release without priorities, catalog activate refuses it. (d) Criterion proposals are kept as they are. (e) The documents of S3-11 §2.4 C are reworded: sprint plan and ROADMAP already (PR #208); ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. (f) Catalog.Contracts as in S3-11 §2.2.
+Additional instructions: Per O-S3-5 (C) nothing is copied into the catalog. Remove the two entries 17 → 12 and 17 → 13 from CriteriaFilterExclusionSeed with a migration of ApplicationDBContext (EF generates DeleteData; has-pending-model-changes must stay clean), and remove „Mobile Anwendung (offen)“ and „Mobile Anwendung (geschlossen)“ from J1's EXCLUDED_BY_PRODUCT_TYPE. The legacy endpoints keep reading the legacy tables. CAT-10's expected sets never change: if they would, stop and report. J1 green on all five browser projects.
 
 Way of working:
-1. Branch sprint03/S3-18-existing-criteria-migration from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
+1. Branch sprint03/S3-18-exclusion-seed-rows from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
 2. Before changing code, give me a short plan: starting point, files, invariants the task activates, tests. Stop and ask if the row, the documents and the code contradict each other, if a UX copy key or its wording is missing, or if the task needs an owner decision that is not given above (CLAUDE §2, §6.5, §6.6). Do not decide for me: give options with a recommendation.
 3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CAT-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
 4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. Sort review findings per CLAUDE §6.8.
-5. Write the protocol docs/sprints/sprint_03/S3-18_existing_criteria_migration.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
+5. Write the protocol docs/sprints/sprint_03/S3-18_exclusion_seed_rows.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
 6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
 
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
@@ -523,7 +523,7 @@ Requirements / invariants: proposal CAT-12 (catalog-endpoint part), CAT-18, CAT-
 Depends on: S3-17 and S3-18 merged; O-S3-6; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-19 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 153, gh issue view 176) and their entries in TECH_DEBT_v2.md; always the highest version of each document in docs/.
-Also read: SPEC_v2 §8.1 (response shape, C77: excludedBy[] without reason text, appTypesWithoutCriteria[]), §8.6; ARCHITECTURE_v15 §7.1, §7.2; TESTING_v23 CAT-12, CAT-18, CAT-19; TECH_DEBT_v2 §3.3 (#153, #176)
+Also read: SPEC_v2 §8.1 (response shape, C77: excludedBy[] without reason text, appTypesWithoutCriteria[]), §8.6; ARCHITECTURE_v17 §7.1, §7.2; TESTING_v29 CAT-12, CAT-18, CAT-19; TECH_DEBT_v2 §3.3 (#153, #176)
 
 Owner decisions for this task: O-S3-6: <controllers | minimal APIs for /api/v1/catalog/*; milestone of #176>
 Additional instructions: The endpoint in the Catalog module per SPEC §8.1, pinned to the active release or a given release id; inactive use cases not offered but still resolvable; exclusions release-pinned. Fix the versioned routes and the duplicate Swagger parameters (#153). Record deferred parts of CAT-12 (configurator, export, directory) in TESTING.
@@ -548,7 +548,7 @@ Requirements / invariants: proposal CAT-01, CAT-02, CAT-06 (release pinning by i
 Depends on: S3-19 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-20 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 §8.2 (response shape, matchedRule.kind), §7.1; ARCHITECTURE_v15 §5.1 (priority resolution), C77; TESTING_v23 §4.2; CLAUDE.md §8 (priorities explain themselves)
+Also read: SPEC_v2 §8.2 (response shape, matchedRule.kind), §7.1; ARCHITECTURE_v17 §5.1 (priority resolution), C77; TESTING_v29 §4.2; CLAUDE.md §8 (priorities explain themselves)
 
 Owner decisions for this task: none
 Additional instructions: Selection validation with field errors (CAT-11). Priority resolution most-specific-first over the four levels, per app type with the strictest result (A > B > Info, then weight), matchedRule naming the deciding app type; every resolved priority with rationale, source „Empfehlung des Projektteams“ and matchedRule (CAT-01, CAT-02, CAT-14) — table-driven tests over MiniCatalog first. Allowed ratings and procedure texts of the selected app types (CAT-16, CAT-21); one procedure criterion per selected test type; empty requirement list plus appTypesWithoutCriteria[] (CAT-20). If the plan shows more than one session, propose a split before coding.
@@ -584,6 +584,31 @@ Way of working:
 3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CAT-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
 4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. Sort review findings per CLAUDE §6.8.
 5. Write the protocol docs/sprints/sprint_03/S3-21_criteria_suggestion_link.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
+6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
+
+Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
+```
+
+### S3-27 — Release 2026.1, part 1: texts without priorities
+
+```text
+Task S3-27 from docs/sprints/sprint_03/SPRINT_03.md — Release 2026.1, part 1: texts without priorities
+Issues: none
+Requirements / invariants: CAT-23 validation must pass on the folder
+Depends on: S3-15 and S3-16 merged (P0 since O-S3-5)
+
+Read first: CLAUDE.md; in SPRINT_03.md the row of S3-27 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
+Also read: kriterienkatalog_bit_inklusiv_v1.md, kriterienkatalog_bit_inklusiv_v1_teil_a.md, kriterienkatalog_bit_inklusiv_v1_teil_b.md; SPEC_v2 R-ADM-01, §13 (O-1, K-1); ARCHITECTURE_v17 §12 step 2 (one procedure criterion per test type)
+
+Owner decisions for this task: O-S3-5 (owner, 2026-11-06; S3-11 §2.9): (a) C — the existing criteria are not copied into the catalog; the legacy endpoints keep reading the legacy tables until S10 (sprint 04) and steps 5/6 retire them. (b) D1 — UseCaseTemplate, AppType, ProductPart and TestType are seeded in the catalog migration (HasData, every field of ARCHITECTURE §5.1, values from Kriterienkatalog §2); Respawn ignores these four tables; release folders reference them by key. (c) Q2 (iii) — catalog import accepts a release without priorities, catalog activate refuses it. (d) Criterion proposals are kept as they are. (e) The documents of S3-11 §2.4 C are reworded: sprint plan and ROADMAP already (PR #208); ARCHITECTURE §12 step 2, S1-15 decision 1A and the CAT-10 fixture description in S3-12. (f) Catalog.Contracts as in S3-11 §2.2.
+Additional instructions: Build catalog/releases/2026.1/ in the format of S3-15 from the BIT inklusiv texts of Teil A/B, with the exclusions and procedure mapping of the Kriterienkatalog (the filter values themselves are seeded by the catalog migration, D1, and referenced by key) and one procedure criterion per test type. No priorities, rationales or plain-language titles: those come from the project team (O-1, K-1) — leave them out and list what is missing per criterion, so the team can fill it in. Do not invent wording. Validate with S3-15 and show in a test that catalog import accepts the folder; do not activate it (Q2 (iii)).
+
+Way of working:
+1. Branch sprint03/S3-27-release-2026-1-texts from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
+2. Before changing code, give me a short plan: starting point, files, invariants the task activates, tests. Stop and ask if the row, the documents and the code contradict each other, if a UX copy key or its wording is missing, or if the task needs an owner decision that is not given above (CLAUDE §2, §6.5, §6.6). Do not decide for me: give options with a recommendation.
+3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CAT-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
+4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. Sort review findings per CLAUDE §6.8.
+5. Write the protocol docs/sprints/sprint_03/S3-27_release_2026_1_texts.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
 6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
 
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
@@ -650,7 +675,7 @@ Requirements / invariants: prepares OPS-04 (step 3)
 Depends on: stretch: only after all P0 tasks
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-24 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 186) and their entries in TECH_DEBT_v2.md; always the highest version of each document in docs/.
-Also read: TECH_DEBT_v2 TD-21; docs/sprints/sprint_02/S2-21_api_dockerfile_swagger.md (open point P3); ARCHITECTURE_v15 C60; TESTING_v23 OPS-04
+Also read: TECH_DEBT_v2 TD-21; docs/sprints/sprint_02/S2-21_api_dockerfile_swagger.md (open point P3); ARCHITECTURE_v17 C60; TESTING_v29 OPS-04
 
 Owner decisions for this task: none
 Additional instructions: Stretch task. Persist the Data Protection key ring in the database (as ARCHITECTURE C60 plans for the cookie session), in the Platform module with its migration. OPS-04 stays planned; note how its test will work.
@@ -711,31 +736,6 @@ Way of working:
 3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CAT-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
 4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. Sort review findings per CLAUDE §6.8.
 5. Write the protocol docs/sprints/sprint_03/S3-26_lint_e2e_scripts.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
-6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
-
-Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
-```
-
-### S3-27 — Release 2026.1, part 1: texts without priorities *(stretch)*
-
-```text
-Task S3-27 from docs/sprints/sprint_03/SPRINT_03.md — Release 2026.1, part 1: texts without priorities
-Issues: none
-Requirements / invariants: CAT-23 validation must pass on the folder
-Depends on: S3-15 merged; stretch: only after all P0 tasks
-
-Read first: CLAUDE.md; in SPRINT_03.md the row of S3-27 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: kriterienkatalog_bit_inklusiv_v1.md, kriterienkatalog_bit_inklusiv_v1_teil_a.md, kriterienkatalog_bit_inklusiv_v1_teil_b.md; SPEC_v2 R-ADM-01, §13 (O-1, K-1); ARCHITECTURE_v15 §12 step 2 (one procedure criterion per test type)
-
-Owner decisions for this task: none
-Additional instructions: Stretch task. Build catalog/releases/2026.1/ in the format of S3-15 from the BIT inklusiv texts of Teil A/B, with the filter dimensions and exclusions of the Kriterienkatalog and one procedure criterion per test type. No priorities, rationales or plain-language titles: those come from the project team (O-1, K-1) — leave them out and list what is missing per criterion, so the team can fill it in. Do not invent wording. Validate with S3-15; do not import or activate it.
-
-Way of working:
-1. Branch sprint03/S3-27-release-2026-1-texts from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
-2. Before changing code, give me a short plan: starting point, files, invariants the task activates, tests. Stop and ask if the row, the documents and the code contradict each other, if a UX copy key or its wording is missing, or if the task needs an owner decision that is not given above (CLAUDE §2, §6.5, §6.6). Do not decide for me: give options with a recommendation.
-3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CAT-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
-4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. Sort review findings per CLAUDE §6.8.
-5. Write the protocol docs/sprints/sprint_03/S3-27_release_2026_1_texts.md in the structure of sprints 01 and 02 (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, figma mapping …).
 6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
 
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
