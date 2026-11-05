@@ -45,12 +45,15 @@ export const withIdentity = () => signalStoreFeature(
       },
       async deleteAccount() {
         state.incrementLoadingCount();
-        const error = await identityApiService.deleteAccount();
-        if (!error) authService.logout();
-        snackbarService.showInfo(
-          error ? "Something went wrong.\nPlease try again." : "Account deleted"
-        );
-        state.decrementLoadingCount();
+        try {
+          const error = await identityApiService.deleteAccount();
+          if (!error) authService.logout();
+          snackbarService.showInfo(
+            error ? "Something went wrong.\nPlease try again." : "Account deleted"
+          );
+        } finally {
+          state.decrementLoadingCount();
+        }
       }
     })),
     withComputed(() => ({ }))

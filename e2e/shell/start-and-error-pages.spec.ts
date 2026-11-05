@@ -135,6 +135,8 @@ test.describe('System states', () => {
 
     const notice = page.getByRole('main').getByRole('status');
     await expect(notice).toContainText('Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.');
+    // A failed load ends the loading state (#168).
+    await expect(page.getByRole('progressbar')).toBeHidden();
     await settled(criteria);
     await expectNoAxeViolations(page, testInfo, 'offline notice');
 

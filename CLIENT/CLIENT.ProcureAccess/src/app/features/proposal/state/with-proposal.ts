@@ -27,11 +27,12 @@ export const withProposal = () => signalStoreFeature(
     withMethods((state, proposalApiService = inject(ProposalApiService)) => ({
       async loadProposals() {
           state.incrementLoadingCount();
-          
-          const result = await proposalApiService.getProposals();
-          this.setProposals(result.value ?? []);
-
-          state.decrementLoadingCount();
+          try {
+              const result = await proposalApiService.getProposals();
+              this.setProposals(result.value ?? []);
+          } finally {
+              state.decrementLoadingCount();
+          }
       },
       setProposals(proposals: ProposalDto[]) {
           patchState(state, {
@@ -62,9 +63,12 @@ export const withProposal = () => signalStoreFeature(
       },
       async approveProposal(command: ApproveProposal) {
           state.incrementLoadingCount();
-          await proposalApiService.approveProposal(command);
-          await this.loadProposals();
-          state.decrementLoadingCount();
+          try {
+              await proposalApiService.approveProposal(command);
+              await this.loadProposals();
+          } finally {
+              state.decrementLoadingCount();
+          }
       }
     })),
     withComputed((state) => ({
