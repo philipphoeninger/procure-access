@@ -1,6 +1,6 @@
 # S3-07 — AutoMapper replacement with the generic CRUD maps and the ARC-06 successor
 
-> **Sprint:** 03, P0 task S3-07 (debt, 3 points, two runs). **Issues:** #31 (`TECH_DEBT_v2.md` §3.2, Dependabot alerts 1, 8, 9, 10), #90 (`TECH_DEBT_v2.md` §3.1, S2-10 P4). **Requirements / invariants:** ARC-06 is replaced by its successor in the next TESTING version (run 2). **Status:** run 1 done by Claude Code (2026-11-05): options as a draft ADR, no code changed; O-S3-4 decided the same day. Run 2 follows the separate pull request of decision (d).
+> **Sprint:** 03, P0 task S3-07 (debt, 3 points, two runs). **Issues:** #31 (`TECH_DEBT_v2.md` §3.2, Dependabot alerts 1, 8, 9, 10), #90 (`TECH_DEBT_v2.md` §3.1, S2-10 P4). **Requirements / invariants:** ARC-06 reworded and still `active` (`TESTING_v27.md` V89); SPEC SD20 / R-ADM-01 (catalog only through the CLI import). **Status:** done by Claude Code (2026-11-05) in two runs: run 1 = options (§2, run 1), owner decision O-S3-4 the same day, pull request #201 for decision (d), run 2 = replacement; pull request open, stacked on #201.
 > **Scope:** run 1 = options only (sprint row, `TASK_PROMPTS.md`). Run 2 = replace every AutoMapper map, fix #90 with tests first, remove the package and the advisory suppression, ADR in the next ARCHITECTURE version, ARC-06 successor in the next TESTING version.
 > **Owner decisions (2026-11-05, after run 1; all as proposed in §2.5):** **O-S3-4 (a)** option A, hand-written mapping, no new package. **(b)** ARC-06 keeps its ID with the S1 wording; the #90 round trips are regular tests. **(c)** option (ii): the generic `POST`/`PUT`/`DELETE` of the four catalog controllers and of `ProposalsController` are removed. **(d)** the removal goes into a separate small pull request before run 2.
 
@@ -19,15 +19,17 @@
 | F9 | ARC-06 (`MappingProfileTests`, U, step 0) calls `AssertConfigurationIsValid`; it only checks maps that exist (#90). TESTING_v26 §5.5 still says "Individual AutoMapper maps (covered by ARC-06 plus the contract tests)" | The successor must also catch a *missing* map or a forgotten member, and §5.5 is reworded in run 2 |
 | F10 | Lifetime of the code: the legacy catalog entities (`Criterion`, `CriteriaFilter`, `FilterType`) are replaced by the catalog module in M2 (S3-11 – S3-20); the proposal workflow retires in M5.6 (`withProposal()`, ARCHITECTURE §8.1); `Product` with the directory (step 6); `User`/`UICustomization` with identity and settings (steps 3/4). New module endpoints are hand-written with their invariants (D11) | The replacement mostly serves code that goes away within the next steps; what the new modules use matters more than the legacy maps |
 
-## 2. Draft ADR-015 — Replace AutoMapper
+## 2. Changes
 
-*Draft for O-S3-4. Goes into the next ARCHITECTURE version (§14 row, D-table row, a `C` entry) in run 2, with the owner's choice.*
+### Run 1 — draft ADR-015 (options for O-S3-4)
 
-### 2.1 Context
+*As written in run 1. The accepted version is ADR-015 in `ARCHITECTURE_v17.md` §6 and §14 (C99).*
+
+#### 2.1 Context
 
 AutoMapper 15+ is RPL-1.5 or commercial and fails D12; 14.0.0, the last MIT version, carries the unpatched High advisory GHSA-rvv3-g6hj-g44x (#31). The profile is small (F2–F4) and the generic CRUD maps are incomplete (#90). ARC-06 can't see missing maps (F9).
 
-### 2.2 Options
+#### 2.2 Options
 
 | | A — Hand-written mapping | B — Mapperly (source generator) | C — Mapster | D — Facet |
 |---|---|---|---|---|
@@ -43,7 +45,7 @@ AutoMapper 15+ is RPL-1.5 or commercial and fails D12; 14.0.0, the last MIT vers
 
 Also rejected: **stay on AutoMapper 14** (High advisory without a fix), **buy the commercial AutoMapper licence** (D12: a publicly funded open-source release must not depend on a commercial licence).
 
-### 2.3 What replaces ARC-06
+#### 2.3 What replaces ARC-06
 
 | | Successor | Fits | Catches a missing map / forgotten member? |
 |---|---|---|---|
@@ -53,11 +55,11 @@ Also rejected: **stay on AutoMapper 14** (High advisory without a fix), **buy th
 
 S3 is what #90 needs in any case (tests first); the question is only whether it is an invariant or a regular test. Because the generic endpoints are legacy (ARC-05 from step 5, D11), Claude recommends regular tests for S3 and keeping the ID **ARC-06 with the S1 wording**, so the gate keeps one invariant for mapping that the new modules also use.
 
-### 2.4 Recommendation
+#### 2.4 Recommendation
 
 **Option A (hand-written) with S1 as ARC-06; the #90 round trips (S3) as regular tests.** Reasons: no new dependency (CLAUDE §11) for code that mostly retires within M2–M6 (F10); the new modules write their projections by hand anyway (D11) and S1 covers them; plain C# is the easiest to hand over. Option B is a close second, and it would be the choice if the owner expects a lot of DTO mapping in the new modules: its compile-time check is stronger than S1, and its licence passes D12.
 
-### 2.5 Decisions needed (O-S3-4)
+#### 2.5 Decisions needed (O-S3-4)
 
 | # | Question | Options | Claude's proposal |
 |---|---|---|---|
@@ -66,23 +68,69 @@ S3 is what #90 needs in any case (tests first); the question is only whether it 
 | c | #90 scope: which generic write endpoints stay (F7, F8) | (i) make `POST`/`PUT`/`DELETE` of all five controllers work as the run-2 instruction says, **plus** an authorization requirement (no catalog role exists yet; legacy JWT only) · (ii) **remove** the generic `POST`/`PUT`/`DELETE` of the four catalog controllers and of `ProposalsController` (keep the `GET`s and `Proposals/upsert`, `review`, `approve`); SD20 = catalog only through the CLI; the 5 DTO→entity maps and `Update` go away · (iii) make them work and limit them to the legacy `Approver` role until step 2 | **(ii)**: closes F7 without inventing a role, needs no maps that nobody calls, follows #90's own suggestion and SD20. It needs the owner because the run-2 instruction says "create and update work" |
 | d | When F7 is closed | Separate small PR **now**, before run 2 (remove or lock the write actions, with an anonymous-write test) · in S3-07 run 2 | **Separate PR now**: every deployed API is open to anonymous deletes until then. Public repository: no public issue with reproduction steps before the fix |
 
+### Pull request #201 — generic CRUD writes removed (decision d)
+
+Branch `sprint03/S3-07-remove-generic-writes`, before run 2, so the open endpoints close without waiting for the replacement.
+
+| File | Change | Why |
+|---|---|---|
+| `API/…/Controllers/Base/BaseCrudController.cs` | `AddOne`, `UpdateOne`, `DeleteOne` and the `Failure` helper removed; class comment | F7, F8; O-S3-4 (c) |
+| `tests/…Integration/Api/GenericCrudWriteTests.cs` (new) | No generic write endpoint is mapped for the five controllers; anonymous and `Approver` `POST`/`PUT`/`DELETE` on `/api/FilterTypes` answer 405 and the record stays. Red before the change | F7 |
+| `tests/…Integration/Api/ProblemDetailsHostTests.cs` | Validation case on a probe endpoint `POST /test/problems/validate`; the throwing-CRUD-service case and its substitute removed with the actions | The actions are gone |
+| `tests/…Integration/Api/ProblemDetailsTests.cs` | API-01 wrong-type case on `PUT /api/UICustomization` (`darkModeOn`) | The actions are gone |
+| `CLAUDE.md` | §3: `BaseCrudController` is read-only | DoD |
+
+### Run 2 — replacement (O-S3-4 a, b)
+
+Tests first: commit `f04d172` added the hand-written maps next to AutoMapper with the new ARC-06 test and a temporary equivalence test (same JSON from both on filled sources, on null navigations, on a join row without its filter, and for language codes); the next commit switched the call sites and removed the package and that test.
+
+| File | Change | Why |
+|---|---|---|
+| `DAL/MODELS…/Entities/Mapping/CatalogMappings.cs`, `AccountMappings.cs` (new) | `ToDto` for criterion, criteria filter, filter type, product, proposal, user, UI settings; `ToLookupDto`; `ToEntity` for the two create DTOs of the proposal approval; three `Expression` projections for the queries; `ToLanguageCode`/`ToLanguage` for the former value converters. A join row without its loaded filter still gives a `null` element, as AutoMapper did (after an approval) | ADR-015 rules 1, 2 |
+| `DAL/MODELS…/Entities/Mapping/MappingProfile.cs`, `EnumToLanguageConverter.cs`, `LanguageToEnumConverter.cs` | Deleted | #31 |
+| `SERVICES/…/Base/BaseService.cs`, `Interfaces/IBaseService.cs` | No `IMapper`; `Read`/`ReadAll` map through `protected abstract ToDto`; `Create`, `Update`, `Delete` removed (no caller since #201) | ADR-015; #90 |
+| `SERVICES/…/CriterionService.cs`, `ProductService.cs`, `CriteriaFilterService.cs`, `FilterTypeService.cs`, `ProposalService.cs`, `UserService.cs` | Constructors without `IMapper`; `ProjectTo` → `Select(<projection>)`; `ToDto` overrides; `ProposalService.Delete` removed | #31 |
+| `DAL/DAL…/Repos/UICustomizationRepo.cs` | No `IMapper`; `ToDto()`, language through `ToLanguage()` | #31 |
+| `API/…/Program.cs`, four `GlobalUsings.cs`, four `.csproj` | `AddAutoMapper`, the `AutoMapper` usings and package references removed | #31 |
+| `Directory.Build.props` | Audit suppression for GHSA-rvv3-g6hj-g44x removed; the file stays (imported by `src/Directory.Build.props`, copied by the API Dockerfile) | #31 |
+| `tests/…Unit/Mapping/MappingCompletenessTests.cs`, `MapCases.cs`, `SampleObjects.cs` (new); `MappingProfileTests.cs` deleted | **INV:ARC-06**: every map of `MapCases` sets every target member not on its ignore list (sources filled by `SampleObjects`); every ignore entry names a real member; every public map method and projection has a case. Plus the language codes | ADR-015 rule 3; O-S3-4 (b) |
+| `tests/…Integration/Catalog/LegacyCatalogReadTests.cs` (new) | `GET /api/CriteriaFilters` (exclusions as lookups) and `GET /api/Products` (criteria filters as lookups) on PostgreSQL: the two projections no other test reached. Same result on the AutoMapper commit (checked in a temporary worktree) | EF translation of the new projections |
+| `docs/TESTING_v27.md` (new) | V89: ARC-06 wording, §5.5 | O-S3-4 (b) |
+| `docs/ARCHITECTURE_v17.md` (new) | C99 (ADR-015 text in §6, row in §14), C100 (D11, §2.3: generic CRUD read-only) | O-S3-4; DoD |
+| `CLAUDE.md` | Header; §3 (no AutoMapper, where the maps live, ARC-06, `Directory.Build.props`); §4 (`MODELS`) | DoD |
+
+#90 is fixed by removing what was broken: create and update no longer exist, so there is nothing to answer 404 for (F5, F6). The run-2 instruction "create and update work" was replaced by O-S3-4 (c).
+
 ## 3. Self-review (CLAUDE §6.7)
 
-Run 1 changes no code. The only test written (F7) was a throwaway probe and is deleted; the spike in §2.2 lives in the session scratchpad. Licences were read from the NuGet `nuspec` files (`<license type="expression">`); the shipped file list of Mapperly from its `.nupkg` and from the spike's build output.
+| # | Finding | Sorting |
+|---|---|---|
+| R1 | JSON of every legacy read endpoint unchanged: the equivalence test compared both mappers on every map before AutoMapper went; `LegacyCatalogReadTests` and the CAT-10 characterisation passed before and after | No change needed |
+| R2 | `ToLanguage` uses `ToLowerInvariant`, the old converter `ToLower` (culture-dependent); the four codes are ASCII without `i`, so no result changes | Won't fix |
+| R3 | `ProposalService.ApplyApprovalSideEffects` calls `dto!.ToEntity()`; a snapshot of literally `null` throws a `NullReferenceException` now; before, AutoMapper returned `null` and EF threw an `ArgumentNullException` on `Add`. Both throw on the same path | Won't fix: legacy workflow, retires in M5.6 |
+| R4 | `Logger` in `BaseCrudController` is unused since #201 | Won't fix: all five constructors inject it; the controllers go with step 2 |
+| R5 | Release build warnings: 104 distinct (112 on `main`); none in a new or changed mapping file; the two gone are the AutoMapper converter and the old `Update` | No change needed; the rest is #118 (S3-08) |
+| R6 | Security: no new endpoint; the maps read nothing the old profile did not; `UserDto` still carries only `Id`, `Email`, UI settings | No change needed |
+| R7 | N+1: the three list queries still project in SQL; `ProposalService` maps loaded entities as before | No change needed |
 
 ## 4. Checks
 
 | Check | Result |
 |---|---|
-| Throwaway integration test (F7), Testcontainers PostgreSQL 17 | Anonymous `DELETE /api/FilterTypes/{id}` → 200, body `1`, row removed; unknown id → 200, body `0` |
-| Mapperly 4.3.1 spike, .NET SDK 10.0.113 | Projection, `ApplyTo` and language helpers as expected; `RMG012`/`RMG020` as errors fail the build on an unmapped new DTO property |
-| `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs`, `reuse lint` | Not needed for run 1 (one Markdown file under `docs/`); run in run 2 |
+| Throwaway integration test (F7, run 1), Testcontainers PostgreSQL 17 | Anonymous `DELETE /api/FilterTypes/{id}` → 200, body `1`, row removed; unknown id → 200, body `0` |
+| Mapperly 4.3.1 spike (run 1), .NET SDK 10.0.113 | Projection, `ApplyTo` and language helpers as expected; `RMG012`/`RMG020` as errors fail the build on an unmapped new DTO property |
+| `GenericCrudWriteTests` before #201's change | 7 of 7 red; green after |
+| Equivalence test (commit `f04d172`, deleted in the next) | 60 mapping tests green; removing one member from a map turns ARC-06 and the equivalence test red |
+| `dotnet test --solution ProcureAccess.sln` | 184 passed (unit, architecture, integration) |
+| `dotnet list package --vulnerable --include-transitive` | No vulnerable package in any project |
+| `dotnet format` whitespace + style (solution) and analyzers (test projects) | No changes |
+| `node scripts/check-invariants.mjs` (reads TESTING_v27, finds the new ARC-06 test), `check-figma-links.mjs`, `check-i18n.mjs`; `reuse lint` | Passed; REUSE compliant |
 
 ## 5. Open points
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | F7: anonymous writes on the generic catalog endpoints | Decision (d); fix before or in run 2 |
-| P2 | F5: `AddOne` answers with the posted id | Goes with #90 in run 2, if the endpoint stays (decision c) |
-| P3 | TESTING_v26 §5.5 says ARC-06 covers individual maps | Reworded in run 2's TESTING version |
-| P4 | The CVE exposure note of S1-03 §4 stays true until run 2 removes the package | — |
+| P1 | Dependabot alerts 1, 8, 9, 10 (AutoMapper) | Close themselves once `main` has no AutoMapper reference; check after the merge |
+| P2 | `TECH_DEBT_v2.md` still lists #31 and #90 as open | `TECH_DEBT_v3.md` at the end of the sprint (process step 14) |
+| P3 | Deployed instances keep the anonymous writes until #201 is deployed | Deploy after the merge |
+| P4 | The new modules will write their own maps; ADR-015 rule 4 names when to revisit Mapperly | — |
