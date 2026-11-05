@@ -78,6 +78,9 @@ jobs:
         run: |
           node --test scripts/check-i18n.test.mjs
           node scripts/check-i18n.mjs
+      # Only the self-test here: the gate itself runs in stage 7 (TESTING §8.3).
+      - name: Invariant gate self-test
+        run: node --test scripts/check-invariants.test.mjs
       # Last in the job: e2e/ is type-checked on the Node of e2e/.nvmrc, as stage 6 runs it (#107).
       # The npm cache was already restored above (both lock files).
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
