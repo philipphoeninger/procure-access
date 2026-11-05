@@ -1,6 +1,6 @@
 # Sprint 03 — task prompts for Claude Code
 
-> **Status:** v1 (2026-11-05). Companion to `SPRINT_03.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_02/TASK_PROMPTS.md` (repeated at the end of this file). Claude Code implements; the owner's control chat for sprint 03 takes the decisions and reviews the reports.
+> **Status:** v1.1 (2026-11-05; v1.1: the prompts S3-11 – S3-27 cite `ARCHITECTURE_v17` and `TESTING_v29`, the highest versions after S3-10, instead of v15 and v23; the sections they name are unchanged except ARCHITECTURE §9 caching → §9.6). Companion to `SPRINT_03.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_02/TASK_PROMPTS.md` (repeated at the end of this file). Claude Code implements; the owner's control chat for sprint 03 takes the decisions and reviews the reports.
 > **How to use:** copy the block of the task into a new Claude Code session. Replace only the placeholders in `<…>` after "Owner decisions for this task" (decisions not yet taken, see "Open placeholders"). `<invariant ID>`, `<NN>`, `<n>` or `<Name>` elsewhere in a prompt are naming patterns for Claude Code, not placeholders for you. Everything else is filled in from `SPRINT_03.md`, `TECH_DEBT_v2.md` and the GitHub issues and pull requests as of 2026-11-05.
 > **Changes to the template since sprint 02:** reads `TECH_DEBT_v2.md`; step 4 also runs `node scripts/check-i18n.mjs`; step 3 asks for the owner's OK also before adding a project; the protocol header names issues and requirements / invariants, as the sprint-02 protocols did.
 
@@ -323,7 +323,7 @@ Requirements / invariants: prepares CAT-05, CAT-07, CAT-10 (stays green), CAT-13
 Depends on: nothing
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-11 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §4.3, §5.1, §12 step 2, ADR-014; SPEC_v2 R-ADM-01, SD20; TESTING_v23 §4.2 (CAT-*), §6, §9 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; the legacy Criteria, CriteriaFilter, FilterType and CriteriaFilterExclusion entities in DAL/MODELS and their controllers
+Also read: ARCHITECTURE_v17 §4.3, §5.1, §12 step 2, ADR-014; SPEC_v2 R-ADM-01, SD20; TESTING_v29 §4.2 (CAT-*), §6, §9 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; the legacy Criteria, CriteriaFilter, FilterType and CriteriaFilterExclusion entities in DAL/MODELS and their controllers
 
 Owner decisions for this task: none (O-S3-5 is taken after this note)
 Additional instructions: Write only the design note, as the draft of the protocol, and stop. It answers: CatalogDbContext and schema per ADR-014; which entities and DTOs go into Catalog.Contracts (O-22 interim rule); how the existing criteria and the CriteriaFilter types 1–4 with their exclusions reach the versioned model — (a) a generated legacy release folder imported by the CLI of S3-16, or (b) an EF data migration — and what that means for the order of S3-12 – S3-18; what the legacy endpoints read afterwards and how CAT-10 stays green with unchanged expected sets; dropping seed rows 2 and 3. Options with a recommendation. No code. The PR contains only the note.
@@ -348,7 +348,7 @@ Requirements / invariants: proposal CAT-05 (unit part) → active; OPS-03 covers
 Depends on: S3-11 decided (O-S3-5); no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-12 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §5.1 (catalog), ADR-014; TESTING_v23 §4.2; the protocol of S3-11
+Also read: ARCHITECTURE_v17 §5.1 (catalog), ADR-014; TESTING_v29 §4.2; the protocol of S3-11
 
 Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
 Additional instructions: CatalogDbContext with its own migration history, schema catalog. Entities CatalogRelease, Criterion (Key, Kind), CriterionRevision, CatalogReleaseCriterion, StandardReference; Fluent API configurations only. A published release and its revisions cannot be changed in the domain (domain error, not silent). Register through AddCatalogModule; only controllers and the registration are public. Confirm in the plan which invariants this task activates.
@@ -373,7 +373,7 @@ Requirements / invariants: proposal CAT-13 → active
 Depends on: S3-12 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-13 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: ARCHITECTURE_v15 §5.1 (filter layers, exclusions, procedure mapping, priority rules); kriterienkatalog_bit_inklusiv_v1.md (filter layers, exclusions, rating scale); TESTING_v23 §4.2
+Also read: ARCHITECTURE_v17 §5.1 (filter layers, exclusions, procedure mapping, priority rules); kriterienkatalog_bit_inklusiv_v1.md (filter layers, exclusions, rating scale); TESTING_v29 §4.2
 
 Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
 Additional instructions: AppType, ProductPart (IsAlwaysSelected), UseCaseTemplate (IsActive), TestType, FilterExclusion, CatalogReleaseFilterExclusion, CatalogReleaseAppTypeProcedure, CriterionApplicability, PriorityRecommendation, CriterionProcedureText, with a migration. A FilterExclusion whose target layer is not lower than its source layer cannot be created (CAT-13). No resolution logic yet (S3-20).
@@ -398,7 +398,7 @@ Requirements / invariants: none activated (test data)
 Depends on: S3-13 merged
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-14 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: TESTING_v23 §6 (builders, canonical fixtures), §9 step 2 (MiniCatalog); tests/ProcureAccess.Tests.Shared; ARCHITECTURE_v15 §5.1
+Also read: TESTING_v29 §6 (builders, canonical fixtures), §9 step 2 (MiniCatalog); tests/ProcureAccess.Tests.Shared; ARCHITECTURE_v17 §5.1
 
 Owner decisions for this task: none
 Additional instructions: A MiniCatalog fixture in Tests.Shared: two use cases (one inactive), app types incl. one without requirement criteria (Hardware), product parts incl. Basisfunktionalität (IsAlwaysSelected), two test types, exclusions across layers, priority rules on all four levels incl. a case with several app types, procedure texts with allowed ratings. Builders in the style of TestData.ACriterion(). Use it in at least one test of S3-12/S3-13 and document it in TESTING §6 in the next TESTING version only if another task writes one anyway; otherwise note it as an open point.
@@ -423,7 +423,7 @@ Requirements / invariants: prepares CAT-23
 Depends on: S3-12 – S3-14 merged
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-15 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v15 C74, §5.1; TESTING_v23 CAT-23
+Also read: SPEC_v2 R-ADM-01, SD20; ARCHITECTURE_v17 C74, §5.1; TESTING_v29 CAT-23
 
 Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
 Additional instructions: Folder layout and JSON files of catalog/releases/<version>/ (criteria revisions, procedure texts, applicability, priorities, exclusions, procedure mapping, filter dimensions); a loader and a validator for the whole folder: references, exclusion layers (CAT-13), procedure mapping, allowed ratings. Errors name the file and the JSON path. A small test release folder for the tests (built from the MiniCatalog shape). JSON files need REUSE coverage (REUSE.toml). Document the format for the project team (it is the review artefact of M2.3) in the protocol and in the next ARCHITECTURE version only if another task writes one anyway; otherwise note it.
@@ -448,7 +448,7 @@ Requirements / invariants: proposal CAT-23 (import part), CAT-05 (integration pa
 Depends on: S3-15 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-16 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01; TESTING_v23 CAT-05, CAT-07, CAT-23; CLAUDE.md §5 (how the CLI should be run, add the command there)
+Also read: SPEC_v2 R-ADM-01; TESTING_v29 CAT-05, CAT-07, CAT-23; CLAUDE.md §5 (how the CLI should be run, add the command there)
 
 Owner decisions for this task: none
 Additional instructions: catalog import <version>: validates the whole folder (S3-15) and imports it atomically as an immutable release — any error leaves the database unchanged. Unchanged criteria share their revision with the previous release (CAT-07). Decide in the plan where the CLI lives (e.g. a command mode of the API host or a small console project) and ask before adding a project or a dependency.
@@ -473,7 +473,7 @@ Requirements / invariants: proposal CAT-23 (activate part), CAT-09 → active
 Depends on: S3-16 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-17 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 R-ADM-01; TESTING_v23 CAT-09, CAT-23; ARCHITECTURE_v15 §9 (caching)
+Also read: SPEC_v2 R-ADM-01; TESTING_v29 CAT-09, CAT-23; ARCHITECTURE_v17 §9.6 (caching)
 
 Owner decisions for this task: none
 Additional instructions: catalog activate <version> switches the active release; the next catalog request returns it. Catalog cache keyed by CatalogReleaseId (CAT-09). Add both commands to CLAUDE.md §5.
@@ -498,7 +498,7 @@ Requirements / invariants: CAT-10 stays green (API and E2E part, expected sets u
 Depends on: S3-17 merged (import path) or S3-13 (data-migration path), per O-S3-5
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-18 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: the protocol of S3-11; ARCHITECTURE_v15 §12 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; tests/…/Catalog/Fixtures/cat-10-criteria-filter.json; e2e/journeys/j1-configurator.spec.ts
+Also read: the protocol of S3-11; ARCHITECTURE_v17 §12 step 2; docs/sprints/sprint_01/S1-15_cat10_characterisation.md; tests/…/Catalog/Fixtures/cat-10-criteria-filter.json; e2e/journeys/j1-configurator.spec.ts
 
 Owner decisions for this task: O-S3-5: <copy the decision from S3-11>
 Additional instructions: Bring the existing criteria and the CriteriaFilter types 1–4 with their exclusions into the catalog model on the path of O-S3-5; drop seed rows 2 and 3; the legacy filter endpoints keep working against the extended contract. CAT-10's expected sets never change: if they would, stop and report. J1 green on all five browser projects.
@@ -523,7 +523,7 @@ Requirements / invariants: proposal CAT-12 (catalog-endpoint part), CAT-18, CAT-
 Depends on: S3-17 and S3-18 merged; O-S3-6; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-19 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 153, gh issue view 176) and their entries in TECH_DEBT_v2.md; always the highest version of each document in docs/.
-Also read: SPEC_v2 §8.1 (response shape, C77: excludedBy[] without reason text, appTypesWithoutCriteria[]), §8.6; ARCHITECTURE_v15 §7.1, §7.2; TESTING_v23 CAT-12, CAT-18, CAT-19; TECH_DEBT_v2 §3.3 (#153, #176)
+Also read: SPEC_v2 §8.1 (response shape, C77: excludedBy[] without reason text, appTypesWithoutCriteria[]), §8.6; ARCHITECTURE_v17 §7.1, §7.2; TESTING_v29 CAT-12, CAT-18, CAT-19; TECH_DEBT_v2 §3.3 (#153, #176)
 
 Owner decisions for this task: O-S3-6: <controllers | minimal APIs for /api/v1/catalog/*; milestone of #176>
 Additional instructions: The endpoint in the Catalog module per SPEC §8.1, pinned to the active release or a given release id; inactive use cases not offered but still resolvable; exclusions release-pinned. Fix the versioned routes and the duplicate Swagger parameters (#153). Record deferred parts of CAT-12 (configurator, export, directory) in TESTING.
@@ -548,7 +548,7 @@ Requirements / invariants: proposal CAT-01, CAT-02, CAT-06 (release pinning by i
 Depends on: S3-19 merged; no other open branch that creates a TESTING version
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-20 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: SPEC_v2 §8.2 (response shape, matchedRule.kind), §7.1; ARCHITECTURE_v15 §5.1 (priority resolution), C77; TESTING_v23 §4.2; CLAUDE.md §8 (priorities explain themselves)
+Also read: SPEC_v2 §8.2 (response shape, matchedRule.kind), §7.1; ARCHITECTURE_v17 §5.1 (priority resolution), C77; TESTING_v29 §4.2; CLAUDE.md §8 (priorities explain themselves)
 
 Owner decisions for this task: none
 Additional instructions: Selection validation with field errors (CAT-11). Priority resolution most-specific-first over the four levels, per app type with the strictest result (A > B > Info, then weight), matchedRule naming the deciding app type; every resolved priority with rationale, source „Empfehlung des Projektteams“ and matchedRule (CAT-01, CAT-02, CAT-14) — table-driven tests over MiniCatalog first. Allowed ratings and procedure texts of the selected app types (CAT-16, CAT-21); one procedure criterion per selected test type; empty requirement list plus appTypesWithoutCriteria[] (CAT-20). If the plan shows more than one session, propose a split before coding.
@@ -650,7 +650,7 @@ Requirements / invariants: prepares OPS-04 (step 3)
 Depends on: stretch: only after all P0 tasks
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-24 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 186) and their entries in TECH_DEBT_v2.md; always the highest version of each document in docs/.
-Also read: TECH_DEBT_v2 TD-21; docs/sprints/sprint_02/S2-21_api_dockerfile_swagger.md (open point P3); ARCHITECTURE_v15 C60; TESTING_v23 OPS-04
+Also read: TECH_DEBT_v2 TD-21; docs/sprints/sprint_02/S2-21_api_dockerfile_swagger.md (open point P3); ARCHITECTURE_v17 C60; TESTING_v29 OPS-04
 
 Owner decisions for this task: none
 Additional instructions: Stretch task. Persist the Data Protection key ring in the database (as ARCHITECTURE C60 plans for the cookie session), in the Platform module with its migration. OPS-04 stays planned; note how its test will work.
@@ -725,7 +725,7 @@ Requirements / invariants: CAT-23 validation must pass on the folder
 Depends on: S3-15 merged; stretch: only after all P0 tasks
 
 Read first: CLAUDE.md; in SPRINT_03.md the row of S3-27 plus the sections Dependencies, Owner decisions, Risks and Definition of done; always the highest version of each document in docs/.
-Also read: kriterienkatalog_bit_inklusiv_v1.md, kriterienkatalog_bit_inklusiv_v1_teil_a.md, kriterienkatalog_bit_inklusiv_v1_teil_b.md; SPEC_v2 R-ADM-01, §13 (O-1, K-1); ARCHITECTURE_v15 §12 step 2 (one procedure criterion per test type)
+Also read: kriterienkatalog_bit_inklusiv_v1.md, kriterienkatalog_bit_inklusiv_v1_teil_a.md, kriterienkatalog_bit_inklusiv_v1_teil_b.md; SPEC_v2 R-ADM-01, §13 (O-1, K-1); ARCHITECTURE_v17 §12 step 2 (one procedure criterion per test type)
 
 Owner decisions for this task: none
 Additional instructions: Stretch task. Build catalog/releases/2026.1/ in the format of S3-15 from the BIT inklusiv texts of Teil A/B, with the filter dimensions and exclusions of the Kriterienkatalog and one procedure criterion per test type. No priorities, rationales or plain-language titles: those come from the project team (O-1, K-1) — leave them out and list what is missing per criterion, so the team can fill it in. Do not invent wording. Validate with S3-15; do not import or activate it.
