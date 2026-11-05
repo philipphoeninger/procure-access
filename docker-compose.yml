@@ -47,7 +47,7 @@ services:
       # Sample user for the local stack; empty = no sample user (only used in Development)
       SampleData__UserPassword: ${SAMPLE_USER_PASSWORD:-}
     ports:
-      # Direct access for Swagger and the dev server (npm start); the client image calls the API
+      # Direct access for Swagger (Development only) and the dev server (npm start); the client image calls the API
       # through its nginx proxy (/api/ → api:8080)
       - 5000:8080
     # volumes:
