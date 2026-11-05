@@ -93,10 +93,10 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
 
         // A value of the wrong type: the key is the path in the payload, without the JSON-path root "$.".
         using var wrongType = await client.PutAsync(
-            "/api/FilterTypes/1", Json("""{"id":"x"}"""), cancellationToken);
+            "/api/UICustomization", Json("""{"darkModeOn":"x"}"""), cancellationToken);
         var wrongTypeProblem = await ProblemResponse.ReadAsync(wrongType, cancellationToken);
         wrongTypeProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
-        wrongTypeProblem.ErrorKeys.ShouldContain("id");
+        wrongTypeProblem.ErrorKeys.ShouldContain("darkModeOn");
         wrongTypeProblem.ErrorKeys.ShouldNotContain(key => key.StartsWith("$.", StringComparison.Ordinal));
     }
 
@@ -129,7 +129,7 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
     /// <summary>
     /// A failure of the legacy UI customisation endpoints: still 400 as before S2-10 (owner,
     /// 2026-11-01), now as Problem Details, and neither the exception text nor the former members
-    /// <c>code</c> and <c>message</c> reach the client. The CRUD endpoints: <see cref="ProblemDetailsHostTests"/>.
+    /// <c>code</c> and <c>message</c> reach the client.
     /// </summary>
     private static void ShouldBeLegacyFailure(ProblemResponse problem)
     {
