@@ -184,11 +184,21 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  # One job per Playwright project, in parallel; each builds and starts its own stack. No
+  # `needs: build`: the stack builds its own images. The required check is the job `e2e-result`.
   e2e:
-    name: 6. E2E + a11y
-    needs: build
+    name: 6. E2E + a11y (${{ matrix.project }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: chromium, browser: chromium }
+          - { project: firefox, browser: firefox }
+          - { project: webkit, browser: webkit }
+          - { project: mobile-chrome, browser: chromium }
+          - { project: mobile-safari, browser: webkit }
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -225,14 +235,16 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
-      - name: Install Playwright browsers
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
+      - name: Install Playwright browser
         if: steps.browser-cache.outputs.cache-hit != 'true'
-        # Downloads three browsers plus the apt packages; has taken up to 8 minutes.
+        # Downloads the browser plus its apt packages; three browsers together took up to 8 minutes.
         timeout-minutes: 15
         working-directory: e2e
-        run: npx playwright install --with-deps chromium firefox webkit
-      - name: Save Playwright browsers
+        run: npx playwright install --with-deps "$BROWSER"
+        env:
+          BROWSER: ${{ matrix.browser }}
+      - name: Save Playwright browser
         if: steps.browser-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -240,23 +252,28 @@ jobs:
           key: ${{ steps.browser-cache.outputs.cache-primary-key }}
       - name: Install Playwright system dependencies
         if: steps.browser-cache.outputs.cache-hit == 'true'
-        # Usually under a minute; a hanging apt mirror once blocked the job until its 45-minute limit.
-        timeout-minutes: 5
+        # Usually under a minute. The limit stops a hanging apt mirror (once 45 minutes); 5 minutes
+        # were too short for a slow one (2026-11-05, up to 2 minutes per package).
+        timeout-minutes: 10
         working-directory: e2e
-        run: npx playwright install-deps chromium firefox webkit
+        run: npx playwright install-deps "$BROWSER"
+        env:
+          BROWSER: ${{ matrix.browser }}
       - name: Start E2E stack
         working-directory: e2e
         run: npm run stack:up
-      - name: Playwright (all five browser projects)
+      - name: Playwright (${{ matrix.project }})
         working-directory: e2e
-        run: npx playwright test
+        run: npx playwright test --project="$PROJECT"
+        env:
+          PROJECT: ${{ matrix.project }}
       - name: Collect stack logs
         if: failure()
         run: $COMPOSE logs --no-color > e2e/compose.log 2>&1 || true
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: |
             e2e/playwright-report/
             e2e/test-results/
@@ -266,6 +283,22 @@ jobs:
         if: always()
         working-directory: e2e
         run: npm run stack:down
+
+  # The required check "6. E2E + a11y": green only when every browser project passed. `always()`
+  # matters: a skipped required check would count as passed.
+  e2e-result:
+    name: 6. E2E + a11y
+    needs: e2e
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: All browser projects passed
+        env:
+          RESULT: ${{ needs.e2e.result }}
+        run: |
+          echo "Browser projects: $RESULT"
+          test "$RESULT" = "success"
 
   invariants:
     name: 7. Invariant gate
