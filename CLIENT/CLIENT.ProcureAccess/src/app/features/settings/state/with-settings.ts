@@ -22,6 +22,7 @@ import { LanguageService } from '@app/features/settings/services/language.servic
 import { DEFAULT_LANGUAGE } from '@app/app.config';
 import { TranslateService } from '@ngx-translate/core';
 import { tap } from 'rxjs';
+import { AppearanceService } from '@app/core/a11y/appearance';
 
 export type SettingsState = { 
     uiCustomization: UICustomization
@@ -53,9 +54,21 @@ export const withSettings = () => signalStoreFeature(
       snackbarService = inject(SnackbarService),
       languageService = inject(LanguageService),
       translateService = inject(TranslateService),
-      rendererFactory = inject(RendererFactory2)
+      rendererFactory = inject(RendererFactory2),
+      appearance = inject(AppearanceService)
     ) => {
       const renderer = rendererFactory.createRenderer(null, null);
+
+      // The appearance follows the system (AppearanceService, R-SET-02). Only an explicit choice
+      // overrides it: the dark-mode toggle and a signed-in user's saved setting. A value from
+      // localStorage is not applied, because the store also saves the system setting there
+      // (S3-09, owner decision D3). Interim until the settings page S60 (step 3).
+      const followSystemAppearance = () => {
+        appearance.setExplicit(null);
+        patchState(state, {
+          uiCustomization: { ...state.uiCustomization(), darkModeOn: appearance.appearance() === 'dark' }
+        });
+      };
 
       return {
         activateMediaEventListeners() {
@@ -76,6 +89,7 @@ export const withSettings = () => signalStoreFeature(
                 const uiCustomization = state.uiCustomization();
                 uiCustomization.darkModeOn = event.matches;
                 this.setUICustomization(uiCustomization);
+                appearance.setExplicit(null);
                 state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
                 snackbarService.showInfo('New color scheme saved as cookie.');
               }
@@ -105,11 +119,7 @@ export const withSettings = () => signalStoreFeature(
         async reloadUICustomization() {
           if (!state.isAuthenticated()) {
             if (state.loadFromLocalStorage(LocalStorageKeys.uiCustomization)) {
-              // Renderer effects
-              renderer.setStyle(
-                document.documentElement, 
-                'color-scheme', 
-                state.uiCustomization().darkModeOn ? 'dark' : 'light');
+              followSystemAppearance();
 
               if (state.uiCustomization().highContrastOn)
                 renderer.addClass(document.documentElement, 'contrast-more');
@@ -129,6 +139,7 @@ export const withSettings = () => signalStoreFeature(
             languageService.init(DEFAULT_LANGUAGE);
             initialSettings.language = languageService.get();
             this.setUICustomization(initialSettings);
+            followSystemAppearance();
             state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
           } else {
             state.incrementLoadingCount();
@@ -150,12 +161,10 @@ export const withSettings = () => signalStoreFeature(
             uiCustomization: { ...uiCustomization }
           });
 
-          // Renderer effects
-          renderer.setStyle(
-            document.documentElement, 
-            'color-scheme', 
-            state.uiCustomization().darkModeOn ? 'dark' : 'light');
-          
+          // A signed-in user's saved setting overrides the system appearance (R-SET-02)
+          if (state.isAuthenticated())
+            appearance.setExplicit(state.uiCustomization().darkModeOn ? 'dark' : 'light');
+
           if (state.uiCustomization().highContrastOn)
             renderer.addClass(document.documentElement, 'contrast-more');
           else renderer.removeClass(document.documentElement, 'contrast-more');
@@ -189,6 +198,7 @@ export const withSettings = () => signalStoreFeature(
           const uiCustomization = state.uiCustomization();
           uiCustomization.darkModeOn = !uiCustomization.darkModeOn;
           this.setUICustomization(uiCustomization);
+          appearance.setExplicit(uiCustomization.darkModeOn ? 'dark' : 'light');
         },
         toggleContrastMode() {
           const uiCustomization = state.uiCustomization();

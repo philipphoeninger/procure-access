@@ -7,7 +7,6 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   provideHttpClient,
   withFetch,
@@ -22,6 +21,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EnLanguage } from './core/models/language.enum';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { provideAppearance } from './core/a11y/appearance';
 import { provideDocumentLanguage } from './core/a11y/document-language';
 import { PageTitleStrategy } from './core/a11y/page-title.strategy';
 
@@ -38,7 +38,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     // Page title, H1 focus and announcement on every route change (R-SHL-04, A11Y-03)
     { provide: TitleStrategy, useClass: PageTitleStrategy },
-    provideAnimationsAsync(),
+    // Light/dark appearance and reduced motion from the system settings (R-SET-02, SPEC §7.5)
+    provideAppearance(),
     // Every mat-icon uses the self-hosted Material Symbols Outlined font (design handoff §1.8).
     provideAppInitializer(() => {
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');

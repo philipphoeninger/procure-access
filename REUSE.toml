@@ -127,10 +127,3 @@ path = "CLIENT/CLIENT.ProcureAccess/public/favicon.ico"
 precedence = "override"
 SPDX-FileCopyrightText = "2010-2025 Google LLC (https://angular.dev/license)"
 SPDX-License-Identifier = "MIT"
-
-# Poppins font (Google Fonts), self-hosted.
-[[annotations]]
-path = "CLIENT/CLIENT.ProcureAccess/src/assets/fonts/poppins/**"
-precedence = "override"
-SPDX-FileCopyrightText = "2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)"
-SPDX-License-Identifier = "OFL-1.1"

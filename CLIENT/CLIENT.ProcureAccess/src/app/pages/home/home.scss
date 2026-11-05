@@ -12,9 +12,14 @@
   inline-size: 100%;
 }
 
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
 .pa-home__title {
   margin: 0;
-  font: var(--mat-sys-headline-medium);
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
 }
 
 .pa-home__intro {
