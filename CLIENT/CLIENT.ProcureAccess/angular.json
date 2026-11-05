@@ -94,7 +94,7 @@
             "tsConfig": "tsconfig.spec.json",
             "providersFile": "src/test-providers.ts",
             "coverageInclude": ["src/app/**/*.ts"],
-            "coverageExclude": ["src/app/**/*.spec.ts", "src/app/testing/**"],
+            "coverageExclude": ["src/app/**/*.spec.ts", "src/app/testing/**", "src/app/**/models/**"],
             "coverageReporters": ["text-summary", "lcov"]
           }
         },
