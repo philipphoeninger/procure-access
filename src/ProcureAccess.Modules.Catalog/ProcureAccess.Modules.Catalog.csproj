@@ -11,10 +11,23 @@ SPDX-License-Identifier: MIT
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!-- Same versions as the Platform module (S3-12); no new dependency. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
   <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
   <ItemGroup>
     <ProjectReference Include="../ProcureAccess.Modules.Catalog.Contracts/ProcureAccess.Modules.Catalog.Contracts.csproj" />
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
+  </ItemGroup>
+
+  <!-- The tests use the internal types. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Integration" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Architecture" />
   </ItemGroup>
 
 </Project>
