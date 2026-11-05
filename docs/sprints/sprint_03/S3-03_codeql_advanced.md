@@ -1,6 +1,6 @@
 # S3-03 — CodeQL advanced setup
 
-> **Sprint:** 03, P0 task S3-03 (debt, 0.5 points). **Issues:** #144. **Requirements / invariants:** none (CI, TESTING §8.2 stage 9); no invariant activated. New `TESTING_v24.md` (V85) for the stage-9 text only. **Status:** done by Claude Code (2026-11-05); one pull request. The Dependabot proof (§4 check 6) follows after the merge in a small docs PR.
+> **Sprint:** 03, P0 task S3-03 (debt, 0.5 points). **Issues:** #144. **Requirements / invariants:** none (CI, TESTING §8.2 stage 9); no invariant activated. New `TESTING_v24.md` (V85) for the stage-9 text only. **Status:** done by Claude Code (2026-11-05); pull request #195, Dependabot proof (§4 check 6) in the follow-up docs PR after the merge.
 > **Scope:** exactly the sprint row: CodeQL moves from GitHub's default setup to a workflow file that also runs on Dependabot pull requests, with the same three languages; actions pinned by SHA like `ci.yml`. The ruleset is the owner's.
 > **Owner decisions** (asked before the start, 2026-11-05):
 > 1. **Order (1A):** Claude Code switches default setup off through the API as soon as the pull request is open, so the PR shows the `Analyze` jobs running. Reason: GitHub rejects results of a workflow while default setup is on.
@@ -61,7 +61,8 @@ No correctness or security bug that affects current behaviour was found in the d
 | 3 | `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs` | ✅ Figma 2 checked, 24 not built, 0 pending; i18n 0 errors (6 keys computed at runtime, as before) |
 | 4 | `reuse lint` (image `fsfe/reuse:latest`) | ✅ compliant, 684 / 684 files (with this protocol) |
 | 5 | `Analyze` on a normal PR: this pull request (#195), run 42068998755 after default setup was switched off | ✅ `Analyze (actions)`, `Analyze (csharp)`, `Analyze (javascript-typescript)` passed (39 s, 2 min 10 s, 47 s); three analyses uploaded for `refs/pull/195/merge` with the categories `/language:actions`, `/language:csharp`, `/language:javascript-typescript`, 0 new results, no upload error; the `CodeQL` check passed; alert 3 is still the only open alert (same key, no duplicate). CI stages 1–8 green |
-| 6 | `Analyze` on a Dependabot PR: #193 after `@dependabot rebase` | follows after the merge (owner decision 2) |
+| 6 | `Analyze` on a Dependabot PR: #193 after `@dependabot rebase` (2026-11-05, after #195 was merged), run 42072735405, actor and triggering actor `dependabot[bot]` | ✅ `Analyze (actions)`, `Analyze (csharp)`, `Analyze (javascript-typescript)` passed (43 s, 2 min, 51 s); three analyses uploaded for `refs/pull/193/merge` with the same categories, 0 results, no upload error. So the job's `security-events: write` takes effect for Dependabot runs (F4) |
+| 6a | First run on `main` after the merge (push, run 42072205565) | ✅ passed |
 | 7 | Build and test levels | – not touched (no application code); CI stages 2–6 green on #195 |
 
 ## 5. Open points
@@ -69,6 +70,6 @@ No correctness or security bug that affects current behaviour was found in the d
 | # | Point | Who, when |
 |---|---|---|
 | P1 | **A CodeQL finding does not block a merge** (F7): the `Analyze` jobs pass also when they find something, and the ruleset has no code-scanning rule. TESTING v23 claimed "CodeQL high findings: yes". Options: **(a, recommended)** add the ruleset rule "Require code scanning results" (tool CodeQL, alerts "Errors", security alerts "High or higher"), which matches the old claim; (b) leave it and keep TESTING v24's "findings: not yet". Alert 3 (S3-04) is not a new alert of a PR, so it would not block other PRs | Owner, with the ruleset change after the merge |
-| P2 | Dependabot proof (§4 check 6) and the ruleset: after the merge, `@dependabot rebase` on #193 (the earlier rebase came before the workflow was on `main`, so Dependabot answered "already up to date"); Claude Code records the run in a docs PR; then the owner adds `Analyze (actions)`, `Analyze (csharp)`, `Analyze (javascript-typescript)` to "Main protection" | Owner and Claude Code, after the merge |
+| P2 | Ruleset: the Dependabot proof is done (§4 check 6), so the owner adds `Analyze (actions)`, `Analyze (csharp)`, `Analyze (javascript-typescript)` to "Main protection" (with P1, if chosen) | Owner, now |
 | P3 | D12 wording for ARCHITECTURE v16 (owner decision 3), proposal: "**Services of the hosting platform** (GitHub Actions runners, CodeQL code scanning, Dependabot) are not dependencies: they are neither shipped nor kept in the repository, so the rule above does not apply to them. Actions that a workflow references (`uses:`) are development tools and follow the rule (e.g. `github/codeql-action`, MIT)." | S3-05 (documentation session) |
 | P4 | `TECH_DEBT_v2.md` keeps #144 open; v3 at the end of the sprint moves it to "Done" together with TD-01's note | Sprint close-out |
