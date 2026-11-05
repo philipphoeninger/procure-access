@@ -160,7 +160,7 @@ Backend (S2-06 – S2-11) and frontend (S2-12 – S2-18) are independent once S2
 | R2 | NetArchTest.Rules (no release since 2021) does not work on .NET 10 | S2-08 blocked | S2-05 on D1; project-reference rules of ARC-03 work without it |
 | R3 | The new shell breaks legacy screens, J1 or the CAT-10 E2E part | S2-15 – S2-18 grow | Legacy screens only need to keep working inside the shell; adjust locators, never expected sets; screens are rebuilt from M2 on |
 | R4 | UX copy lacks keys or wording the shell needs | Shell tasks stop (CLAUDE §6.5) | Collect all gaps in one list and settle them in one UX copy session instead of one by one |
-| R5 | `typescript-eslint` recommended reports many findings in legacy code | S2-14 grows | Fix trivial ones; disable per file with an issue link for legacy code that M1–M3 replaces |
+| R5 | `typescript-eslint` recommended reports many findings in legacy code | S2-14 grows | Fix trivial ones; disable per file with an issue link for legacy code that M1–M5 replaces |
 | R6 | Ride-along debt makes M1 larger than the roadmap says | M1 needs sprint 03 too | Accepted in this plan; record in `ROADMAP_v2.md` |
 | R7 | Velocity basis is thin (days of sprint 01 not recorded) | Over- or under-commitment | 80 % rule plus stretch; record the days used at this close-out |
 | R8 | Dependabot major bump `marked` 17 → 18 | Breaks Markdown rendering | Changelog check in S2-04; `marked` matters for the legal pages (GP.3), so a revert is cheap now |
@@ -192,11 +192,11 @@ Backend (S2-06 – S2-11) and frontend (S2-12 – S2-18) are independent once S2
 
 | Item | Value |
 |---|---|
-| Points done (P0 / stretch) | |
-| Development days used | |
-| Velocity for forecasting | |
-| Carried over to sprint 03 (with reason) | |
-| Issues created / closed | |
-| Changes needed in roadmap or documents | |
+| Points done (P0 / stretch) | **28.5 / 3.5** — all 23 tasks (S2-01 – S2-23), each with its protocol in this folder |
+| Development days used | **about 4** (owner, 2026-11-05); calendar 2026-10-29 – 2026-11-05 |
+| Velocity for forecasting | ≈ **8 points per development day**. Sprint 03 is planned with ~55 points of capacity for 8 days (≈ 7 per day, discounted for the new domain work of M2; `ROADMAP_v3.md` §6) |
+| Carried over to sprint 03 (with reason) | No task. As planned, M1.5 (theme) and the M1 debt #31 / #118 move to sprint 03. Owner work still open: the UX copy session #181 and the decisions of `TECH_DEBT_v2.md` §6 |
+| Issues created / closed | Closed: the items of `TECH_DEBT_v2.md` §4 (among them #37, #43, #73, #74, #77, #78, #95 – #97, #101, #104 – #107, #109 – #111, #113, #117, #119 – #122, #140 – #142). Created: #135, #137, #144, #153, #158, #160, #161, #168, #170, #171, #176 during the sprint; #180 – #188 at the register review |
+| Changes needed in roadmap or documents | `ROADMAP_v3.md` (M1 status, M2 re-estimate, velocity). Written during the sprint: `ARCHITECTURE_v15.md` (ADR-014), `TESTING_v16.md` – `TESTING_v23.md`, UX copy v15, SPEC SD25 (UX-O9). Still open: the documentation drift of #180 (task S3-05). The statements in this plan and in `TASK_PROMPTS.md` about removing `--ignore-exit-code 8` were stale: the flag was gone since S1-23 (S2-05 P2, S2-08 P3) |
 
 **Next sprint (preview):** finish M1 — M1.5 theme foundation with A11Y-08 (5), AutoMapper replacement #31 with #90 and the ARC-06 successor, build warnings and analyzer check #118, remaining stretch items — then start M2 with M2.1 (catalog domain model, 13).
