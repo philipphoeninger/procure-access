@@ -22,11 +22,11 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     }
 
     // CREATE / UPSERT PROPOSAL (stores snapshot)
-    public async Task<ProposalDto> UpsertAsync(UpsertProposalCommand cmd)
+    public async Task<ProposalDto?> UpsertAsync(UpsertProposalCommand cmd)
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
         if (user is null) return null; //gate
-        string userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         var userPermissions = user
                         .Claims
                         .Where(x => x.Type == CustomClaimTypes.Permission)
@@ -49,7 +49,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         {
             entity = new Proposal
             {
-                ProposerId = userId
+                ProposerId = userId!
             };
 
             MainRepo.Context.Proposals.Add(entity);
@@ -74,7 +74,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     }
 
     // GET SINGLE PROPOSAL (with snapshot)
-    public override async Task<Result<ProposalDto?>> Read(int id)
+    public override async Task<Result<ProposalDto?>?> ReadAsync(int id)
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
         if (user is null) return null; //gate
@@ -100,7 +100,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         return Result<ProposalDto?>.Success(dto);
     }
 
-    public override async Task<Result<IEnumerable<ProposalDto>>> ReadAll()
+    public override async Task<Result<IEnumerable<ProposalDto>>?> ReadAllAsync()
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
         if (user is null) return null; //gate
@@ -148,11 +148,11 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     protected override ProposalDto ToDto(Proposal entity) => entity.ToDto();
 
     // REVIEW (approver/proposer edits snapshot)
-    public async Task<ProposalDto> ReviewAsync(ReviewProposalCommand cmd)
+    public async Task<ProposalDto?> ReviewAsync(ReviewProposalCommand cmd)
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
         if (user is null) return null; //gate
-        string userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         var userPermissions = user
                         .Claims
                         .Where(x => x.Type == CustomClaimTypes.Permission)
@@ -189,14 +189,14 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     public async Task<ProposalDto> ApproveAsync(ApproveProposalCommand cmd)
     {
         ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
-        var userPermissions = user
+        var userPermissions = user!
                 .Claims
                 .Where(x => x.Type == CustomClaimTypes.Permission)
                 .Select(x => x.Value);
         if (!userPermissions.Any(x => x == Permissions.ObjectsApprove))
             throw new Exception("User is not authorized to approve proposals.");
 
-        string userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
         var proposal = await MainRepo.Context.Proposals
             .Include(p => p.Product)
@@ -218,7 +218,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
 
         if (cmd.IsApproved)
         {
-            await ApplyApprovalSideEffects(proposal);
+            await ApplyApprovalSideEffectsAsync(proposal);
         }
 
         await MainRepo.Context.SaveChangesAsync();
@@ -227,7 +227,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     }
 
     // APPLY SNAPSHOT → REAL ENTITY
-    private async Task ApplyApprovalSideEffects(Proposal proposal)
+    private async Task ApplyApprovalSideEffectsAsync(Proposal proposal)
     {
         if (!string.IsNullOrEmpty(proposal.ProductSnapshot))
         {

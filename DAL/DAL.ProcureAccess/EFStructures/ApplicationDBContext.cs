@@ -73,7 +73,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     #endregion
 
     #region eventhandlers
-    private void ChangeTracker_Tracked(object sender, EntityTrackedEventArgs e)
+    private void ChangeTracker_Tracked(object? sender, EntityTrackedEventArgs e)
     {
         var source = (e.FromQuery) ? "Database" : "Code";
         //if (e.Entry.Entity is SomeEntity l)
@@ -83,7 +83,7 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         // add more Entities ... 
     }
 
-    private void ChangeTracker_StateChanged(object sender, EntityStateChangedEventArgs e)
+    private void ChangeTracker_StateChanged(object? sender, EntityStateChangedEventArgs e)
     {
         // if (e.Entry.Entity is SomeEntity l) Log_StateChanged(l.Property1 ?? l.Property2, e);
         // add more Entities ...

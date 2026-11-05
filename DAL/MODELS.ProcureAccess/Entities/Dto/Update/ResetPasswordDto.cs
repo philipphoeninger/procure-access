@@ -6,7 +6,7 @@ namespace MODELS.ProcureAccess.Entities.Dto;
 
 public class ResetPasswordDto
 {
-    public string Email { get; set; }
-    public string Token { get; set; }
-    public string NewPassword { get; set; }
+    public string Email { get; set; } = null!;
+    public string Token { get; set; } = null!;
+    public string NewPassword { get; set; } = null!;
 }

@@ -6,7 +6,7 @@ namespace API.ProcureAccess.Extensions;
 
 public static class AuthorizationExtensions
 {
-    public static async Task AddRolesAndPermissions(this WebApplication app, RoleManager<IdentityRole> roleManager)
+    public static async Task AddRolesAndPermissionsAsync(this WebApplication app, RoleManager<IdentityRole> roleManager)
     {
         // set approver permissions
         string[] roles = { Roles.Admin, Roles.Approver };

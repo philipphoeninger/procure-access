@@ -9,6 +9,6 @@ public interface IBaseService<TEntity, TDto>
     where TDto : BaseDto, new()
 {
     IBaseRepo<TEntity> MainRepo { get; set; }
-    Task<Result<TDto?>> Read(int id);
-    Task<Result<IEnumerable<TDto>>> ReadAll();
+    Task<Result<TDto?>?> ReadAsync(int id);
+    Task<Result<IEnumerable<TDto>>?> ReadAllAsync();
 }

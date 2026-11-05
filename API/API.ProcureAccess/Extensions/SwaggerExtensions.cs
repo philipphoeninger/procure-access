@@ -34,7 +34,11 @@ public static class SwaggerExtensions
         app.UseSwaggerUI(options =>
         {
             using var scope = app.Services.CreateScope();
+            // AV0027 asks for app.DescribeApiVersions(); that switch comes with the first
+            // versioned minimal API (#176). Remove this suppression with it.
+#pragma warning disable AV0027
             var versionProvider = scope.ServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
+#pragma warning restore AV0027
             // build a swagger endpoint for each discovered API version
             foreach (var description in versionProvider.ApiVersionDescriptions)
             {

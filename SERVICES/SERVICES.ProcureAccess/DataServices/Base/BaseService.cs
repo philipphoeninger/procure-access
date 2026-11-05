@@ -22,14 +22,14 @@ public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
     #endregion
 
     #region methods
-    public virtual async Task<Result<TDto?>> Read(int id)
+    public virtual async Task<Result<TDto?>?> ReadAsync(int id)
     {
         TEntity? entity = MainRepo.Find(id);
         if (entity is null) return null; //gate
         return Result<TDto?>.Success(ToDto(entity));
     }
 
-    public virtual async Task<Result<IEnumerable<TDto>>> ReadAll()
+    public virtual async Task<Result<IEnumerable<TDto>>?> ReadAllAsync()
     {
         List<TEntity> entities = MainRepo.GetAll().ToList();
         List<TDto> dtos = new List<TDto>();

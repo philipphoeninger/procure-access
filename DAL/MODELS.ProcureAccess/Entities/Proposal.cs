@@ -9,8 +9,8 @@ public partial class Proposal : BaseEntity
 {
     #region fields
     [Required]
-    public string ProposerId { get; set; }
-    public User Proposer { get; set; }
+    public string ProposerId { get; set; } = null!;
+    public User Proposer { get; set; } = null!;
 
     public string? ApproverId { get; set; }
     public User? Approver { get; set; }

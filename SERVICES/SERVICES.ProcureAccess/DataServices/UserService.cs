@@ -39,7 +39,7 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<UserDto?> GetCurrentUser()
+    public async Task<UserDto?> GetCurrentUserAsync()
     {
         ClaimsPrincipal? claimsPrincipal = _httpContextAccessor.HttpContext?.User;
         if (claimsPrincipal is null) return null; //gate
@@ -71,7 +71,7 @@ public class UserService : IUserService
         // if (!user.EmailConfirmed)
         //     throw new Exception("Email not confirmed");
 
-        return await GenerateAuthResponse(user);
+        return await GenerateAuthResponseAsync(user);
     }
 
     // SIGN UP
@@ -153,11 +153,11 @@ public class UserService : IUserService
 
         await _db.SaveChangesAsync();
 
-        return await GenerateAuthResponse(token.User);
+        return await GenerateAuthResponseAsync(token.User);
     }
 
     // PRIVATE: Generate Tokens
-    private async Task<AuthResponseDto> GenerateAuthResponse(User user)
+    private async Task<AuthResponseDto> GenerateAuthResponseAsync(User user)
     {
         var roles = await _userManager.GetRolesAsync(user);
 

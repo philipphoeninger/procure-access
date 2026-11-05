@@ -10,7 +10,7 @@ public partial class CriteriaFilter : BaseEntity
     #region fields
     [Required]
     [StringLength(200)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [StringLength(2000)]
     public string Description { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ public partial class CriteriaFilter : BaseEntity
     [ForeignKey("FilterType")]
     public int FilterTypeId { get; set; }
 
-    public FilterType FilterType { get; set; }
+    public FilterType FilterType { get; set; } = null!;
 
     public ICollection<Criterion> Criteria { get; set; } = new List<Criterion>();
 

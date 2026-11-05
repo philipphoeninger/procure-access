@@ -12,7 +12,7 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
 
     protected override CriterionDto ToDto(Criterion entity) => entity.ToDto();
 
-    public override async Task<Result<IEnumerable<CriterionDto>>> ReadAll()
+    public override async Task<Result<IEnumerable<CriterionDto>>?> ReadAllAsync()
     {
         return Result<IEnumerable<CriterionDto>>.Success(
             await MainRepo.Context.Criteria
@@ -24,7 +24,7 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
                 .ToListAsync());
     }
 
-    public async Task<IEnumerable<CriterionDto>> GetByCriteriaFilterIds(int[] criteriaFilterIds)
+    public async Task<IEnumerable<CriterionDto>> GetByCriteriaFilterIdsAsync(int[] criteriaFilterIds)
     {
         return await MainRepo.Context.Criteria
             .AsNoTracking()

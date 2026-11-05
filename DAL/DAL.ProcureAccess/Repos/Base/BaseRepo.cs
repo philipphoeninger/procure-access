@@ -20,7 +20,7 @@ public abstract class BaseRepo<T> : BaseViewRepo<T>, IBaseRepo<T> where T : Base
         {
             return Context.SaveChanges();
         }
-        catch (CustomException ex)
+        catch (CustomException)
         {
             //Should handle intelligently - already logged
             throw;
@@ -35,9 +35,9 @@ public abstract class BaseRepo<T> : BaseViewRepo<T>, IBaseRepo<T> where T : Base
     // find
     public virtual T? Find(int id) => Table.Find(id);
 
-    public virtual T FindAsNoTracking(int id) => Table.AsNoTrackingWithIdentityResolution().FirstOrDefault(x => x.Id == id);
+    public virtual T? FindAsNoTracking(int id) => Table.AsNoTrackingWithIdentityResolution().FirstOrDefault(x => x.Id == id);
 
-    public virtual T FindIgnoreQueryFilters(int id) => Table.IgnoreQueryFilters().FirstOrDefault(x => x.Id == id);
+    public virtual T? FindIgnoreQueryFilters(int id) => Table.IgnoreQueryFilters().FirstOrDefault(x => x.Id == id);
 
     public virtual void ExecuteParameterizedQuery(string sql, object[] sqlParametersObjects) => Context.Database.ExecuteSqlRaw(sql, sqlParametersObjects);
 

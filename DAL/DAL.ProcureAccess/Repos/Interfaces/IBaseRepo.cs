@@ -7,8 +7,8 @@ namespace DAL.ProcureAccess.Repos.Interfaces;
 public interface IBaseRepo<T> : IBaseViewRepo<T> where T : BaseEntity, new()
 {
     T? Find(int id); // Task<T> Find(int? id);
-    T FindAsNoTracking(int id);
-    T FindIgnoreQueryFilters(int id);
+    T? FindAsNoTracking(int id);
+    T? FindIgnoreQueryFilters(int id);
     void ExecuteParameterizedQuery(string sql, object[] sqlParametersObjects);
     int Add(T entity, bool persist = true);
     int AddRange(IEnumerable<T> entities, bool persist = true);
