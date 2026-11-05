@@ -11,7 +11,7 @@ export const SERVER_ERROR_PATH = 'error';
 /**
  * Whether the server is out of reach (Handoff §6.5, `errors.offline`). Offline when a request
  * gets no answer at all (status 0) or the browser goes offline; online again with the next
- * answer from the server or when the browser is back online.
+ * answer from the API (not from a static file, #171) or when the browser is back online.
  *
  * @spec docs/SPEC_v2.md R-SHL-08; docs/design_handoff_procureaccess_v1.md §6.5
  */
@@ -38,7 +38,7 @@ export class ConnectionStatus {
     this.offlineState.set(true);
   }
 
-  /** The server answered (with any status). */
+  /** The API answered (with any status). */
   answered(): void {
     this.offlineState.set(false);
   }

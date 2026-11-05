@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
+import { API_URL } from '@app/app.config';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
 import { ConnectionStatus } from '../errors/system-errors';
@@ -33,6 +34,7 @@ describe('errorInterceptor', () => {
         provideHttpClientTesting(),
         { provide: SnackbarService, useValue: snackbar },
         { provide: Router, useValue: router },
+        { provide: API_URL, useValue: '/api' },
       ],
     });
     http = TestBed.inject(HttpClient);
@@ -123,6 +125,26 @@ describe('errorInterceptor', () => {
       await failWith({ type: `${base}validation` });
 
       expect(offline()).toBe(false);
+    });
+
+    it('keeps the offline notice when only a static file answers after a request to the API failed (#171)', async () => {
+      const translations = firstValueFrom(http.get('/i18n/de.json'));
+      await getAndFail(0);
+
+      backend.expectOne('/i18n/de.json').flush({});
+      await translations;
+
+      expect(offline()).toBe(true);
+    });
+
+    it('counts an answer only for a path under the API address, not for one that merely starts like it', async () => {
+      await getAndFail(0);
+
+      const request = firstValueFrom(http.get('/apidocs'));
+      backend.expectOne('/apidocs').flush({});
+      await request;
+
+      expect(offline()).toBe(true);
     });
   });
 });

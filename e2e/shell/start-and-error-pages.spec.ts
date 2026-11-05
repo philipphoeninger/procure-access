@@ -146,6 +146,23 @@ test.describe('System states', () => {
     await expect(notice).toBeHidden();
   });
 
+  test('on a first page load without API answers the offline notice stays when the translations answer last (#171)', async ({ page }) => {
+    await page.route(API, (route) => route.abort('internetdisconnected'));
+    // The web server still serves the static files; de.json answers after the failed API calls.
+    await page.route('**/i18n/de.json', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      await route.continue();
+    });
+
+    await page.goto('/filters');
+
+    // The text exists only once de.json has answered, so this checks the state after that answer.
+    await expect(page.getByRole('main').getByRole('status')).toContainText(
+      'Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.',
+    );
+    await expect(page.getByRole('progressbar')).toBeHidden();
+  });
+
   test('INV:A11Y-01 a slow answer shows the progress bar and announces „Wird geladen …“', async ({ page }, testInfo) => {
     const announcements = await recordAnnouncements(page);
     await page.goto('/');
