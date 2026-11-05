@@ -3,6 +3,7 @@
 > **Sprint:** 01, task S1-15 (milestone M0.3, TESTING §4.2, §5.2, §6, §8.1, §9 step 0). **Status:** done by Claude Code (2026-10-23).
 > **Scope:** a tagged integration test that fixes the current behaviour of the existing criteria filter `GET /api/Criteria/byCriteriaFilterIds` for a fixed seed and fixed selections; expected sets in a fixture file. Not in scope: the E2E part of CAT-10 (J1, S1-19), setting CAT-10 to `active` in TESTING §4 (S1-21), any change to the filter itself.
 > **Owner decisions 2026-10-23:** **1A** the seed is the real reference data of migration `AddSeedData` (the data step 2 moves into release 2026.1), not a test-owned seed. **2A** compared fields: `id`, `name`, `criteriaFilterId`; `description` is left out. **3** six selections as proposed (see §2).
+> **Note (2026-11-06, sprint 03, S3-12):** decision 1A and P1 assumed that step 2 moves the seed into release 2026.1. Owner decision O-S3-5 (C, `docs/sprints/sprint_03/S3-11_catalog_design_note.md` §2.4) replaced that: the seed is **not** copied into the catalog; the legacy filter keeps reading the legacy tables until the configurator S10 replaces `/filters` in sprint 04, and release 2026.1 is produced from Kriterienkatalog Teil A/B (`ARCHITECTURE_v18.md` §12 step 2, C102). CAT-10 keeps its expected sets unchanged until its rewrite with S10 (M2.5d). The protocol below is left as written.
 
 ## 1. Starting point
 
