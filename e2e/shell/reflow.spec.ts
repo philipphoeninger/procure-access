@@ -5,10 +5,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Reflow of the shell pages (S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
+ * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
  * 1280 × 1024 window at 400 % zoom, no page scrolls sideways and every link and button lies
  * inside the viewport. Covers the pages of the new shell only; the legacy screens are rebuilt
- * from step 2 on and are checked by hand until then (protocol S2-18).
+ * from step 2 on and are checked by hand until then (protocol S2-18). A rebuilt screen joins this
+ * list in its step (TESTING_v26 V87).
  *
  * The width is compared with the set viewport, not with the document: mobile browsers widen the
  * layout viewport to fit content that is too wide, so the document alone would hide the overflow.
@@ -32,7 +33,7 @@ async function expectReflow(page: Page): Promise<void> {
   await expect.poll(tooWide).toEqual({ pageWidth: 0, outside: [] });
 }
 
-test.describe('Reflow at 320 px / 400 % zoom', () => {
+test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(ZOOM_400);
   });

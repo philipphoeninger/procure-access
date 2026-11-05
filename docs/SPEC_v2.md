@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.2 (2026-11-02; v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25).
+> **Status:** v2.3 (2026-11-05; v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -9,6 +9,8 @@
 > **Also used:** `ux_copy_procureaccess_v12.md` (all UI strings and keys, screen inventory), `TESTING_v8.md` (invariant catalogue), `kriterienkatalog_bit_inklusiv_v1.md` (1.5), `pruefung_hauptdokumente_v1.md` (decisions D1–D7), `CLAUDE.md` (existing codebase), owner decisions of 2026-10-15 (§0).
 >
 > **Aligned follow-up documents (v2):** `ARCHITECTURE_v12.md`, `TESTING_v10.md`, `ux_copy_procureaccess_v14.md`, `design_handoff_procureaccess_v1.md` (1.14), `CLAUDE_v3.md`.
+>
+> **Current versions of the related documents (v2.3):** `ARCHITECTURE_v16.md`, `TESTING_v26.md`, `ux_copy_procureaccess_v15.md`, `design_handoff_procureaccess_v1.md` (1.15), `figma_code_mapping_procureaccess_v1.md` (1.15), `CLAUDE.md`.
 >
 > **Language:** English (project convention for technical documents). UI terms are quoted in German exactly as defined in the UX copy §2; the UX copy remains the only source for UI wording.
 >
@@ -57,6 +59,15 @@ Recorded in this file like v2.1; the S2-12 task allowed recording the decision i
 | # | Change | Driver |
 |---|---|---|
 | v2.2-1 | UX-O9 closed: plural forms are separate keys chosen with `Intl.PluralRules` (SD25); removed from §13 | Owner decision O-S2-3, 2026-11-02; sprint 02, S2-12 (`docs/sprints/sprint_02/S2-12_pluralisation.md`) |
+
+#### Changes in v2.3 (2026-11-05)
+
+Recorded in this file like v2.1 and v2.2 (owner, sprint 03, S3-05); SPEC_v3 stays the P1 version. Source: the sprint-02 findings in `TECH_DEBT_v2.md` (TD-14, issue #180). No behaviour or acceptance criterion changes.
+
+| # | Change | Driver |
+|---|---|---|
+| v2.3-1 | §8.6 names `email-unconfirmed`, as `ARCHITECTURE_v16.md` §7.1 and C72 already did; 13 problem types | Owner decision 3 of 2026-11-01; sprint 02, S2-10 P3 |
+| v2.3-2 | §13: the open targets of the footer links of R-SHL-06 — „Über ProcureAccess“ (O-23) and „Projekt WERTE.IT“ (O-24) are new, „Kriterium vorschlagen“ is O-6 | Sprint 02, S2-15 P2; `ARCHITECTURE_v16.md` C99 |
 
 ---
 
@@ -679,7 +690,7 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 
 ### 8.6 Problem types
 
-`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`, `release-mismatch`, `not-found`. The client maps them to the UX keys named in the feature areas.
+`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`, `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas.
 
 ---
 
@@ -773,11 +784,13 @@ Legal pages (R-SHL-07), the dark theme release check (R-SET-03, O-S5) and the ac
 | O-1 | Priorities and rationales per criterion, use case and app type; plain-language titles and summaries (K-1, K-6) | step 2 (content of release 2026.1) | Project team | ARCH O-1 |
 | O-2 | Hardware and Vermittlungs-/Notrufdienst without a procedure | — (empty state exists) | Project team | ARCH O-2 |
 | O-4 | Bundled legal review (consent texts ⚖️, purge timing, erasure vs. moderation record, vendor authenticity, export legal note, account deletion) | public release | Legal review | ARCH O-4 |
-| O-6 | Contact address or form for „Kriterium vorschlagen“ | production build (R-SUG-01) | Project team | ARCH O-6 |
+| O-6 | Contact address or form for „Kriterium vorschlagen“; the footer link of R-SHL-06 waits for it | production build (R-SUG-01) | Project team | ARCH O-6 |
 | O-7 | Handover target platform | — | WERTE.IT | ARCH O-7 |
 | O-13 | Carrying assessments over to a newer release | — (later) | Owner | ARCH O-13 |
 | O-14 | Priority terms A / B / Hinweis (provisional, SD6) | export column values before the pilot | Project team (accessibility expertise) | ARCH O-14 |
 | O-16 | Rating-level explanations (provisional, SD8) | before the pilot | Project team, possibly BIT inklusiv | ARCH O-16 |
+| O-23 | Target of the footer link „Über ProcureAccess“ (R-SHL-06): a page of its own or a text, and its content | release (footer complete) | Philipp / WERTE.IT | ARCH O-23 |
+| O-24 | URL of the footer link „Projekt WERTE.IT“ (R-SHL-06) | release (footer complete) | WERTE.IT | ARCH O-24 |
 | UX-O11 | Final rate limit of the anonymous export (§7.3 defaults) | pilot | Implementation with pilot feedback | UX copy §8 |
 | H2 | High-contrast variant designed and reviewed | „Hoher Kontrast“ setting (P1) | Philipp | Handoff §9 |
 | O-S5 | Dark theme: Figma dark mode and accessibility review (§7.5) | release (development may start) | Philipp, accessibility tester | SD11 |
