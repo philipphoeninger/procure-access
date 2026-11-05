@@ -59,10 +59,10 @@ No correctness or security bug that affects current behaviour was found in the d
 | 1 | `actionlint` 1.7.12 (Docker image `rhysd/actionlint`, run once, not added to the repository) on `codeql.yml` and `ci.yml` | ✅ no finding (incl. shellcheck of `ci.yml`) |
 | 2 | `node scripts/check-invariants.mjs` | ✅ gate passed, reads `docs/TESTING_v24.md` |
 | 3 | `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs` | ✅ Figma 2 checked, 24 not built, 0 pending; i18n 0 errors (6 keys computed at runtime, as before) |
-| 4 | `reuse lint` (image `fsfe/reuse:latest`) | see below |
-| 5 | `Analyze` on a normal PR: this pull request | see below |
+| 4 | `reuse lint` (image `fsfe/reuse:latest`) | ✅ compliant, 684 / 684 files (with this protocol) |
+| 5 | `Analyze` on a normal PR: this pull request (#195), run 42068998755 after default setup was switched off | ✅ `Analyze (actions)`, `Analyze (csharp)`, `Analyze (javascript-typescript)` passed (39 s, 2 min 10 s, 47 s); three analyses uploaded for `refs/pull/195/merge` with the categories `/language:actions`, `/language:csharp`, `/language:javascript-typescript`, 0 new results, no upload error; the `CodeQL` check passed; alert 3 is still the only open alert (same key, no duplicate). CI stages 1–8 green |
 | 6 | `Analyze` on a Dependabot PR: #193 after `@dependabot rebase` | follows after the merge (owner decision 2) |
-| 7 | Build and test levels | – not touched (no application code); CI runs them on the PR |
+| 7 | Build and test levels | – not touched (no application code); CI stages 2–6 green on #195 |
 
 ## 5. Open points
 
