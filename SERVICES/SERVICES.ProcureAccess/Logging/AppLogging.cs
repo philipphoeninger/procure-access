@@ -104,7 +104,7 @@ public class AppLogging<T> : IAppLogging<T>
             LogContext.PushProperty("FilePath", sourceFilePath),
             LogContext.PushProperty("LineNumber", sourceLineNumber),
         };
-        logAction(ex, message, null);
+        logAction(ex, message, []);
 
         foreach (var item in list)
         {
@@ -125,7 +125,7 @@ public class AppLogging<T> : IAppLogging<T>
             LogContext.PushProperty("FilePath", sourceFilePath),
             LogContext.PushProperty("LineNumber", sourceLineNumber),
         };
-        logAction(message, null);
+        logAction(message, []);
         foreach (var item in list)
         {
             item.Dispose();

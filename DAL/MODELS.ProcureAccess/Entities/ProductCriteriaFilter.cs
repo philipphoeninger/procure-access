@@ -8,8 +8,8 @@ namespace MODELS.ProcureAccess.Entities;
 public class ProductCriteriaFilter
 {
     public int ProductId { get; set; }
-    public Product Product { get; set; }
+    public Product Product { get; set; } = null!;
 
     public int CriteriaFilterId { get; set; }
-    public CriteriaFilter CriteriaFilter { get; set; }
+    public CriteriaFilter CriteriaFilter { get; set; } = null!;
 }

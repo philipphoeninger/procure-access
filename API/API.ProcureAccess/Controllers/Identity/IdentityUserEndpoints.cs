@@ -11,7 +11,7 @@ public static class IdentityUserEndpoints
         app.MapGet("/me", async (
             IUserService service) =>
         {
-            return await service.GetCurrentUser();
+            return await service.GetCurrentUserAsync();
         });
 
         app.MapPost("/signIn", async (

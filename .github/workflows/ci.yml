@@ -42,20 +42,13 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      # Whole solution: whitespace and code style. Analyzer rules only on the test projects:
-      # the production projects still have analyzer findings whose fixes rename methods
-      # (VSTHRD200), which is a refactor for migration step 1 (docs/sprints/sprint_01/S1-20_ci.md).
-      - name: dotnet format (whitespace, style)
+      # Whole solution: whitespace, code style and analyzer rules (all projects since S3-08, #118).
+      # Compiler warnings (e.g. nullable) are not analyzer findings: stage 2 builds with -warnaserror.
+      - name: dotnet format (whitespace, style, analyzers)
         run: |
           dotnet format whitespace ProcureAccess.sln --verify-no-changes
           dotnet format style ProcureAccess.sln --verify-no-changes
-      - name: dotnet format (test projects, incl. analyzers)
-        run: |
-          for project in tests/*/*.csproj; do
-            echo "::group::$project"
-            dotnet format "$project" --verify-no-changes
-            echo "::endgroup::"
-          done
+          dotnet format analyzers ProcureAccess.sln --verify-no-changes
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc
@@ -103,8 +96,10 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Every warning fails the build (#118); NuGet audit warnings stay warnings, so a new
+      # advisory doesn't block unrelated pull requests (Dependabot reports it; owner, 2026-11-05).
       - name: Build .NET solution
-        run: dotnet build ProcureAccess.sln
+        run: dotnet build ProcureAccess.sln -warnaserror -warnnotaserror:NU1901,NU1902,NU1903,NU1904
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: CLIENT/CLIENT.ProcureAccess/.nvmrc

@@ -8,8 +8,8 @@ namespace MODELS.ProcureAccess.Entities;
 public partial class CriteriaFilterExclusion
 {
     public int CriteriaFilterId { get; set; }
-    public CriteriaFilter CriteriaFilter { get; set; }
+    public CriteriaFilter CriteriaFilter { get; set; } = null!;
 
     public int ExclusionId { get; set; }
-    public CriteriaFilter Exclusion { get; set; }
+    public CriteriaFilter Exclusion { get; set; } = null!;
 }

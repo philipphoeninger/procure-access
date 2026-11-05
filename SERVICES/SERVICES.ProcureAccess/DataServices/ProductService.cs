@@ -12,7 +12,7 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
 
     protected override ProductDto ToDto(Product entity) => entity.ToDto();
 
-    public override async Task<Result<IEnumerable<ProductDto>>> ReadAll()
+    public override async Task<Result<IEnumerable<ProductDto>>?> ReadAllAsync()
     {
         return Result<IEnumerable<ProductDto>>.Success(
             await MainRepo.Context.Products
@@ -25,7 +25,7 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
                 .ToListAsync());
     }
 
-    public async Task<Result<IEnumerable<ProductDto>>> GetByCriteriaFilterIds(int[] criteriaFilterIds)
+    public async Task<Result<IEnumerable<ProductDto>>> GetByCriteriaFilterIdsAsync(int[] criteriaFilterIds)
     {
         var query = MainRepo.Context.Products
             .AsNoTracking();

@@ -34,7 +34,7 @@ public class ProposalsController : BaseCrudController<Proposal, ProposalDto, Pro
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<ActionResult<ProposalDto>> Upsert([FromBody] UpsertProposalCommand request)
+    public async Task<ActionResult<ProposalDto>> UpsertAsync([FromBody] UpsertProposalCommand request)
     {
         var result = await _proposalService.UpsertAsync(request);
         return Ok(result);
@@ -56,7 +56,7 @@ public class ProposalsController : BaseCrudController<Proposal, ProposalDto, Pro
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<ActionResult<ProposalDto>> Review([FromBody] ReviewProposalCommand request)
+    public async Task<ActionResult<ProposalDto>> ReviewAsync([FromBody] ReviewProposalCommand request)
     {
         var result = await _proposalService.ReviewAsync(request);
         return Ok(result);
@@ -72,7 +72,7 @@ public class ProposalsController : BaseCrudController<Proposal, ProposalDto, Pro
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<ActionResult<ProposalDto>> Approve([FromBody] ApproveProposalCommand request)
+    public async Task<ActionResult<ProposalDto>> ApproveAsync([FromBody] ApproveProposalCommand request)
     {
         var result = await _proposalService.ApproveAsync(request);
         return Ok(result);

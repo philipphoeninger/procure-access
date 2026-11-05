@@ -44,9 +44,9 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
     [SwaggerResponse(204, "No content")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<ActionResult<TDto>> GetOne(int id)
+    public async Task<ActionResult<TDto>> GetOneAsync(int id)
     {
-        Result<TDto?> dto = await MainService.Read(id);
+        Result<TDto?>? dto = await MainService.ReadAsync(id);
 
         return dto == null ? NoContent() : Ok(dto);
     }
@@ -62,8 +62,8 @@ public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
-    public virtual async Task<ActionResult<IEnumerable<TDto>>> GetAll()
+    public virtual async Task<ActionResult<IEnumerable<TDto>>> GetAllAsync()
     {
-        return Ok(await MainService.ReadAll());
+        return Ok(await MainService.ReadAllAsync());
     }
 }

@@ -6,7 +6,7 @@ namespace MODELS.ProcureAccess.Entities.Dto;
 
 public class UserDto
 {
-    public string Id { get; set; }
-    public string Email { get; set; }
+    public string Id { get; set; } = null!;
+    public string Email { get; set; } = null!;
     public UICustomizationDto? UICustomization { get; set; }
 }

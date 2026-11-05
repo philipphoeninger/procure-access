@@ -14,6 +14,13 @@ SPDX-License-Identifier: MIT
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!--
+      Every warning fails the build of a module project (#118), locally as in CI. NuGet audit
+      warnings (a known vulnerability in a package) stay warnings: a new advisory must not
+      block unrelated work; Dependabot reports it (owner, 2026-11-05).
+    -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
   </PropertyGroup>
 
 </Project>

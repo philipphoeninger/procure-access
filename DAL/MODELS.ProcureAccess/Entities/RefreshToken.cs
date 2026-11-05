@@ -10,10 +10,10 @@ public class RefreshToken
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string Token { get; set; }
+    public string Token { get; set; } = null!;
 
-    public string UserId { get; set; }
-    public User User { get; set; }
+    public string UserId { get; set; } = null!;
+    public User User { get; set; } = null!;
 
     public DateTime ExpiresAt { get; set; }
 

@@ -6,7 +6,7 @@ namespace MODELS.ProcureAccess.Entities.Dto;
 
 public class ProposalDto : BaseDto
 {
-    public string ProposerId { get; set; }
+    public string ProposerId { get; set; } = null!;
     public string? ApproverId { get; set; }
     public ProductDto? Product { get; set; }
     public CriterionDto? Criterion { get; set; }

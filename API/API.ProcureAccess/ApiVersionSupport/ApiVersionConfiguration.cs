@@ -6,7 +6,7 @@ namespace API.ProcureAccess.ApiVersionSupport;
 
 public static class ApiVersionConfiguration
 {
-    public static IServiceCollection AddProcureAccessApiVersionConfiguration(this IServiceCollection services, ApiVersion defaultVersion = null)
+    public static IServiceCollection AddProcureAccessApiVersionConfiguration(this IServiceCollection services, ApiVersion? defaultVersion = null)
     {
         defaultVersion ??= ApiVersion.Default;
 

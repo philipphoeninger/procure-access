@@ -25,35 +25,6 @@ public class UsersController : ControllerBase
         UserManager = userManager;
     }
 
-    /// <summary>
-    /// Gets a single record
-    /// </summary>
-    /// <param name="id">Primary key of the record</param>
-    /// <returns>Single record</returns>
-    // [HttpGet("{id}")]
-    // [ApiVersion("1.0")]
-    // [Produces("application/json")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status204NoContent)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    // [SwaggerResponse(200, "The execution was successful")]
-    // [SwaggerResponse(204, "No content")]
-    // [SwaggerResponse(400, "The request was invalid")]
-    // [SwaggerResponse(401, "Unauthorized access attempted")]
-    // public async Task<IResult> GetOneAsync(int id)
-    // {
-    //     ClaimsPrincipal cp = HContext!.User;
-    //     string userID = cp.Claims.First(x => x.Type == "UserID").Value;
-    //     User? userDetails = await UserManager.FindByIdAsync(userID);
-
-    //     return Results.Ok(
-    //         new
-    //         {
-    //             userDetails?.Email
-    //         });
-    // }
-
     [HttpPost("change-email")]
     [ApiVersion("1.0")]
     [Produces("application/json")]
@@ -63,11 +34,11 @@ public class UsersController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
+    public async Task<IActionResult> ChangeEmailAsync(ChangeEmailRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await Repo.ChangeEmailAsync(
             userId,
             request.NewEmail);
@@ -91,11 +62,11 @@ public class UsersController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await Repo.ChangePasswordAsync(
             userId,
             request.CurrentPassword,
@@ -120,7 +91,7 @@ public class UsersController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> ResetPassword(ResetPWRequest request)
+    public async Task<IActionResult> ResetPasswordAsync(ResetPWRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -147,9 +118,9 @@ public class UsersController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> RevokeSessions()
+    public async Task<IActionResult> RevokeSessionsAsync()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await Repo.RevokeSessionsAsync(userId);
 
         if (!result.Succeeded)
@@ -171,9 +142,9 @@ public class UsersController : ControllerBase
     [SwaggerResponse(200, "The execution was successful")]
     [SwaggerResponse(400, "The request was invalid")]
     [SwaggerResponse(401, "Unauthorized access attempted")]
-    public async Task<IActionResult> DeleteUser()
+    public async Task<IActionResult> DeleteUserAsync()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await Repo.DeleteUserAsync(userId);
 
         if (!result.Succeeded)

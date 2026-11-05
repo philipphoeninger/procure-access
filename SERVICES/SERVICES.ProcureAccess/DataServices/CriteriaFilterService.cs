@@ -12,7 +12,7 @@ public class CriteriaFilterService : BaseService<CriteriaFilter, CriteriaFilterD
 
     protected override CriteriaFilterDto ToDto(CriteriaFilter entity) => entity.ToDto();
 
-    public override async Task<Result<IEnumerable<CriteriaFilterDto>>> ReadAll()
+    public override async Task<Result<IEnumerable<CriteriaFilterDto>>?> ReadAllAsync()
     {
         return Result<IEnumerable<CriteriaFilterDto>>.Success(
             await MainRepo.Context.CriteriaFilters
