@@ -50,7 +50,7 @@ Checklist: security, correctness, N+1, edge cases, a11y; review with `/engineeri
 | # | Finding | Sorting |
 |---|---|---|
 | R1 | Behaviour: the OpenAPI document of `Development` is identical before and after except the wrong summary of `change-email` (check 5); both EF models match their last migration (check 6); every backend test passes, including the Problem Details test that sends `{}` to `change-email` and expects `newEmail` in `errors`, which shows the implicit required check is kept | – |
-| R2 | The `!` on the user id (`UsersController`, `ProposalService`) and on `user` in `ApproveAsync` silence the compiler instead of handling null | Won't fix: handling null would change behaviour (row: no behaviour change); the code goes with steps 3 (identity) and M5.6 (proposals). The missing `[Authorize]` behind it is P2 |
+| R2 | The `!` on the user id (`UsersController`, `ProposalService`) and on `user` in `ApproveAsync` silence the compiler instead of handling null | Won't fix: handling null would change behaviour (row: no behaviour change); the code goes with steps 3 (identity) and M5.6 (proposals). The missing `[Authorize]` behind it is P2 (#205) |
 | R3 | `-warnaserror` also fails CI when an SDK or analyzer update (e.g. a Dependabot pull request) brings a new warning | Intended: the pull request shows it and fixes it; NuGet advisories are exempt (decision 2) |
 | R4 | `AppLogging` passes `[]` instead of `null`: equal for `FormattedLogValues` (values without length → no formatting, message as given) | – |
 | R5 | Guards verified with throwaway probes (removed): a `CS8618` in `API` fails the CI build command; a `CS8618` in `Modules.Platform` fails a plain local `dotnet build`; a `VSTHRD200` in `SERVICES` fails `dotnet format analyzers` (exit 2) | – |
@@ -78,7 +78,7 @@ No correctness or security finding that affects behaviour today; no further revi
 | # | Point | Owner / when |
 |---|---|---|
 | P1 | `TECH_DEBT_v2.md` §3.3 counts 55 warning locations and 2 `VSTHRD200`; the build showed 104 and 22 (F1). #118 is closed by this PR; the register and `ROADMAP_v3.md` M1.1d record it in their next versions | Sprint 03 close-out (TECH_DEBT_v3) |
-| P2 | **Proposed issue:** `UsersController` (`change-email`, `change-password`, `revoke-sessions`, `DELETE /api/Users`) has no `[Authorize]`; anonymous calls answer 400 instead of 401 and change nothing (F7). Add `[Authorize]` and a test, or leave it to step 3, which rebuilds the identity endpoints with cookie sessions | Owner: issue now or step 3 |
+| P2 | **#205** (created 2026-11-05): `UsersController` (`change-email`, `change-password`, `revoke-sessions`, `DELETE /api/Users`) has no `[Authorize]`; anonymous calls answer 400 instead of 401 and change nothing (F7). Add `[Authorize]` (with `[AllowAnonymous]` on `ResetPassword`) and a test per endpoint | #205, milestone M3 at the latest |
 | P3 | Remove the `AV0027` suppression in `SwaggerExtensions.cs` with #176 (the issue's "done when: no AV0027 warning" now means: no suppression) | #176 |
 | P4 | The legacy projects fail on a warning only in CI, not locally (decision 1). Once a project moves into `src/` (O-S2-1) it inherits `TreatWarningsAsErrors` | With each migration step |
 | P5 | WebKit / mobile Safari only in CI | CI of this PR |
