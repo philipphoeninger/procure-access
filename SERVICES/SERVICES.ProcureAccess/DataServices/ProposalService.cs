@@ -12,10 +12,9 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
 
     public ProposalService(
         IProposalRepo repo,
-        IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
         IProductService productService,
-        ICriterionService criterionService) : base(repo, mapper)
+        ICriterionService criterionService) : base(repo)
     {
         _httpContextAccessor = httpContextAccessor;
         _productService = productService;
@@ -146,25 +145,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         return Result<IEnumerable<ProposalDto>>.Success(dtos);
     }
 
-    public override int Delete(int id)
-    {
-        Proposal? proposalEntity = MainRepo.Find(id);
-        if (proposalEntity is null) return -1; //gate
-
-        ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
-        if (user is null) return -1; //gate
-
-        var userPermissions = user
-                        .Claims
-                        .Where(x => x.Type == CustomClaimTypes.Permission)
-                        .Select(x => x.Value);
-
-        if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) ||
-            proposalEntity.ProposerId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return -1; //gate
-
-        // delete
-        return MainRepo.Delete(id);
-    }
+    protected override ProposalDto ToDto(Proposal entity) => entity.ToDto();
 
     // REVIEW (approver/proposer edits snapshot)
     public async Task<ProposalDto> ReviewAsync(ReviewProposalCommand cmd)
@@ -252,7 +233,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         {
             var dto = JsonSerializer.Deserialize<CreateProductDto>(proposal.ProductSnapshot);
 
-            var product = Mapper.Map<Product>(dto);
+            var product = dto!.ToEntity();
 
             MainRepo.Context.Products.Add(product);
 
@@ -264,7 +245,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         {
             var dto = JsonSerializer.Deserialize<CreateCriterionDto>(proposal.CriterionSnapshot);
 
-            var criterion = Mapper.Map<Criterion>(dto);
+            var criterion = dto!.ToEntity();
 
             MainRepo.Context.Criteria.Add(criterion);
 
@@ -276,7 +257,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
     // MAPPING (entity → DTO + snapshot restore)
     private async Task<ProposalDto> MapToDtoAsync(Proposal proposal)
     {
-        var dto = Mapper.Map<ProposalDto>(proposal);
+        var dto = proposal.ToDto();
 
         // If not yet approved or rejected → use snapshot
         if (proposal.FinishedAt == null || proposal.Status == ProposalStatus.Rejected)

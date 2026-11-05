@@ -24,8 +24,6 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddIdentityAuth(builder.Configuration)
                 .AddRepositories()
                 .AddDataServices()
-                .AddAutoMapper(cfg => { },
-                    typeof(MappingProfile).Assembly)
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
 // Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,

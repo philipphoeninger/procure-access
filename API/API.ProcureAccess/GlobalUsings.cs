@@ -23,7 +23,6 @@ global using ProcureAccess.Modules.Platform;
 global using ProcureAccess.Modules.Platform.Contracts.Persistence;
 global using ProcureAccess.Modules.Workspace;
 
-global using AutoMapper;
 
 global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Initialization;

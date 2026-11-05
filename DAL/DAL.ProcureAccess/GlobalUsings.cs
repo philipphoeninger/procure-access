@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-global using AutoMapper;
 
 global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Exceptions;

@@ -4,61 +4,40 @@
 
 namespace SERVICES.ProcureAccess.DataServices.Base;
 
+/// <summary>
+/// Read side of the legacy generic CRUD services. The writes went with the generic CRUD
+/// endpoints (S3-07, #90); each service maps its entity in <see cref="ToDto"/> (ADR-015).
+/// </summary>
 public abstract class BaseService<TEntity, TDto> : IBaseService<TEntity, TDto>
     where TEntity : BaseEntity, new()
     where TDto : BaseDto, new()
 {
     public IBaseRepo<TEntity> MainRepo { get; set; }
-    public IMapper Mapper { get; set; }
 
     #region ctors
-    public BaseService(IBaseRepo<TEntity> repo, IMapper mapper)
+    protected BaseService(IBaseRepo<TEntity> repo)
     {
         MainRepo = repo;
-        Mapper = mapper;
     }
     #endregion
 
     #region methods
-    public virtual async Task<Result<TDto?>> Create(TDto dto)
-    {
-        TEntity entity = Mapper.Map<TEntity>(dto);
-        int success = MainRepo.Add(entity);
-        return Convert.ToBoolean(success) ? await Read(entity.Id) : null;
-    }
-
     public virtual async Task<Result<TDto?>> Read(int id)
     {
         TEntity? entity = MainRepo.Find(id);
         if (entity is null) return null; //gate
-        return Result<TDto?>.Success(Mapper.Map<TDto>(entity));
+        return Result<TDto?>.Success(ToDto(entity));
     }
 
     public virtual async Task<Result<IEnumerable<TDto>>> ReadAll()
     {
         List<TEntity> entities = MainRepo.GetAll().ToList();
         List<TDto> dtos = new List<TDto>();
-        entities.ForEach(x => dtos.Add(Mapper.Map<TDto>(x)));
+        entities.ForEach(x => dtos.Add(ToDto(x)));
         return Result<IEnumerable<TDto>>.Success(dtos);
     }
 
-    public virtual async Task<Result<TDto?>> Update(TDto dto)
-    {
-        TEntity? entity = MainRepo.Find(dto.Id);
-        if (entity is null) return null; //gate
-
-        // update
-        int success = MainRepo.Update(entity);
-        TEntity updatedEntity = MainRepo.Find(dto.Id);
-
-        return Convert.ToBoolean(success)
-            ? Result<TDto?>.Success(Mapper.Map<TDto>(updatedEntity))
-            : Result<TDto?>.Failure("Entity could not be updated.");
-    }
-
-    public virtual int Delete(int id)
-    {
-        return MainRepo.Delete(id);
-    }
+    /// <summary>The service's map from entity to DTO (CatalogMappings, AccountMappings).</summary>
+    protected abstract TDto ToDto(TEntity entity);
     #endregion
 }

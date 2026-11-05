@@ -8,16 +8,13 @@ public class UICustomizationRepo : IUICustomizationRepo
 {
     private readonly bool _disposeContext;
     public ApplicationDBContext Context { get; }
-    private readonly IMapper _mapper;
-
     #region ctors
-    public UICustomizationRepo(ApplicationDBContext context, IMapper mapper)
+    public UICustomizationRepo(ApplicationDBContext context)
     {
         Context = context;
-        _mapper = mapper;
     }
-    protected UICustomizationRepo(DbContextOptions<ApplicationDBContext> options, IMapper mapper)
-        : this(new ApplicationDBContext(options), mapper)
+    protected UICustomizationRepo(DbContextOptions<ApplicationDBContext> options)
+        : this(new ApplicationDBContext(options))
     {
         _disposeContext = true;
     }
@@ -32,14 +29,12 @@ public class UICustomizationRepo : IUICustomizationRepo
             .Select(u => u.UICustomization)
             .FirstAsync();
 
-        return _mapper.Map<UICustomizationDto>(entity);
+        return entity.ToDto();
     }
 
     public async Task UpdateAsync(string userId, UICustomizationDto dto)
     {
         var user = await Context.Users.FirstAsync(u => u.Id == userId);
-
-        var uiCustomizationEntity = _mapper.Map<UICustomization>(dto);
 
         if (dto.BackgroundColor != null)
             user.UICustomization.BackgroundColor = dto.BackgroundColor;
@@ -48,7 +43,7 @@ public class UICustomizationRepo : IUICustomizationRepo
         if (dto.TextColor != null)
             user.UICustomization.TextColor = dto.TextColor;
         if (dto.Language != null)
-            user.UICustomization.Language = uiCustomizationEntity.Language;
+            user.UICustomization.Language = dto.Language.ToLanguage();
 
         if (dto.DarkModeOn.HasValue)
             user.UICustomization.DarkModeOn = dto.DarkModeOn.Value;

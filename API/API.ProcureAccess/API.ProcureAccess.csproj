@@ -25,7 +25,6 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="10.2.1" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <!--
       JwtBearer brings the IdentityModel family (Microsoft.IdentityModel.*, System.IdentityModel.Tokens.Jwt)
       at one version, 8.19.2 for 10.0.14. Do not pin single packages of the family: mixed versions
