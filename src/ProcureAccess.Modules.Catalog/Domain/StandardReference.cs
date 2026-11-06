@@ -10,7 +10,8 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// <remarks>
 /// It has no method that changes it: a row that a revision of a published release cites is part
 /// of that release (owner, S3-12 decision 2), and a row nobody cites yet is just as fixed. A
-/// corrected clause or URL is a new row, cited by a new revision. One row per standard and clause.
+/// corrected clause or URL is a new row, cited by a new revision. One row per standard, clause and
+/// URL (owner, S3-16 decision 5); <c>catalog import</c> reuses an existing row.
 /// </remarks>
 internal sealed class StandardReference : CatalogEntity
 {

@@ -4,6 +4,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Catalog.Commands;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 
@@ -13,8 +14,9 @@ namespace ProcureAccess.Modules.Catalog;
 /// Registration of the Catalog module (ARCHITECTURE §4.3): criteria, revisions, releases, app
 /// types, product parts, use-case templates, test types, priority rules and the procedure mapping.
 /// Since S3-12 it holds the core entities (releases, criteria, revisions, standard references) with
-/// their own database context (ADR-014). The legacy criteria code in API, DAL, MODELS and SERVICES
-/// keeps serving the old screens until they are replaced (O-S3-5).
+/// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>. The legacy
+/// criteria code in API, DAL, MODELS and SERVICES keeps serving the old screens until they are
+/// replaced (O-S3-5).
 /// </summary>
 public static class CatalogModule
 {
@@ -43,5 +45,31 @@ public static class CatalogModule
         services.AddScoped<IModuleDatabaseMigrator, CatalogDatabaseMigrator>();
 
         return services;
+    }
+
+    /// <summary>
+    /// True when the host was started with a catalog command (<c>catalog import &lt;version&gt;</c>)
+    /// instead of as the API (owner, S3-16 decision 1).
+    /// </summary>
+    public static bool IsCommand(IReadOnlyList<string> args) =>
+        args is [CatalogCommandLine.CommandName, ..];
+
+    /// <summary>
+    /// Runs the catalog command in <paramref name="args"/> on <paramref name="services"/>, which
+    /// must hold the Platform and Catalog modules and the configuration. Returns the exit code:
+    /// 0 done, 1 refused (nothing written), 2 wrong usage.
+    /// </summary>
+    public static Task<int> RunCommandAsync(
+        IServiceProvider services,
+        IReadOnlyList<string> args,
+        TextWriter output,
+        TextWriter error,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(args);
+        ArgumentNullException.ThrowIfNull(output);
+        ArgumentNullException.ThrowIfNull(error);
+        return CatalogCommandLine.RunAsync(services, args, output, error, cancellationToken);
     }
 }

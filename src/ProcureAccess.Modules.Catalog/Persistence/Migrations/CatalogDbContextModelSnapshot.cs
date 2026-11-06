@@ -499,13 +499,17 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
 
                     b.HasIndex("SourceProductPartId");
 
-                    b.HasIndex("SourceUseCaseId");
-
                     b.HasIndex("TargetAppTypeId");
 
                     b.HasIndex("TargetProductPartId");
 
                     b.HasIndex("TargetTestTypeId");
+
+                    b.HasIndex("SourceUseCaseId", "SourceAppTypeId", "SourceProductPartId", "TargetAppTypeId", "TargetProductPartId", "TargetTestTypeId", "ReasonDe")
+                        .IsUnique()
+                        .HasDatabaseName("IX_FilterExclusions_Rule");
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("SourceUseCaseId", "SourceAppTypeId", "SourceProductPartId", "TargetAppTypeId", "TargetProductPartId", "TargetTestTypeId", "ReasonDe"), false);
 
                     b.ToTable("FilterExclusions", "catalog", t =>
                         {
@@ -721,8 +725,10 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Standard", "Clause")
+                    b.HasIndex("Standard", "Clause", "Url")
                         .IsUnique();
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("Standard", "Clause", "Url"), false);
 
                     b.ToTable("StandardReferences", "catalog");
                 });

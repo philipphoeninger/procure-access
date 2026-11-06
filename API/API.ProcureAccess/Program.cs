@@ -4,6 +4,12 @@
 
 [assembly: ApiController]
 
+// `catalog import <version>` runs the catalog command and exits instead of starting the API (S3-16).
+if (CatalogModule.IsCommand(args))
+{
+    return await CatalogCommandHost.RunAsync(args);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -104,6 +110,7 @@ catch (Exception ex)
 }
 
 app.Run();
+return 0;
 
 public partial class Program
 {

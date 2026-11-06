@@ -8,8 +8,9 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 /// The test release folders <c>Fixtures/Releases/T.1</c> and <c>T.2</c> (S3-15): the
 /// <see cref="MiniCatalog"/> in the format of <c>catalog/releases/&lt;version&gt;/</c>, written by
 /// hand with the same made-up texts. They live under <c>tests/</c>, so no environment can import
-/// them as a real release. <c>ReleaseFolderReaderTests</c> checks that they equal the MiniCatalog;
-/// a change to one needs the same change to the other.
+/// them as a real release. <c>ReleaseFolderReaderTests</c> checks that they equal the MiniCatalog,
+/// and <c>CatalogImportTests</c> that importing them stores it; a change to one needs the same
+/// change to the other.
 /// </summary>
 internal static class TestReleaseFolders
 {
