@@ -1,0 +1,23 @@
+{
+  "procedures": [
+    {
+      "appType": "web",
+      "testTypes": [
+        "softwareTest"
+      ]
+    },
+    {
+      "appType": "softwareOpen",
+      "testTypes": [
+        "softwareTest"
+      ]
+    },
+    {
+      "appType": "mobileOpen",
+      "testTypes": [
+        "appTest",
+        "softwareTest"
+      ]
+    }
+  ]
+}

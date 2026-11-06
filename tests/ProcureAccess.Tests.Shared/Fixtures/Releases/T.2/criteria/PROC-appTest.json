@@ -1,0 +1,12 @@
+{
+  "kind": "testProcedure",
+  "testType": "appTest",
+  "titleDe": "Geprüft nach BIT inklusiv App-Test",
+  "sortOrder": 910,
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

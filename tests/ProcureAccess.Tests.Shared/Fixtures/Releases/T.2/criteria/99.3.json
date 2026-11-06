@@ -1,0 +1,49 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium der Basisfunktionalität",
+  "sortOrder": 30,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "T.9.1.1",
+      "url": "https://example.org/en301549#T.9.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "mobileOpen"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "99.3-softwareTest",
+      "originalTitleDe": "Testtext 99.3-softwareTest",
+      "requirementDe": [
+        "Anforderung zu 99.3-softwareTest."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "sourceUrl": "https://example.org/softwareTest#99.3-softwareTest"
+    }
+  ]
+}

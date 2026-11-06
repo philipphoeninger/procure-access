@@ -1,0 +1,22 @@
+{
+  "kind": "requirement",
+  "supersedes": [
+    "99.10a",
+    "99.10b"
+  ],
+  "titleDe": "Testkriterium 99.10",
+  "sortOrder": 90,
+  "applicability": [
+    {
+      "appTypes": [
+        "web"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "A",
+      "rationaleDe": "Testbegründung A für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium 99.11",
+  "sortOrder": 100,
+  "applicability": [
+    {
+      "appTypes": [
+        "softwareOpen"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

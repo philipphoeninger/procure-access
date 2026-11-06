@@ -1,0 +1,75 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium mit Regeln auf allen vier Ebenen",
+  "sortOrder": 10,
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "mobileOpen"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "appType": "web",
+      "useCase": "hr",
+      "level": "A",
+      "rationaleDe": "Testbegründung A für web und hr."
+    },
+    {
+      "appType": "softwareOpen",
+      "level": "Info",
+      "rationaleDe": "Testbegründung Info für softwareOpen und jeden Verwendungszweck."
+    },
+    {
+      "useCase": "hr",
+      "level": "B",
+      "weight": 5,
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und hr."
+    },
+    {
+      "useCase": "databaseApplication",
+      "level": "A",
+      "rationaleDe": "Testbegründung A für jeden Anwendungstyp und databaseApplication."
+    },
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "99.1-softwareTest",
+      "originalTitleDe": "Testtext 99.1-softwareTest",
+      "requirementDe": [
+        "Anforderung zu 99.1-softwareTest."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "sourceUrl": "https://example.org/softwareTest#99.1-softwareTest"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "99.1-appTest",
+      "originalTitleDe": "Testtext 99.1-appTest",
+      "requirementDe": [
+        "Anforderung zu 99.1-appTest."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "sourceUrl": "https://example.org/appTest#99.1-appTest"
+    }
+  ]
+}

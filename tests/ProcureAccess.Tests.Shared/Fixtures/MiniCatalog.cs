@@ -36,6 +36,10 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 /// unchanged revisions are shared, so <c>T.2</c> brings exactly four new revisions.</item>
 /// </list>
 /// <para>
+/// The same content is in the test release folders <c>Fixtures/Releases/T.1</c> and <c>T.2</c>
+/// (<see cref="TestReleaseFolders"/>, S3-15); a change here needs the same change there.
+/// </para>
+/// <para>
 /// <c>SupersededByKey</c> is set when the old criterion is created, because a <see cref="Criterion"/>
 /// cannot change afterwards; both releases are built at once.
 /// </para>
@@ -201,50 +205,53 @@ internal sealed class MiniCatalog
         return release.Criteria.Single(c => c.Revision.Criterion.Key == key).Revision;
     }
 
-    /// <summary>The criterion keys of the MiniCatalog.</summary>
+    /// <summary>
+    /// The criterion keys of the MiniCatalog. They follow the key scheme of release folders (S3-15
+    /// decision 1a) in chapter 99, which EN 301 549 does not have, so they never look like real criteria.
+    /// </summary>
     public static class Keys
     {
         /// <summary>Priority rules on all four levels: (Web, HR) A; (Software offen, –) Info; (–, HR) B weight 5; (–, Datenbank) A; default B.</summary>
-        public const string PriorityAllLevels = "T-PRIO-LEVELS";
+        public const string PriorityAllLevels = "99.1";
 
         /// <summary>
         /// Several app types: (Web, HR) and (Software offen, HR) B weight 2 (tie, Web wins by sort
         /// order); (Web, –) B weight 1; (Software offen, –) B weight 3; (Mobile offen, –) A; default Info.
         /// </summary>
-        public const string PriorityAppTypes = "T-PRIO-APPTYPES";
+        public const string PriorityAppTypes = "99.2";
 
         /// <summary>Only the catalog default B; applies with Basisfunktionalität.</summary>
-        public const string DefaultOnly = "T-DEFAULT";
+        public const string DefaultOnly = "99.3";
 
         /// <summary>Applies only with Audio (Web, Software offen); default A.</summary>
-        public const string AudioOnly = "T-AUDIO";
+        public const string AudioOnly = "99.4";
 
         /// <summary>Applies only with Video (Web, Mobile offen); default B.</summary>
-        public const string VideoOnly = "T-VIDEO";
+        public const string VideoOnly = "99.5";
 
         /// <summary>Revision 1 in T.1 (default B), revision 2 in T.2 (default A, other allowed ratings).</summary>
-        public const string Changed = "T-CHANGED";
+        public const string Changed = "99.6";
 
         /// <summary>Only in T.1.</summary>
-        public const string Removed = "T-REMOVED";
+        public const string Removed = "99.7";
 
         /// <summary>Only in T.1; superseded 1:1 by <see cref="RenamedNew"/>.</summary>
-        public const string RenamedOld = "T-RENAMED-OLD";
+        public const string RenamedOld = "99.8";
 
         /// <summary>Only in T.2; replaces <see cref="RenamedOld"/>.</summary>
-        public const string RenamedNew = "T-RENAMED-NEW";
+        public const string RenamedNew = "99.9";
 
         /// <summary>Only in T.1; merged with <see cref="MergedB"/> into <see cref="Merged"/>.</summary>
-        public const string MergedA = "T-MERGE-A";
+        public const string MergedA = "99.10a";
 
         /// <summary>Only in T.1; merged with <see cref="MergedA"/> into <see cref="Merged"/>.</summary>
-        public const string MergedB = "T-MERGE-B";
+        public const string MergedB = "99.10b";
 
         /// <summary>Only in T.2; the successor of two criteria (not 1:1).</summary>
-        public const string Merged = "T-MERGED";
+        public const string Merged = "99.10";
 
         /// <summary>Only in T.2; new criterion without a predecessor.</summary>
-        public const string Added = "T-ADDED";
+        public const string Added = "99.11";
 
         /// <summary>Procedure criterion of the Software-Test.</summary>
         public const string ProcedureSoftwareTest = "PROC-softwareTest";

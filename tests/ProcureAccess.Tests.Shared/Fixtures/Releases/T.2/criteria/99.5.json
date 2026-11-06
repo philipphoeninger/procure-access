@@ -1,0 +1,22 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium für Video",
+  "sortOrder": 50,
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "mobileOpen"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

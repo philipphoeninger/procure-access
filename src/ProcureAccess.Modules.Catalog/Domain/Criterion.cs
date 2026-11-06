@@ -24,7 +24,12 @@ internal sealed class Criterion : CatalogEntity
     {
     }
 
-    /// <summary>Stable key, e.g. <c>BITV-SW-2.1.1</c>; the scheme is decided in S3-15 (S3-11 Q4).</summary>
+    /// <summary>
+    /// Stable key (owner, S3-15 decision 1a): the EN 301 549 number as Kriterienkatalog Teil A/B
+    /// writes it (<c>11.1.3.1c</c>), a PDF/UA-1 clause with a hyphen (<c>UA1-7.10</c>) or
+    /// <c>PROC-&lt;testTypeKey&gt;</c>. The release folder validation enforces it; it is the file name
+    /// in <c>catalog/releases/&lt;version&gt;/criteria/</c>.
+    /// </summary>
     public string Key { get; private set; } = null!;
 
     public CriterionKind Kind { get; private set; }
