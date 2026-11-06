@@ -8,10 +8,9 @@ public static class CriteriaFilterExclusionSeed
 {
     public static readonly CriteriaFilterExclusion[] Data =
     [
-        // HR application - Application Types
+        // HR application - Application Types. It does not exclude the two mobile app types 12 and 13
+        // (ARCHITECTURE §16.3.2; removed by the migration RemoveHrMobileExclusions, S3-18).
         new() { CriteriaFilterId = 17, ExclusionId = 9 },
-        new() { CriteriaFilterId = 17, ExclusionId = 12 },
-        new() { CriteriaFilterId = 17, ExclusionId = 13 },
         new() { CriteriaFilterId = 17, ExclusionId = 14 },
         new() { CriteriaFilterId = 17, ExclusionId = 15 },
         // HR application - Test Types

@@ -365,16 +365,6 @@ namespace DAL.ProcureAccess.Migrations
                         new
                         {
                             CriteriaFilterId = 17,
-                            ExclusionId = 12
-                        },
-                        new
-                        {
-                            CriteriaFilterId = 17,
-                            ExclusionId = 13
-                        },
-                        new
-                        {
-                            CriteriaFilterId = 17,
                             ExclusionId = 14
                         },
                         new
