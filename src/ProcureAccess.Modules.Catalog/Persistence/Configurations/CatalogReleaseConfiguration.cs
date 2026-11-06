@@ -27,5 +27,17 @@ internal sealed class CatalogReleaseConfiguration : IEntityTypeConfiguration<Cat
             .HasForeignKey(x => x.CatalogReleaseId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.Navigation(x => x.Criteria).UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Exclusions)
+            .WithOne(x => x.Release)
+            .HasForeignKey(x => x.CatalogReleaseId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.Exclusions).UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Procedures)
+            .WithOne(x => x.Release)
+            .HasForeignKey(x => x.CatalogReleaseId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.Procedures).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

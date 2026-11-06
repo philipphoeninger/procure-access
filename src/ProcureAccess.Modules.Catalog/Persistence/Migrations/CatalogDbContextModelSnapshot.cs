@@ -38,6 +38,128 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.ToTable("CriterionRevisionStandardReferences", "catalog");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.AppType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("Functionality")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("HintDe")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NameDe")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("AppTypes", "catalog");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "NotApplicable",
+                            Key = "web",
+                            NameDe = "Website oder Webanwendung",
+                            SortOrder = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "Open",
+                            HintDe = "Eigene Hilfsmittel wie Screenreader lassen sich verwenden.",
+                            Key = "softwareOpen",
+                            NameDe = "Software (offen)",
+                            SortOrder = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "Closed",
+                            HintDe = "Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden, etwa bei Kiosk-Terminals.",
+                            Key = "softwareClosed",
+                            NameDe = "Software (geschlossen)",
+                            SortOrder = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "Open",
+                            HintDe = "Eigene Hilfsmittel wie Screenreader lassen sich verwenden.",
+                            Key = "mobileOpen",
+                            NameDe = "Mobile Anwendung (offen)",
+                            SortOrder = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "Closed",
+                            HintDe = "Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden.",
+                            Key = "mobileClosed",
+                            NameDe = "Mobile Anwendung (geschlossen)",
+                            SortOrder = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "NotApplicable",
+                            Key = "document",
+                            NameDe = "Dokument",
+                            SortOrder = 6
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "NotApplicable",
+                            Key = "hardware",
+                            NameDe = "Hardware",
+                            SortOrder = 7
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Functionality = "NotApplicable",
+                            Key = "relayEmergencyService",
+                            NameDe = "Vermittlungs- oder Notrufdienst",
+                            SortOrder = 8
+                        });
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogRelease", b =>
                 {
                     b.Property<int>("Id")
@@ -77,6 +199,26 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.ToTable("CatalogReleases", "catalog");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseAppTypeProcedure", b =>
+                {
+                    b.Property<int>("CatalogReleaseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AppTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TestTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CatalogReleaseId", "AppTypeId", "TestTypeId");
+
+                    b.HasIndex("AppTypeId");
+
+                    b.HasIndex("TestTypeId");
+
+                    b.ToTable("CatalogReleaseAppTypeProcedures", "catalog");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseCriterion", b =>
                 {
                     b.Property<int>("CatalogReleaseId")
@@ -90,6 +232,21 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.HasIndex("CriterionRevisionId");
 
                     b.ToTable("CatalogReleaseCriteria", "catalog");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseFilterExclusion", b =>
+                {
+                    b.Property<int>("CatalogReleaseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FilterExclusionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CatalogReleaseId", "FilterExclusionId");
+
+                    b.HasIndex("FilterExclusionId");
+
+                    b.ToTable("CatalogReleaseFilterExclusions", "catalog");
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.Criterion", b =>
@@ -121,6 +278,9 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
+                    b.Property<int?>("TestTypeId")
+                        .HasColumnType("integer");
+
                     b.Property<uint>("xmin")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -132,7 +292,121 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("Criteria", "catalog");
+                    b.HasIndex("TestTypeId");
+
+                    b.ToTable("Criteria", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_Criteria_TestTypeOnlyForProcedure", "(\"TestTypeId\" IS NOT NULL) = (\"Kind\" = 'TestProcedure')");
+                        });
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionApplicability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<int>("CriterionRevisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProductPartId")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppTypeId");
+
+                    b.HasIndex("ProductPartId");
+
+                    b.HasIndex("CriterionRevisionId", "AppTypeId", "ProductPartId")
+                        .IsUnique();
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("CriterionRevisionId", "AppTypeId", "ProductPartId"), false);
+
+                    b.ToTable("CriterionApplicability", "catalog");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionProcedureText", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AllowedRatings")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ApplicabilityDe")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<int>("CriterionRevisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NegativeExamplesDe")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OriginalNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("OriginalTitleDe")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PositiveExamplesDe")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RationaleWhyDe")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RequirementDe")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<int>("TestTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestTypeId");
+
+                    b.HasIndex("CriterionRevisionId", "TestTypeId")
+                        .IsUnique();
+
+                    b.ToTable("CriterionProcedureTexts", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_CriterionProcedureTexts_AllowedRatings", "\"AllowedRatings\" > 0 AND (\"AllowedRatings\" & ~63) = 0");
+                        });
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", b =>
@@ -179,6 +453,241 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.ToTable("CriterionRevisions", "catalog");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.FilterExclusion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("ReasonDe")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("SourceAppTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SourceProductPartId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SourceUseCaseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TargetAppTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TargetProductPartId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TargetTestTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceAppTypeId");
+
+                    b.HasIndex("SourceProductPartId");
+
+                    b.HasIndex("SourceUseCaseId");
+
+                    b.HasIndex("TargetAppTypeId");
+
+                    b.HasIndex("TargetProductPartId");
+
+                    b.HasIndex("TargetTestTypeId");
+
+                    b.ToTable("FilterExclusions", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_FilterExclusions_OneSourceOneTarget", "num_nonnulls(\"SourceUseCaseId\", \"SourceAppTypeId\", \"SourceProductPartId\") = 1\nAND num_nonnulls(\"TargetAppTypeId\", \"TargetProductPartId\", \"TargetTestTypeId\") = 1");
+
+                            t.HasCheckConstraint("CK_FilterExclusions_TargetLayerLower", "NOT (\"SourceAppTypeId\" IS NOT NULL AND \"TargetAppTypeId\" IS NOT NULL)\nAND NOT (\"SourceProductPartId\" IS NOT NULL AND (\"TargetAppTypeId\" IS NOT NULL OR \"TargetProductPartId\" IS NOT NULL))");
+                        });
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.PriorityRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AppTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<int>("CriterionRevisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("RationaleDe")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<int?>("UseCaseTemplateId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Weight")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppTypeId");
+
+                    b.HasIndex("UseCaseTemplateId");
+
+                    b.HasIndex("CriterionRevisionId", "AppTypeId", "UseCaseTemplateId")
+                        .IsUnique();
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("CriterionRevisionId", "AppTypeId", "UseCaseTemplateId"), false);
+
+                    b.ToTable("PriorityRecommendations", "catalog");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.ProductPart", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("ExplanationDe")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsAlwaysSelected")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NameDe")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("ProductParts", "catalog");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Basisfunktionalitäten sind alle Funktionalitäten, die erfahrungsgemäß in allen Anwendungen vorhanden sind. Der Filter „Basisfunktionalität\" ist standardmäßig immer ausgewählt.",
+                            IsAlwaysSelected = true,
+                            Key = "base",
+                            NameDe = "Basisfunktionalität",
+                            SortOrder = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Audiofunktionalität ist die akustische oder klangliche Wiedergabe von Informationen.",
+                            IsAlwaysSelected = false,
+                            Key = "audio",
+                            NameDe = "Audio",
+                            SortOrder = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Videofunktionalität ist die synchrone Wiedergabe von visuellen (sichtbaren) und optional akustischen (hörbaren) Informationen.",
+                            IsAlwaysSelected = false,
+                            Key = "video",
+                            NameDe = "Video",
+                            SortOrder = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Zweiwege-Sprachkommunikation ist der Austausch von Sprach- und/oder Videoinformationen in zwei Richtungen (z. B. Telefonie und Videokonferenzsysteme).",
+                            IsAlwaysSelected = false,
+                            Key = "twoWayVoice",
+                            NameDe = "Zweiwege-Sprachkommunikation",
+                            SortOrder = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Echtzeittext, Englisch \"real-time-text\" (RTT), bezeichnet die unmittelbare Übertragung von einzelnen schriftlichen Zeichen. Empfänger von Echtzeittext können somit den Schreibprozess direkt mitverfolgen. Echtzeittext findet vor allem in Kommunikations- und Kollaborationslösungen Anwendung, z. B. in Form einer Live-Untertitelung.",
+                            IsAlwaysSelected = false,
+                            Key = "rtt",
+                            NameDe = "Echtzeittext (RTT)",
+                            SortOrder = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Biometrie ist die Verwendung von biologischen Merkmalen zur Benutzeridentifikation oder Steuerung, z. B. Fingerabdruck oder Gesichtserkennung.",
+                            IsAlwaysSelected = false,
+                            Key = "biometrics",
+                            NameDe = "Biometrie",
+                            SortOrder = 6
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ExplanationDe = "Ein Autorenwerkzeug ist jede Möglichkeit, Text in strukturierter Form zu erstellen oder zu bearbeiten, z. B. Textverarbeitungsprogramme, White Boards, aber auch Texteingabefelder mit Strukturierungsmöglichkeiten (z. B. Kommentarfunktion).",
+                            IsAlwaysSelected = false,
+                            Key = "authoringTool",
+                            NameDe = "Autorenwerkzeug",
+                            SortOrder = 7
+                        });
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.StandardReference", b =>
                 {
                     b.Property<int>("Id")
@@ -218,6 +727,190 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.ToTable("StandardReferences", "catalog");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.TestType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NameDe")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("TestTypes", "catalog");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Key = "softwareTest",
+                            NameDe = "BIT inklusiv Software-Test",
+                            SortOrder = 1,
+                            Url = "https://softwaretest.bit-inklusiv.de/"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Key = "appTest",
+                            NameDe = "BIT inklusiv App-Test",
+                            SortOrder = 2,
+                            Url = "https://apptest.bit-inklusiv.de/"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Key = "pdfTest",
+                            NameDe = "BIT inklusiv PDF-Test",
+                            SortOrder = 3,
+                            Url = "https://pdftest.bit-inklusiv.de/"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Key = "bikWeb",
+                            NameDe = "BIK BITV-Test (Web)",
+                            SortOrder = 4,
+                            Url = "https://bitvtest.de/pruefverfahren/bitv-20-web"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Key = "bikApp",
+                            NameDe = "BIK BITV-Test (App)",
+                            SortOrder = 5,
+                            Url = "https://bitvtest.de/pruefverfahren/bitv-20-app"
+                        });
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.UseCaseTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NameDe")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("UseCaseTemplates", "catalog");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "hr",
+                            NameDe = "HR-Anwendung"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "reporting",
+                            NameDe = "Reporting-Anwendung"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "trainingManagement",
+                            NameDe = "Fortbildungsmanagement"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "travelRequests",
+                            NameDe = "Dienstreiseanträge"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "payroll",
+                            NameDe = "Gehaltsabrechnungen"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = true,
+                            Key = "internalCommunication",
+                            NameDe = "Interne Kommunikations- und Datenaustauschplattform"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 11, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsActive = false,
+                            Key = "databaseApplication",
+                            NameDe = "Datenbankgestützte Fachanwendung"
+                        });
+                });
+
             modelBuilder.Entity("CriterionRevisionStandardReferences", b =>
                 {
                     b.HasOne("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", null)
@@ -231,6 +924,33 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                         .HasForeignKey("StandardReferenceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseAppTypeProcedure", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.AppType", "AppType")
+                        .WithMany()
+                        .HasForeignKey("AppTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.CatalogRelease", "Release")
+                        .WithMany("Procedures")
+                        .HasForeignKey("CatalogReleaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.TestType", "TestType")
+                        .WithMany()
+                        .HasForeignKey("TestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppType");
+
+                    b.Navigation("Release");
+
+                    b.Navigation("TestType");
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseCriterion", b =>
@@ -252,6 +972,80 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.Navigation("Revision");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogReleaseFilterExclusion", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.CatalogRelease", "Release")
+                        .WithMany("Exclusions")
+                        .HasForeignKey("CatalogReleaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.FilterExclusion", "Exclusion")
+                        .WithMany()
+                        .HasForeignKey("FilterExclusionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Exclusion");
+
+                    b.Navigation("Release");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.Criterion", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.TestType", "TestType")
+                        .WithMany()
+                        .HasForeignKey("TestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("TestType");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionApplicability", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.AppType", "AppType")
+                        .WithMany()
+                        .HasForeignKey("AppTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", "Revision")
+                        .WithMany("Applicability")
+                        .HasForeignKey("CriterionRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.ProductPart", "ProductPart")
+                        .WithMany()
+                        .HasForeignKey("ProductPartId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AppType");
+
+                    b.Navigation("ProductPart");
+
+                    b.Navigation("Revision");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionProcedureText", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", "Revision")
+                        .WithMany("ProcedureTexts")
+                        .HasForeignKey("CriterionRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.TestType", "TestType")
+                        .WithMany()
+                        .HasForeignKey("TestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Revision");
+
+                    b.Navigation("TestType");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", b =>
                 {
                     b.HasOne("ProcureAccess.Modules.Catalog.Domain.Criterion", "Criterion")
@@ -263,9 +1057,92 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
                     b.Navigation("Criterion");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.FilterExclusion", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.AppType", "SourceAppType")
+                        .WithMany()
+                        .HasForeignKey("SourceAppTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.ProductPart", "SourceProductPart")
+                        .WithMany()
+                        .HasForeignKey("SourceProductPartId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.UseCaseTemplate", "SourceUseCase")
+                        .WithMany()
+                        .HasForeignKey("SourceUseCaseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.AppType", "TargetAppType")
+                        .WithMany()
+                        .HasForeignKey("TargetAppTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.ProductPart", "TargetProductPart")
+                        .WithMany()
+                        .HasForeignKey("TargetProductPartId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.TestType", "TargetTestType")
+                        .WithMany()
+                        .HasForeignKey("TargetTestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("SourceAppType");
+
+                    b.Navigation("SourceProductPart");
+
+                    b.Navigation("SourceUseCase");
+
+                    b.Navigation("TargetAppType");
+
+                    b.Navigation("TargetProductPart");
+
+                    b.Navigation("TargetTestType");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.PriorityRecommendation", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.AppType", "AppType")
+                        .WithMany()
+                        .HasForeignKey("AppTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", "Revision")
+                        .WithMany("Priorities")
+                        .HasForeignKey("CriterionRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.Catalog.Domain.UseCaseTemplate", "UseCase")
+                        .WithMany()
+                        .HasForeignKey("UseCaseTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AppType");
+
+                    b.Navigation("Revision");
+
+                    b.Navigation("UseCase");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CatalogRelease", b =>
                 {
                     b.Navigation("Criteria");
+
+                    b.Navigation("Exclusions");
+
+                    b.Navigation("Procedures");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Catalog.Domain.CriterionRevision", b =>
+                {
+                    b.Navigation("Applicability");
+
+                    b.Navigation("Priorities");
+
+                    b.Navigation("ProcedureTexts");
                 });
 #pragma warning restore 612, 618
         }

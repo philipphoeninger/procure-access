@@ -56,15 +56,21 @@ SPDX-License-Identifier = "MIT"
 
 # BIT inklusiv texts outside the criteria catalog documents: the migrations
 # that carry the criteria seed data (EF Core repeats it in every designer file
-# and in the model snapshot, so new migrations are covered by the glob) and the
+# and in the model snapshot, so new migrations are covered by the glob), the
+# catalog migrations that carry the product-part explanations of the filter-value
+# seed (quoted from the Standardanforderungskatalog; S3-11 P8, S3-13) and the
 # catalog release data (SPEC SD20). The code is MIT, the quoted texts are not.
-# The seed data itself (SeedData/CriteronSeed.cs) carries the same in its header.
+# The seed data itself (SeedData/CriteronSeed.cs, Persistence/Seed/FilterValueSeed.cs)
+# carries the same in its header.
 # Must stay below the migrations and JSON blocks: the last matching block wins.
 [[annotations]]
 path = [
   "DAL/DAL.ProcureAccess/Migrations/*_AddSeedData.cs",
   "DAL/DAL.ProcureAccess/Migrations/*.Designer.cs",
   "DAL/DAL.ProcureAccess/Migrations/ApplicationDBContextModelSnapshot.cs",
+  "src/ProcureAccess.Modules.Catalog/Persistence/Migrations/*_AddFilterDimensions.cs",
+  "src/ProcureAccess.Modules.Catalog/Persistence/Migrations/*.Designer.cs",
+  "src/ProcureAccess.Modules.Catalog/Persistence/Migrations/CatalogDbContextModelSnapshot.cs",
   "catalog/releases/**",
 ]
 precedence = "override"

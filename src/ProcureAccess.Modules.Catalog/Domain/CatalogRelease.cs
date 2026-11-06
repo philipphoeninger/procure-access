@@ -18,7 +18,8 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// throw <see cref="PublishedCatalogChangeException"/>, and so does any change to its revisions.
 /// Only <see cref="IsActive"/> still changes, through <see cref="Activate"/> and
 /// <see cref="Deactivate"/> (<c>catalog activate</c>, S3-17).</para>
-/// <para>The release-pinned exclusions and procedure mapping come with S3-13 and follow the same
+/// <para>The release also pins the exclusion rules it applies (<see cref="AddExclusion"/>, CAT-19)
+/// and the app type → procedure mapping (<see cref="MapProcedure"/>, CAT-21); both follow the same
 /// rule.</para>
 /// </remarks>
 internal sealed class CatalogRelease : CatalogEntity
@@ -26,6 +27,8 @@ internal sealed class CatalogRelease : CatalogEntity
     public const int VersionMaxLength = 32;
 
     private readonly List<CatalogReleaseCriterion> _criteria = [];
+    private readonly List<CatalogReleaseFilterExclusion> _exclusions = [];
+    private readonly List<CatalogReleaseAppTypeProcedure> _procedures = [];
 
     private CatalogRelease()
     {
@@ -42,6 +45,10 @@ internal sealed class CatalogRelease : CatalogEntity
     public string? ReleaseNotes { get; private set; }
 
     public IReadOnlyCollection<CatalogReleaseCriterion> Criteria => _criteria;
+
+    public IReadOnlyCollection<CatalogReleaseFilterExclusion> Exclusions => _exclusions;
+
+    public IReadOnlyCollection<CatalogReleaseAppTypeProcedure> Procedures => _procedures;
 
     public bool IsPublished => PublishedAt is not null;
 
@@ -71,6 +78,40 @@ internal sealed class CatalogRelease : CatalogEntity
         }
 
         _criteria.Add(new CatalogReleaseCriterion(this, revision));
+    }
+
+    /// <summary>
+    /// Adds an exclusion rule to the release: a new rule or one of an earlier release, which both
+    /// releases then share (CAT-19).
+    /// </summary>
+    public void AddExclusion(FilterExclusion exclusion)
+    {
+        ArgumentNullException.ThrowIfNull(exclusion);
+        ThrowIfPublished();
+        if (_exclusions.Any(e => ReferenceEquals(e.Exclusion, exclusion)))
+        {
+            throw new ArgumentException($"Release {Version} already applies this exclusion.", nameof(exclusion));
+        }
+
+        _exclusions.Add(new CatalogReleaseFilterExclusion(this, exclusion));
+    }
+
+    /// <summary>
+    /// States that the texts and allowed ratings of <paramref name="testType"/> apply to
+    /// <paramref name="appType"/> in this release (CAT-21). An app type may map to several procedures.
+    /// </summary>
+    public void MapProcedure(AppType appType, TestType testType)
+    {
+        ArgumentNullException.ThrowIfNull(appType);
+        ArgumentNullException.ThrowIfNull(testType);
+        ThrowIfPublished();
+        if (_procedures.Any(p => p.AppType.Key == appType.Key && p.TestType.Key == testType.Key))
+        {
+            throw new ArgumentException(
+                $"Release {Version} already maps app type '{appType.Key}' to test type '{testType.Key}'.", nameof(testType));
+        }
+
+        _procedures.Add(new CatalogReleaseAppTypeProcedure(this, appType, testType));
     }
 
     /// <summary>Publishes the release and seals its revisions. After this its content never changes.</summary>

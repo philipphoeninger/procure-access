@@ -23,8 +23,11 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// </summary>
 /// <remarks>
 /// Test classes derive from <see cref="IntegrationTest"/>, which empties the database before
-/// each class. Respawn deletes every row except the migration histories, including the reference
-/// data that migration <c>AddSeedData</c> inserts: each test stores the data it needs.
+/// each class. Respawn deletes every row except the migration histories and the four catalog
+/// filter-value tables, including the reference data that migration <c>AddSeedData</c> inserts:
+/// each test stores the data it needs. The filter values (use cases, app types, product parts, test
+/// types) are static reference data that only the catalog migration writes (O-S3-5 D1), so tests
+/// read them instead of storing their own.
 /// </remarks>
 public sealed class ApiFixture : IAsyncLifetime
 {
@@ -38,6 +41,15 @@ public sealed class ApiFixture : IAsyncLifetime
     public static readonly DateTimeOffset ClockStart = new(2026, 3, 2, 9, 0, 0, TimeSpan.Zero);
 
     private readonly PostgreSqlContainer _database = new PostgreSqlBuilder(PostgresImage).Build();
+
+    /// <summary>The seeded filter-value tables Respawn keeps (O-S3-5 D1, S3-11 P6).</summary>
+    private static readonly Table[] CatalogFilterValueTables =
+    [
+        new(CatalogDbContext.Schema, "UseCaseTemplates"),
+        new(CatalogDbContext.Schema, "AppTypes"),
+        new(CatalogDbContext.Schema, "ProductParts"),
+        new(CatalogDbContext.Schema, "TestTypes"),
+    ];
 
     private Respawner? _respawner;
     private ProcureAccessApiFactory? _factory;
@@ -84,6 +96,7 @@ public sealed class ApiFixture : IAsyncLifetime
                     new Table("public", "__EFMigrationsHistory"),
                     new Table(PlatformDbContext.HistorySchema, PlatformDbContext.HistoryTable),
                     new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
+                    .. CatalogFilterValueTables,
                 ],
             });
         }
@@ -91,7 +104,7 @@ public sealed class ApiFixture : IAsyncLifetime
         _factory = new ProcureAccessApiFactory(_database.GetConnectionString(), Clock);
     }
 
-    /// <summary>Deletes all rows except the migration histories.</summary>
+    /// <summary>Deletes all rows except the migration histories and the catalog filter values.</summary>
     public async Task ResetDatabaseAsync()
     {
         if (_respawner is null)

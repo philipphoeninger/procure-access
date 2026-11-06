@@ -11,8 +11,9 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// <see cref="CriterionRevision"/>; releases are matched by <see cref="Key"/> (ADR-002).
 /// </summary>
 /// <remarks>
-/// <c>TestTypeId</c> (with <see cref="CriterionKind.TestProcedure"/>) comes with the test types in
-/// S3-13. Key and kind never change: cross-release matching depends on them.
+/// A procedure criterion („Geprüft nach …“, <see cref="CriterionKind.TestProcedure"/>) names its
+/// <see cref="TestType"/>; a requirement criterion never does (ARCHITECTURE §5.1, C30; also a CHECK
+/// constraint). Key, kind and test type never change: cross-release matching depends on them.
 /// </remarks>
 internal sealed class Criterion : CatalogEntity
 {
@@ -33,12 +34,34 @@ internal sealed class Criterion : CatalogEntity
     /// <summary>Key of the criterion that replaces this one in a later release (CAT-03).</summary>
     public string? SupersededByKey { get; private set; }
 
-    public static Criterion Create(string key, CriterionKind kind, string? category = null, string? supersededByKey = null)
+    /// <summary>Set exactly for <see cref="CriterionKind.TestProcedure"/>.</summary>
+    public int? TestTypeId { get; private set; }
+
+    public TestType? TestType { get; private set; }
+
+    /// <summary>
+    /// Creates a criterion. <paramref name="testType"/> is required for
+    /// <see cref="CriterionKind.TestProcedure"/> and not allowed for
+    /// <see cref="CriterionKind.Requirement"/>.
+    /// </summary>
+    public static Criterion Create(
+        string key,
+        CriterionKind kind,
+        string? category = null,
+        string? supersededByKey = null,
+        TestType? testType = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         if (!Enum.IsDefined(kind))
         {
             throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown criterion kind.");
+        }
+
+        if ((kind == CriterionKind.TestProcedure) != (testType is not null))
+        {
+            throw new ArgumentException(
+                $"A test type is required for a procedure criterion and not allowed for a requirement ('{key}').",
+                nameof(testType));
         }
 
         return new Criterion
@@ -47,6 +70,7 @@ internal sealed class Criterion : CatalogEntity
             Kind = kind,
             Category = category,
             SupersededByKey = supersededByKey,
+            TestType = testType,
         };
     }
 }

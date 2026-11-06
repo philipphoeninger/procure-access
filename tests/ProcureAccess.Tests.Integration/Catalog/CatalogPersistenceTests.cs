@@ -34,17 +34,26 @@ public sealed class CatalogPersistenceTests(ApiFixture api) : IntegrationTest(ap
             rationaleDe: "Begründung",
             sortOrder: 10);
         requirement.AddStandardReference(reference);
-        var procedure = CriterionRevision.Create(Criterion.Create("PROC-T", CriterionKind.TestProcedure), 1, "Geprüft nach T");
-        var release = CatalogRelease.Create("T.1", "Testversion");
-        release.Include(requirement);
-        release.Include(procedure);
-        release.Publish(Clock.GetUtcNow());
 
-        await StoreAsync(release);
+        // The procedure criterion names a seeded test type, so the release is stored through the
+        // context that loaded it (StoreAsync would insert the test type a second time).
+        await using (var scope = Api.Factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+            var pdfTest = await db.TestTypes.SingleAsync(t => t.Key == "pdfTest", cancellationToken);
+            var procedure = CriterionRevision.Create(
+                Criterion.Create("PROC-pdfTest", CriterionKind.TestProcedure, testType: pdfTest), 1, "Geprüft nach T");
+            var release = CatalogRelease.Create("T.1", "Testversion");
+            release.Include(requirement);
+            release.Include(procedure);
+            release.Publish(Clock.GetUtcNow());
+            db.Releases.Add(release);
+            await db.SaveChangesAsync(cancellationToken);
+        }
 
-        await using var scope = Api.Factory.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
-        var loaded = await db.Releases.AsNoTracking()
+        await using var readScope = Api.Factory.Services.CreateAsyncScope();
+        var readDb = readScope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+        var loaded = await readDb.Releases.AsNoTracking()
             .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(r => r.Criterion)
             .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(r => r.StandardReferences)
             .SingleAsync(r => r.Version == "T.1", cancellationToken);
@@ -53,7 +62,7 @@ public sealed class CatalogPersistenceTests(ApiFixture api) : IntegrationTest(ap
         loaded.CreatedAt.ShouldBe(Clock.GetUtcNow());
         loaded.ReleaseNotes.ShouldBe("Testversion");
         loaded.IsActive.ShouldBeFalse();
-        loaded.Criteria.Select(c => c.Revision.Criterion.Key).ShouldBe(["PROC-T", "T-REQ-1"], ignoreOrder: true);
+        loaded.Criteria.Select(c => c.Revision.Criterion.Key).ShouldBe(["PROC-pdfTest", "T-REQ-1"], ignoreOrder: true);
 
         var loadedRequirement = loaded.Criteria.Single(c => c.Revision.Criterion.Key == "T-REQ-1").Revision;
         loadedRequirement.Criterion.Kind.ShouldBe(CriterionKind.Requirement);
@@ -67,8 +76,10 @@ public sealed class CatalogPersistenceTests(ApiFixture api) : IntegrationTest(ap
         loadedReference.Standard.ShouldBe(Standard.En301549);
         loadedReference.Clause.ShouldBe("11.2.1.1");
         loadedReference.Url.ShouldBe("https://example.org/en301549#11.2.1.1");
-        loaded.Criteria.Single(c => c.Revision.Criterion.Key == "PROC-T").Revision.Criterion.Kind
-            .ShouldBe(CriterionKind.TestProcedure);
+        var loadedProcedure = loaded.Criteria.Single(c => c.Revision.Criterion.Key == "PROC-pdfTest").Revision.Criterion;
+        loadedProcedure.Kind.ShouldBe(CriterionKind.TestProcedure);
+        loadedProcedure.TestTypeId.ShouldNotBeNull();
+        loadedRequirement.Criterion.TestTypeId.ShouldBeNull();
     }
 
     [Fact(DisplayName = "INV:CAT-05 " + nameof(Load_StoredRelease_IsSealedAndOnlyActivationIsSaved))]
