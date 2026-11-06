@@ -10,7 +10,7 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 
 /// <summary>
 /// The canonical test catalog of migration step 2 (TESTING §6.2): two published, inactive releases
-/// <c>T.1</c> and <c>T.2</c> with 12 and 11 criteria on the seeded filter values. Made-up texts;
+/// <c>T.1</c> and <c>T.2</c> with 15 and 14 criteria on the seeded filter values. Made-up texts;
 /// every rule of ARCHITECTURE §5.1 that the catalog tests need is reachable with it.
 /// </summary>
 /// <remarks>
@@ -29,10 +29,12 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 /// <c>excludedBy[]</c>.</item>
 /// <item>Procedure mapping with one app type on two procedures; <c>T.2</c> drops Mobile (offen) →
 /// Software-Test (CAT-21). Procedure texts with different allowed ratings per test type (CAT-15).</item>
-/// <item>One procedure criterion per test type, catalog default B (CAT-16).</item>
+/// <item>One procedure criterion per seeded test type, catalog default B (CAT-16); PDF-Test and the
+/// two BIK tests have no mapping and no texts. With a catalog default on every criterion, both
+/// releases are complete, so <c>catalog activate</c> accepts them (S3-17).</item>
 /// <item>From <c>T.1</c> to <c>T.2</c> (CAT-03, CAT-06, CAT-07): one criterion changed (revision 2),
 /// one added, one removed, one renamed 1:1 and two merged into one (the non-1:1
-/// <c>SupersededByKey</c>; a split cannot be stored with one successor key, S3-14). The seven
+/// <c>SupersededByKey</c>; a split cannot be stored with one successor key, S3-14). The ten
 /// unchanged revisions are shared, so <c>T.2</c> brings exactly four new revisions.</item>
 /// </list>
 /// <para>
@@ -128,6 +130,9 @@ internal sealed class MiniCatalog
             .WithTitle($"Geprüft nach {v.AppTest.NameDe}")
             .WithDefaultPriority(PriorityLevel.B)
             .Build();
+        var procedurePdfTest = Procedure(v.PdfTest, 920);
+        var procedureBikWeb = Procedure(v.BikWeb, 930);
+        var procedureBikApp = Procedure(v.BikApp, 940);
 
         // Requirement criteria that differ between the releases.
         var changedCriterion = ACriterion().WithKey(Keys.Changed).Build();
@@ -170,7 +175,7 @@ internal sealed class MiniCatalog
         var t1 = ACatalogRelease().WithVersion(T1Version).WithReleaseNotes("Testkatalog, erste Fassung")
             .Including(
                 priorityAllLevels, priorityAppTypes, defaultOnly, audioOnly, videoOnly, changedV1, removed, renamedOld,
-                mergedA, mergedB, procedureSoftwareTest, procedureAppTest)
+                mergedA, mergedB, procedureSoftwareTest, procedureAppTest, procedurePdfTest, procedureBikWeb, procedureBikApp)
             .WithExclusion(hrHardware).WithExclusion(hrVideo).WithExclusion(databaseAppTest)
             .WithExclusion(mobileAudio).WithExclusion(webAppTest).WithExclusion(audioSoftwareTest)
             .WithProcedure(v.Web, v.SoftwareTest).WithProcedure(v.SoftwareOpen, v.SoftwareTest)
@@ -180,7 +185,7 @@ internal sealed class MiniCatalog
         var t2 = ACatalogRelease().WithVersion(T2Version).WithReleaseNotes("Testkatalog, zweite Fassung")
             .Including(
                 priorityAllLevels, priorityAppTypes, defaultOnly, audioOnly, videoOnly, changedV2, renamedNew, merged,
-                added, procedureSoftwareTest, procedureAppTest)
+                added, procedureSoftwareTest, procedureAppTest, procedurePdfTest, procedureBikWeb, procedureBikApp)
             .WithExclusion(hrHardware).WithExclusion(hrAudio).WithExclusion(databaseAppTest)
             .WithExclusion(mobileAudio).WithExclusion(webAppTest).WithExclusion(audioSoftwareTest)
             .WithProcedure(v.Web, v.SoftwareTest).WithProcedure(v.SoftwareOpen, v.SoftwareTest)
@@ -189,6 +194,13 @@ internal sealed class MiniCatalog
             .Build();
 
         return new MiniCatalog(values, t1, t2);
+
+        // A procedure criterion without procedure texts or mapping: enough for catalog activate (S3-17).
+        CriterionRevision Procedure(TestType testType, int sortOrder) =>
+            ARevision().Of(ACriterion().ProcedureFor(testType)).WithSortOrder(sortOrder)
+                .WithTitle($"Geprüft nach {testType.NameDe}")
+                .WithDefaultPriority(PriorityLevel.B)
+                .Build();
 
         CriterionRevision WebCriterion(Criterion criterion, int sortOrder, PriorityLevel level) =>
             ARevision().Of(criterion).WithSortOrder(sortOrder)
@@ -258,5 +270,14 @@ internal sealed class MiniCatalog
 
         /// <summary>Procedure criterion of the App-Test.</summary>
         public const string ProcedureAppTest = "PROC-appTest";
+
+        /// <summary>Procedure criterion of the PDF-Test; its test type has no mapping and no texts.</summary>
+        public const string ProcedurePdfTest = "PROC-pdfTest";
+
+        /// <summary>Procedure criterion of the BIK BITV-Test (Web); as <see cref="ProcedurePdfTest"/>.</summary>
+        public const string ProcedureBikWeb = "PROC-bikWeb";
+
+        /// <summary>Procedure criterion of the BIK BITV-Test (App); as <see cref="ProcedurePdfTest"/>.</summary>
+        public const string ProcedureBikApp = "PROC-bikApp";
     }
 }

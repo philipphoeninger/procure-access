@@ -76,17 +76,17 @@ public sealed class CatalogImportTests(ApiFixture api) : IntegrationTest(api), I
         Clock.Advance(TimeSpan.FromMinutes(1));
         var t2 = await ImportAsync(TestReleasesPath, MiniCatalog.T2Version);
 
-        t1.Summary.ShouldBe(new CatalogImportSummary(MiniCatalog.T1Version, 12, 12, 12, 0, null));
-        // 99.6 changed, 99.9 renamed, 99.10 merged, 99.11 added: four new revisions, seven shared.
-        t2.Summary.ShouldBe(new CatalogImportSummary(MiniCatalog.T2Version, 11, 3, 4, 7, MiniCatalog.T1Version));
+        t1.Summary.ShouldBe(new CatalogImportSummary(MiniCatalog.T1Version, 15, 15, 15, 0, null));
+        // 99.6 changed, 99.9 renamed, 99.10 merged, 99.11 added: four new revisions, ten shared.
+        t2.Summary.ShouldBe(new CatalogImportSummary(MiniCatalog.T2Version, 14, 3, 4, 10, MiniCatalog.T1Version));
 
         await using var scope = Api.Factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         var stored = await LoadReleasesAsync(db, cancellationToken);
-        (await db.CriterionRevisions.CountAsync(cancellationToken)).ShouldBe(16);
-        (await db.Criteria.CountAsync(cancellationToken)).ShouldBe(15);
+        (await db.CriterionRevisions.CountAsync(cancellationToken)).ShouldBe(19);
+        (await db.Criteria.CountAsync(cancellationToken)).ShouldBe(18);
         var t1Revisions = stored[0].Criteria.Select(c => c.CriterionRevisionId).ToHashSet();
-        stored[1].Criteria.Count(c => t1Revisions.Contains(c.CriterionRevisionId)).ShouldBe(7);
+        stored[1].Criteria.Count(c => t1Revisions.Contains(c.CriterionRevisionId)).ShouldBe(10);
         stored.Select(r => MiniCatalog.RevisionOf(r, Keys.Changed))
             .Select(r => (r.CriterionId, r.RevisionNumber))
             .ShouldBe([(MiniCatalog.RevisionOf(stored[0], Keys.Changed).CriterionId, 1),
@@ -185,7 +185,7 @@ public sealed class CatalogImportTests(ApiFixture api) : IntegrationTest(api), I
         var result = await ImportAsync(_tempReleases, "T.3");
 
         // 99.3 and 99.6 cite the clause; only their revisions are new.
-        result.Summary.ShouldBe(new CatalogImportSummary("T.3", 12, 0, 2, 10, MiniCatalog.T1Version));
+        result.Summary.ShouldBe(new CatalogImportSummary("T.3", 15, 0, 2, 13, MiniCatalog.T1Version));
         await using var scope = Api.Factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         var stored = await LoadReleasesAsync(db, cancellationToken);
@@ -259,7 +259,7 @@ public sealed class CatalogImportTests(ApiFixture api) : IntegrationTest(api), I
 
         first.ShouldBe(0);
         output.ToString().ShouldBe(
-            "Imported release T.1 (inactive): 12 criteria, 12 new; 12 new revision(s), 0 shared with no previous release." +
+            "Imported release T.1 (inactive): 15 criteria, 15 new; 15 new revision(s), 0 shared with no previous release." +
             Environment.NewLine);
         second.ShouldBe(1);
         error.ToString().ShouldBe(

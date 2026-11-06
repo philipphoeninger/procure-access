@@ -20,15 +20,15 @@ public class MiniCatalogTests
     private readonly MiniCatalog _catalog = MiniCatalog.Build(MiniCatalogValues.InMemory());
 
     [Fact]
-    public void Build_TwoPublishedInactiveReleases_WithTwelveAndElevenCriteria()
+    public void Build_TwoPublishedInactiveReleases_WithFifteenAndFourteenCriteria()
     {
         _catalog.T1.Version.ShouldBe(MiniCatalog.T1Version);
         _catalog.T2.Version.ShouldBe(MiniCatalog.T2Version);
         _catalog.Releases.ShouldAllBe(r => r.IsPublished && !r.IsActive);
         _catalog.T1.PublishedAt.ShouldBe(MiniCatalog.T1PublishedAt);
         _catalog.T2.PublishedAt.ShouldBe(MiniCatalog.T2PublishedAt);
-        _catalog.T1.Criteria.Count.ShouldBe(12);
-        _catalog.T2.Criteria.Count.ShouldBe(11);
+        _catalog.T1.Criteria.Count.ShouldBe(15);
+        _catalog.T2.Criteria.Count.ShouldBe(14);
         _catalog.Releases.SelectMany(r => r.Criteria).ShouldAllBe(c => c.Revision.IsSealed);
     }
 
@@ -58,7 +58,7 @@ public class MiniCatalogTests
         var shared = t2Revisions.Where(r => t1Revisions.Contains(r)).Select(r => r.Criterion.Key);
         shared.ShouldBe(
             [Keys.PriorityAllLevels, Keys.PriorityAppTypes, Keys.DefaultOnly, Keys.AudioOnly, Keys.VideoOnly,
-             Keys.ProcedureSoftwareTest, Keys.ProcedureAppTest],
+             Keys.ProcedureSoftwareTest, Keys.ProcedureAppTest, Keys.ProcedurePdfTest, Keys.ProcedureBikWeb, Keys.ProcedureBikApp],
             ignoreOrder: true);
         t2Revisions.Count(r => !t1Revisions.Contains(r)).ShouldBe(4);
     }
@@ -118,7 +118,7 @@ public class MiniCatalogTests
 
         (values.Hr.IsActive, values.DatabaseApplication.IsActive).ShouldBe((true, false));
         values.All.OfType<ProductPart>().Where(p => p.IsAlwaysSelected).ShouldHaveSingleItem().ShouldBeSameAs(values.Base);
-        values.All.OfType<TestType>().Count().ShouldBe(2);
+        values.All.OfType<TestType>().Select(t => t.Key).ShouldBe(["softwareTest", "appTest", "pdfTest", "bikWeb", "bikApp"]);
         MiniCatalog.RevisionOf(_catalog.T1, Keys.DefaultOnly).Applicability.ShouldAllBe(a => a.ProductPart == values.Base);
     }
 
@@ -197,6 +197,14 @@ public class MiniCatalogTests
     }
 
     [Fact]
+    public void Releases_EveryCriterionHasACatalogDefault_SoCatalogActivateAcceptsThem()
+    {
+        // With one procedure criterion per seeded test type (below), this is what activation needs (S3-17).
+        _catalog.Releases.SelectMany(r => r.Criteria).Select(c => c.Revision)
+            .ShouldAllBe(r => r.Priorities.Any(p => p.AppType == null && p.UseCase == null));
+    }
+
+    [Fact]
     public void ProcedureCriteria_OnePerTestType_WithDefaultBAndNoOtherRows()
     {
         foreach (var release in _catalog.Releases)
@@ -206,7 +214,10 @@ public class MiniCatalogTests
                 .ToList();
 
             procedures.Select(r => (r.Criterion.Key, r.Criterion.TestType!.Key))
-                .ShouldBe([(Keys.ProcedureSoftwareTest, "softwareTest"), (Keys.ProcedureAppTest, "appTest")], ignoreOrder: true);
+                .ShouldBe(
+                    [(Keys.ProcedureSoftwareTest, "softwareTest"), (Keys.ProcedureAppTest, "appTest"), (Keys.ProcedurePdfTest, "pdfTest"),
+                     (Keys.ProcedureBikWeb, "bikWeb"), (Keys.ProcedureBikApp, "bikApp")],
+                    ignoreOrder: true);
             procedures.ShouldAllBe(r => r.Applicability.Count == 0 && r.ProcedureTexts.Count == 0);
             procedures.Select(r => r.Priorities.Single()).ShouldAllBe(p =>
                 p.AppType == null && p.UseCase == null && p.Level == PriorityLevel.B);

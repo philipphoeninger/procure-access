@@ -193,6 +193,11 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsActive")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CatalogReleases_SingleActive")
+                        .HasFilter("\"IsActive\"");
+
                     b.HasIndex("Version")
                         .IsUnique();
 

@@ -1,0 +1,12 @@
+{
+  "kind": "testProcedure",
+  "testType": "bikApp",
+  "titleDe": "Geprüft nach BIK BITV-Test (App)",
+  "sortOrder": 940,
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}
