@@ -51,14 +51,9 @@ const PRODUCT_PARTS = [
 const TEST_TYPE = { id: 23, name: 'BIT inklusiv Software-Test' };
 
 /** Options the seed exclusions switch off once HR-Anwendung, then Website / Webanwendung is chosen. */
-const EXCLUDED_BY_PRODUCT_TYPE = [
-  'Dokument',
-  'Mobile Anwendung (offen)',
-  'Mobile Anwendung (geschlossen)',
-  'Hardware',
-  'Vermittlungs-/Notrufdienst',
-  'BIT inklusiv PDF-Test',
-];
+const EXCLUDED_BY_PRODUCT_TYPE = ['Dokument', 'Hardware', 'Vermittlungs-/Notrufdienst', 'BIT inklusiv PDF-Test'];
+/** HR-Anwendung does not exclude the mobile app types (ARCHITECTURE §16.3.2; seed rows removed in S3-18). */
+const NOT_EXCLUDED_BY_PRODUCT_TYPE = ['Mobile Anwendung (offen)', 'Mobile Anwendung (geschlossen)'];
 const EXCLUDED_BY_WEBSITE = ['BIT inklusiv App-Test', 'BIK BITV-Test (App)'];
 
 const recordedNames = recorded.expected.map((criterion) => criterion.name).sort();
@@ -113,6 +108,9 @@ test.describe('J1 configurator without account (current form)', () => {
       await expect(page.getByText('1 ausgewählt')).toBeVisible();
       for (const name of EXCLUDED_BY_PRODUCT_TYPE) {
         await expect(option(page, name), `${name} is excluded by ${PRODUCT_TYPE.name}`).toBeDisabled();
+      }
+      for (const name of NOT_EXCLUDED_BY_PRODUCT_TYPE) {
+        await expect(option(page, name), `${name} is not excluded by ${PRODUCT_TYPE.name}`).toBeEnabled();
       }
       await expectNoAxeViolations(page, testInfo, 'product type chosen, excluded options disabled');
     });
