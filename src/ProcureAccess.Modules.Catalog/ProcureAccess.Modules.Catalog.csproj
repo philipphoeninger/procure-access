@@ -23,8 +23,9 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
   </ItemGroup>
 
-  <!-- The tests use the internal types. -->
+  <!-- The tests use the internal types; Tests.Shared builds the MiniCatalog from them (S3-14). -->
   <ItemGroup>
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Shared" />
     <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />
     <InternalsVisibleTo Include="ProcureAccess.Tests.Integration" />
     <InternalsVisibleTo Include="ProcureAccess.Tests.Architecture" />
