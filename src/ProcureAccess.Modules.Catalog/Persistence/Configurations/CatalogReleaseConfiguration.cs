@@ -18,6 +18,12 @@ internal sealed class CatalogReleaseConfiguration : IEntityTypeConfiguration<Cat
         builder.Property(x => x.Version).HasMaxLength(CatalogRelease.VersionMaxLength);
         builder.HasIndex(x => x.Version).IsUnique();
 
+        // At most one active release (catalog activate, S3-17 decision 4).
+        builder.HasIndex(x => x.IsActive)
+            .IsUnique()
+            .HasFilter("\"IsActive\"")
+            .HasDatabaseName("IX_CatalogReleases_SingleActive");
+
         // Only published releases are stored (owner, S3-12 decision 1).
         builder.Property(x => x.PublishedAt).HasColumnType("timestamptz").IsRequired();
 

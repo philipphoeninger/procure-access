@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Catalog.Commands;
 using ProcureAccess.Modules.Catalog.Persistence;
+using ProcureAccess.Modules.Catalog.Reading;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 
 namespace ProcureAccess.Modules.Catalog;
@@ -14,7 +15,8 @@ namespace ProcureAccess.Modules.Catalog;
 /// Registration of the Catalog module (ARCHITECTURE §4.3): criteria, revisions, releases, app
 /// types, product parts, use-case templates, test types, priority rules and the procedure mapping.
 /// Since S3-12 it holds the core entities (releases, criteria, revisions, standard references) with
-/// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>. The legacy
+/// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>, since S3-17
+/// <c>catalog activate</c> and the cached catalog reads (<see cref="CatalogReader"/>). The legacy
 /// criteria code in API, DAL, MODELS and SERVICES keeps serving the old screens until they are
 /// replaced (O-S3-5).
 /// </summary>
@@ -44,12 +46,16 @@ public static class CatalogModule
         });
         services.AddScoped<IModuleDatabaseMigrator, CatalogDatabaseMigrator>();
 
+        // Catalog reads, cached by release (ARCHITECTURE §9.6, D10; CAT-09, S3-17).
+        services.AddMemoryCache();
+        services.AddScoped<CatalogReader>();
+
         return services;
     }
 
     /// <summary>
-    /// True when the host was started with a catalog command (<c>catalog import &lt;version&gt;</c>)
-    /// instead of as the API (owner, S3-16 decision 1).
+    /// True when the host was started with a catalog command (<c>catalog import &lt;version&gt;</c>,
+    /// <c>catalog activate &lt;version&gt;</c>) instead of as the API (owner, S3-16 decision 1).
     /// </summary>
     public static bool IsCommand(IReadOnlyList<string> args) =>
         args is [CatalogCommandLine.CommandName, ..];

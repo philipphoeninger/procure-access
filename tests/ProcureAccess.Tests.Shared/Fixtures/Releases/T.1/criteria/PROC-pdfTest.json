@@ -1,0 +1,12 @@
+{
+  "kind": "testProcedure",
+  "testType": "pdfTest",
+  "titleDe": "Geprüft nach BIT inklusiv PDF-Test",
+  "sortOrder": 920,
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

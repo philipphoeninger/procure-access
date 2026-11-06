@@ -1,0 +1,12 @@
+{
+  "kind": "testProcedure",
+  "testType": "bikWeb",
+  "titleDe": "Geprüft nach BIK BITV-Test (Web)",
+  "sortOrder": 930,
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

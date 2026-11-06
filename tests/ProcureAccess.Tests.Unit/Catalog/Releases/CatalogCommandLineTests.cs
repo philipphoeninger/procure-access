@@ -19,6 +19,7 @@ public class CatalogCommandLineTests
     [Theory]
     [InlineData("catalog", true)]
     [InlineData("catalog import 2026.1", true)]
+    [InlineData("catalog activate 2026.1", true)]
     [InlineData("", false)]
     [InlineData("--urls http://localhost:5000", false)]
     [InlineData("Catalog import 2026.1", false)]
@@ -29,7 +30,9 @@ public class CatalogCommandLineTests
     [InlineData("catalog")]
     [InlineData("catalog import")]
     [InlineData("catalog import 2026.1 2026.2")]
-    [InlineData("catalog activate 2026.1")]
+    [InlineData("catalog activate")]
+    [InlineData("catalog activate 2026.1 2026.2")]
+    [InlineData("catalog deactivate 2026.1")]
     public async Task RunCommand_WrongUsage_PrintsUsageAndExitsWith2(string commandLine)
     {
         await using var services = new ServiceCollection().BuildServiceProvider();
@@ -41,6 +44,7 @@ public class CatalogCommandLineTests
 
         exitCode.ShouldBe(2);
         error.ToString().ShouldStartWith("Usage: catalog import <version>");
+        error.ToString().ShouldContain("catalog activate <version>");
         output.ToString().ShouldBeEmpty();
     }
 

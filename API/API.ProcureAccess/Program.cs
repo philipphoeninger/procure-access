@@ -4,7 +4,7 @@
 
 [assembly: ApiController]
 
-// `catalog import <version>` runs the catalog command and exits instead of starting the API (S3-16).
+// `catalog import <version>` and `catalog activate <version>` run the catalog command and exit instead of starting the API (S3-16, S3-17).
 if (CatalogModule.IsCommand(args))
 {
     return await CatalogCommandHost.RunAsync(args);

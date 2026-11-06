@@ -46,14 +46,14 @@ public sealed class MiniCatalogPersistenceTests(ApiFixture api) : IntegrationTes
             .ToListAsync(cancellationToken);
 
         releases.Select(r => (r.Version, r.Criteria.Count, r.Exclusions.Count, r.Procedures.Count, r.IsActive))
-            .ShouldBe([(MiniCatalog.T1Version, 12, 6, 4, false), (MiniCatalog.T2Version, 11, 6, 3, false)]);
+            .ShouldBe([(MiniCatalog.T1Version, 15, 6, 4, false), (MiniCatalog.T2Version, 14, 6, 3, false)]);
         releases.Select(r => r.PublishedAt).ShouldBe([MiniCatalog.T1PublishedAt, MiniCatalog.T2PublishedAt]);
 
-        // T.2 brings four new revisions (CAT-07); the other seven are the rows of T.1.
-        (await readDb.CriterionRevisions.CountAsync(cancellationToken)).ShouldBe(16);
-        (await readDb.Criteria.CountAsync(cancellationToken)).ShouldBe(15);
+        // T.2 brings four new revisions (CAT-07); the other ten are the rows of T.1.
+        (await readDb.CriterionRevisions.CountAsync(cancellationToken)).ShouldBe(19);
+        (await readDb.Criteria.CountAsync(cancellationToken)).ShouldBe(18);
         var t1Ids = releases[0].Criteria.Select(c => c.CriterionRevisionId).ToHashSet();
-        releases[1].Criteria.Count(c => t1Ids.Contains(c.CriterionRevisionId)).ShouldBe(7);
+        releases[1].Criteria.Count(c => t1Ids.Contains(c.CriterionRevisionId)).ShouldBe(10);
         var changed = releases.Select(r => MiniCatalog.RevisionOf(r, Keys.Changed)).ToList();
         changed[1].CriterionId.ShouldBe(changed[0].CriterionId);
         changed.Select(r => r.RevisionNumber).ShouldBe([1, 2]);

@@ -5,7 +5,7 @@
 namespace API.ProcureAccess.Extensions;
 
 /// <summary>
-/// Runs a catalog command (<c>catalog import &lt;version&gt;</c>) with the host's configuration
+/// Runs a catalog command (<c>catalog import &lt;version&gt;</c>, <c>catalog activate &lt;version&gt;</c>) with the host's configuration
 /// instead of starting the API (owner, S3-16 decision 1): same image, same settings and secrets,
 /// but only the Platform and Catalog modules. No web server starts, no migration runs and no
 /// background job starts.

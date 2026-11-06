@@ -10,7 +10,8 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 
 /// <summary>
 /// The filter values the <see cref="MiniCatalog"/> uses: a subset of the values the catalog
-/// migration seeds (O-S3-5 D1), referred to by their seeded keys.
+/// migration seeds (O-S3-5 D1), referred to by their seeded keys; all five test types, because
+/// <c>catalog activate</c> needs a procedure criterion for each (S3-17).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -63,9 +64,21 @@ internal sealed class MiniCatalogValues
     /// <summary>Test type „BIT inklusiv App-Test“.</summary>
     public TestType AppTest { get; private init; } = null!;
 
+    /// <summary>Test type „BIT inklusiv PDF-Test“; no procedure is mapped to it, only its procedure criterion exists.</summary>
+    public TestType PdfTest { get; private init; } = null!;
+
+    /// <summary>Test type „BIK BITV-Test (Web)“; as <see cref="PdfTest"/>.</summary>
+    public TestType BikWeb { get; private init; } = null!;
+
+    /// <summary>Test type „BIK BITV-Test (App)“; as <see cref="PdfTest"/>.</summary>
+    public TestType BikApp { get; private init; } = null!;
+
+    /// <summary>Every seeded test type: a release needs a procedure criterion for each to be activated (S3-17).</summary>
+    public IReadOnlyList<TestType> TestTypes => [SoftwareTest, AppTest, PdfTest, BikWeb, BikApp];
+
     /// <summary>Every value, in the order of the layers.</summary>
     public IReadOnlyList<FilterValue> All =>
-        [Hr, DatabaseApplication, Web, SoftwareOpen, MobileOpen, Hardware, Base, Audio, Video, SoftwareTest, AppTest];
+        [Hr, DatabaseApplication, Web, SoftwareOpen, MobileOpen, Hardware, Base, Audio, Video, .. TestTypes];
 
     /// <summary>
     /// New objects with the seeded keys, names, flags and sort orders. Ids and foreign-key properties
@@ -94,6 +107,9 @@ internal sealed class MiniCatalogValues
         Video = ProductPart.Create("video", "Video", "Testerklärung Video.", 3),
         SoftwareTest = TestType.Create("softwareTest", "BIT inklusiv Software-Test", "https://softwaretest.bit-inklusiv.de/", 1),
         AppTest = TestType.Create("appTest", "BIT inklusiv App-Test", "https://apptest.bit-inklusiv.de/", 2),
+        PdfTest = TestType.Create("pdfTest", "BIT inklusiv PDF-Test", "https://pdftest.bit-inklusiv.de/", 3),
+        BikWeb = TestType.Create("bikWeb", "BIK BITV-Test (Web)", "https://bitvtest.de/pruefverfahren/bitv-20-web", 4),
+        BikApp = TestType.Create("bikApp", "BIK BITV-Test (App)", "https://bitvtest.de/pruefverfahren/bitv-20-app", 5),
     };
 
     /// <summary>The seeded rows, tracked by <paramref name="db"/>.</summary>
@@ -109,9 +125,7 @@ internal sealed class MiniCatalogValues
         var productParts = await db.ProductParts
             .Where(p => p.Key == "base" || p.Key == "audio" || p.Key == "video")
             .ToDictionaryAsync(p => p.Key, cancellationToken);
-        var testTypes = await db.TestTypes
-            .Where(t => t.Key == "softwareTest" || t.Key == "appTest")
-            .ToDictionaryAsync(t => t.Key, cancellationToken);
+        var testTypes = await db.TestTypes.ToDictionaryAsync(t => t.Key, cancellationToken);
 
         return new MiniCatalogValues
         {
@@ -126,6 +140,9 @@ internal sealed class MiniCatalogValues
             Video = productParts["video"],
             SoftwareTest = testTypes["softwareTest"],
             AppTest = testTypes["appTest"],
+            PdfTest = testTypes["pdfTest"],
+            BikWeb = testTypes["bikWeb"],
+            BikApp = testTypes["bikApp"],
         };
     }
 }
