@@ -88,6 +88,21 @@ try
     // First in the pipeline: errors of every later middleware become Problem Details (S2-10)
     app.UsePlatformMiddleware();
 
+    // Endpoints. WebApplication runs routing first and the endpoints last, so mapping them here
+    // does not change the middleware order; it must come before the Swagger set-up, which lists the
+    // API versions of the endpoints mapped so far (#176).
+    app.MapControllers();
+    app.MapGroup("/api")
+       .MapIdentityUserEndpoints();
+    app.MapPlatformEndpoints();
+
+    // Module endpoints under /api/v1 (ARCHITECTURE §7.1; owner, S3-19: only the new endpoints are
+    // versioned, the legacy controllers stay at /api/<controller>, #153).
+    app.NewVersionedApi()
+       .MapGroup("/api/v{version:apiVersion}")
+       .HasApiVersion(1, 0)
+       .MapCatalogEndpoints();
+
     app.ConfigureSwaggerExplorer();
 
     //app.UseHttpsRedirection();
@@ -95,12 +110,6 @@ try
 
     app.ConfigureCORS()
        .AddIdentityAuthMiddlewares();
-
-    app.MapControllers();
-    app.MapGroup("/api")
-       .MapIdentityUserEndpoints();
-
-    app.MapPlatformEndpoints();
 }
 catch (Exception ex)
 {

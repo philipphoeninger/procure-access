@@ -152,7 +152,7 @@ Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21
 | S3-16 | S3-15; S3-12 – S3-14 | internal |
 | S3-17 | S3-16 | internal |
 | S3-18 | none (O-S3-5 C: legacy migration and J1 only) | internal |
-| S3-19, S3-20 | S3-17; **O-S3-6** for S3-19 | internal / Philipp |
+| S3-19, S3-20 | S3-17; **O-S3-6** for S3-19 | **O-S3-6 decided 2026-11-06** |
 | S3-03 | Owner re-adds the `Analyze` checks to the ruleset of `main` after the merge | Philipp |
 | S3-22 | UX copy session #181 | Philipp |
 | S3-27 | S3-15 (format), S3-16 (import); priorities and titles O-1, K-1 stay with the project team | internal |
@@ -167,7 +167,7 @@ Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21
 | O-S3-3 | Reflow invariant: give `reflow.spec.ts` an ID (e.g. A11Y-09) in the next TESTING version? (#188) | S3-05 | Yes — rebuilt screens then must be added to the check, and the gate enforces it |
 | O-S3-4 | AutoMapper replacement and the ARC-06 successor (#31), as an ADR (CLAUDE §11) | S3-07 run 2 | Options with licence and effort in run 1 |
 | O-S3-5 | Catalog persistence and the path of the existing criteria into the new model (design note S3-11) | S3-12 | **Decided 2026-11-06** (S3-11 §2.9): **C** no copy of the existing criteria, **D1** filter values seeded in the catalog migration, **Q2 (iii)** import accepts a release without priorities, activate refuses it, criterion proposals kept; documents reworded as in S3-11 §2.4 C (ARCHITECTURE with S3-12); `Catalog.Contracts` as in S3-11 §2.2 |
-| O-S3-6 | Endpoint style of `/api/v1/catalog/*` (controllers or minimal APIs); milestone of #176 | S3-19 | Decide with the first endpoint; S3-19 shows both against ARC-03 and the Swagger set-up |
+| O-S3-6 | Endpoint style of `/api/v1/catalog/*` (controllers or minimal APIs); milestone of #176 | S3-19 | **Decided 2026-11-06:** minimal APIs, `internal` in the module and mapped by the host on its versioned group; #176 done in S3-19 (milestone M2); only the new endpoints under `/api/v1`, URL segment as the only version reader (#153) (ARCHITECTURE_v22 C107) |
 | O-S3-7 | Font subsetting option of #135 | S3-25 (stretch) | Options are in the issue |
 | O-S3-8 | `eslint-plugin-playwright` as a new dev dependency (#161) | S3-26 (stretch) | Licence check in the task first |
 | — | UX copy session #181 (TD-15): page-title variants for S11/S35, singulars, problem-type texts, snackbar buttons, delete reason, account button | before sprint 04 (S11) | — |

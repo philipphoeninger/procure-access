@@ -21,17 +21,11 @@ public static class ApiVersionConfiguration
                 //reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
                 options.ReportApiVersions = true;
 
-                //This combines all of the available option as well as allows for using "v" or "api-version" as options for
-                //query string, header, or media type versioning
-                options.ApiVersionReader = ApiVersionReader.Combine(
-                    new UrlSegmentApiVersionReader(),
-                    new QueryStringApiVersionReader(), //defaults to "api-version"
-                    new QueryStringApiVersionReader("v"),
-                    new HeaderApiVersionReader("api-version"),
-                    new HeaderApiVersionReader("v"),
-                    new MediaTypeApiVersionReader(), //defaults to "v"
-                    new MediaTypeApiVersionReader("api-version")
-                    );
+                // The version is read from the URL segment only (/api/v1/..., ARCHITECTURE §7.1, #153).
+                // The query, header and media-type readers made Swagger list the parameters
+                // api-version and v twice on every operation. Unversioned legacy routes (/api/...)
+                // fall back to the default version through AssumeDefaultVersionWhenUnspecified.
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
             })
             // Asp.Versioning 10 expects MVC (controller) versioning to be registered explicitly (AV0013).
             .AddMvc()
