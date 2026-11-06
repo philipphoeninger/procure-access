@@ -26,6 +26,11 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../../src/ProcureAccess.Modules.Catalog/ProcureAccess.Modules.Catalog.csproj" />
   </ItemGroup>
 
+  <!-- The test release folders T.1 and T.2 (S3-15); copied into the output of every test project that references this one. -->
+  <ItemGroup>
+    <None Update="Fixtures/Releases/**/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- The catalog builders are internal, because the types they build are. -->
   <ItemGroup>
     <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />

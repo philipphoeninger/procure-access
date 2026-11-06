@@ -1,0 +1,38 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium für Audio",
+  "sortOrder": 40,
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen"
+      ],
+      "productParts": [
+        "audio"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "A",
+      "rationaleDe": "Testbegründung A für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "99.4-softwareTest",
+      "originalTitleDe": "Testtext 99.4-softwareTest",
+      "requirementDe": [
+        "Anforderung zu 99.4-softwareTest."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "sourceUrl": "https://example.org/softwareTest#99.4-softwareTest"
+    }
+  ]
+}

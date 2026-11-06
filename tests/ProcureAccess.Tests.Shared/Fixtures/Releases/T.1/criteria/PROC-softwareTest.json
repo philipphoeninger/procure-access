@@ -1,0 +1,12 @@
+{
+  "kind": "testProcedure",
+  "testType": "softwareTest",
+  "titleDe": "Geprüft nach BIT inklusiv Software-Test",
+  "sortOrder": 900,
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

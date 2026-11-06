@@ -1,0 +1,44 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium, Fassung 2",
+  "sortOrder": 60,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "T.9.1.1",
+      "url": "https://example.org/en301549#T.9.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "A",
+      "rationaleDe": "Testbegründung A für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "99.6-softwareTest",
+      "originalTitleDe": "Testtext 99.6-softwareTest",
+      "requirementDe": [
+        "Anforderung zu 99.6-softwareTest."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "sourceUrl": "https://example.org/softwareTest#99.6-softwareTest"
+    }
+  ]
+}

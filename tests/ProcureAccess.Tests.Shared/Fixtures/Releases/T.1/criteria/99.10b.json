@@ -1,0 +1,18 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium 99.10b",
+  "sortOrder": 91,
+  "applicability": [
+    {
+      "appTypes": [
+        "web"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "B",
+      "rationaleDe": "Testbegründung B für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

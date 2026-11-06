@@ -1,0 +1,51 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium für mehrere Anwendungstypen",
+  "sortOrder": 20,
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "mobileOpen"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "appType": "web",
+      "useCase": "hr",
+      "level": "B",
+      "weight": 2,
+      "rationaleDe": "Testbegründung B für web und hr."
+    },
+    {
+      "appType": "softwareOpen",
+      "useCase": "hr",
+      "level": "B",
+      "weight": 2,
+      "rationaleDe": "Testbegründung B für softwareOpen und hr."
+    },
+    {
+      "appType": "web",
+      "level": "B",
+      "weight": 1,
+      "rationaleDe": "Testbegründung B für web und jeden Verwendungszweck."
+    },
+    {
+      "appType": "softwareOpen",
+      "level": "B",
+      "weight": 3,
+      "rationaleDe": "Testbegründung B für softwareOpen und jeden Verwendungszweck."
+    },
+    {
+      "appType": "mobileOpen",
+      "level": "A",
+      "rationaleDe": "Testbegründung A für mobileOpen und jeden Verwendungszweck."
+    },
+    {
+      "level": "Info",
+      "rationaleDe": "Testbegründung Info für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}

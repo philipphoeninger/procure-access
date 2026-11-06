@@ -1,0 +1,70 @@
+{
+  "exclusions": [
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "appType",
+        "key": "hardware"
+      },
+      "reasonDe": "Testgrund: HR-Anwendung schließt Hardware aus."
+    },
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "productPart",
+        "key": "audio"
+      },
+      "reasonDe": "Testgrund: HR-Anwendung schließt Audio aus."
+    },
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "databaseApplication"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "appTest"
+      },
+      "reasonDe": "Testgrund: Datenbankgestützte Fachanwendung schließt den App-Test aus."
+    },
+    {
+      "source": {
+        "layer": "appType",
+        "key": "mobileOpen"
+      },
+      "target": {
+        "layer": "productPart",
+        "key": "audio"
+      },
+      "reasonDe": "Testgrund: Mobile Anwendung schließt Audio aus."
+    },
+    {
+      "source": {
+        "layer": "appType",
+        "key": "web"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "appTest"
+      },
+      "reasonDe": "Testgrund: Webanwendung schließt den App-Test aus."
+    },
+    {
+      "source": {
+        "layer": "productPart",
+        "key": "audio"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "softwareTest"
+      },
+      "reasonDe": "Testgrund: Audio schließt den Software-Test aus."
+    }
+  ]
+}

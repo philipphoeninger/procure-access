@@ -1,0 +1,18 @@
+{
+  "kind": "requirement",
+  "titleDe": "Testkriterium 99.7",
+  "sortOrder": 70,
+  "applicability": [
+    {
+      "appTypes": [
+        "web"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "level": "Info",
+      "rationaleDe": "Testbegründung Info für jeden Anwendungstyp und jeden Verwendungszweck."
+    }
+  ]
+}
