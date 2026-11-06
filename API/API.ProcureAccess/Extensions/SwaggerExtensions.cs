@@ -21,7 +21,8 @@ public static class SwaggerExtensions
 
     /// <summary>
     /// Serves the Swagger UI and the OpenAPI documents in <c>Development</c> only (owner decision
-    /// O-S3-2, #183): elsewhere, staging included, <c>/swagger</c> answers 404.
+    /// O-S3-2, #183): elsewhere, staging included, <c>/swagger</c> answers 404. Call it after every
+    /// <c>Map…</c> call (#176).
     /// </summary>
     public static WebApplication ConfigureSwaggerExplorer(this WebApplication app)
     {
@@ -33,14 +34,10 @@ public static class SwaggerExtensions
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
-            using var scope = app.Services.CreateScope();
-            // AV0027 asks for app.DescribeApiVersions(); that switch comes with the first
-            // versioned minimal API (#176). Remove this suppression with it.
-#pragma warning disable AV0027
-            var versionProvider = scope.ServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
-#pragma warning restore AV0027
-            // build a swagger endpoint for each discovered API version
-            foreach (var description in versionProvider.ApiVersionDescriptions)
+            // One entry per API version of the controllers and of the minimal APIs mapped so far:
+            // versioned minimal APIs must be mapped before this method is called (#176), or the UI
+            // misses their document (SwaggerDocumentTests).
+            foreach (var description in app.DescribeApiVersions())
             {
                 options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
             }

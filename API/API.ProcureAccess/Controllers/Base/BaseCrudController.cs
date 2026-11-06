@@ -8,10 +8,11 @@ namespace API.ProcureAccess.Controllers.Base;
 /// Read-only base of the legacy catalog and proposal controllers. The generic <c>POST</c>,
 /// <c>PUT</c> and <c>DELETE</c> are gone (S3-07, owner decision O-S3-4 (c), #90): they accepted
 /// anonymous requests, and the catalog changes only through the CLI import (SPEC SD20).
+/// Its routes stay unversioned (<c>api/[controller]</c>; the derived controllers declare the same):
+/// only the new module endpoints live under <c>/api/v1</c> (owner, S3-19, #153).
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Route("api/v{version:apiVersion}/[controller]")]
 public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
     where TEntity : BaseEntity, new()
     where TDto : BaseDto, new()

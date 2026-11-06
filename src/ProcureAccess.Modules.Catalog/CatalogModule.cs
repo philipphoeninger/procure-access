@@ -2,9 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Catalog.Commands;
+using ProcureAccess.Modules.Catalog.FilterOptions;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Catalog.Reading;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
@@ -16,7 +20,8 @@ namespace ProcureAccess.Modules.Catalog;
 /// types, product parts, use-case templates, test types, priority rules and the procedure mapping.
 /// Since S3-12 it holds the core entities (releases, criteria, revisions, standard references) with
 /// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>, since S3-17
-/// <c>catalog activate</c> and the cached catalog reads (<see cref="CatalogReader"/>). The legacy
+/// <c>catalog activate</c> and the cached catalog reads (<see cref="CatalogReader"/>), since S3-19
+/// the endpoint <c>GET /api/v1/catalog/filter-options</c> (<see cref="MapCatalogEndpoints"/>). The legacy
 /// criteria code in API, DAL, MODELS and SERVICES keeps serving the old screens until they are
 /// replaced (O-S3-5).
 /// </summary>
@@ -51,6 +56,20 @@ public static class CatalogModule
         services.AddScoped<CatalogReader>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Maps the catalog endpoints (ARCHITECTURE §7.2) as minimal APIs below <c>/catalog</c> of
+    /// <paramref name="routes"/> (owner decision O-S3-6). The host hands in its versioned group
+    /// <c>/api/v{version}</c>, so the module needs no versioning of its own (#153, #176). Map it before
+    /// the Swagger set-up, which lists the API versions of the endpoints mapped so far.
+    /// </summary>
+    public static IEndpointRouteBuilder MapCatalogEndpoints(this IEndpointRouteBuilder routes)
+    {
+        ArgumentNullException.ThrowIfNull(routes);
+        var catalog = routes.MapGroup("/catalog").WithTags("Catalog");
+        FilterOptionsEndpoint.Map(catalog);
+        return routes;
     }
 
     /// <summary>
