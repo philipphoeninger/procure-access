@@ -44,6 +44,9 @@ RUN dotnet publish API/API.ProcureAccess/API.ProcureAccess.csproj -c Release --n
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
+# Catalog release folders for `catalog import <version>` (S3-16 decision 2): the reviewed folders
+# ship with the image; Catalog:ReleasesPath (catalog/releases) is relative to /app.
+COPY catalog/releases/ catalog/releases/
 # The base image listens on port 8080 (ASPNETCORE_HTTP_PORTS) and ships the non-root user "app".
 EXPOSE 8080
 USER $APP_UID

@@ -19,6 +19,9 @@ internal sealed class FilterExclusionConfiguration : IEntityTypeConfiguration<Fi
     /// </summary>
     public const string TargetLayerLowerCheck = "CK_FilterExclusions_TargetLayerLower";
 
+    /// <summary>One row per source, target and reason (S3-16); named, because the generated name is too long.</summary>
+    public const string UniqueRuleIndex = "IX_FilterExclusions_Rule";
+
     public void Configure(EntityTypeBuilder<FilterExclusion> builder)
     {
         builder.ToTable("FilterExclusions", CatalogDbContext.Schema, table =>
@@ -48,5 +51,22 @@ internal sealed class FilterExclusionConfiguration : IEntityTypeConfiguration<Fi
         builder.HasOne(x => x.TargetAppType).WithMany().HasForeignKey(x => x.TargetAppTypeId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.TargetProductPart).WithMany().HasForeignKey(x => x.TargetProductPartId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.TargetTestType).WithMany().HasForeignKey(x => x.TargetTestTypeId).OnDelete(DeleteBehavior.Restrict);
+
+        // One row per rule: the import reuses it in every release that applies it (S3-13 P1, S3-16).
+        // A changed reason is a new rule, so the reason is part of the key; the unused source and
+        // target columns are null and count as one value.
+        builder.HasIndex(x => new
+        {
+            x.SourceUseCaseId,
+            x.SourceAppTypeId,
+            x.SourceProductPartId,
+            x.TargetAppTypeId,
+            x.TargetProductPartId,
+            x.TargetTestTypeId,
+            x.ReasonDe,
+        })
+            .IsUnique()
+            .AreNullsDistinct(false)
+            .HasDatabaseName(UniqueRuleIndex);
     }
 }

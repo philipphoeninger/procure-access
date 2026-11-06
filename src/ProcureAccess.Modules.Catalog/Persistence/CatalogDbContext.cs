@@ -16,7 +16,8 @@ namespace ProcureAccess.Modules.Catalog.Persistence;
 /// <remarks>
 /// Its history table is <c>catalog."__EFMigrationsHistory"</c>. <see cref="TimeProvider"/> sets
 /// <see cref="CatalogEntity.CreatedAt"/> of every added row (CLAUDE.md §7: time only through
-/// <c>TimeProvider</c>).
+/// <c>TimeProvider</c>). <see cref="CatalogImmutabilityInterceptor"/> refuses changes and deletes
+/// of stored rows (CAT-05).
 /// </remarks>
 internal sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options, TimeProvider timeProvider)
     : DbContext(options)
@@ -51,6 +52,9 @@ internal sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> option
         // As in PlatformDbContext: set here, so every instance (application, design-time tools,
         // tests) uses the module's history table.
         optionsBuilder.UseNpgsql(npgsql => npgsql.MigrationsHistoryTable(HistoryTable, Schema));
+
+        // Here as well, so no instance can change or delete a stored catalog row (CAT-05, S3-16).
+        optionsBuilder.AddInterceptors(CatalogImmutabilityInterceptor.Instance);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

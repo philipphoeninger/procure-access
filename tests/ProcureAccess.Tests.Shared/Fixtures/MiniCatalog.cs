@@ -40,8 +40,8 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 /// (<see cref="TestReleaseFolders"/>, S3-15); a change here needs the same change there.
 /// </para>
 /// <para>
-/// <c>SupersededByKey</c> is set when the old criterion is created, because a <see cref="Criterion"/>
-/// cannot change afterwards; both releases are built at once.
+/// Both releases are built at once, so <c>SupersededByKey</c> is set when the old criterion is
+/// created; <c>catalog import</c> sets it later with <see cref="Criterion.MarkSupersededBy"/> (S3-16).
 /// </para>
 /// </remarks>
 internal sealed class MiniCatalog

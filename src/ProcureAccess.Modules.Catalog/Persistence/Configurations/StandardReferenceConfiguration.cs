@@ -18,6 +18,8 @@ internal sealed class StandardReferenceConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.Standard).HasConversion<string>().HasMaxLength(32);
         builder.Property(x => x.Clause).HasMaxLength(StandardReference.ClauseMaxLength);
         builder.Property(x => x.Url).HasMaxLength(StandardReference.UrlMaxLength);
-        builder.HasIndex(x => new { x.Standard, x.Clause }).IsUnique();
+        // One row per standard, clause and URL: a corrected URL is a new row that only the new
+        // revision cites (owner, S3-16 decision 5). A missing URL counts as one value.
+        builder.HasIndex(x => new { x.Standard, x.Clause, x.Url }).IsUnique().AreNullsDistinct(false);
     }
 }

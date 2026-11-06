@@ -78,4 +78,29 @@ internal sealed class Criterion : CatalogEntity
             TestType = testType,
         };
     }
+
+    /// <summary>
+    /// Names the criterion that replaces this one (CAT-03): set once, when <c>catalog import</c>
+    /// stores the release whose criterion lists this key in <c>supersedes</c> (owner, S3-16
+    /// decision 4). Repeating the same key does nothing; another key throws
+    /// <see cref="PublishedCatalogChangeException"/>, because releases already point to it.
+    /// </summary>
+    public void MarkSupersededBy(string successorKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(successorKey);
+        if (successorKey == Key)
+        {
+            throw new ArgumentException($"Criterion '{Key}' cannot supersede itself.", nameof(successorKey));
+        }
+
+        if (SupersededByKey is null)
+        {
+            SupersededByKey = successorKey;
+        }
+        else if (SupersededByKey != successorKey)
+        {
+            throw new PublishedCatalogChangeException(
+                $"Criterion '{Key}' is already superseded by '{SupersededByKey}' and cannot be superseded by '{successorKey}'.");
+        }
+    }
 }
