@@ -9,8 +9,8 @@ using ProcureAccess.Modules.Catalog.Persistence.Configurations;
 namespace ProcureAccess.Modules.Catalog.Persistence;
 
 /// <summary>
-/// The Catalog module's own database context (ARCHITECTURE ADR-014): releases, criteria, revisions
-/// and standard references in the <c>catalog</c> schema. No other module and no legacy code uses it;
+/// The Catalog module's own database context (ARCHITECTURE ADR-014): releases, criteria, revisions,
+/// standard references, the four filter layers and their rules in the <c>catalog</c> schema. No other module and no legacy code uses it;
 /// no foreign key or join leads to another schema (rule 5).
 /// </summary>
 /// <remarks>
@@ -28,6 +28,11 @@ internal sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> option
     public DbSet<Criterion> Criteria => Set<Criterion>();
     public DbSet<CriterionRevision> CriterionRevisions => Set<CriterionRevision>();
     public DbSet<StandardReference> StandardReferences => Set<StandardReference>();
+    public DbSet<UseCaseTemplate> UseCaseTemplates => Set<UseCaseTemplate>();
+    public DbSet<AppType> AppTypes => Set<AppType>();
+    public DbSet<ProductPart> ProductParts => Set<ProductPart>();
+    public DbSet<TestType> TestTypes => Set<TestType>();
+    public DbSet<FilterExclusion> FilterExclusions => Set<FilterExclusion>();
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -56,6 +61,16 @@ internal sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> option
         modelBuilder.ApplyConfiguration(new CriterionConfiguration());
         modelBuilder.ApplyConfiguration(new CriterionRevisionConfiguration());
         modelBuilder.ApplyConfiguration(new StandardReferenceConfiguration());
+        modelBuilder.ApplyConfiguration(new UseCaseTemplateConfiguration());
+        modelBuilder.ApplyConfiguration(new AppTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductPartConfiguration());
+        modelBuilder.ApplyConfiguration(new TestTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new FilterExclusionConfiguration());
+        modelBuilder.ApplyConfiguration(new CatalogReleaseFilterExclusionConfiguration());
+        modelBuilder.ApplyConfiguration(new CatalogReleaseAppTypeProcedureConfiguration());
+        modelBuilder.ApplyConfiguration(new CriterionApplicabilityConfiguration());
+        modelBuilder.ApplyConfiguration(new PriorityRecommendationConfiguration());
+        modelBuilder.ApplyConfiguration(new CriterionProcedureTextConfiguration());
     }
 
     private void SetCreatedAt()

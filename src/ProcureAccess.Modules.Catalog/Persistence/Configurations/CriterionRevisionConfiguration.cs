@@ -36,5 +36,24 @@ internal sealed class CriterionRevisionConfiguration : IEntityTypeConfiguration<
                     j.HasKey("CriterionRevisionId", "StandardReferenceId");
                 });
         builder.Navigation(x => x.StandardReferences).UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        // Rows the revision owns (S3-13); fixed with it once a published release contains it (CAT-05).
+        builder.HasMany(x => x.Applicability)
+            .WithOne(x => x.Revision)
+            .HasForeignKey(x => x.CriterionRevisionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.Applicability).UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Priorities)
+            .WithOne(x => x.Revision)
+            .HasForeignKey(x => x.CriterionRevisionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.Priorities).UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.ProcedureTexts)
+            .WithOne(x => x.Revision)
+            .HasForeignKey(x => x.CriterionRevisionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.ProcedureTexts).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
