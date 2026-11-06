@@ -6,6 +6,7 @@ using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Catalog.Domain;
 using Shouldly;
 using Xunit;
+using static ProcureAccess.Tests.Shared.Builders.Catalog.CatalogData;
 
 namespace ProcureAccess.Tests.Unit.Catalog;
 
@@ -138,18 +139,8 @@ public class CatalogReleaseImmutabilityTests
         Should.Throw<ArgumentException>(() => revision.AddStandardReference(reference));
     }
 
-    private static CriterionRevision Revision(string key) =>
-        CriterionRevision.Create(Criterion.Create(key, CriterionKind.Requirement), 1, $"Titel {key}");
+    private static CriterionRevision Revision(string key) => ARevision().WithKey(key).Build();
 
-    private static CatalogRelease PublishedRelease(string version, params CriterionRevision[] revisions)
-    {
-        var release = CatalogRelease.Create(version);
-        foreach (var revision in revisions)
-        {
-            release.Include(revision);
-        }
-
-        release.Publish(PublishedAt);
-        return release;
-    }
+    private static CatalogRelease PublishedRelease(string version, params CriterionRevision[] revisions) =>
+        ACatalogRelease().WithVersion(version).Including(revisions).PublishedAt(PublishedAt).Build();
 }

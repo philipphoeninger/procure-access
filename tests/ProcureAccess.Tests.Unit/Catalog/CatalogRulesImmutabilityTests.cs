@@ -4,8 +4,10 @@
 
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Catalog.Domain;
+using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
 using Xunit;
+using static ProcureAccess.Tests.Shared.Builders.Catalog.CatalogData;
 
 namespace ProcureAccess.Tests.Unit.Catalog;
 
@@ -19,11 +21,12 @@ public class CatalogRulesImmutabilityTests
 {
     private static readonly DateTimeOffset PublishedAt = new(2026, 11, 6, 10, 0, 0, TimeSpan.Zero);
 
-    private static readonly UseCaseTemplate Hr = UseCaseTemplate.Create("hr", "HR-Anwendung");
-    private static readonly AppType Web = AppType.Create("web", "Website oder Webanwendung", AppTypeFunctionality.NotApplicable, 1);
-    private static readonly AppType Document = AppType.Create("document", "Dokument", AppTypeFunctionality.NotApplicable, 6);
-    private static readonly ProductPart Base = ProductPart.Create("base", "Basisfunktionalität", "Erklärung", 1, isAlwaysSelected: true);
-    private static readonly TestType SoftwareTest = TestType.Create("softwareTest", "BIT inklusiv Software-Test", "https://softwaretest.bit-inklusiv.de/", 1);
+    private static readonly MiniCatalogValues Values = MiniCatalogValues.InMemory();
+    private static readonly UseCaseTemplate Hr = Values.Hr;
+    private static readonly AppType Web = Values.Web;
+    private static readonly AppType Hardware = Values.Hardware;
+    private static readonly ProductPart Base = Values.Base;
+    private static readonly TestType SoftwareTest = Values.SoftwareTest;
 
     private static readonly ProcedureTextContent Text = new(
         "11.2.1.1", "Originaltitel", Rating.Fulfilled | Rating.Blockade, "https://softwaretest.bit-inklusiv.de/#11.2.1.1");
@@ -35,7 +38,7 @@ public class CatalogRulesImmutabilityTests
         var release = PublishedRelease(Revision("K-1"));
 
         Should.Throw<PublishedCatalogChangeException>(
-            () => release.AddExclusion(FilterExclusion.Create(Hr, Document, "Grund")));
+            () => release.AddExclusion(FilterExclusion.Create(Hr, Hardware, "Grund")));
 
         release.Exclusions.ShouldBeEmpty();
     }
@@ -76,7 +79,7 @@ public class CatalogRulesImmutabilityTests
         revision.AddPriority(null, null, PriorityLevel.B, "Standard");
         revision.AddPriority(Web, Hr, PriorityLevel.A, "Für HR im Web", weight: 3);
         revision.AddProcedureText(SoftwareTest, Text);
-        var exclusion = FilterExclusion.Create(Hr, Document, "Grund");
+        var exclusion = FilterExclusion.Create(Hr, Hardware, "Grund");
         var release = CatalogRelease.Create("T.1");
         release.Include(revision);
         release.AddExclusion(exclusion);
@@ -99,7 +102,7 @@ public class CatalogRulesImmutabilityTests
     public void AddExclusion_SameRuleTwice_Throws()
     {
         var release = CatalogRelease.Create("T.1");
-        var exclusion = FilterExclusion.Create(Hr, Document, "Grund");
+        var exclusion = FilterExclusion.Create(Hr, Hardware, "Grund");
         release.AddExclusion(exclusion);
 
         Should.Throw<ArgumentException>(() => release.AddExclusion(exclusion));
@@ -174,18 +177,8 @@ public class CatalogRulesImmutabilityTests
         Criterion.Create("PROC-softwareTest", CriterionKind.TestProcedure, testType: SoftwareTest).TestType.ShouldBeSameAs(SoftwareTest);
     }
 
-    private static CriterionRevision Revision(string key) =>
-        CriterionRevision.Create(Criterion.Create(key, CriterionKind.Requirement), 1, $"Titel {key}");
+    private static CriterionRevision Revision(string key) => ARevision().WithKey(key).Build();
 
-    private static CatalogRelease PublishedRelease(params CriterionRevision[] revisions)
-    {
-        var release = CatalogRelease.Create("T.1");
-        foreach (var revision in revisions)
-        {
-            release.Include(revision);
-        }
-
-        release.Publish(PublishedAt);
-        return release;
-    }
+    private static CatalogRelease PublishedRelease(params CriterionRevision[] revisions) =>
+        ACatalogRelease().Including(revisions).PublishedAt(PublishedAt).Build();
 }
