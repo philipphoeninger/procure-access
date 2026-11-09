@@ -12,12 +12,16 @@
     "stack:down": "docker compose -f ../docker-compose.yml -f ../docker-compose.e2e.yml down -v",
     "test": "playwright test",
     "typecheck": "tsc -p .",
+    "lint": "cd .. && eslint -c e2e/eslint.config.mjs e2e scripts",
     "report": "playwright show-report"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "1.64.1",
     "@types/node": "^24.0.0",
-    "typescript": "~6.0.3"
+    "eslint": "^10.14.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2"
   }
 }

@@ -11,6 +11,7 @@ npx playwright install chromium firefox webkit   # once per Playwright version
 npm run stack:up                          # needs ../.env like the dev stack; stop the dev stack first (same ports 4200/5000)
 npx playwright test                       # all browser projects; e.g. --project=chromium
 npm run report                            # HTML report of the last run (traces of failed tests)
+npm run typecheck && npm run lint         # TypeScript check and ESLint (e2e/ and ../scripts/*.mjs), as in CI stage 1
 npm run stack:down
 ```
 
@@ -27,5 +28,7 @@ Browser projects: `chromium`, `firefox`, `webkit`, `mobile-chrome` (Pixel 7), `m
 | `support/axe-helper.spec.ts` | Self-test of the helper and the suppression rules |
 | `smoke/` | Smoke test of the stack |
 | `journeys/` | Journeys J1–J7 (TESTING §5.4). Today: `j1-configurator.spec.ts`, J1 in its current form (characterisation of the criteria filter on `/filters`; the expected criteria come from the CAT-10 fixture in `tests/ProcureAccess.Tests.Integration/Catalog/Fixtures/`) |
+
+`eslint.config.mjs` (#161, S3-26) lints this folder with `typescript-eslint` `recommendedTypeChecked` — so an `expect(...)` without `await` fails — and `../scripts/*.mjs` with `@eslint/js` recommended plus the type-aware promise rules. `npm run lint` starts ESLint in the repository root, because ESLint lints no file outside the folder it starts from.
 
 Tests that cover an invariant carry `INV:<ID>` in the `describe` or `test` title (TESTING §8.1).
