@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Platform.Analytics;
-using ProcureAccess.Modules.Platform.Contracts.Analytics;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 using ProcureAccess.Modules.Platform.Errors;
 using ProcureAccess.Modules.Platform.Health;
@@ -59,9 +58,9 @@ public static class PlatformModule
         // Log retention in the logging schema (OPS-02)
         services.AddLogRetention();
 
-        // Usage events in the analytics schema, date only (ARCHITECTURE §5.7). Singleton: the
-        // writer keeps no state and opens a scope of its own for every event.
-        services.AddSingleton<IUsageEventWriter, UsageEventWriter>();
+        // Usage events in the analytics schema, date only (ARCHITECTURE §5.7): queued on the
+        // request path, stored by a background service without retrying inserts (#115).
+        services.AddUsageEvents(connectionString);
 
         // /health/live and /health/ready (ARCHITECTURE §9.5)
         services.AddPlatformHealthChecks();

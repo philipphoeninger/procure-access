@@ -2,16 +2,18 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ProcureAccess.Modules.Platform.Contracts.Analytics;
-using ProcureAccess.Modules.Platform.Persistence;
 
 namespace ProcureAccess.Modules.Platform.Analytics;
 
 /// <inheritdoc cref="IUsageEventWriter"/>
+/// <remarks>
+/// Builds the event and puts it into <see cref="UsageEventQueue"/>; it never touches the database
+/// (#115). <see cref="UsageEventBackgroundWriter"/> stores it.
+/// </remarks>
 internal sealed class UsageEventWriter(
-    IServiceScopeFactory scopeFactory,
+    UsageEventQueue queue,
     TimeProvider timeProvider,
     ILogger<UsageEventWriter> logger) : IUsageEventWriter
 {
@@ -24,38 +26,39 @@ internal sealed class UsageEventWriter(
         public const string Csv = "csv";
     }
 
-    public Task CriteriaListShownAsync(bool signedIn) =>
-        WriteAsync(UsageEventType.CriteriaListShown, () => (Audience(signedIn), null));
+    public void CriteriaListShown(bool signedIn) =>
+        Enqueue(UsageEventType.CriteriaListShown, () => (Audience(signedIn), null));
 
-    public Task ExportCreatedAsync(UsageExportFormat format, bool signedIn) =>
-        WriteAsync(UsageEventType.ExportCreated, () => (Format(format), Audience(signedIn)));
+    public void ExportCreated(UsageExportFormat format, bool signedIn) =>
+        Enqueue(UsageEventType.ExportCreated, () => (Format(format), Audience(signedIn)));
 
-    private async Task WriteAsync(UsageEventType eventType, Func<(string Dimension1, string? Dimension2)> dimensions)
+    private void Enqueue(UsageEventType eventType, Func<(string Dimension1, string? Dimension2)> dimensions)
     {
         try
         {
             var (dimension1, dimension2) = dimensions();
-
-            await using var scope = scopeFactory.CreateAsyncScope();
-            var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
-
-            db.UsageEvents.Add(new UsageEvent
+            var usageEvent = new UsageEvent
             {
                 EventType = eventType,
-                // Date only (PRV-05): the UTC day, no time of day.
+                // Date only (PRV-05): the UTC day of the call, not of the later insert.
                 OccurredOn = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime),
                 Dimension1 = dimension1,
                 Dimension2 = dimension2,
-            });
+            };
 
-            // No cancellation token: the event describes something that already happened.
-            await db.SaveChangesAsync(CancellationToken.None);
+            if (!queue.TryEnqueue(usageEvent, out var firstDrop) && firstDrop)
+            {
+                // Once per outage; UsageEventBackgroundWriter logs the number dropped when it
+                // stores events again.
+                logger.LogWarning(
+                    "The usage-event queue is full or the API is stopping; usage events are dropped until it has room again");
+            }
         }
         catch (Exception ex)
         {
             // Counting must never fail the user's request (R-MET-01). The event has no personal
             // data, so the type is all the log needs.
-            logger.LogError(ex, "Writing the usage event {EventType} failed; the event is lost", eventType);
+            logger.LogError(ex, "Recording the usage event {EventType} failed; the event is lost", eventType);
         }
     }
 
