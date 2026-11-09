@@ -154,7 +154,7 @@ Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21
 | S3-18 | none (O-S3-5 C: legacy migration and J1 only) | internal |
 | S3-19, S3-20 | S3-17; **O-S3-6** for S3-19 | **O-S3-6 decided 2026-11-06** |
 | S3-03 | Owner re-adds the `Analyze` checks to the ruleset of `main` after the merge | Philipp |
-| S3-22 | UX copy session #181 | Philipp |
+| S3-22 | ~~UX copy session #181~~ replaced by **O-S3-9** (2026-11-09) | Philipp |
 | S3-27 | S3-15 (format), S3-16 (import); priorities and titles O-1, K-1 stay with the project team | internal |
 | **Invariant flips** | S3-05, S3-07, S3-10, S3-12, S3-13, S3-16, S3-17, S3-19, S3-20 each write a new TESTING version: **one at a time**, the next only after the previous is merged | internal |
 
@@ -170,6 +170,7 @@ Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21
 | O-S3-6 | Endpoint style of `/api/v1/catalog/*` (controllers or minimal APIs); milestone of #176 | S3-19 | **Decided 2026-11-06:** minimal APIs, `internal` in the module and mapped by the host on its versioned group; #176 done in S3-19 (milestone M2); only the new endpoints under `/api/v1`, URL segment as the only version reader (#153) (ARCHITECTURE_v22 C107) |
 | O-S3-7 | Font subsetting option of #135 | S3-25 (stretch) | Options are in the issue |
 | O-S3-8 | `eslint-plugin-playwright` as a new dev dependency (#161) | S3-26 (stretch) | Licence check in the task first |
+| O-S3-9 | Wording of the snackbar buttons without waiting for the UX copy session #181 (#160) | S3-22 (stretch) | **Decided 2026-11-09:** (a) both buttons use the existing `common.actions.close` („Schließen“); the snackbar row of #181 is struck as done |
 | — | UX copy session #181 (TD-15): page-title variants for S11/S35, singulars, problem-type texts, snackbar buttons, delete reason, account button | before sprint 04 (S11) | — |
 | — | Priorities, rationales and plain-language titles (O-1, K-1) from the project team | before M2.3 is finished | — |
 
