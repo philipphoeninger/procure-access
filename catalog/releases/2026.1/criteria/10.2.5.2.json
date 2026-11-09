@@ -1,0 +1,63 @@
+{
+  "kind": "requirement",
+  "titleDe": "Abbrechen oder Widerrufen einer Touch-Geste",
+  "sortOrder": 1630,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.5.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.5.2",
+      "originalTitleDe": "Abbrechen oder Widerrufen einer Touch-Geste",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Auswahlschalter, Buttons oder Links enthält."
+      ],
+      "requirementDe": [
+        "Für Funktionalität, die unter Verwendung eines einzelnen Zeigers (d. h. mit einer Einpunkt-Geste) bedient werden können, gilt mindestens eine der folgenden Aussagen:",
+        "",
+        "- Kein Down-Event: Das Down-Event (gedrückte Taste / Finger-Geste auf Element gedrückt) der Zeigeraktion wird nicht verwendet, um irgendeinen Teil der Funktion auszuführen.",
+        "- Abbrechen oder rückgängig machen: Der Abschluss der Funktion erfolgt auf dem Up-Event (losgelassene Taste / Finger lässt Element los, gehobener Finger) und es ist ein Mechanismus verfügbar, um die Funktion vor Abschluss abzubrechen oder die Funktion nach Abschluss rückgängig zu machen.",
+        "- Umkehrung des Up-Events: Das Up-Event kehrt alle Ergebnisse des vorhergehenden Down-Events um.",
+        "- Unverzichtbar: Der Abschluss der Funktion auf dem Down-Event ist unverzichtbar, wie insbesondere bei Funktionen, die einen Tastendruck auf einer Tastatur oder einem Nummernblock nachbilden."
+      ],
+      "rationaleWhyDe": [
+        "Motorisch eingeschränkte Menschen können Zeigergesten mittels Maus, Touchpads, etc. eventuell nicht präzise ausführen. Personen ohne bzw. mit eingeschränktem Sehvermögen sind ggf. nicht in der Lage, eine versehentlich ausgelöste Funktion wahrzunehmen. Zur Fehlervermeidung muss daher gewährleistet werden, dass Eingaben rückgängig gemacht oder abgebrochen werden können. Eine solche Absicherung vor dem Ausführen einer Funktionalität kommt darüber hinaus allen Menschen zugute."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Wenn mit der linken Maustaste auf ein Bedienelement geklickt wird, wobei die Taste gehalten und nicht losgelassen wird, so lässt sich das Auslösen des Ereignisses dadurch verhindern, dass man den Mausfokus bei weiterhin gedrückter linker Maustaste vom Bedienelement entfernt (Anforderung: Kein Down-Event).",
+        "- erfüllt: Bedienelemente, die einen Tastendruck auf einem Nummernblock nachbilden, führen diese Funktion bereits beim Down-Event aus (Anforderung: Unverzichtbar).",
+        "- erfüllt: Eine Funktion (wie z. B. die Aktivierung einer bestimmten Auswahl) wird bereits dann ausgelöst, wenn mit der linken Maustaste auf das Bedienelement geklickt wird, wobei die Taste gehalten und nicht losgelassen wird. Das Up-Event, d. h. das Loslassen der Maustaste, kehrt die dabei ausgelösten Ereignisse um (und hebt z. B. die Auswahl wieder auf) (Anforderung: Umkehrung des Up-Events).",
+        "- erfüllt: Eine Funktion (wie z. B. die Aktivierung einer bestimmten Auswahl) wird erst dann ausgelöst, wenn zunächst mit der linken Maustaste auf das Bedienelement geklickt und die Maustaste anschließend losgelassen wurde (Up-Event). Die Aktion kann rückgängig gemacht bzw. abgebrochen werden (Anforderung: Abbrechen oder rückgängig machen)."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Eine Funktion wird bereits dann ausgelöst, wenn mit der linken Maustaste auf das Bedienelement geklickt wird, wobei die Taste gehalten und nicht losgelassen wird. D. h. das Auslösen des Ereignisses lässt sich nicht mehr dadurch verhindern, dass man den Mausfokus bei weiterhin gedrückter linker Maustaste vom Bedienelement entfernt und die Aktion lässt sich durch das Up-Event außerdem nicht rückgängig machen, wobei der Abschluss der Funktion nicht als unverzichtbar angesehen wird. Die Auswirkungen der Funktionalität lassen sich jedoch ungeschehen machen, wie z. B. der Aufruf einer Webseite in einem Browserfenster durch das Schließen des neuen Browserfensters, sofern mit dem bloßen Aufruf der Webseite keine weitere Funktionalität verbunden ist (Anforderung: Down-Event und keine Umkehrung des Up-Events sowie nicht unverzichtbar).",
+        "- Barriere: Eine Funktion wird erst dann ausgelöst, wenn zunächst mit der linken Maustaste auf das Bedienelement geklickt und die Maustaste anschließend losgelassen wurde. Es wird jedoch kein Bestätigungsdialog angezeigt, über den die Aktion abgebrochen bzw. rückgängig gemacht werden könnte (Anforderung: Up-Event ohne abbrechen oder rückgängig machen).",
+        "- Blockade: Ein Schalter, welcher die Daten eines Formulars absendet, führt diese Funktion bereits beim Down-Event aus.",
+        "- Blockade: Eine Funktion wird bereits dann ausgelöst, wenn mit der linken Maustaste auf das Bedienelement geklickt wird, wobei die Taste gehalten und nicht losgelassen wird. D. h. das Auslösen des Ereignisses lässt sich nicht mehr dadurch verhindern, dass man den Mausfokus bei weiterhin gedrückter linker Maustaste vom Bedienelement entfernt und die Aktion lässt sich durch das Up-Event außerdem nicht rückgängig machen, wobei der Abschluss der Funktion nicht als unverzichtbar angesehen wird. Die Auswirkungen der Funktionalität lassen sich nicht ungeschehen machen (Anforderung: Down-Event und keine Umkehrung des Up-Events sowie nicht unverzichtbar).",
+        "- Blockade: Elemente können mittels Touch-Geste verschoben werden und lösen bereits beim Überfahren eines Feldes eine Aktion aus."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#abbrechen-oder-widerrufen-einer-touch-geste"
+    }
+  ]
+}

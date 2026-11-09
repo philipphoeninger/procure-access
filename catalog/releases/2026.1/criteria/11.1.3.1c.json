@@ -1,0 +1,92 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Strukturelemente für weitere Objekte",
+  "sortOrder": 460,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.3.1c",
+      "originalTitleDe": "Strukturelemente für weitere Objekte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn für Inhalte der Software weitere Strukturelemente, die nicht explizit in den Prüfschritten 11.1.3.1a Strukturelemente für Überschriften und 11.1.3.1b Strukturelemente für Listen, Auflistungen und Aufzählungen genannt sind, vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Gliederung und Strukturierung von Inhalten werden durch geeignete Objekte visualisiert. Diese visuell erkennbaren Objekte sind zudem programmatisch ermittelbar und bedienbar, wichtige Informationen sind im Kontext für alle Nutzenden wahrnehmbar. Assistive Technologien wie beispielsweise Screenreader bieten umfangreiche Möglichkeiten, um durch Strukturobjekte zu navigieren, ohne den gesamten Inhalt durchlaufen zu müssen. Dazu gehören beispielsweise Container, Links, Formularelemente, Tabellen, Artikel, Tasten, Text- und Suchfelder oder Bilder. Wortwahl oder Stil der Objekte sind nicht Teil der Prüfung.",
+        "",
+        "Tabellen dürfen nicht für Layout- oder Designzwecke verwendet werden. Falls tabellarischer Aufbau rein zu Layoutzwecken verwendet wird, soll die Tabelle nicht als Strukturelement gekennzeichnet sein.",
+        "",
+        "Die Beschriftung von Formularelementen soll beim Erreichen programmatisch ermittelbar sein. Der Screenreader gibt dabei den Namen des jeweiligen Elements aus. Gruppen von Formularelementen sollen eine Gruppenbeschriftung beinhalten, um den Kontext der einzelnen Elemente besser erfassen zu können."
+      ],
+      "rationaleWhyDe": [
+        "Strukturobjekte strukturieren Inhalte für sehende Nutzende und schaffen so Orientierung. Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, müssen diese auch auf einer semantischen Ebene vermitteln. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können beispielsweise auch Nutzende von Screenreadern den Aufbau der Inhalte wahrnehmen und schnell navigieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle vorhandenen Strukturobjekte können mittels Screenreader separat annavigiert werden, ohne den gesamten Inhalt bis zum Erreichen des Objekts durchlaufen zu müssen.",
+        "- Eine Gruppe von Formularelementen, die eine Eingabe einer Lieferadresse ermöglichen, haben eine Gruppenüberschrift „Lieferadresse“ (oder ähnlich)."
+      ],
+      "negativeExamplesDe": [
+        "- Keine oder nicht alle vorhandenen Strukturobjekte können mittels Screenreader separat annavigiert werden, ohne den gesamten Inhalt bis zum Erreichen des Objekts durchlaufen zu müssen.",
+        "- Nach Auswahl eines Strukturobjekts mittels Screenreader wird die Meldung ausgegeben, dass das gewählte Strukturobjekt nicht vorhanden sei.",
+        "- Das ausgewählte Strukturobjekt kann nicht vom Screenreader identifiziert werden.",
+        "- Der Screenreader kann über das entsprechende Strukturelement eine Tabelle annavigieren, die keine tabellarischen Informationen enthält."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#c-strukturelemente-für-weitere-objekte"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.1c",
+      "originalTitleDe": "Strukturelemente für Bedien- und Formularelemente",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Bedien- oder Formularelemente enthält."
+      ],
+      "requirementDe": [
+        "Bedien- und Formularelemente werden über geeignete Objekte visualisiert. Die visuell erkennbaren Objekte sind programmatisch ermittelbar und bedienbar, wichtige Informationen sind im Kontext für alle Nutzenden wahrnehmbar."
+      ],
+      "rationaleWhyDe": [
+        "Korrekt implementierte Bedienelemente und Formularelemente tragen zu einer wesentlich effizienteren Orientierung und Bedienung bei. Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, müssen diese auch auf einer semantischen Ebene vermitteln. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können beispielsweise auch Nutzende von Screenreadern den Aufbau der Inhalte wahrnehmen und schnell navigieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bedien- und Formularelemente sind über die Komfortfunktion des jeweiligen Screenreaders (VoiceOver-Rotor und TalkBack-Menü) erreichbar und somit programmatisch ermittelbar."
+      ],
+      "negativeExamplesDe": [
+        "- Bedien- und Formularelemente sind durch die Nutzung der Komfortfunktion des jeweiligen Screenreaders (VoiceOver-Rotor und TalkBack-Menü) nicht erreichbar und daher programmatisch nicht ermittelbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#c-strukturelemente-für-bedien--und-formularelemente"
+    }
+  ]
+}

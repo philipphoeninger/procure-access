@@ -17,8 +17,9 @@ SPDX-License-Identifier = "MIT"
 # Criteria catalog documents: the project team's own sections (filter layers,
 # exclusions, rating scale) are MIT; the BIT inklusiv texts they quote verbatim,
 # used with permission of Detlef Girke (see the document header), are not.
+# The gap list of a release quotes the BIT inklusiv titles (S3-27).
 [[annotations]]
-path = "docs/kriterienkatalog_bit_inklusiv_v1*.md"
+path = ["docs/kriterienkatalog_bit_inklusiv_v1*.md", "docs/kriterienkatalog_*_luecken_v*.md"]
 precedence = "override"
 SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
 SPDX-License-Identifier = "MIT AND LicenseRef-AllRightsReserved"

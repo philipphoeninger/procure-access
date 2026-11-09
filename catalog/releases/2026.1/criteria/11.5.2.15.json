@@ -1,0 +1,102 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Änderungsbenachrichtigung",
+  "sortOrder": 1080,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.15"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.15",
+      "originalTitleDe": "Änderungsbenachrichtigung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind, die Werte aufweisen oder Zustände einnehmen, und deren Wert oder Zustand durch Interaktion verändert werden kann."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente, die Werte aufweisen oder Zustände einnehmen, und deren Wert oder Zustand durch Interaktion verändert werden kann, übermitteln den aktuellen Wert oder Zustand nach Änderung, gegebenenfalls die veränderte Position oder die veränderten Grenzen korrekt an die assistiven Systeme. Dies betrifft beispielsweise:",
+        "",
+        "- Umschalttasten (aktiviert, nicht aktiviert)",
+        "- Kontrollkästchen (ausgewählt, nicht ausgewählt)",
+        "- Auswahlschalter (aktiviert, nicht aktiviert)",
+        "- Registerkarten (ausgewählt, nicht ausgewählt)",
+        "- Ausklapplisten (erweitert, nicht erweitert)",
+        "- Optionen in Ausklapplisten (Eintrag x von y)"
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Werten und Zuständen ist gerade für Nutzende eines Screenreader essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, werden Verständlichkeit und Wahrnehmbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert oder Zustand nach Änderung korrekt und vollumfänglich wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert oder Zustand nach Änderung nicht korrekt oder vollumfänglich wieder.",
+        "- Eine Registerkarte gibt nicht wieder, ob sie aktuell ausgewählt oder nicht ausgewählt ist.",
+        "- Eine Ausklappliste gibt nach dem Ausklappen den aktuellen Zustand (ausgeklappt) nicht wieder."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#änderungsbenachrichtigung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.15",
+      "originalTitleDe": "Änderungsbenachrichtigung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind, die Werte aufweisen oder Zustände einnehmen, und deren Wert oder Zustand durch Interaktion verändert werden kann."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente, die Werte aufweisen oder Zustände einnehmen, und deren Wert oder Zustand durch Interaktion verändert werden kann, übermitteln den aktuellen Wert oder Zustand nach Änderung, gegebenenfalls die veränderte Position oder die veränderten Grenzen korrekt an die assistiven Systeme. Dies betrifft beispielsweise:",
+        "",
+        "- Umschalttasten (aktiviert, nicht aktiviert)",
+        "- Kontrollkästchen (ausgewählt, nicht ausgewählt)",
+        "- Auswahlschalter (aktiviert, nicht aktiviert)",
+        "- Registerkarten (ausgewählt, nicht ausgewählt)",
+        "- Ausklapplisten (erweitert, nicht erweitert)",
+        "- Optionen in Ausklapplisten (Eintrag x von y)"
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Werten und Zuständen ist gerade für Nutzende eines Screenreader essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, werden Verständlichkeit und Wahrnehmbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert oder Zustand nach Änderung korrekt und vollumfänglich wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert oder Zustand nach Änderung nicht korrekt oder vollumfänglich wieder.",
+        "- Eine Registerkarte gibt nicht wieder, ob sie aktuell ausgewählt oder nicht ausgewählt ist.",
+        "- Eine Ausklappliste gibt nach dem Ausklappen den aktuellen Zustand (ausgeklappt) nicht wieder."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#änderungsbenachrichtigung"
+    }
+  ]
+}

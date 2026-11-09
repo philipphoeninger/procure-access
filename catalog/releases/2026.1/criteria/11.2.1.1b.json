@@ -1,0 +1,53 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Mit assistiven Technologien bedienbar",
+  "sortOrder": 640,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.1.1b",
+      "originalTitleDe": "Mit assistiven Technologien bedienbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Alle nicht ausschließlich dekorativen Inhalte einer Mobile App sind mit dem Screenreader ohne die Verwendung von koordinatenbasierten Gesten (das direkte Antippen von Inhalten) erreichbar. Die Interaktionsmöglichkeit, als auch die Reihenfolge, in der die Elemente fokussiert werden, spielt in diesem Prüfschritt keine Rolle.",
+        "",
+        "Prüfende müssen mit der Funktionsweise des Screenreaders vertraut sein."
+      ],
+      "rationaleWhyDe": [
+        "Viele physisch beeinträchtigte Menschen sind auf die Nutzung diverser assistiver Technologien angewiesen. Diese sind die wichtigste Schnittstelle zwischen beeinträchtigten Nutzenden und der Software und können, je nach Bedarf, sowohl bei der Wahrnehmbarkeit als auch bei der Bedienbarkeit unterstützen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Inhalte der App können mit aktivem Screenreader erreicht werden.",
+        "- Alle Inhalte der App können mit Screenreader über die Nutzung einer externen Tastatur erreicht werden."
+      ],
+      "negativeExamplesDe": [
+        "- Manche Inhalte der App lassen sich mit dem Screenreader nicht erreichen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#b-mit-assistiven-technologien-bedienbar"
+    }
+  ]
+}

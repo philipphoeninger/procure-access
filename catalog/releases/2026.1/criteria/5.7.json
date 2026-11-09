@@ -1,0 +1,70 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Tastenwiederholung",
+  "sortOrder": 80,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.7",
+      "originalTitleDe": "Tastenwiederholung",
+      "applicabilityDe": [
+        "Wenn die Software über eine nicht abschaltbare Tastenwiederholungsfunktion verfügt:",
+        "",
+        "- a) muss die Verzögerung vor der Tastenwiederholung auf mindestens 2 Sekunden einstellbar sein; und",
+        "- b) muss die Tastenwiederholungsrate bis auf ein Zeichen pro 2 Sekunden einstellbar sein.",
+        "",
+        "Die entsprechenden Einstellungen sind im Windows-Betriebssystem unter „Systemsteuerung / Center für erleichterte Bedienung / Bedienung mit der Tastatur erleichtern / Anschlagverzögerung einrichten / Wiederhol- und Anschlaggeschwindigkeit einrichten“ zu finden. Die Windows Bildschirmtastatur bietet keine entsprechende Unterstützung dieser Funktionalität, sondern bietet bei längerem Tastendruck die Auswahl von Sonderzeichen an."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "negativeExamplesDe": [
+        "- Die Software bietet keine Möglichkeit die Tastenwiederholung einzustellen oder abzuschalten."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#tastenwiederholung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.7",
+      "originalTitleDe": "Tastenwiederholung",
+      "applicabilityDe": [
+        "Bei iOS- und Android-Smartphones ist die Zeitverzögerung für anhaltende Tastatureingaben im Betriebssystem konfigurierbar als auch vollständig abschaltbar. Durch die Möglichkeit des Abschaltens dieser Funktionalität in den genannten Betriebssystemen ist dieser Prüfschritt immer nicht anwendbar.",
+        "",
+        "Tipps zur Bedienung von iOS:",
+        "",
+        "In iOS findet sich diese Einstellung unter „Bedienungshilfen > Tastaturen & Texteingabe > Tastenwiederholung > Wiederholungsintervall“.",
+        "",
+        "Tipps zur Bedienung von Android:",
+        "",
+        "Sofern eine Tastatur verbunden ist, findet sich diese Einstellung in Android unter „System > Tastatur > Physische Tastatur > Bedienungshilfen für die physische Tastatur > Tastatureingabe Wiederholung“."
+      ],
+      "allowedRatings": [
+        "notApplicable"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#tastenwiederholung"
+    }
+  ]
+}

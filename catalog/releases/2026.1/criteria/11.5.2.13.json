@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Nachverfolgung des Fokus und der Auswahlattribute",
+  "sortOrder": 1060,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.13"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.13",
+      "originalTitleDe": "Nachverfolgung des Fokus und der Auswahlattribute",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Texteingabefelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Bei der Eingabe von Text in Texteingabefeldern sind der aktuelle Fokus und die aktuelle Cursorposition während der Bearbeitung mit aktivem Screenreader jederzeit im sichtbaren Bereich des Texteingabefelds. Der Anzeigebereich bei zusätzlicher, aktiver Bildschirmlupe folgt jederzeit der aktuellen Cursorposition. Textmarkierungen und Anfang und Ende des Texteingabefelds sind identifizierbar."
+      ],
+      "rationaleWhyDe": [
+        "Zur Eingabe von Text in Formularfeldern muss für Nutzende von assistiven Systemen eine optimale Orientierung geschaffen werden. Durch die programmatische Ermittelbarkeit der Informationen über den Fokus und die Auswahlattribute können assistive Technologien wie Screenreader, Sprachsteuerung, Bildschirmlupe oder Braillezeile besser verstehen und interpretieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Während der Eingabe von Zeichen oder Worten in einem Texteingabefeld wird der Fokus verfolgt und die Cursorposition ist sichtbar.",
+        "- Anfang und Ende des Texteingabefelds werden identifiziert.",
+        "- Der Anzeigebereich bei aktiver Bildschirmlupe folgt in einem Texteingabefeld stets der Cursorposition."
+      ],
+      "negativeExamplesDe": [
+        "- Während der Eingabe von Zeichen oder Worten in einem Texteingabefeld verlässt die Cursorposition den sichtbaren Bereich des Eingabefelds, sobald der Cursor den Anzeigebereich verlässt.",
+        "",
+        "- Anfang und Ende des Eingabefelds werden nicht identifiziert.",
+        "- Der Anzeigebereich bei aktiver Bildschirmlupe folgt nicht der aktuellen Cursorposition.",
+        "- Bei aktiver Bildschirmlupe ist der Cursor kaum sichtbar, weil er nicht mit vergrößert wird."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#nachverfolgung-des-fokus-und-der-auswahlattribute"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.13",
+      "originalTitleDe": "Nachverfolgung des Fokus und der Auswahlattribute",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Texteingabefelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Bei der Eingabe von Text in Texteingabefeldern sind der aktuelle Fokus und die aktuelle Cursorposition während der Bearbeitung mit aktivem Screenreader jederzeit im sichtbaren Bereich des Texteingabefelds. Der Anzeigebereich bei zusätzlicher, aktiver Bildschirmlupe folgt jederzeit der aktuellen Cursorposition. Textmarkierungen und Anfang und Ende des Texteingabefelds sind identifizierbar."
+      ],
+      "rationaleWhyDe": [
+        "Zur Eingabe von Text in Formularfeldern muss für Nutzende von assistiven Systemen eine optimale Orientierung geschaffen werden. Durch die programmatische Ermittelbarkeit der Informationen über den Fokus und die Auswahlattribute können assistive Technologien wie Screenreader, Sprachsteuerung, Bildschirmlupe oder Braillezeile besser verstehen und interpretieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Während der Eingabe von Zeichen oder Worten in einem Texteingabefeld wird der Fokus verfolgt und die Cursorposition ist sichtbar.",
+        "- Anfang und Ende des Texteingabefelds werden identifiziert.",
+        "- Der Anzeigebereich bei aktiver Bildschirmlupe folgt in einem Texteingabefeld stets der Cursorposition."
+      ],
+      "negativeExamplesDe": [
+        "- Während der Eingabe von Zeichen oder Worten in einem Texteingabefeld verlässt die Cursorposition den sichtbaren Bereich des Eingabefelds, sobald der Cursor den Anzeigebereich verlässt.",
+        "",
+        "- Anfang und Ende des Eingabefelds werden nicht identifiziert.",
+        "- Der Anzeigebereich bei aktiver Bildschirmlupe folgt nicht der aktuellen Cursorposition.",
+        "- Bei aktiver Bildschirmlupe ist der Cursor kaum sichtbar, weil er nicht mit vergrößert wird."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#nachverfolgung-des-fokus-und-der-auswahlattribute"
+    }
+  ]
+}

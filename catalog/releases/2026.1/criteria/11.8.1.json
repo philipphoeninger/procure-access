@@ -1,0 +1,64 @@
+{
+  "kind": "requirement",
+  "category": "Autorenwerkzeuge",
+  "titleDe": "Inhaltstechnologie",
+  "sortOrder": 1130,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.8.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "authoringTool"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.8.1",
+      "originalTitleDe": "Inhaltstechnologie",
+      "applicabilityDe": [
+        "Der Prüfschritt wird über die Prüfschritte 11.8.2 Erstellung barrierefreier Inhalte, 11.8.3 Erhaltung von Barrierefreiheit bei Umwandlungen, 11.8.4 Reparaturunterstützung und 11.8.5 Vorlagen abgedeckt. Eine eigene Prüfung dieses Prüfschritts ist nicht notwendig. Sofern einer der genannten Prüfschritte als nicht voll erfüllt gewertet wird, wird auch dieser Prüfschritt entsprechend gewertet."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#inhaltstechnologie"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.8.1",
+      "originalTitleDe": "Inhaltstechnologie",
+      "applicabilityDe": [
+        "Der Prüfschritt wird über die Prüfschritte 11.8.2 Erstellung barrierefreier Inhalte, 11.8.3 Erhaltung von Barrierefreiheit bei Umwandlungen, 11.8.4 Reparaturunterstützung und 11.8.5 Vorlagen abgedeckt. Eine eigene Prüfung dieses Prüfschritts ist nicht notwendig. Der Prüfschritt übernimmt das negativste Bewertungsresultat aus den zuvor referenzierten Prüfschritten. Sofern alle referenzierten Prüfschritte mit „nicht anwendbar“ bewertet wurden, gilt der Prüfschritt als „nicht anwendbar“."
+      ],
+      "requirementDe": [
+        "Ein Autorenwerkzeug ist eine spezialisierte Softwareanwendung, mit der digitale Inhalte – wie Texte, Bilder, Videos und interaktive Elemente erstellt, bearbeitet und organisiert werden können. Diese Tools ermöglichen es auch Nutzenden ohne tiefgehende Programmierkenntnisse, professionelle und multimediale Inhalte zu gestalten. Zu den typischen Funktionen gehören das Einfügen und Formatieren von Text, die Integration von Medien, die Gestaltung des Seitenlayouts sowie die Verwaltung und Verlinkung von Inhalten. Moderne Autorenwerkzeuge bieten oft eine intuitive Benutzeroberfläche und unterstützen die Zusammenarbeit mehrerer Autoren, sodass Inhalte effizient und flexibel online publiziert werden können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#inhaltstechnologie"
+    }
+  ]
+}

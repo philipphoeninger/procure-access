@@ -1,0 +1,100 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Kontrast von Texten",
+  "sortOrder": 550,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.3",
+      "originalTitleDe": "Kontrast von Texten",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Kontraste von Text sind in allen Zuständen des Texts ausreichend. Hierbei wird bei Software grundsätzlich ein Kontrastverhältnis von 4,5:1 zugrunde gelegt.",
+        "",
+        "Die Anforderung gilt nicht für Textinhalte, die Teil einer inaktiven Benutzeroberflächenkomponente, rein dekorativ, für niemanden sichtbar oder Teil eines Bildes sind, das bedeutende andere visuelle Inhalte enthält. Weiterhin sind Texte eines Logos oder Markennamen ausgenommen.",
+        "",
+        "Die Prüfung erfolgt in der Standarddarstellung der Software. Eventuell vorhandene, alternative Darstellungen oder Mechanismen zum Verändern des Designs sind nicht Teil der Prüfung und werden nicht berücksichtigt.",
+        "",
+        "Trotz ausreichender Kontrastwerte ist die Kombination von gesättigtem Rot mit Schwarz als Vorder- und Hintergrundfarbe für Texte nicht empfehlenswert (vgl. ISO 9241-125). Es existieren keine klaren Vorgaben für Farbwerte von gesättigtem Rot, daher kann der Prüfende nur aufgrund seiner subjektiven Wahrnehmung urteilen. Ein entsprechender Befund sollte nur als Empfehlung mitgeteilt werden.",
+        "",
+        "Bei Texten, die auf einem Bild oder einem Farbverlauf liegen, ist der vermeintlich schwächste Kontrastzustand zu messen."
+      ],
+      "rationaleWhyDe": [
+        "Gute Kontrastverhältnisse zwischen Text- und Hintergrundfarbe sorgen dafür, dass Nutzende die Inhalte besser erkennen und lesen können. Menschen mit Sehbeeinträchtigung und Farbfehlsichtigkeit profitieren von guten Kontrastverhältnissen genauso wie ältere Menschen, die unter verminderter Kontrastempfindlichkeit leiden. Letztendlich kommen gute Kontraste allen Menschen zugute, beispielsweise beim Verwenden der Software bei starker Sonneneinstrahlung oder bei Darstellung über einen Projektor."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Das Kontrastverhältnis zwischen Text- und Hintergrundfarbe liegt bei 4,5:1 oder höher."
+      ],
+      "negativeExamplesDe": [
+        "- Das Kontrastverhältnis zwischen Text- und Hintergrundfarbe liegt unter 4,5:1."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#kontrast-von-texten"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.3",
+      "originalTitleDe": "Kontrast von Texten",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Kontraste von Text sind in allen Zuständen des Texts ausreichend. Hierbei wird bei Mobile Apps grundsätzlich ein Kontrastverhältnis von 4,5:1 zugrunde gelegt, da eine pixelgenaue Betrachtung von Schriftgrößen auf mobilen Endgeräten nicht möglich ist. Zudem ist der Bildschirm eines mobilen Endgeräts kleiner als der Monitor eines Desktop-Systems, was zu Forderung der genannten Kontrastwerte führt.",
+        "",
+        "Die Anforderung gilt nicht für Textinhalte, die Teil einer inaktiven Benutzeroberflächenkomponente, rein dekorativ, für niemanden sichtbar oder Teil eines Bildes sind, das bedeutende andere visuelle Inhalte enthält. Weiterhin sind Texte eines Logos oder Markennamen ausgenommen.",
+        "",
+        "Die Prüfung erfolgt in der Standarddarstellung der App. Eventuell vorhandene, alternative Darstellungen oder Mechanismen zum Verändern des Designs sind nicht Teil der Prüfung und werden nicht berücksichtigt.",
+        "",
+        "Trotz ausreichender Kontrastwerte ist die Kombination von gesättigtem Rot mit Schwarz als Vorder- und Hintergrundfarbe für Texte nicht empfehlenswert (vgl. ISO 9241-125). Es existieren keine klaren Vorgaben für Farbwerte von gesättigtem Rot, daher kann der Prüfende nur aufgrund seiner subjektiven Wahrnehmung urteilen. Ein entsprechender Befund sollte nur als Empfehlung mitgeteilt werden.",
+        "",
+        "Bei Texten, die auf einem Bild oder einem Farbverlauf liegen, ist der vermeintlich schwächste Kontrastzustand zu messen."
+      ],
+      "rationaleWhyDe": [
+        "Gute Kontrastverhältnisse zwischen Text- und Hintergrundfarbe sorgen dafür, dass Nutzende die Inhalte besser erkennen und lesen können. Menschen mit Sehbeeinträchtigung und Farbfehlsichtigkeit profitieren von guten Kontrastverhältnissen genauso wie ältere Menschen, die unter verminderter Kontrastempfindlichkeit leiden. Letztendlich kommen gute Kontraste allen Menschen zugute, beispielsweise beim Verwenden des mobilen Endgeräts bei starker Sonneneinstrahlung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Das Kontrastverhältnis zwischen Text- und Hintergrundfarbe liegt bei 4,5:1 oder höher.",
+        "- Wenige Kontrastverhältnisse zwischen Text- und Hintergrundfarbe weisen einen Grenzwert von 4,3:1 oder höher auf."
+      ],
+      "negativeExamplesDe": [
+        "- Das Kontrastverhältnis zwischen Text- und Hintergrundfarbe liegt unter 4,5:1.",
+        "- Zu viele Kontrastverhältnisse zwischen Text- und Hintergrundfarbe weisen einen Grenzwert von 4,3:1 oder geringer auf."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#kontrast-von-texten"
+    }
+  ]
+}

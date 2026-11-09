@@ -1,0 +1,48 @@
+{
+  "kind": "requirement",
+  "titleDe": "Optionaler Inhalt",
+  "sortOrder": 1790,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.10",
+      "originalTitleDe": "Optionaler Inhalt",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument optionalen Inhalt enthält."
+      ],
+      "requirementDe": [
+        "Alle Dictionaries für die Konfiguration von optionalem Inhalt im Dokument, einschließlich des Default-Dictionary für die Konfiguration von optionalem Inhalt, müssen einen Name-Eintrag enthalten, dessen Wert ein nicht leerer Text ist, wenn beide der folgenden Bedingungen erfüllt sind:",
+        "",
+        "- Ein Dokument enthält einen Configs-Eintrag im OCProperties-Eintrag des Catalog-Dictionary,",
+        "- und der Configs-Eintrag enthält mindestens ein Dictionary für die Konfiguration von optionalem Inhalt.",
+        "",
+        "Der AS-Schlüssel darf in keinem Dictionary für die Konfiguration von optionalem Inhalt erscheinen."
+      ],
+      "rationaleWhyDe": [
+        "Es muss sichergestellt sein, dass alle Nutzenden optionalen Inhalt ein- und ausblenden können."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Die Struktureinträge sind vorhanden und verursachen keinen Fehler im Prüfbericht von PAC."
+      ],
+      "negativeExamplesDe": [
+        "- Blockade: Die Struktureinträge fehlen und verursachen einen Fehler im Prüfbericht von PAC."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.10-optionaler-inhalt"
+    }
+  ]
+}

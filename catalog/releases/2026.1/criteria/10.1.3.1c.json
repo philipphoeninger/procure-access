@@ -1,0 +1,45 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Gruppierende Strukturelemente/Rootelemente",
+  "sortOrder": 1310,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1c",
+      "originalTitleDe": "Info und Beziehungen: Gruppierende Strukturelemente/Rootelemente",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Jedes PDF-Dokument benötigt genau ein gruppierendes Element als Root. Das gruppierende Element muss als erster Tag im PDF-Dokument platziert sein und alle anderen Tags umfassen."
+      ],
+      "rationaleWhyDe": [
+        "Der Einsatz eines Rootelements (in den meisten Fällen \"Document\") als erster Tag eines PDF-Dokuments ist unverzichtbar. Der Einsatz weiterer gruppierender Rootelemente zur Unterteilung in zusammengehörende Teile ist für ein konformes PDF-Dokument nicht gefordert, steigert jedoch die Überschaubarkeit."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction"
+      ],
+      "negativeExamplesDe": [
+        "Dieser Prüfschritt ist erfüllt, wenn das PDF-Dokument ein gruppierendes Element als Root besitzt (und zwar vorzugsweise \"Document\"). Das gruppierende Element muss als erster Tag im PDF-Dokument platziert sein. Andernfalls handelt es sich um eine Einschränkung."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#c-info-und-beziehungen-gruppierende-strukturelementerootelemente"
+    }
+  ]
+}

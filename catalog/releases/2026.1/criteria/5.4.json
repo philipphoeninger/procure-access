@@ -1,0 +1,83 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Erhaltung von Barrierefreiheitsinformationen bei Konvertierung",
+  "sortOrder": 30,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.4",
+      "originalTitleDe": "Erhaltung von Barrierefreiheitsinformationen bei Konvertierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Konvertierungen von Inhalten der Software in andere Formate zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Konvertierungsmöglichkeiten in andere Formate an, müssen bereits vorhandene Barrierefreiheitsinformationen und -Funktionen im Zielformat übernommen werden, wenn das Zielformat diese Informationen und Funktionen grundsätzlich unterstützt."
+      ],
+      "rationaleWhyDe": [
+        "Wenn das digitale Produkt Dokumente in Formate konvertiert, die grundsätzlich Barrierefreiheitsinformationen unterstützen, dann sollen diese im Zieldokument korrekt übernommen werden. Beim Konvertieren von Dokumenten in andere Formate soll beispielsweise sichergestellt sein, dass das Zieldokument auch mit Screenreadern erfassbar und bedienbar ist."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Zielformat enthält alle Barrierefreiheitsinformationen, die in der Software verfügbar waren, und die im Zielformat unterstützt werden.",
+        "- Nach einem Export in das Zielformat PDF sind im PDF die Überschriftenebenen, Alternativtexte und weitere semantische Informationen erhalten geblieben.",
+        "- Nach dem Speichern eines Videos auf dem Mobiltelefon sind die Untertitel im Video erhalten geblieben."
+      ],
+      "negativeExamplesDe": [
+        "- Das Zielformat enthält keine oder nur einige Barrierefreiheitsinformationen, die in der Software verfügbar waren."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#erhaltung-von-barrierefreiheitsinformationen-bei-konvertierung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.4",
+      "originalTitleDe": "Erhaltung von Barrierefreiheitsinformationen bei Konvertierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Inhalte aus der Mobile App heruntergeladen werden können und diese Inhalte außerdem in anderer Form in der Mobile App dargestellt werden. Vorschauansichten von herunterladbaren Inhalten zählen hierbei nicht zur In-App-Darstellung."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Konvertierungsmöglichkeiten in andere Formate an, müssen bereits vorhandene Barrierefreiheitsinformationen und -Funktionen im Zielformat übernommen werden, wenn das Zielformat diese Informationen und Funktionen grundsätzlich unterstützt."
+      ],
+      "rationaleWhyDe": [
+        "Wenn das digitale Produkt Inhalte in Dokumente konvertiert, die grundsätzlich Barrierefreiheitsinformationen unterstützen, dann sollen diese im Zieldokument korrekt übernommen werden. Beim Konvertieren von Inhalten in andere Formate soll beispielsweise sichergestellt sein, dass das Zieldokument auch mit Screenreadern erfassbar und bedienbar ist."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Zielformat enthält alle Barrierefreiheitsinformationen, die in der Mobile App verfügbar waren, und die im Zielformat unterstützt werden.",
+        "- Nach einem Export in das Zielformat PDF sind im PDF die Überschriftenebenen, Alternativtexte und weitere semantische Informationen erhalten geblieben."
+      ],
+      "negativeExamplesDe": [
+        "- Das Zielformat enthält keine oder nur einige Barrierefreiheitsinformationen, die in der Mobile App verfügbar waren."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#erhaltung-von-barrierefreiheitsinformationen-bei-konvertierung"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "procedures": [
+    {
+      "appType": "web",
+      "testTypes": [
+        "softwareTest"
+      ]
+    },
+    {
+      "appType": "softwareOpen",
+      "testTypes": [
+        "softwareTest"
+      ]
+    },
+    {
+      "appType": "softwareClosed",
+      "testTypes": [
+        "softwareTest"
+      ]
+    },
+    {
+      "appType": "mobileOpen",
+      "testTypes": [
+        "appTest"
+      ]
+    },
+    {
+      "appType": "mobileClosed",
+      "testTypes": [
+        "appTest"
+      ]
+    },
+    {
+      "appType": "document",
+      "testTypes": [
+        "pdfTest"
+      ]
+    }
+  ]
+}

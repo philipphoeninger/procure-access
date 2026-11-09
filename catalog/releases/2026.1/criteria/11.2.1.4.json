@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Tastaturkürzel",
+  "sortOrder": 660,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.1.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.1.4",
+      "originalTitleDe": "Tastaturkürzel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Verwendet die Software Tastaturkürzel über Einzeltasten (Buchstaben, Zahlen, Satzzeichen, Symbole), müssen die Tastaturkürzel abschaltbar sein oder auf eine Tastenkombination mit Verwendung einer zusätzlichen Modifikator-Taste umgestellt werden können, oder das Tastaturkürzel ist nur aktiv, wenn die entsprechende Benutzeroberflächenkomponente den Fokus erhält. Für Mehrtastenkombinationen darf die Umschalttaste nur in Kombination mit einer weiteren Modifikationstaste verwendet werden."
+      ],
+      "rationaleWhyDe": [
+        "Tastenkombinationen können mit den Tastenkombinationen von Assistenztechnologien kollidieren. Tastenkürzel müssen leicht zugänglich oder deaktivierbar sein, damit sie nicht in Konflikt mit den Funktionen von Hilfstechnologien geraten. Auch Nutzende, die Spracheingabe verwenden, können so unerwünschte Konflikte mit Sprachsteuerungsfunktionen vermeiden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Das Drücken der Tasten löst keine Funktionen aus, es sind also keine Tastaturkürzel implementiert.",
+        "- Interaktive Bedienelemente sind mit einem Tastenkürzel implementiert, das in den Einstellungen abgeschaltet oder zu einer Mehrtastenkombination gemappt werden kann.",
+        "- Spezielle Bedienelemente, wie beispielsweise eine Auswahlliste, springen mit Drücken auf die entsprechende Taste zur Auswahloption.",
+        "- Es sind Tastaturkürzel implementiert, die in den Einstellungen abgeschaltet oder zu Mehrtasten-Kombinationen gemappt werden können."
+      ],
+      "negativeExamplesDe": [
+        "- Es sind Tastaturkürzel implementiert, die in den Einstellungen nicht abgeschaltet oder zu Mehrtasten-Kombinationen gemappt werden können."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#tastaturkürzel"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.1.4",
+      "originalTitleDe": "Tastaturkürzel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Verwendet die Mobile App Tastaturkürzel über Einzeltasten (Buchstaben, Zahlen, Satzzeichen, Symbole), müssen die Tastaturkürzel abschaltbar sein oder auf eine Tastenkombination mit Verwendung einer zusätzlichen Modifikator-Taste umgestellt werden können, oder das Tastaturkürzel ist nur aktiv, wenn die entsprechende Benutzeroberflächenkomponente den Fokus erhält. Für Mehrtastenkombinationen darf die Umschalttaste nur in Kombination mit einer weiteren Modifikationstaste verwendet werden."
+      ],
+      "rationaleWhyDe": [
+        "Tastenkombinationen können mit den Tastenkombinationen von Assistenztechnologien kollidieren. Tastenkürzel müssen leicht zugänglich oder deaktivierbar sein, damit sie nicht in Konflikt mit den Funktionen von Hilfstechnologien geraten. Auch Nutzende, die Spracheingabe verwenden, können so unerwünschte Konflikte mit Sprachsteuerungsfunktionen vermeiden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Das Drücken der Tasten löst keine Funktionen aus, es sind also keine Tastaturkürzel implementiert.",
+        "- Interaktive Bedienelemente sind mit einem Tastenkürzel implementiert, das in den Einstellungen abgeschaltet oder zu einer Mehrtastenkombination gemappt werden kann.",
+        "- Spezielle Bedienelemente, wie beispielsweise eine Auswahlliste, springen mit Drücken auf die entsprechende Taste zur Auswahloption.",
+        "- Es sind Tastaturkürzel implementiert, die in den Einstellungen abgeschaltet oder zu Mehrtasten-Kombinationen gemappt werden können."
+      ],
+      "negativeExamplesDe": [
+        "- Es sind Tastaturkürzel implementiert, die in den Einstellungen nicht abgeschaltet oder zu Mehrtasten-Kombinationen gemappt werden können."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#tastaturkürzel"
+    }
+  ]
+}

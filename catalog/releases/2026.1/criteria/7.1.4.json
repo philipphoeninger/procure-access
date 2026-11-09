@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Anpassungen für Untertitel",
+  "sortOrder": 300,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.1.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.1.4",
+      "originalTitleDe": "Anpassungen für Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videos mit synchroner Bild- und Tonspur in Verbindung mit ein- und ausblendbaren Untertiteln (closed captions) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Videos mit ein- und ausblendbaren Untertiteln (closed captions) an, muss die Darstellung der Untertitel individuell konfiguriert werden können. Die EN 301 549 definiert weder Art noch Umfang der Möglichkeiten, sondern benennt folgende Beispiele: Hintergrund- und Vordergrundfarbe, Schriftart, Kontur oder Ränder der Schriftarten und Deckkraft des Hintergrunds. Somit gilt der Prüfschritt als erfüllt, wenn wenigstens eine der Möglichkeiten konfigurierbar ist. Der Prüfschritt gilt auch dann als erfüllt, wenn die Untertitel systemseitige Benutzerpräferenzen wie Schriftgröße oder Farbe übernehmen. Bei dauerhaft angezeigten Untertiteln (open captions) ist der Prüfschritt nicht anwendbar."
+      ],
+      "rationaleWhyDe": [
+        "Die flexible Anpassung der Darstellung von Untertiteln, beziehungsweise das Übernehmen von entsprechenden Benutzerpräferenzen stellt eine wichtige Funktion für alle Nutzergruppen dar, da auf diese Weise die Darstellung vom Nutzenden selbst an die eigenen Bedürfnisse gezielt angepasst werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Darstellung der Untertitel ist für mindestens eines der genannten Beispiele konfigurierbar.",
+        "- Der Videoplayer bietet selbst keine Konfigurationsmöglichkeiten zur Darstellung der Untertitel, die Untertitel reagieren jedoch auf entsprechende Benutzerpräferenzen."
+      ],
+      "negativeExamplesDe": [
+        "- Es sind keine Konfigurationsmöglichkeiten zur Darstellung der Untertitel vorhanden, und die Untertitel reagieren nicht auf entsprechende Benutzerpräferenzen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#anpassungen-für-untertitel"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.1.4",
+      "originalTitleDe": "Anpassungen für Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videos mit synchroner Bild- und Tonspur in Verbindung mit ein- und ausblendbaren Untertiteln (closed captions) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Videos mit ein- und ausblendbaren Untertiteln (closed captions) an, muss die Darstellung der Untertitel individuell konfiguriert werden können. Die EN 301 549 definiert weder Art noch Umfang der Möglichkeiten, sondern benennt folgende Beispiele: Hintergrund- und Vordergrundfarbe, Schriftart, Kontur oder Ränder der Schriftarten und Deckkraft des Hintergrunds. Somit gilt der Prüfschritt als erfüllt, wenn wenigstens eine der Möglichkeiten konfigurierbar ist. Der Prüfschritt gilt auch dann als erfüllt, wenn die Untertitel systemseitige Benutzerpräferenzen wie Schriftgröße oder Farbe übernehmen. Bei dauerhaft angezeigten Untertiteln (open captions) ist der Prüfschritt nicht anwendbar."
+      ],
+      "rationaleWhyDe": [
+        "Die flexible Anpassung der Darstellung von Untertiteln, beziehungsweise das Übernehmen von entsprechenden Benutzerpräferenzen stellt eine wichtige Funktion für alle Nutzergruppen dar, da auf diese Weise die Darstellung vom Nutzenden selbst an die eigenen Bedürfnisse gezielt angepasst werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Darstellung der Untertitel ist für mindestens eines der genannten Beispiele konfigurierbar.",
+        "- Der Videoplayer bietet selbst keine Konfigurationsmöglichkeiten zur Darstellung der Untertitel, die Untertitel reagieren jedoch auf entsprechende Benutzerpräferenzen."
+      ],
+      "negativeExamplesDe": [
+        "- Es sind keine Konfigurationsmöglichkeiten zur Darstellung der Untertitel vorhanden, und die Untertitel reagieren nicht auf entsprechende Benutzerpräferenzen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#anpassungen-für-untertitel"
+    }
+  ]
+}

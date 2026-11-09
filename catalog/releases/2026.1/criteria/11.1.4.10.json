@@ -1,0 +1,70 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Automatischer Umbruch (Reflow)",
+  "sortOrder": 580,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.10"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.10",
+      "originalTitleDe": "Automatischer Umbruch (Reflow)",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "- Alle Schriften der Anwendung können mit den Schriftgröße-Einstellungen der Plattform oder der Anwendung auf 400% vergrößert werden, ohne dass dabei Inhalt oder Funktionalität verloren gehen."
+      ],
+      "rationaleWhyDe": [
+        "- Das Ziel ist die Bereitstellung eines Bedienmodus, in dem der Text groß genug ist, um von Benutzern mit stark vermindertem Sehvermögen genutzt werden zu können, ohne dass diese Benutzer in zwei Richtungen scrollen müssen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Inhalte der Anwendung können gelesen und bedient werden, ohne dass Nutzende horizontal scrollen müssen.",
+        "- Nur Segmente mit Inhalten wie beispielsweise Tabellen, Diagramme, Präsentationen usw. können horizontal gescrollt werden."
+      ],
+      "negativeExamplesDe": [
+        "- Wichtige Bereiche der Anwendung sind abgeschnitten, so dass Nutzende sie nicht mehr lesen und bedienen können."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#automatischer-umbruch-reflow"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.10",
+      "originalTitleDe": "Automatischer Umbruch (Reflow)",
+      "applicabilityDe": [
+        "Der Prüfschritt ist zum aktuellen Stand der Technik bei Mobile Apps nicht prüfbar (Stand Januar 2024)."
+      ],
+      "allowedRatings": [
+        "notApplicable"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#automatischer-umbruch-reflow"
+    }
+  ]
+}

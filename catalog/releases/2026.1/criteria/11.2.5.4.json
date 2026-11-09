@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Steuerung durch Bewegung",
+  "sortOrder": 780,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.5.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.5.4",
+      "originalTitleDe": "Steuerung durch Bewegung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Funktionen durch Bewegung des Endgeräts ausgelöst werden können. Beispiele für Bewegungsaktivierung sind Schütteln, Drehen, Kippen des Endgeräts, oder Bewegen des Endgeräts durch den Raum."
+      ],
+      "requirementDe": [
+        "Funktionen, die durch die Bewegung des Endgeräts ausgelöst werden, müssen auch durch Steuerelemente auf der Benutzeroberfläche bedient werden können. Die Reaktion auf die Bewegungsaktivierung kann deaktiviert werden, um ein versehentliches Betätigen zu verhindern, es sei denn, die Bewegungsaktivierung ist für die jeweilige Funktion essenziell (beispielsweise bei einer Schrittzähler-App, oder bei Navigation durch Orte mit unterstützender Anzeige von Informationen zum Ort)."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können Bewegungseingaben eventuell nicht oder nicht zielgerichtet mit notwendiger Genauigkeit ausführen. Oftmals sind Endgeräte montiert, was Bewegungseingaben unmöglich macht. Es müssen entsprechende Mechanismen verfügbar sein, um Funktionen auch ohne Bewegungssteuerung nutzen zu können. Zudem können ungewollte Bewegungen bei anderen motorischen Beeinträchtigungsbildern zu nicht gewünschten Eingaben führen. Zur Vermeidung von Fehlern müssen ungewollte Aktionen über eine Deaktivierung der Bewegungssteuerung verhindert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind Bedienelemente verfügbar.",
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind Bedienelemente verfügbar, und die Bewegungssteuerung kann abgeschaltet werden.",
+        "- Ein Anmeldeprozess, der das Scannen eines QR-Codes voraussetzt, bietet eine weitere Alternative, für die keine Bewegung notwendig ist."
+      ],
+      "negativeExamplesDe": [
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind keine Bedienelemente verfügbar.",
+        "- Die Bewegungssteuerung kann nicht abgeschaltet werden.",
+        "- Ein Anmeldeprozess kann ausschließlich über das Scannen eines QR-Codes durchgeführt werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#steuerung-durch-bewegung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.5.4",
+      "originalTitleDe": "Steuerung durch Bewegung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Funktionen durch Bewegung des Endgeräts ausgelöst werden können. Beispiele für Bewegungsaktivierung sind Schütteln, Drehen, Kippen des Endgeräts, oder Bewegen des Endgeräts durch den Raum."
+      ],
+      "requirementDe": [
+        "Funktionen, die durch die Bewegung des Endgeräts ausgelöst werden, müssen auch durch Steuerelemente auf der Benutzeroberfläche bedient werden können. Die Reaktion auf die Bewegungsaktivierung kann deaktiviert werden, um ein versehentliches Betätigen zu verhindern, es sei denn, die Bewegungsaktivierung ist für die jeweilige Funktion essenziell (beispielsweise bei einer Schrittzähler-App, oder bei Navigation durch Orte mit unterstützender Anzeige von Informationen zum Ort)."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können Bewegungseingaben eventuell nicht oder nicht zielgerichtet mit notwendiger Genauigkeit ausführen. Oftmals sind Endgeräte montiert, was Bewegungseingaben unmöglich macht. Es müssen entsprechende Mechanismen verfügbar sein, um Funktionen auch ohne Bewegungssteuerung nutzen zu können. Zudem können ungewollte Bewegungen bei anderen motorischen Beeinträchtigungsbildern zu nicht gewünschten Eingaben führen. Zur Vermeidung von Fehlern müssen ungewollte Aktionen über eine Deaktivierung der Bewegungssteuerung verhindert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind Bedienelemente verfügbar.",
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind Bedienelemente verfügbar, und die Bewegungssteuerung kann abgeschaltet werden.",
+        "- Ein Anmeldeprozess, der das Scannen eines QR-Codes voraussetzt, bietet eine weitere Alternative, für die keine Bewegung notwendig ist."
+      ],
+      "negativeExamplesDe": [
+        "- Für Funktionen, die durch Bewegung gesteuert werden, sind keine Bedienelemente verfügbar.",
+        "- Die Bewegungssteuerung kann nicht abgeschaltet werden.",
+        "- Ein Anmeldeprozess kann ausschließlich über das Scannen eines QR-Codes durchgeführt werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#steuerung-durch-bewegung"
+    }
+  ]
+}

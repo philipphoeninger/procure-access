@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Alternativen zu sprachbasierten Diensten",
+  "sortOrder": 210,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.4",
+      "originalTitleDe": "Alternativen zu sprachbasierten Diensten",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Sprach- oder Videotelefonie mit Voicemail-Funktion zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Sprach- oder Videotelefonie mit Voicemail-Funktion, so muss die Nutzung dieser Dienste, die in aller Regel sprachbasiert gesteuert werden, auch ohne Sprech- oder Hörvermögen nutzbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Beeinträchtigungen des Hörvermögens und des Sprechens können sprachbasierte Funktionen nicht nutzen. Es muss eine zugängliche Alternative bereitstehen, in der Zugang zu Informationen und Bedienung der Konfigurationsmöglichkeiten ohne Sprech- oder Hörvermögen möglich ist."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich visuell über Bedien-Menüs oder Formularsteuerung bedienen.",
+        "- Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich visuell über Bedien-Menüs oder Formularsteuerung bedienen, jedoch ist der Funktionsumfang geringfügig eingeschränkt."
+      ],
+      "negativeExamplesDe": [
+        "- Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich nicht visuell über Bedien-Menüs oder Formularsteuerung bedienen.",
+        "- Die Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, stehen visuell über Bedien-Menüs oder Formularsteuerung bedienbar nur in reduziertem Funktionsumfang zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#alternativen-zu-sprachbasierten-diensten"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.4",
+      "originalTitleDe": "Alternativen zu sprachbasierten Diensten",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Sprach- oder Videotelefonie mit Voicemail-Funktion zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Sprach- oder Videotelefonie mit Voicemail-Funktion, so muss die Nutzung dieser Dienste, die in aller Regel sprachbasiert gesteuert werden, auch ohne Sprech- oder Hörvermögen nutzbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Beeinträchtigungen des Hörvermögens und des Sprechens können sprachbasierte Funktionen nicht nutzen. Es muss eine zugängliche Alternative bereitstehen, in der Zugang zu Informationen und Bedienung der Konfigurationsmöglichkeiten ohne Sprech- oder Hörvermögen möglich ist."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich visuell über Bedien-Menüs oder Formularsteuerung bedienen.",
+        "- Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich visuell über Bedien-Menüs oder Formularsteuerung bedienen, jedoch ist der Funktionsumfang geringfügig eingeschränkt."
+      ],
+      "negativeExamplesDe": [
+        "- Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, lassen sich nicht visuell über Bedien-Menüs oder Formularsteuerung bedienen.",
+        "- Die Konfigurationsmöglichkeiten, die sprachbasiert zur Verfügung stehen, stehen visuell über Bedien-Menüs oder Formularsteuerung bedienbar nur in reduziertem Funktionsumfang zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#alternativen-zu-sprachbasierten-diensten"
+    }
+  ]
+}

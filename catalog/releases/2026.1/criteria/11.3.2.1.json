@@ -1,0 +1,97 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Kontextänderung bei Fokus",
+  "sortOrder": 820,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.2.1",
+      "originalTitleDe": "Kontextänderung bei Fokus",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Fokuserhalt von Benutzeroberflächenkomponenten bei Tastaturbedienung (Tabulator oder Pfeiltasten) und bei Tastaturbedienung mit aktivem Screenreader darf nicht zu unerwarteten oder unangekündigten Kontextänderungen führen (beispielsweise plötzliches Öffnen von neuen Ansichten oder weiteren Applikationen oder Einblenden von neuen Bedienelementen).",
+        "",
+        "Das Anzeigen von Tooltips oder anderen Hinweisen, die sich beim Weiternavigieren selbständig wieder schließen, gilt nicht als unerwartete Kontextänderung.",
+        "",
+        "Pop-Ups oder modale Dialoge sind nicht Bestandteil der Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Unerwartete oder unangekündigte Kontextänderungen beeinträchtigen die Orientierung von Nutzenden. Sie lenken ab, verwirren, oder bleiben gerade bei Menschen mit Sehbeeinträchtigungen unbemerkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente lösen bei Fokuserhalt keine unerwartete Kontextänderung aus.",
+        "- Interaktive Elemente lösen bei Fokuserhalt die Anzeige von Hinweisen aus, die bei Fokusversetzung automatisch wieder ausgeblendet werden.",
+        "- Interaktive Elemente lösen bei Fokuserhalt eine Kontextänderung aus, über die der Nutzende im Vorfeld informiert wurde.",
+        "- Eine Kontextänderung wird explizit ausgelöst, z.B. mit der Eingabetaste auf einem Bedienelement (Menüpunkt, Button, Link), oder durch das Verlassen eines Eingabefeldes mit Tabulatortaste."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente lösen bei Fokuserhalt eine unerwartete Kontextänderung aus, über die der Nutzende im Vorfeld nicht informiert wurde.",
+        "- Ein Formular wird automatisch abgeschickt, sobald ein bestimmtes Eingabefeld den Fokus erhält.",
+        "- Ein Dropdown-Menü enthält Sprunglinks, die direkt ausgelöst werden, sobald ein Menüeintrag mit der Pfeiltaste fokussiert wird.",
+        "- Bei Fokus eines Radiobuttons öffnet sich automatisch ein Pop-up mit einem Hilfetext.",
+        "- Erhält ein Eingabefeld den Fokus, wird ein Hilfedialogfenster geöffnet, der das Feld beschreibt. Bei Navigation mit der Tabulatortaste durch die Anwendung, wird das Dialogfeld geöffnet und der Tastaturfokus beim Verlassen des Feldes direkt in das Pop-up versetzt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#kontextänderung-bei-fokus"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.2.1",
+      "originalTitleDe": "Kontextänderung bei Fokus",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Fokuserhalt von Benutzeroberflächenkomponenten bei Bedienung mit einer externen Tastatur und bei Wischnavigation bei aktivem Screenreader darf nicht zu unerwarteten oder unangekündigten Kontextänderungen führen (beispielsweise plötzliches Öffnen von neuen Ansichten oder weiteren Applikationen oder Einblenden von neuen Bedienelementen).",
+        "",
+        "Das Anzeigen von Tooltips oder anderen Hinweisen, die sich beim Weiternavigieren selbständig wieder schließen, gilt nicht als unerwartete Kontextänderung.",
+        "",
+        "Pop-Ups oder modale Dialoge sind nicht Bestandteil der Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Unerwartete oder unangekündigte Kontextänderungen beeinträchtigen die Orientierung von Nutzenden. Sie lenken ab, verwirren, oder bleiben gerade bei Menschen mit Sehbeeinträchtigungen unbemerkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente lösen bei Fokuserhalt keine unerwartete Kontextänderung aus.",
+        "- Interaktive Elemente lösen bei Fokuserhalt die Anzeige von Hinweisen aus, die bei Fokusversetzung automatisch ausgeblendet werden.",
+        "- Interaktive Elemente lösen bei Fokuserhalt eine Kontextänderung aus, über die der Nutzende im Vorfeld informiert wurde."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente lösen bei Fokuserhalt eine unerwartete Kontextänderung aus, über die der Nutzende im Vorfeld nicht informiert wurde."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#kontextänderung-bei-fokus"
+    }
+  ]
+}

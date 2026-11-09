@@ -1,0 +1,64 @@
+{
+  "kind": "requirement",
+  "titleDe": "Tastatur-Kurzbefehle abschaltbar oder anpassbar",
+  "sortOrder": 1530,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.1.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.1.4",
+      "originalTitleDe": "Tastatur-Kurzbefehle abschaltbar oder anpassbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument Tastatur-Kurzbefehle etabliert sind, welche allein auf Buchstaben (Groß- oder Kleinbuchstaben), Satzzeichen, Ziffern oder Symbolen basieren.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Sind Tastatur-Kurzbefehle etabliert, welche allein auf Buchstaben (Groß- und Kleinbuchstaben), Satzzeichen, Ziffern oder Symbolen basieren, muss mindestens einer der folgenden Punkte zutreffen:",
+        "",
+        "- Deaktivierbar: Der Tastatur-Kurzbefehl muss abschaltbar sein.",
+        "- Anpassbar: Der Tastatur-Kurzbefehl muss dahingehend anpassbar sein, dass auf eine Tastenkombination mit Modifikator-Tasten umgestellt werden kann (z. B. nicht druckbare Tasten wie Alt oder Strg).",
+        "- Aktiv nur bei Fokussierung: Der Tastatur-Kurzbefehl darf nur aktiv sein bei Fokussierung des ihn betreffenden Objekts."
+      ],
+      "rationaleWhyDe": [
+        "Das Arbeiten mit Tastatur-Kurzbefehlen ist besonders geeignet für Menschen, die geübt darin sind, die Tastatur zu bedienen. Die Anwendung von Tastatur-Kurzbefehlen kann andererseits aber auch eine Hürde darstellen, und zwar insbesondere für Menschen, die überwiegend mit Spracheingabe arbeiten oder Schwierigkeiten bei der Bedienung der Tastatur haben und Tasten bzw. eine Kombination aus Tasten z. B. nicht genau treffen können.",
+        "",
+        "Es soll vermieden werden, dass Tastatur-Kurzbefehle unbeabsichtigt ausgeführt werden."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Zu Beginn des PDF-Dokuments wird auf geeignete Weise auf die Verwendung von Tastatur-Kurzbefehlen hingewiesen, welche allein auf Buchstaben (Groß- und Kleinbuchstaben), Satzzeichen, Ziffern oder Symbolen basieren. Darüber hinaus wird darauf hingewiesen, wie sich diese Tastatur-Kurzbefehle mit einer einfachen Aktion deaktivieren lassen.",
+        "- erfüllt: Zu Beginn des PDF-Dokuments wird auf geeignete Weise auf die Verwendung von Tastatur-Kurzbefehlen hingewiesen, welche allein auf Buchstaben (Groß- und Kleinbuchstaben), Satzzeichen, Ziffern oder Symbolen basieren. Darüber hinaus wird darauf hingewiesen, wie sich diese Tastatur-Kurzbefehle mit einer einfachen Aktion anpassen lassen.",
+        "- erfüllt: Im PDF-Dokument wird eine Video-Datei bereitgestellt. Der Maus- bzw. Tastaturfokus befindet sich auf der Video-Datei und das Abspielen der Video-Datei lässt sich mittels Leerzeichen-Taste starten bzw. stoppen."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Der Prüfschritt ist mit „nicht anwendbar“ zu bewerten, sofern mithilfe des angegebenen Testverfahrens keine Tastatur-Kurzbefehle dieser Art aufgespürt werden konnten.",
+        "- Barriere: Im PDF-Dokument wird eine Video-Datei bereitgestellt. Der Maus- bzw. Tastaturfokus befindet sich nicht auf der Video-Datei. Dennoch startet bzw. stoppt die Betätigung der Leerzeichen-Taste das Abspielen der Video-Datei und der Tastatur-Kurzbefehl lässt sich nicht deaktivieren bzw. anpassen. Dabei befindet sich der Maus- bzw. Tastaturfokus nicht auf einem Formularfeld.",
+        "- Blockade: Im PDF-Dokument wird eine Video-Datei bereitgestellt. Das Betätigen der Leerzeichen-Taste startet bzw. stoppt das Abspielen der Video-Datei und der Tastatur-Kurzbefehl lässt sich nicht deaktivieren bzw. anpassen, auch wenn sich der Maus- bzw. Tastaturfokus auf einem Formularfeld befindet.",
+        "- Barriere: Im PDF-Dokument ist als Tastatur-Kurzbefehl der Großbuchstabe P für das Drucken des gesamten Dokuments bzw. der Kleinbuchstabe p für das Drucken der aktuellen Seite implementiert (ohne weitere Modifikator-Taste) und der Tastatur-Kurzbefehl lässt sich nicht deaktivieren bzw. anpassen. Dabei befindet sich der Maus- bzw. Tastaturfokus nicht auf einem Formularfeld.",
+        "- Blockade: Im PDF-Dokument ist als Tastatur-Kurzbefehl der Großbuchstabe P für das Drucken des gesamten Dokuments bzw. der Kleinbuchstabe p für das Drucken der aktuellen Seite implementiert (ohne weitere Modifikator-Taste) und der Tastatur-Kurzbefehl lässt sich nicht deaktivieren bzw. anpassen, auch wenn sich der Maus- bzw. Tastaturfokus auf einem Formularfeld befindet."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#tastatur-kurzbefehle-abschaltbar-oder-anpassbar"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Nicht bearbeitbarer Text",
+  "sortOrder": 1020,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.10"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.10a",
+      "originalTitleDe": "Nicht bearbeitbarer Text",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn nicht bearbeitbarer Text vorhanden ist."
+      ],
+      "requirementDe": [
+        "Textinhalte werden analog zur visuellen Darstellung durch den Screenreader wiedergegeben. Längerer Text wird bei aktivem Screenreader sinnvoll und absatzweise in Blöcken fokussiert. Visuell hervorgehobene Textinhalte (beispielsweise fett, kursiv, unterstrichen) werden auch innerhalb eines Absatzes vom Screenreader separat fokussiert. Unnötige Sonderzeichen werden vom Screenreader ignoriert.",
+        "",
+        "Abkürzungen werden vom Screenreader ungekürzt ausgesprochen. Spezielle Formate, beispielsweise Informationen zu Datum oder Uhrzeit, werden im jeweiligen Format korrekt wiedergegeben.",
+        "",
+        "Es wird dringend empfohlen, entsprechend relevante Inhalte, beispielsweise eine IBAN, eine Postleitzahl oder eine Telefonnummer, auf eine Art zu implementieren, dass sie vom Screenreader zeichenweise buchstabiert ausgegeben werden. Dies ist technisch unter Umständen nicht in allen Umgebungen umsetzbar und kann somit nicht gefordert werden."
+      ],
+      "rationaleWhyDe": [
+        "Nicht nur der Inhalt von Text, sondern auch die Formatierung vermittelt Informationen. Fetter oder kursiver Text deutet wichtige Informationen innerhalb eines Absatzes an. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit das dahinter liegende Kommunikationskonzept von allen Nutzenden nachvollzogen werden kann. Weiterhin ist bei speziellen Akronymen, Begriffen oder Werten die zeichenweise Ausgabe über den Screenreader zum besseren Verständnis essenziell. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit der Kontext von allen Nutzenden nachvollzogen werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der vom Screenreader wiedergegebene Text entspricht der visuellen Darstellung.",
+        "- Textinhalte werden gemäß der sichtbaren Trennung durch Absätze in den entsprechenden Abschnitten fokussiert und wiedergegeben",
+        "- Längerer Text wird in sinnvollen Blöcken vom Screenreader fokussiert und wiedergegeben.",
+        "- Spezielle Formate, beispielsweise eine Telefonnummer, wird vom Screenreader zeichenweise wiedergegeben.",
+        "- In einem Kalender werden die einzelnen Tage visuell abgekürzt (Mo, Di, Mi etc.). Der Screenreader spricht die Tage aus (Montag, Dienstag, Mittwoch etc.).",
+        "- Ein Datum (beispielsweise 10/10/2000) wird im korrekten Format vom Screenreader wiedergegeben (beispielsweise „Zehnter Oktober Zweitausend“).",
+        "- Das Satzzeichen „Punkt“ wird nicht wiedergegeben, da die Ausgabeeinstellung des Screenreaders auf „Keine“ eingestellt wurde.",
+        "- Ein fettgedruckter Textinhalt wird innerhalb des Absatzes separat fokussiert und wiedergegeben.",
+        "- Relevante Inhalte, beispielsweise eine IBAN, wird nicht zeichenweise buchstabiert ausgegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Textinhalte werden abweichend von der visuellen Darstellung vom Screenreader wiedergegeben.",
+        "- Ein in sichtbare Absätze unterteilter Text wird vom Screenreader am Stück fokussiert und wiedergegeben.",
+        "- Textinhalte werden vom Screenreader zu kleinteilig fokussiert und wiedergegeben.",
+        "- Eine Telefonnummer wird als einzelne lange Zahl wiedergegeben.",
+        "- Die Abkürzung „Mo“ wird unverändert wiedergegeben.",
+        "- Ein Datum (beispielsweise 10.10.2000) wird unverständlich, beispielsweise als „Zehn Punkt Zehn Punkt Zweitausend“ wiedergegeben.",
+        "- Das Satzzeichen „Punkt“ wird wiedergegeben, obwohl die Ausgabeeinstellung des Screenreaders auf „Keine“ eingestellt wurde.",
+        "- Ein fettgedruckter Textinhalt innerhalb eines Absatzes wird nicht separat fokussiert"
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#a-nicht-bearbeitbarer-text"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.10a",
+      "originalTitleDe": "Nicht bearbeitbarer Text",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn nicht bearbeitbarer Text vorhanden ist."
+      ],
+      "requirementDe": [
+        "Textinhalte werden analog zur visuellen Darstellung durch den Screenreader wiedergegeben. Längerer Text wird bei aktivem Screenreader sinnvoll und absatzweise in Blöcken fokussiert. Visuell hervorgehobene Textinhalte (beispielsweise fett, kursiv, unterstrichen) werden auch innerhalb eines Absatzes vom Screenreader separat fokussiert. Unnötige Sonderzeichen werden vom Screenreader ignoriert.",
+        "",
+        "Abkürzungen werden vom Screenreader ungekürzt ausgesprochen. Spezielle Formate, beispielsweise Informationen zu Datum oder Uhrzeit, werden im jeweiligen Format korrekt wiedergegeben.",
+        "",
+        "Es wird dringend empfohlen, entsprechend relevante Inhalte, beispielsweise eine IBAN, eine Postleitzahl oder eine Telefonnummer, auf eine Art zu implementieren, dass sie vom Screenreader zeichenweise buchstabiert ausgegeben werden. Dies ist technisch unter Umständen nicht in allen Umgebungen umsetzbar und kann somit nicht gefordert werden."
+      ],
+      "rationaleWhyDe": [
+        "Nicht nur der Inhalt von Text, sondern auch die Formatierung vermittelt Informationen. Fetter oder kursiver Text deutet wichtige Informationen innerhalb eines Absatzes an. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit das dahinter liegende Kommunikationskonzept von allen Nutzenden nachvollzogen werden kann. Weiterhin ist bei speziellen Akronymen, Begriffen oder Werten die zeichenweise Ausgabe über den Screenreader zum besseren Verständnis essenziell. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit der Kontext von allen Nutzenden nachvollzogen werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der vom Screenreader wiedergegebene Text entspricht der visuellen Darstellung.",
+        "- Textinhalte werden gemäß der sichtbaren Trennung durch Absätze in den entsprechenden Abschnitten fokussiert und wiedergegeben",
+        "- Längerer Text wird in sinnvollen Blöcken vom Screenreader fokussiert und wiedergegeben.",
+        "- Spezielle Formate, beispielsweise eine Telefonnummer, wird vom Screenreader zeichenweise wiedergegeben.",
+        "- In einem Kalender werden die einzelnen Tage visuell abgekürzt (Mo, Di, Mi etc.). Der Screenreader spricht die Tage aus (Montag, Dienstag, Mittwoch etc.).",
+        "- Ein Datum (beispielsweise 10/10/2000) wird im korrekten Format vom Screenreader wiedergegeben (beispielsweise „Zehnter Oktober Zweitausend“).",
+        "- Das Satzzeichen „Punkt“ wird nicht wiedergegeben, da die Ausgabeeinstellung des Screenreaders auf „Keine“ eingestellt wurde.",
+        "- Ein fettgedruckter Textinhalt wird innerhalb des Absatzes separat fokussiert und wiedergegeben.",
+        "- Relevante Inhalte, beispielsweise eine IBAN, wird nicht zeichenweise buchstabiert ausgegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Textinhalte werden abweichend von der visuellen Darstellung vom Screenreader wiedergegeben.",
+        "- Ein in sichtbare Absätze unterteilter Text wird vom Screenreader am Stück fokussiert und wiedergegeben.",
+        "- Textinhalte werden vom Screenreader zu kleinteilig fokussiert und wiedergegeben.",
+        "- Eine Telefonnummer wird als einzelne lange Zahl wiedergegeben.",
+        "- Die Abkürzung „Mo“ wird unverändert wiedergegeben.",
+        "- Ein Datum (beispielsweise 10.10.2000) wird unverständlich, beispielsweise als „Zehn Punkt Zehn Punkt Zweitausend“ wiedergegeben.",
+        "- Das Satzzeichen „Punkt“ wird wiedergegeben, obwohl die Ausgabeeinstellung des Screenreaders auf „Keine“ eingestellt wurde.",
+        "- Ein fettgedruckter Textinhalt innerhalb eines Absatzes wird nicht separat fokussiert"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#a-nicht-bearbeitbarer-text"
+    }
+  ]
+}

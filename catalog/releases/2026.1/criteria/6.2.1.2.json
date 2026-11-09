@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Gleichzeitige Verwendung von Sprache und Text",
+  "sortOrder": 130,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.1.2",
+      "originalTitleDe": "Gleichzeitige Verwendung von Sprache und Text",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), sollen beide Kommunikationskanäle gleichwertig genutzt werden können."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Sprache zur Kommunikation nicht nutzen können oder wollen, sollen im Vergleich zu Sprachnutzenden gleichwertig behandelt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Funktionen wie „Handheben“ oder „abwechselnde Kommunikation” (beispielsweise die Darstellung des aktuellen Sprechers im Fokus) werden gegenüber Sprach- und Textnutzenden gleichwertig behandelt.",
+        "- Chat-Funktion und Echtzeit-Text (RTT) sind separiert voneinander verwendbar."
+      ],
+      "negativeExamplesDe": [
+        "- Funktionen wie „Handheben“ oder „abwechselnde Kommunikation” (beispielsweise die Darstellung des aktuellen Sprechers im Fokus) werden gegenüber Sprach- und Textnutzenden nicht gleichwertig behandelt.",
+        "- Chat-Funktion und Echtzeit-Text (RTT) sind nicht separiert voneinander verwendbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#gleichzeitige-verwendung-von-sprache-und-text"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.1.2",
+      "originalTitleDe": "Gleichzeitige Verwendung von Sprache und Text",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), sollen beide Kommunikationskanäle gleichwertig genutzt werden können."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Sprache zur Kommunikation nicht nutzen können oder wollen, sollen im Vergleich zu Sprachnutzenden gleichwertig behandelt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Funktionen wie „Handheben“ oder „abwechselnde Kommunikation (beispielsweise die Darstellung des aktuellen Sprechers im Fokus)“ werden gegenüber Sprach- und Textnutzenden gleichwertig behandelt.",
+        "- Chat-Funktion und Echtzeit-Text (RTT) sind separiert voneinander verwendbar."
+      ],
+      "negativeExamplesDe": [
+        "- Funktionen wie „Handheben“ oder „abwechselnde Kommunikation (beispielsweise die Darstellung des aktuellen Sprechers im Fokus)“ werden gegenüber Sprach- und Textnutzenden nicht gleichwertig behandelt.",
+        "- Chat-Funktion und Echtzeit-Text (RTT) sind nicht separiert voneinander verwendbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#gleichzeitige-verwendung-von-sprache-und-text"
+    }
+  ]
+}

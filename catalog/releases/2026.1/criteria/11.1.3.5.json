@@ -1,0 +1,109 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Eingabezweck bestimmen",
+  "sortOrder": 520,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.3.5",
+      "originalTitleDe": "Eingabezweck bestimmen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Eingabefelder für Nutzerdaten, oder Eingabefelder, die ein spezielles Format erwarten, vorhanden sind."
+      ],
+      "requirementDe": [
+        "Eingabefelder, die sich eindeutig auf Nutzerdaten beziehen und Informationen wie beispielsweise Name, E-Mailadresse, postalische Adresse, Rufnummer oder Kreditkartendaten anfordern, müssen programmatisch ermittelbar sein, damit unterstützende Technologien Nutzenden den Zweck der Eingabe erläutern können."
+      ],
+      "rationaleWhyDe": [
+        "Korrekte Autocomplete- oder Autofill-Vorschläge sorgen dafür, dass Nutzende die Informationen nicht mehr, beziehungsweise nicht mehr vollumfänglich selbst eingeben müssen und stattdessen den Wert des Feldes bestätigen oder bei Bedarf ändern können. Dies ist ein erheblicher Vorteil für Nutzende mit kognitiven und motorischen Beeinträchtigungen.",
+        "",
+        "Da die Daten für die automatische Vervollständigung sprachunabhängig sind, können Nutzende aufgrund der festgelegten Taxonomie der Begriffe den Zweck der Eingabefelder erkennen, auch wenn sie mit der Sprache nicht vertraut sind.",
+        "",
+        "Zusätzlich zur Nutzung dieser Taxonomien können Technologien bei Verwendung der Attributtechnik den korrekten Inhalt vorschlagen und automatisch ausfüllen, indem sie diese Felder basierend auf früheren Eingaben, die im System gespeichert sind, automatisch vervollständigen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- In einem Kontaktformular werden die korrekten hinterlegten Daten für die Felder Name, E-Mailadresse und Telefon zum automatischen Befüllen vorgeschlagen.",
+        "- Im Rahmen eines Bestellvorgangs werden die korrekten hinterlegten Daten für Adresse und Lieferadresse zum automatischen Befüllen vorgeschlagen."
+      ],
+      "negativeExamplesDe": [
+        "- In entsprechenden Eingabefeldern, für die hinterlegte Daten zur Verfügung stehen, erscheint kein Vorschlag für automatische Befüllung.",
+        "- In entsprechenden Eingabefeldern, für die hinterlegte Daten zur Verfügung stehen, werden die falschen Daten zur automatischen Befüllung vorgeschlagen.",
+        "- Es wurden Authentifizierungsdaten bei einem Login gespeichert, bei einem erneuten Aufruf der Eingabefelder zum Login wird jedoch nicht vorgeschlagen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#eingabezweck-bestimmen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.5",
+      "originalTitleDe": "Eingabezweck bestimmen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Eingabefelder für Nutzerdaten, oder Eingabefelder, die ein spezielles Format erwarten, vorhanden sind."
+      ],
+      "requirementDe": [
+        "Eingabefelder, die sich eindeutig auf Nutzerdaten beziehen und Informationen wie beispielsweise Name, E-Mailadresse, postalische Adresse, Rufnummer oder Kreditkartendaten anfordern, müssen programmatisch ermittelbar sein, damit unterstützende Technologien Nutzenden den Zweck der Eingabe erläutern können.",
+        "",
+        "Eingabefelder, die eine Eingabe in einem speziellen Format erwarten wie beispielsweise Postleitzahlen, Rufnummern oder E-Mailadressen, sollen das für die jeweilige Eingabe optimierte Tastaturlayout ansteuern.",
+        "",
+        "Anmeldedaten, die zur Authentifizierung in der Mobile App notwendig sind, werden beim Login durch den Passwortmanager abrufbar, sofern sie vorab gespeichert werden konnten."
+      ],
+      "rationaleWhyDe": [
+        "Korrekte Autocomplete- oder Autofill-Vorschläge sorgen dafür, dass Nutzende die Informationen nicht mehr, beziehungsweise nicht mehr vollumfänglich selbst eingeben müssen und stattdessen den Wert des Feldes bestätigen oder bei Bedarf ändern können. Dies ist ein erheblicher Vorteil für Nutzende mit kognitiven und motorischen Beeinträchtigungen.",
+        "",
+        "Da die Daten für die automatische Vervollständigung sprachunabhängig sind, können Nutzende aufgrund der festgelegten Taxonomie der Begriffe den Zweck der Eingabefelder erkennen, auch wenn sie mit der Sprache nicht vertraut sind.",
+        "",
+        "Zusätzlich zur Nutzung dieser Taxonomien können Technologien bei Verwendung der Attributtechnik den korrekten Inhalt vorschlagen und automatisch ausfüllen, indem sie diese Felder basierend auf früheren Eingaben, die im Betriebssystem gespeichert sind, automatisch vervollständigen.",
+        "",
+        "Optimiertes Tastaturlayout sorgt dafür, dass Nutzende direkt mit der Eingabe der entsprechenden Daten beginnen können, ohne manuell auf das Ziellayout innerhalb der Tastatur umschalten zu müssen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- In einem Kontaktformular werden die korrekten hinterlegten Daten für die Felder Name, E-Mailadresse und Telefon zum automatischen Befüllen vorgeschlagen.",
+        "- Im Rahmen eines Bestellvorgangs werden die korrekten hinterlegten Daten für Adresse und Lieferadresse zum automatischen Befüllen vorgeschlagen.",
+        "- Bei der Eingabe einer Auftragsnummer, die ausschließlich aus Zahlen besteht, wird die numerische Tastatur als optimiertes Tastaturlayout angesteuert.",
+        "- Bei der Eingabe einer deutschen Postleitzahl oder einer Telefonnummer wird die numerische Tastatur als optimiertes Tastaturlayout angesteuert.",
+        "- Bei der Eingabe einer E-Mailadresse wird das optimierte Tastaturlayout angesteuert, das unter anderem Tasten für „@“ und die Top-Leveldomain („.com“, „.de“) enthält.",
+        "- Beim den Eingabefeldern zur Authentifizierung wird vorgeschlagen, über den Passwortmanager des Betriebssystems nach hinterlegten Logindaten zu suchen."
+      ],
+      "negativeExamplesDe": [
+        "- In entsprechenden Eingabefeldern, für die hinterlegte Daten zur Verfügung stehen, erscheint kein Vorschlag für automatische Befüllung.",
+        "- In entsprechenden Eingabefeldern, für die hinterlegte Daten zur Verfügung stehen, werden die falschen Daten zur automatischen Befüllung vorgeschlagen.",
+        "- Entsprechende Eingabefelder steuern kein optimiertes Tastaturlayout an.",
+        "- Es wurden Authentifizierungsdaten bei einem Login gespeichert, bei einem erneuten Aufruf der Eingabefelder zum Login wird jedoch nicht vorgeschlagen, über den Passwortmanager des Betriebssystems nach entsprechenden Logindaten zu suchen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#eingabezweck-bestimmen"
+    }
+  ]
+}

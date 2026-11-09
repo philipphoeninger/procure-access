@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Keine Kontextänderung bei Eingabe",
+  "sortOrder": 1690,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.2.2",
+      "originalTitleDe": "Keine Kontextänderung bei Eingabe",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente zur Eingabe von Daten, wie Eingabefelder oder Auswahlschalter, enthält."
+      ],
+      "requirementDe": [
+        "Wenn der Zustand einer Dokumenten-Komponente beispielsweise durch eine Eingabe oder die Auswahl einer Option eines Auswahlschalters bzw. das Ankreuzen einer Checkbox geändert wird, wird keine Kontextänderung ausgelöst, es sei denn, vor der Verwendung der Komponente wurde auf geeignete Weise über das Verhalten informiert."
+      ],
+      "rationaleWhyDe": [
+        "Die bei einer Eingabe oder der Auswahl einer Option eines Auswahlschalters auftretenden Effekte sollten vorhersehbar sein. Jede unbeabsichtigte Kontextänderung könnte zu Orientierungsverlust führen oder aber zunächst gar nicht bemerkt werden. Dies betrifft insbesondere Menschen, denen es nicht möglich ist, die gesamte Anzeige auf einmal zu sehen bzw. kognitiv zu erfassen, aber auch Menschen mit Leseschwäche.",
+        "",
+        "Somit muss es möglich sein, im PDF-Dokument Eingaben vorzunehmen, ohne dass dadurch eine Kontextänderung erfolgt. Um darüber hinaus eine andere Wirkung auszulösen, sollte immer eine bewusste Aktion erforderlich sein, es sei denn, vor der Verwendung der Komponente wurde auf geeignete Weise über das Verhalten informiert.",
+        "",
+        "Indem vor der Bearbeitung ein Hinweis auf möglicherweise mit der Bearbeitung einhergehende Kontextänderungen gegeben wird, wird die Gefahr eines Orientierungsverlustes minimiert."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle interaktiven Elemente verhalten sich nach Eingabe von Daten bzw. Bedienung eines Auswahlschalters ihres Kontextes entsprechend.",
+        "- erfüllt: Mit einem Formular können Kalendereinträge erstellt werden. Neben den Standardfeldern für Betreff, Zeit und Ort gibt es weitere Eingabefelder, beispielsweise Termin oder Besprechung. Wird das Optionsfeld für Besprechung angewählt, werden unterhalb zusätzliche Felder für die Eingabe der Teilnehmenden angezeigt. Wird darüber hinaus die Reminder-Funktion ausgewählt, erscheinen weitere Auswahlmöglichkeiten, die in direktem Zusammenhang mit der Reminder-Funktion stehen. Derartige Änderungen, die in unmittelbarem Zusammenhang mit der Bestimmung des Elements stehen, sind als geringfügig einzustufen, so lange die generelle Struktur unverändert bleibt. Es ist insbesondere kein sichtbarer Text notwendig, der auf dieses Verhalten hinweist.",
+        "- erfüllt: Ein Eingabefeld für 20 Zahlen ist in fünf separate Zahlenblöcke unterteilt. Sobald vier Zahlen eingegeben wurden, springt der Fokus automatisch zum nächsten Zahlenblock weiter. Vor Beginn der Eingabe wird auf dieses Verhalten hingewiesen."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Das PDF-Dokument enthält keine interaktiven Elemente zur Eingabe von Daten.",
+        "- Blockade: Eines oder mehrere interaktive Elemente verhalten sich entgegen ihrer Bestimmung (unerwartete Kontextänderung nach Eingabe von Daten bzw. Bedienung eines Auswahlschalters).",
+        "- Blockade: Bei Markierung einer Checkbox öffnet sich automatisch ein Pop-up mit einem Hilfetext.",
+        "- Blockade: Nach der Auswahl einer Checkbox werden oberhalb des Feldes weitere Eingabefelder angezeigt. Ein gibt keinen sichtbaren Text, der auf dieses Verhalten hinweist."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#keine-kontextänderung-bei-eingabe"
+    }
+  ]
+}

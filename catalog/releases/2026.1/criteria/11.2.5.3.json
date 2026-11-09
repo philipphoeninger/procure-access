@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Sichtbare Beschriftung als Teil der programmatischen Beschriftung",
+  "sortOrder": 770,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.5.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.5.3",
+      "originalTitleDe": "Sichtbare Beschriftung als Teil der programmatischen Beschriftung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Visuell sichtbare Beschriftungen von interaktiven Elementen, unabhängig davon, ob sie mit reinem Text oder mit Text in grafischen Objekten beschriftet sind, müssen die visuelle in der programmatisch ermittelbaren Beschriftung enthalten. Idealerweise wird die visuelle Beschriftung direkt am Anfang der programmatischen Beschriftung genannt.",
+        "",
+        "Die programmatische Beschriftung kann hierbei weitere Informationen enthalten, die visuell nicht ersichtlich ist."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Spracheingabe aktivieren Bedienelemente, indem sie die visuell sichtbare Beschriftung als Sprachbefehl diktieren. Weicht die programmatische von der visuellen Beschriftung ab, können Sprachbefehle unter Umständen nicht oder nur über Umwege platziert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die programmatische Beschriftung ist analog zur visuellen Beschriftung.",
+        "- Die programmatische Beschriftung ist analog zur visuellen Beschriftung, enthält jedoch weitere Informationen.",
+        "- Die visuelle Beschriftung ist in der programmatischen Beschriftung enthalten, wird jedoch nicht am Anfang ausgegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Die programmatische Beschriftung lautet anders als die visuelle Beschriftung (beispielsweise „Nächste Seite“ und „Weiter“).",
+        "- Die programmatische Beschriftung weicht von der visuellen Beschriftung ab (beispielsweise „Nachname“ und „Geben Sie hier Ihren Nachnamen ein“).",
+        "- Es ist keine programmatische Beschriftung vorhanden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sichtbare-beschriftung-als-teil-der-programmatischen-beschriftung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.5.3",
+      "originalTitleDe": "Sichtbare Beschriftung als Teil der programmatischen Beschriftung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Visuell sichtbare Beschriftungen von interaktiven Elementen, unabhängig davon, ob sie mit reinem Text oder mit Text in grafischen Objekten beschriftet sind, müssen die visuelle in der programmatisch ermittelbaren Beschriftung enthalten. Idealerweise wird die visuelle Beschriftung direkt am Anfang der programmatischen Beschriftung genannt.",
+        "",
+        "Die programmatische Beschriftung kann hierbei weitere Informationen enthalten, die visuell nicht ersichtlich ist."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Spracheingabe aktivieren Bedienelemente, indem sie die visuell sichtbare Beschriftung als Sprachbefehl diktieren. Weicht die programmatische von der visuellen Beschriftung ab, können Sprachbefehle unter Umständen nicht oder nur über Umwege platziert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die programmatische Beschriftung ist analog zur visuellen Beschriftung.",
+        "- Die programmatische Beschriftung ist analog zur visuellen Beschriftung, enthält jedoch weitere Informationen.",
+        "- Die visuelle Beschriftung ist in der programmatischen Beschriftung enthalten, wird jedoch nicht am Anfang ausgegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Die programmatische Beschriftung lautet anders als die visuelle Beschriftung (beispielsweise „Nächste Seite“ und „Weiter“).",
+        "- Die programmatische Beschriftung weicht von der visuellen Beschriftung ab (beispielsweise „Nachname“ und „Geben Sie hier Ihren Nachnamen ein“).",
+        "- Es ist keine programmatische Beschriftung vorhanden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sichtbare-beschriftung-als-teil-der-programmatischen-beschriftung"
+    }
+  ]
+}

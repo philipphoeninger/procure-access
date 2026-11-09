@@ -1,0 +1,71 @@
+{
+  "kind": "requirement",
+  "titleDe": "Alternativen für aufgezeichnetes Audio und Videos ohne Ton",
+  "sortOrder": 1240,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.2.1",
+      "originalTitleDe": "Alternativen für aufgezeichnetes Audio und Videos ohne Ton",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald im PDF-Dokument voraufgezeichnete Audio-Dateien ohne Video bzw. Video-Dateien ohne Tonspur bereitgestellt werden."
+      ],
+      "requirementDe": [
+        "Für voraufgezeichnete Nur-Audio- und Nur-Video-Medien gilt Folgendes, es sei denn, die Audio- oder Video-Datei stellt eine Medienalternative für Text dar und wird auch deutlich als solche gekennzeichnet:",
+        "",
+        "- Voraufgezeichnetes Nur-Audio: Es wird eine Alternative für zeitbasierte Medien bereitgestellt, die gleichwertige Informationen für voraufgezeichnete reine Audio-Inhalte bietet.",
+        "- Voraufgezeichnetes Nur-Video: Es wird entweder eine Alternative für zeitbasierte Medien oder eine Audiospur bereitgestellt, die gleichwertige Informationen für voraufgezeichnete reine Videoinhalte bietet."
+      ],
+      "rationaleWhyDe": [
+        "Bei der Bereitstellung einer Textalternative zu allen reinen Audio-Dateien, bei denen es sich nicht um eine Medienalternative für Text handelt, geht es darum, insbesondere gehörlosen oder schwerhörigen Menschen vollständigen Zugang zu den Inhalten zu ermöglichen. Textalternativen liefern dabei den über die Tonspur verfügbaren Inhalt. Eine Textalternative muss nicht nur Dialoge wiedergeben, sondern auch angeben, wer spricht. Textalternativen enthalten darüber hinaus nichtsprachliche Informationen, die durch Ton vermittelt werden, wie insbesondere Soundeffekte, aber auch Stille.",
+        "",
+        "Bei der Bereitstellung einer Textalternative oder alternativ einer Audio-Datei zu allen reinen Video-Dateien, bei denen es sich nicht um eine Medienalternative für Text handelt, geht es darum, insbesondere Personen, die Schwierigkeiten damit haben, bewegte Bilder zu erfassen, sowie Personen ohne bzw. mit eingeschränktem Sehvermögen vollständigen Zugang zu den Inhalten zu ermöglichen.",
+        "",
+        "Dem Zwei-Sinne-Prinzip folgend erleichtert eine Medienalternative auch Menschen mit kognitiven Einschränkungen bzw. mit Sprach- bzw. Lernschwierigkeiten den Zugang zu den dargestellten Inhalten.",
+        "",
+        "Text als Medienalternative ist darüber hinaus vielfältig einsetzbar, wie insbesondere auch für Übersetzungen, und kann in diverse Ausgabeformate, wie z. B. Audio, Braille etc., transformiert werden, um den unterschiedlichsten Bedürfnissen gerecht zu werden. Darüber hinaus unterstützt Text die Möglichkeit, nach Medieninhalten zu suchen und Inhalte auf eine Vielzahl von Arten zu einem neuen Zweck zu verbinden."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Der Inhalt einer reinen Audio-Datei wird über eine Textalternative vollumfänglich wiedergegeben. Die zugehörige Textalternative lässt sich rasch identifizieren und eindeutig zuordnen.",
+        "- erfüllt: Der Inhalt einer reinen Audio-Datei wird über eine Textalternative vollumfänglich wiedergegeben. Die Textalternative kann über einen Link mit aussagekräftiger Beschriftung unmittelbar im Anschluss an die reine Audio-Datei aufgerufen werden.",
+        "- erfüllt: Der Inhalt einer reinen Video-Datei ohne Tonspur wird über eine Textalternative vollumfänglich wiedergegeben. Die zugehörige Textalternative lässt sich rasch identifizieren und eindeutig zuordnen.",
+        "- erfüllt: Der Inhalt einer reinen Video-Datei ohne Tonspur wird über eine Audioaufnahme vollumfänglich wiedergegeben. Die zugehörige Audioaufnahme lässt sich rasch identifizieren und eindeutig zuordnen.",
+        "- erfüllt: Der Inhalt einer reinen Video-Datei ohne Tonspur dient (z. B. in einem Tutorial) zur Illustration einer bereits in Textform vorliegenden ausführlichen Beschreibung. Die zugehörige Textalternative weist darauf in geeigneter Weise und aller Kürze hin."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Es existiert eine gut auffindbare Textalternative bzw. eine gut auffindbare Audioaufnahme. Der Inhalt der reinen Audio-Datei bzw. reinen Video-Datei ohne Tonspur ist darin jedoch nicht vollumfänglich wiedergegeben, wobei als unwesentlich einzustufende Informationen fehlen.",
+        "- Einschränkung: Es existiert eine gut auffindbare Textalternative bzw. eine gut auffindbare Audioaufnahme. Der Inhalt der reinen Audio-Datei bzw. reinen Video-Datei ohne Tonspur ist darin jedoch nicht vollumfänglich wiedergegeben, wobei die fehlenden Informationen als wesentlich einzustufen sind.",
+        "- Einschränkung: Der Inhalt einer reinen Audio-Datei bzw. einer reinen Video-Datei ohne Tonspur wird über eine Textalternative vollumfänglich wiedergegeben. Es ist jedoch aufwändig, die zugehörige Textalternative zu ermitteln und eindeutig zuzuordnen.",
+        "- Einschränkung: Der Inhalt einer reinen Video-Datei ohne Tonspur wird über eine Audioaufnahme vollumfänglich wiedergegeben. Es ist jedoch aufwändig, die zugehörige Audioaufnahme zu ermitteln und eindeutig zuzuordnen.",
+        "- Barriere: Zu einer reinen Audio-Datei bzw. einer reinen Video-Datei ohne Tonspur existiert eine Textalternative bzw. eine Audioaufnahme und der Inhalt ist darin vollumfänglich wiedergegeben. Doch die Zuordnung ist nicht eindeutig.",
+        "- Blockade: Für den Inhalt einer reinen Audio-Datei steht keine Textalternative zur Verfügung.",
+        "- Blockade: Für den Inhalt einer reinen Video-Datei ohne Tonspur steht weder eine Audioaufnahme noch eine Textalternative zur Verfügung."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#alternativen-für-aufgezeichnetes-audio-und-videos-ohne-ton"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "kind": "requirement",
+  "titleDe": "Fehlerkorrektur",
+  "sortOrder": 1720,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.3.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.3.3",
+      "originalTitleDe": "Fehlerkorrektur",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn in einem PDF-Dokument Fehlermeldungen erzeugt werden, beispielsweise durch Fehleingaben bei Eingabefeldern."
+      ],
+      "requirementDe": [
+        "Wenn ein Eingabefehler automatisch erkannt wird und Korrekturvorschläge bekannt sind, werden die Vorschläge konkret benannt, es sei denn, dies würde die Sicherheit oder den Zweck des Inhalts gefährden."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass Fehlermeldungen bei einer fehlerhaften Eingabe hilfreiche Korrekturvorschläge enthalten, falls möglich.",
+        "",
+        "Fehler lassen sich mithilfe von konkreten Hinweisen leichter bzw. überhaupt erst beheben, beispielsweise wenn bei der Festlegung eines Passwortes sehr konkrete Kriterien zugrunde gelegt werden, die an keiner Stelle benannt werden. Der Hinweis darauf, dass diesbezüglich ggf. nur gängige Sonderzeichen zulässig sind, könnte einen entscheidenden Hinweis auf die Korrektur der Eingabe liefern.",
+        "",
+        "Dabei ist sicherzustellen, dass die Fehlermeldungen auch für Menschen mit Sehbeeinträchtigung bzw. eingeschränktem Sehvermögen erfassbar sind sowie für Menschen mit kognitiven Einschränkungen bzw. mit eingeschränktem Sprachvermögen oder mit Lern- bzw. Leseschwäche und darüber hinaus auch für Menschen mit eingeschränkter Handhabung bzw. mit eingeschränkter Kraft.",
+        "",
+        "Für Menschen mit Beeinträchtigungen ist in vielen Fällen das Risiko von Fehleingaben größer. Menschen mit Legasthenie beispielsweise vertauschen häufiger Zahlen, Menschen mit motorischen Einschränkungen drücken häufiger versehentlich falsche Tasten. Deshalb sind alle Maßnahmen zur Überprüfung der Eingaben für diese Personengruppen besonders wichtig. Darüber hinaus ist es für alle Menschen hilfreich, einen deutlich Hinweis darauf zu erhalten, dass sich ein Formular aufgrund einer fehlerhaften oder fehlenden Eingabe nicht abschicken lässt – und nicht etwa aufgrund einer Störung der Funktionalität des Absendebuttons."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Eine Meldung beschreibt präzise, wie der Fehlerfall behoben werden kann. Dabei werden Sinn und Zweck des Inhalts nicht gefährdet.",
+        "- erfüllt: Fehlermeldung „Nachname: Eine Eingabe ist erforderlich.“",
+        "- erfüllt: Fehlermeldung „Geburtsdatum: Das Format ist nicht korrekt. Bitte im Format TT.MM.JJJJ ausfüllen.“",
+        "- erfüllt: Ein Eingabefeld verlangt die Angabe des Monatsnamens in ausgeschriebener Form. Es wird eine Zahlenangabe gemacht. Die Fehlermeldung listet alle möglichen Monatsnamen auf. Hinweis: Diese Fehlermeldung weist konkret auf die verlangte Sprachversion hin und ist auch bei einem vorliegenden Rechtschreibfehler hilfreich.",
+        "- erfüllt: Ein Eingabefeld verlangt die Angabe des Monatsnamens in ausgeschriebener Form. Es wird ‚12‘ eingetragen. Fehlermeldung: „Meinen Sie ‚Dezember‘?“",
+        "- erfüllt: Ein Eingabefeld verlangt die Angabe des Monatsnamens in ausgeschriebener Form. Es wird ‚may‘ eingetragen. Fehlermeldung: „Meinen Sie ‚Mai‘?“. Hinweis: Diese Fehlermeldung ist ebenfalls hilfreich, falls die korrekte Eingabe von ‚Mai‘ aufgrund einer fälschlicherweise auf Englisch eingestellten Autokorrektur vom PDF-Anzeigeprogramm falsch korrigiert wurde.",
+        "- erfüllt: Ein Eingabefeld verlangt die Angabe des Monats in Zahlenform. Es wird ‚21‘ eingegeben. Die Fehlermeldung listet alle möglichen Zahlenangaben von 1 bis 12 auf. Hinweis: Diese Fehlermeldung ist auch bei einem möglicherweise vorliegenden Zahlendreher hilfreich."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: In dem PDF-Dokument werden keinerlei Fehlermeldungen angezeigt bzw. das PDF-Dokument verfügt über keine interaktiven Elemente, die Fehlermeldungen verursachen könnten bzw. die Angabe von konkreten Fehlermeldungen würde Sicherheit oder Zweck des Inhalts gefährden.",
+        "- Blockade: Ein Meldungsfenster gibt nur den Begriff „Fehler“ oder „falsches Format“ aus.",
+        "- Blockade: „Eingabe ist ungültig“"
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#fehlerkorrektur"
+    }
+  ]
+}

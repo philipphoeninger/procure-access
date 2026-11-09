@@ -1,0 +1,57 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Mit externer Tastatur bedienbar",
+  "sortOrder": 630,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.1.1a",
+      "originalTitleDe": "Mit externer Tastatur bedienbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Mobile App ist ohne Verwendung von Touch- oder Wischgesten ausschließlich über eine externe Tastatur bedienbar. Alle Bedienelemente der App können über die externe Tastatur angesteuert werden. Falls die Seite scrollbare Bereiche enthält, sollen die nicht sichtbaren Inhalte über die Tastatur erreichbar sein.",
+        "",
+        "Ein eventuell auf der Tastatur vorhandenes Track-Pad ist nicht Bestandteil der Prüfung.",
+        "",
+        "Falls die Seite scrollbare Bereiche enthält, sollen die nicht sichtbaren Inhalte über die Tastatur erreichbar sein. Die Reihenfolge, in der die Elemente fokussiert werden, spielt in diesem Prüfschritt keine Rolle.",
+        "",
+        "Prüfende müssen mit der Funktionsweise der Tastaturbedienung vertraut sein."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Inhalte der App können mit externer Tastatur angesteuert werden.",
+        "- Alle Inhalte der App können mit externer Tastatur bedient werden."
+      ],
+      "negativeExamplesDe": [
+        "- Die Mobile App kann mit externer Tastatur nicht oder nicht vollumfänglich bedient werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#a-mit-externer-tastatur-bedienbar"
+    }
+  ]
+}

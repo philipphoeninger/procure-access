@@ -1,0 +1,122 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Sinnvolle Reihenfolge",
+  "sortOrder": 490,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.3.2",
+      "originalTitleDe": "Sinnvolle Reihenfolge",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Beim Einsatz von assistiven Technologien wie beispielsweise Screenreadern oder auch bei der Tastaturnutzung erhalten die Inhalte den Fokus in einer Reihenfolge, die der logischen beziehungsweise visuellen Struktur, oder einem für Screenreadernutzenden optimiertem Bedienablauf entspricht. Die Navigation erfolgt hierbei von Element zu Element, bei Tastaturbedienung (mit aktivem Screenreader) von interaktivem Element zu interaktivem Element.",
+        "",
+        "Ausgeblendete oder unsichtbare Inhalte, Layout-Objekte oder Inhalte, die im Hintergrund liegen, dürfen dabei nicht fokussiert werden.",
+        "",
+        "#todo#Bei einem Seitenaufruf soll bei der Tastaturnavigation das erste Element im Fokus die Seitenüberschrift sein. Ist keine Seitenüberschrift vorhanden, soll die Zurück-Taste als erstes Element fokussiert werden. Bietet die Seite eine zentrale Funktion (beispielsweise das Suchfeld der Google Suche), so kann das Suchfeld direkt fokussiert werden.",
+        "",
+        "Bei Bedienung mit externer Tastatur soll das erste Element im Fokus das erste interaktive Element sein. Kontextelemente sind mit den Pfeiltasten erreichbar.",
+        "",
+        "Bei modalen Dialogen muss das erste Element innerhalb des Dialogs fokussiert werden. Eine Wischnavigation ist nur innerhalb des Dialogs möglich, bis er geschlossen wird. Nach Schließen des Dialogs muss sich der Fokus am zuvor auslösenden Element befinden. Sollte der Dialog beim Start der Software oder beim Aufruf einer Seite automatisch geöffnet werden, muss sich der Fokus nach Schließen des Dialogs am ersten Element der Seite befinden."
+      ],
+      "rationaleWhyDe": [
+        "Screenreadernutzende erhalten die Information der Reihenfolge dargestellter Informationen in gesprochener Form und können somit den Kontext von Inhalten besser verstehen. Durch eine nicht nachvollziehbare Reihenfolge der fokussierten Elemente wird die Bedienbarkeit für diese Nutzenden erheblich beeinträchtigt. Sehbeeinträchtigte oder blinde Nutzende werden darüber hinaus in ihrer Fähigkeit, sich ein mentales Modell vom Aufbau der der Inhalte zu machen, eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Beim Öffnen einer Ansicht ist die Zurück-Taste das fokussierte Element.",
+        "- Beim Öffnen einer Ansicht ist der Seitentitel das fokussierte Element.",
+        "- Beim Öffnen einer Such-Ansicht ist das Suchfeld, das in der Mitte der Ansicht lokalisiert ist, das fokussierte Element."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienung ist über Wischnavigation möglich, jedoch nicht mit externer Tastatur, oder umgekehrt.",
+        "- Nach Öffnen des Menüs wird nicht das erste Inhaltselement des Menüs fokussiert.",
+        "- Nach Schließen eines Dialogs muss der Nutzende zusätzliche Schritte verfolgen, um zur Ausgangsposition zurückzukehren.",
+        "- Elemente werden in unlogischer Reihenfolge fokussiert.",
+        "- Dekorative Objekte, beispielsweise Trennlinien, werden fokussiert.",
+        "- Aufzählungspunkte innerhalb einer Liste werden fokussiert.",
+        "- Der Fokus kann von einem Header-Objekt nicht in den Inhalt versetzt werden.",
+        "- In einem Karussell-Widget werden die Bedienelemente zum Blättern erst nach den Inhalten fokussiert.",
+        "- In Teaser-Kacheln wird das verlinkte Bild oder das Datum vor der Überschrift fokussiert.",
+        "- Bei einem Formularelement wird zuerst das Eingabefeld, danach die Beschriftung fokussiert."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sinnvolle-reihenfolge"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.2",
+      "originalTitleDe": "Sinnvolle Reihenfolge",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bei aktivem Screenreader erhalten die Inhalte sowohl bei der Wischnavigation als auch bei der Navigation mit externer Tastatur den Fokus in einer Reihenfolge, die der logischen beziehungsweise visuellen Struktur, oder einem für Screenreadernutzenden optimiertem Bedienablauf entspricht. Die Navigation erfolgt hierbei bei der Wischnavigation von Element zu Element, bei Bedienung mit externer Tastatur mit aktivem Screenreader von interaktivem Element zu interaktivem Element.",
+        "",
+        "Ausgeblendete oder unsichtbare Inhalte, Layout-Objekte oder Inhalte, die im Hintergrund liegen, dürfen dabei nicht fokussiert werden.",
+        "",
+        "Bei einem Seitenaufruf soll bei der Wischnavigation das erste Element im Fokus die Seitenüberschrift sein. Ist keine Seitenüberschrift vorhanden, soll die Zurück-Taste als erstes Element fokussiert werden. Bietet die Seite eine zentrale Funktion (beispielsweise das Suchfeld der Google Suche), so kann das Suchfeld direkt fokussiert werden.",
+        "",
+        "Bei Bedienung mit externer Tastatur soll das erste Element im Fokus das erste interaktive Element sein. Kontextelemente sind mit den Pfeiltasten erreichbar.",
+        "",
+        "Bei modalen Dialogen muss das erste Element innerhalb des Dialogs fokussiert werden. Eine Wischnavigation ist nur innerhalb des Dialogs möglich, bis er geschlossen wird. Nach Schließen des Dialogs muss sich der Fokus am zuvor auslösenden Element befinden. Sollte der Dialog beim Start der Mobile App oder beim Aufruf einer Seite automatisch geöffnet werden, muss sich der Fokus nach Schließen des Dialogs am ersten Element der Seite befinden."
+      ],
+      "rationaleWhyDe": [
+        "Screenreadernutzende erhalten die Information der Reihenfolge dargestellter Informationen in gesprochener Form und können somit den Kontext von Inhalten besser verstehen. Durch eine nicht nachvollziehbare Reihenfolge der fokussierten Elemente wird die Bedienbarkeit für diese Nutzenden erheblich beeinträchtigt. Sehbeeinträchtigte oder blinde Nutzende werden darüber hinaus in ihrer Fähigkeit, sich ein mentales Modell vom Aufbau der der Inhalte zu machen, eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Beim Öffnen einer Ansicht ist die Zurück-Taste das fokussierte Element.",
+        "- Beim Öffnen einer Ansicht ist der Seitentitel das fokussierte Element.",
+        "- Beim Öffnen einer Such-Ansicht ist das Suchfeld, das in der Mitte der Ansicht lokalisiert ist, das fokussierte Element."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienung ist über Wischnavigation möglich, jedoch nicht mit externer Tastatur, oder umgekehrt.",
+        "- Nach Öffnen des Menüs wird nicht das erste Inhaltselement des Menüs fokussiert.",
+        "- Nach Schließen eines Dialogs muss der Nutzende zusätzliche Schritte verfolgen, um zur Ausgangsposition zurückzukehren.",
+        "- Elemente werden in unlogischer Reihenfolge fokussiert.",
+        "- Dekorative Objekte, beispielsweise Trennlinien, werden fokussiert.",
+        "- Aufzählungspunkte innerhalb einer Liste werden fokussiert.",
+        "- Der Fokus kann von einem Header-Objekt nicht in den Inhalt versetzt werden.",
+        "- In einem Karussell-Widget werden die Bedienelemente zum Blättern erst nach den Inhalten fokussiert.",
+        "- In Teaser-Kacheln wird das verlinkte Bild oder das Datum vor der Überschrift fokussiert.",
+        "- Bei einem Formularelement wird zuerst das Eingabefeld, danach die Beschriftung fokussiert."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sinnvolle-reihenfolge"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "kind": "requirement",
+  "titleDe": "Steuerung durch Bewegung",
+  "sortOrder": 1650,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.5.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.5.4",
+      "originalTitleDe": "Steuerung durch Bewegung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist nicht anwendbar."
+      ],
+      "allowedRatings": [
+        "notApplicable"
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#steuerung-durch-bewegung"
+    }
+  ]
+}

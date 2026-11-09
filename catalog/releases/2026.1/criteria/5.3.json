@@ -1,0 +1,80 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Biometrie",
+  "sortOrder": 20,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "biometrics"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.3",
+      "originalTitleDe": "Biometrie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software biometrische Merkmale zur Identifikation eines Nutzenden oder zum Log-In eines Nutzenden zur Verfügung stellt, beziehungsweise auf die biometrische Identifikation des Betriebssystems zurückgreift."
+      ],
+      "requirementDe": [
+        "Bietet die Software eine biometrische Identifizierungsmethode an, so darf der Identifikationsvorgang nicht nur auf das biometrische Merkmal beschränkt sein. Es muss mindestens eine weitere Identifizierungsmethode unterstützt werden. Eine Alternative zu einer biometrischen Identifizierungsmethode kann sowohl eine weitere biometrische Methode als auch eine nicht biometrische Methode sein."
+      ],
+      "rationaleWhyDe": [
+        "Anmeldeprozesse, die auf der Auswertung biometrischer Merkmale, wie zum Beispiel Fingerabdruck, Sprache oder Gesicht basieren, können dem Nutzenden den Zugang zum digitalen Produkt erleichtern. Für Menschen, die aufgrund einer Beeinträchtigung eine bestimmte biometrische Authentifizierung nicht nutzen können, ist eine geeignete Alternative nötig. Eine nicht biometrische Methode ist für die meisten Nutzenden bedienbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Zusätzlich zu einer biometrischen Methode gibt es mindestens eine weitere biometrische (beispielsweise Gesichtserkennung, Fingerabdruck) oder nicht-biometrische Methode (beispielsweise Passworteingabe, PIN-Eingabe)."
+      ],
+      "negativeExamplesDe": [
+        "- Es stehen keine Alternativen zu einer biometrischen Methode zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#biometrie"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.3",
+      "originalTitleDe": "Biometrie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App biometrische Merkmale zur Identifikation eines Nutzenden oder zum Log-In eines Nutzenden zur Verfügung stellt, beziehungsweise auf die biometrische Identifikation des Betriebssystems zurückgreift."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App eine biometrische Identifizierungsmethode an, so darf der Identifikationsvorgang nicht nur auf das biometrische Merkmal beschränkt sein. Es muss mindestens eine weitere Identifizierungsmethode unterstützt werden. Eine Alternative zu einer biometrischen Identifizierungsmethode kann sowohl eine weitere biometrische Methode als auch eine nicht biometrische Methode sein."
+      ],
+      "rationaleWhyDe": [
+        "Anmeldeprozesse, die auf der Auswertung biometrischer Merkmale, wie zum Beispiel Fingerabdruck, Sprache oder Gesicht basieren, können dem Nutzenden den Zugang zum digitalen Produkt erleichtern. Für Menschen, die aufgrund einer Beeinträchtigung eine bestimmte biometrische Authentifizierung nicht nutzen können, ist eine geeignete Alternative nötig. Eine nicht biometrische Methode ist für die meisten Nutzenden bedienbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Zusätzlich zu einer biometrischen Methode gibt es mindestens eine weitere biometrische (beispielsweise Gesichtserkennung, Fingerabdruck) oder nicht-biometrische Methode (beispielsweise Passworteingabe, PIN-Eingabe)."
+      ],
+      "negativeExamplesDe": [
+        "- Es stehen keine Alternativen zu einer biometrischen Methode zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#biometrie"
+    }
+  ]
+}

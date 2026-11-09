@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Redundanter Eintrag",
+  "sortOrder": 890,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.7",
+      "originalTitleDe": "Redundanter Eintrag",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Müssen innerhalb eines Prozesses bestimmte, bereits zuvor eingegebene Daten eines Nutzenden erneut eingegeben werden, muss der Nutzende bei der erneuten Eingabe unterstützt werden. Als Unterstützung zählen:",
+        "",
+        "- Die Daten werden bei der Eingabe als Ergänzungsvorschlag angeboten",
+        "- Es wird eine Funktion zum automatischen Ausfüllen bereitgestellt",
+        "- Die Daten können innerhalb der gleichen Seite kopiert und eingefügt werden",
+        "",
+        "Daten, deren erneute Eingabe unerlässlich oder sicherheitsrelevant ist, oder falls die vorherige Eingabe nicht mehr gültig ist, sind hiervon ausgenommen."
+      ],
+      "rationaleWhyDe": [
+        "Vermeidung von wiederholter Eingabe durch Nutzende unterstützt Menschen mit kognitiver Beeinträchtigung bei der Vermeidung von Fehleingaben. Sie werden befähigt, sich einfacher auf die aktuelle Aufgabe zu konzentrieren. Auch werden Menschen mit motorischen Beeinträchtigungen, die beispielsweise eine Spracheingabe verwenden, entlastet."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für entsprechende Formularfelder wird mindestens eine der Eingabehilfen angeboten.",
+        "- Auf Seite 2 eines Registrierungsprozesses kann der Wert des Eingabefelds für Nachname vom Wert des Eingabefelds für Nachname auf Seite 1 über das Aktivieren eines Kontrollkästchens automatisch übernommen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Für entsprechende Formularfelder wird keine der Eingabehilfen angeboten.",
+        "- Ein Registrierungsprozess fordert mehrmals die Eingabe des Nachnamens, bietet aber keine Eingabeunterstützung an.",
+        "- Zum Kopieren des Inhalts des Formularfelds Nachname muss auf eine vorherige Seite gewechselt werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#redundanter-eintrag"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.7",
+      "originalTitleDe": "Redundanter Eintrag",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Müssen innerhalb eines Prozesses bestimmte, bereits zuvor eingegebene Daten eines Nutzenden erneut eingegeben werden, muss der Nutzende bei der erneuten Eingabe unterstützt werden. Als Unterstützung zählen:",
+        "",
+        "- Die Daten werden bei der Eingabe als Ergänzungsvorschlag angeboten",
+        "- Es wird eine Funktion zum automatischen Ausfüllen bereitgestellt",
+        "- Die Daten können innerhalb der gleichen Seite kopiert und eingefügt werden",
+        "",
+        "Daten, deren erneute Eingabe unerlässlich oder sicherheitsrelevant ist, oder falls die vorherige Eingabe nicht mehr gültig ist, sind hiervon ausgenommen."
+      ],
+      "rationaleWhyDe": [
+        "Vermeidung von wiederholter Eingabe durch Nutzende unterstützt Menschen mit kognitiver Beeinträchtigung bei der Vermeidung von Fehleingaben. Sie werden befähigt, sich einfacher auf die aktuelle Aufgabe zu konzentrieren. Auch werden Menschen mit motorischen Beeinträchtigungen, die beispielsweise eine Spracheingabe verwenden, entlastet."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für entsprechende Formularfelder wird mindestens eine der Eingabehilfen angeboten.",
+        "- Auf Seite 2 eines Registrierungsprozesses kann der Wert des Eingabefelds für Nachname vom Wert des Eingabefelds für Nachname auf Seite 1 über das Aktivieren eines Kontrollkästchens automatisch übernommen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Für entsprechende Formularfelder wird keine der Eingabehilfen angeboten.",
+        "- Ein Registrierungsprozess fordert mehrmals die Eingabe des Nachnamens, bietet aber keine Eingabeunterstützung an.",
+        "- Zum Kopieren des Inhalts des Formularfelds Nachname muss auf eine vorherige Seite gewechselt werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#redundanter-eintrag"
+    }
+  ]
+}

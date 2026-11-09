@@ -1,0 +1,65 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Unterscheidbarkeit der bedienbaren Elemente",
+  "sortOrder": 50,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.5.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.5.2",
+      "originalTitleDe": "Unterscheidbarkeit der bedienbaren Elemente",
+      "applicabilityDe": [
+        "Wenn die Software bedienbare Teile enthält, muss sie eine Möglichkeit bieten, jedes bedienbare Teil zu erkennen, ohne dass eine Sicht erforderlich ist und ohne dass die mit dem bedienbaren Teil verbundene Handlung ausgeführt werden muss.",
+        "",
+        "Eine Möglichkeit, diese Anforderung zu erfüllen, besteht darin, die bedienbaren Teile taktil wahrnehmbar zu machen, z.B. bei Geld- oder Fahrscheinautomaten mit Touchscreen und Drucktasten. Der Prüfschritt ist bei der Prüfung von Software nicht anwendbar, da die Software keine Möglichkeit hat, ein physikalisches Bedienelement des Endgeräts zu beschriften"
+      ],
+      "rationaleWhyDe": [
+        "Sehbeeinträchtigte und blinde Menschen können den Status von Bedienelementen visuell nicht unterscheiden und sind auf andere, geeignete Methoden zur Erkennung des Status angewiesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Tasten sind durch unterschiedliche Formen bzw. Beschriftungen eindeutig unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Die Tasten sind taktil nicht unterscheidbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#unterscheidbarkeit-der-bedienbaren-elemente"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.5.2",
+      "originalTitleDe": "Unterscheidbarkeit der bedienbaren Elemente",
+      "applicabilityDe": [
+        "Der Prüfschritt ist bei der Prüfung von Mobile Apps nicht anwendbar, da die Mobile App keine Möglichkeit hat, ein physikalisches Bedienelement des Endgeräts zu beschriften."
+      ],
+      "allowedRatings": [
+        "notApplicable"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#unterscheidbarkeit-der-bedienbaren-elemente"
+    }
+  ]
+}

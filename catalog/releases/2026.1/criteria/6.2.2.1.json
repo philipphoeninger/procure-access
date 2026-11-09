@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Visuell unterscheidbare Darstellung",
+  "sortOrder": 140,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.2.1",
+      "originalTitleDe": "Visuell unterscheidbare Darstellung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Echtzeit-Textkommunikation (RTT = Real-Time Text) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Echtzeit-Textkommunikation (RTT) an, sollen gesendete und empfangene Nachrichten visuell hinreichend voneinander unterscheidbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Echtzeit-Textkommunikation verwenden, sollen gesendete und empfangene Nachrichten visuell einfach und hinreichend voneinander unterscheiden können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Gesendete und empfangene Nachrichten sind deutlich identifizierbar und unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Gesendete und empfangene Nachrichten sind nicht deutlich unterscheidbar.",
+        "- Gesendete und empfangene Nachrichten sind ausschließlich über die optische Darstellung unterscheidbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#visuell-unterscheidbare-darstellung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.2.1",
+      "originalTitleDe": "Visuell unterscheidbare Darstellung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Echtzeit-Textkommunikation (RTT = Real-Time Text) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Echtzeit-Textkommunikation (RTT) an, sollen gesendete und empfangene Nachrichten visuell hinreichend voneinander unterscheidbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Echtzeit-Textkommunikation verwenden, sollen gesendete und empfangene Nachrichten visuell einfach und hinreichend voneinander unterscheiden können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Gesendete und empfangene Nachrichten sind deutlich identifizierbar und unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Gesendete und empfangene Nachrichten sind nicht deutlich unterscheidbar.",
+        "- Gesendete und empfangene Nachrichten sind ausschließlich über die optische Darstellung unterscheidbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#visuell-unterscheidbare-darstellung"
+    }
+  ]
+}

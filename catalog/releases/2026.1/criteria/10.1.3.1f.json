@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Überschriften",
+  "sortOrder": 1340,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1f",
+      "originalTitleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Überschriften",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Überschriften enthält oder der Einsatz der Elemente H1-H6 erforderlich gewesen wäre."
+      ],
+      "requirementDe": [
+        "Wenn im PDF-Dokument Überschriften verwendet werden, sollten sie korrekt ausgezeichnet werden. Die Kennzeichnung als Überschrift sollte nicht rein zu Layout-Zwecken eingesetzt werden, falls es sich beim entsprechend als Überschrift ausgewiesenen Bereich semantisch nicht um eine Überschrift handelt."
+      ],
+      "rationaleWhyDe": [
+        "Visuell werden PDF-Dokumente in der Regel durch Überschriften strukturiert. Dank dieser Strukturierung ist erkennbar, welche Bereiche semantisch zusammengehören, und Nutzende können die Inhalte des PDF-Dokuments leichter überblicken und gezielt auf Inhalte zugreifen, die für sie von Interesse sind.",
+        "",
+        "Menschen, die eine visuell erkennbare Strukturierung nicht nutzen können, zum Beispiel, weil sie blind sind oder nur einen kleinen Ausschnitt der Seite sehen können, sind darauf angewiesen, dass die Struktur unabhängig von der visuellen Darstellung auf dem Bildschirm zugänglich und nutzbar ist. Die Verwendung von Überschriften-Elementen ist dafür eine wesentliche Voraussetzung.",
+        "",
+        "Screenreader-Programme bieten darüber hinaus die Funktionalität, dass durch einzelne Elementgruppen getabbt werden kann. D. h. mit einem Screenreader-Programm kann man Überschriften als zentrale Gliederungselemente nutzen und von einer Überschrift zur nächsten springen. Wenn keine Überschriften ausgezeichnet sind, muss eine blinde Person den ganzen Text auslesen lassen, um zum nächsten Bereich zu gelangen.",
+        "",
+        "Tags, die nicht entsprechend ihrer Semantik verwendet werden (z. B. ein Überschriften-Tag wie H1 zum Hervorheben von Teilen eines Absatzes), führen bei Menschen, die auf semantische Informationen angewiesen sind (z. B. bei Screenreader-Nutzung), zu Missverständnissen bis hin zum Informationsverlust. Das soll durch korrektes Taggen vermieden werden."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Dieser Prüfschritt ist erfüllt, wenn im PDF-Dokument Überschriften verwendet und korrekt ausgezeichnet werden."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Wird nur eine Überschrift verwendet und diese als H, nicht als H1 ausgezeichnet, handelt es sich um eine leichte Einschränkung.",
+        "- Einschränkung: Werden Überschriften verwendet, jedoch in der Nummerierung eine Überschriftenebene ausgelassen, handelt es sich um eine Einschränkung.",
+        "- Einschränkung: Ziehen sich Überschriften über mehrere Zeilen hin und wird jede Zeile neu mit einem H-Tag versehen, handelt es sich ebenfalls um eine Einschränkung wie beispielsweise bei: <H2> Dies ist eine </H2> (nächste Zeile) <H2> Überschrift </H2>"
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#f-info-und-beziehungen-blocklevel-strukturelementeüberschriften"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "kind": "requirement",
+  "titleDe": "Verzicht auf Flackern",
+  "sortOrder": 1560,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.3.1",
+      "originalTitleDe": "Verzicht auf Flackern",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald das PDF-Dokument Inhalte aufweist, welche blinken oder flackern können."
+      ],
+      "requirementDe": [
+        "Wenn ein PDF-Dokument blinkende oder flackernde Elemente enthält, so dürfen innerhalb einer Sekunde maximal drei Blitze abgegeben werden. Grelles Flackern ist gänzlich zu vermeiden."
+      ],
+      "rationaleWhyDe": [
+        "Bei Menschen mit Epilepsie kann längeres Flackern in bestimmten Frequenzen einen Anfall auslösen. Ferner können flackernde Inhalte das Lesen von PDF-Dokumenten erschweren. Dies betrifft nicht nur Menschen mit Sehbehinderung."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Das PDF-Dokument enthält keinerlei flackernde Elemente."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Das PDF-Dokument enthält Elemente, welche periodisch (beispielsweise alle zwei Sekunden) ihre Farbe verändern, aber dabei insbesondere nicht flackern. Diese Elemente befinden sich in unmittelbarer Nähe zu informatorischem Text. Die Farbveränderung kann Menschen mit spezifischen Sehbeeinträchtigungen ablenken und den Zugang zum Text erschweren.",
+        "- Barriere: Das PDF-Dokument enthält eines oder mehrere flackernde Elemente, welche ihren Farbzustand innerhalb einer Sekunde mindestens 3 verändern.",
+        "- Blockade: Das PDF-Dokument enthält eine Vielzahl an grell flackernden Elemente, welche ihren Farbzustand innerhalb einer Sekunde mindestens 3 verändern."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#verzicht-auf-flackern"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "kind": "requirement",
+  "titleDe": "Audiodeskription oder Medienalternative für aufgezeichnete Videos",
+  "sortOrder": 1260,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.2.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.2.3",
+      "originalTitleDe": "Audiodeskription oder Medienalternative für aufgezeichnete Videos",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald im PDF-Dokument aufgezeichnete Video-Dateien mit synchronisiertem Ton und Bild bereitgestellt werden."
+      ],
+      "requirementDe": [
+        "Für alle voraufgezeichneten Videoinhalte in synchronisierten Medien steht eine Textalternative zur Verfügung, die gleichwertige Informationen für die voraufgezeichneten Videoinhalte bietet, es sei denn, die Video-Datei stellt eine Medienalternative für Text dar und wird auch deutlich als solche gekennzeichnet. Die Textalternative kann in Form von Audiodeskription oder einer Alternative für zeitbasierte Medien bereitgestellt werden."
+      ],
+      "rationaleWhyDe": [
+        "Durch Audiodeskription kann sichergestellt werden, dass auch Personen, die Schwierigkeiten damit haben, bewegte Bilder zu erfassen, sowie Personen ohne bzw. mit eingeschränktem Sehvermögen die visuellen Inhalte einer synchronisierten Medienpräsentation vollumfänglich zur Verfügung stehen. Die Audiodeskription ergänzt den Audioteil der Medienpräsentation um alle Informationen, die zusätzlich benötigt werden, wenn der Videoteil nicht verfügbar ist.",
+        "",
+        "Volltext-Alternativen können ebenfalls sowohl für Menschen, die Schwierigkeiten damit haben, bewegte Bilder zu erfassen, sowie für Menschen ohne bzw. mit eingeschränktem Hörvermögen als auch für Menschen ohne bzw. mit Sehvermögen von Vorteil sein."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Wenn alle Videoinformationen bereits in vorhandenem Audio enthalten sind, ist keine zusätzliche Audiodeskription erforderlich.",
+        "- erfüllt: Das PDF-Dokument enthält zwar Videoinhalte, welche ohne Audiodeskription nicht zugänglich sind. Jedoch werden sämtliche Videoinhalte mittels Textalternative (Fließtext o. Ä.) erläutert."
+      ],
+      "negativeExamplesDe": [
+        "- Blockade: Das PDF-Dokument enthält Videoinhalte ohne zusätzliche Audiodeskription, welche auch nicht durch eine Volltextalternative zugänglich gemacht werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#audiodeskription-oder-medienalternative-für-aufgezeichnete-videos"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Alternativen für CAPTCHAs",
+  "sortOrder": 380,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.1.1c",
+      "originalTitleDe": "Alternativen für CAPTCHAs",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software CAPTCHA-Funktionalität einsetzt."
+      ],
+      "requirementDe": [
+        "Für bildbasierte oder Audio-CAPTCHAs sind Alternativtexte verfügbar, die den Zweck des Objekts beschreiben und über Alternativen zum jeweiligen CAPTCHA informieren. Es muss mindestens eine Alternative für grafische oder Audio-CAPTCHAs vorhanden sein. Das alternative CAPTCHA muss im unmittelbaren Kontext zur Verfügung stehen."
+      ],
+      "rationaleWhyDe": [
+        "Sehbeeinträchtigte bzw. blinde Nutzende können bildbasierte CAPTCHAS unter Umständen nicht bedienen. Audiobasierte CAPTCHAS sind hingegen für Nutzende mit eingeschränktem oder fehlendem Hörvermögen nicht bedienbar. Entsprechende Alternativtexte schaffen Orientierung, CAPTCHA-Alternativen sorgen für entsprechende Nutzungsmöglichkeiten des Angebots."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs und über entsprechende Alternativen. Die Alternativen sind im unmittelbaren Kontext auffindbar."
+      ],
+      "negativeExamplesDe": [
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs, jedoch nicht über entsprechende Alternativen.",
+        "- Der Alternativtext eines CAPTCHAs informiert nicht über den Zweck des CAPTCHAs.",
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs und über entsprechende Alternativen. Die Alternativen sind jedoch nicht im unmittelbaren Kontext auffindbar.",
+        "- Es existiert keine Alternative zu einem bildbasierten oder Audio-CAPTCHA."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#c-alternativen-für-captchas"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.1.1c",
+      "originalTitleDe": "Alternativen für CAPTCHAs",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App CAPTCHA-Funktionalität einsetzt."
+      ],
+      "requirementDe": [
+        "Für bildbasierte oder Audio-CAPTCHAs sind Alternativtexte verfügbar, die den Zweck des Objekts beschreiben und über Alternativen zum jeweiligen CAPTCHA informieren. Es muss mindestens eine Alternative für grafische oder Audio-CAPTCHAs vorhanden sein. Das alternative CAPTCHA muss im unmittelbaren Kontext zur Verfügung stehen."
+      ],
+      "rationaleWhyDe": [
+        "Sehbeeinträchtigte bzw. blinde Nutzende können bildbasierte CAPTCHAS unter Umständen nicht bedienen. Audiobasierte CAPTCHAS sind hingegen für Nutzende mit eingeschränktem oder fehlendem Hörvermögen nicht bedienbar. Entsprechende Alternativtexte schaffen Orientierung, CAPTCHA-Alternativen sorgen für entsprechende Nutzungsmöglichkeiten des Angebots."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs und über entsprechende Alternativen. Die Alternativen sind im unmittelbaren Kontext auffindbar."
+      ],
+      "negativeExamplesDe": [
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs, jedoch nicht über entsprechende Alternativen.",
+        "- Der Alternativtext eines CAPTCHAs informiert nicht über den Zweck des CAPTCHAs.",
+        "- Der Alternativtext eines CAPTCHAs informiert über den Zweck des CAPTCHAs und über entsprechende Alternativen. Die Alternativen sind jedoch nicht im unmittelbaren Kontext auffindbar.",
+        "- Es existiert keine Alternative zu einem bildbasierten oder Audio-CAPTCHA."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#c-alternativen-für-captchas"
+    }
+  ]
+}

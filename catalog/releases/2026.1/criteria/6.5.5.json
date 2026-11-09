@@ -1,0 +1,82 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Visuelle Anzeige von Audio-Aktivität",
+  "sortOrder": 250,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.5.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.5.5",
+      "originalTitleDe": "Visuelle Anzeige von Audio-Aktivität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Zwei-Wege-Sprachkommunikation und Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Zwei-Wege-Sprachkommunikation mittels Videotelefonie, so muss Audioaktivität von Teilnehmern in Echtzeit visualisiert werden. Der visuelle Indikator der Audio-Aktivität kann ein visueller Punkt, eine Rahmenmarkierung des Nutzenden oder eine andere Art von Ein- / Aus-Anzeige sein, die flackert."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation von Audioaktivität in Verbindung mit dem entsprechenden Teilnehmer essenziell, um im Kontext die jeweilige Aktivität dem Teilnehmer zuordnen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell identifizierbar."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell nicht identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist visuell nur manchmal, und nicht bei jeder Audioaktivität identifizierbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#visuelle-anzeige-von-audio-aktivität"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.5.5",
+      "originalTitleDe": "Visuelle Anzeige von Audio-Aktivität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Zwei-Wege-Sprachkommunikation und Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Zwei-Wege-Sprachkommunikation mittels Videotelefonie, so muss Audioaktivität von Teilnehmern in Echtzeit visualisiert werden. Der visuelle Indikator der Audio-Aktivität kann ein visueller Punkt, eine Rahmenmarkierung des Nutzenden oder eine andere Art von Ein- / Aus-Anzeige sein, die flackert."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation von Audioaktivität in Verbindung mit dem entsprechenden Teilnehmer essenziell, um im Kontext die jeweilige Aktivität dem Teilnehmer zuordnen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell identifizierbar."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell nicht identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist visuell nur manchmal, und nicht bei jeder Audioaktivität identifizierbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#visuelle-anzeige-von-audio-aktivität"
+    }
+  ]
+}

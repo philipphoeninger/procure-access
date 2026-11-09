@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.5 (2026-11-09; v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way.
+> **Status:** v2.6 (2026-11-09; v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -89,6 +89,14 @@ Recorded in this file like v2.1 – v2.4; SPEC_v3 stays the P1 version. Source: 
 | v2.5-1 | R-SUG-01: `Contact:CriteriaSuggestion` is the client setting `criteriaSuggestion` of the environment files (`environment.ts`, `environment.prod.ts`), not an API setting — no endpoint (ARCH §16.4.2); one value for every environment, because it is WERTE.IT's channel. The 🔧 placeholder is a `mailto:` address on the reserved domain `.invalid`; the link is shown with it outside production | Owner decisions 2a, 3a |
 | v2.5-2 | R-SUG-01: „production build fails“ → the release check `scripts/check-release-config.mjs` fails while the value is the placeholder or neither `mailto:<address>` nor an https URL; it runs before a production release, not on pull requests (its self-test runs in CI stage 1). R-SHL-07 (GP.3) can use the same check | Owner decision 1a |
 | v2.5-3 | R-SUG-01: the hidden suffix is `suggest.external` for a `mailto:` channel and `suggest.external.url` for a URL (UX copy v16, U85); from the footer the mail has the subject `suggest.mailSubject` and no body — the body with the criterion key comes with S11 | Owner decision 4 |
+
+#### Changes in v2.6 (2026-11-09)
+
+Recorded in this file like v2.1 – v2.5; SPEC_v3 stays the P1 version. Source: sprint 03 task S3-27 (`docs/sprints/sprint_03/S3-27_release_2026_1_texts.md`).
+
+| # | Change | Source |
+|---|---|---|
+| v2.6-1 | §13 O-1: release 2026.1 exists as a folder with the BIT inklusiv texts but without priorities and plain-language titles; `docs/kriterienkatalog_2026_1_luecken_v1.md` lists what is missing per criterion. The folder has no field for the short description (Kurzbeschreibung) of Kriterienkatalog §6.1 and the export column of §8.4 yet | S3-27 |
 
 ---
 
@@ -806,7 +814,7 @@ Legal pages (R-SHL-07), the dark theme release check (R-SET-03, O-S5) and the ac
 
 | # | Question | Blocks | Decides | Source |
 |---|---|---|---|---|
-| O-1 | Priorities and rationales per criterion, use case and app type; plain-language titles and summaries (K-1, K-6) | step 2 (content of release 2026.1) | Project team | ARCH O-1 |
+| O-1 | Priorities and rationales per criterion, use case and app type; plain-language titles and summaries (K-1, K-6). The texts of release 2026.1 are in `catalog/releases/2026.1/` (S3-27); `docs/kriterienkatalog_2026_1_luecken_v1.md` lists what is missing per criterion | step 2 (content of release 2026.1) | Project team | ARCH O-1 |
 | O-2 | Hardware and Vermittlungs-/Notrufdienst without a procedure | — (empty state exists) | Project team | ARCH O-2 |
 | O-4 | Bundled legal review (consent texts ⚖️, purge timing, erasure vs. moderation record, vendor authenticity, export legal note, account deletion) | public release | Legal review | ARCH O-4 |
 | O-6 | Contact address or form for „Kriterium vorschlagen“; the footer link shows a placeholder channel until then (S3-21) | production release (R-SUG-01: release check, v2.5-2) | Project team | ARCH O-6 |

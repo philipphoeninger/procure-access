@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Gleichzeitige Benutzerhandlungen",
+  "sortOrder": 100,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.9"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.9",
+      "originalTitleDe": "Gleichzeitige Benutzerhandlungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Funktionalitäten zur Verfügung stellt, für deren Bedienung gleichzeitige Benutzeraktionen oder komplexe Touch-Gesten mit mindestens zwei Fingern erforderlich sind."
+      ],
+      "requirementDe": [
+        "Sofern die Software zum Betrieb oder zur Bedienung gleichzeitige Benutzerhandlungen oder komplexe Touch-Gesten mit mindestens zwei Fingern erfordert, muss sie einen alternativen Bedienmodus bereitstellen, der keine gleichzeitigen Benutzerhandlungen für den Betrieb oder die Bedienung benötigt."
+      ],
+      "rationaleWhyDe": [
+        "Motorisch beeinträchtigte Menschen können komplexe oder gleichzeitige Benutzerhandlungen gegebenenfalls nicht ausführen. Daher soll es in Software mindestens eine einfach anzuwendende Alternative geben, um entsprechende Aktionen auszuführen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es wird ein alternativer Bedienmodus zur Verfügung gestellt, für den zum Ausführen der entsprechenden Aktion keine der in den Anforderungen definierten, gleichzeitigen Benutzerhandlungen erfordert."
+      ],
+      "negativeExamplesDe": [
+        "- Es wird kein alternativer Bedienmodus zur Verfügung gestellt. Entsprechende Aktionen erfordern, die in den Anforderungen definierten, gleichzeitigen Benutzerhandlungen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#gleichzeitige-benutzerhandlungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.9",
+      "originalTitleDe": "Gleichzeitige Benutzerhandlungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Funktionalitäten zur Verfügung stellt, für deren Bedienung gleichzeitige Benutzeraktionen oder komplexe Touch-Gesten mit mindestens zwei Fingern erforderlich sind."
+      ],
+      "requirementDe": [
+        "Sofern die Mobile App zum Betrieb oder zur Bedienung gleichzeitige Benutzerhandlungen oder komplexe Touch-Gesten mit mindestens zwei Fingern erfordert, muss sie einen alternativen Bedienmodus bereitstellen, der keine gleichzeitigen Benutzerhandlungen für den Betrieb oder die Bedienung benötigt.",
+        "",
+        "Anmerkung: beide Hände benutzen zu müssen, um beispielsweise ein Mobiltelefon aufzuklappen, oder um eine ausklappbare Tastatur zu öffnen, zwei oder mehr Tasten gleichzeitig drücken zu müssen, oder eine Oberfläche mit mehr als einem Finger berühren zu müssen sind Beispiele für gleichzeitige Benutzerhandlungen."
+      ],
+      "rationaleWhyDe": [
+        "Motorisch beeinträchtigte Menschen können komplexe oder gleichzeitige Benutzerhandlungen gegebenenfalls nicht ausführen. Daher soll es in Mobile Apps mindestens eine einfach anzuwendende Alternative geben, um entsprechende Aktionen auszuführen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es wird ein alternativer Bedienmodus zur Verfügung gestellt, für den zum Ausführen der entsprechenden Aktion keine der in den Anforderungen definierten, gleichzeitigen Benutzerhandlungen erfordert.",
+        "- Eine Kamera stellt zum Auslösen einen zeitverzögerten Selbstauslöser zur Verfügung, damit vor dem Auslösen die Kamera entsprechend justiert werden kann."
+      ],
+      "negativeExamplesDe": [
+        "- Es wird kein alternativer Bedienmodus zur Verfügung gestellt. Entsprechende Aktionen erfordern, die in den Anforderungen definierten, gleichzeitigen Benutzerhandlungen.",
+        "- Eine Kamera stellt zum Auslösen keinen zeitverzögerten Selbstauslöser zur Verfügung; die Kamera muss zeitgleich mit dem Auslöser justiert werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#gleichzeitige-benutzerhandlungen"
+    }
+  ]
+}

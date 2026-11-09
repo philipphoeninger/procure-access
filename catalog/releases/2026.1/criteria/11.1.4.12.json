@@ -1,0 +1,91 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Textabstand",
+  "sortOrder": 600,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.12"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.12",
+      "originalTitleDe": "Textabstand",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software eine softwarespezifische Funktion zum Verändern von Textabständen zur Verfügung stellt. Gängige Betriebssysteme wie beispielsweise Windows 11 und macOS bieten zum aktuellen Stand der Technik keine eigenen Möglichkeiten zum Anpassen von Textabständen (Stand Mai 2025). Bei Webanwendungen können Browsererweiterungen genutzt werden, um Textabstände zu anzupassen."
+      ],
+      "requirementDe": [
+        "Das Anpassen der Zeilenhöhe auf mindestens das 1,5-fache der Textgröße, des Abstands nach Absätzen auf mindestens das 2-fache der Textgröße, des Zeichenabstands auf mindestens das 0,12-fache der Textgröße und des Wortabstands auf mindestens das 0,16-fache der Textgröße führt nicht zu Verlust von Inhalt oder Funktionalität."
+      ],
+      "rationaleWhyDe": [
+        "Für Nutzende mit Sehbeeinträchtigung ist das Anpassen von Abständen nach ihren Bedürfnissen ein essenzieller Bestandteil, um die Lesbarkeit von Inhalten zu verbessern. Nutzende mit Legasthenie profitieren zudem von einer erhöhten Lesegeschwindigkeit."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Inhalte skalieren entsprechend der Anpassung. Es entsteht keine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die Skalierung führt zu vertikal scrollbaren Bereichen."
+      ],
+      "negativeExamplesDe": [
+        "- Alle Inhalte skalieren entsprechend der Einstellung, jedoch entsteht eine Überlappung oder Verdrängung bei Inhalten.",
+        "",
+        "- Die Steuerelemente sind nicht am Seitenanfang auffindbar.",
+        "- Die Skalierung führt zu horizontal scrollbaren Bereichen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#textabstand"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.12",
+      "originalTitleDe": "Textabstand",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App eine App-eigene Funktion zum Verändern von Textabständen zur Verfügung stellt. Die Betriebssysteme iOS und Android bieten zum aktuellen Stand der Technik keine eigenen Möglichkeiten zum Anpassen von Textabständen (Stand Januar 2024)."
+      ],
+      "requirementDe": [
+        "Das Anpassen der Zeilenhöhe auf mindestens das 1,5-fache der Textgröße, des Abstands nach Absätzen auf mindestens das 2-fache der Textgröße, des Zeichenabstands auf mindestens das 0,12-fache der Textgröße und des Wortabstands auf mindestens das 0,16-fache der Textgröße führt nicht zu Verlust von Inhalt oder Funktionalität. Beim Bereitstellen der Funktion müssen die zugehörigen Steuerelemente am Seitenbeginn auffindbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Für Nutzende mit Sehbeeinträchtigung ist das Anpassen von Abständen nach ihren Bedürfnissen ein essenzieller Bestandteil, um die Lesbarkeit von Inhalten zu verbessern. Nutzende mit Legasthenie profitieren zudem von einer erhöhten Lesegeschwindigkeit."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Inhalte skalieren entsprechend der Anpassung. Es entsteht keine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die Skalierung führt zu scrollbaren Bereichen."
+      ],
+      "negativeExamplesDe": [
+        "- Alle Inhalte skalieren entsprechend der Einstellung, jedoch entsteht eine Überlappung oder Verdrängung bei Inhalten.",
+        "",
+        "- Die Steuerelemente sind nicht am Seitenanfang auffindbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#textabstand"
+    }
+  ]
+}

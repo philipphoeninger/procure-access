@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Auflösung bei Videotelefonie",
+  "sortOrder": 220,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.5.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.5.2",
+      "originalTitleDe": "Auflösung bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Software, die Videotelefonie zur Verfügung stellen, sollen mindestens die QVGA-Auflösung bei 320x240 Pixel, vorzugsweise die VGA-Auflösung bei 640x480 Pixel für die Videoübertragung unterstützen."
+      ],
+      "rationaleWhyDe": [
+        "Hochwertige Bildqualität bei Videotelefonie ermöglicht es manchen Beeinträchtigungsgruppen, Informationen wie Mimik oder Gestik wahrzunehmen, die bei reiner Sprach- oder Textkommunikation im Kontext fehlen. Zudem können Menschen mit Beeinträchtigung des Gehörs zusätzlich von den Lippen lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Auflösung ist in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Auflösung ist nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Auflösung ist in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel.",
+        "- Die Auflösung ist nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#auflösung-bei-videotelefonie"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.5.2",
+      "originalTitleDe": "Auflösung bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Mobile Apps, die Videotelefonie zur Verfügung stellen, sollen mindestens die QVGA-Auflösung bei 320x240 Pixel, vorzugsweise die VGA-Auflösung bei 640x480 Pixel für die Videoübertragung unterstützen."
+      ],
+      "rationaleWhyDe": [
+        "Hochwertige Bildqualität bei Videotelefonie ermöglicht es manchen Beeinträchtigungsgruppen, Informationen wie Mimik oder Gestik wahrzunehmen, die bei reiner Sprach- oder Textkommunikation im Kontext fehlen. Zudem können Menschen mit Beeinträchtigung des Gehörs zusätzlich von den Lippen lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Auflösung ist in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Auflösung ist nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Auflösung ist in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel.",
+        "- Die Auflösung ist nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#auflösung-bei-videotelefonie"
+    }
+  ]
+}

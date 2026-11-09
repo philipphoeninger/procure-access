@@ -1,0 +1,168 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Objektinformationen",
+  "sortOrder": 970,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.5",
+      "originalTitleDe": "Objektinformationen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente müssen ihren Namen, ihre Rolle, und gegebenenfalls vorhandene Grenzen oder Beschreibungen korrekt an die assistiven Systeme übermitteln und programmatisch ermittelbar sein. Die programmatische Beschriftung muss die sichtbare Beschriftung mindestens zu Beginn der Beschriftung beinhalten. Idealerweise sind die Beschriftungen in beiden Varianten analog. Dies betrifft beispielsweise:",
+        "",
+        "- Tasten",
+        "- Tasten mit eingebetteter Grafik",
+        "- Umschalttasten",
+        "- Kontrollkästchen",
+        "- Optionsfeld",
+        "- Registerkarten",
+        "- Ausklapplisten",
+        "- Formularfelder",
+        "- Links",
+        "- Links mit eingebetteter Grafik"
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Elementtypen und zugehörigen Kontextinformationen ist gerade für Nutzende von einem Screenreader, als auch für Nutzende von Sprachsteuerung essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, oder weicht die programmatische Beschriftung von der visuellen Beschriftung ab, werden Verständlichkeit, Wahrnehmbarkeit und Bedienbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben einen zutreffenden Namen und eine zutreffende Rolle korrekt und vollumfänglich wieder.",
+        "- Ein Kontrollkästchen wird als Checkbox, Kontrollfeld oder ähnlich wiedergegeben.",
+        "- Ein Optionsfeld wird als Auswahlschalter, Radio-Button, oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld wird als Inputfeld, Textfeld oder ähnlich wiedergegeben.",
+        "- Ein Dropdown-Listenfeld wird als Ausklappliste, Auswahlliste, Dropdown-Element, Klappliste oder ähnlich wiedergegeben.",
+        "- Eine Register einer Registerkartengruppe wird als Tab, Register, Registerkarte oder ähnlich wiedergegeben.",
+        "- Ein Umschalter wird als Umschalttaste; Toggle, Switch oder ähnlich wiedergegeben.",
+        "- Eine Schaltfläche wird als Schalter, Taste, Button oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld gibt Namen, Rolle und eine Beschreibung zur erwarteten Eingabe wieder.",
+        "- Ein Eingabefeld, dass auf eine bestimmte Anzahl an Zeichen begrenzt ist, gibt die erwartete Zeichenanzahl als Grenze wieder.",
+        "- Entsprechende Eingabefelder geben notwendige Kontextinformationen zu ihren Grenzen wieder (beispielsweise verbotene Zeichen bei der Eingabe einer E-Mailadresse).",
+        "- Ein Eingabefeld gibt wieder, welche Art der Eingabe es erwartet (beispielsweise nur Ziffern bei einem Feld für eine Telefonnummer).",
+        "- Die programmatische Beschriftung eines Bedienelements ist analog zur sichtbaren Beschriftung.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet die sichtbare Beschriftung.",
+        "- Eine verlinkte Grafik enthält das Ziel des Links.",
+        "- Ein Diagramm informiert im Alternativtext über den Titel des Diagramms und weist darauf hin, dass eine alternative Ansicht über einen Doppeltipp auf das Diagramm aktiviert werden kann.",
+        "- Ein News-Ticker übermittelt die jeweiligen relevanten Informationen.",
+        "- Eine Grafik, die die Funktion einer Taste übernimmt, übermittelt die auszulösende Funktion.",
+        "- Ein Home-Piktogramm übermittelt „Zurück zur Startseite“.",
+        "- Ein Lupen-Piktogramm übermittelt „Suchen”.",
+        "- Ein verlinktes Bild, dessen Inhalt zusätzliche Information enthält, übermittelt Bildinhalt und Ziel."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Namen oder ihre Rolle nicht korrekt oder nicht vollumfänglich wieder.",
+        "- Ein Link wird als Taste, Schalter oder ähnlich wiedergegeben.",
+        "- Eine Auswahlliste wird als Schaltfläche oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld gibt seine Rolle korrekt wieder, übermittelt jedoch keinen Namen.",
+        "- Ein Eingabefeld, das auf eine bestimmte Anzahl an Zeichen begrenzt ist, gibt die erwartete Zeichenanzahl als Grenze nicht wieder.",
+        "- Ein Eingabefeld, dass nur gewisse Zeichen oder Ziffern zulässt, gibt die erlaubten Zeichen oder Ziffern nicht wieder.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet nicht die sichtbare Beschriftung.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet die sichtbare Beschriftung nicht zu Beginn der Beschriftung.",
+        "- Entsprechende Objekte übermitteln keine oder keine geeignete Information.",
+        "- Entsprechende Objekte übermitteln den Namen des Elements.",
+        "- Der Alternativtext entsprechender Objekte ist zu lang."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#objektinformationen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.5",
+      "originalTitleDe": "Objektinformationen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente müssen ihren Namen, ihre Rolle, und gegebenenfalls vorhandene Grenzen oder Beschreibungen korrekt an die assistiven Systeme übermitteln und programmatisch ermittelbar sein. Die programmatische Beschriftung muss die sichtbare Beschriftung mindestens zu Beginn der Beschriftung beinhalten. Idealerweise sind die Beschriftungen in beiden Varianten analog. Dies betrifft beispielsweise:",
+        "",
+        "- Tasten",
+        "- Tasten mit eingebetteter Grafik",
+        "- Umschalttasten",
+        "- Kontrollkästchen",
+        "- Optionsfeld",
+        "- Registerkarten",
+        "- Ausklapplisten",
+        "- Formularfelder",
+        "- Links",
+        "- Links mit eingebetteter Grafik"
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Elementtypen und zugehörigen Kontextinformationen ist gerade für Nutzende von einem Screenreader, als auch für Nutzende von Sprachsteuerung essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, oder weicht die programmatische Beschriftung von der visuellen Beschriftung ab, werden Verständlichkeit, Wahrnehmbarkeit und Bedienbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben einen zutreffenden Namen und eine zutreffende Rolle korrekt und vollumfänglich wieder.",
+        "- Ein Kontrollkästchen wird als Checkbox, Kontrollfeld oder ähnlich wiedergegeben.",
+        "- Ein Optionsfeld wird als Auswahlschalter, Radio-Button, oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld wird als Inputfeld, Textfeld oder ähnlich wiedergegeben.",
+        "- Ein Dropdown-Listenfeld wird als Ausklappliste, Auswahlliste, Dropdown-Element, Klappliste oder ähnlich wiedergegeben.",
+        "- Eine Register einer Registerkartengruppe wird als Tab, Register, Registerkarte oder ähnlich wiedergegeben.",
+        "- Ein Umschalter wird als Umschalttaste; Toggle, Switch oder ähnlich wiedergegeben.",
+        "- Eine Schaltfläche wird als Schalter, Taste, Button oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld gibt Namen, Rolle und eine Beschreibung zur erwarteten Eingabe wieder.",
+        "- Ein Eingabefeld, dass auf eine bestimmte Anzahl an Zeichen begrenzt ist, gibt die erwartete Zeichenanzahl als Grenze wieder.",
+        "- Entsprechende Eingabefelder geben notwendige Kontextinformationen zu ihren Grenzen wieder (beispielsweise verbotene Zeichen bei der Eingabe einer E-Mailadresse).",
+        "- Ein Eingabefeld gibt wieder, welche Art der Eingabe es erwartet (beispielsweise nur Ziffern bei einem Feld für eine Telefonnummer).",
+        "- Die programmatische Beschriftung eines Bedienelements ist analog zur sichtbaren Beschriftung.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet die sichtbare Beschriftung.",
+        "- Eine verlinkte Grafik enthält das Ziel des Links.",
+        "- Ein Diagramm informiert im Alternativtext über den Titel des Diagramms und weist darauf hin, dass eine alternative Ansicht über einen Doppeltipp auf das Diagramm aktiviert werden kann.",
+        "- Ein News-Ticker übermittelt die jeweiligen relevanten Informationen.",
+        "- Eine Grafik, die die Funktion einer Taste übernimmt, übermittelt die auszulösende Funktion.",
+        "- Ein Home-Piktogramm übermittelt „Zurück zur Startseite“.",
+        "- Ein Lupen-Piktogramm übermittelt „Suchen”.",
+        "- Ein verlinktes Bild, dessen Inhalt zusätzliche Information enthält, übermittelt Bildinhalt und Ziel."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Namen oder ihre Rolle nicht korrekt oder nicht vollumfänglich wieder.",
+        "- Ein Link wird als Taste, Schalter oder ähnlich wiedergegeben.",
+        "- Eine Auswahlliste wird als Schaltfläche oder ähnlich wiedergegeben.",
+        "- Ein Eingabefeld gibt seine Rolle korrekt wieder, übermittelt jedoch keinen Namen.",
+        "- Ein Eingabefeld, das auf eine bestimmte Anzahl an Zeichen begrenzt ist, gibt die erwartete Zeichenanzahl als Grenze nicht wieder.",
+        "- Ein Eingabefeld, dass nur gewisse Zeichen oder Ziffern zulässt, gibt die erlaubten Zeichen oder Ziffern nicht wieder.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet nicht die sichtbare Beschriftung.",
+        "- Die programmatische Beschriftung eines Bedienelements beinhaltet die sichtbare Beschriftung nicht zu Beginn der Beschriftung.",
+        "- Entsprechende Objekte übermitteln keine oder keine geeignete Information.",
+        "- Entsprechende Objekte übermitteln den Namen des Elements.",
+        "- Der Alternativtext entsprechender Objekte ist zu lang."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#objektinformationen"
+    }
+  ]
+}

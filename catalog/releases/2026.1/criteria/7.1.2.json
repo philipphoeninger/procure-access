@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Synchronisation der Untertitel",
+  "sortOrder": 280,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.1.2",
+      "originalTitleDe": "Synchronisation der Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Nicht-Live-Videos mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Nicht-Live-Videos mit in Verbindung mit Untertiteln an, müssen Untertitel und Tonspur synchron wiedergegeben werden.",
+        "",
+        "Die EN 301549 konkretisiert dabei die zwei folgenden Anforderungen:",
+        "",
+        "- Die Anzeige des Untertitels weicht nicht mehr als 100ms vom Zeitstempel des Untertitels ab.",
+        "- Die Anforderung besteht gleichermaßen für Live-Untertitel. Es ist zu erwarten, dass bei Live-Untertiteln mit Verzögerungen durch die Konvertierung von gesprochener Sprache in Text zu rechnen ist."
+      ],
+      "rationaleWhyDe": [
+        "Untertitel sollen synchron zur Bewegung der Lippen eines Sprechers angezeigt werden, da hörbeeinträchtigte Menschen neben der Untertitelung auch auf Mundbewegungen achten. Es wichtig, dass die Untertitelung klar dem Gesprochenen zuzuordnen ist. Weiterhin fördert die Synchronität die Gesamtverständlichkeit eines Videos."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Untertitel sind synchron zur Tonspur."
+      ],
+      "negativeExamplesDe": [
+        "- Die Untertitel sind nicht synchron zur Tonspur."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#synchronisation-der-untertitel"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.1.2",
+      "originalTitleDe": "Synchronisation der Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Nicht-Live-Videos mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Nicht-Live-Videos mit in Verbindung mit Untertiteln an, müssen Untertitel und Tonspur synchron wiedergegeben werden.",
+        "",
+        "Die EN 301549 konkretisiert dabei die zwei folgenden Anforderungen:",
+        "",
+        "- Die Anzeige des Untertitels weicht nicht mehr als 100ms vom Zeitstempel des Untertitels ab.",
+        "- Die Anforderung besteht gleichermaßen für Live-Untertitel. Es ist zu erwarten, dass bei Live-Untertiteln mit Verzögerungen durch die Konvertierung von gesprochener Sprache in Text zu rechnen ist."
+      ],
+      "rationaleWhyDe": [
+        "Untertitel sollen synchron zur Bewegung der Lippen eines Sprechers angezeigt werden, da hörbeeinträchtigte Menschen neben der Untertitelung auch auf Mundbewegungen achten. Es wichtig, dass die Untertitelung klar dem Gesprochenen zuzuordnen ist. Weiterhin fördert die Synchronität die Gesamtverständlichkeit eines Videos."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Untertitel sind synchron zur Tonspur."
+      ],
+      "negativeExamplesDe": [
+        "- Die Untertitel sind nicht synchron zur Tonspur."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#synchronisation-der-untertitel"
+    }
+  ]
+}

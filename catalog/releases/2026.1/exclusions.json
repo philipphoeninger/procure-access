@@ -1,0 +1,81 @@
+{
+  "exclusions": [
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "appType",
+        "key": "document"
+      },
+      "reasonDe": "Passt nicht zum Verwendungszweck HR-Anwendung"
+    },
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "appType",
+        "key": "hardware"
+      },
+      "reasonDe": "Passt nicht zum Verwendungszweck HR-Anwendung"
+    },
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "appType",
+        "key": "relayEmergencyService"
+      },
+      "reasonDe": "Passt nicht zum Verwendungszweck HR-Anwendung"
+    },
+    {
+      "source": {
+        "layer": "useCase",
+        "key": "hr"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "pdfTest"
+      },
+      "reasonDe": "Passt nicht zum Verwendungszweck HR-Anwendung"
+    },
+    {
+      "source": {
+        "layer": "appType",
+        "key": "web"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "appTest"
+      },
+      "reasonDe": "Passt nicht zum Anwendungstyp Website oder Webanwendung"
+    },
+    {
+      "source": {
+        "layer": "appType",
+        "key": "web"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "pdfTest"
+      },
+      "reasonDe": "Passt nicht zum Anwendungstyp Website oder Webanwendung"
+    },
+    {
+      "source": {
+        "layer": "appType",
+        "key": "web"
+      },
+      "target": {
+        "layer": "testType",
+        "key": "bikApp"
+      },
+      "reasonDe": "Passt nicht zum Anwendungstyp Website oder Webanwendung"
+    }
+  ]
+}

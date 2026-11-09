@@ -1,0 +1,66 @@
+{
+  "kind": "requirement",
+  "titleDe": "Verständliche Beschriftungen oder Anweisungen bei Formularfeldern",
+  "sortOrder": 1710,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.3.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.3.2",
+      "originalTitleDe": "Verständliche Beschriftungen oder Anweisungen bei Formularfeldern",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente zur Eingabe von Daten wie Eingabefelder oder Auswahlschalter enthält."
+      ],
+      "requirementDe": [
+        "Interaktive Elemente zur Eingabe von Daten sind mit einer sichtbaren Beschriftung (Label) oder einer Anweisung versehen."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass bei interaktiven Elementen zur Eingabe von Daten entweder sichtbare Beschriftungen oder Anweisungen bereitgestellt sind.",
+        "",
+        "Sinnvolle und verständliche sichtbare Beschriftungen und Anweisungen sind notwendig, um den Zweck von Eingabefeldern zu verstehen. Die Anordnung von Beschriftungen direkt vor oder über dem Eingabefeld entspricht den üblichen Gestaltungskonventionen.",
+        "",
+        "Dabei muss auch in ausschnitthaften Ansichten (etwa in Vergrößerungssoftware) deutlich erkennbar sein, welche Beschriftung zu welchem Feld gehört, um insbesondere Menschen, die nur einen kleinen Ausschnitt des Bildes sehen und auf die Nutzung von Vergrößerungssoftware angewiesen sind, alle benötigten Informationen vollumfänglich zur Verfügung zu stellen.",
+        "",
+        "Bei kombinierten Eingabeelementen ist es für Menschen mit Sehbeeinträchtigung bzw. eingeschränktem Sehvermögen insbesondere bei Screenreader-Nutzung unverzichtbar, dass jedes einzelne Auswahlfeld mit einer programmatisch ermittelbaren Beschriftung versehen ist.",
+        "",
+        "Ohne sinnvolle Hinweise auf Pflichtfelder sowie auf ggf. vorgegebene Eingabeformate wird die Bearbeitung des PDF-Dokuments für alle Menschen unnötig erschwert. Konkrete Angaben sowie Platzhalter-Text kommen entsprechend allen Menschen zugute und sind insbesondere für Menschen mit kognitiven Einschränkungen bzw. mit eingeschränktem Sprachvermögen oder mit Lern- bzw. Leseschwäche eine unverzichtbare Unterstützung.",
+        "",
+        "Für Menschen mit Beeinträchtigungen ist in vielen Fällen das Risiko von Fehleingaben größer. Menschen mit Legasthenie beispielsweise vertauschen häufiger Zahlen, Menschen mit motorischen Einschränkungen drücken häufiger versehentlich falsche Tasten. Deshalb sind konkrete Angaben dazu, welche Eingaben erwartet werden und wie Eingabefelder korrekt auszufüllen sind, für diese Personengruppen besonders wichtig."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Formularfelder haben eine sichtbare Beschriftung bzw. Anweisung. Pflichtfelder sind eindeutig gekennzeichnet und Platzhalter-Text entspricht den Vorgaben."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Die Pflichtfeld-Markierung, z. B. durch ein Sternchen-Zeichen (*) wird nicht erläutert.",
+        "- Einschränkung: Beschriftungen sind optisch nicht eindeutig dem zugehörigen Formularfeld zuzuordnen.",
+        "- Barriere: Beschriftungen werden ausschließlich in Form von Platzhalter-Text bereitgestellt.",
+        "- Barriere: Vorgegebene Eingabeformate werden ausschließlich in Form von Platzhalter-Text bereitgestellt.",
+        "- Blockade: Wichtige Formularelemente (z. B. die Sucheingabe) sind ohne sichtbare Beschriftung. Die Funktion wird auch in angrenzenden Elementen nicht erklärt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#verständliche-beschriftungen-oder-anweisungen-bei-formularfeldern"
+    }
+  ]
+}

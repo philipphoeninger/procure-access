@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Wiedergabe der Audiodeskription",
+  "sortOrder": 320,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.2.1",
+      "originalTitleDe": "Wiedergabe der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videos mit synchroner Bild- und Tonspur in Verbindung mit einer Audiodeskription zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software eine Audiodeskription für verfügbare Videos an, muss die Audiodeskription als eigene Tonspur auswählbar und aktivierbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Werden Audiodeskriptionen für Videos zur Verfügung gestellt, müssen die Audiodeskriptionen entsprechend aktivierbar und deaktivierbar sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Video enthält die Audiodeskription als eigene Tonspur.",
+        "- Der Videoplayer bietet eine Funktionalität zum Aktivieren und Deaktivieren der Audiodeskription.",
+        "- Es steht ein separates Video zur Verfügung, das als Tonspur die Audiodeskription enthält."
+      ],
+      "negativeExamplesDe": [
+        "- Es existiert keine Möglichkeit, die Audiodeskription zu aktivieren, bzw. das Video mit Audiodeskription zu konsumieren."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#wiedergabe-der-audiodeskription"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.2.1",
+      "originalTitleDe": "Wiedergabe der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videos mit synchroner Bild- und Tonspur in Verbindung mit einer Audiodeskription zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App eine Audiodeskription für verfügbare Videos an, muss die Audiodeskription als eigene Tonspur auswählbar und aktivierbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Werden Audiodeskriptionen für Videos zur Verfügung gestellt, müssen die Audiodeskriptionen entsprechend aktivierbar und deaktivierbar sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Video enthält die Audiodeskription als eigene Tonspur.",
+        "- Der Videoplayer bietet eine Funktionalität zum Aktivieren und Deaktivieren der Audiodeskription.",
+        "- Es steht ein separates Video zur Verfügung, das als Tonspur die Audiodeskription enthält."
+      ],
+      "negativeExamplesDe": [
+        "- Es existiert keine Möglichkeit, die Audiodeskription zu aktivieren, bzw. das Video mit Audiodeskription zu konsumieren."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#wiedergabe-der-audiodeskription"
+    }
+  ]
+}

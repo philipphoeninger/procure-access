@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Konsistente Hilfe",
+  "sortOrder": 840,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.2.6"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.2.6",
+      "originalTitleDe": "Konsistente Hilfe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn auf mehreren Seiten eine Hilfefunktion angeboten wird. Die Hilfefunktion kann hierbei auf allen Seiten, oder nur auf Seiten, die ein gemeinsamer Zweck verbindet (beispielsweise ein Teilprozess wie ein mehrstufiger Warenkorb-Checkout), angeboten werden."
+      ],
+      "requirementDe": [
+        "Wird eine seitenübergreifende Hilfefunktion angeboten, muss diese stets an der gleichen Position relativ zu den Inhalten angezeigt werden, es sei denn, der Nutzende verändert die Reihenfolge der Darstellung. Als Hilfefunktion gelten:",
+        "",
+        "- Kontakt-Angaben (beispielsweise Telefonnummern, E-Mailadressen)",
+        "- Persönliche Kontaktaufnahme (beispielsweise Messenger-Dienste, Kontaktformulare, Social Media)",
+        "- Möglichkeiten zur Selbsthilfe (beispielsweise Frequently Asked Questions, Hilfe-Seiten)",
+        "- Automatisierte Kontaktmechanismen (beispielsweise Chat-Bots)"
+      ],
+      "rationaleWhyDe": [
+        "Die Positionierung von Hilfefunktionen an gleichbleibender Stelle unterstützt vor allem Menschen mit kognitiver Beeinträchtigung. Sie erleben weniger Ablenkung und werden so befähigt, sich einfacher auf die aktuelle Aufgabe zu konzentrieren. Zudem werden sie beim leichteren Auffinden der Hilfefunktionen unterstützt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Entsprechende Hilfefunktionen werden auf allen Seiten gleichbleibend an der gleichen Position angeboten.",
+        "- Entsprechende Hilfefunktionen werden nur auf einigen Seiten, die ein gemeinsamer Zweck verbindet, gleichbleibend an der gleichen Position angeboten.",
+        "- Die Taste zum Aktivieren des Hilfe-Chat-Bots findet sich stets an der unteren rechten Ecke des Anzeigebereichs."
+      ],
+      "negativeExamplesDe": [
+        "- Entsprechende Hilfefunktionen werden auf entsprechenden Seiten an unterschiedlichen Positionen angeboten.",
+        "- Die Taste zum Aktivieren des Hilfe-Chat-Bots befindet auf der einen Seite in der unteren rechten Ecke, auf einer anderen Seite in der unteren linken Ecke des Anzeigebereichs."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#konsistente-hilfe"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.2.6",
+      "originalTitleDe": "Konsistente Hilfe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn auf mehreren Seiten eine Hilfefunktion angeboten wird. Die Hilfefunktion kann hierbei auf allen Seiten, oder nur auf Seiten, die ein gemeinsamer Zweck verbindet (beispielsweise ein Teilprozess wie ein mehrstufiger Warenkorb-Checkout), angeboten werden."
+      ],
+      "requirementDe": [
+        "Wird eine seitenübergreifende Hilfefunktion angeboten, muss diese stets an der gleichen Position relativ zu den Inhalten angezeigt werden, es sei denn, der Nutzende verändert die Reihenfolge der Darstellung. Als Hilfefunktion gelten:",
+        "",
+        "- Kontakt-Angaben (beispielsweise Telefonnummern, E-Mailadressen)",
+        "- Persönliche Kontaktaufnahme (beispielsweise Messenger-Dienste, Kontaktformulare, Social Media)",
+        "- Möglichkeiten zur Selbsthilfe (beispielsweise Frequently Asked Questions, Hilfe-Seiten)",
+        "- Automatisierte Kontaktmechanismen (beispielsweise Chat-Bots)"
+      ],
+      "rationaleWhyDe": [
+        "Die Positionierung von Hilfefunktionen an gleichbleibender Stelle unterstützt vor allem Menschen mit kognitiver Beeinträchtigung. Sie erleben weniger Ablenkung und werden so befähigt, sich einfacher auf die aktuelle Aufgabe zu konzentrieren. Zudem werden sie beim leichteren Auffinden der Hilfefunktionen unterstützt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Entsprechende Hilfefunktionen werden auf allen Seiten gleichbleibend an der gleichen Position angeboten.",
+        "- Entsprechende Hilfefunktionen werden nur auf einigen Seiten, die ein gemeinsamer Zweck verbindet, gleichbleibend an der gleichen Position angeboten.",
+        "- Die Taste zum Aktivieren des Hilfe-Chat-Bots findet sich stets an der unteren rechten Ecke des Anzeigebereichs."
+      ],
+      "negativeExamplesDe": [
+        "- Entsprechende Hilfefunktionen werden auf entsprechenden Seiten an unterschiedlichen Positionen angeboten.",
+        "- Die Taste zum Aktivieren des Hilfe-Chat-Bots befindet auf der einen Seite in der unteren rechten Ecke, auf einer anderen Seite in der unteren linken Ecke des Anzeigebereichs."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#konsistente-hilfe"
+    }
+  ]
+}

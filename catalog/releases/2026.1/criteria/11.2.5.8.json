@@ -1,0 +1,101 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Zielgröße (Minimum)",
+  "sortOrder": 800,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.5.8"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.5.8",
+      "originalTitleDe": "Zielgröße (Minimum)",
+      "applicabilityDe": [
+        "Der Prüfschritt kann nur mit Zugriff auf den Quellcode der Software belastbar getestet werden. Während eines Blackbox-Tests in der Praxis, kann nur eine subjektive Überprüfung vorgenommen werden."
+      ],
+      "requirementDe": [
+        "User-Interface-Elemente, die die Funktion eines Ziels übernehmen (beispielsweise bei Drag & Drop Events), müssen während der Nutzung eine Zielgröße von mindestens 24 x 24 CSS-Pixel aufweisen. Hierbei gelten folgende Ausnahmen:",
+        "",
+        "- Abstand Ziele, die kleiner als 24 x 24 CSS-Pixel sind, bieten ausreichend Abstand zu anderen Zielen. Sie werden so positioniert, dass bei Zentrierung eines Kreises mit einem Durchmesser von 24 CSS-Pixeln auf dem Begrenzungsrahmen des jeweiligen Ziels, der positionierte Kreis keine anderen Ziele, oder andere Kreise für zu kleine Ziele überschneidet",
+        "- Gleichwertige Alternative Die Funktion kann durch ein anderes Steuerelement (beispielsweise durch eine Taste oder ein Kontextmenü), das sich auf der gleichen Seite befindet, ausgeführt werden",
+        "- Inline Das Ziel befindet sich in innerhalb eines Fließtexts, oder die Größe des Ziels wird durch die Zeilenhöhe von umgebendem, nicht interaktivem Text eingeschränkt",
+        "- Kontrolle durch User-Agent Die Größe des Ziels wird vom User-Agent bestimmt und wird vom Autor:in nicht verändert",
+        "- Essenziell Die Darstellung des Ziels ist unerlässlich oder gesetzlich vorgeschrieben"
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen benötigen zum Ausführen von Touch-Funktionen ausreichend Platz. Sie haben Schwierigkeiten, kleine Ziele punktgenau zu erreichen. Hinreichende Größenverhältnisse verringern die Fehleranfälligkeit, ungewollt falsche Funktionen auszuführen oder falsche Ziele zu treffen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Ein entsprechendes User-Interface-Element weist subjektiv eine ausreichende Größe auf.",
+        "- Für ein entsprechendes User-Interface-Element greifen eine oder mehrere der Ausnahmen."
+      ],
+      "negativeExamplesDe": [
+        "- Ein entsprechendes User-Interface-Element weist subjektiv keine ausreichende Größe auf, und es greift nicht mindestens eine der Ausnahmen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#zielgröße-minimum"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.5.8",
+      "originalTitleDe": "Zielgröße (Minimum)",
+      "applicabilityDe": [
+        "Der Prüfschritt kann nur mit Zugriff auf den Quellcode der Mobile App belastbar getestet werden. Während eines Blackbox-Tests in der Praxis kann nur eine subjektive Überprüfung vorgenommen werden."
+      ],
+      "requirementDe": [
+        "User-Interface-Elemente, die die Funktion eines Ziels übernehmen (beispielsweise bei Drag & Drop Events), müssen während der Nutzung eine Zielgröße von mindestens 24 x 24 CSS-Pixel aufweisen. Hierbei gelten folgende Ausnahmen:",
+        "",
+        "- Abstand",
+        " Ziele, die kleiner als 24 x 24 CSS-Pixel sind, bieten ausreichend Abstand zu anderen Zielen. Sie werden so positioniert, dass bei Zentrierung eines Kreises mit einem Durchmesser von 24 CSS-Pixeln auf dem Begrenzungsrahmen des jeweiligen Ziels, der positionierte Kreis keine anderen Ziele, oder andere Kreise für zu kleine Ziele überschneidet",
+        "- Gleichwertige Alternative",
+        " Die Funktion kann durch ein anderes Steuerelement (beispielsweise durch eine Taste oder ein Kontextmenü), das sich auf der gleichen Seite befindet, ausgeführt werden",
+        "- Inline",
+        " Das Ziel befindet sich in innerhalb eines Fließtexts, oder die Größe des Ziels wird durch die Zeilenhöhe von umgebendem, nicht interaktivem Text eingeschränkt",
+        "- Kontrolle durch User-Agent",
+        " Die Größe des Ziels wird vom User-Agent bestimmt und wird vom Autor:in nicht verändert",
+        "- Essenziell",
+        " Die Darstellung des Ziels ist unerlässlich oder gesetzlich vorgeschrieben"
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen benötigen zum Ausführen von Touch-Funktionen ausreichend Platz. Sie haben Schwierigkeiten, kleine Ziele punktgenau zu erreichen. Hinreichende Größenverhältnisse verringern die Fehleranfälligkeit, ungewollt falsche Funktionen auszuführen oder falsche Ziele zu treffen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Ein entsprechendes User-Interface-Element weist subjektiv eine ausreichende Größe auf.",
+        "- Für ein entsprechendes User-Interface-Element greifen eine oder mehrere der Ausnahmen."
+      ],
+      "negativeExamplesDe": [
+        "- Ein entsprechendes User-Interface-Element weist subjektiv keine ausreichende Größe auf, und es greift nicht mindestens eine der Ausnahmen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#zielgröße-minimum"
+    }
+  ]
+}

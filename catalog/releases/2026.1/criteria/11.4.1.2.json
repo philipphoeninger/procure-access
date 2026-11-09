@@ -1,0 +1,61 @@
+{
+  "kind": "requirement",
+  "category": "Robustheit",
+  "titleDe": "Name, Rolle, Wert",
+  "sortOrder": 940,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.4.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.4.1.2",
+      "originalTitleDe": "Name, Rolle, Wert",
+      "applicabilityDe": [
+        "Der Prüfschritt wird über die Prüfschritte 11.5.2.5 Objektinformationen, 11.5.2.7 Werte, 11.5.2.15 Änderungsbenachrichtigung und 11.5.2.16 Änderungen von Zuständen und Eigenschaften abgedeckt. Eine eigene Prüfung dieses Prüfschritts ist nicht notwendig. Sofern einer der genannten Prüfschritte als nicht voll erfüllt gewertet wird, wird auch dieser Prüfschritt entsprechend gewertet, oder dieser Prüfschritt erhält die Bewertung „Nicht getestet“."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#name-rolle-wert"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.4.1.2",
+      "originalTitleDe": "Name, Rolle, Wert",
+      "applicabilityDe": [
+        "Der Prüfschritt wird über die Prüfschritte 11.5.2.5 Objektinformationen, 11.5.2.7 Werte, 11.5.2.15 Änderungsbenachrichtigung und 11.5.2.16 Änderungen von Zuständen und Eigenschaften abgedeckt. Eine eigene Prüfung dieses Prüfschritts ist nicht notwendig. Der Prüfschritt übernimmt das negativste Bewertungsresultat aus den zuvor referenzierten Prüfschritten. Sofern alle referenzierten Prüfschritte mit „nicht anwendbar“ bewertet wurden, gilt der Prüfschritt als „nicht anwendbar“."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#name-rolle-wert"
+    }
+  ]
+}

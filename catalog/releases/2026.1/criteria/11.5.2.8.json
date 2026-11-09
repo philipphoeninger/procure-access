@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Label-Beziehungen",
+  "sortOrder": 1000,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.8"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.8",
+      "originalTitleDe": "Label-Beziehungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder oder interaktive Elemente vorhanden sind, die zum logischen Verständnis einen Bezug zu einer anderen Beschriftung oder einem anderen Inhalt auf der Benutzeroberfläche benötigen."
+      ],
+      "requirementDe": [
+        "Formularfelder oder interaktive Elemente, die durch ihre Beschriftung im Kontext nicht direkt oder eindeutig identifizierbar sind und indirekt oder zusätzlich durch ein anderes Element gelabelt werden, oder ein Label für ein anderes Element sind, übermitteln diese verknüpfenden Kontextinformationen an die assistiven Systeme, um den logischen Bezug auch programmatisch ermittelbar nachvollziehen zu können."
+      ],
+      "rationaleWhyDe": [
+        "Label-Beschriftungen erhöhen die Verständlichkeit entsprechender Elemente. Ein intelligentes Arrangement von Label-Beziehungen zu Formular- und Bedienelementen stellt sicher, dass die Elemente der Benutzeroberfläche für Hilfsmitteltechnologien ebenso verständlich und effizient nutzbar sind wie bei der Benutzung ohne Hilfsmittel."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Formularfelder oder interaktive Elemente, die durch ihre Beschriftung nicht eindeutig identifizierbar sind, geben die notwendigen Kontextinformationen wieder, um sie eindeutig zu identifizieren.",
+        "- Formularfelder, die in Gruppen angeordnet sind, geben das Gruppenpräfix beziehungsweise die Gruppenüberschrift wieder (beispielsweise Lieferadresse für die Eingabefelder einer Lieferadresse, und Rechnungsadresse für die Eingabe einer Rechnungsadresse).",
+        "- Auswahlfelder einer Umfrage, die „Ja“ und „Nein“ lauten, geben die entsprechende Frage, der sie zugeordnet sind, wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Formularfelder oder interaktive Elemente, die durch ihre Beschriftung nicht eindeutig identifizierbar sind, geben keine notwendigen Kontextinformationen wieder, um sie eindeutig zu identifizieren.",
+        "- Formularfelder, die in Gruppen angeordnet sind, geben das Gruppenpräfix beziehungsweise die Gruppenüberschrift nicht wieder.",
+        "- Auswahlfelder einer Umfrage, die „Ja“ und „Nein“ lauten, geben die entsprechende Frage, der sie zugeordnet sind, nicht wieder."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#label-beziehungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.8",
+      "originalTitleDe": "Label-Beziehungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder oder interaktive Elemente vorhanden sind, die zum logischen Verständnis einen Bezug zu einer anderen Beschriftung oder einem anderen Inhalt auf der Benutzeroberfläche benötigen."
+      ],
+      "requirementDe": [
+        "Formularfelder oder interaktive Elemente, die durch ihre Beschriftung im Kontext nicht direkt oder eindeutig identifizierbar sind und indirekt oder zusätzlich durch ein anderes Element gelabelt werden, oder ein Label für ein anderes Element sind, übermitteln diese verknüpfenden Kontextinformationen an die assistiven Systeme, um den logischen Bezug auch programmatisch ermittelbar nachvollziehen zu können."
+      ],
+      "rationaleWhyDe": [
+        "Label-Beschriftungen erhöhen die Verständlichkeit entsprechender Elemente. Ein intelligentes Arrangement von Label-Beziehungen zu Formular- und Bedienelementen stellt sicher, dass die Elemente der Benutzeroberfläche für Hilfsmitteltechnologien ebenso verständlich und effizient nutzbar sind wie bei der Benutzung ohne Hilfsmittel."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Formularfelder oder interaktive Elemente, die durch ihre Beschriftung nicht eindeutig identifizierbar sind, geben die notwendigen Kontextinformationen wieder, um sie eindeutig zu identifizieren.",
+        "- Formularfelder, die in Gruppen angeordnet sind, geben das Gruppenpräfix beziehungsweise die Gruppenüberschrift wieder (beispielsweise Lieferadresse für die Eingabefelder einer Lieferadresse, und Rechnungsadresse für die Eingabe einer Rechnungsadresse).",
+        "- Auswahlfelder einer Umfrage, die „Ja“ und „Nein“ lauten, geben die entsprechende Frage, der sie zugeordnet sind, wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Formularfelder oder interaktive Elemente, die durch ihre Beschriftung nicht eindeutig identifizierbar sind, geben keine notwendigen Kontextinformationen wieder, um sie eindeutig zu identifizieren.",
+        "- Formularfelder, die in Gruppen angeordnet sind, geben das Gruppenpräfix beziehungsweise die Gruppenüberschrift nicht wieder.",
+        "- Auswahlfelder einer Umfrage, die „Ja“ und „Nein“ lauten, geben die entsprechende Frage, der sie zugeordnet sind, nicht wieder."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#label-beziehungen"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "kind": "requirement",
+  "category": "Dokumentation und unterstützende Dienste",
+  "titleDe": "Dokumentation von Barrierefreiheit und Kompatibilität",
+  "sortOrder": 1180,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "12.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "12.1.1",
+      "originalTitleDe": "Dokumentation von Barrierefreiheit und Kompatibilität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Produktdokumentation beispielsweise in Form einer Hilfeseite, eines Handbuches oder eine Erklärung zur Barrierefreiheit vorhanden ist, und zusätzliche Barrierefreiheitsfunktionen in der Software angeboten werden.",
+        "",
+        "Beispiele",
+        "",
+        "- Einstellungen zu hohem Kontrast, anderen Farbschemata oder größere Schriftgröße, ggf. mit entsprechender Tastenkombination.",
+        "- Spezielle Tastenkombinationen für das Überspringen von Bereichen",
+        "- Bedienung einer Vorlesefunktion: Start, Stopp, Lesegeschwindigkeit, Lautstärke."
+      ],
+      "requirementDe": [
+        "Die Verwendung spezieller Barrierefreiheitsfunktionen wird in der Produktdokumentation, in der Erklärung zur Barrierefreiheit oder in beiden Dokumentationen erklärt."
+      ],
+      "rationaleWhyDe": [
+        "Die Dokumentation, beziehungsweise die Erklärung zur Barrierefreiheit, ist oftmals der erste Anlaufpunkt für Menschen mit Beeinträchtigungen. Die entsprechende Dokumentation unterstützt sie dabei, die angebotenen Funktionalitäten zu verstehen und sie leichter aufzufinden. Dabei haben Betroffene einen größeren Aufwand, die Inhalte und Funktionen aufzufinden. Eine vorhandene Dokumentation erleichtert dabei deutlich die Orientierung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine Erklärung der Barrierefreiheitsfunktionen ist in mindestens einer der Dokumentation vollumfänglich erhalten."
+      ],
+      "negativeExamplesDe": [
+        "- Es ist keine Erklärung der Barrierefreiheitsfunktionen in mindestens einer der Dokumentation erhalten.",
+        "- Die Erklärung der Barrierefreiheitsfunktionen ist fehlerhaft oder unvollständig."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#dokumentation-von-barrierefreiheit-und-kompatibilität"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "12.1.1",
+      "originalTitleDe": "Dokumentation von Barrierefreiheit und Kompatibilität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Produktdokumentation beispielsweise in Form einer Hilfeseite, eines Handbuches, oder eine Erklärung zur Barrierefreiheit vorhanden ist, und gleichzeitig App-eigene, assistive Unterstützung angeboten wird."
+      ],
+      "requirementDe": [
+        "Die Verwendung App-eigener, assistiver Unterstützungen werden in der Produktdokumentation, in der Erklärung zur Barrierefreiheit oder in beiden Dokumentationen erklärt."
+      ],
+      "rationaleWhyDe": [
+        "Die Dokumentation, beziehungsweise die Erklärung zur Barrierefreiheit, ist oftmals der erste Anlaufpunkt für Menschen mit Beeinträchtigungen. Die entsprechende Dokumentation unterstützt sie dabei, die angebotenen Funktionalitäten zu verstehen und sie leichter aufzufinden. Dabei haben Betroffene einen größeren Aufwand, die Inhalte und Funktionen aufzufinden. Eine vorhandene Dokumentation erleichtert dabei deutlich die Orientierung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine Erklärung der App-eigenen, assistiven Systeme ist in mindestens einer der Dokumentation vollumfänglich erhalten.",
+        "- Eventuelle Einschränkungen hinsichtlich unterstützter, assistiver Systeme der Betriebssysteme in Verbindung mit der Mobile App sind in einer der Dokumentation beschrieben."
+      ],
+      "negativeExamplesDe": [
+        "- Es ist keine Erklärung der App-eigenen, assistiven Systeme ist in mindestens einer der Dokumentation erhalten.",
+        "- Die Erklärung der App-eigenen, assistiven Systeme ist fehlerhaft oder unvollständig."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#dokumentation-von-barrierefreiheit-und-kompatibilität"
+    }
+  ]
+}

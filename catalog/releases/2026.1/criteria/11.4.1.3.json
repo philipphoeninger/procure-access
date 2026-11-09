@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Robustheit",
+  "titleDe": "Statusmeldungen",
+  "sortOrder": 950,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.4.1.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.4.1.3",
+      "originalTitleDe": "Statusmeldungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Statusmeldungen oder ähnliche Aktualisierungen dynamisch generiert werden."
+      ],
+      "requirementDe": [
+        "Dynamische Aktualisierungen des Inhalts, die keine Kontextänderung darstellen und dem Nutzenden Informationen über beispielsweise den Status einer Aktion, den Fortschritt eines Prozesses oder das Erkennen von Fehlern bereitstellen, müssen programmatisch anhand geeigneter Rollen oder Eigenschaften durch assistive Technologien ermittelt werden können, ohne explizit den Fokus zu erhalten. Die Benachrichtigung zu solchen Ereignissen muss automatisch an das assistive System übermittelt und ausgegeben werden.",
+        "",
+        "Kontextänderungen, beispielsweise neue Ansichten, neue Interaktionsmöglichkeiten; neue Inhalte auf einer Ansicht, oder Hinweise über Dialoge, werden durch assistive Technologien durch aktive Fokussierung wahrgenommen und sind hiervon nicht betroffen.",
+        "",
+        "Statusmeldungen, die durch das Betriebssystem selbst generiert ausgegeben werden, sind hiervon nicht betroffen."
+      ],
+      "rationaleWhyDe": [
+        "Dynamisch erzeugte Statusmeldungen erscheinen oftmals ungeplant oder nur vorübergehend. Nutzende von assistiven Technologien benötigen grundsätzlich die Information der Statusmeldung, sollen dadurch jedoch nicht die Orientierung oder den aktuellen verlieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Statusmeldungen werden automatisch ausgegeben und erhalten dabei nicht den Fokus (beispielsweise nach Hinzufügen eines Artikels in den Warenkorb, nach Hinzufügen eines Produkts zu einer Merkliste, bei Fehlermeldungen in Formularen, nach Abschicken eines Formulars oder bei einem Ladebalken eines Ladeprozesses)."
+      ],
+      "negativeExamplesDe": [
+        "- Statusmeldungen werden nicht, oder nur nach manueller Fokussierung vom Screenreader ausgegeben.",
+        "- Statusmeldungen werden ausgegeben, die Meldung wird hierbei jedoch fokussiert."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#statusmeldungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.4.1.3",
+      "originalTitleDe": "Statusmeldungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Statusmeldungen oder ähnliche Aktualisierungen dynamisch generiert werden."
+      ],
+      "requirementDe": [
+        "Dynamische Aktualisierungen des Inhalts, die keine Kontextänderung darstellen und dem Nutzenden Informationen über beispielsweise den Status einer Aktion, den Fortschritt eines Prozesses oder das Erkennen von Fehlern bereitstellen, müssen programmatisch anhand geeigneter Rollen oder Eigenschaften durch assistive Technologien ermittelt werden können, ohne explizit den Fokus zu erhalten. Die Benachrichtigung zu solchen Ereignissen muss automatisch an das assistive System übermittelt und ausgegeben werden.",
+        "",
+        "Kontextänderungen, beispielsweise neue Ansichten, neue Interaktionsmöglichkeiten; neue Inhalte auf einer Ansicht, oder Hinweise über Dialoge, werden durch assistive Technologien durch aktive Fokussierung wahrgenommen und sind hiervon nicht betroffen.",
+        "",
+        "Statusmeldungen oder Push-Mitteilungen, die durch das Betriebssystem selbst generiert ausgegeben werden, sind hiervon nicht betroffen."
+      ],
+      "rationaleWhyDe": [
+        "Dynamisch erzeugte Statusmeldungen erscheinen oftmals ungeplant oder nur vorübergehend. Nutzende von assistiven Technologien benötigen grundsätzlich die Information der Statusmeldung, sollen dadurch jedoch nicht die Orientierung oder den aktuellen verlieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Statusmeldungen werden automatisch ausgegeben und erhalten dabei nicht den Fokus (beispielsweise nach Hinzufügen eines Artikels in den Warenkorb, nach Hinzufügen eines Produkts zu einer Merkliste, bei Fehlermeldungen in Formularen, nach Abschicken eines Formulars oder bei einem Ladebalken eines Ladeprozesses)."
+      ],
+      "negativeExamplesDe": [
+        "- Statusmeldungen werden nicht, oder nur nach manueller Fokussierung vom Screenreader ausgegeben.",
+        "- Statusmeldungen werden ausgegeben, die Meldung wird hierbei jedoch fokussiert."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#statusmeldungen"
+    }
+  ]
+}

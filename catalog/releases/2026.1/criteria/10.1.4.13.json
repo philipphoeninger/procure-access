@@ -1,0 +1,67 @@
+{
+  "kind": "requirement",
+  "titleDe": "Eingeblendete Inhalte",
+  "sortOrder": 1500,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.13"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.13",
+      "originalTitleDe": "Eingeblendete Inhalte",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument Inhalte beim Überfahren mit der Maus (Hover) oder bei aktivem Tastaturfokus eingeblendet werden.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Wenn der Maus- oder der Tastaturfokus dazu führt, dass zusätzlicher Inhalt sichtbar und dann wieder ausgeblendet wird, gelten die folgenden Prinzipien:",
+        "",
+        "- Ausblendbar: Es steht ein Mechanismus zur Verfügung, um den zusätzlichen Inhalt zu entfernen, ohne den Mauszeiger oder den Tastaturfokus zu bewegen, es sei denn, der zusätzliche Inhalt weist auf einen Eingabefehler hin bzw. verdeckt oder ersetzt keinen anderen Inhalt.",
+        "- Schwebend: Wenn der Mauszeiger den zusätzlichen Inhalt auslösen kann, kann der Zeiger über den zusätzlichen Inhalt bewegt werden, ohne dass der zusätzliche Inhalt verschwindet.",
+        "- Fixiert: Der zusätzliche Inhalt bleibt sichtbar, bis der Hover- oder Fokus-Trigger entfernt wird bzw. bis das Schließen durch eine bewusste Aktion veranlasst wurde oder bis die Informationen des zusätzlichen Inhalts nicht mehr gültig sind."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit einer Sehbehinderung arbeiten häufig mit einer sehr starken Vergrößerung. Sie müssen die Möglichkeit haben, (ggf. unabsichtlich ausgelöste) zusätzliche Inhalte auszublenden bzw. zu schließen, ohne dafür den Fokus bewegen zu müssen, insbesondere wenn der zusätzliche Inhalt darunterliegende Informationen überlagert.",
+        "",
+        "Für das Lesen einer Information kann unter Umständen besonders viel Zeit benötigt werden, wie beispielsweise aufgrund einer spezifischen Einschränkung aber auch bei einer Arbeitsunterbrechung oder Pausenzeit bzw. bei einer Störung von außen. Daher sollte der zusätzliche Inhalt nicht automatisch nach einer bestimmten Zeit ausgeblendet werden, sondern nur dann, wenn das Schließen in geeigneter Weise durch eine bewusste Aktion ausgelöst wurde."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Beim Überfahren mit der Maus (Hover) oder bei aktivem Tastaturfokus wird z. B. bei einem externen Verweis (Link) zusätzlicher Inhalt in Form einer Miniatur-Ansicht eingeblendet. Der eingeblendete Inhalt kann durch Drücken der Escape-Taste wieder ausgeblendet werden.",
+        "- erfüllt: Beim Überfahren mit der Maus (Hover) oder bei aktivem Tastaturfokus wird z. B. bei einem externen Verweis (Link) zusätzlicher Inhalt in Form einer Miniatur-Ansicht eingeblendet, ohne dass dadurch auch bei starker Vergrößerung andere Inhalte überdeckt werden.",
+        "- erfüllt: Zusätzlich eingeblendeter Inhalt ist programmatisch ermittelbar und wird von einem Screenreader-Programm korrekt wiedergegeben."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Der zusätzlich eingeblendete Inhalt wird bei der kleinsten Mausbewegung geschlossen, obwohl sich der Zeiger noch immer über dem zusätzlichen Inhalt befindet.",
+        "- Einschränkung: Beim Überfahren mit der Maus (Hover) oder bei aktivem Tastaturfokus wird z. B. bei einem Button zusätzlicher Inhalt in Form eines Hilfetextes eingeblendet, der andere Inhalte überdeckt. Der zusätzlich eingeblendete Inhalt lässt sich nur durch eine Bewegung des Mauszeigers oder eine Verschiebung des Tastaturfokus ausblenden.",
+        "- Barriere: Der zusätzlich eingeblendete Inhalt wird unerwartet (z. B. aufgrund einer zeitlichen Limitierung) geschlossen, ohne dass dies durch eine bewusste Aktion veranlasst wurde.",
+        "- Blockade: Der zusätzlich eingeblendete Inhalt wird unerwartet (z. B. aufgrund einer zeitlichen Limitierung) geschlossen und lässt sich nur durch Schließen und erneutes Öffnen des PDF-Dokuments erneut aufrufen.",
+        "- Blockade: Der zusätzlich eingeblendete Inhalt, der andere Inhalte überdeckt, lässt sich nur durch Schließen und erneutes Öffnen des PDF-Dokuments ausblenden.",
+        "- Blockade: Zusätzlich eingeblendeter Inhalt ist programmatisch nicht ermittelbar und kann von einem Screenreader-Programm nicht wiedergegeben werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#eingeblendete-inhalte"
+    }
+  ]
+}

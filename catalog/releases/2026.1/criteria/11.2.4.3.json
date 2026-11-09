@@ -1,0 +1,104 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Sinnvolle Reihenfolge bei Bedienung mit externer Tastatur",
+  "sortOrder": 700,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.4.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.4.3",
+      "originalTitleDe": "Sinnvolle Reihenfolge bei Bedienung mit externer Tastatur",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bei Bedienung der Software mit einer Tastatur erhalten interaktive Bedienelemente den Fokus in einer Reihenfolge, die der logischen beziehungsweise visuellen Struktur, oder einem für Tastaturnutzende optimiertem Bedienablauf entspricht. Die Navigation erfolgt hierbei anhand der Bedienelemente von Element zu Element.",
+        "",
+        "Ausgeblendete oder unsichtbare Inhalte, Layout-Objekte oder Inhalte, die im Hintergrund liegen, dürfen dabei nicht fokussiert werden. Bei einem Seitenaufruf soll das erste Element im Fokus das erste Bedienelement sein. Bietet die Seite eine zentrale Funktion (beispielsweise das Suchfeld der Google Suche), so kann das Suchfeld direkt fokussiert werden.",
+        "",
+        "Bei modalen Dialogen muss das erste Bedienelement innerhalb des Dialogs fokussiert werden. Eine Navigation ist nur innerhalb des Dialogs möglich, bis er geschlossen wird. Nach Schließen des Dialogs muss sich der Fokus am zuvor auslösenden Bedienelement befinden. Sollte der Dialog beim Start der Software oder beim Aufruf einer Seite automatisch geöffnet werden, muss sich der Fokus nach Schließen des Dialogs am ersten Bedienelement der Seite befinden."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Durch eine nicht nachvollziehbare Reihenfolge der fokussierten Elemente wird die Bedienbarkeit für diese Nutzenden erheblich beeinträchtigt. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Beim Öffnen einer Ansicht ist die Zurück-Taste das fokussierte Element.",
+        "- Beim Öffnen einer Ansicht ist das erste Bedienelement das fokussierte Element.",
+        "- Beim Öffnen einer Such-Ansicht ist das Suchfeld, das in der Mitte der Ansicht lokalisiert ist, das fokussierte Element."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienung ist mit Tastatur nicht oder nicht vollumfänglich möglich.",
+        "- Nach Öffnen des Menüs wird nicht das erste interaktive Element des Menüs fokussiert.",
+        "- Nach Schließen eines Dialogs muss der Nutzende zusätzliche Schritte verfolgen, um zur Ausgangsposition zurückzukehren.",
+        "- Interaktive Elemente werden in unlogischer Reihenfolge fokussiert.",
+        "- Ein oder mehrere interaktive Elemente sind nicht erreichbar.",
+        "- Dekorative Objekte, beispielsweise Trennlinien, werden fokussiert.",
+        "- Der Fokus kann von einem Header-Objekt nicht in den Inhalt versetzt werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sinnvolle-reihenfolge-bei-bedienung-mit-externer-tastatur"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.4.3",
+      "originalTitleDe": "Sinnvolle Reihenfolge bei Bedienung mit externer Tastatur",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bei Bedienung der Mobile App mit einer externen Tastatur erhalten interaktive Bedienelemente den Fokus in einer Reihenfolge, die der logischen beziehungsweise visuellen Struktur, oder einem für Tastaturnutzende optimiertem Bedienablauf entspricht. Die Navigation erfolgt hierbei anhand der Bedienelemente von Element zu Element.",
+        "",
+        "Ausgeblendete oder unsichtbare Inhalte, Layout-Objekte oder Inhalte, die im Hintergrund liegen, dürfen dabei nicht fokussiert werden. Bei einem Seitenaufruf soll das erste Element im Fokus das erste Bedienelement sein. Bietet die Seite eine zentrale Funktion (beispielsweise das Suchfeld der Google Suche), so kann das Suchfeld direkt fokussiert werden.",
+        "",
+        "Bei modalen Dialogen muss das erste Bedienelement innerhalb des Dialogs fokussiert werden. Eine Navigation ist nur innerhalb des Dialogs möglich, bis er geschlossen wird. Nach Schließen des Dialogs muss sich der Fokus am zuvor auslösenden Bedienelement befinden. Sollte der Dialog beim Start der Mobile App oder beim Aufruf einer Seite automatisch geöffnet werden, muss sich der Fokus nach Schließen des Dialogs am ersten Bedienelement der Seite befinden."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Durch eine nicht nachvollziehbare Reihenfolge der fokussierten Elemente wird die Bedienbarkeit für diese Nutzenden erheblich beeinträchtigt. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Beim Öffnen einer Ansicht ist die Zurück-Taste das fokussierte Element.",
+        "- Beim Öffnen einer Ansicht ist das erste Bedienelement das fokussierte Element.",
+        "- Beim Öffnen einer Such-Ansicht ist das Suchfeld, das in der Mitte der Ansicht lokalisiert ist, das fokussierte Element."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienung ist mit externer Tastatur nicht oder nicht vollumfänglich möglich.",
+        "- Nach Öffnen des Menüs wird nicht das erste interaktive Element des Menüs fokussiert.",
+        "- Nach Schließen eines Dialogs muss der Nutzende zusätzliche Schritte verfolgen, um zur Ausgangsposition zurückzukehren.",
+        "- Interaktive Elemente werden in unlogischer Reihenfolge fokussiert.",
+        "- Ein oder mehrere interaktive Elemente sind nicht erreichbar.",
+        "- Dekorative Objekte, beispielsweise Trennlinien, werden fokussiert.",
+        "- Der Fokus kann von einem Header-Objekt nicht in den Inhalt versetzt werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sinnvolle-reihenfolge-bei-bedienung-mit-externer-tastatur"
+    }
+  ]
+}

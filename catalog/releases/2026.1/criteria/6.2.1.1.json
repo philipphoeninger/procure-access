@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "RTT-Kommunikation",
+  "sortOrder": 120,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.1.1",
+      "originalTitleDe": "RTT-Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software eine Zwei-Wege-Sprachkommunikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Zusätzlich zur Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie, muss die Software eine Textkommunikation in Echtzeit (RTT = Real-Time Text) zur Verfügung stellen.",
+        "",
+        "Bei RTT handelt es sich um Text, der sofort übertragen wird, während er eingegeben oder erstellt wird. Dadurch können die Empfänger die Nachricht sofort lesen, während sie geschrieben wird."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Sprache zur Kommunikation nicht nutzen können oder wollen, erhalten die Möglichkeit, über Echtzeit-Textkommunikation (RTT) an Konversationen in der entsprechenden Software teilzunehmen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Eingaben des Versenders können in Echtzeit, bzw. mit kaum merkbarer Latenz eingesehen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Die Eingaben des Versenders können nicht, bzw. nur mit merkbarer Latenz eingesehen werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#rtt-kommunikation"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.1.1",
+      "originalTitleDe": "RTT-Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App eine Zwei-Wege-Sprachkommunikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Zusätzlich zur Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie, muss die Mobile App eine Textkommunikation in Echtzeit (RTT = Real-Time Text) zur Verfügung stellen.",
+        "",
+        "Bei RTT handelt es sich um Text, der sofort übertragen wird, während er eingegeben oder erstellt wird. Dadurch können die Empfänger die Nachricht sofort lesen, während sie geschrieben wird."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die Sprache zur Kommunikation nicht nutzen können oder wollen, erhalten die Möglichkeit, über Echtzeit-Textkommunikation (RTT) an Konversationen in der entsprechenden Mobile App teilzunehmen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Eingaben des Versenders können in Echtzeit, bzw. mit kaum merkbarer Latenz eingesehen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Die Eingaben des Versenders können nicht, bzw. nur mit merkbarer Latenz eingesehen werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#rtt-kommunikation"
+    }
+  ]
+}
