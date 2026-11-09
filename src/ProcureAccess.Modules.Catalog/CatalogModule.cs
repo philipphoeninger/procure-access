@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Catalog.Commands;
+using ProcureAccess.Modules.Catalog.Criteria;
 using ProcureAccess.Modules.Catalog.FilterOptions;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Catalog.Reading;
@@ -69,6 +70,7 @@ public static class CatalogModule
         ArgumentNullException.ThrowIfNull(routes);
         var catalog = routes.MapGroup("/catalog").WithTags("Catalog");
         FilterOptionsEndpoint.Map(catalog);
+        CriteriaEndpoint.Map(catalog);
         return routes;
     }
 

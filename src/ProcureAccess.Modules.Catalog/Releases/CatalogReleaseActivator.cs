@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.EntityFrameworkCore;
-using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Catalog.Persistence;
 
 namespace ProcureAccess.Modules.Catalog.Releases;
@@ -78,50 +77,27 @@ internal sealed class CatalogReleaseActivator(CatalogDbContext db)
         return new CatalogActivationResult(version, previous, []);
     }
 
-    /// <summary>What the release lacks to be activated, in a stable order.</summary>
+    /// <summary>What the release lacks to be activated, in a stable order (<see cref="ReleaseCompleteness"/>).</summary>
     private async Task<List<string>> FindGapsAsync(int releaseId, CancellationToken cancellationToken)
     {
         var criteria = await db.Releases.AsNoTracking()
             .Where(r => r.Id == releaseId)
             .SelectMany(r => r.Criteria)
-            .Select(c => new
-            {
+            .Select(c => new CriterionCompletenessFacts(
                 c.Revision.Criterion.Key,
                 c.Revision.Criterion.Kind,
-                c.Revision.Criterion.TestTypeId,
-                HasDefault = c.Revision.Priorities.Any(p => p.AppTypeId == null && p.UseCaseTemplateId == null),
-            })
+                c.Revision.Criterion.TestType == null ? null : c.Revision.Criterion.TestType.Key,
+                c.Revision.Priorities.Any(p => p.AppTypeId == null && p.UseCaseTemplateId == null)))
             .ToListAsync(cancellationToken);
-        var testTypes = await db.TestTypes.AsNoTracking()
+        var testTypeKeys = await db.TestTypes.AsNoTracking()
             .OrderBy(t => t.SortOrder)
-            .Select(t => new { t.Id, t.Key })
+            .Select(t => t.Key)
             .ToListAsync(cancellationToken);
 
-        var gaps = criteria
-            .Where(c => !c.HasDefault)
-            .Select(c => c.Key)
-            .Order(StringComparer.Ordinal)
-            .Select(key => $"Criterion '{key}' has no catalog-default priority (a rule without app type and use case).")
-            .ToList();
-        var procedureTestTypes = criteria
-            .Where(c => c.Kind == CriterionKind.TestProcedure)
-            .Select(c => c.TestTypeId)
-            .ToHashSet();
-        gaps.AddRange(testTypes
-            .Where(t => !procedureTestTypes.Contains(t.Id))
-            .Select(t => $"Test type '{t.Key}' has no procedure criterion (PROC-{t.Key})."));
-        return gaps;
+        return ReleaseCompleteness.FindGaps(criteria, testTypeKeys);
     }
 }
 
-/// <summary>
-/// Outcome of <see cref="CatalogReleaseActivator.ActivateAsync"/>: the active release and the one
-/// active before, or why nothing changed.
-/// </summary>
-/// <param name="Active">The version active now; null when the command was refused.</param>
-/// <param name="Previous">The version active before; equal to <paramref name="Active"/> when it already was.</param>
-/// <param name="Errors">Why the release was not activated; empty on success.</param>
-/// <param name="IsIncomplete">True when the release is stored but lacks what activation needs.</param>
 internal sealed record CatalogActivationResult(
     string? Active,
     string? Previous,

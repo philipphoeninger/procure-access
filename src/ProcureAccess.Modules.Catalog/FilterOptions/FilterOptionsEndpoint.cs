@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Security.Cryptography;
-using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
+using ProcureAccess.Modules.Catalog.Http;
 using ProcureAccess.Modules.Catalog.Reading;
 using HttpJsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -24,23 +22,11 @@ namespace ProcureAccess.Modules.Catalog.FilterOptions;
 /// <para><b>Errors (owner, S3-19 decision 4).</b> An unknown release, or no active release when
 /// none is named, answers 404 <c>not-found</c>; an unknown key answers 400 <c>validation</c> with
 /// one error per key.</para>
-/// <para><b>HTTP caching (ARCHITECTURE §9.6, owner, S3-19 decision 3).</b> The <c>ETag</c> is a
-/// hash of the body, so it changes with the release and the selection; <c>If-None-Match</c> gets
-/// 304. A named release never changes and may be kept for an hour; an answer for the active release
-/// must be revalidated on every use, so the request after <c>catalog activate</c> returns the new
-/// release (CAT-09).</para>
+/// <para><b>HTTP caching</b> as for every catalog endpoint: <see cref="CatalogJsonAnswer"/>.</para>
 /// </remarks>
 internal static class FilterOptionsEndpoint
 {
     public const string Path = "/filter-options";
-
-    /// <summary><c>Cache-Control</c> of an answer for a named release.</summary>
-    public const string NamedReleaseCacheControl = "public, max-age=3600, must-revalidate";
-
-    /// <summary><c>Cache-Control</c> of an answer for the active release.</summary>
-    public const string ActiveReleaseCacheControl = "public, no-cache";
-
-    private const string JsonContentType = "application/json; charset=utf-8";
 
     public static RouteHandlerBuilder Map(IEndpointRouteBuilder routes) =>
         routes.MapGet(Path, HandleAsync)
@@ -83,19 +69,6 @@ internal static class FilterOptionsEndpoint
         }
 
         var response = FilterOptionsResolver.Resolve(values, snapshot, selection);
-        var body = JsonSerializer.SerializeToUtf8Bytes(response, jsonOptions.Value.SerializerOptions);
-        var etag = new EntityTagHeaderValue($"\"{Convert.ToHexStringLower(SHA256.HashData(body).AsSpan(0, 16))}\"");
-
-        var headers = context.Response.GetTypedHeaders();
-        headers.ETag = etag;
-        context.Response.Headers.CacheControl = namedRelease ? NamedReleaseCacheControl : ActiveReleaseCacheControl;
-
-        var ifNoneMatch = context.Request.GetTypedHeaders().IfNoneMatch;
-        if (ifNoneMatch.Any(tag => tag.Equals(EntityTagHeaderValue.Any) || tag.Compare(etag, useStrongComparison: false)))
-        {
-            return TypedResults.StatusCode(StatusCodes.Status304NotModified);
-        }
-
-        return TypedResults.Bytes(body, JsonContentType);
+        return CatalogJsonAnswer.Create(response, namedRelease, jsonOptions.Value.SerializerOptions, context);
     }
 }

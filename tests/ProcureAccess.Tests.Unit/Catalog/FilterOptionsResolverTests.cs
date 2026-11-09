@@ -215,12 +215,8 @@ public class FilterOptionsResolverTests
 
     private static FilterValueRef Ref(FilterValue value) => new(value.Layer, value.Key);
 
-    private static CatalogReleaseSnapshot Snapshot(CatalogRelease release) => new(
-        0,
-        release.Version,
-        release.PublishedAt!.Value,
-        [],
-        [.. release.Exclusions.Select(e => new ExclusionRule(Ref(e.Exclusion.Source!), Ref(e.Exclusion.Target!)))]);
+    private static CatalogReleaseSnapshot Snapshot(CatalogRelease release) =>
+        CatalogReleaseSnapshot.From(release, V.TestTypes.Select(t => t.Key));
 
     private static IEnumerable<(int Layer, string Id, IReadOnlyList<ExcludingValue> ExcludedBy)> AllOptions(FilterOptionsResponse response) =>
         response.Layers.UseCases.Select(o => ((int)FilterLayer.UseCase, o.Id, o.ExcludedBy))

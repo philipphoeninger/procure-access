@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.3 (2026-11-05; v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way.
+> **Status:** v2.4 (2026-11-09; v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -10,7 +10,7 @@
 >
 > **Aligned follow-up documents (v2):** `ARCHITECTURE_v12.md`, `TESTING_v10.md`, `ux_copy_procureaccess_v14.md`, `design_handoff_procureaccess_v1.md` (1.14), `CLAUDE_v3.md`.
 >
-> **Current versions of the related documents (v2.3):** `ARCHITECTURE_v16.md`, `TESTING_v26.md`, `ux_copy_procureaccess_v15.md`, `design_handoff_procureaccess_v1.md` (1.15), `figma_code_mapping_procureaccess_v1.md` (1.15), `CLAUDE.md`.
+> **Current versions of the related documents (v2.4):** `ARCHITECTURE_v24.md`, `TESTING_v36.md`, `ux_copy_procureaccess_v15.md`, `design_handoff_procureaccess_v1.md` (1.15), `figma_code_mapping_procureaccess_v1.md` (1.15), `CLAUDE.md`.
 >
 > **Language:** English (project convention for technical documents). UI terms are quoted in German exactly as defined in the UX copy §2; the UX copy remains the only source for UI wording.
 >
@@ -68,6 +68,17 @@ Recorded in this file like v2.1 and v2.2 (owner, sprint 03, S3-05); SPEC_v3 stay
 |---|---|---|
 | v2.3-1 | §8.6 names `email-unconfirmed`, as `ARCHITECTURE_v16.md` §7.1 and C72 already did; 13 problem types | Owner decision 3 of 2026-11-01; sprint 02, S2-10 P3 |
 | v2.3-2 | §13: the open targets of the footer links of R-SHL-06 — „Über ProcureAccess“ (O-23) and „Projekt WERTE.IT“ (O-24) are new, „Kriterium vorschlagen“ is O-6 | Sprint 02, S2-15 P2; `ARCHITECTURE_v16.md` C99 |
+
+#### Changes in v2.4 (2026-11-09)
+
+Recorded in this file like v2.1 – v2.3; SPEC_v3 stays the P1 version. Source: the owner decisions of 2026-11-09 before sprint 03 task S3-20 (`docs/sprints/sprint_03/S3-20a_priority_resolution.md`, `S3-20b_criteria_endpoint.md`; `ARCHITECTURE_v23.md` C108, `ARCHITECTURE_v24.md` C109). §8.2 is as built in S3-20b; no acceptance criterion changes.
+
+| # | Change | Source |
+|---|---|---|
+| v2.4-1 | §8.2: `productPart` is one value — of the criterion's applicability rows that match the selection, the selected part with the lowest sort order; `null` when none names a part (Kriterienkatalog K-4) | Owner decision 2 |
+| v2.4-2 | §8.2: a procedure criterion („Geprüft nach …“) has `allowedRatings: []`, `number: null`, `productPart: null` and no procedure texts — it is never rated (C30) | Owner decision 3; SPEC §8.3 (empty number) |
+| v2.4-3 | §8.2, §8.6: 400 `validation` for an incomplete selection (CAT-11), 400 `selection-excluded` for a value excluded by the rules of the release, both with field errors keyed as sent; 404 `not-found` for an unknown release, no active release, or a release `catalog activate` would refuse | Owner decisions 5, 7 |
+| v2.4-4 | §8.2: the fields the example left open — `standardReferences[]` `{ standard, clause, url }`, `procedureTexts[]` with the BIT inklusiv texts and their own `allowedRatings`, `level` as `A` / `B` / `Info` (the UX keys `criteria.priority.A` …), `number` = the criterion key; the key scheme of the example follows S3-15 | S3-20b; `ARCHITECTURE_v20.md` C105 |
 
 ---
 
@@ -641,10 +652,14 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 // GET /api/v1/catalog/criteria?release=…&useCase=…&appTypeIds[]=…&productPartIds[]=…&testTypeIds[]=…
 {
   "release": "2026.1",
-  "criteria": [ { "revisionId": 101, "key": "BITV-SW-11.2.1.1", "kind": "requirement", "number": "11.2.1.1",
-                  "title": "…", "plainLanguage": "…", "productPart": "base", "standardReferences": [ … ],
+  "criteria": [ { "revisionId": 101, "key": "11.2.1.1", "kind": "requirement", "number": "11.2.1.1",
+                  "title": "…", "plainLanguage": "…", "productPart": "base",
+                  "standardReferences": [ { "standard": "en301549", "clause": "11.2.1.1", "url": "https://…" } ],
                   "allowedRatings": [ "fulfilled", "restriction", "barrier", "blockade" ],
-                  "procedureTexts": [ { "testType": "softwareTest", … } ],
+                  "procedureTexts": [ { "testType": "softwareTest", "originalNumber": "…", "originalTitle": "…",
+                                        "applicability": "…", "requirement": "…", "rationaleWhy": "…",
+                                        "allowedRatings": [ … ], "positiveExamples": "…", "negativeExamples": "…",
+                                        "sourceUrl": "https://…#…" } ],
                   "resolvedPriority": { "level": "A", "weight": null, "rationale": "…",
                                         "source": "expertJudgement",
                                         "matchedRule": { "kind": "appTypeAndUseCase", "appType": "web", "useCase": "hr" } } } ],
@@ -652,7 +667,7 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 }
 ```
 
-- `appTypesWithoutCriteria[]` contains the selected app types for which the release has no applicable requirement criterion (today Hardware, Vermittlungs-/Notrufdienst); it may be non-empty while `criteria` is not empty. `matchedRule.kind` ∈ `appTypeAndUseCase | appType | useCase | default` (maps to `criteria.priority.rule.*`). `allowedRatings` never contains `unknown` (always allowed).
+- `appTypesWithoutCriteria[]` contains the selected app types for which the release has no applicable requirement criterion (today Hardware, Vermittlungs-/Notrufdienst); it may be non-empty while `criteria` is not empty. `matchedRule.kind` ∈ `appTypeAndUseCase | appType | useCase | default` (maps to `criteria.priority.rule.*`). `allowedRatings` never contains `unknown` (always allowed). (v2.4) `productPart`: of the applicability rows that match the selection, the selected part with the lowest sort order, `null` when none names a part. A procedure criterion („Geprüft nach …“, one per selected test type) has `number: null`, `productPart: null`, `allowedRatings: []` and no `procedureTexts`. `procedureTexts` are those of the procedures the release maps to a selected app type; `allowedRatings` is their union, all six levels when none applies (C31). `level` is `A`, `B` or `Info`. Errors: 400 `validation` for an incomplete selection (CAT-11), 400 `selection-excluded` for a value excluded by the rules of the release, both with field errors as sent; 404 `not-found` for an unknown release, no active release, or one `catalog activate` would refuse.
 
 ### 8.3 Export file (XLSX and CSV)
 
@@ -690,7 +705,7 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 
 ### 8.6 Problem types
 
-`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`, `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas.
+`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded` (v2.4: a selection with a value excluded by the rules of its release, §8.2), `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas.
 
 ---
 
