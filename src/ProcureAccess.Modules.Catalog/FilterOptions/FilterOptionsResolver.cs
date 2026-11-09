@@ -5,6 +5,7 @@
 using System.Globalization;
 using ProcureAccess.Modules.Catalog.Domain;
 using ProcureAccess.Modules.Catalog.Reading;
+using ProcureAccess.Modules.Catalog.Selection;
 
 namespace ProcureAccess.Modules.Catalog.FilterOptions;
 
@@ -68,8 +69,10 @@ internal static class FilterOptionsResolver
             }
         }
 
-        var appTypes = ReadKeys(appTypeIds, values.AppTypes, "appTypeIds", "app type", errors);
-        var productParts = ReadKeys(productPartIds, values.ProductParts, "productPartIds", "product part", errors);
+        var appTypes = SelectionKeys.Read(appTypeIds, values.AppTypes, "appTypeIds", "app type", errors)
+            .Select(k => k.Key).ToList();
+        var productParts = SelectionKeys.Read(productPartIds, values.ProductParts, "productPartIds", "product part", errors)
+            .Select(k => k.Key).ToList();
 
         return errors.Count == 0
             ? (new FilterSelection(selectedUseCase, appTypes, productParts), errors)
@@ -145,39 +148,4 @@ internal static class FilterOptionsResolver
         FilterLayer.TestType => "testType",
         _ => throw new ArgumentOutOfRangeException(nameof(layer), layer, "Unknown filter layer."),
     };
-
-    private static List<string> ReadKeys(
-        IReadOnlyList<string?>? keys,
-        IEnumerable<FilterValue> known,
-        string parameter,
-        string what,
-        Dictionary<string, string[]> errors)
-    {
-        var result = new List<string>();
-        if (keys is null)
-        {
-            return result;
-        }
-
-        var knownKeys = known.Select(v => v.Key).ToHashSet(StringComparer.Ordinal);
-        for (var i = 0; i < keys.Count; i++)
-        {
-            var key = keys[i];
-            if (string.IsNullOrEmpty(key) || result.Contains(key, StringComparer.Ordinal))
-            {
-                continue;
-            }
-
-            if (knownKeys.Contains(key))
-            {
-                result.Add(key);
-            }
-            else
-            {
-                errors[$"{parameter}[{i}]"] = [$"Unknown {what} '{key}'."];
-            }
-        }
-
-        return result;
-    }
 }
