@@ -134,3 +134,13 @@ path = "CLIENT/CLIENT.ProcureAccess/public/favicon.ico"
 precedence = "override"
 SPDX-FileCopyrightText = "2010-2025 Google LLC (https://angular.dev/license)"
 SPDX-License-Identifier = "MIT"
+
+# Material Symbols Outlined (#135, S3-25): the font of the material-symbols package
+# (Google, Apache-2.0), cut down to the icons of material-symbols-icons.json by
+# scripts/subset-material-symbols.py, i.e. changed. The client image also lists it
+# in /3rdpartylicenses.txt (CLIENT Dockerfile).
+[[annotations]]
+path = "CLIENT/CLIENT.ProcureAccess/src/assets/fonts/material-symbols-outlined.woff2"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Google LLC"
+SPDX-License-Identifier = "Apache-2.0"

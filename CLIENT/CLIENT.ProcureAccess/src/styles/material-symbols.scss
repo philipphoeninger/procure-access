@@ -1,0 +1,15 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// Material Symbols Outlined from the subset in src/assets/fonts (#135, S3-25): only the icons of
+// src/assets/fonts/material-symbols-icons.json. The @font-face and the class come from the
+// package's own mixin (font-display: block, so no icon name is shown while the font loads);
+// only the font path differs. A new icon goes into the list first: see scripts/check-icons.mjs.
+// The build resolves the url() of the mixin from the package's folder (node_modules/material-symbols),
+// so the path is relative to it; a wrong path stops the build ("Could not resolve").
+@use 'material-symbols/core' with (
+  $material-symbols-font-path: '../../src/assets/fonts/'
+);
+
+@include core.material-symbols-font('Material Symbols Outlined');

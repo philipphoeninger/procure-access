@@ -71,6 +71,12 @@ jobs:
         run: |
           node --test scripts/check-i18n.test.mjs
           node scripts/check-i18n.mjs
+      # The icon font is a subset with only the listed icons (#135, S3-25): the list must match the
+      # icons the client uses, and the subset the list and the pinned material-symbols version.
+      - name: Icon check (icon list and font subset)
+        run: |
+          node --test scripts/check-icons.test.mjs
+          node scripts/check-icons.mjs
       # Only the self-test here: the gate itself runs in stage 7 (TESTING §8.3).
       - name: Invariant gate self-test
         run: node --test scripts/check-invariants.test.mjs
