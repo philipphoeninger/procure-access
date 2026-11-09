@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sichtbare Beschriftung Teil der programmatischen Beschriftung",
+  "sortOrder": 1640,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.5.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.5.3",
+      "originalTitleDe": "Sichtbare Beschriftung Teil der programmatischen Beschriftung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Auswahlschalter, Buttons oder Links enthält."
+      ],
+      "requirementDe": [
+        "Bei Bedienelementen, die mit textlichem Inhalt in Form von Text oder mit textlichem Inhalt in grafischer Form beschriftet sind, muss der Name der sichtbaren Bezeichnung entsprechen."
+      ],
+      "rationaleWhyDe": [
+        "Wenn ein PDF-Dokument per Sprache gesteuert wird, dann werden Befehle auf Basis der sichtbaren Beschriftungen von Elementen gesprochen. Wird die sichtbare Beschriftung nicht in gleicher Form an die Accessibility API des Betriebssystems weitergegeben bzw. kommt die sichtbare Beschriftung im Accessible Name nicht vor, so kann das zu Missverständnissen und Fehlern bzw. zur Nicht-Nutzbarkeit des betreffenden Elements führen. Dies ist insbesondere für Menschen, die auf ein Screenreader-Programm angewiesen sind, relevant, um sich optimal mit Menschen, die das PDF-Dokument visuell erfassen, austauschen zu können."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Das PDF-Dokument enthält ausschließlich Bedienelemente, die nicht mit textlichen Inhalten gekennzeichnet sind."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Ein Formularfeld ist sichtbar beschriftet mit „Kfz-Kennzeichen“, Screenreader-Programme geben als Beschriftung hingegen „Nummernschild“ aus, wobei der Kontext aus dem umgebenden Text deutlich wird.",
+        "- Barriere: Ein Formularfeld ist sichtbar beschriftet mit „Kfz-Kennzeichen“, Screenreader-Programme geben als Beschriftung hingegen „Nummernschild“ aus, wobei der Kontext aus dem umgebenden Text nicht sofort deutlich wird.",
+        "- Einschränkung: Ein Button besitzt die sichtbare Beschriftung „weiter“, Screenreader-Programme geben als Beschriftung hingegen „zur nächsten Seite“ aus, wobei es auf der aktuellen Seite tatsächlich auch keine weiteren Inhalte gibt. Mit dem Ausführen der Aktion ist eine Navigation innerhalb des PDF-Dokuments verbunden.",
+        "- Barriere: Ein Button besitzt die sichtbare Beschriftung „weiter“, Screenreader-Programme geben als Beschriftung hingegen „zur nächsten Seite“ aus, wobei es auf der aktuellen Seite tatsächlich noch weitere Inhalte gibt und der mit dem Button verknüpfte Inhalt sich nicht auf der nächsten Seite des PDF-Dokuments befindet. Mit dem Ausführen der Aktion ist eine Navigation innerhalb des PDF-Dokuments verbunden und das PDF-Dokument bleibt dennoch nutzbar.",
+        "- Blockade: Ein Button besitzt die sichtbare Beschriftung „weiter“, Screenreader-Programme geben als Beschriftung hingegen „zur nächsten Seite“ aus, wobei mit Ausführen der Aktion ein Schließen des PDF-Dokuments verbunden ist.",
+        "- Blockade: Ein Formularfeld ist sichtbar beschriftet mit „Kfz-Kennzeichen“, Screenreader-Programme geben als Beschriftung hingegen „Vorname“ aus.",
+        "",
+        "Entspricht der für die Assistenztechnologie zugängliche Name von Bedienelementen nicht der sichtbaren Beschriftung und ist das Bedienelement dadurch nicht vollumfänglich nutzbar bzw. verständlich, dann handelt es sich mindestens um eine Einschränkung."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sichtbare-beschriftung-teil-der-programmatischen-beschriftung"
+    }
+  ]
+}

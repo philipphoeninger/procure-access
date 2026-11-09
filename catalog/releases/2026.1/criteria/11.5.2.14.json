@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Änderung des Fokus und der Auswahlattribute",
+  "sortOrder": 1070,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.14"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.14",
+      "originalTitleDe": "Änderung des Fokus und der Auswahlattribute",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Texteingabefelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Während der Eingabe von Text in Formularfeldern bei aktivem Screenreader und in Kombination mit aktiver Sprachsteuerung oder Tastatur sind der aktuelle Fokus und die aktuelle Cursorposition jederzeit sichtbar, sämtliche Bewegungsoptionen des Cursors (beispielsweise die wort- und zeichenweise Navigation) werden unterstützt. Textmarkierungen und Änderungen der Markierungen sind möglich, und markierte Stellen sind identifizierbar."
+      ],
+      "rationaleWhyDe": [
+        "Zur Eingabe und Bearbeitung von Text in Formularfeldern muss für Nutzende von assistiven Systemen eine optimale Orientierung geschaffen werden. Durch die programmatische Ermittelbarkeit der Informationen über den Fokus und die Auswahlattribute, und die entsprechende Unterstützung bei Bearbeitung können assistive Technologien wie Screenreader, Sprachsteuerung, Bildschirmlupe oder Braillezeilen besser verstehen, interpretieren und mit der Benutzeroberfläche interagieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Anforderungen werden auch in den diversen Kombinationen der assistiven Systeme unterstützt.",
+        "- Die wort- oder zeichenweise Navigation mittels Screenreader wird unterstützt.",
+        "- Das Markieren eines Wortes ist bei Nutzung einer Tastatur möglich."
+      ],
+      "negativeExamplesDe": [
+        "- Mindestens eine der Anforderungen, beziehungsweise eine der Kombinationen der assistiven Systeme wird nicht, fehlerhaft oder nicht vollumfänglich unterstützt.",
+        "- Die wort- oder zeichenweise Navigation mittels Screenreader wird nicht, nicht vollumfänglich oder nur fehlerhaft unterstützt.",
+        "- Das Markieren eines Wortes ist bei Nutzung der Tastatur nicht möglich."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#änderung-des-fokus-und-der-auswahlattribute"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.14",
+      "originalTitleDe": "Änderung des Fokus und der Auswahlattribute",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Texteingabefelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Während der Eingabe von Text in Formularfeldern bei aktivem Screenreader und in Kombination mit aktiver Sprachsteuerung oder externer Tastatur sind der aktuelle Fokus und die aktuelle Cursorposition jederzeit sichtbar, sämtliche Bewegungsoptionen des Cursors (beispielsweise die wort- und zeichenweise Navigation) werden unterstützt. Textmarkierungen und Änderungen der Markierungen sind möglich, und markierte Stellen sind identifizierbar."
+      ],
+      "rationaleWhyDe": [
+        "Zur Eingabe und Bearbeitung von Text in Formularfeldern muss für Nutzende von assistiven Systemen eine optimale Orientierung geschaffen werden. Durch die programmatische Ermittelbarkeit der Informationen über den Fokus und die Auswahlattribute, und die entsprechende Unterstützung bei Bearbeitung können assistive Technologien wie Screenreader, Sprachsteuerung, Bildschirmlupe oder Braillezeilen besser verstehen, interpretieren und mit der Benutzeroberfläche interagieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Anforderungen werden auch in den diversen Kombinationen der assistiven Systeme unterstützt.",
+        "- Die wort- oder zeichenweise Navigation mittels VoiceOver-Rotor oder Android TalkBack-Menü wird unterstützt.",
+        "- Das Markieren eines Wortes ist auch bei Nutzung einer externen Tastatur möglich."
+      ],
+      "negativeExamplesDe": [
+        "- Mindestens eine der Anforderungen, beziehungsweise eine der Kombinationen der assistiven Systeme wird nicht, fehlerhaft oder nicht vollumfänglich unterstützt.",
+        "- Die wort- oder zeichenweise Navigation mittels VoiceOver-Rotor oder Android TalkBack-Menü wird nicht, nicht vollumfänglich oder nur fehlerhaft unterstützt.",
+        "- Das Markieren eines Wortes ist bei Nutzung einer externen Tastatur nicht möglich."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#änderung-des-fokus-und-der-auswahlattribute"
+    }
+  ]
+}

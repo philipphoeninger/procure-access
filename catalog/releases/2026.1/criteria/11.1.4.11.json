@@ -1,0 +1,97 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Nicht-Text-Kontrast",
+  "sortOrder": 590,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.11"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.11",
+      "originalTitleDe": "Nicht-Text-Kontrast",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn grafische Bedienelemente oder informationstragende Grafiken vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Kontraste von grafischen Bedienelementen und informationstragenden Grafiken sind mit einem Kontrastverhältnis von mindestens 3:1 ausreichend. Bei der Kontrastmessung steht der informationstragende Bereich oder die Hervorhebung des Zustands eines Elements im Fokus.",
+        "",
+        "Die Anforderung gilt nicht für inaktive Benutzeroberflächenkomponenten, inaktive Zustände von Bedienelementen, Logos beziehungsweise Markennamen, und grafische Inhalte, deren Inhalt nicht verändert werden darf, beispielsweise Flaggen, Screenshots oder Heatmaps.",
+        "",
+        "Die Anforderung gilt weiterhin nicht für native grafische Bedienelemente, die in ihrem Erscheinungsbild nicht beeinflusst werden können, beispielsweise native Switches in ihren jeweiligen Zuständen, Checkboxen oder Radio-Buttons.",
+        "",
+        "Die Prüfung erfolgt in der Standarddarstellung der Software. Eventuell vorhandene, alternative Darstellungen oder Mechanismen zum Verändern des Designs sind nicht Teil der Prüfung und werden nicht berücksichtigt."
+      ],
+      "rationaleWhyDe": [
+        "Gute Kontrastverhältnisse sorgen dafür, dass Nutzende die Inhalte besser erkennen, lesen und bedienen können. Menschen mit Sehbeeinträchtigung und Farbfehlsichtigkeit profitieren von guten Kontrastverhältnissen genauso wie ältere Menschen, die unter verminderter Kontrastempfindlichkeit leiden. Letztendlich kommen gute Kontraste allen Menschen zugute, beispielsweise beim Verwenden der Software bei starker Sonneneinstrahlung oder bei Darstellung über einen Projektor."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Gemessene Kontrastverhältnisse liegen bei 3:1 oder höher."
+      ],
+      "negativeExamplesDe": [
+        "- Gemessene Kontrastverhältnisse liegen unter 3:1."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#nicht-text-kontrast"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.11",
+      "originalTitleDe": "Nicht-Text-Kontrast",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn grafische Bedienelemente oder informationstragende Grafiken vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Kontraste von grafischen Bedienelementen und informationstragenden Grafiken sind mit einem Kontrastverhältnis von mindestens 3:1 ausreichend. Bei der Kontrastmessung steht der informationstragende Bereich oder die Hervorhebung des Zustands eines Elements im Fokus.",
+        "",
+        "Die Anforderung gilt nicht für inaktive Benutzeroberflächenkomponenten, inaktive Zustände von Bedienelementen, Logos beziehungsweise Markennamen, und grafische Inhalte, deren Inhalt nicht verändert werden darf, beispielsweise Flaggen, Screenshots oder Heatmaps.",
+        "",
+        "Die Anforderung gilt weiterhin nicht für native grafische Bedienelemente, die in ihrem Erscheinungsbild nicht beeinflusst werden können, beispielsweise native Switches in ihren jeweiligen Zuständen, Checkboxen oder Radio-Buttons.",
+        "",
+        "Die Prüfung erfolgt in der Standarddarstellung der App. Eventuell vorhandene, alternative Darstellungen oder Mechanismen zum Verändern des Designs sind nicht Teil der Prüfung und werden nicht berücksichtigt."
+      ],
+      "rationaleWhyDe": [
+        "Gute Kontrastverhältnisse sorgen dafür, dass Nutzende die Inhalte besser erkennen, lesen und bedienen können. Menschen mit Sehbeeinträchtigung und Farbfehlsichtigkeit profitieren von guten Kontrastverhältnissen genauso wie ältere Menschen, die unter verminderter Kontrastempfindlichkeit leiden. Letztendlich kommen gute Kontraste allen Menschen zugute, beispielsweise beim Verwenden des mobilen Endgeräts bei starker Sonneneinstrahlung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Gemessene Kontrastverhältnisse liegen bei 3:1 oder höher.",
+        "- Wenige Kontrastverhältnisse weisen einen Grenzwert von 2,85:1 oder höher auf."
+      ],
+      "negativeExamplesDe": [
+        "- Gemessene Kontrastverhältnisse liegen unter 3:1.",
+        "- Zu viele Kontrastverhältnisse weisen einen Grenzwert von 2,85:1 oder geringer auf."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#nicht-text-kontrast"
+    }
+  ]
+}

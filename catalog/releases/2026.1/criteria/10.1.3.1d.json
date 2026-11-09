@@ -1,0 +1,49 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Gruppierende Strukturelemente/Inhaltsverzeichnis",
+  "sortOrder": 1320,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1d",
+      "originalTitleDe": "Info und Beziehungen: Gruppierende Strukturelemente/Inhaltsverzeichnis",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument ein Inhaltsverzeichnis enthält."
+      ],
+      "requirementDe": [
+        "Wenn im PDF-Dokument ein Inhaltsverzeichnis vorhanden ist, muss es korrekt getaggt sein."
+      ],
+      "rationaleWhyDe": [
+        "Inhaltsverzeichnisse informieren über den Aufbau des PDF-Dokuments und geben Hinweise zur Positionierung der Inhalte des PDF-Dokuments. Wenn ein Inhaltsverzeichnis vorhanden ist, muss es als solches erkennbar sein."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Das PDF-Dokument enthält ein Inhaltsverzeichnis und dieses ist mit TOC ausgezeichnet und dessen Einträge sind mit TOCI ausgezeichnet."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Das Inhaltsverzeichnis ist nicht mit TOC ausgezeichnet bzw. dessen Einträge sind nicht mit TOCI ausgezeichnet."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#d-info-und-beziehungen-gruppierende-strukturelementeinhaltsverzeichnis"
+    }
+  ]
+}

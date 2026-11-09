@@ -1,0 +1,65 @@
+{
+  "kind": "requirement",
+  "titleDe": "Fokus sichtbar",
+  "sortOrder": 1610,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.4.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.4.7",
+      "originalTitleDe": "Fokus sichtbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Buttons oder Links enthält.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Jedes durch Tastatur bedienbare Bedienelement hat einen Bedienmodus, bei dem der Tastaturfokus sichtbar ist."
+      ],
+      "rationaleWhyDe": [
+        "Für Menschen, die auf die Nutzung der Tastatur angewiesen sind, ist es wichtig zu sehen, wo sich der Tastaturfokus gerade befindet und welche Aktion also ausgelöst wird, wenn die Eingabe-Taste (Enter) gedrückt wird, bzw. an welcher Stelle eingegebene Zeichen erscheinen werden. Ohne sichtbaren Tastaturfokus ist ein PDF-Dokument für Menschen, die sich optisch orientieren, praktisch nicht tastaturbedienbar.",
+        "",
+        "Die sichtbare Rückmeldung liefert Aufschluss darüber, ob ein Bildschirmelement bedienbar ist und ob es mit dem Zeigegerät erfolgreich fokussiert wurde und darüber hinaus ob eine angewählte Funktion verfügbar ist oder aber vorübergehend nicht funktioniert bzw. ob eine beabsichtigte Aktivierung erfolgreich war.",
+        "",
+        "Eine verlässliche Rückmeldung von Bedienelementen gibt Sicherheit in der Bedienung. Dies trifft in besonderem Maß auf Menschen mit kognitiver Beeinträchtigung zu und kommt darüber hinaus vor allem bei selten genutzten Funktionen allen Menschen zugute."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Ein aktiviertes Element ändert sein Aussehen deutlich, so lange die Aktivierung andauert."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Ein aktiviertes Element ändert sein Aussehen bei passendem Vergrößerungsfaktor deutlich. Der passende Vergrößerungsfaktor ergibt sich durch maximal zweimaliges Betätigen der Tastenkombination STRG+Pluszeichen.",
+        "- Einschränkung: Um die Schaltfläche, die fokussiert wird, erscheint ein gepunkteter Rahmen, der sich nicht deutlich abhebt.",
+        "- Einschränkung: Im Eingabefeld erscheint an der Stelle, an der die eingegebenen Zeichen eingefügt werden, als Text-Indikator ein blinkender senkrechter Strich, der nicht deutlich erkennbar ist.",
+        "- Einschränkung: Zustandsänderungen sind nicht deutlich erkennbar.",
+        "- Einschränkung: Der Tastaturfokus ist nur schwach sichtbar.",
+        "- Barriere: Der Tastaturfokus ist für mehr als 3 Tastenanschläge nicht sichtbar.",
+        "- Blockade: Der Tastaturfokus ist in ganzen Bereichen des PDF-Dokuments nicht sichtbar.",
+        "- Blockade: Zustandsänderungen sind nicht erkennbar."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#fokus-sichtbar"
+    }
+  ]
+}

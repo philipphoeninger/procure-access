@@ -1,0 +1,75 @@
+{
+  "kind": "requirement",
+  "titleDe": "Name, Rolle, Wert",
+  "sortOrder": 1750,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.4.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.4.1.2",
+      "originalTitleDe": "Name, Rolle, Wert",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Auswahlschalter, Buttons oder Links bzw. von JavaScript-gesteuerte Elemente enthält."
+      ],
+      "requirementDe": [
+        "Bedienelemente sollen mit geeigneten Namen, Rollen und Eigenschaften ausgezeichnet und bei Nutzung assistiver Technologien in vollem Umfang zugänglich sein.",
+        "",
+        "Darüber hinaus soll die korrekte Übertragung der bei der Bearbeitung vorgenommenen Einstellungen an diesen Elementen bzw. die Auslesbarkeit ihrer Zustände programmatisch gewährleistet sein und konsistent an assistive Technologien übermittelt werden."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die auf assistive Technologien angewiesen sind, können Bedienelemente in einem PDF-Dokument, die für die assistive Technologie nicht ermittelbar sind, nicht zuverlässig nutzen.",
+        "",
+        "Wenn der Zustand eines Bedienelementes durch Screenreader-Programme falsch oder gar nicht ausgelesen werden kann, hat eine Person, die auf die Nutzung assistiver Technologien angewiesen ist, keine Kontrolle über die mit dem Bedienelement verknüpfte Aktion bzw. Auswirkung.",
+        "",
+        "Abweichende Bezeichnungen in der Sprachausgabe eines Screenreader-Programms und der Funktion eines Bedienelementes bzw. der vom Screenreader-Programm ausgelesenen Beschreibung und der sichtbaren Beschreibung eines Bedienelementes führen zu Irritationen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Bedienelemente sind mit Namen, ihrer Rolle und dem entsprechenden Wert erkennbar bzw. auslesbar.",
+        "- erfüllt: Eine Ausklappliste ist als solche auch bei einem Vergrößerungsfaktor von beispielsweise 300 % erkennbar und der ausgewählte Eintrag ist für die assistive Technologie ersichtlich.",
+        "- erfüllt: Jeder Radiobutton einer Gruppe von Radiobuttons hat einen individuellen Wert. Der ausgewählte Status ist für die assistive Technologie ermittelbar, wie z. B.: \"Mittelgroß: Ausgewählt!\"."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Das PDF-Dokument enthält keine interaktiven Bedienelemente.",
+        "- Einschränkung: Wenn der Name des Elements nicht im Feld Name, sondern in einem anderen Feld wie Wert oder Hilfetext steht und hieraus Widersprüche entstehen.",
+        "- Barriere: Wenn sich kein Rahmen um das Element bildet oder der Rahmen nicht der visuell wahrnehmbaren Begrenzung des Elements entspricht. Hier ist die Personengruppe mit Sehbehinderungen ggf. komplett ausgeschlossen. Zudem können solche Felder auch für andere Personengruppen nicht direkt erkennbar sein.",
+        "- Blockade: Wenn der Name des Elements nicht vorhanden ist, nicht der sichtbaren Beschriftung entspricht, verschiedene Namen in den Teilen eines zusammengesetzten Elements angegeben sind oder verschiedene Namen im fokussierten und nicht fokussierten Zustand angegeben sind.",
+        "",
+        "Alle Mängel, soweit nicht bereits gewichtet, werden nach der Bedeutung für die Arbeitsaufgabe bewertet.",
+        "",
+        "- Barriere: Wenn der Name des Elements im Feld Wert steht und der Wert des Elements sich dynamisch ändern kann (Formularfelder, Statusanzeigen).",
+        "- Blockade: Die Rolle eines Elements ist unzutreffend angegeben.",
+        "- Blockade: In den verschiedenen, für die Rolle einsetzbaren, Feldern stehen widersprüchliche Angaben.",
+        "- Blockade: Teile zusammengesetzter Elemente geben widersprüchliche Rollen an.",
+        "- Blockade: Fokussierte und nicht fokussierte Elemente geben unterschiedliche Rollen an.",
+        "- Blockade: Die Sprachausgabe eines Screenreader-Programms beschreibt ein Texteingabefeld als Kontrollfeld.",
+        "- Blockade: Der Zustand eines Kontrollfeldes wird durch das Screenreader-Programm falsch wiedergegeben.",
+        "- Blockade: Der Zustand einer Ausklappliste, eines Kombinationsfeldes oder eines Akkordeons wird nicht wiedergegeben.",
+        "- Blockade: Die sichtbare Beschriftung einer Schaltfläche weicht von der Bezeichnung der Screenreader-Ausgabe ab.",
+        "- Blockade: Ein Schieberegler gibt den aktuell gewählten Wert nicht wieder."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#name-rolle-wert"
+    }
+  ]
+}

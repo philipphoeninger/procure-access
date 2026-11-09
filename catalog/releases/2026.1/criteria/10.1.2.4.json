@@ -1,0 +1,51 @@
+{
+  "kind": "requirement",
+  "titleDe": "Untertitel für Live-Videos",
+  "sortOrder": 1270,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.2.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.2.4",
+      "originalTitleDe": "Untertitel für Live-Videos",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald innerhalb des PDF-Dokuments die Möglichkeit besteht, Echtzeitübertragungen via Video-Datei mit synchroner Tonübertragung abzurufen."
+      ],
+      "requirementDe": [
+        "Untertitel werden für alle Live-Videoinhalte in synchronisierten Medien bereitgestellt."
+      ],
+      "rationaleWhyDe": [
+        "In diesem Prüfschritt geht es darum, gehörlosen oder schwerhörigen Menschen die Möglichkeit zu bieten, synchronisierte Medienpräsentationen vollständig zu erfassen. Untertitel liefern dabei den Teil des Inhalts, der über die Tonspur verfügbar ist. Untertitel müssen nicht nur Dialoge wiedergeben, sondern auch angeben, wer spricht. Sie enthalten darüber hinaus nichtsprachliche Informationen, die durch Ton vermittelt werden, einschließlich aussagekräftiger Soundeffekte."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Menschen unterhalten sich, während im Hintergrund ein Unfall mit einem lauten Knall passiert. Die Information, dass sich im Hintergrund ein Unfall ereignet, wird im Untertitel angegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Menschen unterhalten sich, während im Hintergrund ein Unfall mit einem lauten Knall passiert. Die Videoinhalte werden vorab in einer Textalternative erklärt. Doch die synchrone Vermittlung visueller und akustischer Informationen fehlt.",
+        "- Blockade: Für die Echtzeitübertragung werden keine Untertitel bereitgestellt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#untertitel-für-live-videos"
+    }
+  ]
+}

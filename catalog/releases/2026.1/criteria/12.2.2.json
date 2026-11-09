@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Dokumentation und unterstützende Dienste",
+  "titleDe": "Informationen zu Barrierefreiheits- und Kompatibilitätsfunktionen",
+  "sortOrder": 1200,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "12.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "12.2.2",
+      "originalTitleDe": "Informationen zu Barrierefreiheits- und Kompatibilitätsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Barrierefreiheitsfunktionen wie in Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben vorhanden sind, und eine Möglichkeit zur Kontaktaufnahme für Produktsupport vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die durch den Produktsupport übermittelten Informationen zur Software entsprechen mindestens dem Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können.",
+        "",
+        "Als Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung)."
+      ],
+      "rationaleWhyDe": [
+        "Selbst eine barrierefreie Produktdokumentation ist für manche Menschen nicht ohne Aufwand nutzbar. Informationen in der Dokumentation sind zudem schnell veraltet oder nicht vollumfänglich. Es ist für einige Menschen deutlich einfacher, einen direkten Kontakt zum Produktsupport herzustellen, um individuell Fragen stellen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Produktsupport ist zur Software auskunftsfähig.",
+        "- Die durch den Produktsupport übermittelten Informationen zur Software entsprechen oder übertreffen den Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können."
+      ],
+      "negativeExamplesDe": [
+        "- Innerhalb von 48 Stunden nach Anfrage erfolgt keine Antwort.",
+        "- Der Produktsupport ist zur Software nicht auskunftsfähig.",
+        "- Die durch den Produktsupport übermittelten Informationen zur Software sind geringer als der Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#informationen-zu-barrierefreiheits--und-kompatibilitätsfunktionen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "12.2.2",
+      "originalTitleDe": "Informationen zu Barrierefreiheits- und Kompatibilitätsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn App-eigene, assistive Unterstützungen wie in Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben, und eine Möglichkeit zur Kontaktaufnahme für Produktsupport vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die durch den Produktsupport übermittelten Informationen zu den App-eigenen, assistiven Systemen entsprechen mindestens dem Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können.",
+        "",
+        "Als Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung)."
+      ],
+      "rationaleWhyDe": [
+        "Selbst eine barrierefreie Produktdokumentation ist für manche Menschen nicht ohne Aufwand nutzbar. Informationen in der Dokumentation sind zudem schnell veraltet oder nicht vollumfänglich. Es ist für einige Menschen deutlich einfacher, einen direkten Kontakt zum Produktsupport herzustellen, um individuell Fragen stellen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Produktsupport ist zu den App-eigenen, assistiven Systemen auskunftsfähig.",
+        "- Die durch den Produktsupport übermittelten Informationen zu den App-eigenen, assistiven Systemen entsprechen oder übertreffen den Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können."
+      ],
+      "negativeExamplesDe": [
+        "- Innerhalb von 48 Stunden nach Anfrage erfolgt keine Antwort.",
+        "- Der Produktsupport ist zu den App-eigenen, assistiven Systemen nicht auskunftsfähig.",
+        "- Die durch den Produktsupport übermittelten Informationen zu den App-eigenen, assistiven Systemen sind geringer als der Umfang an Informationen, die in der Dokumentation wie unter Prüfschritt 12.1.1 Dokumentation von Barrierefreiheit und Kompatibilität beschrieben ermittelt werden können."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#informationen-zu-barrierefreiheits--und-kompatibilitätsfunktionen"
+    }
+  ]
+}

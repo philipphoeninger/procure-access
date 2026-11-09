@@ -1,0 +1,35 @@
+{
+  "kind": "requirement",
+  "titleDe": "Statusmeldungen",
+  "sortOrder": 1760,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.4.1.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.4.1.3",
+      "originalTitleDe": "Statusmeldungen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist nicht anwendbar."
+      ],
+      "allowedRatings": [
+        "notApplicable"
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#statusmeldungen"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Fehlererkennung",
+  "sortOrder": 850,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.1",
+      "originalTitleDe": "Fehlererkennung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind, die bei fehlerhafter oder unvollständiger Eingabe Fehlermeldungen erzeugen."
+      ],
+      "requirementDe": [
+        "Bei fehlerhafter oder unvollständiger Eingabe in Formularfeldern müssen die betroffenen Formularfelder eindeutig identifizierbar sein und der Fehler in Textform beschrieben werden, sofern eine Fehlererkennung implementiert ist. Das Identifizieren der betroffenen Formularfelder kann hierbei auf verschiedene Weise erfolgen:",
+        "",
+        "- Die betroffenen Formularfelder werden am Seitenbeginn beschrieben.",
+        "- Die betroffenen Formularfelder werden zusätzlich zur Fehlerbeschreibung deutlich hervorgehoben (Form und Farbe).",
+        "- Die Beschriftung der betroffenen Formularfelder ändert sich.",
+        "- Die Fehlerbeschreibung wird in unmittelbarer Nähe des betroffenen Formularfelds angezeigt.",
+        "- Die Fehlerbeschreibung wird zusammen mit den betroffenen Formularfeldern in einem Warnhinweis angezeigt.",
+        "",
+        "Ist keine Fehlererkennung implementiert, führt das nicht zu einer negativen Bewertung und der Prüfschritt ist nicht anwendbar."
+      ],
+      "rationaleWhyDe": [
+        "Für blinde Menschen und Menschen mit Farbfehlsichtigkeit ist eine Fehlerbeschreibung in Textform unerlässlich, um entsprechende Formularfelder identifizieren zu können. Menschen mit Legasthenie vertauschen häufiger Zahlen, Menschen mit motorischen Beeinträchtigungen drücken häufiger versehentlich falsche Tasten. Menschen, die nur einen kleinen Ausschnitt der Anzeige sehen, bemerken einen Fehlerzustand möglicherweise nicht."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Fehler wird in Textform am Seitenanfang oder am Formularfeld beschrieben. Zusätzlich sind die entsprechenden Formularfelder in Form und Farbe markiert.",
+        "- Der Fehler wird in einem Warnhinweis dargestellt, der den Fehler und das betroffene Formularfeld eindeutig beschreibt.",
+        "- Die Beschriftung eines Formularfelds hat sich aufgrund des Fehlers verändert.",
+        "- Der Nutzende wird durch einen Fehlerdialog geführt, der den Fokus erhält."
+      ],
+      "negativeExamplesDe": [
+        "- Das betroffene Formularfeld wird lediglich farblich markiert.",
+        "- Die Fehlermeldung in Textform lautet „Fehler im Formularfeld“, das Formularfeld wird nicht zusätzlich markiert.",
+        "- Nach Anzeige der Fehlermeldungen werden Formularfelder neu geladen, die Eingaben müssen erneut vorgenommen werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#fehlererkennung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.1",
+      "originalTitleDe": "Fehlererkennung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind, die bei fehlerhafter oder unvollständiger Eingabe Fehlermeldungen erzeugen."
+      ],
+      "requirementDe": [
+        "Bei fehlerhafter oder unvollständiger Eingabe in Formularfeldern müssen die betroffenen Formularfelder eindeutig identifizierbar sein, die Fehlermeldungen müssen dauerhaft sichtbar sein und in Textform beschrieben werden. Das Identifizieren der betroffenen Formularfelder kann hierbei auf verschiedene Weise erfolgen:",
+        "",
+        "- Die betroffenen Formularfelder werden am Seitenbeginn beschrieben.",
+        "- Die betroffenen Formularfelder werden zusätzlich zur Fehlerbeschreibung deutlich hervorgehoben (Form und Farbe).",
+        "- Die Beschriftung der betroffenen Formularfelder ändert sich.",
+        "- Die Fehlerbeschreibung wird in unmittelbarer Nähe des betroffenen Formularfelds angezeigt.",
+        "- Die Fehlerbeschreibung wird zusammen mit den betroffenen Formularfeldern in einem Warnhinweis angezeigt.",
+        "",
+        "Ist keine Fehlererkennung implementiert, führt das nicht zu einer negativen Bewertung und der Prüfschritt ist nicht anwendbar."
+      ],
+      "rationaleWhyDe": [
+        "Für blinde Menschen und Menschen mit Farbfehlsichtigkeit ist eine Fehlerbeschreibung in Textform unerlässlich, um entsprechende Formularfelder identifizieren zu können. Menschen mit Legasthenie vertauschen häufiger Zahlen, Menschen mit motorischen Beeinträchtigungen drücken häufiger versehentlich falsche Tasten. Menschen, die nur einen kleinen Ausschnitt der Anzeige sehen, bemerken einen Fehlerzustand möglicherweise nicht."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Fehler wird in Textform am Seitenanfang oder am Formularfeld beschrieben. Zusätzlich sind die entsprechenden Formularfelder in Form und Farbe markiert.",
+        "- Der Fehler wird in einem Warnhinweis dargestellt, der den Fehler und das betroffene Formularfeld eindeutig beschreibt.",
+        "- Die Beschriftung eines Formularfelds hat sich aufgrund des Fehlers verändert.",
+        "- Der Nutzende wird durch einen Fehlerdialog geführt, der den Fokus erhält."
+      ],
+      "negativeExamplesDe": [
+        "- Die Fehlermeldung in Textform lautet „Fehler im Formularfeld“, das Formularfeld wird nicht zusätzlich markiert.",
+        "- Nach Anzeige der Fehlermeldungen werden Formularfelder neu geladen, die Eingaben müssen erneut vorgenommen werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fehlererkennung"
+    }
+  ]
+}

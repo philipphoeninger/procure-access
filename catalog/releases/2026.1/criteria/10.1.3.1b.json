@@ -1,0 +1,59 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: OCR",
+  "sortOrder": 1300,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1b",
+      "originalTitleDe": "Info und Beziehungen: OCR",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Text enthält, der mittels OCR in eine maschinenlesbare Form übertragen wurde."
+      ],
+      "requirementDe": [
+        "Der durch OCR in eine maschinenlesbare Form übertragene Text muss mit dem gescannten Text vollständig übereinstimmen.",
+        "",
+        "Der Suspect-Eintrag wird gesetzt, wenn bei der optischen Zeichenerkennung (OCR) die Interpretation eines Zeichens nicht schlüssig ist."
+      ],
+      "rationaleWhyDe": [
+        "PDF-Dokumente, die mittels OCR maschinenlesbar gemacht wurden, können orthografische Fehler enthalten, die von der Texterkennung herrühren."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Sofern die textlichen Informationen des PDF-Dokuments auch für Screenreader-Programme brauchbar sind, ist dieser Prüfschritt erfüllt."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Vereinzelte OCR-Fehler erschweren das Verständnis von Worten wie beispielsweise „imrner“ statt „immer“.",
+        "- Einschränkung: Einige OCR-Fehler erschweren das Verständnis des erkannten Textes, machen das Verständnis aber nicht unmöglich.",
+        "- Barriere: Viele OCR-Fehler erschweren das Verständnis des erkannten Textes, machen das Verständnis aber nicht unmöglich.",
+        "- Blockade: Die im PDF-Dokument enthaltenen textlichen Informationen sind sowohl beim Lesen als auch für Screenreader-Programme vollkommen unbrauchbar.",
+        "",
+        "Sofern die textlichen Informationen, die in maschinenlesbarer Form bereitgestellt werden, in Teilen nicht den optisch erkennbaren Inhalten entsprechen, ist dieser Prüfschritt nicht voll erfüllt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#b-info-und-beziehungen-ocr"
+    }
+  ]
+}

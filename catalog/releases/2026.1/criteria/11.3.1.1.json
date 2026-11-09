@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Sprache der Software",
+  "sortOrder": 810,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.1.1",
+      "originalTitleDe": "Sprache der Software",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Software soll die Sprache, in der sie verwendet wird, an das Betriebssystem übermitteln, um die lokalisierte Anzeige von Text und die korrekte Auswahl des Sprachpakets und der korrekten Aussprache des Screenreaders sicherzustellen.",
+        "",
+        "Dies betrifft mindestens die Standardsprache der Software. Bietet sie über eine Sprachauswahl entsprechende Lokalisierungen an, sind auch diese Sprachen Bestandteil der Anforderung.",
+        "",
+        "Worte oder einzelne Passagen oder Phrasen des Inhalts, die von der verwendeten Sprache abweichen, sind nicht Teil der Anforderung. Es wird jedoch empfohlen, entsprechende Inhalte zu kennzeichnen.",
+        "",
+        "Die Qualität von Lokalisierungen ist nicht Bestandteil der Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Screenreader verwenden verschiedene Sprachausgaben für die jeweiligen natürlichen Sprachen. Die Sprachausgabe bestimmt, ob die Inhalte einer Software korrekt ausgesprochen werden. Die Sprache der Software soll programmatisch ermittelbar sein, damit Inhalte korrekt angezeigt und vom Screenreader automatisch das korrekte Sprachpaket gewählt wird. Muss der Nutzende eingreifen, um die Sprachausgabe zu ändern, beeinträchtigt dies Arbeitsabläufe."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Software übermittelt die verwendete Sprache korrekt an das Betriebssystem. Der Inhalt wird in der gewählten Sprache angezeigt, und es wird das entsprechende Sprachpaket des Screenreaders verwendet.",
+        "- Das Betriebssystem in deutscher Sprache konfiguriert. Ein internationaler Newsticker ist in englischer Sprache verfasst. Die Sprachausgabe wechselt in die englische Sprache, sobald der Benutzende den Newsticker öffnet.",
+        "- Beim Wechsel zwischen mehreren offenen Anwendungen, wechselt die Sprache automatisch, sobald die zu prüfende Anwendung aktiv wird."
+      ],
+      "negativeExamplesDe": [
+        "- Die Software übermittelt die verwendete Sprache nicht an das Betriebssystem. Der Inhalt wird zwar in der gewählten Sprache angezeigt, jedoch wird nicht das entsprechende Sprachpaket des Screenreaders verwendet.",
+        "- Der Benutzende muss zunächst im Screenreader die Sprache umstellen, bevor er die Anwendung verwenden kann.",
+        "- Geschlossene Funktionalität: Die Anwendung wird in Deutsch angezeigt. Deutsch ist auch im Betriebssystem des Nutzenden voreingestellt. Der Screenreader gibt jedoch fremdsprachliche Begriffe in deutscher Sprache unverständlich aus."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sprache-der-software"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.1.1",
+      "originalTitleDe": "Sprache der Software",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Mobile App soll die Sprache, in der sie verwendet wird, an das Betriebssystem übermitteln, um die lokalisierte Anzeige von Text und die korrekte Auswahl des Sprachpakets und der korrekten Aussprache des Screenreaders sicherzustellen.",
+        "",
+        "Dies betrifft mindestens die Standardsprache der Mobile App. Bietet sie über eine Sprachauswahl entsprechende Lokalisierungen an, sind auch diese Sprachen Bestandteil der Anforderung.",
+        "",
+        "Worte oder einzelne Passagen oder Phrasen des Inhalts, die von der verwendeten Sprache abweichen, sind nicht Teil der Anforderung. Es wird jedoch empfohlen, entsprechende Inhalte zu kennzeichnen.",
+        "",
+        "Die Qualität von Lokalisierungen ist nicht Bestandteil der Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Screenreader verwenden verschiedene Sprachausgaben für die jeweiligen natürlichen Sprachen. Die Sprachausgabe bestimmt, ob die Inhalte einer Mobile App korrekt ausgesprochen werden. Die Sprache der Mobile App soll programmatisch ermittelbar sein, damit Inhalte korrekt angezeigt und vom Screenreader automatisch das korrekte Sprachpaket gewählt werden. Muss der Nutzende eingreifen, um die Sprachausgabe zu ändern, beeinträchtigt dies Arbeitsabläufe."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Mobile App übermittelt die verwendete Sprache korrekt an das Betriebssystem. Der Inhalt wird in der gewählten Sprache angezeigt, und es wird das entsprechende Sprachpaket des Screenreaders verwendet."
+      ],
+      "negativeExamplesDe": [
+        "- Die Mobile App übermittelt die verwendete Sprache nicht an das Betriebssystem. Der Inhalt wird zwar in der gewählten Sprache angezeigt, jedoch wird nicht das entsprechende Sprachpaket des Screenreaders verwendet."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sprache-der-software"
+    }
+  ]
+}

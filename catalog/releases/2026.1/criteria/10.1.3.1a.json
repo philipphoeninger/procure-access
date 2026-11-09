@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Getaggtes Dokument",
+  "sortOrder": 1290,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1a",
+      "originalTitleDe": "Info und Beziehungen: Getaggtes Dokument",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Informationen, Strukturen und Beziehungen, welche die Darstellung vermittelt, können programmatisch festgelegt und ermittelt werden oder sind im Text verfügbar."
+      ],
+      "rationaleWhyDe": [
+        "PDF-Dokumente benötigen Strukturinformationen, damit optisch unterscheidbare Element-Typen wie Überschriften, Listen, Tabellen, etc. auch auf einer semantischen Ebene und damit bei Screenreader-Nutzung ermittelbar unterscheidbar sind."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Dieser Prüfschritt ist erfüllt, wenn das PDF-Dokument für alle Inhalte Tags enthält."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Inhalte ohne oder mit geringem informativem Charakter sind nicht getaggt.",
+        "- Einschränkung: Inhalte, die zum Verständnis der Struktur des PDF-Dokuments erforderlich sind (Überschriften, Listen, …), sind in geringem Umfang nicht oder nicht korrekt getaggt.",
+        "- Barriere: Das PDF-Dokument ist nicht getaggt. Der Inhalt kann - wenn auch in unstrukturierter Form - als sinnvoll linearisierter Text per Screenreader-Programm erfasst werden. Strukturinformationen müssen aus dem inhaltlichen Kontext geschlossen werden.",
+        "- Blockade: Das PDF-Dokument ist nicht getaggt und der sichtbare Inhalt lässt sich auch per Screenreader-Programm nicht erschließen.",
+        "",
+        "Dieser Prüfschritt ist nicht voll erfüllt, wenn das PDF-Dokument nicht für alle Inhalte Tags enthält, die Struktur-Informationen vermitteln könnten.",
+        "",
+        "Dieser Prüfschritt ist nicht erfüllt, wenn das PDF-Dokument keine Tags enthält."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#a-info-und-beziehungen-getaggtes-dokument"
+    }
+  ]
+}

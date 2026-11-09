@@ -1,0 +1,65 @@
+{
+  "kind": "requirement",
+  "titleDe": "Fehlervermeidung",
+  "sortOrder": 1730,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.3.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.3.4",
+      "originalTitleDe": "Fehlervermeidung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn ein PDF-Dokument Aktionen enthält, die rechtliche Verpflichtungen oder finanzielle Transaktionen zur Folge haben oder Daten in Datenspeichersystemen ändern bzw. löschen oder Prüfungsfragen übermitteln."
+      ],
+      "requirementDe": [
+        "Wenn in einem PDF-Dokument Aktionen vorhanden sind, die rechtliche Verpflichtungen oder finanzielle Transaktionen zur Folge haben oder Daten in Datenspeichersystemen ändern bzw. löschen oder Prüfungsfragen übermitteln, gilt mindestens eine der folgenden Aussagen:",
+        "",
+        "- Rückgängig: Übermittlungen sind umkehrbar.",
+        "- Geprüft: Die eingegebenen Daten können vor dem Auslösen der Aktion auf Eingabefehler hin überprüft und ggf. korrigiert werden.",
+        "- Bestätigt: Die Eingaben können überprüft, bestätigt und korrigiert werden, bevor die Übermittlung abgeschlossen wird."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass im Hinblick auf Aktionen, die rechtliche Verpflichtungen oder finanzielle Transaktionen zur Folge haben oder Daten in Datenspeichersystemen ändern bzw. löschen oder Prüfungsfragen übermitteln, spezifische Anforderungen zur Umkehrung bzw. Prüfung erfüllt sind, bevor ernsthafte Konsequenzen in Kraft treten.",
+        "",
+        "Es ist für alle von Vorteil, wenn bei Eingaben bzw. einer Auswahloption mit rechtskräftigen oder unumkehrbaren Folgen bzw. mit Auswirkungen, die sich nur mit erheblichem Aufwand umkehren lassen würden, ein deutlicher Hinweis auf das Absenden der Eingaben bzw. der gewählten Auswahloption gegeben wird verbunden mit der Möglichkeit zur Überprüfung bzw. zum Abbruch der Aktion.",
+        "",
+        "Bei Menschen mit Beeinträchtigung ist in vielen Fällen das Risiko von Fehleingaben erhöht. Menschen mit Legasthenie beispielsweise vertauschen häufiger Zahlen, Menschen mit motorischen Einschränkungen drücken häufiger versehentlich falsche Tasten, während Menschen mit Sehbehinderungen ggf. nur einen kleinen Teil der Anzeige wahrnehmen können und dadurch leichter unabsichtlich Aktionen auslösen könnten."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Sämtliche Aktionen oder Daten lassen sich entweder rückgängig machen oder vor dem Absenden überprüfen und mittels Bestätigung legitimieren.",
+        "- erfüllt: Ein Antrag besteht aus mehreren Prozessschritten. Im letzten Prozessschritt bzw. auf der letzten Seite werden alle Daten in einer Übersicht angezeigt. Vor dem Absenden des Antrags können Korrekturen vorgenommen werden.",
+        "- erfüllt: In einer Übersicht können Datensätze gelöscht werden. Vor dem Löschen erfolgt eine Rückfrage, sodass der Vorgang noch abgebrochen werden kann.",
+        "- erfüllt: Ein Formular in einem PDF-Dokument sendet direkt Daten an einen Verarbeitungsserver. Diese Aktion kann nicht rückgängig gemacht werden. Bevor das Senden beginnt, wird ein Bestätigungsdialog angezeigt. Auf diese Weise wird verhindert, dass die Aktion durch ein versehentliches Ausführen des Shortcuts für das Absenden ausgelöst wird.",
+        "- erfüllt: Ein Formular in einem PDF-Dokument sendet Daten zur Ausführung eines Wertpapiergeschäfts. Vor dem Senden findet zunächst eine Prüfung statt, ob der Zeitpunkt innerhalb der Öffnungszeiten der elektronischen Börse liegt und unmittelbar ausgeführt werden könnte. Andernfalls würde beim Ausführen ggf. eine After Hours Trading Aktion (nachbörslicher Handel) angestoßen. Auch für After Hours Trading gelten spezifische Zeiten. Eine Fehlermeldung weist auf die Öffnungszeiten sowie auf ggf. mit After Hours Trading verbundene Risiken hin. Es gibt die Möglichkeit, das Ausführen der Aktion abzubrechen."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: In dem PDF-Dokument werden mit keinerlei interaktiven Elementen finanzielle Daten übermittelt oder Rechtsgeschäfte geschlossen.",
+        "- Blockade: Sämtliche bzw. einzelne Aktionen oder Daten werden direkt übermittelt und lassen sich nicht rückgängig machen oder vor dem Absenden überprüfen und mittels Bestätigung legitimieren.",
+        "- Blockade: Ein Formular in einem PDF-Dokument sendet direkt Daten an einen Verarbeitungsserver, ohne die Übermittlung vorher durch einen Bestätigungsdialog abzufragen.",
+        "- Blockade: In einer Prüfungssituation wird jede getätigte Antwort ohne Bestätigungsdialog sofort final an den Verarbeitungsserver übermittelt sowie der Prüfling zur nächsten Frage navigiert.",
+        "- Blockade: In einer Prüfungssituation erhält der Prüfling vor dem Absenden aller Antworten keine Gelegenheit, die getätigten Eingaben noch ein letztes Mal zu überprüfen."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#fehlervermeidung"
+    }
+  ]
+}

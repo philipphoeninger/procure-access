@@ -1,0 +1,118 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Beschriftungen oder Anweisungen bei Formularfeldern",
+  "sortOrder": 860,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.2",
+      "originalTitleDe": "Beschriftungen oder Anweisungen bei Formularfeldern",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Beschriftungen, oder falls notwendig Anweisungen, werden für Formularfelder bereitgestellt. Die jeweilige Beschriftung oder Anweisung soll bei Eingabefeldern links neben dem Element oder darüber, bei Checkboxen und Radio-Buttons rechts neben dem Element lokalisiert sein.",
+        "",
+        "Pflichtfelder sind als solche eindeutig gekennzeichnet, beispielsweise durch die zusätzliche Beschriftung „(Pflichtfeld)“. Werden Sie mit Symbolen gekennzeichnet, ist eine Legende zu Beginn des Formulars oder in der Dokumentation der Software verfügbar, die die Symbole erklärt.",
+        "",
+        "Sind spezielle Formate bei der Eingabe notwendig, wird das entsprechende Format vor dem Formularelement oder in der Vorbelegung des Formularelements beschrieben.",
+        "",
+        "Eindeutig identifizierbare Formularfelder wie beispielsweise ein Suchfeld, das aus einem Eingabefeld und der Suchentaste besteht, benötigen unter Umständen keine eigene visuelle Beschriftung, da der Einsatzzweck aus dem Kontext ermittelt werden kann (beispielsweise durch Verwendung eines Lupe-Symbols als Taste). Sie müssen jedoch zu jederzeit programmatisch ermittelbar sein.",
+        "",
+        "Die Inhalte von Placeholder-Texten in Formularelementen gelten nicht als Beschriftung."
+      ],
+      "rationaleWhyDe": [
+        "Für jeden Nutzenden ist es von Vorteil, wenn Formularfelder und die geforderten Eingabeformate am Formularfeld beschrieben werden, denn es ist aufwändig, ein Formular anhand der Fehlermeldungen zu korrigieren. Die geforderte Positionierung von Beschriftungen entspricht den üblichen Gestaltungsrichtlinien. Auch in ausschnitthaften Ansichten ist so einfach erkennbar, welche Beschriftung zu welchem Formularfeld gehört."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Am Anfang des Formulars werden alle Felder als Pflichtfelder deklariert.",
+        "- Alle Formularfelder sind beschriftet.",
+        "- Die Anweisung eines Datumsfeldes beschreibt das erwartete Format, beispielsweise „Geburtsdatum (TT.MM.JJJJ)“.",
+        "- Die Anweisung eines numerischen Feldes beschreibt den erwarteten Wertebereich, beispielsweise „Alter in Jahren (von 18 bis 35)“.",
+        "- Die Anweisung eines numerischen Feldes für eine Personalnummer beschreibt die erwartete Anzahl an Zeichen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Formularfelder sind nicht beschriftet.",
+        "- Nur einige Formularfelder sind beschriftet.",
+        "- Pflichtfelder werden durch ein Sternchen-Symbol gekennzeichnet, das nicht in einer Legende erklärt wird.",
+        "- Pflichtfelder werden durch ein Sternchen-Symbol gekennzeichnet, die Legende dazu befindet sich jedoch am Ende des Formulars.",
+        "- Die Beschriftung von Eingabefeldern erfolgt ausschließlich über die Vorbelegung des Formularfeldes."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#beschriftungen-oder-anweisungen-bei-formularfeldern"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.2",
+      "originalTitleDe": "Beschriftungen oder Anweisungen bei Formularfeldern",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind."
+      ],
+      "requirementDe": [
+        "Beschriftungen, oder falls notwendig Anweisungen, werden für Formularfelder bereitgestellt. Die jeweilige Beschriftung oder Anweisung soll bei Eingabefeldern links neben dem Element oder darüber, bei Checkboxen und Radio-Buttons rechts neben dem Element lokalisiert sein.",
+        "",
+        "Pflichtfelder sind als solche eindeutig gekennzeichnet, beispielsweise durch die zusätzliche Beschriftung „(Pflichtfeld)“. Werden Sie mit Symbolen gekennzeichnet, ist eine Legende zu Beginn des Formulars verfügbar, die die Symbole erklärt.",
+        "",
+        "Sind spezielle Formate bei der Eingabe notwendig, wird das entsprechende Format vor dem Formularelement oder in der Vorbelegung des Formularelements beschrieben.",
+        "",
+        "Eindeutig identifizierbare Formularfelder wie beispielsweise ein Suchfeld, das aus einem Eingabefeld und der Suchentaste besteht, benötigen unter Umständen keine eigene visuelle Beschriftung, da der Einsatzzweck aus dem Kontext ermittelt werden kann (beispielsweise durch Verwendung eines Lupe-Symbols als Taste). Sie müssen jedoch zu jederzeit programmatisch ermittelbar sein.",
+        "",
+        "Die Inhalte von Placeholder-Texten in Formularelementen gelten nicht als Beschriftung."
+      ],
+      "rationaleWhyDe": [
+        "Für jeden Nutzenden ist es von Vorteil, wenn Formularfelder und die geforderten Eingabeformate am Formularfeld beschrieben werden, denn es ist aufwändig, ein Formular anhand der Fehlermeldungen zu korrigieren. Die geforderte Positionierung von Beschriftungen entspricht den üblichen Gestaltungsrichtlinien. Auch in ausschnitthaften Ansichten ist so einfach erkennbar, welche Beschriftung zu welchem Formularfeld gehört."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Am Anfang des Formulars werden alle Felder als Pflichtfelder deklariert.",
+        "- Alle Formularfelder sind beschriftet.",
+        "- Die Anweisung eines Datumsfeldes beschreibt das erwartete Format, beispielsweise „Geburtsdatum (TT.MM.JJJJ)“.",
+        "- Die Anweisung eines numerischen Feldes beschreibt den erwarteten Wertebereich, beispielsweise „Alter in Jahren (von 18 bis 35)“.",
+        "- Die Anweisung eines numerischen Feldes für eine Personalnummer beschreibt die erwartete Anzahl an Zeichen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Formularfelder sind nicht beschriftet.",
+        "- Nur einige Formularfelder sind beschriftet.",
+        "- Pflichtfelder werden durch ein Sternchen-Symbol gekennzeichnet, das nicht in einer Legende erklärt wird.",
+        "- Pflichtfelder werden durch ein Sternchen-Symbol gekennzeichnet, die Legende dazu befindet sich jedoch am Ende des Formulars.",
+        "- Die Beschriftung von Eingabefeldern erfolgt ausschließlich über die Vorbelegung des Formularfeldes."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#beschriftungen-oder-anweisungen-bei-formularfeldern"
+    }
+  ]
+}

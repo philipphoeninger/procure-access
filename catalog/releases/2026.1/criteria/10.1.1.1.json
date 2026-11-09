@@ -1,0 +1,61 @@
+{
+  "kind": "requirement",
+  "titleDe": "Nicht-Text-Inhalt",
+  "sortOrder": 1230,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.1.1",
+      "originalTitleDe": "Nicht-Text-Inhalt",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument nicht textlichen Inhalt besitzt bzw. Inhalt, der zwar in textlicher Form sichtbar, aber beispielsweise mit einem Screenreader-Programm nur dann lesbar ist, wenn er über einen sogenannten ActualText verfügt."
+      ],
+      "requirementDe": [
+        "Für alle nicht text-basierten Inhalte (z. B. informative Grafiken und Bilder) steht eine Textalternative zur Verfügung, welche die gleichen Informationen abdeckt."
+      ],
+      "rationaleWhyDe": [
+        "Durch Textalternativen kann sichergestellt werden, dass auch Personen ohne bzw. mit eingeschränktem Sehvermögen die visuellen Inhalte einer Medienpräsentation (sowie die damit direkt oder implizit verbundenen Informationen) vollumfänglich zur Verfügung stehen.",
+        "",
+        "Darüber hinaus ist Text als Medienalternative vielfältig einsetzbar, wie insbesondere auch für Übersetzungen, und kann in diverse Ausgabeformate, wie z. B. Audio, Braille etc., transformiert werden, um den unterschiedlichsten Bedürfnissen gerecht zu werden. Darüber hinaus unterstützt Text die Möglichkeit, nach Medieninhalten zu suchen und Inhalte auf eine Vielzahl von Arten zu einem neuen Zweck zu verbinden.",
+        "",
+        "Dem Zwei-Sinne-Prinzip folgend erleichtert eine Medienalternative auch Menschen mit kognitiven Einschränkungen bzw. mit Sprach- bzw. Lernschwierigkeiten den Zugang zu den dargestellten Inhalten."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Für informative nicht text-basierte Inhalte existieren Textalternativen mit zutreffendem Inhalt in angemessenem Umfang."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Für informative nicht text-basierte Inhalte existieren zwar Textalternativen, diese ufern aber unnötig aus.",
+        "- Einschränkung: Für informative nicht text-basierte Inhalte existieren Textalternativen mit zutreffenden Inhalten, bei denen jedoch wesentliche Informationen fehlen.",
+        "- Barriere: Für informative nicht text-basierte Inhalte existieren Textalternativen mit zutreffenden Inhalten, die jedoch unnötig ausufern und bei denen wesentliche Informationen fehlen.",
+        "- Blockade: Das PDF-Dokument enthält informative nicht text-basierte Inhalte, die über keinerlei Textalternative verfügt.",
+        "",
+        "Wenn obige Anforderungen nicht voll erfüllt sind, kann mindestens mit „leichte Einschränkung“ bewertet werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#nicht-text-inhalt"
+    }
+  ]
+}

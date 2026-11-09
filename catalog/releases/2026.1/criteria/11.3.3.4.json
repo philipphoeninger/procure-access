@@ -1,0 +1,105 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Fehlervermeidung",
+  "sortOrder": 880,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.4",
+      "originalTitleDe": "Fehlervermeidung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn über entsprechende Prozesse rechtlich bindende Verpflichtungen eingegangen, finanzielle Transaktionen ausgelöst, oder sensible Nutzerdaten übermittelt werden."
+      ],
+      "requirementDe": [
+        "Beinhaltet die Software Prozesse, über die rechtlich bindende Verpflichtungen eingegangen, finanzielle Transaktionen ausgelöst, oder sensible Nutzerdaten übermittelt werden, so muss mindestens eine der folgenden Anforderungen erfüllt sein:",
+        "",
+        "- Vorgang kann rückgängig gemacht werden Das Übermitteln der Daten kann rückgängig gemacht werden.",
+        "",
+        "- Daten werden vor Übermittlung überprüft und bestätigt Vor Übermittlung der Daten können die Eingaben geprüft und korrigiert werden. Nach einer Bestätigung werden die Daten übermittelt.",
+        "- Übermittlung nach Bestätigung Die Übermittlung der Daten erfolgt erst nach Bestätigung eines Dialogs, der die Folgen der Übermittlung beschreibt.",
+        "",
+        "Erfolgreiche Übermittlungen sollten nach der Übertragung bestätigt werden."
+      ],
+      "rationaleWhyDe": [
+        "Die Überprüfung und Korrektur von sensiblen Daten sind für jeden Nutzenden wichtig. Bei Menschen mit Beeinträchtigung im Speziellen ist das Risiko von Fehleingaben allerdings deutlich erhöht. Menschen mit Legasthenie vertauschen häufiger Zahlen, Menschen mit motorischen Beeinträchtigungen drücken häufiger versehentlich falsche Tasten. Menschen, die nur einen kleinen Ausschnitt der Anzeige sehen, bemerken eine Fehleingabe möglicherweise nicht."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der betroffene Prozess erfüllt mindestens eine der genannten Anforderungen."
+      ],
+      "negativeExamplesDe": [
+        "- Der betroffene Prozess erfüllt keine der genannten Anforderungen.",
+        "- Anstatt einer Übersicht der erfassten Daten ist lediglich eine Checkbox verfügbar, über die die Richtigkeit der erfassten Daten bestätigt werden muss.",
+        "- In einer Übersicht werden die erfassten Daten angezeigt, es gibt jedoch keine Möglichkeit, an dieser Stelle Korrekturen vorzunehmen.",
+        "- Es erfolgt keine Bestätigung nach der erfolgreichen Übermittlung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#fehlervermeidung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.4",
+      "originalTitleDe": "Fehlervermeidung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn über entsprechende Prozesse rechtlich bindende Verpflichtungen eingegangen, finanzielle Transaktionen ausgelöst, oder sensible Daten von Nutzenden übermittelt werden."
+      ],
+      "requirementDe": [
+        "Beinhaltet die Mobile App Prozesse, über die rechtlich bindende Verpflichtungen eingegangen, finanzielle Transaktionen ausgelöst, oder sensible Nutzerdaten übermittelt werden, so muss mindestens eine der folgenden Anforderungen erfüllt sein:",
+        "",
+        "- Vorgang kann rückgängig gemacht werden",
+        " Das Übermitteln der Daten kann rückgängig gemacht werden.",
+        "",
+        "- Daten werden vor Übermittlung überprüft und bestätigt",
+        " Vor Übermittlung der Daten können die Eingaben geprüft und korrigiert werden. Nach einer Bestätigung werden die Daten übermittelt.",
+        "- Übermittlung nach Bestätigung",
+        " Die Übermittlung der Daten erfolgt erst nach Bestätigung eines Dialogs, der die Folgen der Übermittlung beschreibt.",
+        "",
+        "Erfolgreiche Übermittlungen sollten nach der Übertragung bestätigt werden."
+      ],
+      "rationaleWhyDe": [
+        "Die Überprüfung und Korrektur von sensiblen Daten sind für jeden Nutzenden wichtig. Bei Menschen mit Beeinträchtigung im Speziellen ist das Risiko von Fehleingaben allerdings deutlich erhöht. Menschen mit Legasthenie vertauschen häufiger Zahlen, Menschen mit motorischen Beeinträchtigungen drücken häufiger versehentlich falsche Tasten. Menschen, die nur einen kleinen Ausschnitt der Anzeige sehen, bemerken eine Fehleingabe möglicherweise nicht."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der betroffene Prozess erfüllt mindestens eine der genannten Anforderungen."
+      ],
+      "negativeExamplesDe": [
+        "- Der betroffene Prozess erfüllt keine der genannten Anforderungen.",
+        "- Anstatt einer Übersicht der erfassten Daten ist lediglich eine Checkbox verfügbar, über die die Richtigkeit der erfassten Daten bestätigt werden muss.",
+        "- In einer Übersicht werden die erfassten Daten angezeigt, es gibt jedoch keine Möglichkeit, an dieser Stelle Korrekturen vorzunehmen.",
+        "- Es erfolgt keine Bestätigung nach der erfolgreichen Übermittlung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fehlervermeidung"
+    }
+  ]
+}

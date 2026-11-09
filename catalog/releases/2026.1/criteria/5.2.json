@@ -1,0 +1,106 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Aktivierung von Barrierefreiheitsfunktionen",
+  "sortOrder": 10,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.2",
+      "originalTitleDe": "Aktivierung von Barrierefreiheitsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software eigene, vom Standardumfang des Betriebssystems unabhängige, assistive Bedienungshilfen zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software eigene assistive Unterstützungen an, so müssen die Funktionen für die jeweilige Zielgruppe barrierefrei auffindbar und aktivierbar sein. Nachdem verschiedene Funktionen für verschiedene Nutzergruppen bereitgestellt werden können, deren Anforderungen unterschiedlich sind, kann kein allgemein gültiges Vorgehen definiert werden.",
+        "",
+        "Beispiele für individuelle Funktionen:",
+        "",
+        "- Die Software bietet eine Vorlesefunktion an.",
+        "- Die Software bietet Inhalte in leichter Sprache oder Gebärdensprache an.",
+        "- Die Software bietet das Verändern von Farben oder Kontrasten an.",
+        "- Die Software bietet das Verändern von Schriftart, Schriftgröße oder Zeilenabstand an.",
+        "- Die Software bietet Funktionen zum Vergrößern oder Verkleinern von Inhalten an."
+      ],
+      "rationaleWhyDe": [
+        "Barrierefreiheitsfunktionen können Nutzergruppen mit verschiedenen Beeinträchtigungen helfen, die Inhalte der Seite nach den jeweiligen Bedürfnissen anzupassen. Hierzu ist es nötig, dass diese Funktionen von der betroffenen Nutzergruppe selbständig gefunden und aktiviert werden können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Funktion zum Aktivieren von leichter Sprache ist einfach identifizierbar und aktivierbar.",
+        "- Die Taste zum Ändern von Kontrasten, Schriftarten oder Farben erfüllt die Anforderungen des Prüfschritts 11.1.4.11 Nicht-Text-Kontrast.",
+        "- Die Taste zum Ändern von Schriftgröße oder Zeilenabstand ist programmatisch ermittelbar und gibt korrekte Werte zum Aktivitätszustand aus."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienelemente sind versteckt und nur schwer auffindbar.",
+        "- Die Bedienelemente sind nicht eindeutig gekennzeichnet oder nicht aktivierbar.",
+        "- Die Bedienelemente verstoßen gegen weitere Anforderungen der EN 301549."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#aktivierung-von-barrierefreiheitsfunktionen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.2",
+      "originalTitleDe": "Aktivierung von Barrierefreiheitsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App eigene, vom Standardumfang des Betriebssystems unabhängige, assistive Bedienungshilfen zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App eigene assistive Unterstützungen an, so müssen die Funktionen für die jeweilige Zielgruppe barrierefrei auffindbar und aktivierbar sein. Nachdem verschiedene Funktionen für verschiedene Nutzergruppen bereitgestellt werden können, deren Anforderungen unterschiedlich sind, kann kein allgemein gültiges Vorgehen definiert werden.",
+        "",
+        "Beispiele für individuelle Funktionen:",
+        "",
+        "- Die Mobile App bietet eine Vorlesefunktion an.",
+        "- Die Mobile App bietet Inhalte in leichter Sprache oder Gebärdensprache an.",
+        "- Die Mobile App bietet das Verändern von Farben oder Kontrasten an.",
+        "- Die Mobile App bietet das Verändern von Schriftart, Schriftgröße oder Zeilenabstand an.",
+        "- Die Mobile App bietet Funktionen zum Vergrößern oder Verkleinern von Inhalten an."
+      ],
+      "rationaleWhyDe": [
+        "Barrierefreiheitsfunktionen können Nutzergruppen mit verschiedenen Beeinträchtigungen helfen, die Inhalte der Seite nach den jeweiligen Bedürfnissen anzupassen. Hierzu ist es nötig, dass diese Funktionen von der betroffenen Nutzergruppe selbständig gefunden und aktiviert werden können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Funktion zum Aktivieren von leichter Sprache ist einfach identifizierbar und aktivierbar.",
+        "- Die Taste zum Ändern von Kontrasten, Schriftarten oder Farben erfüllt die Anforderungen des Prüfschritts 11.1.4.11 Nicht-Text-Kontrast.",
+        "- Die Taste zum Ändern von Schriftgröße oder Zeilenabstand ist programmatisch ermittelbar und gibt korrekte Werte zum Aktivitätszustand aus."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bedienelemente sind versteckt und nur schwer auffindbar.",
+        "- Die Bedienelemente sind nicht eindeutig gekennzeichnet oder nicht aktivierbar.",
+        "- Die Bedienelemente verstoßen gegen weitere Anforderungen der EN 301549."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#aktivierung-von-barrierefreiheitsfunktionen"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "kind": "requirement",
+  "titleDe": "Verwendung von Farbe",
+  "sortOrder": 1420,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.1",
+      "originalTitleDe": "Verwendung von Farbe",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument Text bzw. Symbole sowie Bereiche oder sonstige visuelle Elemente mit Farbauszeichnungen verwendet werden."
+      ],
+      "requirementDe": [
+        "Farbe wird nicht als einziges visuelles Mittel verwendet, um Informationen zu übermitteln, eine Aktion (Handlung) anzuzeigen, eine Antwort (Reaktion) auszulösen oder ein visuelles Element zu unterscheiden."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass alle relevanten Informationen insbesondere auch für ältere Personen bzw. Personen mit einer Sehbehinderung, bei der Farben nur eingeschränkt bzw. nicht ausreichend erkannt werden, zugänglich sind.",
+        "",
+        "Dabei geht es explizit nicht darum, ob die entsprechenden Informationen von einem Screenreader-Programm ausgelesen werden könnten. Denn es kann nicht vorausgesetzt werden, dass dieser Personenkreis Screenreader-Programme nutzt.",
+        "",
+        "Darüber hinaus können auch Personen, die Nur-Text-, Farb- oder Monochrom-Displays (z. B. eBook-Reader) und Browser verwenden, nicht auf Informationen zugreifen, welche nur in Farbe dargestellt werden."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Bei einer Projektampel werden Zustände mit einem farblichen Kreis markiert (rot, orange, grün). In einem konkreten Fall wird der rote Kreis an oberster Position angezeigt, wobei sich der Farbwert hinsichtlich des Kontrastwerts von den unteren beiden Farbwerten (ggf. Schwarz oder Grau für „inaktiv“) unterscheidet. Darüber hinaus wird erläutert, dass das Projekt bei Aktivierung der oberen Position in eine kritische Phase geraten ist.",
+        "- erfüllt: Bei einem Terminplan werden Zustände durch unterschiedlich farbige Formen markiert (rote Dreiecke, orange Rechtecke und grüne Kreise). Die Bedeutung der Merkmalskombinationen wird in Textform erläutert.",
+        "- erfüllt: Der aktive Menüpunkt in einem Anwendungsprogramm erhält als Abgrenzung zu den übrigen Menüpunkten eine grafische Markierung, etwa einen Rahmen oder einen Punkt. Der Menüeintrag erfolgt dabei in Form von Text.",
+        "- erfüllt: Als Markierung wird eine Invertierung von Vorder- und Hintergrundfarbe bei ausreichendem Farbkontrast verwendet. Die Bedeutung der Markierung ist in Textform ersichtlich.",
+        "- erfüllt: Als Markierung wird eine Textfarbe verwendet. Zusätzlich wird z. B. ein Haken, Rahmen, eine Unterstreichung etc. als Unterscheidungsmerkmal verwendet. Die Bedeutung der Merkmalskombinationen wird in Textform erläutert.",
+        "- erfüllt: Rot wird verwendet, um zu warnen, dass eine Anwendung nicht betriebsbereit ist, oder um eine Notsituation anzuzeigen. Die Farbinformation wird durch einen Text ergänzt, beispielsweise „Warnung“ oder „Notfall“.",
+        "- erfüllt: Grün wird verwendet, um eine erfolgreiche Aktion zu bestätigen. Die Farbe wird durch ein grafisches Symbol (z. B. einen OK-Haken) ergänzt.",
+        "- erfüllt: Ein Belegungsplan für Veranstaltungen verwendet für die Darstellung der Räume die Anordnung in Spalten. Zeiten werden in Zeilen angeordnet. Ob eine Raum-Zeit-Kombination frei oder gebucht ist, wird nur über unterschiedliche Farben in der jeweiligen Zelle angezeigt. Es gibt kein Merkmal wie ein Symbol, Fettschrift, Unterstreichung, Einrückung etc. als zusätzliches Kennzeichen, aber der Kontrast-Unterschied beträgt mindestens 3:1. In der Legende wird erläutert: Grün bedeutet „noch buchbar“, Rot bedeutet „ausgebucht“. Zusätzlich ist jeweils ein Farbmusters in der Legende abgebildet."
+      ],
+      "negativeExamplesDe": [
+        "- Barriere: Text-Links im Fließtext werden nur farblich markiert und der Kontrast-Unterschied zwischen den Links und dem Fließtext ist geringer als 3:1.",
+        "- Blockade: Bei einem Raumbelegungsplan werden Zustände nur mit einem farblichen Kreis markiert (rot, orange, grün).",
+        "- Blockade: Der aktive Menüeintrag unterscheidet sich nur durch Farbe von den anderen Menüeinträgen und der Kontrast zwischen aktiven und nicht-aktiven Menüeinträgen ist geringer als 3:1.",
+        "- Blockade: Ein Belegungsplan für Veranstaltungen verwendet für die Darstellung der Räume die Anordnung in Spalten. Zeiten werden in Zeilen angeordnet. Ob eine Raum-Zeit-Kombination frei oder gebucht ist, wird nur über unterschiedliche Farben in der jeweiligen Zelle angezeigt. Der Kontrast-Unterschied ist geringer als 3:1 und es gibt kein Merkmal wie ein Symbol, Fettschrift, Unterstreichung, Einrückung etc. als zusätzliches Kennzeichen. In der Legende wird überdies erläutert: Grün bedeutet „noch buchbar“, Rot bedeutet „ausgebucht“. Eine Identifizierungsmöglichkeit in Form eines Farbmusters gibt es in der Legende nicht.",
+        "- Blockade: Das Ergebnis einer Befragung ist in einem Kreisdiagramm mit unterschiedlichen Farbtönen dargestellt. Die einzelnen Bereiche sind darüber hinaus nicht voneinander abgegrenzt. Ein Mensch, der die Farbwerte selbst nicht wahrnehmen kann, kann die einzelnen Bereiche nicht voneinander unterscheiden und hat demzufolge keinen Zugang zu den dargestellten Ergebnissen.",
+        "- Barriere: In einer tabellarischen Darstellung werden die Spalten abwechselnd mit zwei unterschiedlichen Hintergrundfarben gekennzeichnet. Die einzelnen Tabellenzellen haben keinen Rahmen. Die einzelnen Spalten folgen mit ausreichend großem Abstand aufeinander, sodass auch allein anhand der Position ermittelt werden kann, zu welcher Spalte die Inhalte gehören. Die Hintergrundfarbe soll das Erfassen der zu einer Spalte zugehörigen Inhalte erleichtern. Der Kontrast-Unterschied der gewählten Farbwerte ist geringer als 3:1. Die Einstufung als Barriere (im Unterschied zur Einstufung als Blockade) erfolgt hierbei aufgrund der Einschätzung, dass ein als unwesentlich eingestuftes Merkmal betroffen ist, denn durch den fehlenden Kontrast gehen keine Informationen verloren: Es kann auch ohne Farbwahrnehmung eindeutig ermittelt werden, welcher Spalte die einzelnen Inhalte zugeordnet sind."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#verwendung-von-farbe"
+    }
+  ]
+}

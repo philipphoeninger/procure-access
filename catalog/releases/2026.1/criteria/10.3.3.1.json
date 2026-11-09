@@ -1,0 +1,62 @@
+{
+  "kind": "requirement",
+  "titleDe": "Fehlererkennung",
+  "sortOrder": 1700,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.3.1",
+      "originalTitleDe": "Fehlererkennung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn in einem PDF-Dokument Fehlermeldungen erzeugt werden, beispielsweise durch Fehleingaben bei Eingabefeldern."
+      ],
+      "requirementDe": [
+        "Wenn ein Eingabefehler automatisch erkannt wird, wird das fehlerhafte Element identifiziert und der Fehler im Text beschrieben."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass Fehlermeldungen bei einer fehlerhaften Eingabe deutlich gekennzeichnet und gut auffindbar sind.",
+        "",
+        "Menschen, die nur einen kleinen Ausschnitt des Bildes sehen, bemerken einen Fehlerzustand möglicherweise nicht. Sie müssen daher zur Fehlermeldung und zur korrigierenden Eingabe hingeführt werden. Darüber hinaus ist sicherzustellen, dass die Fehlermeldung auch für Menschen mit Farbenblindheit deutlich erkennbar ist sowie für Menschen mit kognitiven Einschränkungen bzw. mit eingeschränktem Sprachvermögen oder mit Leseschwäche.",
+        "",
+        "Manchen Menschen fällt es besonders schwer, einen Hinweis, der allein durch ein Icon gegeben wird, richtig zu interpretieren. Eine unmissverständliche Beschreibung, wofür ein Icon steht, erleichtert allen Menschen das korrekte Verständnis der zugeordneten Bedeutung. Die Kennzeichnung beispielsweise mittels doppeltem Sternchen-Zeichen (*) direkt an einer Fehlerstelle ermöglicht es allen Menschen, Fehlerstellen mittels Suchfunktion aufzufinden.",
+        "",
+        "Für Menschen mit Beeinträchtigungen ist in vielen Fällen das Risiko von Fehleingaben größer. Menschen mit Legasthenie beispielsweise vertauschen häufiger Zahlen, Menschen mit motorischen Einschränkungen drücken häufiger versehentlich falsche Tasten. Deshalb sind alle Maßnahmen zur Überprüfung der Eingaben für diese Personengruppen besonders wichtig. Darüber hinaus ist es für alle Menschen hilfreich, einen deutlich Hinweis darauf zu erhalten, dass sich ein Formular aufgrund einer fehlerhaften oder fehlenden Eingabe nicht abschicken lässt – und nicht etwa aufgrund einer Störung der Funktionalität des Absendebuttons."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Fehleingaben werden mit deutlich lesbaren Fehlermeldungen quittiert. Die Gestaltungsregeln sind eingehalten.",
+        "- erfüllt: Nach dem Auftreten des Fehlers startet ein Fehlerdialog, der den Fokus erhält.",
+        "- erfüllt: Der Fehler wird in Textform innerhalb eines Fehlerdialoges beschrieben. Der Fehlerzustand kann zusätzlich beispielsweise durch einen Signalton oder ein Icon oder die Kennzeichnung „Fehler“ im Titel der Meldung erfolgen.",
+        "- erfüllt: Ein fehlerhaft ausgefülltes Feld wird deutlich hervorgehoben, etwa durch einen farblich abgesetzten Rahmen sowie zusätzlich ein Zeichen in Textform wie z. B. ein Sternchen-Zeichen (*). In der Label-Beschriftung werden der Fehler und das fehlerhafte Feld beschrieben.",
+        "- erfüllt: Es erfolgt eine automatische Eingabeprüfung mit deutlichem Hinweis auf automatisch vorgenommene Korrekturen, sodass die Richtigkeit der korrigierten Daten im Anschluss nochmals überprüft werden kann."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Das PDF-Dokument enthält keine interaktiven Elemente zur Eingabe von Daten, wie Eingabefelder oder Auswahlschalter.",
+        "- nicht anwendbar: Das PDF-Dokument enthält interaktive Elemente zur Eingabe von Daten, doch für keines der Elemente wurde eine Fehlererkennung eingestellt, sodass im Fehlerfall keine Fehlermeldung ausgegeben wird.",
+        "- Blockade: In der Fehlermeldung ist nicht klar gekennzeichnet, an welcher Stelle es bei der Eingabe zu einem Fehler gekommen ist.",
+        "- Blockade: Der Fehlerzustand wird nur durch einen farbigen Rahmen angezeigt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#fehlererkennung"
+    }
+  ]
+}

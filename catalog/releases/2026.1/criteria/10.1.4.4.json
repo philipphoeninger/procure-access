@@ -1,0 +1,51 @@
+{
+  "kind": "requirement",
+  "titleDe": "Textgröße ändern",
+  "sortOrder": 1450,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.4",
+      "originalTitleDe": "Textgröße ändern",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Text enthält."
+      ],
+      "requirementDe": [
+        "Text soll um bis zu 200 % vergrößert werden können, ohne den Einsatz einer zusätzlichen Vergrößerungssoftware. Dabei darf kein Inhalt und keine Funktionalität verloren gehen und die Schrift darf außerdem nicht verpixelt dargestellt werden. Die verwendete Schriftart muss eine Skalierung ermöglichen."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende sollen die Schriftgröße ohne großen Aufwand gemäß ihren individuellen Bedürfnissen einstellen können."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Der Text lässt sich mit einem PDF-Anzeigeprogramm auf mindestens 200 % vergrößern, ohne dass es zu Textverlusten oder Verpixelungen kommt."
+      ],
+      "negativeExamplesDe": [
+        "- Barriere: Eine Einstellung verhindert die Vergrößerung des PDF-Dokuments.",
+        "- Blockade: Bei einem Zoomfaktor von 200 % kommt es zu Verpixelungen bzw. zu Überlagerungen bzw. zu Textverlust, sodass der Text nicht mehr lesbar ist."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#textgröße-ändern"
+    }
+  ]
+}

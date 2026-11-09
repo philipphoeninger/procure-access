@@ -1,0 +1,80 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Möglichkeiten der Bedienung",
+  "sortOrder": 40,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.5.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.5.1",
+      "originalTitleDe": "Möglichkeiten der Bedienung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software zum Ausführen bestimmter Funktionalitäten auf physische Bedienelemente des Endgeräts zurückgreift."
+      ],
+      "requirementDe": [
+        "Greift die Software zum Ausführen bestimmter Funktionalitäten auf physische Bedienelemente des Endgeräts zurück, die zur Bedienung ein Greifen, Zusammendrücken oder Drehen des Handgelenks erfordern, muss eine barrierefreie, alternative Möglichkeit der Bedienung zur Verfügung stehen, für die diese Handlungen nicht erforderlich sind. Alternative Bedienmethoden können Hardware- oder Software-Lösungen sein."
+      ],
+      "rationaleWhyDe": [
+        "Motorisch beeinträchtigte Menschen können komplexe Bedien-Gesten gegebenenfalls nicht ausführen. Eine alternative Bedienmethode muss zur Verfügung gestellt werden, damit entsprechende Nutzergruppen die Bedienung durchführen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für entsprechende Funktionalitäten steht eine alternative Bedienmethode zur Verfügung, weder Greifen, Zusammendrücken oder Drehen des Handgelenks erfordert."
+      ],
+      "negativeExamplesDe": [
+        "- Für entsprechende Funktionalitäten steht keine alternative Bedienmethode zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#möglichkeiten-der-bedienung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.5.1",
+      "originalTitleDe": "Möglichkeiten der Bedienung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App zum Ausführen bestimmter Funktionalitäten auf physische Bedienelemente des Endgeräts zurückgreift."
+      ],
+      "requirementDe": [
+        "Greift die Mobile App zum Ausführen bestimmter Funktionalitäten auf physische Bedienelemente des Endgeräts zurück, die zur Bedienung ein Greifen, Zusammendrücken oder Drehen des Handgelenks erfordern, muss eine barrierefreie, alternative Möglichkeit der Bedienung zur Verfügung stehen, für die diese Handlungen nicht erforderlich sind. Alternative Bedienmethoden können Hardware- oder Software-Lösungen sein."
+      ],
+      "rationaleWhyDe": [
+        "Motorisch beeinträchtigte Menschen können komplexe Bedien-Gesten gegebenenfalls nicht ausführen. Eine alternative Bedienmethode muss zur Verfügung gestellt werden, damit entsprechende Nutzergruppen die Bedienung durchführen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für entsprechende Funktionalitäten steht eine alternative Bedienmethode zur Verfügung, weder Greifen, Zusammendrücken oder Drehen des Handgelenks erfordert."
+      ],
+      "negativeExamplesDe": [
+        "- Für entsprechende Funktionalitäten steht keine alternative Bedienmethode zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#möglichkeiten-der-bedienung"
+    }
+  ]
+}

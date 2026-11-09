@@ -1,0 +1,102 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Audiodeskription für aufgezeichnete Videos",
+  "sortOrder": 430,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.2.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.2.5",
+      "originalTitleDe": "Audiodeskription für aufgezeichnete Videos",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software aufgezeichnete Videos mit synchronisierter, informativer Tonspur enthält."
+      ],
+      "requirementDe": [
+        "Bietet die Software aufgezeichnete Videos mit informativer Tonspur, deren visuelle Inhalte zusätzliche Informationen übermitteln (beispielsweise Informationen zu Aktionen, Charakteren, Szenenänderungen, Geräusche, Bildschirmtext), muss eine Audiodeskription als Medienalternative zur Verfügung stehen.",
+        "",
+        "Bieten die visuellen Inhalte keinen weiteren Informationen, die zum Gesamtverständnis wichtig sind, oder stellt das Video bereits eine Medienalternative dar, oder ist das Video ein Gebärdensprachenvideo, ist keine der genannten Alternativen notwendig.",
+        "",
+        "Die Audiodeskription kann auf verschiedenen Wegen angeboten werden:",
+        "",
+        "- Die Audiodeskription ist in der Standard-Tonspur enthalten.",
+        "- Die Audiodeskription ist in einer separaten Tonspur aktivierbar.",
+        "- Die Audiodeskription ist als weitere Videoversion im unmittelbaren Kontext des Videos verfügbar."
+      ],
+      "rationaleWhyDe": [
+        "Durch entsprechende Medienalternativen wird sichergestellt, dass Nutzende mit Sehbeeinträchtigung Inhalte von Videos vollumfänglich nutzen können. Darüber hinaus bieten Audiodeskriptionen auch Nutzenden mit kognitiven Beeinträchtigungen eine alternative Möglichkeit, auf diese Inhalte zuzugreifen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht eine Audiodeskription zur Verfügung, die die visuellen Inhalte zutreffend und vollumfänglich beschreibt."
+      ],
+      "negativeExamplesDe": [
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht keine Audiodeskription zur Verfügung.",
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht eine Audiodeskription zur Verfügung, die jedoch die visuellen Inhalte fehlerhaft oder unvollständig beschreibt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#audiodeskription-für-aufgezeichnete-videos"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.2.5",
+      "originalTitleDe": "Audiodeskription für aufgezeichnete Videos",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App aufgezeichnete Videos mit informativem Inhalt bereitstellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App aufgezeichnete Videos mit informativem Inhalt an, muss eine Audiodeskription zur Verfügung gestellt werden.",
+        "",
+        "Die zur Verfügung gestellte Audiodeskription muss sämtliche Informationen, die visuell im Video enthalten sind, vollumfänglich und inhaltlich zutreffend beschreiben.",
+        "",
+        "Die Audiodeskription kann auf verschiedenen Wegen angeboten werden:",
+        "",
+        "- Die Audiodeskription ist in der Standard-Tonspur enthalten.",
+        "- Die Audiodeskription ist in einer separaten Tonspur aktivierbar.",
+        "- Die Audiodeskription ist als weitere Videoversion im unmittelbaren Kontext des Videos verfügbar.",
+        "",
+        "Enthalten die visuellen Inhalte des Videos keine weiteren Informationen, die zum Gesamtverständnis wichtig sind (beispielsweise Informationen zu Aktionen, Charakteren, Szenenänderungen, Geräusche, Bildschirmtext), oder stellt das Video bereits eine Medienalternative dar, oder ist das Video ein Gebärdensprachenvideo, ist keine Audiodeskription notwendig."
+      ],
+      "rationaleWhyDe": [
+        "Durch entsprechende Medienalternativen wird sichergestellt, dass Nutzende mit Sehbeeinträchtigung Inhalte von Videos vollumfänglich nutzen können. Darüber hinaus bieten Audiodeskriptionen auch Nutzenden mit kognitiven Beeinträchtigungen eine alternative Möglichkeit, auf diese Inhalte zuzugreifen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht eine Audiodeskription zur Verfügung, die die visuellen Inhalte zutreffend und vollumfänglich beschreibt."
+      ],
+      "negativeExamplesDe": [
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht keine Audiodeskription zur Verfügung.",
+        "- Für Videos, deren visuelle Inhalte zusätzliche Informationen übermitteln, steht eine Audiodeskription zur Verfügung, die jedoch die visuellen Inhalte fehlerhaft oder unvollständig beschreibt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#audiodeskription-für-aufgezeichnete-videos"
+    }
+  ]
+}

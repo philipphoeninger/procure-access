@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Alternativtexte für dekorative Grafiken",
+  "sortOrder": 370,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.1.1b",
+      "originalTitleDe": "Alternativtexte für dekorative Grafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software dekorative, nicht informative Grafiken oder Objekte enthält, die zudem keine Interaktion ermöglichen."
+      ],
+      "requirementDe": [
+        "Alle Grafiken und Objekte (Objekte ohne auslösbare Funktion, beispielsweise dekorative Bilder, Farbflächen, Abstandshalter oder Symbole mit sichtbarer Beschriftung ohne Funktion), die keinen informativen Mehrwert bieten, sind als dekorative Objekte gekennzeichnet. Die entsprechende Kennzeichnung als dekoratives Objekt wird an den Screenreader übermittelt. Der Screenreader ignoriert das Objekt und fokussiert es nicht."
+      ],
+      "rationaleWhyDe": [
+        "Text ist als Medienalternative vielfältig einsetzbar. So können bspw. Menschen, die taub-blind sind, den Text in Braille lesen. Rein dekorative Grafiken und Bilder sind hierbei anders zu behandeln. Sofern sie einem rein dekorativen Zweck dienen, sollen diese Elemente so implementiert sein, dass sie von assistiven Technologien wie Screenreadern ignoriert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine grafisch dargestellte Trennlinie wird vom Screenreader nicht erfasst, da sie als dekorativ gekennzeichnet wurde.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader nicht erreichbar."
+      ],
+      "negativeExamplesDe": [
+        "- Eine grafisch dargestellte Trennlinie wird vom Screenreader bei der Navigation erfasst, da ihr der Alternativtext „Trennlinie“ gegeben wurde.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader erreichbar und übermitteln einen Alternativtext.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader erreichbar, übermitteln aber keinen Alternativtext."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#b-alternativtexte-für-dekorative-grafiken"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.1.1b",
+      "originalTitleDe": "Alternativtexte für dekorative Grafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App dekorative, nicht informative Grafiken oder Objekte enthält, die zudem keine Interaktion ermöglichen."
+      ],
+      "requirementDe": [
+        "Alle Grafiken und Objekte (Objekte ohne auslösbare Funktion, beispielsweise dekorative Bilder, Farbflächen, Abstandshalter oder Symbole mit sichtbarer Beschriftung ohne Funktion), die keinen informativen Mehrwert bieten, sind als dekorative Objekte gekennzeichnet. Die entsprechende Kennzeichnung als dekoratives Objekt wird an den Screenreader übermittelt. Der Screenreader ignoriert das Objekt und fokussiert es nicht."
+      ],
+      "rationaleWhyDe": [
+        "Text ist als Medienalternative vielfältig einsetzbar. So können bspw. Menschen, die taub-blind sind, den Text in Braille lesen. Rein dekorative Grafiken und Bilder sind hierbei anders zu behandeln. Sofern sie einem rein dekorativen Zweck dienen, sollen diese Elemente so implementiert sein, dass sie von assistiven Technologien wie Screenreadern ignoriert werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine grafisch dargestellte Trennlinie wird vom Screenreader nicht erfasst, da sie als dekorativ gekennzeichnet wurde.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader nicht erreichbar."
+      ],
+      "negativeExamplesDe": [
+        "- Eine grafisch dargestellte Trennlinie wird vom Screenreader bei der Navigation erfasst, da ihr der Alternativtext „Trennlinie“ gegeben wurde.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader erreichbar und übermitteln einen Alternativtext.",
+        "- Grafiken und Objekte ohne informativen Mehrwert sind mit aktivem Screenreader erreichbar, übermitteln aber keinen Alternativtext."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#b-alternativtexte-für-dekorative-grafiken"
+    }
+  ]
+}

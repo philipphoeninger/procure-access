@@ -1,0 +1,50 @@
+{
+  "kind": "requirement",
+  "titleDe": "Ton abschaltbar",
+  "sortOrder": 1430,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "audio"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.2",
+      "originalTitleDe": "Ton abschaltbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument Tonelemente verwendet werden, die automatisch abgespielt werden."
+      ],
+      "requirementDe": [
+        "Automatisch abgespielte Töne, die nicht nach drei Sekunden enden, sollen abschaltbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Automatisch abgespielte Töne stören Personen, die sich auf einer Seite mittels Sprachausgabe orientieren.",
+        "",
+        "Falls ein Tonelement automatisch startet, ist es deshalb wichtig, dass es sich über einen am Seitenbeginn befindlichen barrierefreien Mechanismus abschalten, anhalten oder herunterregeln lässt."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "negativeExamplesDe": [
+        "- Barriere: Der Mechanismus zum Abschalten des Tons befindet sich nicht unmittelbar am Seitenbeginn. Es gibt am Seitenbeginn lediglich eine Erklärung, wie der Ton mittels Tastatur abschaltbar ist.",
+        "- Blockade: Automatisch abgespielter Ton enthält von Beginn an längere Sprachpassagen oder andere laute und störende Ton-Ereignisse. Die Sprachausgabe des Abschaltmechanismus kann deshalb nur schlecht wahrgenommen werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ton-abschaltbar"
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Übersicht verfügbarer Aktionen",
+  "sortOrder": 1040,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.11"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.11",
+      "originalTitleDe": "Übersicht verfügbarer Aktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente übermitteln eine Übersicht ihrer verfügbaren Aktionen, als auch die Art und Weise, wie die jeweilige Aktion bei aktivem Screenreader ausgeführt wird, korrekt an die assistiven Systeme. Dies betrifft beispielsweise:",
+        "",
+        "- Tasten (Zum Ausführen doppelklicken)",
+        "- Umschalttasten (Zum Umschalten doppelklicken)",
+        "- Kontrollkästchen (Zum Ändern doppelklicken)",
+        "- Auswahlschalter (Zum Auswählen doppelklicken)",
+        "- Registerkarten (Zum Auswählen doppelklicken)",
+        "- Ausklapplisten (Zum Auswählen doppelklicken)",
+        "- Formularfelder (Zum Bearbeiten doppelklicken, oder Zum Einfügen von Text doppelklicken)",
+        "- Links (Zum Öffnen doppelklicken)"
+      ],
+      "rationaleWhyDe": [
+        "Während der Bedienung mit aktivem Screenreader ist oftmals nicht klar, welche Aktionen an einem Bedienelement auf welche Art zum Ziel führt. Sofern die entsprechenden Elemente korrekte Aufforderungen anbieten, können Screenreader die jeweils notwendige Aktion ausgeben. Konsistente Aktionsaufforderungen, beispielsweise “Zum Öffnen doppelklicken”, an Bedienelementen helfen vor allem unerfahrenen Nutzenden bei der Bedienung der diversen Steuerelemente."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die verfügbaren Aktionen interaktiver Bedienelemente werden vom Screenreader korrekt und vollumfänglich wiedergegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Die verfügbaren Aktionen interaktiver Bedienelemente werden vom Screenreader nicht, fehlerhaft oder nicht vollumfänglich wiedergegeben."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#übersicht-verfügbarer-aktionen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.11",
+      "originalTitleDe": "Übersicht verfügbarer Aktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Bedien- und Formularelemente übermitteln eine Übersicht aller verfügbaren Aktionen korrekt und vollumfänglich an assistive Technologien. Dies beinhaltet, auf welche Art und Weise die jeweilige Aktion bei aktivem Screenreader ausgeführt werden kann. Beispiele für einfache Aktionsaufforderungen sind:",
+        "",
+        "- Tasten („Zum Aktivieren doppeltippen“)",
+        "- Umschalttasten („Zum Umschalten doppeltippen“)",
+        "- Kontrollkästchen („Zum Ändern doppeltippen“)",
+        "- Auswahlschalter („Zum Auswählen doppeltippen“)",
+        "- Registerkarten („Zum Auswählen doppeltippen“)",
+        "- Ausklapplisten („Zum Erweitern doppeltippen“)",
+        "- Eingabefelder („Zum Bearbeiten doppeltippen“)",
+        "- Schieberegler („Zum Anpassen des Werts mit einem Finger nach oben oder unten streichen“)",
+        "- Karusselle („Zum Ändern der Seite mit einem Finger nach oben oder unten streichen“)",
+        "- Links („Zum Öffnen doppeltippen“)",
+        "",
+        "Da das Betriebssystem iOS bei manchen einfachen Bedienelementen wie Tasten auf die Ausgabe der verfügbaren Aktionen verzichtet, kann dies auch im Rahmen des Tests explizit für diese Komponenten vernachlässigt werden, sofern sie über keine weiteren Aktionen verfügen.",
+        "",
+        "Verfügt ein Bedien- oder Formularelement über mehrere Aktionen, muss die Aktionsaufforderung außerdem über das Vorhandensein dieser Aktionen informieren. Beispiele für Aktionsaufforderungen bei mehreren verfügbaren Aktionen sind:",
+        "",
+        "- Listeneinträge („Zum Öffnen doppeltippen; Aktionen verfügbar“)",
+        "- Eingabefelder („Zum Bearbeiten doppeltippen; Aktionen verfügbar“)",
+        "",
+        "Nachdem der Nutzende die aktive, verfügbare Aktion gewechselt hat, muss die aktualisierte Aktionsaufforderung automatisch ausgegeben werden. Beispiele für aktualisierte Aktionsaufforderungen sind:",
+        "",
+        "- Listeneinträge („Zum Löschen doppeltippen“)",
+        "- Eingabefelder („Zum Einfügen von Text doppeltippen“)",
+        "",
+        "Da die Betriebssysteme iOS und Android bei einigen zur Verfügung gestellten Komponenten mit mehreren Aktionen keine Informationen über die Bedienung zum Ändern der Aktionen ausgeben (beispielsweise „Zum Ändern der Aktion mit einem Finger nach oben oder unten streichen“), ist dies im Rahmen dieses Prüfschritts keine notwendige Anforderung, aber empfehlenswert."
+      ],
+      "rationaleWhyDe": [
+        "Während der Bedienung mit aktivem Screenreader ist oftmals nicht klar, welche Aktionen an einem Bedienelement auf welche Art zum Ziel führt. Sofern die entsprechenden Elemente korrekte Aufforderungen anbieten, können Screenreader die jeweils notwendige Aktion ausgeben. Konsistente Aktionsaufforderungen, beispielsweise “Zum Öffnen Doppeltippen”, an Bedienelementen helfen vor allem unerfahrenen Nutzenden bei der Bedienung der diversen Steuerelemente."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die verfügbaren Aktionen von Bedien- und Formularelementen werden vom Screenreader korrekt und vollumfänglich wiedergegeben.",
+        "- Tasten werden von VoiceOver ohne Aktionsaufforderung ausgegeben.",
+        "- Bei Bedienelementen mit mehreren Aktionen wird eine Information über das Vorhandensein weiterer Aktionen ausgegeben.",
+        "- Bei Bedienelementen mit mehreren Aktionen werden alle verfügbaren Aktionen vom Screenreader bei Aktivierung korrekt und vollumfänglich wiedergegeben."
+      ],
+      "negativeExamplesDe": [
+        "- Die verfügbaren Aktionen interaktiver Bedienelemente werden vom Screenreader nicht, fehlerhaft oder nicht vollumfänglich wiedergegeben.",
+        "- Bedienelemente mit mehreren verfügbaren Aktionen weisen nicht auf das Vorhandensein weiterer Aktionen hin."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#übersicht-verfügbarer-aktionen"
+    }
+  ]
+}

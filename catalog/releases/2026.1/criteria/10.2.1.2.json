@@ -1,0 +1,54 @@
+{
+  "kind": "requirement",
+  "titleDe": "Keine Tastaturfalle",
+  "sortOrder": 1520,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.1.2",
+      "originalTitleDe": "Keine Tastaturfalle",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Kann der Tastaturfokus über eine Tastaturschnittstelle zu einer Komponente des PDF-Dokuments verschoben werden, muss er von dort auch mit den Standardbeendigungsmethoden wieder wegbewegt werden können."
+      ],
+      "rationaleWhyDe": [
+        "Ziel dieses Prüfschritts ist sicherzustellen, dass der Fokus nicht an einer bestimmten Stelle im PDF-Dokument fixiert und von dort mit der Tastatur nicht mehr gelöst werden kann. Die Bedienung soll geräteunabhängig möglich sein. Das bedeutet: Sie muss sowohl mit der Maus als auch mit der Tastatur möglich sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Es ist eine Standardbeendigungsmethode realisiert und man kann sich mithilfe der Tastatur vollständig durch das gesamte PDF-Dokument bewegen."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Es wurde eine nicht standardisierte Beendigungsmethode realisiert. Auf diese Methode wird explizit hingewiesen.",
+        "- Barriere: Es wurde eine nicht standardisierte Beendigungsmethode realisiert und die gewählte Beendigungsmethode nicht dokumentiert.",
+        "- Blockade: Der Tastaturfokus kann an einer Position gar nicht mehr bewegt werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#keine-tastaturfalle"
+    }
+  ]
+}

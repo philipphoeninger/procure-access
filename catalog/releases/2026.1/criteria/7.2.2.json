@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Synchronisation der Audiodeskription",
+  "sortOrder": 330,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.2.2",
+      "originalTitleDe": "Synchronisation der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videos mit synchroner Bild- und Tonspur in Verbindung mit einer Audiodeskription zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software eine Audiodeskription für verfügbare Videos an, muss die Audiodeskription synchron zu Bild und Ton wiedergegeben werden."
+      ],
+      "rationaleWhyDe": [
+        "Unterstützende Bildbeschreibungen müssen synchron zur Handlung zur Verfügung gestellt werden. Dies erhöht die Verständlichkeit entsprechender Inhalte enorm."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audiodeskription ist bei allen angebotenen Videos synchron zu Bild und Ton."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audiodeskription ist nur bei einigen angebotenen Videos synchron zu Bild und Ton.",
+        "- Die Audiodeskription ist bei allen angebotenen Videos nicht synchron zu Bild und Ton."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#synchronisation-der-audiodeskription"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.2.2",
+      "originalTitleDe": "Synchronisation der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videos mit synchroner Bild- und Tonspur in Verbindung mit einer Audiodeskription zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App eine Audiodeskription für verfügbare Videos an, muss die Audiodeskription synchron zu Bild und Ton wiedergegeben werden."
+      ],
+      "rationaleWhyDe": [
+        "Unterstützende Bildbeschreibungen müssen synchron zur Handlung zur Verfügung gestellt werden. Dies erhöht die Verständlichkeit entsprechender Inhalte enorm."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audiodeskription ist bei allen angebotenen Videos synchron zu Bild und Ton."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audiodeskription ist nur bei einigen angebotenen Videos synchron zu Bild und Ton.",
+        "- Die Audiodeskription ist bei allen angebotenen Videos nicht synchron zu Bild und Ton."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#synchronisation-der-audiodeskription"
+    }
+  ]
+}

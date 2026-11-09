@@ -1,0 +1,82 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Gesprochene Untertitel",
+  "sortOrder": 310,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.1.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.1.5",
+      "originalTitleDe": "Gesprochene Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videos mit synchroner Bild- und Tonspur in Verbindung mit ein- und ausblendbaren Untertiteln (closed captions) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Videos mit ein- und ausblendbaren Untertiteln (closed captions) an, müssen diese Untertitel als Ton ausgegeben werden können. Die Originaltonspur soll ersetzt oder zumindest stark abgedimmt werden. Untertitel, die fester Bestandteil des Videos sind (open captions), sind von dieser Anforderung ausgenommen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die den Originalton eines Videos nicht verstehen, benötigen eine für ihre Bedürfnisse passende Untertitelung. Diese Untertitel sollen auch für sehbeeinträchtigte Menschen als akustische Ausgabe zugänglich sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Software stellt Tonspuren bzw. Sprachausgaben für die Untertitel zur Verfügung.",
+        "- Die im Video gesprochenen Inhalte entsprechen genau den Untertiteln."
+      ],
+      "negativeExamplesDe": [
+        "- Die Software stellt keine Tonspuren bzw. Sprachausgaben für die Untertitel zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#gesprochene-untertitel"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.1.5",
+      "originalTitleDe": "Gesprochene Untertitel",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videos mit synchroner Bild- und Tonspur in Verbindung mit ein- und ausblendbaren Untertiteln (closed captions) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Videos mit ein- und ausblendbaren Untertiteln (closed captions) an, müssen diese Untertitel als Ton ausgegeben werden können. Die Originaltonspur soll ersetzt oder zumindest stark abgedimmt werden. Untertitel, die fester Bestandteil des Videos sind (open captions), sind von dieser Anforderung ausgenommen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die den Originalton eines Videos nicht verstehen, benötigen eine für ihre Bedürfnisse passende Untertitelung. Diese Untertitel sollen auch für sehbeeinträchtigte Menschen als akustische Ausgabe zugänglich sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Mobile App stellt Tonspuren bzw. Sprachausgaben für die Untertitel zur Verfügung.",
+        "- Die im Video gesprochenen Inhalte entsprechen genau den Untertiteln."
+      ],
+      "negativeExamplesDe": [
+        "- Die Mobile App stellt keine Tonspuren bzw. Sprachausgaben für die Untertitel zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#gesprochene-untertitel"
+    }
+  ]
+}

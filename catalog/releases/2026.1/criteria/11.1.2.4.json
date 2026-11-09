@@ -1,0 +1,96 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Untertitel für Live-Videos",
+  "sortOrder": 420,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.2.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.2.4",
+      "originalTitleDe": "Untertitel für Live-Videos",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Live-Übertragungen mit synchronisierter, informativer Tonspur enthält."
+      ],
+      "requirementDe": [
+        "Bietet die Software Live-Videos mit synchronisierter, informativer Tonspur, so müssen Untertitel als Medienalternative bereitgestellt werden. Untertitel müssen sowohl für sprachliche als auch für nichtsprachliche Audioinhalte (Geräuscheffekte, Musik, Lachen, Identifizierung und Position des Sprechers, etc.) bereitgestellt werden.",
+        "",
+        "Bei Liveübertragungen können die Untertitel aufgrund der technischen Machbarkeit mit leichter Latenz angezeigt werden. Die Bewertung liegt im Ermessensspielraum des Prüfers."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Hörbeeinträchtigung sind auf Untertitel angewiesen, um den Inhalt von Live-Videos mit Tonspur zu verstehen. Darüber hinaus können Untertitel vielen Nutzenden helfen, die aufgezeichneten Inhalte zu verstehen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Live-Videos mit informativer Tonspur werden standardmäßig korrekte Untertitel angezeigt.",
+        "- Für Live-Videos mit informativer Tonspur können korrekte Untertitel aktiviert werden.",
+        "- Für Live-Videos mit informativer Tonspur existieren keine Untertitel, im unmittelbaren Kontext ist jedoch eine korrekte Medienalternative verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Für Live-Videos mit informativer Tonspur existieren weder Untertitel noch Medienalternativen.",
+        "- Für Live-Videos mit informativer Tonspur existieren Untertitel oder Medienalternativen im unmittelbaren Kontext, die jedoch den Inhalt der Tonspur nicht adäquat wiedergeben.",
+        "- Es existiert eine Medienalterative, jedoch ist sie nicht im unmittelbaren Kontext auffindbar oder aufrufbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#untertitel-für-live-videos"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.2.4",
+      "originalTitleDe": "Untertitel für Live-Videos",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Live-Übertragungen mit synchronisierter, informativer Tonspur enthält."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Live-Videos mit synchronisierter, informativer Tonspur, so müssen Untertitel als Medienalternative bereitgestellt werden. Untertitel müssen sowohl für sprachliche als auch für nichtsprachliche Audioinhalte (Geräuscheffekte, Musik, Lachen, Identifizierung und Position des Sprechers, etc.) bereitgestellt werden.",
+        "",
+        "Bei Liveübertragungen können die Untertitel aufgrund der technischen Machbarkeit mit leichter Latenz angezeigt werden. Die Bewertung liegt im Ermessensspielraum des Prüfers."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Hörbeeinträchtigung sind auf Untertitel angewiesen, um den Inhalt von Live-Videos mit Tonspur zu verstehen. Darüber hinaus können Untertitel vielen Nutzenden helfen, die aufgezeichneten Inhalte zu verstehen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Für Live-Videos mit informativer Tonspur werden standardmäßig korrekte Untertitel angezeigt.",
+        "- Für Live-Videos mit informativer Tonspur können korrekte Untertitel aktiviert werden.",
+        "- Für Live-Videos mit informativer Tonspur existieren keine Untertitel, im unmittelbaren Kontext ist jedoch eine korrekte Medienalternative verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Für Live-Videos mit informativer Tonspur existieren weder Untertitel noch Medienalternativen.",
+        "- Für Live-Videos mit informativer Tonspur existieren Untertitel oder Medienalternativen im unmittelbaren Kontext, die jedoch den Inhalt der Tonspur nicht adäquat wiedergeben.",
+        "- Es existiert eine Medienalterative, jedoch ist sie nicht im unmittelbaren Kontext auffindbar oder aufrufbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#untertitel-für-live-videos"
+    }
+  ]
+}

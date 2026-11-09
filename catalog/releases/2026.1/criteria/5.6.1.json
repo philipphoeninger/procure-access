@@ -1,0 +1,82 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Taktiler oder auditiver Status",
+  "sortOrder": 60,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.6.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.6.1",
+      "originalTitleDe": "Taktiler oder auditiver Status",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Funktionalität einer Software mit einem physischen Bedienelement des Endgeräts gesteuert werden kann und der Status des Steuerelements visuell dargestellt wird."
+      ],
+      "requirementDe": [
+        "Kann eine Funktionalität der Software mit einem physischen Bedienelement des Endgeräts gesteuert werden, und wird der Status des Steuerelements visuell dargestellt, muss zusätzlich zur visuellen Erkennung mindestens ein weiterer Modus zum Identifizieren des jeweiligen Status des Steuerelementes zur Verfügung stehen, entweder durch Berührung oder durch Audioausgabe."
+      ],
+      "rationaleWhyDe": [
+        "Sehbeeinträchtigte und blinde Menschen können den Status von Bedienelementen visuell nicht unterscheiden und sind auf andere, geeignete Methoden zur Erkennung des Status angewiesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status visuell und durch Audioausgabe. Die verschiedenen Status sind dabei durch unterschiedliche Audioausgaben eindeutig unterscheidbar.",
+        "- Das Steuerelement vermittelt seinen Status durch Braille-Beschriftung. Die verschiedenen Status sind dabei durch unterschiedliche Beschriftungen eindeutig unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status ausschließlich visuell."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#taktiler-oder-auditiver-status"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.6.1",
+      "originalTitleDe": "Taktiler oder auditiver Status",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Funktionalität einer Mobile App mit einem physischen Bedienelement des Endgeräts gesteuert werden kann und der Status des Steuerelements visuell dargestellt wird."
+      ],
+      "requirementDe": [
+        "Kann eine Funktionalität der Mobile App mit einem physischen Bedienelement des Endgeräts gesteuert werden, und wird der Status des Steuerelements visuell dargestellt, muss zusätzlich zur visuellen Erkennung mindestens ein weiterer Modus zum Identifizieren des jeweiligen Status des Steuerelementes zur Verfügung stehen, entweder durch Berührung oder durch Audioausgabe."
+      ],
+      "rationaleWhyDe": [
+        "Sehbeeinträchtigte und blinde Menschen können den Status von Bedienelementen visuell nicht unterscheiden und sind auf andere, geeignete Methoden zur Erkennung des Status angewiesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status visuell und durch Audioausgabe. Die verschiedenen Status sind dabei durch unterschiedliche Audioausgaben eindeutig unterscheidbar.",
+        "- Das Steuerelement vermittelt seinen Status durch Braille-Beschriftung. Die verschiedenen Status sind dabei durch unterschiedliche Beschriftungen eindeutig unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status ausschließlich visuell."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#taktiler-oder-auditiver-status"
+    }
+  ]
+}

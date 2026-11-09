@@ -1,0 +1,82 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Bedienelemente für Untertitel und Audiodeskription",
+  "sortOrder": 350,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.3",
+      "originalTitleDe": "Bedienelemente für Untertitel und Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videos mit synchroner Bild- und Tonspur und mit ein- und ausblendbaren Untertiteln und/oder Audiodeskriptionen zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Videos mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln und/oder Audiodeskriptionen an, müssen die Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und Audiodeskription auf derselben Interaktionsebene wie die Wiedergabesteuerung zur Verfügung gestellt werden."
+      ],
+      "rationaleWhyDe": [
+        "Bedienelemente zum Steuern von Untertiteln und Audiodeskriptionen müssen für ihre jeweilige Zielgruppe so einfach wie möglich auffindbar und aktivierbar sein. Die wichtigste Ebene bei der Bedienung von Videos ist die Wiedergabesteuerung. Die Kombination beider Steuerungen erleichtert Menschen die Bedienung des Angebots."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription befinden sich auf gleicher Interaktionsebene wie die Wiedergabesteuerung."
+      ],
+      "negativeExamplesDe": [
+        "- Es werden keine Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription zur Verfügung gestellt.",
+        "- Es werden Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription auf einer anderen Ebene als die Wiedergabesteuerung zur Verfügung gestellt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#bedienelemente-für-untertitel-und-audiodeskription"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.3",
+      "originalTitleDe": "Bedienelemente für Untertitel und Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videos mit synchroner Bild- und Tonspur und mit ein- und ausblendbaren Untertiteln und/oder Audiodeskriptionen zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Videos mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln und/oder Audiodeskriptionen an, müssen die Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und Audiodeskription auf derselben Interaktionsebene wie die Wiedergabesteuerung zur Verfügung gestellt werden."
+      ],
+      "rationaleWhyDe": [
+        "Bedienelemente zum Steuern von Untertiteln und Audiodeskriptionen müssen für ihre jeweilige Zielgruppe so einfach wie möglich auffindbar und aktivierbar sein. Die wichtigste Ebene bei der Bedienung von Videos ist die Wiedergabesteuerung. Die Kombination beider Steuerungen erleichtert Menschen die Bedienung des Angebots."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription befinden sich auf gleicher Interaktionsebene wie die Wiedergabesteuerung."
+      ],
+      "negativeExamplesDe": [
+        "- Es werden keine Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription zur Verfügung gestellt.",
+        "- Es werden Bedienelemente zum Aktivieren und Deaktivieren von Untertitel und/oder Audiodeskription auf einer anderen Ebene als die Wiedergabesteuerung zur Verfügung gestellt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#bedienelemente-für-untertitel-und-audiodeskription"
+    }
+  ]
+}

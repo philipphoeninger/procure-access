@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Alternativen für aufgezeichnetes Audio und Videos ohne Ton",
+  "sortOrder": 390,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.2.1",
+      "originalTitleDe": "Alternativen für aufgezeichnetes Audio und Videos ohne Ton",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software aufgezeichnete „Nur“-Audio- oder „Nur“-Video-Inhalte zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Aufgezeichnete Audioinhalte und Videos ohne Ton, die Informationen übermitteln, beziehungsweise einen informativen Mehrwert bieten, benötigen äquivalente Medienalternativen im unmittelbaren Kontext, es sei denn, sie stellen bereits eine Medienalternative für Textinhalte dar. Die Medienalternative kann direkt in der Software, oder in einer externen Quelle bereitgestellt werden."
+      ],
+      "rationaleWhyDe": [
+        "Videoinhalte sind für sehbeeinträchtigte Menschen nicht zugänglich und benötigen eine äquivalente Medienalternative, etwa als Text- oder Audioinhalt. Audioinhalte sind für hörbeeinträchtigte Menschen nicht zugänglich und benötigen eine äquivalente Transkription. Darüber hinaus können Textalternativen vielen Nutzenden helfen, die aufgezeichneten Inhalte zu verstehen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Inhalt einer Audioaufnahme wird über eine Transkription, die im unmittelbaren Kontext der Audioaufnahme zu finden ist, vollumfänglich wiedergegeben.",
+        "- Der Inhalt eines Videos ohne Ton wird über eine Audioaufnahme, die im unmittelbaren Kontext des Videos zu finden ist, vollumfänglich wiedergegeben.",
+        "- Der Inhalt eines Videos ohne Ton wird über eine Transkription, die im unmittelbaren Kontext des Videos zu finden ist, vollumfänglich wiedergegeben.",
+        "- Die Medienalternative referenziert auf eine externe Quelle, ist aber im unmittelbaren Kontext zu finden."
+      ],
+      "negativeExamplesDe": [
+        "- Für Audio- oder Videoinhalte steht keine Medienalternative zur Verfügung.",
+        "- Es existiert eine Medienalternative, sie kann aber nicht eindeutig dem Audio- oder Videoinhalt zugeordnet werden.",
+        "- Es existiert eine Medienalterative, jedoch ist sie nicht im unmittelbaren Kontext auffindbar oder aufrufbar.",
+        "- Es existiert eine Medienalternative, jedoch sind die Inhalte nicht vollumfänglich wiedergegeben."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#alternativen-für-aufgezeichnetes-audio-und-videos-ohne-ton"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.2.1",
+      "originalTitleDe": "Alternativen für aufgezeichnetes Audio und Videos ohne Ton",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App aufgezeichnete „Nur“-Audio- oder „Nur“-Video-Inhalte zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Aufgezeichnete Audioinhalte und Videos ohne Ton, die Informationen übermitteln, beziehungsweise einen informativen Mehrwert bieten, benötigen äquivalente Medienalternativen im unmittelbaren Kontext, es sei denn, sie stellen bereits eine Medienalternative für Textinhalte dar. Die Medienalternative kann direkt in der Mobile App, oder in einer externen Quelle bereitgestellt werden."
+      ],
+      "rationaleWhyDe": [
+        "Videoinhalte sind für sehbeeinträchtigte Menschen nicht zugänglich und benötigen eine äquivalente Medienalternative, etwa als Text- oder Audioinhalt. Audioinhalte sind für hörbeeinträchtigte Menschen nicht zugänglich und benötigen eine äquivalente Transkription. Darüber hinaus können Textalternativen vielen Nutzenden helfen, die aufgezeichneten Inhalte zu verstehen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Inhalt einer Audioaufnahme wird über eine Transkription, die im unmittelbaren Kontext der Audioaufnahme zu finden ist, vollumfänglich wiedergegeben.",
+        "- Der Inhalt eines Videos ohne Ton wird über eine Audioaufnahme, die im unmittelbaren Kontext des Videos zu finden ist, vollumfänglich wiedergegeben.",
+        "- Der Inhalt eines Videos ohne Ton wird über eine Transkription, die im unmittelbaren Kontext des Videos zu finden ist, vollumfänglich wiedergegeben.",
+        "- Die Medienalternative referenziert auf eine externe Quelle, ist aber im unmittelbaren Kontext zu finden."
+      ],
+      "negativeExamplesDe": [
+        "- Für Audio- oder Videoinhalte steht keine Medienalternative zur Verfügung.",
+        "- Es existiert eine Medienalternative, sie kann aber nicht eindeutig dem Audio- oder Videoinhalt zugeordnet werden.",
+        "- Es existiert eine Medienalterative, jedoch ist sie nicht im unmittelbaren Kontext auffindbar oder aufrufbar.",
+        "- Es existiert eine Medienalternative, jedoch sind die Inhalte nicht vollumfänglich wiedergegeben."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#alternativen-für-aufgezeichnetes-audio-und-videos-ohne-ton"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "kind": "requirement",
+  "titleDe": "Audiodeskription für aufgezeichnete Videos",
+  "sortOrder": 1280,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.2.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.2.5",
+      "originalTitleDe": "Audiodeskription für aufgezeichnete Videos",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald im PDF-Dokument aufgezeichnete Video-Dateien mit synchronisiertem Ton und Bild bereitgestellt werden."
+      ],
+      "requirementDe": [
+        "Für alle voraufgezeichneten Videoinhalte in synchronisierten Medien wird Audiodeskription bereitgestellt."
+      ],
+      "rationaleWhyDe": [
+        "Durch Audiodeskription kann sichergestellt werden, dass auch Personen, die Schwierigkeiten damit haben, bewegte Bilder zu erfassen, sowie Personen ohne bzw. mit eingeschränktem Sehvermögen die visuellen Inhalte einer synchronisierten Medienpräsentation vollumfänglich zur Verfügung stehen. Die Audiodeskription ergänzt den Audioteil der Medienpräsentation um alle Informationen, die zusätzlich benötigt werden, wenn der Videoteil nicht verfügbar ist."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Der Prüfschritt ist erfüllt, wenn Audiodeskription zum Verständnis des Inhalts benötigt wird und vorhanden ist."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Eine leichte Einschränkung liegt vor, wenn Audiodeskription zwar nur teilweise oder nicht vorhanden ist, aber alle zum Verständnis des PDF-Dokuments notwendigen Informationen aus dem Kontext erschlossen werden können.",
+        "- Einschränkung: Eine Einschränkung liegt vor, wenn die nur teilweise vorhandene Audiodeskription zwar zu offenen Fragen führt, aber ein Großteil der Informationen noch aus dem Kontext erschlossen werden können.",
+        "- Barriere: Eine Barriere liegt vor, wenn die nur teilweise vorhandene Audiodeskription zu offenen Fragen führt, die sich nicht aus dem Kontext erschließen lassen.",
+        "- Blockade: Eine Blockade liegt vor, wenn Audiodeskription zum Verständnis des PDF-Dokuments benötigt wird, jedoch nicht vorhanden ist.",
+        "",
+        "Der Prüfschritt ist nicht voll erfüllt, wenn Audiodeskription zum Verständnis des Inhalts benötigt wird, aber nur teilweise vorhanden ist."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#audiodeskription-für-aufgezeichnete-videos"
+    }
+  ]
+}

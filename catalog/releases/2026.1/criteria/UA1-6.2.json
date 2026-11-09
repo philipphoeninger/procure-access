@@ -1,0 +1,46 @@
+{
+  "kind": "requirement",
+  "titleDe": "Metadaten und UA-Kennzeichnung",
+  "sortOrder": 1770,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 6.2",
+      "originalTitleDe": "Metadaten und UA-Kennzeichnung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Eingebundene Metadaten im PDF-Dokument sind korrekt hinterlegt, sodass keine Fehlermeldungen im PAC erscheinen. Eine PDF/UA-Kennzeichnung (Identifier) ist vorhanden."
+      ],
+      "rationaleWhyDe": [
+        "Der PDF/UA Identifier ist ein Hinweis für PDF/UA Konformität sowie die Kennzeichnung für getaggte PDF-Dokumente und sollte daher eingetragen sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Es sind Metadaten und Dokumenteinstellungen (UA-Kennzeichnung) vorhanden."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Es sind keine Metadaten oder Dokumenteinstellungen (UA-Kennzeichnung) vorhanden. Ein Screenreader-Programm identifiziert jedoch alle Inhalte eindeutig und korrekt.",
+        "- Einschränkung: Es sind keine Metadaten oder Dokumenteinstellungen (UA-Kennzeichnung) vorhanden. Ein Screenreader-Programm identifiziert unwesentliche Inhalte nicht eindeutig und nicht ganz korrekt.",
+        "- Barriere: Es sind keine Metadaten oder Dokumenteinstellungen (UA-Kennzeichnung) vorhanden und Screenreader-Programme identifizieren deshalb nicht alle Inhalte eindeutig."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-6.2-metadaten-und-ua-kennzeichnung"
+    }
+  ]
+}

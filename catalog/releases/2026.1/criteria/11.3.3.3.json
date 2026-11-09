@@ -1,0 +1,85 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Fehlerkorrektur",
+  "sortOrder": 870,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.3",
+      "originalTitleDe": "Fehlerkorrektur",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind, die bei fehlerhafter oder unvollständiger Eingabe Fehlermeldungen erzeugen."
+      ],
+      "requirementDe": [
+        "Sofern eine Fehlerkennung bei Formularfeldern implementiert ist, müssen die Fehlermeldungen eindeutig sein und Korrekturvorschläge zur Fehlerbehebung benannt werden, es sei denn, dies würde die Sicherheit oder den Zweck des Inhalts gefährden."
+      ],
+      "rationaleWhyDe": [
+        "Sofern bereits eine Fehlererkennung implementiert ist, soll sie die Nutzenden optimal unterstützen. Nutzende können Fehler leichter beheben, wenn konkrete Hinweise zur Fehlerbehebung verfügbar sind."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Beschreibung der Fehler gibt konkrete Hinweise zur Behebung des Eingabefehlers, beispielsweise durch das Benennen der geforderten Formate.",
+        "- Die Fehlermeldung lautet z.B. „Nachname: Eine Eingabe ist erforderlich“."
+      ],
+      "negativeExamplesDe": [
+        "- Die Beschreibung der Fehler geben keine konkreten Hinweise zur Behebung des Eingabefehlers, beispielsweise lautet die Fehlermeldung lediglich „Fehler im Formularfeld“.",
+        "- Nach Anzeige der Fehlermeldungen werden Formularfelder neu geladen, die Eingaben müssen erneut vorgenommen werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#fehlerkorrektur"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.3",
+      "originalTitleDe": "Fehlerkorrektur",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularfelder vorhanden sind, die bei fehlerhafter oder unvollständiger Eingabe Fehlermeldungen erzeugen."
+      ],
+      "requirementDe": [
+        "Sofern eine Fehlerkennung bei Formularfeldern implementiert ist, müssen die Fehlermeldungen eindeutig sein und Korrekturvorschläge zur Fehlerbehebung benannt werden, es sei denn, dies würde die Sicherheit oder den Zweck des Inhalts gefährden."
+      ],
+      "rationaleWhyDe": [
+        "Sofern bereits eine Fehlererkennung implementiert ist, soll sie die Nutzenden optimal unterstützen. Nutzende können Fehler leichter beheben, wenn konkrete Hinweise zur Fehlerbehebung verfügbar sind."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Beschreibung der Fehler gibt konkrete Hinweise zur Behebung des Eingabefehlers, beispielsweise durch das Benennen der geforderten Formate."
+      ],
+      "negativeExamplesDe": [
+        "- Die Beschreibung der Fehler geben keine konkreten Hinweise zur Behebung des Eingabefehlers, beispielsweise lautet die Fehlermeldung lediglich „Fehler im Formularfeld“.",
+        "- Nach Anzeige der Fehlermeldungen werden Formularfelder neu geladen, die Eingaben müssen erneut vorgenommen werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fehlerkorrektur"
+    }
+  ]
+}

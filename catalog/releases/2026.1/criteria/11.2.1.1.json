@@ -1,0 +1,110 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Ohne Maus nutzbar",
+  "sortOrder": 620,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.1.1",
+      "originalTitleDe": "Ohne Maus nutzbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Software ist ohne Verwendung einer Maus ausschließlich über eine Tastatur bedienbar. Ein eventuell auf der Tastatur vorhandenes Track-Pad ist nicht Bestandteil der Prüfung. Falls die Seite scrollbare Bereiche enthält, sollen die nicht sichtbaren Inhalte über die Tastatur erreichbar sein. Die Reihenfolge, in der die Elemente fokussiert werden, spielt in diesem Prüfschritt keine Rolle.",
+        "",
+        "Prüfende müssen mit der Funktionsweise der Tastaturbedienung vertraut sein."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Software kann mit einer Tastatur bedient werden.",
+        "- Ein Schieberegler zur Steuerung der Lautstärke kann mit TAB angesprungen und wieder verlassen werden, mit den Pfeiltasten kann die Einstellung geändert werden.",
+        "- Ein geöffnetes Dialogfenster kann mit dem Schließen-Button oder mit der ESC-Taste geschlossen werden.",
+        "- In einem Eingabefeld kann Text mit der Tastatur zeichenweise fokussiert und markiert werden.",
+        "- Eine Software verwendet eine Scrollleiste, um lange Inhalte auf begrenztem Raum anzuzeigen. Der nicht sichtbare Bereich kann auch mit den Pfeiltasten und mit den Tasten SEITE AUF und SEITE AB sichtbar gemacht werden.",
+        "- Ein Programm zum rechnergestützten Zeichnen (CAD) wird üblicherweise mit einer Maus verwendet, es bietet aber auch die Möglichkeit, Punkte anhand ihrer x-, y- und z-Koordinaten festzulegen und Zeichnungselemente aus einer hierarchischen Liste von Unterbaugruppen und Teilen auszuwählen oder mit Hilfe der Pfeiltasten zwischen den auf der Anzeige dargestellten Elementen zu navigieren.",
+        "- Bedienelemente können auch bei Screenreader-Nutzung mit TAB oder Pfeiltasten fokussiert und mit EINGABE oder LEER ausgelöst werden.",
+        "- Tastaturfunktionen zur Bewegung in Daten und zur Selektion von Daten funktionieren auch mit dem Screenreader.",
+        "- Die Standardfunktionen STRG+LEER zum Ab- und Hinzuwählen von Daten aus einer Liste, falls in der Anwendung verwendet, funktionieren auch mit dem Screenreader.",
+        "- Shortcuts der Anwendung funktionieren weiterhin. Bei Konflikten mit den Shortcuts des Screenreaders greift das „Tastatur durchreichen“-Kommando des Screenreaders.",
+        "- Die Standardfunktionen wie F3 (Suchen) bzw. F4 (Suche wiederholen) unter Windows, falls in der Anwendung verwendet, funktionieren auch bei Screenreader-Nutzung.",
+        "- Die Standardfunktionen wie STRG+c (Kopieren), STRG+v (Einfügen), STRG+z (Rückgängig), falls in der Anwendung verwendet, funktionieren auch mit dem Screenreader."
+      ],
+      "negativeExamplesDe": [
+        "- Die Software kann mit einer Tastatur nicht oder nicht vollumfänglich bedient werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#ohne-maus-nutzbar"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.1.1",
+      "originalTitleDe": "Fokusbasierte Bedienung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Software ist ohne Verwendung einer Maus ausschließlich über eine Tastatur bedienbar. Ein eventuell auf der Tastatur vorhandenes Track-Pad ist nicht Bestandteil der Prüfung. Falls die Seite scrollbare Bereiche enthält, sollen die nicht sichtbaren Inhalte über die Tastatur erreichbar sein. Die Reihenfolge, in der die Elemente fokussiert werden, spielt in diesem Prüfschritt keine Rolle.",
+        "",
+        "Prüfende müssen mit der Funktionsweise der Tastaturbedienung vertraut sein."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Software kann mit einer Tastatur bedient werden.",
+        "- Ein Schieberegler zur Steuerung der Lautstärke kann mit TAB angesprungen und wieder verlassen werden, mit den Pfeiltasten kann die Einstellung geändert werden.",
+        "- Ein geöffnetes Dialogfenster kann mit dem Schließen-Button oder mit der ESC-Taste geschlossen werden.",
+        "- In einem Eingabefeld kann Text mit der Tastatur zeichenweise fokussiert und markiert werden.",
+        "- Eine Software verwendet eine Scrollleiste, um lange Inhalte auf begrenztem Raum anzuzeigen. Der nicht sichtbare Bereich kann auch mit den Pfeiltasten und mit den Tasten SEITE AUF und SEITE AB sichtbar gemacht werden.",
+        "- Ein Programm zum rechnergestützten Zeichnen (CAD) wird üblicherweise mit einer Maus verwendet, es bietet aber auch die Möglichkeit, Punkte anhand ihrer x-, y- und z-Koordinaten festzulegen und Zeichnungselemente aus einer hierarchischen Liste von Unterbaugruppen und Teilen auszuwählen oder mit Hilfe der Pfeiltasten zwischen den auf der Anzeige dargestellten Elementen zu navigieren.",
+        "- Bedienelemente können auch bei Screenreader-Nutzung mit TAB oder Pfeiltasten fokussiert und mit EINGABE oder LEER ausgelöst werden.",
+        "- Tastaturfunktionen zur Bewegung in Daten und zur Selektion von Daten funktionieren auch mit dem Screenreader.",
+        "- Die Standardfunktionen STRG+LEER zum Ab- und Hinzuwählen von Daten aus einer Liste, falls in der Anwendung verwendet, funktionieren auch mit dem Screenreader.",
+        "- Shortcuts der Anwendung funktionieren weiterhin. Bei Konflikten mit den Shortcuts des Screenreaders greift das „Tastatur durchreichen“-Kommando des Screenreaders.",
+        "- Die Standardfunktionen wie F3 (Suchen) bzw. F4 (Suche wiederholen) unter Windows, falls in der Anwendung verwendet, funktionieren auch bei Screenreader-Nutzung.",
+        "- Die Standardfunktionen wie STRG+c (Kopieren), STRG+v (Einfügen), STRG+z (Rückgängig), falls in der Anwendung verwendet, funktionieren auch mit dem Screenreader."
+      ],
+      "negativeExamplesDe": [
+        "- Die Software kann mit einer Tastatur nicht oder nicht vollumfänglich bedient werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fokusbasierte-bedienung"
+    }
+  ]
+}

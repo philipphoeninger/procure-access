@@ -1,0 +1,82 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Visueller Status",
+  "sortOrder": 70,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.6.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.6.2",
+      "originalTitleDe": "Visueller Status",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Bestandteil eines physischen Endgeräts ist, das ein physisches Steuerelement zum Verriegeln oder Umschalten zur Verfügung stellt und den Status des Steuerelements non-visuell (beispielsweise bei Berührung oder durch Audiowiedergabe) wiedergibt."
+      ],
+      "requirementDe": [
+        "Bietet die Software ein physisches Steuerelement zum Sperren oder Umschalten, und stellt den Status des Steuerelements non-visuell dar, muss zusätzlich zur vorhandenen Erkennungsmethode eine visuelle Identifizierung des jeweiligen Status des Steuerelementes zur Verfügung stehen."
+      ],
+      "rationaleWhyDe": [
+        "Einige Menschen unterschiedlicher Beeinträchtigungen sind auf die visuelle Erkennung des Status von Steuerelementen angewiesen, da andere Erkennungsmethoden für sie unter Umständen nicht zugänglich sind. So können beispielsweise Menschen mit Hörbeeinträchtigung eine Audioausgabe nicht wahrnehmen, oder Menschen ohne Sehbeeinträchtigung kein Braille lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status durch Audioausgabe und durch eine visuelle LED. Die verschiedenen Status sind dabei durch unterschiedlich positionierte LED‘s eindeutig unterscheidbar.",
+        "- Das Steuerelement vermittelt seinen Status durch Braille-Beschriftung und durch einen beleuchteten Schalter. Die verschiedenen Status sind dabei durch unterschiedliche Schalterpositionen eindeutig unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Das Bedienelement vermittelt seinen Status nicht visuell."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#visueller-status"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.6.2",
+      "originalTitleDe": "Visueller Status",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Bestandteil eines physischen Endgeräts ist, das ein physisches Steuerelement zum Verriegeln oder Umschalten zur Verfügung stellt und den Status des Steuerelements non-visuell (beispielsweise bei Berührung oder durch Audiowiedergabe) wiedergibt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App ein physisches Steuerelement zum Sperren oder Umschalten, und stellt den Status des Steuerelements non-visuell dar, muss zusätzlich zur vorhandenen Erkennungsmethode eine visuelle Identifizierung des jeweiligen Status des Steuerelementes zur Verfügung stehen."
+      ],
+      "rationaleWhyDe": [
+        "Einige Menschen unterschiedlicher Beeinträchtigungen sind auf die visuelle Erkennung des Status von Steuerelementen angewiesen, da andere Erkennungsmethoden für sie unter Umständen nicht zugänglich sind. So können beispielsweise Menschen mit Hörbeeinträchtigung eine Audioausgabe nicht wahrnehmen, oder Menschen ohne Sehbeeinträchtigung kein Braille lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Das Steuerelement vermittelt seinen Status durch Audioausgabe und durch eine visuelle LED. Die verschiedenen Status sind dabei durch unterschiedlich positionierte LED‘s eindeutig unterscheidbar.",
+        "- Das Steuerelement vermittelt seinen Status durch Braille-Beschriftung und durch einen beleuchteten Schalter. Die verschiedenen Status sind dabei durch unterschiedliche Schalterpositionen eindeutig unterscheidbar."
+      ],
+      "negativeExamplesDe": [
+        "- Das Bedienelement vermittelt seinen Status nicht visuell."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#visueller-status"
+    }
+  ]
+}

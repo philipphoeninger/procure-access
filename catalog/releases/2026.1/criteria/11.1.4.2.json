@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Audio-Steuerelement",
+  "sortOrder": 540,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "audio"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.2",
+      "originalTitleDe": "Audio-Steuerelement",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn in der Software automatisch Audio abgespielt wird."
+      ],
+      "requirementDe": [
+        "Für Audio-Inhalte, die in der Software automatisch und länger als 3 Sekunden abgespielt werden, muss ein Steuerelement zum Pausieren, Stoppen des Audios, oder eine Lautstärkeregelung zum Steuern der Audiolautstärke unabhängig von der Lautstärke des Gesamtsystems zur Verfügung stehen. Entsprechende Steuerelemente müssen am Seitenbeginn, beziehungsweise im unmittelbaren Kontext des Elements auffindbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Screenreadern werden durch automatisch abgespielte Audioinhalte gestört. Daher müssen derartige Inhalte kurz sein oder abgeschaltet beziehungsweise heruntergeregelt werden können. Die Lautstärke muss unabhängig von der Systemlautstärke geregelt werden können, damit die verschiedenen Audioquellen ausreichend kontrastieren. Von diesem Kriterium profitieren auch Nutzende mit Aufmerksamkeitsstörungen, die bei laufendem Ton Schwierigkeiten haben, sich auf die Bedienung oder die Inhalte der Software zu konzentrieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Automatisch abgespielte Audioinhalte dauern nicht länger als drei Sekunden an.",
+        "- Es steht ein Steuerelement zum Anhalten und Abspielen des Audioinhalts zur Verfügung.",
+        "- Es steht eine Lautstärkeregelung zur Verfügung."
+      ],
+      "negativeExamplesDe": [
+        "- Es stehen keine Steuerelemente zum Stoppen oder zur Regelung der Lautstärke zur Verfügung.",
+        "- Die Regelung der Lautstärke beeinflusst auch die Systemlautstärke.",
+        "- Audio wird beim Aufruf der Seite gestartet, die Steuerelemente befinden sich jedoch nicht unmittelbar am Beginn der Seite."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#audio-steuerelement"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.2",
+      "originalTitleDe": "Audio-Steuerelement",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn in der Mobile App automatisch Audio abgespielt wird."
+      ],
+      "requirementDe": [
+        "Für Audio-Inhalte, die in der Mobile App automatisch und länger als 3 Sekunden abgespielt werden, muss ein Steuerelement zum Pausieren, Stoppen des Audios, oder eine Lautstärkeregelung zum Steuern der Audiolautstärke unabhängig von der Lautstärke des Gesamtsystems zur Verfügung stehen. Entsprechende Steuerelemente müssen am Seitenbeginn, beziehungsweise im unmittelbaren Kontext des Elements auffindbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Screenreadern werden durch automatisch abgespielte Audioinhalte gestört. Daher müssen derartige Inhalte kurz sein oder abgeschaltet beziehungsweise heruntergeregelt werden können. Die Lautstärke muss unabhängig von der Systemlautstärke geregelt werden können, damit die verschiedenen Audioquellen ausreichend kontrastieren. Von diesem Kriterium profitieren auch Nutzende mit Aufmerksamkeitsstörungen, die bei laufendem Ton Schwierigkeiten haben, sich auf die Bedienung oder die Inhalte der Mobile App zu konzentrieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Automatisch abgespielte Audioinhalte dauern nicht länger als drei Sekunden an.",
+        "- Es steht ein Steuerelement zum Anhalten und Abspielen des Audioinhalts zur Verfügung.",
+        "- Es steht eine Lautstärkeregelung zur Verfügung."
+      ],
+      "negativeExamplesDe": [
+        "- Es stehen keine Steuerelemente zum Stoppen oder zur Regelung der Lautstärke zur Verfügung.",
+        "- Die Regelung der Lautstärke beeinflusst auch die Systemlautstärke.",
+        "- Audio wird beim Aufruf der Seite gestartet, die Steuerelemente befinden sich jedoch nicht unmittelbar am Beginn der Seite."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#audio-steuerelement"
+    }
+  ]
+}

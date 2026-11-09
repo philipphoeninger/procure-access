@@ -1,0 +1,92 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Eltern-Kind-Beziehungen",
+  "sortOrder": 1010,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.9"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.9",
+      "originalTitleDe": "Eltern-Kind-Beziehungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Elemente vorhanden sind, die ihnen übergeordnete oder untergeordnete Elemente beinhalten."
+      ],
+      "requirementDe": [
+        "Beziehungen zwischen Elementen und ihnen übergeordneten oder untergeordneten Elementen, die zum logischen Verständnis des jeweiligen Elements notwendig sind, werden an die assistiven Systeme übermittelt und vom Screenreader wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Visuell identifizierbare Hierarchien und Zusammengehörigkeiten von Elementen sind für Screenreadernutzende nicht zugänglich. Diese Beziehungen müssen auch programmatisch ermittelbar sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die zum Verständnis notwendige Beziehung zwischen einem Element und einem ihm übergeordneten oder untergeordneten Element wird durch den Screenreader eindeutig wiedergegeben.",
+        "- In einer Gruppe von Auswahlfeldern, die von der jeweiligen Auswahl des vorherigen Elements abhängen, wird der Bezug zum vorherigen Element eindeutig hergestellt und vom Screenreader wiedergegeben.",
+        "- In einem Kalender werden die einzelnen Tage eindeutig dem jeweiligen Monat zugeordnet und vom Screenreader ausgegeben.",
+        "- Die Formularfelder zur Eingabe einer Lieferadresse können eindeutig der Erfassung einer Lieferadresse zugeordnet werden."
+      ],
+      "negativeExamplesDe": [
+        "- Die zum Verständnis notwendige Beziehung zwischen einem Element und einem ihm übergeordneten oder untergeordneten Element wird durch den Screenreader nicht eindeutig wiedergegeben.",
+        "- In einer Gruppe von Auswahlfeldern, die von der jeweiligen Auswahl des vorherigen Elements abhängen, wird der Bezug zum vorherigen Element nicht oder nicht eindeutig hergestellt.",
+        "- In einer mobilen Applikation zum Erlernen einer Fremdsprache können die Abschlussfragen der jeweiligen Lektion nicht der entsprechenden Lektion zugeordnet werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#eltern-kind-beziehungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.9",
+      "originalTitleDe": "Eltern-Kind-Beziehungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Elemente vorhanden sind, die ihnen übergeordnete oder untergeordnete Elemente beinhalten."
+      ],
+      "requirementDe": [
+        "Beziehungen zwischen Elementen und ihnen übergeordneten oder untergeordneten Elementen, die zum logischen Verständnis des jeweiligen Elements notwendig sind, werden an die assistiven Systeme übermittelt und vom Screenreader wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Visuell identifizierbare Hierarchien und Zusammengehörigkeiten von Elementen sind für Screenreadernutzende nicht zugänglich. Diese Beziehungen müssen auch programmatisch ermittelbar sein."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die zum Verständnis notwendige Beziehung zwischen einem Element und einem ihm übergeordneten oder untergeordneten Element wird durch den Screenreader eindeutig wiedergegeben.",
+        "- In einer Gruppe von Auswahlfeldern, die von der jeweiligen Auswahl des vorherigen Elements abhängen, wird der Bezug zum vorherigen Element eindeutig hergestellt und vom Screenreader wiedergegeben.",
+        "- In einem Kalender werden die einzelnen Tage eindeutig dem jeweiligen Monat zugeordnet und vom Screenreader ausgegeben.",
+        "- Die Formularfelder zur Eingabe einer Lieferadresse können eindeutig der Erfassung einer Lieferadresse zugeordnet werden."
+      ],
+      "negativeExamplesDe": [
+        "- Die zum Verständnis notwendige Beziehung zwischen einem Element und einem ihm übergeordneten oder untergeordneten Element wird durch den Screenreader nicht eindeutig wiedergegeben.",
+        "- In einer Gruppe von Auswahlfeldern, die von der jeweiligen Auswahl des vorherigen Elements abhängen, wird der Bezug zum vorherigen Element nicht oder nicht eindeutig hergestellt.",
+        "- In einer mobilen Applikation zum Erlernen einer Fremdsprache können die Abschlussfragen der jeweiligen Lektion nicht der entsprechenden Lektion zugeordnet werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#eltern-kind-beziehungen"
+    }
+  ]
+}

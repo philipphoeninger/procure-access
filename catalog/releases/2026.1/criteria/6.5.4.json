@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Synchronisation von Audio und Video bei Videotelefonie",
+  "sortOrder": 240,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.5.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.5.4",
+      "originalTitleDe": "Synchronisation von Audio und Video bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Software, die Videotelefonie zur Verfügung stellen, sollen sicherstellen, dass die Latenz zwischen Audio- und Videowiedergabe nicht mehr als 100 Millisekunden beträgt und somit eine hochwertige Lippensynchronität besteht."
+      ],
+      "rationaleWhyDe": [
+        "Zur optimalen Verständlichkeit von Videotelefonie ist Lippensynchronität essenziell. Nur so können Informationen im Kontext wie Gestik und Mimik mit den gesprochenen Inhalten erfasst werden. Menschen mit kognitiven Beeinträchtigungen und Beeinträchtigungen des Hörvermögens sind auf Synchronität von Bewegung und Sprache angewiesen, und innerhalb einer Kommunikation alle Informationen verstehen zu können. Untersuchungen haben zudem gezeigt, dass Video nach Audio deutlich schwerer zu verstehen ist als umgekehrt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Informationen zur Latenz sind in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Informationen zur Latenz sind nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Informationen zur Latenz sind in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel, da Audio und Video asynchron sind.",
+        "- Die Informationen zur Latenz sind nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig, da Audio und Video asynchron sind."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#synchronisation-von-audio-und-video-bei-videotelefonie"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.5.4",
+      "originalTitleDe": "Synchronisation von Audio und Video bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Mobile Apps, die Videotelefonie zur Verfügung stellen, sollen sicherstellen, dass die Latenz zwischen Audio- und Videowiedergabe nicht mehr als 100 Millisekunden beträgt und somit eine hochwertige Lippensynchronität besteht."
+      ],
+      "rationaleWhyDe": [
+        "Zur optimalen Verständlichkeit von Videotelefonie ist Lippensynchronität essenziell. Nur so können Informationen im Kontext wie Gestik und Mimik mit den gesprochenen Inhalten erfasst werden. Menschen mit kognitiven Beeinträchtigungen und Beeinträchtigungen des Hörvermögens sind auf Synchronität von Bewegung und Sprache angewiesen, und innerhalb einer Kommunikation alle Informationen verstehen zu können. Untersuchungen haben zudem gezeigt, dass Video nach Audio deutlich schwerer zu verstehen ist als umgekehrt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Informationen zur Latenz sind in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Informationen zur Latenz sind nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Informationen zur Latenz sind in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel, da Audio und Video asynchron sind.",
+        "- Die Informationen zur Latenz sind nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig, da Audio und Video asynchron sind."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#synchronisation-von-audio-und-video-bei-videotelefonie"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Erhaltung der Audiodeskription",
+  "sortOrder": 340,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.2.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.2.3",
+      "originalTitleDe": "Erhaltung der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Videos mit Audiodeskription der Software übertragen, konvertiert oder aufgenommen werden können."
+      ],
+      "requirementDe": [
+        "Bietet die Software die Möglichkeit, Videos mit Audiodeskription zu übertragen, zu konvertieren oder aufzuzeichnen, müssen die Audiodeskription und die Synchronität zu Bild und Ton beim generierten Video erhalten bleiben."
+      ],
+      "rationaleWhyDe": [
+        "Barrierefreiheitsinformationen, die in Quelldateien bereits vorhanden sind, sollen auch in neu generierten Dateien vorhanden und korrekt übernommen werden. So wird sichergestellt, dass Menschen, die auf die jeweilige Unterstützung angewiesen sind, das Angebot entsprechend weiter nutzen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Audiodeskription und Synchronität sind in der generierten Datei analog zur Quelldatei enthalten."
+      ],
+      "negativeExamplesDe": [
+        "- Audiodeskription ist in der generierten Datei analog zur Quelldatei enthalten, die Synchronität hat sich während des Vorgangs marginal verschlechtert.",
+        "- Audiodeskription ist in der generierten Datei nicht mehr enthalten.",
+        "- Synchronität hat sich in der generierten Datei verschlechtert."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#erhaltung-der-audiodeskription"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.2.3",
+      "originalTitleDe": "Erhaltung der Audiodeskription",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Videos mit Audiodeskription in der Mobile App aufgenommen, konvertiert oder auf das Endgerät heruntergeladen werden können."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App die Möglichkeit, Videos mit Audiodeskription zu übertragen, zu konvertieren oder aufzuzeichnen, müssen die Audiodeskription und die Synchronität zu Bild und Ton beim generierten Video erhalten bleiben."
+      ],
+      "rationaleWhyDe": [
+        "Barrierefreiheitsinformationen, die in Quelldateien bereits vorhanden sind, sollen auch in neu generierten Dateien vorhanden und korrekt übernommen werden. So wird sichergestellt, dass Menschen, die auf die jeweilige Unterstützung angewiesen sind, das Angebot entsprechend weiter nutzen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Audiodeskription und Synchronität sind in der generierten Datei analog zur Quelldatei enthalten."
+      ],
+      "negativeExamplesDe": [
+        "- Audiodeskription ist in der generierten Datei analog zur Quelldatei enthalten, die Synchronität hat sich während des Vorgangs marginal verschlechtert.",
+        "- Audiodeskription ist in der generierten Datei nicht mehr enthalten.",
+        "- Synchronität hat sich in der generierten Datei verschlechtert."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#erhaltung-der-audiodeskription"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Sensorische Eigenschaften",
+  "sortOrder": 500,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.3.3",
+      "originalTitleDe": "Sensorische Eigenschaften",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Inhalte der Software werden auf inhaltliche Verweise mittels sensorischer Merkmale wie Form, Größe, Position, Ausrichtung, Orientierung oder Ton geprüft. Solche Verweise dürfen nicht ausschließlich mittels der jeweiligen Sinneswahrnehmung verständlich sein."
+      ],
+      "rationaleWhyDe": [
+        "Anweisungen für die Bedienung oder Verwendung der Inhalte dürfen nicht ausschließlich sensorische Merkmale (Farbe, Form, Größe, Position oder Töne) enthalten. Durch zusätzliche Informationen kann sichergestellt werden, dass auch blinde und sehbeeinträchtigte, sowie hörbeeinträchtigte Nutzende die entsprechenden Inhalte verstehen. Alle Nutzenden müssen auf alle Inhalte zugreifen können. Dies gilt auch dann, wenn sie beispielsweise Form, Größe oder Ton nicht wahrnehmen oder Informationen über die räumliche Position bzw. Ausrichtung nicht verwenden können. Manche Nutzende mit Beeinträchtigungen können Form oder Position aufgrund der Art der von ihnen verwendeten Hilfstechnologien nicht wahrnehmen. Es müssen spezifischere oder erweiterte Informationen zur Verfügung gestellt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Es sind keine ausschließlichen Verweise mittels sensorischer Merkmale vorhanden.",
+        "- Für einen Verweis mittels sensorischer Merkmale sind weitere Anweisungen vorhanden, die keine Sinneswahrnehmung ansprechen.",
+        "- Anstatt „Klicken Sie die rechte, untere Taste“ lautet die Anweisung „Klicken Sie die Weiter-Taste, die Sie im unteren Teil der App auf der rechten Seite finden“."
+      ],
+      "negativeExamplesDe": [
+        "- Eine Tabelle weist „Details können Sie in der rechten Spalte nachlesen“ an.",
+        "- Eine Funktion weist „Mit der runden Taste können Sie die Aktion jederzeit abbrechen“ an.",
+        "- Ein Umfrageergebnis weist „Der größere Balken zeigt die Antwort der meisten Teilnehmer“ an.",
+        "- Ein Video-/Sprach-Konferenzsystem informiert „Wenn Sie einen Piepton hören, betritt ein weiterer Teilnehmer den Raum“.",
+        "- Zum Seitenwechsel steht ein Pfeilsymbol deutlicher Kennzeichnung „Weiter“ zur Verfügung, die Anweisung im Kontext lautet jedoch „Zum Seitenwechsel wählen Sie das grüne Pfeilsymbol unteren rechten Ecke unter der Umfrage.“"
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sensorische-eigenschaften"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.3",
+      "originalTitleDe": "Sensorische Eigenschaften",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Anweisungen, welche zum Verständnis oder zur Bedienung der Mobile App dienen, dürfen ihre Inhalte nicht ausschließlich durch Verweise auf sensorische Merkmale vermitteln. Zu diesen Merkmalen gehören Verweise auf die Form, Größe, Position, Ausrichtung, Orientierung oder den ausgegebenen Ton."
+      ],
+      "rationaleWhyDe": [
+        "Anweisungen für die Bedienung oder Verwendung der Inhalte dürfen nicht ausschließlich sensorische Merkmale (Farbe, Form, Größe, Position oder Töne) enthalten. Durch zusätzliche Informationen kann sichergestellt werden, dass auch blinde und sehbeeinträchtigte, sowie hörbeeinträchtigte Nutzende die entsprechenden Inhalte verstehen. Alle Nutzenden müssen auf alle Inhalte zugreifen können. Dies gilt auch dann, wenn sie beispielsweise Form, Größe oder Ton nicht wahrnehmen oder Informationen über die räumliche Position bzw. Ausrichtung nicht verwenden können. Manche Nutzende mit Beeinträchtigungen können Form oder Position aufgrund der Art der von ihnen verwendeten Hilfstechnologien nicht wahrnehmen. Es müssen spezifischere oder erweiterte Informationen zur Verfügung gestellt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Es sind keine ausschließlichen Verweise mittels sensorischer Merkmale vorhanden.",
+        "- Für einen Verweis mittels sensorischer Merkmale sind weitere Anweisungen vorhanden, die keine Sinneswahrnehmung ansprechen.",
+        "- Anstatt „Klicken Sie die rechte, untere Taste“ lautet die Anweisung „Klicken Sie die Weiter-Taste, die Sie im unteren Teil der App auf der rechten Seite finden“."
+      ],
+      "negativeExamplesDe": [
+        "- Eine Tabelle weist „Details können Sie in der rechten Spalte nachlesen“ an.",
+        "- Eine Funktion weist „Mit der runden Taste können Sie die Aktion jederzeit abbrechen“ an.",
+        "- Ein Umfrageergebnis weist „Der größere Balken zeigt die Antwort der meisten Teilnehmer“ an.",
+        "- Ein Video-/Sprach-Konferenzsystem informiert „Wenn Sie einen Piepton hören, betritt ein weiterer Teilnehmer den Raum“.",
+        "- Zum Seitenwechsel steht ein Pfeilsymbol deutlicher Kennzeichnung „Weiter“ zur Verfügung, die Anweisung im Kontext lautet jedoch „Zum Seitenwechsel wählen Sie das grüne Pfeilsymbol unteren rechten Ecke unter der Umfrage.“"
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sensorische-eigenschaften"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sprache von einzelnen Abschnitten/Sätzen",
+  "sortOrder": 1670,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.1.2",
+      "originalTitleDe": "Sprache von einzelnen Abschnitten/Sätzen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Sprache eines jeden Abschnitts des PDF-Dokuments muss programmatisch ermittelbar sein mit Ausnahme von Eigennamen, technischen Fachbegriffen, Wörtern einer unklaren Sprache und Wörtern oder Wendungen, die Teil der Umgangssprache des direkt umliegenden Textes geworden sind."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass die textlichen Inhalte des PDF-Dokuments allen Personengruppen vollumfänglich zur Verfügung stehen.",
+        "",
+        "Screenreader-Programme verwenden verschiedene Sprachsynthesizer für die jeweilige natürliche Sprache. Der Synthesizer bestimmt, ob die Texte eines PDF-Dokuments (Inhalte, Beschriftungen, Alternativtexte usw.) richtig ausgesprochen werden.",
+        "",
+        "Die Hauptsprache des PDF-Dokuments ist automatisch die Sprache für den gesamten textlichen Inhalt, die Metadaten sowie die zusätzlichen textlichen Passagen wie z. B. Alternativtexte. Wenn bei einzelnen Textpassagen, bei denen eine abweichende Sprache verwendet wird, kein programmatischer Sprachwechsel angegeben ist, sodass das Screenreader-Programm automatisch die richtige Sprachausgabe wählen können, so kann es z. B. passieren, dass deutscher Text mit englischer Sprachkonvention vorgelesen wird und damit nicht mehr verständlich ist.",
+        "",
+        "Wenn Menschen, die auf die Nutzung eines Screenreader-Programms angewiesen sind, manuell eingreifen müssen, um die Sprachausgabe umzuschalten, weil das Screenreader-Programm nicht automatisch zur richtigen Sprachausgabe wechselt, so behindert dies die Arbeitsabläufe."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Dokumentinhalte tragen das korrekte Sprach-Attribut."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Wenige bzw. untergeordnete Textinhalte sind mit dem falschen Sprach-Attribut ausgezeichnet.",
+        "- Einschränkung: Wichtige Textinhalte, die für das Textverständnis ausschlaggebend sind, sind mit dem falschen Sprach-Attribut ausgezeichnet.",
+        "- Barriere: Wesentliche Textinhalte sind mit dem falschen Sprach-Attribut ausgezeichnet.",
+        "- Blockade: Alle Textinhalte sind trotzt korrekter Hauptsprache des PDF-Dokuments mit der falschen individuell benötigten Sprache ausgezeichnet."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sprache-von-einzelnen-abschnittensätzen"
+    }
+  ]
+}

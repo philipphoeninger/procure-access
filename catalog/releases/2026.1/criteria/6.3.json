@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Anrufer-Identifizierung",
+  "sortOrder": 200,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.3",
+      "originalTitleDe": "Anrufer-Identifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Sprach- oder Videotelefonie mit Anrufer-Identifikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Sprach- oder Videotelefonie mit Anrufer-Identifikation, so muss die Anrufer-Identifikation visuell in Textform, und programmatisch identifizierbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Über die Anruferkennung wird sichergestellt, dass sowohl visuelle Menschen als auch Nutzende von assistiven Systemen einen Anrufer eindeutig und schnell identifizieren können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Anrufer wird visuell und programmatisch problemlos identifiziert."
+      ],
+      "negativeExamplesDe": [
+        "- Der Anrufer ist nur auf einem der geforderten Wege identifizierbar.",
+        "- Der Anrufer ist nur mit Zwischenschritten programmatisch identifizierbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#anrufer-identifizierung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.3",
+      "originalTitleDe": "Anrufer-Identifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Sprach- oder Videotelefonie mit Anrufer-Identifikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Sprach- oder Videotelefonie mit Anrufer-Identifikation, so muss die Anrufer-Identifikation visuell in Textform, und programmatisch identifizierbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Über die Anruferkennung wird sichergestellt, dass sowohl visuelle Menschen als auch Nutzende von assistiven Systemen einen Anrufer eindeutig und schnell identifizieren können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Anrufer wird visuell und programmatisch problemlos identifiziert."
+      ],
+      "negativeExamplesDe": [
+        "- Der Anrufer ist nur auf einem der geforderten Wege identifizierbar.",
+        "- Der Anrufer ist nur mit Zwischenschritten programmatisch identifizierbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#anrufer-identifizierung"
+    }
+  ]
+}

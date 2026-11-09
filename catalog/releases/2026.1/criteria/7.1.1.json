@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Videofähigkeiten",
+  "titleDe": "Wiedergabe von Untertiteln",
+  "sortOrder": 270,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "7.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "7.1.1",
+      "originalTitleDe": "Wiedergabe von Untertiteln",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software aufgenommene Videoinhalte mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software aufgenommene Videoinhalte mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln an, benötigt der Videoplayer die Möglichkeit, die Untertitel über ein Bedienelement ein- und auszublenden (closed captions). Eine Funktion zur Ausgabe der Untertitel auf Braille-Zeilen ist notwendig."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Hörbeeinträchtigung sind auf Untertitel angewiesen, um den Inhalt von Videos mit Tonspur zu verstehen. Gleichzeitig können Untertitel beispielsweise kognitiv beeinträchtigte Menschen beim Verstehen der Inhalte stören. Zuschaltbare Untertitel (closed captions) müssen somit durch den Videoplayer ein- und ausschaltbar sein, um den Bedürfnissen der Nutzenden gerecht zu werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung.",
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel, und eine Ausgabemöglichkeit für Braille-Zeilen zur Verfügung, oder leitet die Ausgabe an Braille-Zeilen automatisch weiter."
+      ],
+      "negativeExamplesDe": [
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung.",
+        "- Der Videoplayer stellt ein Bedienelement zur Ausgabe an Braille-Zeilen zur Verfügung, oder leitet die Ausgabe automatisch weiter, stellt jedoch kein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#wiedergabe-von-untertiteln"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "7.1.1",
+      "originalTitleDe": "Wiedergabe von Untertiteln",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App aufgenommene Videoinhalte mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App aufgenommene Videoinhalte mit synchroner Bild- und Tonspur in Verbindung mit Untertiteln an, benötigt der Videoplayer die Möglichkeit, die Untertitel über ein Bedienelement ein- und auszublenden (closed captions). Eine Funktion zur Ausgabe der Untertitel auf Braille-Zeilen ist notwendig."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Hörbeeinträchtigung sind auf Untertitel angewiesen, um den Inhalt von Videos mit Tonspur zu verstehen. Gleichzeitig können Untertitel beispielsweise kognitiv beeinträchtigte Menschen beim Verstehen der Inhalte stören. Zuschaltbare Untertitel (closed captions) müssen somit durch den Videoplayer ein- und ausschaltbar sein, um den Bedürfnissen der Nutzenden gerecht zu werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung.",
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel, und eine Ausgabemöglichkeit für Braille-Zeilen zur Verfügung, oder leitet die Ausgabe an Braille-Zeilen automatisch weiter."
+      ],
+      "negativeExamplesDe": [
+        "- Der Videoplayer stellt ein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung.",
+        "- Der Videoplayer stellt ein Bedienelement zur Ausgabe an Braille-Zeilen zur Verfügung, oder leitet die Ausgabe automatisch weiter, stellt jedoch kein Bedienelement zum Ein- und Ausblenden der Untertitel zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#wiedergabe-von-untertiteln"
+    }
+  ]
+}

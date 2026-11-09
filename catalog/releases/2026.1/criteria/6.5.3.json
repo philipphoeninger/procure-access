@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Bildwiederholfrequenz bei Videotelefonie",
+  "sortOrder": 230,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.5.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.5.3",
+      "originalTitleDe": "Bildwiederholfrequenz bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Software, die Videotelefonie zur Verfügung stellen, sollen eine Bildwiederholfrequenz (frame rate) von mindestens 20 Bildern pro Sekunde, vorzugsweise 30 Bildern pro Sekunde für die Videoübertragung unterstützen."
+      ],
+      "rationaleWhyDe": [
+        "Hochwertige Bildqualität bei Videotelefonie ermöglicht es manchen Beeinträchtigungsgruppen, Informationen wie Mimik oder Gestik wahrzunehmen, die bei reiner Sprach- oder Textkommunikation im Kontext fehlen. Zudem können Menschen mit Beeinträchtigung des Gehörs zusätzlich von den Lippen lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Bildwiederholfrequenz (frame rate) ist in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Bildwiederholfrequenz (frame rate) ist nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bildwiederholfrequenz (frame rate) ist in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel.",
+        "- Die Bildwiederholfrequenz (frame rate) ist nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#bildwiederholfrequenz-bei-videotelefonie"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.5.3",
+      "originalTitleDe": "Bildwiederholfrequenz bei Videotelefonie",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Videotelefonie zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Mobile Apps, die Videotelefonie zur Verfügung stellen, sollen eine Bildwiederholfrequenz (frame rate) von mindestens 20 Bildern pro Sekunde, vorzugsweise 30 Bildern pro Sekunde für die Videoübertragung unterstützen."
+      ],
+      "rationaleWhyDe": [
+        "Hochwertige Bildqualität bei Videotelefonie ermöglicht es manchen Beeinträchtigungsgruppen, Informationen wie Mimik oder Gestik wahrzunehmen, die bei reiner Sprach- oder Textkommunikation im Kontext fehlen. Zudem können Menschen mit Beeinträchtigung des Gehörs zusätzlich von den Lippen lesen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Bildwiederholfrequenz (frame rate) ist in der Dokumentation enthalten und die Qualität eines Testanruf erscheint plausibel.",
+        "- Die Bildwiederholfrequenz (frame rate) ist nicht in der Dokumentation enthalten, jedoch wirkt die Qualität eines Testanrufs subjektiv hochwertig."
+      ],
+      "negativeExamplesDe": [
+        "- Die Bildwiederholfrequenz (frame rate) ist in der Dokumentation enthalten, jedoch erscheint die Qualität eines Testanrufs nicht plausibel.",
+        "- Die Bildwiederholfrequenz (frame rate) ist nicht in der Dokumentation enthalten und die Qualität eines Testanrufs wirkt subjektiv minderwertig."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#bildwiederholfrequenz-bei-videotelefonie"
+    }
+  ]
+}

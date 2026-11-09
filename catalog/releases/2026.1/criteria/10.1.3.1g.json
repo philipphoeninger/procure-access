@@ -1,0 +1,54 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Listen",
+  "sortOrder": 1350,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1g",
+      "originalTitleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Listen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Listen enthält oder der Einsatz von Listen-Elementen erforderlich gewesen wäre."
+      ],
+      "requirementDe": [
+        "Wenn im PDF-Dokument Listen und Auflistungen verwendet werden, sollten sie korrekt ausgezeichnet werden."
+      ],
+      "rationaleWhyDe": [
+        "Mit Listen werden Informationen gruppiert. Sind Listen nicht korrekt ausgezeichnet, werden Menschen, die auf assistive Technologien angewiesen sind, entscheidende Informationen vorenthalten."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Dieser Prüfschritt ist erfüllt, wenn im PDF-Dokument Listen verwendet werden und die Listen korrekt ausgezeichnet sind."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Listen sind ausgezeichnet, besitzen jedoch keine Lbl-Tags.",
+        "- Einschränkung: Nicht alle Listen des PDF-Dokuments sind ausgezeichnet.",
+        "- Barriere: Keine der im PDF-Dokument enthaltenen Listen ist als Liste ausgezeichnet, sodass die Strukturierung des Textes bei Nutzung von assistiven Technologien nicht erkennbar ist.",
+        "- Barriere: Listeneinträge sind nicht korrekt ausgezeichnet und können nicht navigiert werden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#g-info-und-beziehungen-blocklevel-strukturelementelisten"
+    }
+  ]
+}

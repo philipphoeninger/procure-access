@@ -1,0 +1,55 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sensorische Merkmale",
+  "sortOrder": 1390,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.3",
+      "originalTitleDe": "Sensorische Merkmale",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument sensorische Merkmale vorhanden sind."
+      ],
+      "requirementDe": [
+        "Angaben zur Verständlichkeit der Inhalte bzw. zur Bearbeitung des PDF-Dokuments sollen nicht ausschließlich über sensorische Merkmale (wie insbesondere über Form, Farbe, Größe, Position, Ausrichtung oder Klang) gegeben werden."
+      ],
+      "rationaleWhyDe": [
+        "Ziel dieses Prüfschritts ist sicherzustellen, dass auch Menschen, die nicht in der Lage sind, akustische Hinweise (Klang) bzw. Nutzung von Form, Farbe, Größe, Position und Ausrichtung als Unterscheidungsmerkmal wahrzunehmen, Verweise zur Nutzung des PDF-Dokuments verstehen können. Wird beispielsweise Wichtiges farblich hervorgehoben, können blinde oder sehbehinderte Menschen das nicht ohne Weiteres mit ihrer assistiven Technologie erkennen. Werden Pflichteingaben nur mit einem Hinweiston angezeigt, haben Menschen, die schlecht oder gar nicht hören können, keine Chance, dies wahrzunehmen.",
+        "",
+        "Grundsätzlich sollte immer das Zwei-Sinne-Prinzip zum Einsatz kommen. Wichtiges kann beispielsweise farblich und zusätzlich mit dem Wort „Wichtig“, gekennzeichnet werden. Pflichteingaben sollten neben einem Hinweiston auch optisch, beispielsweise durch ein Sternchen-Zeichen (*) im Eingabefeld, gekennzeichnet werden."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Das PDF-Dokument enthält zwar Hinweise, die nur sehend bzw. hörend erfasst werden können (Form, Farbe, Größe bzw. Klang), doch schränken diese das Verstehen des PDF-Dokuments für blinde Menschen sowie Menschen mit Sehbeeinträchtigung bzw. Menschen mit eingeschränktem Hörvermögen nicht ein.",
+        "- Einschränkung: Das PDF-Dokument enthält Hinweise, die nur sehend bzw. hörend erfasst werden können (Form, Farbe, Größe bzw. Klang), welche das Verstehen des PDF-Dokuments für blinde Menschen sowie Menschen mit Sehbeeinträchtigung bzw. Menschen mit eingeschränktem Hörvermögen in der Form einschränken, dass die notwendigen Informationen aus dem Kontext gewonnen werden müssen („Hinweise sind rot markiert“).",
+        "- Barriere: Das PDF-Dokument enthält Hinweise, die nur sehend bzw. hörend erfasst werden können (Form, Farbe, Größe bzw. Klang), wodurch das Verstehen des PDF-Dokuments für blinde Menschen sowie Menschen mit Sehbeeinträchtigung bzw. Menschen mit eingeschränktem Hörvermögen nur mit erheblichem Aufwand möglich ist („Beachten Sie den grau hinterlegten Text“).",
+        "- Blockade: Das PDF-Dokument enthält Hinweise, die nur sehend bzw. hörend erfasst werden können (Form, Farbe, Größe bzw. Klang), wodurch das Verstehen des PDF-Dokuments für blinde Menschen sowie Menschen mit Sehbeeinträchtigung bzw. Menschen mit eingeschränktem Hörvermögen unmöglich ist (z. B. Fehlerhinweise).",
+        "- Blockade: Das PDF-Dokument enthält mehrere gleichartig gestaltete Objekte und es soll ein durch eine bestimmte Position gekennzeichnetes Objekt markiert werden, was für Menschen, die Informationen über die räumliche Position bzw. Ausrichtung nicht verwerten können unmöglich ist („Klicken Sie auf den Pfeil oben rechts.“)."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sensorische-merkmale"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Werte",
+  "sortOrder": 990,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.7",
+      "originalTitleDe": "Werte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind, die Werte aufweisen."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente, die Werte aufweisen, übermitteln den aktuellen Wert und gegebenenfalls die Position oder die entsprechenden Grenzen korrekt an die assistiven Systeme. Dies betrifft beispielsweise:",
+        "",
+        "- Umschalttasten (aktiviert, nicht aktiviert)",
+        "- Kontrollkästchen (ausgewählt, nicht ausgewählt)",
+        "- Auswahlschalter (aktiviert, nicht aktiviert)",
+        "- Registerkarten (ausgewählt, nicht ausgewählt)",
+        "- Ausklapplisten (erweitert, nicht erweitert)",
+        "- Formularelemente (Wert des Elements, beispielsweise eingetragener Text)",
+        "- Optionen in Ausklapplisten (Eintrag x von y)",
+        "",
+        "Der aktuelle Wert eines entsprechenden Elements wird bei Fokussierung des Elements mit aktivem Screenreader proaktiv wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Werten ist gerade für Screenreadernutzende essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, werden Verständlichkeit und Wahrnehmbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert bei Fokussierung korrekt und vollumfänglich wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert bei Fokussierung nicht, nicht korrekt oder nicht vollumfänglich wieder.",
+        "- Die Optionen einer Auswahlliste geben ihre Position oder Grenze nicht wieder (beispielsweise 3 von 5).",
+        "- Eine Registerkarte gibt nicht wieder, ob sie aktuell ausgewählt oder nicht ausgewählt ist.",
+        "- Bei mehreren Registerkarten gibt die jeweilige Registerkarte ihre Position oder Grenze nicht wieder (beispielsweise 2 von 6).",
+        "- Ein Eingabefeld gibt den vorbelegten Text nicht wieder."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#werte"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.7",
+      "originalTitleDe": "Werte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind, die Werte aufweisen."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente, die Werte aufweisen, übermitteln den aktuellen Wert und gegebenenfalls die Position oder die entsprechenden Grenzen korrekt an die assistiven Systeme. Dies betrifft beispielsweise:",
+        "",
+        "- Umschalttasten (aktiviert, nicht aktiviert)",
+        "- Kontrollkästchen (ausgewählt, nicht ausgewählt)",
+        "- Auswahlschalter (aktiviert, nicht aktiviert)",
+        "- Registerkarten (ausgewählt, nicht ausgewählt)",
+        "- Ausklapplisten (erweitert, nicht erweitert)",
+        "- Formularelemente (Wert des Elements, beispielsweise eingetragener Text)",
+        "- Optionen in Ausklapplisten (Eintrag x von y)",
+        "",
+        "Der aktuelle Wert eines entsprechenden Elements wird bei Fokussierung des Elements mit aktivem Screenreader proaktiv wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Das Identifizieren und die damit verbundene, korrekte Implementierung von Werten ist gerade für Screenreadernutzende essenziell, denn nur so können die Nutzenden das jeweilige Element im Kontext zuordnen, verstehen und bedienen. Sind Informationen am Element unvollständig oder fehlerhaft, werden Verständlichkeit und Wahrnehmbarkeit erheblich eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert bei Fokussierung korrekt und vollumfänglich wieder."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Elemente geben ihren Wert bei Fokussierung nicht, nicht korrekt oder nicht vollumfänglich wieder.",
+        "- Die Optionen einer Auswahlliste geben ihre Position oder Grenze nicht wieder (beispielsweise 3 von 5).",
+        "- Eine Registerkarte gibt nicht wieder, ob sie aktuell ausgewählt oder nicht ausgewählt ist.",
+        "- Bei mehreren Registerkarten gibt die jeweilige Registerkarte ihre Position oder Grenze nicht wieder (beispielsweise 2 von 6).",
+        "- Ein Eingabefeld gibt den vorbelegten Text nicht wieder."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#werte"
+    }
+  ]
+}

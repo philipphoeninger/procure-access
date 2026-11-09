@@ -1,0 +1,59 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sinnvolle Reihenfolge bei der Bedienung mit externer Tastatur",
+  "sortOrder": 1580,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.4.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.4.3",
+      "originalTitleDe": "Sinnvolle Reihenfolge bei der Bedienung mit externer Tastatur",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Buttons oder Links enthält."
+      ],
+      "requirementDe": [
+        "Beim Navigieren mit der Tastatur erhalten die Bedienelemente eines PDF-Dokuments den Fokus in einer Reihenfolge, die der logischen Struktur oder dem Bedienablauf entspricht."
+      ],
+      "rationaleWhyDe": [
+        "Durch eine nicht nachvollziehbare Reihenfolge der fokussierten Elemente kann die Tastaturbedienbarkeit erheblich beeinträchtigt werden. Sehbehinderte oder blinde Menschen werden darüber hinaus in ihrer Fähigkeit eingeschränkt, sich ein mentales Modell vom Aufbau des PDF-Dokuments zu machen.",
+        "",
+        "Falls der Tastaturfokus nach Nutzung eines Dialogs nicht automatisch wiederhergestellt wird, sodass zunächst (und ggf. zudem sehr häufig) die Tabulator-Taste betätigt werden muss, um zur vorigen Position zurückzukehren, so erschwert dies die Orientierung und beeinträchtigt die optimale Bedienung des PDF-Dokuments."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Elemente, die per Tastatur erreichbar sein sollten, werden in einer sinnvollen und nachvollziehbaren Reihenfolge erreicht."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Der Tastaturfokus springt bei der Tastaturnavigation bei ein oder zwei Elementen in einer nicht sinnvoll erscheinenden Reihenfolge, die Abfolge liefert aber insgesamt immer noch alle zum Verständnis des PDF-Dokuments notwendigen Informationen.",
+        "- Einschränkung: Der Tastaturfokus springt bei der Tastaturnavigation bei mehr als zwei Elementen in einer nicht sinnvoll erscheinenden Reihenfolge, die Abfolge liefert aber insgesamt immer noch alle zum Verständnis des PDF-Dokuments notwendigen Informationen.",
+        "- Einschränkung: Ein Formular besteht aus zwei nebeneinander angeordneten Blöcken, wobei der linke Block Eingabefelder für Kontaktdaten mit Name, Anschrift etc. bereithält und der rechte Block aus Checkboxen mit konkreten Auswahlmöglichkeiten zu Statusangaben wie „Sind Sie bereits Bestandskunde oder interessieren Sie sich für ein Angebot?“ oder „Wie sind Sie auf uns aufmerksam geworden?“ etc. besteht. Der Tastaturfokus springt bei der Tastaturnavigation abwechselnd von einem Element des linken zu einem Element des rechten Blocks.",
+        "- Einschränkung: Beim Öffnen eines Dialogfelds erhält ein Element den Fokus, das weder der aktuellen Aufgabe bzw. einer zu erwartenden Position, noch dem zuletzt aktivierten Element entspricht.",
+        "- Barriere: Beim Schließen eines Dialogfeldes kehrt der Fokus nicht zum auslösenden Element zurück, sondern landet am Anfang des PDF-Dokuments. Hinweis: Dabei kann es sich in seltenen Fällen um tatsächlich beabsichtigtes und sinnvolles Verhalten handeln, beispielsweise dann, wenn ein Eintrag in einem Dialog zusätzliche Formularbereiche oberhalb des auslösenden Elements freigeschaltet hat.",
+        "- Blockade: Die vorgegebene Reihenfolge bei der Tastaturnavigation verhindert ein sinnvolles Erfassen des PDF-Dokuments."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sinnvolle-reihenfolge-bei-der-bedienung-mit-externer-tastatur"
+    }
+  ]
+}

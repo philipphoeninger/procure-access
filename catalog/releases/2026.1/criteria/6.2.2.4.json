@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Anzeige von Audioaktivität in Echtzeit",
+  "sortOrder": 170,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.2.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.2.4",
+      "originalTitleDe": "Anzeige von Audioaktivität in Echtzeit",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), so muss Audioaktivität von Teilnehmern in Echtzeit visualisiert werden. Der visuelle Indikator muss gleichermaßen programmatisch ermittelbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation von Audioaktivität in Verbindung mit dem entsprechenden Teilnehmer essenziell, um im Kontext die jeweilige Aktivität dem Teilnehmer zuordnen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist programmatisch ermittelbar."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell nicht identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist programmatisch nicht ermittelbar.",
+        "- Die Audioaktivität eines Teilnehmers ist visuell nur manchmal, und nicht bei jeder Audioaktivität identifizierbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#anzeige-von-audioaktivität-in-echtzeit"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.2.4",
+      "originalTitleDe": "Anzeige von Audioaktivität in Echtzeit",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), so muss Audioaktivität von Teilnehmern in Echtzeit visualisiert werden. Der visuelle Indikator muss gleichermaßen programmatisch ermittelbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation von Audioaktivität in Verbindung mit dem entsprechenden Teilnehmer essenziell, um im Kontext die jeweilige Aktivität dem Teilnehmer zuordnen zu können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist programmatisch ermittelbar."
+      ],
+      "negativeExamplesDe": [
+        "- Die Audioaktivität eines Teilnehmers ist visuell nicht identifizierbar.",
+        "- Die Audioaktivität eines Teilnehmers ist programmatisch nicht ermittelbar.",
+        "- Die Audioaktivität eines Teilnehmers ist visuell nur manchmal, und nicht bei jeder Audioaktivität identifizierbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#anzeige-von-audioaktivität-in-echtzeit"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Dokumentation und unterstützende Dienste",
+  "titleDe": "Effektive Kommunikation",
+  "sortOrder": 1210,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "12.2.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "12.2.3",
+      "originalTitleDe": "Effektive Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Möglichkeit zur Kontaktaufnahme für Produktsupport vorhanden ist."
+      ],
+      "requirementDe": [
+        "Die Erreichbarkeit des Produktsupports soll den Bedürfnissen von Menschen mit Beeinträchtigungen gerecht werden, indem mindestens zwei Supportkanäle angeboten werden, die unterschiedliche Sinne ansprechen. Dabei ist es irrelevant, ob der Produktsupport durch den Hersteller selbst, oder durch einen Dienstleister erbracht wird.",
+        "",
+        "Die Anforderung ist bei jedem Niveau der Unterstützung verschiedener Kommunikationsarten erfüllt. Anbieter können angeben, in welchem Umfang die Kommunikationsarten unterstützt werden, um eine aussagekräftigere Bewertung der Angemessenheit und Qualität der Unterstützung zu ermöglichen.",
+        "",
+        "Als Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung)."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Beeinträchtigung beim Hören oder Sprechen können unter Umständen einen telefonischen Supportkanal nicht nutzen. Dagegen kann es kognitiv beeinträchtigten Menschen schwerfallen, schriftlich zu kommunizieren. Um den Bedürfnissen der verschiedenen Menschen zu begegnen, müssen Alternativen nach dem Mehr-Sinne-Prinzip angeboten werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden mindestens zwei Supportkanäle, die unterschiedliche Sinne ansprechen, angeboten."
+      ],
+      "negativeExamplesDe": [
+        "- Es werden kein oder nur ein Supportkanal angeboten."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#effektive-kommunikation"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "12.2.3",
+      "originalTitleDe": "Effektive Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Möglichkeit zur Kontaktaufnahme für Produktsupport vorhanden ist."
+      ],
+      "requirementDe": [
+        "Die Erreichbarkeit des Produktsupports soll den Bedürfnissen von Menschen mit Beeinträchtigungen gerecht werden, indem mindestens zwei Supportkanäle angeboten werden, die unterschiedliche Sinne ansprechen. Dabei ist es irrelevant, ob der Produktsupport durch den Hersteller selbst, oder durch einen Dienstleister erbracht wird.",
+        "",
+        "Die Anforderung ist bei jedem Niveau der Unterstützung verschiedener Kommunikationsarten erfüllt. Anbieter können angeben, in welchem Umfang die Kommunikationsarten unterstützt werden, um eine aussagekräftigere Bewertung der Angemessenheit und Qualität der Unterstützung zu ermöglichen.",
+        "",
+        "Als Produktsupport zählen beispielsweise eine Service-Hotline, ein Helpdesk oder technischer Support. Es ist irrelevant, über welche Kanäle der Produktsupport dabei erreicht werden kann. Einfache Kontaktdaten ohne Kennzeichnung als Produktsupport oder Service-Angebot gelten nicht als Produktsupport (beispielsweise E-Mailadressen im Impressum oder in der Datenschutzerklärung)."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit Beeinträchtigung beim Hören oder Sprechen können unter Umständen einen telefonischen Supportkanal nicht nutzen. Dagegen kann es kognitiv beeinträchtigten Menschen schwerfallen, schriftlich zu kommunizieren. Um den Bedürfnissen der verschiedenen Menschen zu begegnen, müssen Alternativen nach dem Mehr-Sinne-Prinzip angeboten werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden mindestens zwei Supportkanäle, die unterschiedliche Sinne ansprechen, angeboten."
+      ],
+      "negativeExamplesDe": [
+        "- Es werden kein oder nur ein Supportkanal angeboten."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#effektive-kommunikation"
+    }
+  ]
+}

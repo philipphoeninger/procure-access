@@ -1,0 +1,111 @@
+{
+  "kind": "requirement",
+  "category": "Benutzerpräferenzen",
+  "titleDe": "Individuelle Benutzerpräferenzen",
+  "sortOrder": 1120,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.7",
+      "originalTitleDe": "Individuelle Benutzerpräferenzen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Über das Betriebssystem konfigurierte, individuelle Benutzereinstellungen werden durch die Software übernommen. Das beinhaltet obligatorisch:",
+        "",
+        "- Maßeinheiten (beispielsweise Zeit, Datum, Gewicht, Größe, Distanz, Temperatur)",
+        "- Farbeinstellungen",
+        "- Kontrasteinstellungen",
+        "- Schriftarten",
+        "- Farbe des Fokusrahmens",
+        "",
+        "Ausnahme: Es handelt sich um Software, die dafür vorgesehen ist, von ihren zugrundeliegenden Plattformen isoliert zu sein und daher keinen Zugriff auf die Benutzervorgaben auf der Plattform besteht.",
+        "",
+        "Die genannten Benutzerpräferenzen sind unter Umständen nicht vollumfänglich. Je nach Betriebssystem und Art der Software stehen unter Umständen weniger, weitere oder andere Präferenzen zur Auswahl."
+      ],
+      "rationaleWhyDe": [
+        "Für Menschen mit Beeinträchtigungen sind individuelle, ihren Bedürfnissen entsprechende Benutzereinstellungen ein essenzieller Bestandteil, um die Nutzung digitaler Produkte zu verbessern und die Darstellung von Inhalten gezielt anzupassen. Diese Einstellungen ermöglichen eine globale Verwaltung der Darstellung von Inhalten und erhöhen entscheidend die Effizienz während der Nutzung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle individuellen Benutzerpräferenzen werden korrekt übernommen.",
+        "- Die individuellen Farbeinstellungen sind nicht erkennbar, oder werden nicht übernommen."
+      ],
+      "negativeExamplesDe": [
+        "- Individuelle Benutzerpräferenzen werden nicht, nicht vollumfänglich oder fehlerhaft vollumfänglich übernommen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#individuelle-benutzerpräferenzen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.7",
+      "originalTitleDe": "Individuelle Benutzerpräferenzen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Über das Betriebssystem konfigurierte, individuelle Benutzereinstellungen werden durch die Mobile App übernommen. Das beinhaltet obligatorisch:",
+        "",
+        "- Maßeinheiten (beispielsweise Zeit, Datum, Gewicht, Größe, Distanz, Temperatur)",
+        "- Farbeinstellungen",
+        "- Kontrasteinstellungen",
+        "- Schriftarten",
+        "- Farbe des Fokusrahmens",
+        "",
+        "Es wird dringend empfohlen, folgende Benutzereinstellungen fakultativ zu unterstützen:",
+        "",
+        "- Dunkler Modus (Dark Mode)",
+        "",
+        "Die Prüfung auf Ändern der Textgröße ist nicht Bestandteil dieses Prüfschritts.",
+        "",
+        "Die genannten Benutzerpräferenzen sind unter Umständen nicht vollumfänglich. Je nach Betriebssystem und Art der Mobile App stehen unter Umständen weniger, weitere oder andere Präferenzen zur Auswahl."
+      ],
+      "rationaleWhyDe": [
+        "Für Menschen mit Beeinträchtigungen sind individuelle, ihren Bedürfnissen entsprechende Benutzereinstellungen ein essenzieller Bestandteil, um die Nutzung digitaler Produkte zu verbessern und die Darstellung von Inhalten gezielt anzupassen. Diese Einstellungen ermöglichen eine globale Verwaltung der Darstellung von Inhalten und erhöhen entscheidend die Effizienz während der Nutzung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle individuellen Benutzerpräferenzen werden korrekt übernommen.",
+        "- Die individuellen Farbeinstellungen sind nicht erkennbar, oder werden nicht übernommen.",
+        "- Der aktive, dunkle Modus wird nicht übernommen."
+      ],
+      "negativeExamplesDe": [
+        "- Individuelle Benutzerpräferenzen werden nicht, nicht vollumfänglich oder fehlerhaft übernommen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#individuelle-benutzerpräferenzen"
+    }
+  ]
+}
