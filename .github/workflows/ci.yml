@@ -94,6 +94,11 @@ jobs:
         run: |
           npm ci
           npm run typecheck
+      # ESLint for e2e/ and scripts/*.mjs with e2e/'s packages (#161, S3-26): the script starts
+      # ESLint in the repository root, so it reaches scripts/ as well.
+      - name: ESLint (e2e and scripts)
+        working-directory: e2e
+        run: npm run lint
 
   build:
     name: 2. Build
