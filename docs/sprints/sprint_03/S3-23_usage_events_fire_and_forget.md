@@ -74,4 +74,4 @@ No correctness or security finding left that affects behaviour today; no further
 | P1 | First callers: S11 calls `CriteriaListShown` once per complete selection shown (R-CON-10), the export calls `ExportCreated` after the file is generated (M2.7). Both just call the `void` method; no `await`, no `try` | M2.6, M2.7 |
 | P2 | `TECH_DEBT_v3` (sprint close-out, step 14): #115 resolved; S1-23 P4 is done with it | Sprint 03 close-out |
 | P3 | `TESTING_v37` still names `ARCHITECTURE_v25.md` as its input; no TESTING version was written because no invariant or test rule changed | Next TESTING version |
-| P4 | `CLAUDE.md` version line: S3-22 (PR #222, not merged yet) appends to the same line, so whichever PR merges second needs a one-line merge | Merge of #222 / this PR |
+| P4 | `CLAUDE.md` version line: S3-22 (PR #222) appended to the same line | Done: resolved when main (#222) was merged into this branch; both entries and the S3-22 sentence of §3 kept |
