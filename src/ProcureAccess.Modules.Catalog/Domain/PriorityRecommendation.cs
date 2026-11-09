@@ -10,7 +10,7 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// A priority rule of a criterion (ARCHITECTURE §5.1, „Priority resolution“). Which of the four
 /// levels it is follows from what it names: app type and use case (1), app type (2), use case (3)
 /// or neither, the catalog default (4). A revision holds at most one rule per level and value pair.
-/// Created only by <see cref="CriterionRevision.AddPriority"/>; resolution comes with S3-20.
+/// Created only by <see cref="CriterionRevision.AddPriority"/>; resolved by <c>Criteria.PriorityResolver</c> (S3-20a).
 /// </summary>
 /// <remarks>Every rule explains itself: <see cref="RationaleDe"/> is required (CAT-02).</remarks>
 internal sealed class PriorityRecommendation : CatalogEntity

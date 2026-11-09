@@ -7,8 +7,8 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// <summary>
 /// Where a requirement criterion applies: for an app type, optionally limited to one product part
 /// (ARCHITECTURE §5.1). Part of its <see cref="CriterionRevision"/>; created only by
-/// <see cref="CriterionRevision.AddApplicability"/>. How a selection is matched against these rows
-/// is S3-20's.
+/// <see cref="CriterionRevision.AddApplicability"/>. A selection is matched against these rows by
+/// <c>Criteria.CriterionRules.AppTypesApplyingTo</c> (S3-20a).
 /// </summary>
 internal sealed class CriterionApplicability : CatalogEntity
 {

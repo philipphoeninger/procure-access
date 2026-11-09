@@ -102,7 +102,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
 | S3-19 | `GET /api/v1/catalog/filter-options` per SPEC §8.1: layers, exclusions with `excludedBy[]` (no reason text), inactive use cases not offered, `appTypesWithoutCriteria[]`; versioned routes and the duplicate Swagger parameters fixed (#153); endpoint style and #176 per **O-S3-6** | 3 | Proposal **CAT-12** (catalog-endpoint part), **CAT-18**, **CAT-19** active; #153 closed |
-| S3-20 | `GET /api/v1/catalog/criteria` per SPEC §8.2: selection validation with field errors, resolved priority most-specific-first and strictest per app type with `rationale`, `source`, `matchedRule`, allowed ratings, procedure texts of the selected app types, empty requirement list plus `appTypesWithoutCriteria[]` | 3 | Proposal **CAT-01, CAT-02, CAT-06** (release pinning by id), **CAT-11, CAT-14, CAT-16** (selection and detail part), **CAT-20** (contract part), **CAT-21** active |
+| S3-20 | `GET /api/v1/catalog/criteria` per SPEC §8.2: selection validation with field errors, resolved priority most-specific-first and strictest per app type with `rationale`, `source`, `matchedRule`, allowed ratings, procedure texts of the selected app types, empty requirement list plus `appTypesWithoutCriteria[]` | 3 | Proposal **CAT-01, CAT-02, CAT-06** (release pinning by id), **CAT-11, CAT-14, CAT-16** (selection and detail part), **CAT-20** (contract part), **CAT-21** active. **Split (owner, 2026-11-09):** S3-20a selection check and priority resolution (CAT-01, CAT-14; unit parts of CAT-02, CAT-11), S3-20b endpoint (the rest) |
 
 #### M2.8 „Kriterium vorschlagen“ — 1 point
 
