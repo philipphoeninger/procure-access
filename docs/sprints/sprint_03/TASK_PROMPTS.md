@@ -31,7 +31,7 @@
 | S3-19 | GET /api/v1/catalog/filter-options | #153, #176 (milestone per O-S3-6) | after S3-18 and O-S3-6 |
 | S3-20 | GET /api/v1/catalog/criteria with resolved priorities | none | after S3-19 |
 | S3-21 | Footer link „Kriterium vorschlagen“ | none | ready |
-| S3-22 | Snackbar buttons in German | #160 | stretch, after #181 |
+| S3-22 | Snackbar buttons in German | #160 | stretch, O-S3-9 instead of #181 |
 | S3-23 | Usage events: fire-and-forget writes | #115 | stretch, ready |
 | S3-24 | Persist the Data Protection keys outside the container | #186 | stretch, ready |
 | S3-25 | Material Symbols font subsetting | #135 | stretch, after O-S3-7 |
@@ -50,6 +50,7 @@
 | O-S3-6 (endpoint style, #176) | S3-19 | owner choice, best after S3-11 |
 | O-S3-7 (font subsetting) | S3-25 | owner choice (options in #135) |
 | O-S3-8 (eslint-plugin-playwright) | S3-26 | owner choice |
+| ~~O-S3-9 (snackbar button wording)~~ | S3-22 | **filled 2026-11-09**: (a) `common.actions.close` for both |
 
 ## Rules for running tasks
 
