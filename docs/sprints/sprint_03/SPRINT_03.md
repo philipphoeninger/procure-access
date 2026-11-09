@@ -217,11 +217,11 @@ Backend (S3-07, S3-08, S3-11 – S3-20) and frontend (S3-02, S3-09, S3-10, S3-21
 
 | Item | Value |
 |---|---|
-| Points done (P0 / stretch) | |
-| Development days used | |
-| Velocity for forecasting | |
-| Carried over to sprint 04 (with reason) | |
-| Issues created / closed | |
-| Changes needed in roadmap or documents | |
+| Points done (P0 / stretch) | **42.5 / 5.5** — every task incl. stretch; S3-20 was split into S3-20a (priority resolution) and S3-20b (endpoint); 28 protocols in this folder |
+| Development days used | **about 3** (owner, 2026-11-10); calendar 2026-11-05 – 2026-11-10 |
+| Velocity for forecasting | ≈ **16 points per development day** (sprint 02: ≈ 8). Sprint 04 is planned with ~70 points for 8 days (≈ 9 per day, discounted for the first screen sprint; `ROADMAP_v4.md` §6) |
+| Carried over to sprint 04 (with reason) | No task. M2.3 priorities stay blocked on O-1/K-1 (project team); the UX copy gaps #181 are generated as proposals in S4-02 (owner, 2026-11-10) |
+| Issues created / closed | Closed: #31, #90, #115, #118, #135, #137, #144, #153, #160, #161, #168, #171, #176, #180, #182 – #186, #188, #192 and the Dependabot PRs #164 – #166, #175. Created: #203, #205 during the sprint; #233 – #243 at the register review (`TECH_DEBT_v3.md` §8) |
+| Changes needed in roadmap or documents | `ROADMAP_v4.md` (M1 done, M2 status, velocity, forecast per gate). Written during the sprint: ARCHITECTURE up to v27 (ADR-015, catalog), TESTING up to v39, SPEC v2.6, UX copy v16, `kriterienkatalog_2026_1_luecken_v1.md`. Still open: the documentation drift of #243 (task S4-07) |
 
 **Next sprint (preview):** configurator S10 (M2.5) with its debt (#52, J1 and CAT-10 rewrite, `vitest-axe`), then the criteria list S11 (M2.6) once the UX copy session #181 is done; release 2026.1 (M2.3) as soon as O-1 / K-1 arrive.
