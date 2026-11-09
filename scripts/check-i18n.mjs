@@ -20,7 +20,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // UX copy areas (key roots) that de.json carries in full. Add a root with the step that builds its screens.
-export const AREAS = ['common', 'shell', 'errors', 'legal', 'home'];
+export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest'];
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = 'CLIENT/CLIENT.ProcureAccess';

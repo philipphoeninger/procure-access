@@ -341,5 +341,13 @@
       }
     },
     "disclaimer": "ProcureAccess ersetzt keine professionelle Barrierefreiheitsprüfung. Das Tool stellt Kriterien und veröffentlichte Angaben zusammen, prüft aber selbst keine Produkte."
+  },
+  "suggest": {
+    "link": "Kriterium vorschlagen",
+    "linkContext": "Fehlt ein Kriterium oder ist eine Formulierung unklar? Schlagen Sie eine Änderung vor",
+    "external": "(öffnet Ihr E-Mail-Programm)",
+    "external.url": "(öffnet eine externe Seite)",
+    "mailSubject": "Vorschlag für den Kriterienkatalog",
+    "mailBody": "Mein Vorschlag betrifft das Kriterium: {{criterionKey}}%0A%0ABitte beschreiben Sie Ihren Vorschlag:"
   }
 }

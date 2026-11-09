@@ -6,5 +6,9 @@
 // the API container (nginx.conf), so one image works in the local stack and in Dokploy.
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: '/api',
+  // Channel of „Kriterium vorschlagen“ (R-SUG-01, SPEC `Contact:CriteriaSuggestion`): `mailto:<address>`
+  // or an https URL. 🔧 Placeholder until O-6 is decided: an address on the reserved domain
+  // `.invalid`, which scripts/check-release-config.mjs refuses for a production release.
+  criteriaSuggestion: 'mailto:kriterium-vorschlagen@example.invalid'
 };
