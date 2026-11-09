@@ -6,6 +6,18 @@ SPDX-License-Identifier: MIT
 
 <footer class="pa-footer">
   <ul class="pa-footer__links">
+    <li>
+      <a [href]="suggestHref()"
+        >{{ 'shell.footer.suggest' | translate }}
+        <span class="cdk-visually-hidden">
+          @if (suggestChannel.kind === 'mail') {
+            {{ 'suggest.external' | translate }}
+          } @else {
+            {{ 'suggest.external.url' | translate }}
+          }
+        </span></a
+      >
+    </li>
     <li><a routerLink="/barrierefreiheit">{{ 'shell.footer.accessibility' | translate }}</a></li>
     <li><a routerLink="/datenschutz">{{ 'shell.footer.privacy' | translate }}</a></li>
     <li><a routerLink="/impressum">{{ 'shell.footer.imprint' | translate }}</a></li>

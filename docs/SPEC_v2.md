@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.4 (2026-11-09; v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way.
+> **Status:** v2.5 (2026-11-09; v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -79,6 +79,16 @@ Recorded in this file like v2.1 – v2.3; SPEC_v3 stays the P1 version. Source: 
 | v2.4-2 | §8.2: a procedure criterion („Geprüft nach …“) has `allowedRatings: []`, `number: null`, `productPart: null` and no procedure texts — it is never rated (C30) | Owner decision 3; SPEC §8.3 (empty number) |
 | v2.4-3 | §8.2, §8.6: 400 `validation` for an incomplete selection (CAT-11), 400 `selection-excluded` for a value excluded by the rules of the release, both with field errors keyed as sent; 404 `not-found` for an unknown release, no active release, or a release `catalog activate` would refuse | Owner decisions 5, 7 |
 | v2.4-4 | §8.2: the fields the example left open — `standardReferences[]` `{ standard, clause, url }`, `procedureTexts[]` with the BIT inklusiv texts and their own `allowedRatings`, `level` as `A` / `B` / `Info` (the UX keys `criteria.priority.A` …), `number` = the criterion key; the key scheme of the example follows S3-15 | S3-20b; `ARCHITECTURE_v20.md` C105 |
+
+#### Changes in v2.5 (2026-11-09)
+
+Recorded in this file like v2.1 – v2.4; SPEC_v3 stays the P1 version. Source: the owner decisions of 2026-11-09 before sprint 03 task S3-21 (`docs/sprints/sprint_03/S3-21_criteria_suggestion_link.md`; `ARCHITECTURE_v25.md` C110). The release build runs in CI, in the client image and in staging, so it cannot fail while O-6 is open; the fourth acceptance criterion of R-SUG-01 moves to a release check. Behaviour for the user is unchanged.
+
+| # | Change | Source |
+|---|---|---|
+| v2.5-1 | R-SUG-01: `Contact:CriteriaSuggestion` is the client setting `criteriaSuggestion` of the environment files (`environment.ts`, `environment.prod.ts`), not an API setting — no endpoint (ARCH §16.4.2); one value for every environment, because it is WERTE.IT's channel. The 🔧 placeholder is a `mailto:` address on the reserved domain `.invalid`; the link is shown with it outside production | Owner decisions 2a, 3a |
+| v2.5-2 | R-SUG-01: „production build fails“ → the release check `scripts/check-release-config.mjs` fails while the value is the placeholder or neither `mailto:<address>` nor an https URL; it runs before a production release, not on pull requests (its self-test runs in CI stage 1). R-SHL-07 (GP.3) can use the same check | Owner decision 1a |
+| v2.5-3 | R-SUG-01: the hidden suffix is `suggest.external` for a `mailto:` channel and `suggest.external.url` for a URL (UX copy v16, U85); from the footer the mail has the subject `suggest.mailSubject` and no body — the body with the criterion key comes with S11 | Owner decision 4 |
 
 ---
 
@@ -502,7 +512,7 @@ Flow E, `ARCH §4.6`, C54, C55, D16; Handoff S55.
 
 | ID | Prio | Requirement | Acceptance criteria |
 |---|---|---|---|
-| R-SUG-01 | P0 | „Kriterium vorschlagen“ in the footer and at the end of S11 opens the configured channel (`Contact:CriteriaSuggestion`, 🔧 placeholder until O-6 is decided) | ☐ supports `mailto:` (subject `suggest.mailSubject`, body `suggest.mailBody` with the criterion key when opened from a criterion) or an https URL ☐ hidden suffix `suggest.external` matches the channel type ☐ no data model, no endpoint (`ARCH §16.4.2`) ☐ production build fails if the value is still the placeholder (like R-SHL-07) |
+| R-SUG-01 | P0 | „Kriterium vorschlagen“ in the footer and at the end of S11 opens the configured channel (`Contact:CriteriaSuggestion`, 🔧 placeholder until O-6 is decided) | ☐ supports `mailto:` (subject `suggest.mailSubject`, body `suggest.mailBody` with the criterion key when opened from a criterion) or an https URL ☐ hidden suffix `suggest.external` / `suggest.external.url` matches the channel type (v2.5-3) ☐ no data model, no endpoint (`ARCH §16.4.2`) ☐ the release check fails if the value is still the placeholder (like R-SHL-07; v2.5-2) |
 
 ### FA-16 Usage events for the success metrics
 
@@ -799,7 +809,7 @@ Legal pages (R-SHL-07), the dark theme release check (R-SET-03, O-S5) and the ac
 | O-1 | Priorities and rationales per criterion, use case and app type; plain-language titles and summaries (K-1, K-6) | step 2 (content of release 2026.1) | Project team | ARCH O-1 |
 | O-2 | Hardware and Vermittlungs-/Notrufdienst without a procedure | — (empty state exists) | Project team | ARCH O-2 |
 | O-4 | Bundled legal review (consent texts ⚖️, purge timing, erasure vs. moderation record, vendor authenticity, export legal note, account deletion) | public release | Legal review | ARCH O-4 |
-| O-6 | Contact address or form for „Kriterium vorschlagen“; the footer link of R-SHL-06 waits for it | production build (R-SUG-01) | Project team | ARCH O-6 |
+| O-6 | Contact address or form for „Kriterium vorschlagen“; the footer link shows a placeholder channel until then (S3-21) | production release (R-SUG-01: release check, v2.5-2) | Project team | ARCH O-6 |
 | O-7 | Handover target platform | — | WERTE.IT | ARCH O-7 |
 | O-13 | Carrying assessments over to a newer release | — (later) | Owner | ARCH O-13 |
 | O-14 | Priority terms A / B / Hinweis (provisional, SD6) | export column values before the pilot | Project team (accessibility expertise) | ARCH O-14 |
