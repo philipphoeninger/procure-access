@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Npgsql;
 using ProcureAccess.Modules.Catalog.Persistence;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
 using ProcureAccess.Modules.Platform.Persistence;
 using Respawn.Graph;
 using Respawn;
@@ -23,8 +25,8 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// </summary>
 /// <remarks>
 /// Test classes derive from <see cref="IntegrationTest"/>, which empties the database before
-/// each class. Respawn deletes every row except the migration histories and the four catalog
-/// filter-value tables, including the reference data that migration <c>AddSeedData</c> inserts:
+/// each class. Respawn deletes every row except the migration histories, the four catalog
+/// filter-value tables and the Data Protection key ring, including the reference data that migration <c>AddSeedData</c> inserts:
 /// each test stores the data it needs. The filter values (use cases, app types, product parts, test
 /// types) are static reference data that only the catalog migration writes (O-S3-5 D1), so tests
 /// read them instead of storing their own.
@@ -50,6 +52,13 @@ public sealed class ApiFixture : IAsyncLifetime
         new(CatalogDbContext.Schema, "ProductParts"),
         new(CatalogDbContext.Schema, "TestTypes"),
     ];
+
+    /// <summary>
+    /// The Data Protection key ring (S3-24). The API host caches it, so deleting the rows under a
+    /// running host would only make the database and the cache disagree.
+    /// </summary>
+    private static readonly Table DataProtectionKeysTable =
+        new(IdentityAccessDbContext.Schema, DataProtectionKeyConfiguration.Table);
 
     private Respawner? _respawner;
     private ProcureAccessApiFactory? _factory;
@@ -81,6 +90,11 @@ public sealed class ApiFixture : IAsyncLifetime
             await context.Database.MigrateAsync();
         }
 
+        await using (var context = CreateIdentityAccessDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
         await using (var context = CreateCatalogDbContext())
         {
             await context.Database.MigrateAsync();
@@ -95,8 +109,10 @@ public sealed class ApiFixture : IAsyncLifetime
                 [
                     new Table("public", "__EFMigrationsHistory"),
                     new Table(PlatformDbContext.HistorySchema, PlatformDbContext.HistoryTable),
+                    new Table(IdentityAccessDbContext.Schema, IdentityAccessDbContext.HistoryTable),
                     new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
                     .. CatalogFilterValueTables,
+                    DataProtectionKeysTable,
                 ],
             });
         }
@@ -104,7 +120,7 @@ public sealed class ApiFixture : IAsyncLifetime
         _factory = new ProcureAccessApiFactory(_database.GetConnectionString(), Clock);
     }
 
-    /// <summary>Deletes all rows except the migration histories and the catalog filter values.</summary>
+    /// <summary>Deletes all rows except the migration histories, the catalog filter values and the Data Protection keys.</summary>
     public async Task ResetDatabaseAsync()
     {
         if (_respawner is null)
@@ -173,6 +189,11 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private PlatformDbContext CreatePlatformDbContext() =>
         new(new DbContextOptionsBuilder<PlatformDbContext>()
+            .UseNpgsql(_database.GetConnectionString())
+            .Options);
+
+    private IdentityAccessDbContext CreateIdentityAccessDbContext() =>
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>()
             .UseNpgsql(_database.GetConnectionString())
             .Options);
 

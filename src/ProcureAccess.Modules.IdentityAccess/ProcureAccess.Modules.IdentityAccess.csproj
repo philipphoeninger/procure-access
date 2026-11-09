@@ -11,10 +11,25 @@ SPDX-License-Identifier: MIT
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!-- Same EF Core and Npgsql versions as the other modules. DataProtection.EntityFrameworkCore (MIT, owner OK S3-24)
+       stores the Data Protection key ring in the database (ARCHITECTURE §9.1, C60). -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
   <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
   <ItemGroup>
     <ProjectReference Include="../ProcureAccess.Modules.IdentityAccess.Contracts/ProcureAccess.Modules.IdentityAccess.Contracts.csproj" />
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
+  </ItemGroup>
+
+  <!-- The tests use the internal types. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Integration" />
+    <InternalsVisibleTo Include="ProcureAccess.Tests.Architecture" />
   </ItemGroup>
 
 </Project>
