@@ -53,6 +53,11 @@ test('reads literal names, quoted names in interpolations, and skips HTML commen
   assert.deepEqual(errors, []);
 });
 
+test('a comment ends at its first -->: an icon after it counts, one inside does not', () => {
+  const { names } = iconsInTemplate('<!-- <mat-icon>lock</mat-icon> --><mat-icon>add</mat-icon><!-- a --> <mat-icon>edit</mat-icon>');
+  assert.deepEqual(names, ['add', 'edit']);
+});
+
 test('reads the glyphs of the EasyMDE map', () => {
   assert.deepEqual(iconsInScssMap(SCSS), ['format_bold', 'link']);
   assert.equal(iconsInScssMap('$other: (a: b);'), null);

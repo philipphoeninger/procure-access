@@ -31,7 +31,9 @@ export const MAIN_SCSS = 'src/styles/main.scss';
 const PACKAGE_JSON = `${CLIENT}/package.json`;
 const REGENERATE = 'run scripts/subset-material-symbols.sh';
 
-const MAT_ICON = /<mat-icon\b[^>]*>([\s\S]*?)<\/mat-icon>/g;
+// One scan from left to right, as HTML reads it: a comment is matched (and skipped) before any
+// <mat-icon> inside it can be.
+const COMMENT_OR_MAT_ICON = /<!--[\s\S]*?-->|<mat-icon\b[^>]*>([\s\S]*?)<\/mat-icon>/g;
 const QUOTED = /'([^'\\]*)'|"([^"\\]*)"/g;
 const NAME = /^[a-z0-9_]+$/;
 
@@ -42,7 +44,8 @@ export function iconsInTemplate(source) {
   const names = [];
   const errors = [];
   let computed = false;
-  for (const [, raw] of source.replace(/<!--[\s\S]*?-->/g, '').matchAll(MAT_ICON)) {
+  for (const [match, raw] of source.matchAll(COMMENT_OR_MAT_ICON)) {
+    if (match.startsWith('<!--')) continue;
     const content = raw.trim();
     if (content.includes('{{')) {
       const literals = quoted(content);

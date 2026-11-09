@@ -31,7 +31,7 @@
 | `CLIENT/…/src/assets/fonts/material-symbols-outlined.woff2`, `…manifest.json` | Generated, committed: the subset (24,108 bytes) and its manifest (package version, icons, SHA-256) |
 | `scripts/subset-material-symbols.py` | Generator (fontTools): checks that `node_modules` holds the pinned version, matches the ligature rules by spelled name, removes the others, fails on a name that is no icon of the package, subsets (letters/digits/underscore of the names + the kept glyphs, all layout features, variable axes kept), writes WOFF2 and the manifest |
 | `scripts/subset-material-symbols.sh` | Runs the generator in `python:3.13-slim` with pinned fontTools and brotli, as the current user, repository mounted |
-| `scripts/check-icons.mjs` (+ `check-icons.test.mjs`, 12 cases) | Icon check (V117): list ↔ names in templates (also inline templates, HTML comments skipped, quoted names in `{{ }}`), EasyMDE map, `computed` (a `<mat-icon>` without a literal needs its component there; each name must be written in that file), `material`; manifest ↔ list, pinned version, font hash. Every message names the fix |
+| `scripts/check-icons.mjs` (+ `check-icons.test.mjs`, 13 cases) | Icon check (V117): list ↔ names in templates (also inline templates, HTML comments skipped, quoted names in `{{ }}`), EasyMDE map, `computed` (a `<mat-icon>` without a literal needs its component there; each name must be written in that file), `material`; manifest ↔ list, pinned version, font hash. Every message names the fix |
 | `CLIENT/…/src/styles/material-symbols.scss`, `angular.json` | Replaces `node_modules/material-symbols/outlined.css`: the package's own mixin (`@font-face` with `font-display: block` and the `.material-symbols-outlined` class, unchanged) with the subset's path |
 | `CLIENT/…/Dockerfile` | Build stage appends the font's licence entry to `3rdpartylicenses.txt` (decision 4) |
 | `.github/workflows/ci.yml` | Stage 1: step „Icon check“ (self-test, then the check) |
@@ -54,6 +54,7 @@ Checklist of CLAUDE §6.7 (security, correctness, N+1, edge cases, a11y), with `
 | R5 | A `<mat-icon>` with control flow (`@if …`) or a `>` inside an attribute would not be parsed as a name | No change: it fails loudly („is not an icon name“), never silently |
 | R6 | Security: no input from outside the repository in the CI step, the Dockerfile `RUN` or the scripts; no third-party request added (J1 and the shell tests check this) | — |
 | R7 | a11y: `mat-icon` stays `aria-hidden`; icons render identically (§4 row 6); A11Y-01 green | — |
+| R8 | CodeQL on the pull request (`js/incomplete-multi-character-sanitization`, high): the check removed HTML comments with `replace`, which could leave a new `<!--` behind. Not exploitable (the script reads repository files and prints names, nothing is rendered), but the ruleset blocks a merge on a high security alert | **Fixed** without removing anything: one left-to-right scan matches a comment or a `<mat-icon>` and skips the comments, as HTML reads them; self-test case added. (Repeating the `replace` until stable, CodeQL's usual advice, would miss an icon after a broken `<!-` in rare input.) An unclosed comment is left to the Angular compiler, which rejects it |
 
 ## 4. Checks
 
@@ -67,7 +68,7 @@ Checklist of CLAUDE §6.7 (security, correctness, N+1, edge cases, a11y), with `
 | 6 | E2E stack (client image rebuilt), `npx playwright test` on chromium, firefox, mobile-chrome | ✅ 141 passed (J1 with axe on every state in both appearances = A11Y-01/A11Y-08, shell, reflow, third-party request checks). WebKit and mobile Safari run in CI only |
 | 7 | Served by nginx from the image | `media/material-symbols-outlined-ITFOKGAT.woff2`: 24,108 bytes, `font/woff2`, `public, max-age=31536000, immutable`; `/3rdpartylicenses.txt` holds the entry „material-symbols (Material Symbols Outlined, cut down by ProcureAccess …)“, Apache-2.0 |
 | 8 | `npm run lint`; `npx ng test` | ✅ All files pass; 34 files, 149 tests |
-| 9 | `node scripts/check-icons.mjs`; `node --test scripts/check-icons.test.mjs` | ✅ 0 errors; 12/12 |
+| 9 | `node scripts/check-icons.mjs`; `node --test scripts/check-icons.test.mjs` | ✅ 0 errors; 13/13 |
 | 10 | `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs`; the other four self-tests | ✅ all green |
 | 11 | `reuse lint` (fsfe/reuse 6.2.0); actionlint 1.7.12 | ✅ compliant (1,055 files; Apache-2.0 now a used licence); ✅ no findings |
 | 12 | .NET build and tests | Not run: no backend file changed |
