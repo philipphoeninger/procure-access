@@ -17,7 +17,8 @@ namespace ProcureAccess.Tests.Integration.Analytics;
 /// <summary>
 /// The usage-event writer against the real table (SPEC R-MET-01, §9.1; ARCHITECTURE §5.7):
 /// fixed dimension values, the UTC day of the fake clock, its own database context, and no
-/// exception for the caller.
+/// exception for the caller. The writer only queues; the API's background service stores the
+/// events (#115), so the tests wait until the rows are there.
 /// </summary>
 public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
 {
@@ -39,16 +40,17 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
             ? UsageEventType.CriteriaListShown
             : UsageEventType.ExportCreated;
 
-        await (call switch
+        Action record = call switch
         {
-            "list-anonymous" => Writer.CriteriaListShownAsync(signedIn: false),
-            "list-signedIn" => Writer.CriteriaListShownAsync(signedIn: true),
-            "xlsx-anonymous" => Writer.ExportCreatedAsync(UsageExportFormat.Xlsx, signedIn: false),
-            "csv-signedIn" => Writer.ExportCreatedAsync(UsageExportFormat.Csv, signedIn: true),
+            "list-anonymous" => () => Writer.CriteriaListShown(signedIn: false),
+            "list-signedIn" => () => Writer.CriteriaListShown(signedIn: true),
+            "xlsx-anonymous" => () => Writer.ExportCreated(UsageExportFormat.Xlsx, signedIn: false),
+            "csv-signedIn" => () => Writer.ExportCreated(UsageExportFormat.Csv, signedIn: true),
             _ => throw new ArgumentOutOfRangeException(nameof(call)),
-        });
+        };
+        record();
 
-        var stored = (await AllEventsAsync()).ShouldHaveSingleItem();
+        var stored = (await StoredEventsAsync(1)).ShouldHaveSingleItem();
         stored.EventType.ShouldBe(expectedType);
         stored.OccurredOn.ShouldBe(DateOnly.FromDateTime(Clock.GetUtcNow().UtcDateTime));
         stored.Dimension1.ShouldBe(expectedDimension1);
@@ -62,12 +64,12 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
 
         for (var i = 0; i < 5; i++)
         {
-            await Writer.CriteriaListShownAsync(signedIn: false);
+            Writer.CriteriaListShown(signedIn: false);
         }
 
         // A random key must not show the order of the events (#124). UUIDv7, which Npgsql
         // generates for Guid keys by default, is time-ordered; an identity is sequential.
-        var ids = (await AllEventsAsync()).Select(stored => stored.Id).ToList();
+        var ids = (await StoredEventsAsync(5)).Select(stored => stored.Id).ToList();
         ids.Count.ShouldBe(5);
         ids.ShouldAllBe(id => id.Version == 4);
         ids.Distinct().Count().ShouldBe(5);
@@ -82,11 +84,11 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
 
         // 23:59:59 UTC is already the next day in Germany; the event still counts for the UTC day.
         Clock.Advance(midnight - now - TimeSpan.FromSeconds(1));
-        await Writer.CriteriaListShownAsync(signedIn: false);
+        Writer.CriteriaListShown(signedIn: false);
         Clock.Advance(TimeSpan.FromSeconds(2));
-        await Writer.CriteriaListShownAsync(signedIn: false);
+        Writer.CriteriaListShown(signedIn: false);
 
-        (await AllEventsAsync()).Select(stored => stored.OccurredOn).ShouldBe(
+        (await StoredEventsAsync(2)).Select(stored => stored.OccurredOn).ShouldBe(
             [DateOnly.FromDateTime(midnight.UtcDateTime.AddDays(-1)), DateOnly.FromDateTime(midnight.UtcDateTime)],
             ignoreOrder: true);
     }
@@ -107,9 +109,9 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
         };
         requestDb.SeriLogEntries.Add(unsaved);
 
-        await Writer.CriteriaListShownAsync(signedIn: true);
+        Writer.CriteriaListShown(signedIn: true);
 
-        (await AllEventsAsync()).ShouldHaveSingleItem();
+        (await StoredEventsAsync(1)).ShouldHaveSingleItem();
         requestDb.Entry(unsaved).State.ShouldBe(EntityState.Added);
         using var checkScope = Api.Factory.Services.CreateScope();
         (await checkScope.ServiceProvider.GetRequiredService<PlatformDbContext>().SeriLogEntries
@@ -122,9 +124,43 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
     {
         await DeleteAllEventsAsync();
 
-        await Should.NotThrowAsync(() => Writer.ExportCreatedAsync((UsageExportFormat)99, signedIn: false));
+        Should.NotThrow(() => Writer.ExportCreated((UsageExportFormat)99, signedIn: false));
+        // A valid event after it: once that one is stored, the invalid one would be too.
+        Writer.ExportCreated(UsageExportFormat.Csv, signedIn: false);
 
-        (await AllEventsAsync()).ShouldBeEmpty();
+        (await StoredEventsAsync(1)).ShouldHaveSingleItem().Dimension1.ShouldBe(UsageEventWriter.Dimensions.Csv);
+    }
+
+    [Fact]
+    public async Task Store_DatabaseUnreachable_ReportsNotConnectedSoTheBatchCanBeTriedAgain()
+    {
+        // Port 1 refuses the connection at once; nothing is sent, so a retry cannot double an event.
+        var store = new UsageEventStore(UsageEventStore.OptionsFor(
+            "Host=127.0.0.1;Port=1;Database=none;Username=none;Password=none;Timeout=5"));
+
+        var result = await store.WriteAsync([new UsageEvent
+        {
+            EventType = UsageEventType.CriteriaListShown,
+            OccurredOn = DateOnly.FromDateTime(Clock.GetUtcNow().UtcDateTime),
+            Dimension1 = UsageEventWriter.Dimensions.Anonymous,
+        }], TestContext.Current.CancellationToken);
+
+        result.Outcome.ShouldBe(UsageEventWriteOutcome.NotConnected);
+        result.Error.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void Store_OwnContext_HasNoRetryingExecutionStrategy()
+    {
+        // A retry after a lost commit acknowledgement would store the events twice (#115). The
+        // module's registration retries; the store's own options must not.
+        var store = Api.Factory.Services.GetRequiredService<IUsageEventStore>().ShouldBeOfType<UsageEventStore>();
+        using var storeDb = store.CreateContext();
+        using var scope = Api.Factory.Services.CreateScope();
+        var moduleDb = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
+
+        storeDb.Database.CreateExecutionStrategy().RetriesOnFailure.ShouldBeFalse();
+        moduleDb.Database.CreateExecutionStrategy().RetriesOnFailure.ShouldBeTrue();
     }
 
     private IUsageEventWriter Writer => Api.Factory.Services.GetRequiredService<IUsageEventWriter>();
@@ -136,11 +172,26 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
             .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
     }
 
-    private async Task<List<UsageEvent>> AllEventsAsync()
+    /// <summary>
+    /// Waits (in real time, at most ten seconds) until the background service has stored
+    /// <paramref name="count"/> events, then returns all stored events.
+    /// </summary>
+    private async Task<List<UsageEvent>> StoredEventsAsync(int count)
     {
-        using var scope = Api.Factory.Services.CreateScope();
-        return await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
-            .AsNoTracking()
-            .ToListAsync(TestContext.Current.CancellationToken);
+        using var patience = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        patience.CancelAfter(TimeSpan.FromSeconds(10));
+        while (true)
+        {
+            using var scope = Api.Factory.Services.CreateScope();
+            var stored = await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
+                .AsNoTracking()
+                .ToListAsync(patience.Token);
+            if (stored.Count >= count)
+            {
+                return stored;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(50), patience.Token);
+        }
     }
 }
