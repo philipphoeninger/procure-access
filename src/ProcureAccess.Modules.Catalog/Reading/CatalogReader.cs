@@ -67,47 +67,30 @@ internal sealed class CatalogReader(CatalogDbContext db, IMemoryCache cache)
 
     private async Task<CatalogReleaseSnapshot> LoadReleaseAsync(int releaseId, CancellationToken cancellationToken)
     {
-        var release = await db.Releases.AsNoTracking()
-            .Where(r => r.Id == releaseId)
-            .Select(r => new
-            {
-                r.Id,
-                r.Version,
-                PublishedAt = r.PublishedAt!.Value,
-                Criteria = r.Criteria.Select(c => new { c.Revision.Criterion.Key, c.Revision.SortOrder }).ToList(),
-            })
-            .SingleOrDefaultAsync(cancellationToken)
+        // One split query per collection, once per release; the snapshot is cached without expiry.
+        var release = await db.Releases.AsNoTracking().AsSplitQuery()
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.Criterion).ThenInclude(c => c.TestType)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.StandardReferences)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.Applicability).ThenInclude(a => a.AppType)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.Applicability).ThenInclude(a => a.ProductPart)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.Priorities).ThenInclude(p => p.AppType)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.Priorities).ThenInclude(p => p.UseCase)
+            .Include(r => r.Criteria).ThenInclude(c => c.Revision).ThenInclude(v => v.ProcedureTexts).ThenInclude(t => t.TestType)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.SourceUseCase)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.SourceAppType)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.SourceProductPart)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.TargetAppType)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.TargetProductPart)
+            .Include(r => r.Exclusions).ThenInclude(e => e.Exclusion).ThenInclude(e => e.TargetTestType)
+            .Include(r => r.Procedures).ThenInclude(p => p.AppType)
+            .Include(r => r.Procedures).ThenInclude(p => p.TestType)
+            .SingleOrDefaultAsync(r => r.Id == releaseId, cancellationToken)
             ?? throw new InvalidOperationException($"Catalog release {releaseId} is not stored.");
 
-        // The rules the release applies (CAT-19), by the keys of source and target.
-        var exclusions = await db.Releases.AsNoTracking()
-            .Where(r => r.Id == releaseId)
-            .SelectMany(r => r.Exclusions.Select(e => e.Exclusion))
-            .Select(e => new
-            {
-                SourceUseCase = (string?)e.SourceUseCase!.Key,
-                SourceAppType = (string?)e.SourceAppType!.Key,
-                SourceProductPart = (string?)e.SourceProductPart!.Key,
-                TargetAppType = (string?)e.TargetAppType!.Key,
-                TargetProductPart = (string?)e.TargetProductPart!.Key,
-                TargetTestType = (string?)e.TargetTestType!.Key,
-            })
-            .ToListAsync(cancellationToken);
-
-        var keys = release.Criteria
-            .OrderBy(c => c.SortOrder).ThenBy(c => c.Key, StringComparer.Ordinal)
-            .Select(c => c.Key)
-            .ToList();
-        var rules = exclusions
-            .Select(e => new ExclusionRule(
-                e.SourceUseCase is not null ? new FilterValueRef(FilterLayer.UseCase, e.SourceUseCase)
-                    : e.SourceAppType is not null ? new FilterValueRef(FilterLayer.AppType, e.SourceAppType)
-                    : new FilterValueRef(FilterLayer.ProductPart, e.SourceProductPart!),
-                e.TargetAppType is not null ? new FilterValueRef(FilterLayer.AppType, e.TargetAppType)
-                    : e.TargetProductPart is not null ? new FilterValueRef(FilterLayer.ProductPart, e.TargetProductPart)
-                    : new FilterValueRef(FilterLayer.TestType, e.TargetTestType!)))
-            .ToList();
-        return new CatalogReleaseSnapshot(release.Id, release.Version, release.PublishedAt, keys, rules);
+        var values = await GetFilterValuesAsync(cancellationToken);
+        return CatalogReleaseSnapshot.From(
+            release,
+            values.TestTypes.OrderBy(t => t.SortOrder).ThenBy(t => t.Key, StringComparer.Ordinal).Select(t => t.Key));
     }
 
     private async Task<CatalogFilterValues> LoadFilterValuesAsync(CancellationToken cancellationToken) =>
@@ -125,17 +108,6 @@ internal sealed class CatalogReader(CatalogDbContext db, IMemoryCache cache)
         public static readonly FilterValuesCacheKey Instance = new();
     }
 }
-
-/// <summary>
-/// What the cache holds for one release: its identity, its criteria in list order and the exclusion
-/// rules it applies. S3-20 adds what the criteria endpoint returns.
-/// </summary>
-internal sealed record CatalogReleaseSnapshot(
-    int Id,
-    string Version,
-    DateTimeOffset PublishedAt,
-    IReadOnlyList<string> CriterionKeys,
-    IReadOnlyList<ExclusionRule> Exclusions);
 
 /// <summary>A filter value named by its layer and key.</summary>
 internal sealed record FilterValueRef(FilterLayer Layer, string Key);
