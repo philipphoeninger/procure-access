@@ -264,9 +264,12 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ steps.browser-cache.outputs.cache-primary-key }}
       # The browser's apt packages, on every run. Usually 10–40 s, but a slow apt mirror (about
-      # 40 kB/s) made it take more than 10 minutes on a third of the runs on main (#203). So each
-      # attempt stops after 3 minutes and a second one follows: apt keeps the packages the first
-      # attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
+      # 40 kB/s) made one job hit the former 10-minute limit in a third of the runs on main (#203).
+      # So each attempt stops after 3 minutes and a second one follows: apt keeps the packages the
+      # first attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
+      # `timeout` runs as root: a user's signals do not reach the root apt-get under sudo, which
+      # then kept apt's lock and failed the second attempt. apt starts dpkg in its own session, out
+      # of timeout's reach, so the retry waits until dpkg has finished.
       - name: Install Playwright system dependencies
         timeout-minutes: 8
         working-directory: e2e
@@ -276,13 +279,11 @@ jobs:
             limit=3m
             if [ "$attempt" -eq 1 ]; then limit="$FIRST_LIMIT"; fi  # PROOF ONLY: cut attempt 1 short
             echo "Attempt $attempt, limit $limit"
-            ( sleep 2; echo "-- PROOF during attempt $attempt:"; ps -eo pid,ppid,pgid,sid,stat,etimes,args | grep -E "timeout|npm|node|sudo|sh -c|apt|dpkg|http" | grep -v grep
-              for pid in $(pgrep -x 'apt-get|dpkg|sudo|sh|node|timeout'); do echo "$pid $(cat /proc/$pid/comm) $(grep -E '^Sig(Blk|Ign|Cgt)' /proc/$pid/status | tr -s '\t\n' '  ')"; done ) &
             sudo env "PATH=$PATH" timeout --kill-after=10s "$limit" npx playwright install-deps "$BROWSER" || status=$?
-            echo "-- PROOF after attempt $attempt (exit $status):"; ps -eo pid,ppid,pgid,sid,stat,etimes,args | grep -E "timeout|npm|node|sudo|sh -c|apt|dpkg|http" | grep -v grep || true
-            echo "-- PROOF root-owned files in the workspace and home:"; find "$GITHUB_WORKSPACE" "$HOME" -xdev -user root 2>/dev/null | head -5 || true
+            echo "-- PROOF left after attempt $attempt (exit $status):"; pgrep -a -x 'apt-get|dpkg' || echo "(none)"
             if [ "$status" -eq 0 ]; then exit 0; fi
-            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 = stopped after 3 minutes)"
+            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 or 137 = stopped after 3 minutes)"
+            while pgrep -x dpkg > /dev/null; do sleep 2; done
             sudo dpkg --configure -a
           done
           exit 1
