@@ -1,6 +1,6 @@
 # S4-03 — `UsersController` requires authentication
 
-> **Sprint:** 04, P0 task S4-03 (debt, 0.5 points). **Issues:** #205. **Requirements / invariants:** SEC-01 (legacy JWT) unchanged; API-01 stays green; no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10), pull request open for review. **Deviation from the row:** no `[AllowAnonymous]` on `ResetPassword`. The action is removed instead (owner decision 1).
+> **Sprint:** 04, P0 task S4-03 (debt, 0.5 points). **Issues:** #205. **Requirements / invariants:** SEC-01 (legacy JWT) unchanged; API-01 stays green; no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10), pull request #249 open for review. **Deviation from the row:** no `[AllowAnonymous]` on `ResetPassword`. The action is removed instead (owner decision 1).
 > **Scope:** exactly the sprint row: `[Authorize]` on `UsersController`, 401 tests, and the null-forgiving `!` on the user id replaced by a real check. No other behaviour change; the controller is replaced in migration step 3 (ARCHITECTURE §7.1).
 > **Owner decisions** (2026-11-10, before the start):
 > 1. **O-S4-7 (a):** remove `POST /api/Users/reset-password` instead of marking it `[AllowAnonymous]` (F2). Options (b) `[Authorize]` (any signed-in user could still set another user's password) and (c) `[AllowAnonymous]` as the row said (keeps the hole) were rejected. Recorded in `SPRINT_04.md`, owner decisions.
