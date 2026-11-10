@@ -11,15 +11,17 @@
 # - database in memory (tmpfs): every start begins with an empty database, nothing persists;
 # - stack-local network instead of the external dokploy-network (CI has none);
 # - SMTP credentials cleared, so no e-mail can leave an E2E run;
+# - the test release folders mounted read-only, so the API seeds and activates T.1 at startup
+#   (S4-08, #241; catalog part of the seeder of TESTING §6.3, Development/E2E only);
 # - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
 #   client answers and the API reaches its database.
 #
 # The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml):
 # stop one before starting the other.
 #
-# Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment with its own
-# seeder, Mailpit, the test clock endpoint and the relaxed export rate limit. Until then the API
-# runs as Development, like the dev stack.
+# Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment of its own, the
+# users and products of the seeder, Mailpit, the test clock endpoint and the relaxed export rate
+# limit. Until then the API runs as Development, like the dev stack.
 name: procureaccess-e2e
 
 services:
@@ -34,6 +36,11 @@ services:
     environment:
       Email__Username: ""
       Email__Password: ""
+      # Active test release T.1 (MiniCatalog), seeded at startup in Development/E2E only (S4-08, #241)
+      Catalog__TestRelease__Path: /app/catalog/test-releases
+      Catalog__TestRelease__Version: T.1
+    volumes:
+      - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
 
   client:
     healthcheck:
