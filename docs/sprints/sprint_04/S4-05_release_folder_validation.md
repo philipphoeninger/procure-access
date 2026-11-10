@@ -1,6 +1,6 @@
 # S4-05 — Validate every catalog release folder in CI
 
-> **Sprint:** 04, P0 task S4-05 (debt, 0.5 points). **Issues:** #239 (TD-33, from S3-16 P5). **Requirements / invariants:** CAT-23 unchanged (wording and status); the new tests carry `INV:CAT-23`; no new TESTING version. **Status:** done by Claude Code (2026-11-10), pull request open, not merged.
+> **Sprint:** 04, P0 task S4-05 (debt, 0.5 points). **Issues:** #239 (TD-33, from S3-16 P5). **Requirements / invariants:** CAT-23 unchanged (wording and status); the new tests carry `INV:CAT-23`; no new TESTING version. **Status:** done by Claude Code (2026-11-10), pull request #257 open, not merged.
 > **Scope:** exactly the sprint row: every folder under `catalog/releases/` is validated in CI with the validator of `catalog import`, and a broken folder fails with the validator's message (file and JSON path). No change to the validator, the import, the CLI or the CI workflow.
 > **Owner decisions:** **O-S4-2 (a)** — a CI check without a new command: a .NET unit test finds every folder and runs the validator on it; no `catalog validate` command. **CI proof (i)** — a throwaway draft pull request with a deliberately broken folder, closed after the result is recorded. The plan was approved without changes.
 
