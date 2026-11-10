@@ -5,6 +5,7 @@
     "app_registration",
     "arrow_downward",
     "box",
+    "check",
     "checklist",
     "contrast",
     "contrast_rtl_off",
@@ -36,7 +37,11 @@
     "warning"
   ],
   "computed": {
-    "src/app/shared/components/notice/notice.ts": ["error", "info", "warning"]
+    "src/app/shared/components/notice/notice.ts": [
+      "error",
+      "info",
+      "warning"
+    ]
   },
   "material": {
     "create": "mat-stepper: step header in the edit state",
