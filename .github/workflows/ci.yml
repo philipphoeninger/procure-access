@@ -207,11 +207,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { project: chromium, browser: chromium }
-          - { project: firefox, browser: firefox }
-          - { project: webkit, browser: webkit }
-          - { project: mobile-chrome, browser: chromium }
-          - { project: mobile-safari, browser: webkit }
+          - { project: chromium, browser: chromium, first-limit: 3s }
+          - { project: firefox, browser: firefox, first-limit: 6s }
+          - { project: webkit, browser: webkit, first-limit: 9s }
+          - { project: mobile-chrome, browser: chromium, first-limit: 12s }
+          - { project: mobile-safari, browser: webkit, first-limit: 15s }
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -273,7 +273,10 @@ jobs:
         run: |
           for attempt in 1 2; do
             status=0
-            timeout 3m npx playwright install-deps "$BROWSER" || status=$?
+            limit=3m
+            if [ "$attempt" -eq 1 ]; then limit="$FIRST_LIMIT"; fi  # PROOF ONLY: cut attempt 1 short
+            echo "Attempt $attempt, limit $limit"
+            timeout "$limit" npx playwright install-deps "$BROWSER" || status=$?
             if [ "$status" -eq 0 ]; then exit 0; fi
             echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 = stopped after 3 minutes)"
             sudo dpkg --configure -a
@@ -281,6 +284,7 @@ jobs:
           exit 1
         env:
           BROWSER: ${{ matrix.browser }}
+          FIRST_LIMIT: ${{ matrix.first-limit }}
       - name: Start E2E stack
         working-directory: e2e
         run: npm run stack:up
