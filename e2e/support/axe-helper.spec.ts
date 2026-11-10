@@ -24,10 +24,18 @@ const pageWithTwoViolations = `
     </body>
   </html>`;
 
+/**
+ * The button has its own colours: how a native button looks in the dark appearance is up to the
+ * browser, and since Playwright 1.65 axe reports WebKit's unstyled button there as a contrast
+ * violation. The fixture tests the helper, not the browser's defaults.
+ */
 const cleanPage = `
   <!doctype html>
   <html lang="de">
-    <head><title>Axe helper fixture</title></head>
+    <head>
+      <title>Axe helper fixture</title>
+      <style>button { color: #000; background: #fff; border: 1px solid #000; }</style>
+    </head>
     <body><main><h1>Fixture</h1><button type="button">Weiter</button></main></body>
   </html>`;
 

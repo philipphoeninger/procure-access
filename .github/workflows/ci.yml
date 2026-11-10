@@ -261,10 +261,10 @@ jobs:
       - name: Start E2E stack
         working-directory: e2e
         run: npm run stack:up
-      # The host network reaches the stack on localhost like a local run; e2e/node_modules comes
-      # from `npm ci` above (same Node major as the image). The runner's user keeps the reports
-      # writable for the next steps. GITHUB_WORKSPACE inside the container lets the `github`
-      # reporter name the right files in its annotations.
+      # The host network reaches the stack on localhost like a local run. e2e/node_modules comes
+      # from `npm ci` above; it has no native module, so it runs on the image's Node. The runner's
+      # user keeps the reports writable for the next steps. GITHUB_WORKSPACE inside the container
+      # lets the `github` reporter name the right files in its annotations.
       - name: Playwright (${{ matrix.project }})
         run: >-
           docker run --rm --init --ipc=host --network=host
