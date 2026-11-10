@@ -1,7 +1,7 @@
 # S4-09 — Configurator state: in-memory draft, catalog client, selection rules
 
 > **Sprint:** 04, P0 task S4-09 (M2.5, 3 points). **Issues:** none. **Requirements / invariants:** R-CON-09; prepares R-CON-01 – R-CON-08, R-CON-10, CFG-01 – CFG-04 and the configurator part of CAT-12. No invariant changes status — CFG-01 – CFG-04 check the page (`role="status"`, `aria-disabled`, combobox, submit button) and flip with S4-10 – S4-12 — so there is no new TESTING version. New version `ARCHITECTURE_v30.md` (C116; v28 deleted).
-> **Status:** done — pull request open.
+> **Status:** done — pull request #261 open.
 > **Scope:** exactly the sprint row: `withConfigurator()` with the four-layer draft in memory, the typed client of `GET /api/v1/catalog/filter-options`, and the selection rules as pure functions with tests, under `features/configurator/`. No screen, no route, no UI text, no criteria call (S4-14), no switch between S10 and the legacy filter (S4-12).
 > **Owner decisions (2026-11-10):** **O-S4-8 (a)** — `withConfigurator()` is a slice of the root store and holds the draft and the filter options answered for it; `withCatalog()` comes when the legacy filter goes. **Defaults of the plan accepted:** the draft pins the release of the first answer (ADR-002); the options load again after each change of steps 1–3, the latest answer wins; any change of a layer clears every lower layer except Basisfunktionalität (CFG-01) and reports the changed layer and the cleared layers that held a selection; „Keiner davon passt“ is its own state; the always-selected parts come from `alwaysSelected`; no new dependency.
 
