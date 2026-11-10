@@ -12,6 +12,7 @@ import { withFavorites } from "@app/features/favorites/state/with-favorites";
 import { withProducts } from "@app/features/products/state/with-products";
 import { withSettings } from "@app/features/settings/state/with-settings";
 import { withProposal } from "@app/features/proposal/state/with-proposal";
+import { withConfigurator } from "@app/features/configurator/state/with-configurator";
 
 export const ProcureAccessStore = signalStore(
     { providedIn: 'root' },
@@ -24,6 +25,7 @@ export const ProcureAccessStore = signalStore(
     withProducts(),
     withProposal(),
     withSettings(),
+    withConfigurator(),
     withMethods((state) => {
         return {
             async init() {
