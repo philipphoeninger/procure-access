@@ -86,6 +86,19 @@ test('--write rejects the key segments __proto__, constructor and prototype', ()
   assert.equal({}.polluted, undefined);
 });
 
+test('--write rejects an unsafe segment at the start, in the middle and at the end of a key', () => {
+  for (const unsafe of ['__proto__', 'constructor', 'prototype']) {
+    // `shell.b` does not exist yet: a guard that ran only during the walk would leave it behind.
+    for (const key of [`${unsafe}.a`, `shell.b.${unsafe}.c`, `shell.b.${unsafe}`]) {
+      const de = { shell: {} };
+      assert.throws(() => setText(de, key, 'x', new Set()), (e) => e.message === `${key}: the segment "${unsafe}" is not allowed in a key`, key);
+      assert.deepEqual(de, { shell: {} }, key);
+    }
+  }
+  assert.equal({}.a, undefined);
+  assert.equal({}.c, undefined);
+});
+
 test('check 1 fails on a missing or different text of an area', () => {
   assert.deepEqual(run(['| `shell.a` | x | Eins | |'], { shell: {} }), ['shell.a: missing in de.json (run with --write)']);
   assert.match(run(['| `shell.a` | x | Eins | |'], { shell: { a: 'Uno' } })[0], /differs from the UX copy/);

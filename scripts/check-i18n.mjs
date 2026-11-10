@@ -160,7 +160,8 @@ export function flatten(dict, prefix = '') {
  * Sets `key` to `text`. Where a shorter key in `textKeys` holds a text, the rest of the key
  * goes into one property name with dots next to it (file header).
  * A segment `__proto__`, `constructor` or `prototype` is rejected: it would write into the
- * prototype of every object instead of into de.json (#182).
+ * prototype of every object instead of into de.json (#182). All segments are checked before
+ * anything is written, so a rejected key leaves `dict` unchanged.
  */
 export function setText(dict, key, text, textKeys) {
   const segs = key.split('.');
@@ -169,6 +170,10 @@ export function setText(dict, key, text, textKeys) {
   let cur = dict;
   for (let i = 0; i < segs.length; i++) {
     const name = segs[i];
+    // Unreachable after the check above; CodeQL counts only a check on `name` itself (#233).
+    if (name === '__proto__' || name === 'constructor' || name === 'prototype') {
+      throw new Error(`${key}: the segment "${name}" is not allowed in a key`);
+    }
     if (i === segs.length - 1) {
       if (cur[name] !== null && typeof cur[name] === 'object') throw new Error(`${key}: is a group of keys in de.json, cannot hold a text`);
       cur[name] = text;
