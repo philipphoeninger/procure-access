@@ -1,6 +1,6 @@
 # S4-04 — Scripts and licence: CodeQL alert 3 and the CAT-10 fixture
 
-> **Sprint:** 04, P0 task S4-04 (debt, 0.5 points). **Issues:** #233 (TD-24), #242 (TD-36). **Requirements / invariants:** none (CI stage 1); no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10), pull request open for review; alert 3 is checked after the merge (P1).
+> **Sprint:** 04, P0 task S4-04 (debt, 0.5 points). **Issues:** #233 (TD-24), #242 (TD-36). **Requirements / invariants:** none (CI stage 1); no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10), merged with pull request #254 (06b6500); #233 and #242 closed; CodeQL alert 3 fixed on `main` (C9).
 > **Scope:** exactly the sprint row: the loop variable of `setText` in `scripts/check-i18n.mjs` checked inside the loop as well, with a self-test case; the CAT-10 fixture annotated as BIT inklusiv in `REUSE.toml`. No other behaviour change.
 > **Owner decisions:** none needed (task prompt: "none"; confirmed before the start). The plan was approved without changes.
 
@@ -63,10 +63,11 @@ No correctness or security bug left that affects current behaviour; no further r
 | C6 | `npm run typecheck && npm run lint` in `e2e/` (lints `scripts/*.mjs`) | Green |
 | C7 | `dotnet test --project tests/ProcureAccess.Tests.Integration --filter-class "*CriteriaFilterCharacterisationTests"` (reads the fixture) | 6 of 6 pass. No .NET or client code changed, so no further build; J1 (also reads the fixture) runs in CI |
 | C8 | CI and CodeQL on pull request #254 (fc52d55) | All checks green, the five E2E browser projects included. The JavaScript/TypeScript analysis of `refs/pull/254/merge` has 0 results: alert 3 is not found there (its instances are only `main` at 9934952 and the old ref `refs/pull/157/head`), and R2 gave no new alert |
+| C9 | Alert 3 after the merge: `gh api repos/philipphoeninger/procure-access/code-scanning/alerts/3` and the analyses of `refs/heads/main` | The JavaScript/TypeScript analysis of `main` at 06b6500 has 0 results; alert 3 is `fixed` (2026-11-10 15:38 UTC). Its stale instance on `refs/pull/157/head` did not keep it open, so nothing was dismissed. No open code-scanning alert is left in the repository |
 
 ## 5. Open points
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge | Check after the merge (`gh api repos/philipphoeninger/procure-access/code-scanning/alerts/3`) and record the result here in a follow-up commit; #233 is closed by the merge. If the alert stays open only because of the stale instance on `refs/pull/157/head`, dismiss it as fixed in the Security tab |
+| P1 | ~~Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge~~ | Done: fixed on `main` after the merge (C9) |
 | P2 | If the CAT-10 rewrite (S4-13, O-S4-5) adds or renames a fixture that quotes BIT inklusiv texts, it needs the same entry in `REUSE.toml` (R4) | In S4-13; #242 already names it |
