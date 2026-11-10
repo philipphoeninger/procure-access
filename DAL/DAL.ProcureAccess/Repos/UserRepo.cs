@@ -102,26 +102,6 @@ public class UserRepo : IUserRepo
         return IdentityResult.Success;
     }
 
-    public async Task<IdentityResult> ResetPasswordAsync(
-        string email,
-        string newPassword)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-
-        if (user == null)
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "User not found."
-            });
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-        return await _userManager.ResetPasswordAsync(
-            user,
-            token,
-            newPassword);
-    }
-
     public async Task<IdentityResult> RevokeSessionsAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
