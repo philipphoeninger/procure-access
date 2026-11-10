@@ -15,10 +15,6 @@ public interface IUserRepo
         string currentPassword,
         string newPassword);
 
-    Task<IdentityResult> ResetPasswordAsync(
-        string email,
-        string newPassword);
-
     Task<IdentityResult> RevokeSessionsAsync(string userId);
 
     Task<IdentityResult> DeleteUserAsync(string userId);

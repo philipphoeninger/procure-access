@@ -157,6 +157,7 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-4 | UX copy v17: approve or edit the proposals for the #181 gaps (review of the S4-02 PR) | S4-14 – S4-18 | — (Claude drafts, the owner decides the wording) |
 | O-S4-5 | CAT-10 after S10: keep the API part while the legacy endpoints exist (fix #91, #92) and retire the E2E part with the legacy filter; or move a new characterisation to S10 on `T.1`; or retire CAT-10 as a whole once the legacy filter is unreachable | S4-13 | Keep the API part, retire the E2E part — J1 on S10 takes over the end-to-end check |
 | O-S4-6 | Short description (#237, TD-30): a field in `CriterionRevision` and the release format, or derived from existing text; until then the export column stays empty? | S4-20 (column), S4-24 | A field, with an ADR; the column is written empty until the project team fills it |
+| O-S4-7 | `POST /api/Users/reset-password` sets any user's password from the e-mail address alone (no token; found while planning S4-03): (a) remove the action, (b) put it under `[Authorize]` like the rest, (c) `[AllowAnonymous]` as the S4-03 row says | S4-03 | (a); **decided (a)**, owner 2026-11-10 — the client resets through the token-based `POST /api/reset-password` |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 
