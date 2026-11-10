@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# Development override of docker-compose.yml (S4-08, owner decision O-S4-3 (b)):
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Mounts the test release folders read-only, so the API seeds and activates the test release T.1
+# (MiniCatalog) at startup and the catalog endpoints answer before a real release can be activated
+# (O-1). The API seeds only in Development (and E2E), and only when the folder is there: staging is
+# deployed from docker-compose.yml alone, so it never gets the folder.
+#
+# The seeder imports T.1 once and activates it only while no release is active, so a release
+# activated by hand stays active. After a change to the T.1 folder, the stored T.1 is the old one:
+# remove the database volume (docker compose down -v) to get the new one.
+services:
+  api:
+    environment:
+      Catalog__TestRelease__Path: /app/catalog/test-releases
+      Catalog__TestRelease__Version: T.1
+    volumes:
+      - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro

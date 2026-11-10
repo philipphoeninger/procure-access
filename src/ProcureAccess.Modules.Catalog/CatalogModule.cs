@@ -12,6 +12,7 @@ using ProcureAccess.Modules.Catalog.Criteria;
 using ProcureAccess.Modules.Catalog.FilterOptions;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Catalog.Reading;
+using ProcureAccess.Modules.Catalog.Releases;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 
 namespace ProcureAccess.Modules.Catalog;
@@ -22,7 +23,8 @@ namespace ProcureAccess.Modules.Catalog;
 /// Since S3-12 it holds the core entities (releases, criteria, revisions, standard references) with
 /// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>, since S3-17
 /// <c>catalog activate</c> and the cached catalog reads (<see cref="CatalogReader"/>), since S3-19
-/// the endpoint <c>GET /api/v1/catalog/filter-options</c> (<see cref="MapCatalogEndpoints"/>). The legacy
+/// the endpoint <c>GET /api/v1/catalog/filter-options</c> (<see cref="MapCatalogEndpoints"/>), since
+/// S4-08 the test-release seeder of development and E2E stacks (<see cref="SeedTestReleaseAsync"/>). The legacy
 /// criteria code in API, DAL, MODELS and SERVICES keeps serving the old screens until they are
 /// replaced (O-S3-5).
 /// </summary>
@@ -98,5 +100,24 @@ public static class CatalogModule
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(error);
         return CatalogCommandLine.RunAsync(services, args, output, error, cancellationToken);
+    }
+
+    /// <summary>
+    /// Imports the test release folder <paramref name="version"/> below <paramref name="releasesPath"/>
+    /// if it is not stored yet, and activates it if no release is active (catalog part of the E2E
+    /// seeder, TESTING §6.3; S4-08). Only for development and E2E stacks: the host checks the
+    /// environment before it calls this (O-S4-3). Throws when the folder cannot be imported or the
+    /// release cannot be activated.
+    /// </summary>
+    public static async Task SeedTestReleaseAsync(
+        IServiceProvider services,
+        string releasesPath,
+        string version,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        await using var scope = services.CreateAsyncScope();
+        await ActivatorUtilities.CreateInstance<TestReleaseSeeder>(scope.ServiceProvider)
+            .SeedAsync(releasesPath, version, cancellationToken);
     }
 }
