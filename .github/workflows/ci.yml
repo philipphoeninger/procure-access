@@ -264,9 +264,9 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ steps.browser-cache.outputs.cache-primary-key }}
       # The browser's apt packages, on every run. Usually 10–40 s, but a slow apt mirror (about
-      # 40 kB/s) made it take more than 10 minutes on a third of the runs on main (#203). So each
-      # attempt stops after 3 minutes and a second one follows: apt keeps the packages the first
-      # attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
+      # 40 kB/s) made one job hit the former 10-minute limit in a third of the runs on main (#203).
+      # So each attempt stops after 3 minutes and a second one follows: apt keeps the packages the
+      # first attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
       - name: Install Playwright system dependencies
         timeout-minutes: 8
         working-directory: e2e
