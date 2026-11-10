@@ -267,15 +267,19 @@ jobs:
       # 40 kB/s) made one job hit the former 10-minute limit in a third of the runs on main (#203).
       # So each attempt stops after 3 minutes and a second one follows: apt keeps the packages the
       # first attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
+      # `timeout` runs as root: a user's signals do not reach the root apt-get under sudo, which
+      # then kept apt's lock and failed the second attempt. apt starts dpkg in its own session, out
+      # of timeout's reach, so the retry waits until dpkg has finished.
       - name: Install Playwright system dependencies
         timeout-minutes: 8
         working-directory: e2e
         run: |
           for attempt in 1 2; do
             status=0
-            timeout 3m npx playwright install-deps "$BROWSER" || status=$?
+            sudo env "PATH=$PATH" timeout --kill-after=10s 3m npx playwright install-deps "$BROWSER" || status=$?
             if [ "$status" -eq 0 ]; then exit 0; fi
-            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 = stopped after 3 minutes)"
+            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 or 137 = stopped after 3 minutes)"
+            while pgrep -x dpkg > /dev/null; do sleep 2; done
             sudo dpkg --configure -a
           done
           exit 1
