@@ -1,6 +1,6 @@
 # S4-07 — Documentation session: sprint-03 findings
 
-> **Sprint:** 04, P0 task S4-07 (documentation, 1 point). **Issues:** #243 (`TECH_DEBT_v3.md` TD-37). **Requirements / invariants:** none (documents only); no invariant changes status. **Status:** done by Claude Code (2026-11-10), pull request open, not merged.
+> **Sprint:** 04, P0 task S4-07 (documentation, 1 point). **Issues:** #243 (`TECH_DEBT_v3.md` TD-37). **Requirements / invariants:** none (documents only); no invariant changes status. **Status:** done by Claude Code (2026-11-10), pull request #258 open, not merged.
 > **Scope:** the TD-37 points the task prompt lists for ARCHITECTURE (status line, `Category` in §5.1), TESTING (input line, §8.2 stage 9 and V85 against the ruleset), SPEC (R-SHL-10, §11 step 1, R-SET-03, current-versions line), the Design handoff (UX copy version, §1.3 subsets, sources line) and the Figma mapping (body and related line). ROADMAP_v4 and the SPRINT_03 close-out were already done and are not touched. PRD, Kriterienkatalog and UX copy are the owner's documents: their points are listed in §5. No rule or requirement changes beyond the listed points.
 > **Owner decisions:** none for this task. Before the start, the owner had no objection to four defaults Claude named: SPEC as v2.7 in `SPEC_v2.md` (renumbered if the draft PR #248, which also writes a v2.7, merges first); criterion splits (TD-31, #238) left out; #243 closed by this PR with the owner-document points in §5 and a proposed follow-up issue; the third-newest versions deleted (CLAUDE §2).
 
