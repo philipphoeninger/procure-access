@@ -1,0 +1,47 @@
+{
+  "kind": "requirement",
+  "titleDe": "Navigation über Lesezeichen",
+  "sortOrder": 1810,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.17",
+      "originalTitleDe": "Navigation über Lesezeichen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument mehrere Seiten hat und mindestens eine optische Überschrift."
+      ],
+      "requirementDe": [
+        "Ein PDF-Dokument soll eine Übersicht mit Navigationsmöglichkeit - z. B. in Form von Lesezeichen (Bookmarks) - enthalten, die der Lesereihenfolge entspricht und die verwendeten Überschriftenebenen abbildet."
+      ],
+      "rationaleWhyDe": [
+        "Lesezeichen erleichtern allen Nutzenden die Navigation, da auf schnellem Wege zu einer bestimmten Stelle oder Seite im PDF-Dokument gesprungen werden kann. Vor allem in mehrseitigen PDF-Dokumenten ist dies eine sinnvolle Erleichterung, um schnell Inhalte aufzusuchen.",
+        "",
+        "Eine Person mit kognitiven Behinderungen zieht unter Umständen eine hierarchische Kurzdarstellung (Outline) vor, die einen Überblick über das PDF-Dokument gibt, anstatt viele Seiten zu lesen und durchzugehen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Lesezeichen sind vollständig vorhanden und funktionieren zuverlässig."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Vorhandene Lesezeichen funktionieren zuverlässig, wobei nicht alle wesentlichen Überschriften als Lesezeichen abgebildet sind.",
+        "- Einschränkung: Nicht alle Lesezeichen funktionieren zuverlässig."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.17-navigation-über-lesezeichen"
+    }
+  ]
+}

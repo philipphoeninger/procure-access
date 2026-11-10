@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Interoperabilität",
+  "sortOrder": 180,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.3",
+      "originalTitleDe": "Interoperabilität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt, und wenn die Software in der Lage ist, mit einer anderen Software des gleichen Funktionsumfangs zu kommunizieren."
+      ],
+      "requirementDe": [
+        "Bietet die Software Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), und unterstützt sie zudem die Nutzung dieser Funktionen in Kombination mit anderer Software desselben Funktionsumfangs, so muss die Interoperabilität auf Basis der relevanten, technischen Standards unterstützt werden.",
+        "",
+        "Die EN 301549 benennt dabei folgende Standards:",
+        "",
+        "- Kommunikation über das öffentliche Telefonnetz: ITU-T V.18 [i.23] oder dessen Text-Telefonie-Standards in den Anhängen werden verwendet",
+        "- Voice over IP (VoIP) über das Session Initiation Protocol (SIP): Empfehlungen der IETF zu Textkommunikation in Echtzeit (RTT = Real Time Text) RFC 4103 [i.13] werden verwendet",
+        "- Voice over IP (VoIP) über das IP Multimedia Sub-System (IMS): Protokolle ETSI TS 126 114 [i.10], ETSI TS 122 173 [i.11] und ETSI TS 134 229 [i.12] werden verwendet",
+        "- Andere Kommunikationsmethoden: Gemeinsame, relevante und veröffentlichte Standards werden verwendet"
+      ],
+      "rationaleWhyDe": [
+        "Die Verwendung technischer Standards stellt soweit möglich eine gleichbleibende und verlässliche Funktionalität auch anwendungsübergreifend sicher. Mit Hilfe derartiger Standards sollen Menschen bei der Wahl der Anwendung nicht unnötig eingeschränkt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- In der Dokumentation sind die Empfehlungen der EN 301549 als verwendete Standards benannt.",
+        "- Nach Kontaktaufnahme mit dem Anbieter der Software werden die Empfehlungen der EN 301549 als verwendete Standards bestätigt."
+      ],
+      "negativeExamplesDe": [
+        "- Ein oder mehrere der verwendeten Standards entsprechen nicht den Empfehlungen der EN 301549."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#interoperabilität"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.3",
+      "originalTitleDe": "Interoperabilität",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Zwei-Wege-Sprachkommunikation und Textkommunikation in Echtzeit (RTT) zur Verfügung stellt, und wenn die Mobile App in der Lage ist, mit einer anderen Mobile App des gleichen Funktionsumfangs zu kommunizieren."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Zwei-Wege-Sprachkommunikation via Sprach- oder Videotelefonie und Textkommunikation in Echtzeit (RTT), und unterstützt sie zudem die Nutzung dieser Funktionen in Kombination mit anderen Mobile Apps desselben Funktionsumfangs, so muss die Interoperabilität auf Basis der relevanten, technischen Standards unterstützt werden.",
+        "",
+        "Die EN 301549 benennt dabei folgende Standards:",
+        "",
+        "- Kommunikation über das öffentliche Telefonnetz: ITU-T V.18 [i.23] oder dessen Text-Telefonie-Standards in den Anhängen werden verwendet",
+        "- Voice over IP (VoIP) über das Session Initiation Protocol (SIP): Empfehlungen der IETF zu Textkommunikation in Echtzeit (RTT = Real Time Text) RFC 4103 [i.13] werden verwendet",
+        "- Voice over IP (VoIP) über das IP Multimedia Sub-System (IMS): Protokolle ETSI TS 126 114 [i.10], ETSI TS 122 173 [i.11] und ETSI TS 134 229 [i.12] werden verwendet",
+        "- Andere Kommunikationsmethoden: Gemeinsame, relevante und veröffentlichte Standards werden verwendet"
+      ],
+      "rationaleWhyDe": [
+        "Die Verwendung technischer Standards stellt soweit möglich eine gleichbleibende und verlässliche Funktionalität auch anwendungsübergreifend sicher. Mit Hilfe derartiger Standards sollen Menschen bei der Wahl der Anwendung nicht unnötig eingeschränkt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- In der Dokumentation sind die Empfehlungen der EN 301549 als verwendete Standards benannt.",
+        "- Nach Kontaktaufnahme mit dem Anbieter der Mobile App werden die Empfehlungen der EN 301549 als verwendete Standards bestätigt."
+      ],
+      "negativeExamplesDe": [
+        "- Ein oder mehrere der verwendeten Standards entsprechen nicht den Empfehlungen der EN 301549."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#interoperabilität"
+    }
+  ]
+}

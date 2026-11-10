@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Schriftgrafiken",
+  "sortOrder": 570,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.5",
+      "originalTitleDe": "Schriftgrafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bilder oder Grafiken werden nicht zur Darstellung von Schrift verwendet. Logos, beziehungsweise Text, der Teil eines Logos oder Markennamens ist, ist hiervon ausgenommen. Eine Schriftgrafik ist eine visuelle Gestaltung und Anordnung von Buchstaben, Zeichen und Textelementen innerhalb eines grafischen Elements. Wird der Informationsinhalt der Schriftgrafik auch im Kontext als Text wiedergeben, gilt dies als Medienalternative."
+      ],
+      "rationaleWhyDe": [
+        "Die Darstellung von textuellen Inhalten soll nicht in Form von grafischen Elementen erfolgen, sondern immer als Klartext. So kann sichergestellt werden, dass die Darstellung an individuelle Bedürfnisse angepasst werden kann, und assistive Technologien uneingeschränkt darauf zugreifen können.",
+        "",
+        "Nutzende mit einer Sehbeeinträchtigung oder mit kognitiver Beeinträchtigung erleben aufgrund der Schriftfamilie, Schriftgröße oder -Farbe eventuell Einschränkungen hinsichtlich der Lesbarkeit und haben somit keinen vollumfänglichen Zugang zu den Informationen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden keine Schriftgrafiken verwendet.",
+        "- Es werden Schriftgrafiken verwendet, der Informationsinhalt ist im Kontext zusätzlich als Klartext verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Ein Bedienelement ist mit einer Schriftgrafik beschriftet.",
+        "- Überschriften werden durch Bilder dargestellt.",
+        "- Zur Darstellung von Text werden grafische Custom Fonts verwendet."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#schriftgrafiken"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.5",
+      "originalTitleDe": "Schriftgrafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bilder oder Grafiken werden nicht zur Darstellung von Schrift verwendet. Logos, beziehungsweise Text, der Teil eines Logos oder Markennamens ist, ist hiervon ausgenommen. Eine Schriftgrafik ist eine visuelle Gestaltung und Anordnung von Buchstaben, Zeichen und Textelementen innerhalb eines grafischen Elements. Wird der Informationsinhalt der Schriftgrafik auch im Kontext als Text wiedergeben, gilt dies als Medienalternative."
+      ],
+      "rationaleWhyDe": [
+        "Die Darstellung von textuellen Inhalten soll nicht in Form von grafischen Elementen erfolgen, sondern immer als Klartext. So kann sichergestellt werden, dass die Darstellung an individuelle Bedürfnisse angepasst werden kann, und assistive Technologien uneingeschränkt darauf zugreifen können.",
+        "",
+        "Nutzende mit einer Sehbeeinträchtigung oder mit kognitiver Beeinträchtigung erleben aufgrund der Schriftfamilie, Schriftgröße oder -Farbe eventuell Einschränkungen hinsichtlich der Lesbarkeit und haben somit keinen vollumfänglichen Zugang zu den Informationen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden keine Schriftgrafiken verwendet.",
+        "- Es werden Schriftgrafiken verwendet, der Informationsinhalt ist im Kontext zusätzlich als Klartext verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Ein Bedienelement ist mit einer Schriftgrafik beschriftet.",
+        "- Überschriften werden durch Bilder dargestellt.",
+        "- Zur Darstellung von Text werden grafische Custom Fonts verwendet."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#schriftgrafiken"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Keine Strukturelemente für Layouttabellen",
+  "sortOrder": 470,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.1d",
+      "originalTitleDe": "Keine Strukturelemente für Layouttabellen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Tabellen dürfen nicht für Layout- oder Designzwecke verwendet werden. Falls tabellarischer Aufbau rein zu Layoutzwecken verwendet wird, soll die Tabelle nicht als Strukturelement gekennzeichnet sein."
+      ],
+      "rationaleWhyDe": [
+        "Tabellen ohne Dateninhalt können sowohl die Reihenfolge der Fokussierung mittels assistiver Technologien, als auch das Verständnis und das mentale Modell der Mobile App negativ beeinflussen. Daher ist auf die Verwendung tabellarischer Strukturen für reine Layoutzwecke zu verzichten, mindestens jedoch sind solche Tabellen für assistive Technologien auszublenden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier"
+      ],
+      "positiveExamplesDe": [
+        "- Die Mobile App enthält keine Layouttabellen.",
+        "- Über die Komfortfunktion des jeweiligen Screenreaders (VoiceOver-Rotor und TalkBack-Menü) sind keine Layouttabellen auffindbar."
+      ],
+      "negativeExamplesDe": [
+        "- Der VoiceOver-Rotor oder das Android TalkBack-Menü können über das entsprechende Strukturelement eine Tabelle an navigieren, die keine tabellarischen Informationen enthält."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#d-keine-strukturelemente-für-layouttabellen"
+    }
+  ]
+}

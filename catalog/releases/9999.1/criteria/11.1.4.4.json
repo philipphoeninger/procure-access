@@ -1,0 +1,89 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Textgröße ändern",
+  "sortOrder": 560,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.4",
+      "originalTitleDe": "Textgröße ändern",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Textgröße kann auf mindestens 200% skaliert werden, ohne dass Inhalt oder Funktionalität dabei verloren gehen. Die Vergrößerung kann über die Einstellungen der Textgröße im Betriebssystem, oder über eine softwarespezifische Funktionalität zur Verfügung gestellt werden. Beim Bereitstellen einer eigenen Funktionalität müssen die zugehörigen Steuerelemente am Seitenbeginn auffindbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Für Nutzende mit Sehbeeinträchtigung ist das Anpassen der Textgröße nach ihren Bedürfnissen ein essenzieller Bestandteil, um die Lesbarkeit von Inhalten zu verbessern. Nutzende mit Legasthenie profitieren zudem von einer erhöhten Lesegeschwindigkeit. Sämtlicher Text muss ohne Verlust von Inhalten mit der individuellen Textgröße des Systems skalieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Textinhalte skalieren entsprechend der Einstellung. Es entsteht keine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die Skalierung führt zu scrollbaren Bereichen."
+      ],
+      "negativeExamplesDe": [
+        "- Alle Textinhalte skalieren entsprechend der Einstellung, jedoch entsteht eine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die skalierte Schrift wird unscharf dargestellt.",
+        "- Die Steuerelemente der softwarespezifischen Funktionalität sind nicht am Seitenanfang auffindbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#textgröße-ändern"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.4",
+      "originalTitleDe": "Textgröße ändern",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Textgröße kann auf mindestens 200% skaliert werden, ohne dass Inhalt oder Funktionalität dabei verloren gehen. Die Vergrößerung kann über die Einstellungen der Textgröße im Betriebssystem, oder über eine App-eigene Funktionalität zur Verfügung gestellt werden. Beim Bereitstellen einer eigenen Funktionalität müssen die zugehörigen Steuerelemente am Seitenbeginn auffindbar sein. Eine Skalierung auf genau 200% ist in Android das mögliche Maximum, bei iOS können genau 200% nicht erreicht werden. Hier liegt der zu testende Wert zwischen 190% und 235%."
+      ],
+      "rationaleWhyDe": [
+        "Für Nutzende mit Sehbeeinträchtigung ist das Anpassen der Textgröße nach ihren Bedürfnissen ein essenzieller Bestandteil, um die Lesbarkeit von Inhalten zu verbessern. Nutzende mit Legasthenie profitieren zudem von einer erhöhten Lesegeschwindigkeit. Sämtlicher Text muss ohne Verlust von Inhalten mit der individuellen Textgröße des Systems skalieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Textinhalte skalieren entsprechend der Einstellung. Es entsteht keine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die Skalierung führt zu scrollbaren Bereichen.",
+        "- In iOS werden die Inhalte bei 190% Skalierung korrekt angezeigt, bei 235% entstehen Darstellungsfehler."
+      ],
+      "negativeExamplesDe": [
+        "- Alle Textinhalte skalieren entsprechend der Einstellung, jedoch entsteht eine Überlappung oder Verdrängung bei Inhalten.",
+        "- Die skalierte Schrift wird unscharf dargestellt.",
+        "- Die Steuerelemente der eigenen App-Funktionalität sind nicht am Seitenanfang auffindbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#textgröße-ändern"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Verwendung von Farbe",
+  "sortOrder": 530,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.4.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.4.1",
+      "originalTitleDe": "Verwendung von Farbe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Farbe wird nicht als einzige visuelle Möglichkeit zur Übermittlung von Informationen, zur Anzeige einer Aktion, zum Anfordern einer Reaktion oder zur Unterscheidung eines visuellen Elements verwendet."
+      ],
+      "rationaleWhyDe": [
+        "Farbe ist ein wichtiges Gestaltungselement, das die ästhetische Anziehungskraft, das Nutzungserlebnis und die Barrierefreiheit verbessert. Einige Nutzende haben jedoch Schwierigkeiten, Farben wahrzunehmen. Menschen mit Sehbeeinträchtigungen haben oftmals eine eingeschränkte Farbwahrnehmung. Ältere Menschen sehen Farben möglicherweise nicht gut. Manche Menschen sehen Farben gar nicht. Darüber hinaus können Nutzende, die Bildschirme mit begrenzten Farben oder monochromen Displays und Browser verwenden, möglicherweise nicht auf Informationen zugreifen, die nur in Farbe präsentiert werden. Die Bereitstellung der durch Farbe vermittelten Information über ein weiteres visuelles Mittel gewährleistet, dass Nutzende, die Farbe nicht sehen, die Information dennoch wahrnehmen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Überschriften sind zusätzlich zur Farbgebung eingerückt oder durch eine andere Schriftgröße hervorgehoben.",
+        "- Linien in Schaubildern sind zusätzlich gestrichelt oder durchgezogen.",
+        "- Flächen haben unterscheidbare Muster.",
+        "- Ein ausgewählter Menüeintrag erhält als Abgrenzung zu den anderen Einträgen eine grafische Markierung, etwa einen Rahmen oder einen Punkt.",
+        "- Als Markierung wird eine Invertierung von Vorder- und Hintergrundfarbe verwendet.",
+        "- Farbliche Warnhinweise werden durch Text ergänzt, beispielsweise „Warnung“.",
+        "- Farbliche Hinweise werden durch ein grafisches Symbol ergänzt, beispielsweise einen OK-Haken.",
+        "- Zustände werden nicht nur durch farbliche Kreise markiert, sondern zusätzlich durch unterschiedliche Formen wie beispielsweise Dreieck, Rechteck, Kreis.",
+        "- Pflichtfelder sind zusätzlich mit einem Stern-Symbol oder dem Begriff „Pflichtfeld“ gekennzeichnet."
+      ],
+      "negativeExamplesDe": [
+        "- Informationen werden ausschließlich über Farbgebung vermittelt.",
+        "- Zustände werden ausschließlich über Farbe vermittelt.",
+        "- Ausgewählte Menüeinträge unterscheiden sich nur durch Farbe von anderen Einträgen.",
+        "- Links in einem Fließtext werden nur farblich markiert."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#verwendung-von-farbe"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.4.1",
+      "originalTitleDe": "Verwendung von Farbe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Farbe wird nicht als einzige visuelle Möglichkeit zur Übermittlung von Informationen, zur Anzeige einer Aktion, zum Anfordern einer Reaktion oder zur Unterscheidung eines visuellen Elements verwendet."
+      ],
+      "rationaleWhyDe": [
+        "Farbe ist ein wichtiges Gestaltungselement, das die ästhetische Anziehungskraft, das Nutzungserlebnis und die Barrierefreiheit verbessert. Einige Nutzende haben jedoch Schwierigkeiten, Farben wahrzunehmen. Menschen mit Sehbeeinträchtigungen haben oftmals eine eingeschränkte Farbwahrnehmung. Ältere Menschen sehen Farben möglicherweise nicht gut. Manche Menschen sehen Farben gar nicht. Darüber hinaus können Nutzende, die Bildschirme mit begrenzten Farben oder monochromen Displays und Browser verwenden, möglicherweise nicht auf Informationen zugreifen, die nur in Farbe präsentiert werden. Die Bereitstellung der durch Farbe vermittelten Information über ein weiteres visuelles Mittel gewährleistet, dass Nutzende, die Farbe nicht sehen, die Information dennoch wahrnehmen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Überschriften sind zusätzlich zur Farbgebung eingerückt oder durch eine andere Schriftgröße hervorgehoben.",
+        "- Linien in Schaubildern sind zusätzlich gestrichelt oder durchgezogen.",
+        "- Flächen haben unterscheidbare Muster.",
+        "- Ein ausgewählter Menüeintrag erhält als Abgrenzung zu den anderen Einträgen eine grafische Markierung, etwa einen Rahmen oder einen Punkt.",
+        "- Als Markierung wird eine Invertierung von Vorder- und Hintergrundfarbe verwendet.",
+        "- Farbliche Warnhinweise werden durch Text ergänzt, beispielsweise „Warnung“.",
+        "- Farbliche Hinweise werden durch ein grafisches Symbol ergänzt, beispielsweise einen OK-Haken.",
+        "- Zustände werden nicht nur durch farbliche Kreise markiert, sondern zusätzlich durch unterschiedliche Formen wie beispielsweise Dreieck, Rechteck, Kreis.",
+        "- Pflichtfelder sind zusätzlich mit einem Stern-Symbol oder dem Begriff „Pflichtfeld“ gekennzeichnet."
+      ],
+      "negativeExamplesDe": [
+        "- Informationen werden ausschließlich über Farbgebung vermittelt.",
+        "- Zustände werden ausschließlich über Farbe vermittelt.",
+        "- Ausgewählte Menüeinträge unterscheiden sich nur durch Farbe von anderen Einträgen.",
+        "- Links in einem Fließtext werden nur farblich markiert.",
+        "- Die Kennzeichnung eines Fehlers, beispielsweise bei Fehleingabe von Informationen in einem Kontaktformular, erfolgt lediglich durch eine farbliche Markierung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#verwendung-von-farbe"
+    }
+  ]
+}

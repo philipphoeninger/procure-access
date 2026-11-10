@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Abbrechen oder Widerrufen einer Touch-Geste",
+  "sortOrder": 760,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.5.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.5.2",
+      "originalTitleDe": "Abbrechen oder Widerrufen einer Touch-Geste",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Elemente erfüllen bei Berührung des Elements mit einem einzelnen Finger, Mausklick oder Teilklick (Mouse-Down) mindestens eine der folgenden Bedingungen:",
+        "",
+        "- Kein Down-Event Das Down-Event führt nicht direkt zum Auslösen der Funktion. Das bedeutet, die Funktion wird nicht durch das reine Drücken des interaktiven Elements ausgelöst. Erst das Loslassen des Elements, indem der Finger nach oben bewegt bzw. die Maustaste wieder losgelassen wird, löst die Funktion aus.",
+        "- Abbrechen oder Rückgängig machen Die Ausführung der Funktion erfolgt beim Up-Event. Es steht ein Mechanismus zur Verfügung, um die Funktion vor Abschluss abzubrechen, oder die Funktion nach Auslösen rückgängig zu machen.",
+        "- Up Reversal Das Loslassen des Elements (Up-Event) kehrt die Auswirkungen des vorherigen Drückens (Down-Event) mit dem Finger um. Wenn beispielsweise das Drücken einer Taste etwas aktiviert, wird durch das Loslassen der Taste der Vorgang rückgängig gemacht.",
+        "- Essenziell Die Funktion muss beim Drücken des Elements (Down-Event) durchgeführt werden. Es gibt keine Option zum Abbrechen oder Rückgängigmachen. Die Funktion wird unmittelbar beim Drücken abgeschlossen (beispielsweise beim Schreiben mit einem Finger oder einem Stift, oder beim Tippen mit einer virtuellen Tastatur).",
+        "",
+        "Die Anforderung gilt nicht für Kontextmenüs, die bei längerem Gedrückthalten eines interaktiven Elements geöffnet werden."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können Maus- oder Touch-Gesten evtl. nicht punktgenau oder mit notwendiger Genauigkeit ausführen. Zur Fehlervermeidung müssen entsprechende Mechanismen verfügbar sein, um ungewollte Aktionen zu vermeiden, beziehungsweise um sie rückgängig zu machen oder abzubrechen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente erfüllen mindestens eine der Anforderungen."
+      ],
+      "negativeExamplesDe": [
+        "- Ein oder mehrere interaktive Elemente erfüllen keine der Anforderungen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#abbrechen-oder-widerrufen-einer-touch-geste"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.5.2",
+      "originalTitleDe": "Abbrechen oder Widerrufen einer Touch-Geste",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Elemente erfüllen bei Berührung des Elements mit einem einzelnen Finger mindestens eine der folgenden Bedingungen:",
+        "",
+        "- Kein Down-Event",
+        " Das Down-Event des Fingers führt nicht direkt zum Auslösen der Funktion. Das bedeutet, die Funktion wird nicht durch das reine Drücken des interaktiven Elements ausgelöst. Erst das Loslassen des Elements, indem der Finger nach oben bewegt wird, löst die Funktion aus.",
+        "- Abbrechen oder Rückgängig machen",
+        " Die Ausführung der Funktion erfolgt beim Up-Event. Es steht ein Mechanismus zur Verfügung, um die Funktion vor Abschluss abzubrechen, oder die Funktion nach Auslösen rückgängig zu machen.",
+        "- Up Reversal",
+        " Das Loslassen des Elements (Up-Event) kehrt die Auswirkungen des vorherigen Drückens (Down-Event) mit dem Finger um. Wenn beispielsweise das Drücken einer Taste etwas aktiviert, wird durch das Loslassen der Taste der Vorgang rückgängig gemacht.",
+        "- Essenziell",
+        " Die Funktion muss beim Drücken des Elements (Down-Event) durchgeführt werden. Es gibt keine Option zum Abbrechen oder Rückgängigmachen. Die Funktion wird unmittelbar beim Drücken abgeschlossen (beispielsweise beim Schreiben mit einem Finger oder einem Stift, oder beim Tippen mit einer virtuellen Tastatur).",
+        "",
+        "Die Anforderung gilt nicht für Kontextmenüs, die bei längerem Gedrückthalten eines interaktiven Elements geöffnet werden."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können Touch-Gesten evtl. nicht punktgenau oder mit notwendiger Genauigkeit ausführen. Zur Fehlervermeidung müssen entsprechende Mechanismen verfügbar sein, um ungewollte Aktionen zu vermeiden, beziehungsweise um sie rückgängig zu machen oder abzubrechen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Elemente erfüllen mindestens eine der Anforderungen."
+      ],
+      "negativeExamplesDe": [
+        "- Ein oder mehrere interaktive Elemente erfüllen keine der Anforderungen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#abbrechen-oder-widerrufen-einer-touch-geste"
+    }
+  ]
+}

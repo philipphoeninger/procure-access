@@ -1,0 +1,81 @@
+{
+  "kind": "requirement",
+  "titleDe": "Bewegte Inhalte abschaltbar",
+  "sortOrder": 1550,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.2.2",
+      "originalTitleDe": "Bewegte Inhalte abschaltbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald das PDF-Dokument Inhalte aufweist, welche blinken, animiert sind oder sich selbstständig aktualisieren."
+      ],
+      "requirementDe": [
+        "Für sich bewegende, blinkende, scrollende oder automatisch aktualisierende Informationen treffen alle folgenden Punkte zu:",
+        "",
+        "**1. Bewegen, Blinken, Scrollen**",
+        "",
+        "Für alle sich bewegenden, blinkenden oder scrollenden Informationen, die",
+        "",
+        "- automatisch starten,",
+        "- länger als fünf Sekunden sichtbar sind und",
+        "- parallel zu anderen Inhalten präsentiert werden,",
+        "",
+        "gibt es einen Mechanismus, mit dem Nutzende sie anhalten, stoppen oder ausblenden können, es sei denn, die Bewegung, das Blinken oder Scrollen ist Teil einer Aktivität, für die dieses unerlässlich ist.",
+        "",
+        "**2. Automatische Aktualisierung**",
+        "",
+        "Für alle sich automatisch aktualisierenden Informationen, die",
+        "",
+        "- automatisch starten und",
+        "- parallel zu anderen Inhalten präsentiert werden,",
+        "",
+        "gibt es einen Mechanismus, mit dem Nutzende sie anhalten, stoppen oder ausblenden oder die Häufigkeit der Aktualisierung kontrollieren können, es sei denn, die automatische Aktualisierung ist Teil einer Aktivität, für die dieses unerlässlich ist."
+      ],
+      "rationaleWhyDe": [
+        "Animationen bzw. automatische Aktualisierungen stellen eine Ablenkung dar. Eine effektive Nutzung des PDF-Dokuments ist dann ggf. nicht möglich."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, dauern aber nicht länger als fünf Sekunden an. Es gibt keine Inhalte, die sich ohne aktive Veranlassung automatisch aktualisieren oder verändern.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, dauern aber nicht länger als fünf Sekunden an, und die automatische Aktualisierung von Inhalten lässt sich anhalten oder in ihrer Häufigkeit anpassen.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, dauern aber nicht länger als fünf Sekunden an, und alle Inhalte, die sich ohne aktive Veranlassung automatisch aktualisieren oder verändern, sind Teil einer Aktivität, für die dieses unerlässlich ist.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, lassen sich aber anhalten oder ausblenden. Es gibt keine Inhalte, die sich ohne aktive Veranlassung automatisch aktualisieren oder verändern.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, lassen sich aber anhalten oder ausblenden, und die automatische Aktualisierung von Inhalten lässt sich anhalten oder in ihrer Häufigkeit anpassen.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch, lassen sich aber anhalten oder ausblenden, und alle Inhalte, die sich ohne aktive Veranlassung automatisch aktualisieren oder verändern, sind Teil einer Aktivität, für die dieses unerlässlich ist.",
+        "- erfüllt: Im PDF-Dokument animierte Inhalte beginnen zwar automatisch und lassen sich zudem weder anhalten noch ausblenden, sind aber Teil einer Aktivität, für die dieses unerlässlich ist. Die Anforderungen an zusätzlich vorhandene automatische Aktualisierung sind erfüllt."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Im PDF-Dokument animierte Inhalte beginnen mit langsamer Geschwindigkeit automatisch, ohne sich anhalten oder ausblenden zu lassen, und dauern etwas länger als fünf Sekunden (maximal zehn Sekunden) an. Die Anforderungen an zusätzlich vorhandene automatische Aktualisierung sind erfüllt.",
+        "- Einschränkung: Im PDF-Dokument animierte Inhalte beginnen mit langsamer Geschwindigkeit automatisch, ohne sich anhalten oder ausblenden zu lassen, und dauern maximal dreißig Sekunden an. Die Anforderungen an zusätzlich vorhandene automatische Aktualisierung sind erfüllt.",
+        "- Barriere: Im PDF-Dokument animierte Inhalte, die länger als fünf Sekunden andauern, beginnen automatisch und lassen sich nur umständlich anhalten oder ausblenden. Ggf. sind außerdem die Anforderungen an zusätzlich vorhandene automatische Aktualisierung nicht erfüllt.",
+        "- Blockade: Das PDF-Dokument enthält eine Vielzahl animierter Inhalte, die automatisch beginnen und länger als fünf Sekunden andauern, bzw. automatische Aktualisierungen, die alle einzeln angehalten oder ausgeblendet bzw. in ihrer Häufigkeit reguliert werden müssen.",
+        "- Blockade: Im PDF-Dokument animierte Inhalte beginnen automatisch und dauern länger als fünf Sekunden an. Sie lassen sich darüber hinaus nicht anhalten oder ausblenden. Ggf. sind außerdem die Anforderungen an zusätzlich vorhandene automatische Aktualisierung nicht erfüllt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#bewegte-inhalte-abschaltbar"
+    }
+  ]
+}

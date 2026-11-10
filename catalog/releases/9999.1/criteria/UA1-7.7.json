@@ -1,0 +1,47 @@
+{
+  "kind": "requirement",
+  "titleDe": "Unicode-Zuordnung",
+  "sortOrder": 1780,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.7",
+      "originalTitleDe": "Unicode-Zuordnung",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald das PDF-Dokument durchsuchbaren Text enthält."
+      ],
+      "requirementDe": [
+        "Alle in durchsuchbarem Text verwendeten Schriftzeichen sollen in ein adäquates Unicode-Zeichen überführt werden können."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass die Inhalte von durchsuchbarem Text eines PDF-Dokuments allen Personengruppen vollumfänglich zur Verfügung stehen. Die Schriftzeichen von getaggtem Text werden in Form von Unicode an assistive Technologien übergeben. Welche Schriftarten konkret verwendet werden, ist für assistive Technologie zunächst nicht von Bedeutung. In den verwendeten Schriften muss eine Übersetzungstabelle eingebettet sein, die alle verwendeten Schriftzeichen umfasst. Andernfalls besteht die Gefahr von Missverständnissen bis hin zu vollständigem Informationsverlust, wenn einzelne Worte oder ganze Abschnitte von assistiven Technologien aufgrund einer unvollständigen bzw. vollständig fehlenden Übersetzungstabelle nicht interpretiert werden können."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: PAC meldet bezüglich der Unicode-Zuordnung keine Fehler. Der gesamte durchsuchbare Text wird vollständig korrekt an assistive Technologien übergeben."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: PAC meldet ggf. keine Fehler hinsichtlich der Unicode-Zuordnung. Doch nicht der gesamte durchsuchbare Text im PDF-Dokument wird vollständig korrekt an assistive Technologien übergeben. Betroffen sind nur einige wenige Worte. Die fehlenden Bestandteile werden als derart unwesentlich eingestuft, dass es nicht erforderlich erscheint, dass ihre Bedeutung aus dem Kontext erschlossen wird (z. B. Eigennamen).",
+        "- Barriere: PAC meldet ggf. keine Fehler hinsichtlich der Unicode-Zuordnung. Doch nicht der gesamte durchsuchbare Text im PDF-Dokument wird vollständig korrekt an assistive Technologien übergeben. Die fehlenden Bestandteile werden als unwesentlich eingestuft. Die Bedeutung des Abschnitts kann aus dem Kontext erschlossen werden.",
+        "- Blockade: Nicht der gesamte durchsuchbare Text im PDF-Dokument wird vollständig korrekt an assistive Technologien übergeben. Die fehlenden Bestandteile werden als wesentlich eingestuft."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.7-unicode-zuordnung"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Ausführung verfügbarer Aktionen",
+  "sortOrder": 1050,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.12"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.12",
+      "originalTitleDe": "Ausführung verfügbarer Aktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Interaktive Bedienelemente sind über die assistiven Systeme bedienbar, unabhängig davon, ob verfügbare Aktionen ausgegeben werden oder nicht. Dies betrifft beispielsweise:",
+        "",
+        "- Tasten (Zum Ausführen doppelklicken)",
+        "- Umschalttasten (Zum Umschalten doppelklicken)",
+        "- Kontrollkästchen (Zum Ändern doppelklicken)",
+        "- Auswahlschalter (Zum Auswählen doppelklicken)",
+        "- Registerkarten (Zum Auswählen doppelklicken)",
+        "- Ausklapplisten (Zum Auswählen doppelklicken)",
+        "- Optionen von Ausklapplisten (Ändern der Optionen mittels Pfeiltasten)",
+        "- Formularfelder (Zum Bearbeiten doppelklicken, Einfügen von Text mittels Tastatur)",
+        "- Links (Zum Öffnen doppelklicken)"
+      ],
+      "rationaleWhyDe": [
+        "Interaktive Elemente, die bei aktivem Screenreader oder mittels Sprachsteuerung nicht bedient werden können, blockieren den Nutzenden bei der Verwendung des digitalen Produkts. Bei Blockaden steht in aller Regel keine, oder nur eine über Umwege erreichbare Behelfslösung zur Verfügung, der Nutzende ist dann bei der Verwendung des Produkts unter Umständen stark eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Interaktive Bedienelemente können bei aktivem Screenreader vollumfänglich bedient werden, die Aktionen werden korrekt ausgelöst.",
+        "- Interaktive Bedienelemente können mittels Ansage der Beschriftung korrekt ausgelöst werden."
+      ],
+      "negativeExamplesDe": [
+        "- Interaktive Bedienelemente können bei aktivem Screenreader nicht, fehlerhaft oder nicht vollumfänglich bedient werden.",
+        "- Interaktive Elemente können mittels Sprachsteuerung nur über die Rasteransicht bedient werden, jedoch nicht mittels Ansage der Beschriftung.",
+        "- Die Auswahl von Optionen in Auswahlfeldern kann über Wischgeste nach rechts oder links verändert werden, jedoch nicht über die Wischgeste nach oben oder unten mit 3 Fingern."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#ausführung-verfügbarer-aktionen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.12",
+      "originalTitleDe": "Ausführung verfügbarer Aktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn interaktive Elemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Bedien- und Formularelemente sind über assistive Technologien vollumfänglich bedienbar, unabhängig davon, ob verfügbare Aktionen ausgegeben werden oder nicht. Dies betrifft beispielsweise:",
+        "",
+        "- Tasten („Zum Aktivieren doppeltippen“)",
+        "- Umschalttasten („Zum Umschalten doppeltippen“)",
+        "- Kontrollkästchen („Zum Ändern doppeltippen“)",
+        "- Auswahlschalter („Zum Auswählen doppeltippen“)",
+        "- Registerkarten („Zum Auswählen doppeltippen“)",
+        "- Ausklapplisten („Zum Erweitern doppeltippen“)",
+        "- Eingabefelder („Zum Bearbeiten doppeltippen“, oder „Zum Einfügen von Text doppeltippen“)",
+        "- Schieberegler („Zum Anpassen des Werts mit einem Finger nach oben oder unten streichen“)",
+        "- Karusselle („Zum Ändern der Seite mit einem Finger nach oben oder unten streichen“)",
+        "- Links („Zum Öffnen doppeltippen“)",
+        "",
+        "Bei Elementen mit mehreren verfügbaren Aktionen müssen alle Funktionen mit assistiven Technologien ausführbar sein. Dies betrifft auch Funktionen, welche vom Nutzenden manuell eingeblendet werden müssen, beispielsweise die Löschen-Funktion eines Listeneintrags, welcher erst durch eine Wischgeste angezeigt wird."
+      ],
+      "rationaleWhyDe": [
+        "Interaktive Elemente, die bei aktivem Screenreader oder mittels Sprachsteuerung nicht bedient werden können, blockieren den Nutzenden bei der Verwendung des digitalen Produkts. Bei Blockaden steht in aller Regel keine, oder nur eine über Umwege erreichbare Behelfslösung zur Verfügung, der Nutzende ist dann bei der Verwendung des Produkts unter Umständen stark eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bedienelemente können bei aktivem Screenreader vollumfänglich bedient werden, die Aktionen werden korrekt ausgelöst.",
+        "- Bedienelemente können mittels Ansage der Beschriftung korrekt ausgelöst werden."
+      ],
+      "negativeExamplesDe": [
+        "- Bedienelemente können bei aktivem Screenreader nicht, fehlerhaft oder nicht vollumfänglich bedient werden.",
+        "- Interaktive Elemente können mittels Sprachsteuerung nur über die Rasteransicht bedient werden, jedoch nicht mittels Ansage der Beschriftung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#ausführung-verfügbarer-aktionen"
+    }
+  ]
+}

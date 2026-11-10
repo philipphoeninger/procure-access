@@ -1,0 +1,68 @@
+{
+  "kind": "requirement",
+  "titleDe": "Zeitvorgaben anpassbar",
+  "sortOrder": 1540,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.2.1",
+      "originalTitleDe": "Zeitvorgaben anpassbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn im PDF-Dokument Tastatureingaben möglich sind und eine zeitliche Limitation vorgesehen ist."
+      ],
+      "requirementDe": [
+        "Für jede im PDF-Dokument festgelegte zeitliche Limitation ist mindestens eine der folgenden Bedingungen erfüllt:",
+        "",
+        "- Deaktivierbar: Das Zeitlimit lässt sich ausschalten, bevor es eintritt.",
+        "- Anpassbar: Das Zeitlimit lässt sich mindestens um das 10-Fache erweitern, bevor es eintritt.",
+        "- Verlängerbar: Nutzende werden vor Ablauf der Zeit gewarnt und erhalten mindestens 20 Sekunden Zeit, um das Zeitlimit mit einer einfachen Aktion zu verlängern (z. B. „Drücken Sie die Leerzeichen-Taste“), und eine solche Möglichkeit besteht mindestens zehn Mal.",
+        "- Echtzeit-Ausnahme: Das Zeitlimit ist ein notwendiger Bestandteil eines Echtzeit-Ereignisses (z. B. einer Auktion), und es gibt keine Alternative zum Zeitlimit.",
+        "- Wesentliche Ausnahme: Die Frist ist wesentlich, und ihre Verlängerung würde die Tätigkeit zunichtemachen.",
+        "- 20 Stunden-Ausnahme: Das Zeitlimit ist länger als 20 Stunden."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass Aufgaben ohne unerwartete Änderungen des PDF-Dokuments oder des Kontexts, die sich aus einem Zeitlimit ergeben, erledigt werden können.",
+        "",
+        "Wenn sich Zeitbegrenzungen nicht abschalten oder verlängern lassen, können Menschen, die mehr Zeit für Eingaben brauchen, Transaktionen oftmals nicht rechtzeitig abschließen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Ein im PDF-Dokument vorhandenes Zeitlimit ist länger als 20 Stunden.",
+        "- erfüllt: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich ausschalten, bevor es eintritt.",
+        "- erfüllt: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich mindestens um das 10-Fache erweitern, bevor es eintritt. Nutzende werden vor Ablauf der Zeit gewarnt und erhalten mindestens 20 Sekunden Zeit, um das Zeitlimit mit einer einfachen Aktion zu verlängern (z. B. „Drücken Sie die Leerzeichen-Taste“), wobei diese Möglichkeit mindestens zehn Mal besteht."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Ein PDF-Dokument enthält kein Zeitlimit oder das Zeitlimit ist für die Nutzung des PDF-Dokuments notwendig. Das ist z. B. der Fall, wenn Fragen im Rahmen einer Prüfung innerhalb eines bestimmten Zeitraums beantwortet werden müssen.",
+        "- leichte Einschränkung: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich nicht ausschalten, bevor es eintritt. Es lässt sich aber mindestens um das 10-Fache erweitern, bevor es eintritt. Nutzende werden außerdem vor Ablauf der Zeit gewarnt und erhalten mindestens 20 Sekunden Zeit, um das Zeitlimit mit einer einfachen Aktion zu verlängern (z. B. „Drücken Sie die Leerzeichen-Taste“). Allerdings besteht diese Möglichkeit weniger als zehn Mal.",
+        "- Einschränkung: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich nicht ausschalten, bevor es eintritt. Es lässt sich aber mindestens um das 10-Fache erweitern, bevor es eintritt. Nutzende werden auch vor Ablauf der Zeit gewarnt, erhalten aber weniger als 20 Sekunden Zeit, um das Zeitlimit mit einer einfachen Aktion zu verlängern (z. B. „Drücken Sie die Leerzeichen-Taste“), wobei diese Möglichkeit deutlich weniger als zehn Mal besteht.",
+        "- Barriere: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich nicht ausschalten, bevor es eintritt. Es lässt sich außerdem um weniger als das 10-Fache erweitern, bevor es eintritt. Nutzende werden zwar vor Ablauf der Zeit gewarnt, erhalten aber deutlich weniger als 20 Sekunden Zeit, um das Zeitlimit mit einer einfachen Aktion zu verlängern (z. B. „Drücken Sie die Leerzeichen-Taste“), wobei diese Möglichkeit nur ein oder zwei Mal besteht.",
+        "- Blockade: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich nicht ausschalten, bevor es eintritt. Es lässt sich außerdem um deutlich weniger als das 10-Fache erweitern, bevor es eintritt. Nutzende werden darüber hinaus vor Ablauf der Zeit nicht gewarnt und erhalten keinen Hinweis, wie sich das Zeitlimit mit einer einfachen Aktion verlängern lässt (z. B. „Drücken Sie die Leerzeichen-Taste“).",
+        "- Blockade: Ein im PDF-Dokument vorhandenes Zeitlimit lässt sich nicht ausschalten, bevor es eintritt, und lässt sich darüber hinaus auch nicht erweitern."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#zeitvorgaben-anpassbar"
+    }
+  ]
+}

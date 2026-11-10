@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Fokus nicht verdeckt (Minimum)",
+  "sortOrder": 740,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.4.11"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.4.11",
+      "originalTitleDe": "Fokus nicht verdeckt (Minimum)",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Während der Bedienung mit einer Tastatur, mit inaktivem Screenreader oder mit Tastatur und aktivem Screenreader darf der Fokusrahmen, genauso wenig wie lediglich ein deutlich sichtbarerer Teil des Fokusrahmens zu keiner Zeit von anderen Inhalten oder Inhaltselementen der Software teilweise oder vollständig verdeckt werden. Dies gilt auch für durch Nutzende eingeblendete Inhalte, wie Ausklapplisten oder Menüs."
+      ],
+      "rationaleWhyDe": [
+        "Gerade für Menschen mit Beeinträchtigung des Sehvermögens, aber auch für Menschen mit motorischer Einschränkung ist es wichtig zu erkennen, welche Stelle aktuell fokussiert wird, welches Element gerade aktiv ist oder wo Eingaben erscheinen werden. Wird der Fokusrahmen ganz oder teilweise von anderen Elementen oder Inhalten verdeckt, verlieren optisch orientierte Menschen leicht die Orientierung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Der Fokusrahmen wird zu keinem Zeitpunkt, auch nicht teilweise, verdeckt.",
+        "- Textblöcke verdecken zu keinem Zeitpunkt den sichtbaren Fokusrahmen von benachbarten Tasten.",
+        "- Eine erweiterte Ausklappliste verdeckt kein anderes Element, sobald dieses Element fokussiert wird."
+      ],
+      "negativeExamplesDe": [
+        "- Der Fokusrahmen wird an manchen Stellen teilweise oder komplett verdeckt.",
+        "- Textblöcke verdecken teilweise den sichtbaren Fokusrahmen von benachbarten Tasten.",
+        "- Eine erweiterte Ausklappliste verdeckt andere Elemente auch dann, wenn diese fokussiert werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#fokus-nicht-verdeckt-minimum"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.4.11",
+      "originalTitleDe": "Fokus nicht verdeckt (Minimum)",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Während der Bedienung mit einer externen Tastatur, mit aktivem Screenreader oder mit externer Tastatur in Kombination mit aktivem Screenreader muss das fokussierte Element für den Nutzenden zu jeder Zeit sichtbar und in seinem Inhalt und seiner Funktion identifizierbar sein.",
+        "",
+        "Das fokussierte Element soll zu keiner Zeit von anderen Inhalten verdeckt werden. Dies gilt auch für durch den Nutzenden eingeblendete Inhalte, wie Ausklapplisten oder Menüs. Vom Nutzenden eingeblendete Inhalte sollen hierfür entweder manuell ausgeblendet werden können oder bei der Fokussierung eines Elements, welches hierdurch verdeckt wird, automatisch ausgeblendet werden.",
+        "",
+        "Seiten, die mehr Inhalt bereitstellen, als auf dem Bildschirm des Endgeräts angezeigt werden kann, müssen den Bildschirminhalt den Fokus verfolgend automatisch verschieben."
+      ],
+      "rationaleWhyDe": [
+        "Gerade für Menschen mit Beeinträchtigung des Sehvermögens, aber auch für Menschen mit motorischer Einschränkung ist es wichtig zu erkennen, welche Stelle aktuell fokussiert wird, welches Element gerade aktiv ist oder wo Eingaben erscheinen werden. Werden aktuell fokussierte Elemente ganz oder teilweise von anderen Elementen oder Inhalten verdeckt, verlieren optisch orientierte Menschen leicht die Orientierung."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Elemente sind bei Fokuserhalt sichtbar.",
+        "- Eine fokussierte Taste wird an einer Stelle zum Teil von einer erweiterten Ausklappliste verdeckt, ist jedoch weiterhin eindeutig als Taste erkennbar und die Beschriftung ist vollständig lesbar.",
+        "- Seiteninhalte werden beim Navigieren passend gescrollt, sodass alle Elemente bei Fokuserhalt stets sichtbar bleiben."
+      ],
+      "negativeExamplesDe": [
+        "- Ein Element wird bei Fokuserhalt durch einen vorangehenden Textblock vollständig verdeckt.",
+        "- Eine fokussierte Taste wird an einer Stelle zum Teil von einer erweiterten Ausklappliste verdeckt. Die Beschriftung der Taste ist nicht mehr vollständig lesbar.",
+        "- Fokussierte Elemente sind nicht sichtbar, da der Anzeigebereich nicht rechtzeitig automatisch scrollt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fokus-nicht-verdeckt-minimum"
+    }
+  ]
+}

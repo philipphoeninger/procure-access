@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Bewegte Inhalte abschaltbar",
+  "sortOrder": 680,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.2.2",
+      "originalTitleDe": "Bewegte Inhalte abschaltbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn in der Software gleichzeitig bewegte Inhalte und nicht bewegte Inhalte darstellt werden."
+      ],
+      "requirementDe": [
+        "Ablenkender Inhalt durch Blinken oder Bewegung soll vermieden werden, zeitlich auf maximal 5 Sekunden begrenzt oder abschaltbar sein. Bewegter Inhalt, der Teil einer essenziellen Aktivität ist, ist von dieser Anforderung ausgenommen. Die Anforderung gilt für jegliche Inhalte, die blinken oder automatisch aktualisiert oder bewegt werden."
+      ],
+      "rationaleWhyDe": [
+        "Blinkende oder sich bewegende Inhalte führen bei vielen Menschen zu Ablenkung. Sie können sich nicht auf andere Inhalte konzentrieren und verlieren den Fokus. Menschen mit beeinträchtigtem Sehvermögen oder Leseschwierigkeiten benötigen zudem ausreichend Zeit zur Verarbeitung der Informationen, um sie zu verstehen. Menschen, die einen Screenreader verwenden, können durch automatische Aktualisierungen gestört werden und die Orientierung verlieren. Zudem kann es auch zu Verschiebungen der Fokusposition kommen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bewegter Inhalt ist abschaltbar oder zeitlich auf maximal 5 Sekunden begrenzt.",
+        "- Die Animation einer Ladephase ist nicht zeitlich begrenzt und kann nicht gestoppt werden. Sie gilt jedoch als essenziell."
+      ],
+      "negativeExamplesDe": [
+        "- Bewegter Inhalt ist nicht abschaltbar.",
+        "- Die Dauer von bewegtem Inhalt ist länger als 5 Sekunden, bewegter Inhalt ist nicht abschaltbar.",
+        "- Die Schaltfläche zum Starten und Stoppen von bewegtem Inhalt ist nicht im unmittelbaren Kontext auffindbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#bewegte-inhalte-abschaltbar"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.2.2",
+      "originalTitleDe": "Bewegte Inhalte abschaltbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn in der Mobile App gleichzeitig bewegte Inhalte und nicht bewegte Inhalte darstellt werden."
+      ],
+      "requirementDe": [
+        "Ablenkender Inhalt durch Blinken oder Bewegung soll vermieden werden, zeitlich auf maximal 5 Sekunden begrenzt oder abschaltbar sein. Bewegter Inhalt, der Teil einer essenziellen Aktivität ist, ist von dieser Anforderung ausgenommen. Die Anforderung gilt für jegliche Inhalte, die blinken oder automatisch aktualisiert oder bewegt werden."
+      ],
+      "rationaleWhyDe": [
+        "Blinkende oder sich bewegende Inhalte führen bei vielen Menschen zu Ablenkung. Sie können sich nicht auf andere Inhalte konzentrieren und verlieren den Fokus. Menschen mit beeinträchtigtem Sehvermögen oder Leseschwierigkeiten benötigen zudem ausreichend Zeit zur Verarbeitung der Informationen, um sie zu verstehen. Screenreadernutzende sind durch automatische Aktualisierungen gestört und verlieren Wahrnehmung und Orientierung bis hin zu Verschiebungen des Fokus."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bewegter Inhalt ist abschaltbar oder zeitlich auf maximal 5 Sekunden begrenzt.",
+        "- Die Animation einer Ladephase ist nicht zeitlich begrenzt und kann nicht gestoppt werden. Sie gilt jedoch als essenziell."
+      ],
+      "negativeExamplesDe": [
+        "- Bewegter Inhalt ist nicht abschaltbar.",
+        "- Die Dauer von bewegtem Inhalt ist länger als 5 Sekunden, bewegter Inhalt ist nicht abschaltbar.",
+        "- Die Schaltfläche zum Starten und Stoppen von bewegtem Inhalt ist nicht im unmittelbaren Kontext auffindbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#bewegte-inhalte-abschaltbar"
+    }
+  ]
+}

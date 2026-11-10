@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sinnvoller Dokumenttitel",
+  "sortOrder": 1570,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.4.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.4.2",
+      "originalTitleDe": "Sinnvoller Dokumenttitel",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "PDF-Dokumente haben Dokumenttitel, die Thema oder Zweck des PDF-Dokuments beschreiben.",
+        "",
+        "Der Dokumenttitel soll beim Öffnen des PDF-Dokuments anstelle des Dateinamens angezeigt werden."
+      ],
+      "rationaleWhyDe": [
+        "Ein aussagekräftiger und eindeutiger Dokumenttitel ermöglicht es, fehlerfrei zwischen mehreren Dateien zu navigieren, insbesondere wenn mehrere Dokumente geöffnet sind, und bietet allen Menschen optimale Orientierung.",
+        "",
+        "Der aussagekräftige Dokumenttitel ist außerdem speziell für Menschen, die Screenreader-Programme nutzen, wichtig, um PDF-Dokumente rasch identifizieren und zuordnen zu können. Dies betrifft insbesondere Menschen ohne bzw. mit eingeschränktem Sehvermögen.",
+        "",
+        "Von einem präzisen Dokumenttitel profitieren darüber hinaus aber auch Menschen mit kognitiven Einschränkungen bzw. mit eingeschränktem Erinnerungsvermögen oder mit Leseschwäche sowie Menschen mit eingeschränkter Handhabung bzw. mit eingeschränkter Kraft, die Navigation mittels Audio ausführen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier"
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Der Dokumenttitel ist nicht sinnvoll, er bezeichnet den Inhalt nicht aussagekräftig.",
+        "- leichte Einschränkung: Der Dokumenttitel ist nicht genau.",
+        "- Einschränkung: Der Dokumenttitel ist zu lang bzw. beinhaltet die wichtigen Informationen erst ganz am Ende.",
+        "- Einschränkung: Der Dokumenttitel enthält typographischen Schmuck (etwa , ~~, ====).",
+        "- Einschränkung: Der Dokumenttitel wird nicht beim Öffnen als Registerkarteninformation angezeigt. Stattdessen wird der Dateiname angezeigt.",
+        "- Barriere: Der Dokumenttitel ist bei mehreren Dokumenten mit unterschiedlichem Inhalt identisch."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sinnvoller-dokumenttitel"
+    }
+  ]
+}

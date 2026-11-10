@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Audio-Bandbreite für Sprache",
+  "sortOrder": 110,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.1",
+      "originalTitleDe": "Audio-Bandbreite für Sprache",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software eine Funktion zur Zwei-Wege-Sprachkommunikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Zum Sicherstellen von entsprechender Sprachverständlichkeit bei der Zwei-Wege-Sprachkommunikation soll zum Kodieren und Dekodieren von Audio ein Frequenzbereich genutzt werden, dessen obere Grenze bis mindestens 7.000 Hz reicht. Dieser Frequenzbereich kann beispielsweise mit dem Standard-Codec G.722 [i.21] erreicht werden."
+      ],
+      "rationaleWhyDe": [
+        "Klare und gut verständliche Audioqualität bei der Zwei-Wege-Kommunikation ist besonders für Menschen mit Hörbeeinträchtigungen essenziell. Über einen verbindlichen Mindeststandard für Audioqualität soll diese Anforderung erfüllt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Qualität von mindestens zwei der drei getätigten Anrufe wurde subjektiv als hochwertig beurteilt."
+      ],
+      "negativeExamplesDe": [
+        "- Die Qualität von mindestens zwei der drei getätigten Anrufe wurde subjektiv als nicht hochwertig beurteilt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#audio-bandbreite-für-sprache"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.1",
+      "originalTitleDe": "Audio-Bandbreite für Sprache",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App eine Funktion zur Zwei-Wege-Sprachkommunikation zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Zum Sicherstellen von entsprechender Sprachverständlichkeit bei der Zwei-Wege-Sprachkommunikation soll zum Kodieren und Dekodieren von Audio ein Frequenzbereich genutzt werden, dessen obere Grenze bis mindestens 7.000 Hz reicht. Dieser Frequenzbereich kann beispielsweise mit dem Standard-Codec G.722 [i.21] erreicht werden."
+      ],
+      "rationaleWhyDe": [
+        "Klare und gut verständliche Audioqualität bei der Zwei-Wege-Kommunikation ist besonders für Menschen mit Hörbeeinträchtigungen essenziell. Über einen verbindlichen Mindeststandard für Audioqualität soll diese Anforderung erfüllt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Qualität von mindestens zwei der drei getätigten Anrufe wurde subjektiv als hochwertig beurteilt."
+      ],
+      "negativeExamplesDe": [
+        "- Die Qualität von mindestens zwei der drei getätigten Anrufe wurde subjektiv als nicht hochwertig beurteilt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#audio-bandbreite-für-sprache"
+    }
+  ]
+}

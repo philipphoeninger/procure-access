@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Ohne Maus nutzbar",
+  "sortOrder": 1510,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.1.1",
+      "originalTitleDe": "Ohne Maus nutzbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Die gesamte Interaktion im PDF-Dokument muss ohne zeitliche Limitierung mittels Tastatur möglich sein, es sei denn die zugrundeliegende Funktionalität ist von einer konkreten Bewegung abhängig (auf dem Weg hin zu einem Endpunkt)."
+      ],
+      "rationaleWhyDe": [
+        "Ziel dieses Prüfschritts ist sicherzustellen, dass das PDF-Dokument mittels Tastatur oder eines Tastatursimulators bearbeitet werden kann. Die Bedienung soll geräteunabhängig möglich sein. Das bedeutet: Sie muss sowohl mit der Maus als auch mit der Tastatur möglich sein. Auf Tastaturbedienbarkeit angewiesen sind zum Beispiel viele motorisch eingeschränkte oder blinde Menschen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Elemente, die für die Nutzung und das Verständnis des Inhalts des PDF-Dokuments notwendig sind, können erwartungskonform mit der Tastatur erreicht werden."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Einige Elemente, die für die Nutzung und das Verständnis des Inhalts des PDF-Dokuments notwendig sind, können nur über ungewöhnliche Tasten-Kombinationen (z. B. zweimal Pfeil-Taste, einmal Tab-Taste) mit der Tastatur erreicht werden.",
+        "- Einschränkung: Alle Elemente, die für die Nutzung und das Verständnis des Inhalts des PDF-Dokuments notwendig sind, können nur über ungewöhnliche Tasten-Kombinationen (z. B. zweimal Pfeil-Taste, einmal Tab-Taste) mit der Tastatur erreicht werden.",
+        "- Barriere: Elemente, die für die Nutzung und das Verständnis des Inhalts des PDF-Dokuments notwendig sind, können nur über Umwege (z. B. die Objektnavigation im Screenreader-Programm NVDA) mit der Tastatur erreicht werden.",
+        "- Blockade: Elemente, die für die Nutzung und das Verständnis des Inhalts des PDF-Dokuments notwendig sind, können mit der Tastatur nicht erreicht werden.",
+        "",
+        "Darüber hinaus je nach Relevanz der Funktionalität, die nicht mittels Tastatur ausführbar ist, Einschränkung bis Blockade."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ohne-maus-nutzbar"
+    }
+  ]
+}

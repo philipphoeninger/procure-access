@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "titleDe": "Aussagekräftige Überschriften und Beschriftungen",
+  "sortOrder": 1600,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.4.6"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.4.6",
+      "originalTitleDe": "Aussagekräftige Überschriften und Beschriftungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Inhalte durch Überschriften strukturiert werden, Beschriftungen zu interaktiven Elementen zur Eingabe von Daten vorhanden sind oder wenn das PDF-Dokument Abkürzungen enthält."
+      ],
+      "requirementDe": [
+        "**1. Überschriften**",
+        "",
+        "Ein vorhandener sichtbarer Überschriftentext muss den zugehörigen Abschnitt hinreichend genau bzw. aussagekräftig beschreiben. Die jeweiligen Überschriften müssen zudem eindeutig, insbesondere im Gesamtkontext der im PDF-Dokument verwendeten Überschriften sein.",
+        "",
+        "**2. Label/Beschriftungen**",
+        "",
+        "Vorhandene sichtbare Beschriftungen von interaktiven Elementen zur Eingabe von Daten, wie Eingabefelder oder Auswahlschalter, müssen die dazugehörigen Interaktiv-Komponenten hinreichend genau bzw. sinngebend beschreiben. Die jeweiligen Beschriftungen müssen zudem eindeutig, insbesondere im Gesamtkontext der im PDF-Dokument verwendeten Beschriftungen sein. Dies kann auch in Verbindung mit z. B. Bereichsüberschriften hergestellt werden.",
+        "",
+        "**3. Abkürzungen**",
+        "",
+        "Es muss ein Mechanismus vorhanden sein, um die ausgeschriebene Form einer Abkürzung bzw. ihre Bedeutung, zu identifizieren."
+      ],
+      "rationaleWhyDe": [
+        "**1. Überschriften**",
+        "",
+        "Überschriften sind die wichtigsten Gliederungsmerkmale eines PDF-Dokuments. PDF-Dokumente werden durch Überschriften strukturiert. Dank dieser Strukturierung wissen Nutzende, was zusammengehört, können die Inhalte überblicken und gezielt auf Inhalte zugreifen bzw. danach suchen.",
+        "",
+        "Menschen mit Seheinschränkung verwenden Überschriften zur Navigation. Diese technische Navigation in PDF-Dokumenten basiert ausschließlich auf Kennzeichnungen (Tags), die bereits im Quellsystem z. B. über Word-Formatvorlagen gesetzt werden müssen. Eine rein visuelle Kennzeichnung (z. B. Schriftgröße, Fett usw.) erreicht diese Strukturierung nicht.",
+        "",
+        "Wenn Überschriften den Inhalt des folgenden Abschnitts nicht sinnvoll beschreiben bzw. organisieren, ist eine Navigation bzw. Orientierung anhand von Überschriften nicht möglich.",
+        "",
+        "**2. Label/Beschriftungen**",
+        "",
+        "Sinnvolle Beschriftungen von interaktiven Elementen zur Eingabe von Daten ermöglichen das Erkennen der Interaktiv-Komponenten und eine sinngemäße Bedienung.",
+        "",
+        "**3. Abkürzungen**",
+        "",
+        "Bei Abkürzungen, die nicht alltäglich sind, kann nicht vorausgesetzt werden, dass ihre Bedeutung allgemein bekannt ist. Bei Abkürzungen, die einen hohen Kontextbezug zum Dokumentinhalt haben, gilt dies insbesondere nicht nur für Menschen, die Schwierigkeiten mit der Dekodierung von Worten oder ein eingeschränktes Erinnerungsvermögen haben.",
+        "",
+        "Darüber hinaus kann eine Abkürzung abhängig vom Kontext ganz unterschiedliche Bedeutungen aufweisen, insbesondere auch innerhalb ein und desselben PDF-Dokuments. Die Kurzform eines Wortes – ein Akronym – kann wiederum identisch sein mit einer Abkürzung bzw. kann wie ein Wort mit einer ganz anderen Bedeutung ausgesprochen werden.",
+        "",
+        "Insbesondere bei der Nutzung eines Screenreader-Programms können Abkürzungen den Lesefluss erschweren und bei der Nutzung einer Bildschirmlupe besteht bei großem Vergrößerungsfaktor die Gefahr, den Kontext zu verlieren.",
+        "",
+        "Indem eine Abkürzung erklärt bzw. mit einem Erweiterungstext versehen wird, werden Missverständnisse und Irritationen von vornherein vermieden. Ein solches Vorgehen erleichtert allen Personengruppen das Verständnis des gemeinten Sachverhalts."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle verwendeten Überschriften und Beschriftungen sind sinnvoll und eindeutig. Abkürzungen, deren Bedeutung zum Verstehen des Textes wichtig ist, werden bei erstmaligem Vorkommen erklärt bzw. mit Erweiterungstext versehen."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung bzw. Einschränkung: Nicht eindeutige Beschriftungen oder Überschriften sind je nachdem zu bewerten, wie aufwändig es ist, notwendige Zusatzinformationen zu ermitteln.",
+        "- Einschränkung: Abkürzungen sind nur teilweise oder unzureichend erklärt bzw. mit Erweiterungstexten versehen. Dabei handelt es sich um eindeutige Abkürzungen, die aus anderen Quellen zweifelsfrei erschlossen werden könnten (siehe dazu auch das letzte Beispiel).",
+        "- Barriere: Sämtliche Abkürzungen werden weder erklärt noch im Tag-Baum mit Erweiterungstexten versehen. Dabei handelt es sich um eindeutige Abkürzungen, die aus anderen Quellen zweifelsfrei erschlossen werden könnten (erhöhter Aufwand, siehe dazu auch das letzte Beispiel).",
+        "- Barriere: Abkürzungen sind nur teilweise oder unzureichend erklärt bzw. mit Erweiterungstexten versehen. Dabei handelt es sich um Abkürzungen, die nicht eindeutig sind bzw. die einen hohen Kontextbezug zum Dokumentinhalt haben, sodass bestimmte Inhalte nicht erschlossen werden können. Diese sind jedoch nicht entscheidend für das Ausführen von Handlungen.",
+        "- Blockade: Wesentliche bzw. die meisten verwendeten Überschriften und/oder Beschriftungen sind nicht sinnvoll bzw. eindeutig. Das Verständnis der überschriebenen Inhalte bzw. die Bedienung der interaktiven Elemente zur Eingabe von Daten ist aufgrund der fehlenden Aussagekraft nicht möglich.",
+        "- Blockade: Sämtliche Abkürzungen werden weder erklärt noch im Tag-Baum mit Erweiterungstexten versehen. Dabei handelt es sich um Abkürzungen, die nicht eindeutig sind bzw. die einen hohen Kontextbezug zum Dokumentinhalt haben.",
+        "- Blockade: Auf einer Rechnung nimmt ein sehender Mensch \"USt.\" automatisch als \"Umsatzsteuer\" wahr. Zu dieser Abkürzung gibt es im PDF-Dokument keine Erläuterung im Text und es ist auch kein Erweiterungstext vorhanden. Das Screenreader-Programm NVDA liest an dieser Stelle \"ust\" vor."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#aussagekräftige-überschriften-und-beschriftungen"
+    }
+  ]
+}

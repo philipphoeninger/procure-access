@@ -1,0 +1,100 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Zugänglicher Anmeldeprozess",
+  "sortOrder": 900,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.8"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.8a",
+      "originalTitleDe": "Zugänglicher Anmeldeprozess",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die vollständige Nutzung der Software eine Anmeldung voraussetzt. Der Prüfschritt bezieht sich hierbei nicht auf Registrierungsprozesse."
+      ],
+      "requirementDe": [
+        "Der Anmeldeprozess kann ohne Einsatz kognitiver Fähigkeiten (beispielsweise das Merken eines Passworts, oder das Lösen eines Rätsels) durchgeführt werden, es sei denn, es wird mindestens eine der folgenden Möglichkeiten angeboten:",
+        "",
+        "- Einfügen des Passworts durch Kopieren und Einfügen von Text",
+        "- Automatisches Einfügen des Passworts über den Passwortmanager des Betriebssystems",
+        "- Anmeldung über einen Drittanbieterdienst (beispielsweise Anmeldung mit Apple-ID oder Google-Account)",
+        "- Alternative Anmeldung über ein biometrisches Merkmal (beispielsweise Touch-ID oder Face-ID)",
+        "- Alternative Anmeldung über das Scannen eines QR-Codes",
+        "",
+        "Es ist nicht ausreichend, wenn zur Anmeldung ausschließlich die Option zum Scannen eines QR-Codes zur Verfügung steht."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende benötigen eine einfache und zugängliche, und zugleich sichere Methode, um sich in einer Software anmelden zu können. Passworteingaben, die die Nutzung kognitiver Fähigkeiten ohne entsprechende Alternativen vorsehen, stellen für manche Nutzende eine Barriere oder sogar eine Blockade dar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden eine oder mehrere der Möglichkeiten im Anmeldeprozess unterstützt.",
+        "- Die Passworteingabe für vom Passwortmanager des Betriebssystems übernommen.",
+        "- Statt einer Passworteingabe kann Face-ID verwendet werden."
+      ],
+      "negativeExamplesDe": [
+        "- Das Passwort kann ausschließlich manuell in das dafür vorgesehene Eingabefeld eingegeben werden. Es gibt keinerlei Unterstützungsfunktionen oder Alternativen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#a-zugänglicher-anmeldeprozess"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.8a",
+      "originalTitleDe": "Zugänglicher Anmeldeprozess",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die vollständige Nutzung der Mobile App eine Anmeldung voraussetzt. Der Prüfschritt bezieht sich hierbei nicht auf Registrierungsprozesse."
+      ],
+      "requirementDe": [
+        "Der Anmeldeprozess kann ohne Einsatz kognitiver Fähigkeiten (beispielsweise das Merken eines Passworts, oder das Lösen eines Rätsels) durchgeführt werden, es sei denn, es wird mindestens eine der folgenden Möglichkeiten angeboten:",
+        "",
+        "- Einfügen des Passworts durch Kopieren und Einfügen von Text",
+        "- Automatisches Einfügen des Passworts über den Passwortmanager des Betriebssystems",
+        "- Anmeldung über einen Drittanbieterdienst (beispielsweise Anmeldung mit Apple-ID oder Google-Account)",
+        "- Alternative Anmeldung über ein biometrisches Merkmal (beispielsweise Touch-ID oder Face-ID)",
+        "- Alternative Anmeldung über das Scannen eines QR-Codes",
+        "",
+        "Es ist nicht ausreichend, wenn zur Anmeldung ausschließlich die Option zum Scannen eines QR-Codes zur Verfügung steht."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende benötigen eine einfache und zugängliche, und zugleich sichere Methode, um sich in einer Mobile App anmelden zu können. Passworteingaben, die die Nutzung kognitiver Fähigkeiten ohne entsprechende Alternativen vorsehen, stellen für manche Nutzende eine Barriere oder sogar eine Blockade dar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Es werden eine oder mehrere der Möglichkeiten im Anmeldeprozess unterstützt.",
+        "- Die Passworteingabe für vom Passwortmanager des Betriebssystems übernommen.",
+        "- Statt einer Passworteingabe kann Face-ID verwendet werden."
+      ],
+      "negativeExamplesDe": [
+        "- Das Passwort kann ausschließlich manuell in das dafür vorgesehene Eingabefeld eingegeben werden. Es gibt keinerlei Unterstützungsfunktionen oder Alternativen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#a-zugänglicher-anmeldeprozess"
+    }
+  ]
+}

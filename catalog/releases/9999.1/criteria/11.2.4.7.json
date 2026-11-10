@@ -1,0 +1,109 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Fokus sichtbar",
+  "sortOrder": 730,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.4.7"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.4.7",
+      "originalTitleDe": "Fokus sichtbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Während der Bedienung mit einer Tastatur, mit inaktivem Screenreader oder mit Tastatur und aktivem Screenreader muss der Fokus zu jeder Zeit deutlich sichtbar sein. Der Fokus wird hierbei durch einen deutlich sichtbaren Rahmen, der das Element umrahmt, oder durch farbliches Ausfüllen der Elementfläche visualisiert.",
+        "",
+        "Seiten, die mehr Inhalt bereitstellen als auf dem Bildschirm des Endgeräts angezeigt werden kann, müssen den Bildschirminhalt den Fokus verfolgend automatisch verschieben.",
+        "",
+        "In Eingabefeldern muss zusätzlich zur Fokussierung des Elements der Cursor im Eingabefeld angezeigt werden.",
+        "",
+        "Versteckte Sprunglinks sollen bei Fokuserhalt eingeblendet werden.",
+        "",
+        "Für die Darstellung des Fokus gilt generell eine Kontrastanforderung von 3:1 zum Hintergrund und zum interaktiven Element."
+      ],
+      "rationaleWhyDe": [
+        "Gerade für Menschen mit Beeinträchtigung des Sehvermögens, aber auch für Menschen mit motorischer Einschränkung ist es wichtig zu erkennen, welche Stelle aktuell fokussiert wird, welches Element gerade aktiv ist oder wo Eingaben erscheinen werden. Ohne sichtbaren Fokus ist die Software für optisch orientierte Menschen nicht bedienbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Der Fokus ist an allen Stellen beziehungsweise in allen Elementzuständen deutlich sichtbar.",
+        "- Der Fokus bei Tastaturbedienung wechselt bei manchen Elementen von einem Rahmen auf eine ausgefüllte Hintergrundfläche."
+      ],
+      "negativeExamplesDe": [
+        "- Der Fokus ist nur schwach sichtbar.",
+        "- Der Fokus bei Zustandsänderungen ist nicht deutlich erkennbar.",
+        "- Der Fokus ist für mehr als 3 Navigationsschritte nicht sichtbar.",
+        "- Der Fokus ist in ganzen Bereichen der Software nicht sichtbar.",
+        "- Bei Tastaturbedienung ohne aktiven Screenreader wird ein Eingabefeld wird durch einen Rahmen fokussiert, jedoch wird der Cursor im Eingabefeld nicht angezeigt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#fokus-sichtbar"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.4.7",
+      "originalTitleDe": "Fokus sichtbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Während der Bedienung mit einer externen Tastatur, mit aktivem Screenreader oder mit externer Tastatur in Kombination mit aktivem Screenreader muss der visuelle Fokusindikator zu jeder Zeit deutlich sichtbar sein. Der Fokusindikator wird hierbei durch einen deutlich sichtbaren Rahmen, der das Element umrahmt, oder durch farbliches Ausfüllen der Elementfläche visualisiert.",
+        "",
+        "In Eingabefeldern im Eingabemodus muss zusätzlich zur Fokussierung des Elements der Cursor im Eingabefeld angezeigt werden.",
+        "",
+        "Versteckte Sprunglinks sollen bei Fokuserhalt eingeblendet werden.",
+        "",
+        "Bei aktiver Bildschirmlupe soll der angezeigte Bildschirmausschnitt stets dem fokussierten Element folgen.",
+        "",
+        "Für die Darstellung des Fokusindikators gilt generell eine Kontrastanforderung von 3:1 zum Hintergrund und zum fokussierten Element."
+      ],
+      "rationaleWhyDe": [
+        "Gerade für Menschen mit Beeinträchtigung des Sehvermögens, aber auch für Menschen mit motorischer Einschränkung ist es wichtig zu erkennen, welche Stelle aktuell fokussiert wird, welches Element gerade aktiv ist oder wo Eingaben erscheinen werden. Ohne sichtbaren Fokus ist die Mobile App für optisch orientierte Menschen nicht bedienbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Der Fokusindikator ist an allen Stellen beziehungsweise in allen Elementzuständen deutlich sichtbar.",
+        "- Der Fokusindikator bei Tastaturbedienung wechselt bei manchen Elementen von einem Rahmen auf eine ausgefüllte Hintergrundfläche."
+      ],
+      "negativeExamplesDe": [
+        "- Der Fokusindikator ist nur schwach sichtbar.",
+        "- Der Fokusindikator umschließt nicht das fokussierte Element, da er versetzt angezeigt wird.",
+        "- Der Fokusindikator überlappt deutlich mit dem fokussierten Element.",
+        "- Bei Zustandsänderungen ist der Fokusindikator nicht deutlich erkennbar.",
+        "- Der Fokusindikator ist in einem Bereich der Mobile App nicht sichtbar.",
+        "- Bei Tastaturbedienung ohne aktiven Screenreader wird der Cursor im Eingabefeld nicht angezeigt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#fokus-sichtbar"
+    }
+  ]
+}

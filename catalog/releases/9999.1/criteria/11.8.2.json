@@ -1,0 +1,124 @@
+{
+  "kind": "requirement",
+  "category": "Autorenwerkzeuge",
+  "titleDe": "Erstellung barrierefreier Inhalte",
+  "sortOrder": 1140,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.8.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "authoringTool"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.8.2",
+      "originalTitleDe": "Erstellung barrierefreier Inhalte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Funktionalitäten vorhanden sind, durch die Inhalte erstellt werden können. Solche Autorenwerkzeuge unterstützen Autoren dabei, Inhalte zu erstellen, zu organisieren und zu verwalten. Autorenwerkzeuge sind beispielsweise:",
+        "",
+        "- Texteditoren und Markdown-Editoren",
+        "- Grafikdesign-Tools",
+        "- Kollaborative Schreibwerkzeuge",
+        "- Storyboard-Tools",
+        "- Content-Management-Systeme (CMS)",
+        "- Übersetzungs- und Lokalisierungstools",
+        "- Rich Media-Editoren",
+        "- Social Media Publishing-Tools",
+        "- Blog Publishing-Tools"
+      ],
+      "requirementDe": [
+        "Autorenwerkzeuge müssen die Erstellung von barrierefreien Inhalten ermöglichen und die Autoren bei der Erstellung entsprechend anleiten. Der neu generierte Inhalt muss dabei innerhalb der Software ausgegeben werden. Autorenwerkzeuge dürfen dabei zusätzliche Werkzeuge einbinden, wenn die Konformität bestimmter Anforderungen von einem einzelnen Werkzeug nicht erreicht werden kann.",
+        "",
+        "Ein Export in andere Dateiformate ist nicht Bestandteil dieser Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, und interaktive Elemente, die bestimmte Funktionalitäten bereitstellen, müssen diese Informationen auch an die assistiven Systeme vermitteln. Dies gilt auch für neu generierten Inhalt. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können auch Nutzende von assistiven Systemen den Aufbau der Inhalte wahrnehmen, durchsuchen und bedienen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine neu generierte Überschrift wird vom Screenreader als Überschrift inklusive Angabe der korrekten Ebene wiedergegeben.",
+        "- Beim Hochladen von Bildern wird die Eingabe eines Alternativtexts gefordert, der nach dem Hochladen vom Screenreader wiedergegeben wird.",
+        "- Beim Generieren eines Videos können Untertitel manuell hinzugefügt oder nachbearbeitet werden.",
+        "- Beim Generieren eines Links kann eine eindeutige Beschriftung hinzugefügt werden."
+      ],
+      "negativeExamplesDe": [
+        "- Eine neu generierte Überschrift kann nur durch Änderung der Schriftgröße optisch identifiziert werden, der Screenreader erkennt die Überschrift nicht.",
+        "- Beim Hochladen von Bildern wird die Eingabe eines Alternativtexts nicht gefordert, oder das Eingabefeld ist ein Pflichtfeld.",
+        "- Nach dem Hochladen von Bildern wird der Alternativtext nicht vom Screenreader wiedergegeben.",
+        "- Beim Generieren eines Videos können Untertitel nicht manuell hinzugefügt oder nachbearbeitet werden.",
+        "- Nach dem Generieren einer Liste identifiziert der Screenreader die generierten Inhalte nicht als Liste."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#erstellung-barrierefreier-inhalte"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.8.2",
+      "originalTitleDe": "Erstellung barrierefreier Inhalte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Funktionalitäten vorhanden sind, durch die Inhalte erstellt werden können. Solche Autorenwerkzeuge unterstützen Autoren dabei, Inhalte zu erstellen, zu organisieren und zu verwalten. Autorenwerkzeuge sind beispielsweise:",
+        "",
+        "- Texteditoren und Markdown-Editoren",
+        "- Grafikdesign-Tools",
+        "- Kollaborative Schreibwerkzeuge",
+        "- Storyboard-Tools",
+        "- Content-Management-Systeme (CMS)",
+        "- Übersetzungs- und Lokalisierungstools",
+        "- Rich Media-Editoren",
+        "- Social Media Publishing-Tools",
+        "- Blog Publishing-Tools"
+      ],
+      "requirementDe": [
+        "Autorenwerkzeuge müssen die Erstellung von barrierefreien Inhalten ermöglichen und die Autoren bei der Erstellung entsprechend anleiten. Der neu generierte Inhalt muss dabei innerhalb der Mobile App ausgegeben werden. Autorenwerkzeuge dürfen dabei zusätzliche Werkzeuge einbinden, wenn die Konformität bestimmter Anforderungen von einem einzelnen Werkzeug nicht erreicht werden kann.",
+        "",
+        "Ein Export in andere Dateiformate ist nicht Bestandteil dieser Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, und interaktive Elemente, die bestimmte Funktionalitäten bereitstellen, müssen diese Informationen auch an die assistiven Systeme vermitteln. Dies gilt auch für neu generierten Inhalt. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können auch Nutzende von assistiven Systemen den Aufbau der Inhalte wahrnehmen, durchsuchen und bedienen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine neu generierte Überschrift wird vom Screenreader als Überschrift inklusive Angabe der korrekten Ebene wiedergegeben.",
+        "- Beim Hochladen von Bildern wird die Eingabe eines Alternativtexts gefordert, der nach dem Hochladen vom Screenreader wiedergegeben wird.",
+        "- Beim Generieren eines Videos können Untertitel manuell hinzugefügt oder nachbearbeitet werden.",
+        "- Beim Generieren eines Links kann eine eindeutige Beschriftung hinzugefügt werden."
+      ],
+      "negativeExamplesDe": [
+        "- Eine neu generierte Überschrift kann nur durch Änderung der Schriftgröße optisch identifiziert werden, der Screenreader erkennt die Überschrift nicht.",
+        "- Beim Hochladen von Bildern wird die Eingabe eines Alternativtexts nicht gefordert, oder das Eingabefeld ist ein Pflichtfeld.",
+        "- Nach dem Hochladen von Bildern wird der Alternativtext nicht vom Screenreader wiedergegeben.",
+        "- Beim Generieren eines Videos können Untertitel nicht manuell hinzugefügt oder nachbearbeitet werden.",
+        "- Nach dem Generieren einer Liste identifiziert der Screenreader die generierten Inhalte nicht als Liste."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#erstellung-barrierefreier-inhalte"
+    }
+  ]
+}

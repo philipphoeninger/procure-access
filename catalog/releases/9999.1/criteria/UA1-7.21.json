@@ -1,0 +1,55 @@
+{
+  "kind": "requirement",
+  "titleDe": "Schriften",
+  "sortOrder": 1830,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.21",
+      "originalTitleDe": "Schriften",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald das PDF-Dokument durchsuchbaren Text in Form von nicht-Symbolen (normale Textzeichen per Schriftarten wie Arial, Verdana, etc.) bzw. Symbolen (Wingdings, Formelzeichen oder Aufzählungszeichen, etc.) enthält."
+      ],
+      "requirementDe": [
+        "Die verwendeten Schriftarten sollen im PDF-Dokument eingebettet sein.",
+        "",
+        "Enthält ein PDF-Dokument durchsuchbare nicht-Symbol-Textzeichen, wie Buchstaben, Zahlen oder übliche Sonderzeichen, so muss für eingebettete nicht-Symbol-TrueType-Schriftarten ein korrekter Encoding-Eintrag gesetzt sein.",
+        "",
+        "Enthält ein PDF-Dokument durchsuchbare symbolische Zeichen, wie Aufzählungszeichen oder Formelzeichen, so muss für eingebettete symbolische TrueType Schriftarten ein korrekter Encoding-Eintrag gesetzt sein."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass die Inhalte von durchsuchbarem Text eines PDF-Dokuments allen Personengruppen vollumfänglich zur Verfügung stehen.",
+        "",
+        "Damit die im PDF-Dokument verwendeten Schriftarten zuverlässig in allen Ausgabeformen (wie z. B. bei Nutzung von Screenreader-Programmen bzw. Braille-Software) aber auch von sämtlichen PDF-Anzeigeprogrammen optisch korrekt dargestellt werden, ist das Vorhandensein eines entsprechenden Encoding-Eintrages erforderlich.",
+        "",
+        "Andernfalls besteht die Gefahr von Missverständnissen bis hin zu vollständigem Informationsverlust."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: PAC meldet bezüglich der Schriften keine Fehler. Die eingebettete nicht-Symbol-TrueType-Schrift bzw. eingebettete Symbol-TrueType-Schrift enthält einen Kodierungseintrag."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Nicht alle im PDF-Dokument vorhandenen Inhalte lassen sich in der PAC Screenreader-Vorschau wiederfinden.",
+        "- Einschränkung: Die eingebettete nicht-Symbol-TrueType-Schrift bzw. eingebettete Symbol-TrueType-Schrift enthält keinen Kodierungseintrag, kann jedoch von einem Screenreader-Programm korrekt ausgelesen werden und ist auch optisch korrekt erkennbar.",
+        "- Blockade: Die PAC Screenreader-Vorschau liefert keine noch als sinnvoll verwertbar anzusehenden Informationen.",
+        "- Blockade: Die eingebettete nicht-Symbol-TrueType-Schrift bzw. eingebettete Symbol-TrueType-Schrift enthält keinen Kodierungseintrag und ist, entweder von einem Screenreader-Programm oder rein optisch, nicht korrekt erkennbar."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.21-schriften"
+    }
+  ]
+}

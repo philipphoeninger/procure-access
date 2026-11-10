@@ -1,0 +1,50 @@
+{
+  "kind": "requirement",
+  "titleDe": "Automatischer Umbruch (Reflow)",
+  "sortOrder": 1470,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.10"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.10",
+      "originalTitleDe": "Automatischer Umbruch (Reflow)",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Anpassung der Vergrößerung bei einer „normalen“ Fenster-Breite von 1280px nach Zoom auf 400 % (oder bei ungezoomter Ansicht bei einer Fenster-Breite von 320px) führt nicht zu einem Verlust an Inhalten oder Funktionalitäten. Die Inhalte sind ohne horizontales (waagerechtes) Scrollen vollständig erreichbar."
+      ],
+      "rationaleWhyDe": [
+        "Personen mit Sehbehinderung vergrößern PDF-Dokumente häufig über die Zoomfunktion. Eine responsive Gestaltung, die abhängig vom Zoomfaktor und der verfügbaren Bildschirmbreite dynamisch den Zeilen-/Seitenumbruch für PDF-Dokumente anpasst, würde die Lesbarkeit von vergrößerten PDF-Dokumenten auf jeglichen Geräten verbessern."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: In der Umfließen-Ansicht kommt es weder zu Textverlusten noch zu Verpixelungen und alle Funktionalitäten bleiben bedienbar."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Die Umfließen-Ansicht im PDF-Anzeigeprogramm lässt sich nicht aktivieren.",
+        "- Blockade: In der Umfließen-Ansicht kommt es zu Textverlusten, weil Inhalte z. B. nicht mehr vollständig erreichbar sind, bzw. zu Verpixelungen und/oder zum Verlust von Funktionalitäten."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#automatischer-umbruch-reflow"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Keine Kontextänderung bei Fokus",
+  "sortOrder": 1680,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.2.1",
+      "originalTitleDe": "Keine Kontextänderung bei Fokus",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente wie Eingabefelder, Auswahlschalter, Buttons oder Links enthält."
+      ],
+      "requirementDe": [
+        "Wenn eine Dokumenten-Komponente wie ein Eingabefeld, Link oder Button den Fokus erhält, wird keine Kontextänderung ausgelöst."
+      ],
+      "rationaleWhyDe": [
+        "Die bei Fokuserhalt auftretenden Effekte sollten vorhersehbar sein. Für Menschen, denen es nicht möglich ist, die gesamte Anzeige auf einmal zu sehen bzw. kognitiv zu erfassen, aber auch Menschen mit Leseschwäche sowie Menschen mit eingeschränkter Handhabung bzw. mit eingeschränkter Kraft, ist es unerlässlich, das PDF-Dokument in Ruhe erkunden zu können und zunächst Schritt für Schritt durch alle verfügbaren Bedienelemente navigieren zu können. Jede unbeabsichtigte Kontextänderung könnte zu Orientierungsverlust führen oder aber zunächst gar nicht bemerkt werden.",
+        "",
+        "Somit muss es möglich sein, den Tastaturfokus im PDF-Dokument zu bewegen, ohne dadurch bei anderen Inhalten eine Wirkung hervorzurufen. Um darüber hinaus eine andere Wirkung auszulösen, sollte immer eine bewusste Aktion erforderlich sein."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle interaktiven Elemente verhalten sich ihres Kontextes entsprechend.",
+        "- erfüllt: Eine Kontextänderung wird explizit ausgelöst, z. B. mit der Eingabe-Taste (Enter) oder einem Leerzeichen auf einem Bedienelement (Eingabefeld, Button, Link), aber nicht durch das Verlassen eines Eingabefeldes mit Tabulator-Taste oder Escape-Taste.",
+        "- erfüllt: Wie zuvor, aber die Menüeinträge können mit der Tastatur oder mittels Pfeil-Tasten beliebig durchlaufen werden, ohne dass eine Aktion ausgelöst wird. Die Aktion des fokussierten Menüeintrags wird erst durch Betätigen der Leerzeichen- oder Eingabe-Taste (Enter) ausgelöst. Mittels Tabulator-Taste oder Escape-Taste kann das Pulldownmenü verlassen werden, ohne dass eine Aktion ausgelöst wird."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Das PDF-Dokument enthält keine interaktiven Elemente, welche einen Fokus erhalten könnten.",
+        "- Blockade: Eines oder mehrere interaktive Elemente verhalten sich entgegen ihrer Bestimmung (unerwartete Kontextänderung).",
+        "- Blockade: Ein Formular wird automatisch abgeschickt, sobald ein bestimmtes Eingabefeld den Fokus erhält.",
+        "- Blockade: Ein Dropdownmenü enthält Menüeinträge, welche mit Script-Aktionen verknüpft sind, und ein mit der Tastatur oder mittels Pfeil-Tasten angesteuerter Aktions-Menüeintrag wird direkt ausgelöst.",
+        "- Blockade: Bei Fokus einer Checkbox öffnet sich automatisch ein Pop-up mit einem Hilfetext.",
+        "- Blockade: Wenn ein Eingabefeld den Fokus erhält, wird ein Hilfedialogfenster geöffnet, das das Feld beschreibt. Bei Navigation mittels Tabulator-Taste wird der Tastaturfokus direkt in das Hilfedialogfenster versetzt und nicht zum nächstfolgenden Element. Das nächstfolgende Element ist damit ggf. unerreichbar."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#keine-kontextänderung-bei-fokus"
+    }
+  ]
+}

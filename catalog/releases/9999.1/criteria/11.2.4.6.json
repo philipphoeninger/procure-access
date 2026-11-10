@@ -1,0 +1,96 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Überschriften und Beschriftungen",
+  "sortOrder": 720,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.4.6"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.4.6",
+      "originalTitleDe": "Überschriften und Beschriftungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Inhalte werden visuell durch Überschriften strukturiert und beschreiben den nachfolgenden Inhalt zutreffend. Formularelemente sind aussagekräftig und zum Element passend beschriftet."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende können durch Strukturierung Inhalte leicht überblicken und gezielt auf Inhalte zugreifen. Knappe und zutreffende Beschriftungen unterstützen jeden Nutzenden, den Sinn eines Elements oder einer Gruppe von Elementen schnell zu erfassen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Inhalte werden durch Überschriften strukturiert.",
+        "- Überschriften beschreiben den nachfolgenden Inhalt zutreffend.",
+        "- Formularelemente sind zutreffend beschriftet."
+      ],
+      "negativeExamplesDe": [
+        "- Inhalte werden nicht durch Überschriften strukturiert.",
+        "- Überschriften beschreiben den nachfolgenden Inhalt unzutreffend.",
+        "- Formularelemente sind nicht oder nicht zutreffend beschriftet."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#überschriften-und-beschriftungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.4.6",
+      "originalTitleDe": "Überschriften und Beschriftungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "In der Mobile App vorhandene Überschriften entsprechen der visuellen Strukturierung des Inhalts und beschreiben den nachfolgenden Inhalt zutreffend.",
+        "",
+        "Das Vorhandensein von Haupt- und Unterüberschriften ist kein Teil der zugrundeliegenden Anforderungen, wird jedoch dringend empfohlen, da diese sowohl die visuelle als auch die semantische Strukturierung der Mobile App deutlich verbessern.",
+        "",
+        "Visuelle Beschriftungen von Formularelementen sind aussagekräftig und entsprechen der Funktion des zugehörigen Elements."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende können durch Strukturierung Inhalte leicht überblicken und gezielt auf Inhalte zugreifen. Knappe und zutreffende Beschriftungen unterstützen jeden Nutzenden, den Sinn eines Elements oder einer Gruppe von Elementen schnell zu erfassen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Überschriften beschreiben den nachfolgenden Inhalt zutreffend.",
+        "- Inhalte werden nicht durch Überschriften strukturiert.",
+        "- Formularelemente sind zutreffend beschriftet."
+      ],
+      "negativeExamplesDe": [
+        "- Hauptüberschriften beschreiben den Seiteninhalt unzutreffend.",
+        "- Überschriften beschreiben den nachfolgenden Inhalt unzutreffend.",
+        "- Formularelemente sind nicht oder nicht zutreffend beschriftet."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#überschriften-und-beschriftungen"
+    }
+  ]
+}

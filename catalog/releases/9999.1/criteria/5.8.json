@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Allgemeine Anforderungen",
+  "titleDe": "Annahme eines zweifachen Tastenanschlags",
+  "sortOrder": 90,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "5.8"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "5.8",
+      "originalTitleDe": "Annahme eines zweifachen Tastenanschlags",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Eingabefelder für Texteingaben zur Verfügung stellt. Die Anwendbarkeit gilt auch für Software, die Bestandteil eines physischen Endgeräts sind, das eine physische Tastatur zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Individuelle Benutzereinstellungen zur Anschlagsverzögerung, die im Betriebssystem konfigurierbar sind, müssen von der Software übernommen werden. Die Mindestforderungen lauten:",
+        "",
+        "- Zeitverzögerung von mindestens 0,5 Sekunden vor der Annahme eines weiteren Tastenanschlags",
+        "",
+        "Sofern die Software die Einstellungen des Betriebssystems nicht übernimmt, kann sie eine eigene Konfigurationsmöglichkeit zur Verfügung stellen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die aufgrund motorischer Beeinträchtigungen mehr Zeit für Bewegungen mit den Armen oder Fingern benötigen, sind unter Umständen auf ein längeres Intervall bei Verwendung von Tastaturen angewiesen. Mit genug Zeit vor der Annahme eines weiteren Tastenanschlags werden so Fehleingaben vermieden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Einstellungen des Betriebssystems werden korrekt übernommen.",
+        "- Eigene Konfigurationsmöglichkeiten werden angeboten und korrekt übernommen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Einstellungen des Betriebssystems werden nicht oder fehlerhaft übernommen.",
+        "- Eigene Konfigurationsmöglichkeiten werden nicht oder fehlerhaft übernommen.",
+        "- Es werden keine eigenen Konfigurationsmöglichkeiten angeboten, und die Einstellungen des Betriebssystems werden nicht oder fehlerhaft übernommen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#annahme-eines-zweifachen-tastenanschlags"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "5.8",
+      "originalTitleDe": "Annahme eines zweifachen Tastenanschlags",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Eingabefelder für Texteingaben zur Verfügung stellt. Die Anwendbarkeit gilt gleichermaßen für Mobile Apps auf Mobiltelefonen, als auch für Mobile Apps, die Bestandteil eines physischen Endgeräts sind, das eine physische Tastatur zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Individuelle Benutzereinstellungen zur Anschlagsverzögerung, die im Betriebssystem konfigurierbar sind, müssen von der Mobile App übernommen werden. Die Mindestforderungen lauten:",
+        "",
+        "- Zeitverzögerung von mindestens 0,5 Sekunden vor der Annahme eines weiteren Tastenanschlags",
+        "",
+        "Sofern die Mobile App die Einstellungen des Betriebssystems nicht übernimmt, kann sie eine eigene Konfigurationsmöglichkeit zur Verfügung stellen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die aufgrund motorischer Beeinträchtigungen mehr Zeit für Bewegungen mit den Armen oder Fingern benötigen, sind unter Umständen auf ein längeres Intervall bei Verwendung von Tastaturen angewiesen. Mit genug Zeit vor der Annahme eines weiteren Tastenanschlags werden so Fehleingaben vermieden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Einstellungen des Betriebssystems werden korrekt übernommen.",
+        "- Eigene Konfigurationsmöglichkeiten werden angeboten und korrekt übernommen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Einstellungen des Betriebssystems werden nicht oder fehlerhaft übernommen.",
+        "- Eigene Konfigurationsmöglichkeiten werden nicht oder fehlerhaft übernommen.",
+        "- Es werden keine eigenen Konfigurationsmöglichkeiten angeboten, und die Einstellungen des Betriebssystems werden nicht oder fehlerhaft übernommen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#annahme-eines-zweifachen-tastenanschlags"
+    }
+  ]
+}

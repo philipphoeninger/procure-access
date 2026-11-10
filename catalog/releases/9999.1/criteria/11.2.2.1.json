@@ -1,0 +1,100 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Zeitvorgaben anpassbar",
+  "sortOrder": 670,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.2.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.2.1",
+      "originalTitleDe": "Zeitvorgaben anpassbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Bei zeitbegrenzten Inhalten kann die Zeitbegrenzung abgeschaltet, angepasst oder verlängert werden. Diese Anforderung gilt nicht für Limitierungen, die unverzichtbar sind oder ein Echtzeit-Ereignis darstellen. Es gelten folgende Anforderungen:",
+        "",
+        "- Abschalten Die Zeitbegrenzung kann abgeschaltet werden, bevor sie eintritt.",
+        "- Anpassen Die Zeitbegrenzung kann angepasst werden, bevor sie eintritt, mindestens bis zum Zehnfachen der Standardeinstellung.",
+        "- Verlängern Die Zeitbegrenzung warnt vor Ablauf und stellt mindestens 20 Sekunden Zeit zur Verfügung, um die Zeitbegrenzung mit einer einfachen Handlung zu verlängern. Die Verlängerung kann mindestens 10mal vorgenommen werden.",
+        "- Echtzeit-Ausnahme Die Zeitbegrenzung ist ein erforderlicher Teil eines Echtzeit-Ereignisses und es ist keine Alternative zur Zeitbegrenzung möglich.",
+        "- Unverzichtbare Ausnahmen Die Zeitbegrenzung ist unverzichtbar und ihre Verlängerung würde den Vorgang ungültig machen.",
+        "- 20 Stunden Ausnahme Die Zeitbegrenzung beträgt standardmäßig mehr als 20 Stunden."
+      ],
+      "rationaleWhyDe": [
+        "Manche Menschen benötigen mehr Zeit, um eine Aktion abzuschließen, insbesondere wenn sie motorisch oder kognitiv beeinträchtigt sind. Die individuelle Anpassung von Zeitlimits stellt sicher, dass Nutzende Aktionen bedienen und abschließen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Zeitbegrenzungen erfüllen mindestens eine der in den Anforderungen genannten Möglichkeiten."
+      ],
+      "negativeExamplesDe": [
+        "- Zeitbegrenzungen erfüllen keine der in den Anforderungen genannten Möglichkeiten, oder erfüllen sie nicht ausreichend."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#zeitvorgaben-anpassbar"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.2.1",
+      "originalTitleDe": "Zeitvorgaben anpassbar",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar, wenn Inhalte in der Mobile App zeitbegrenzt bereitgestellt werden."
+      ],
+      "requirementDe": [
+        "Bei zeitbegrenzten Inhalten kann die Zeitbegrenzung abgeschaltet, angepasst oder verlängert werden. Diese Anforderung gilt nicht für Limitierungen, die unverzichtbar sind oder ein Echtzeit-Ereignis darstellen. Es gelten folgende Anforderungen:",
+        "",
+        "- Abschalten",
+        " Die Zeitbegrenzung kann abgeschaltet werden, bevor sie eintritt.",
+        "- Anpassen",
+        " Die Zeitbegrenzung kann angepasst werden, bevor sie eintritt, mindestens bis zum Zehnfachen der Standardeinstellung.",
+        "- Verlängern",
+        " Die Zeitbegrenzung warnt vor Ablauf und stellt mindestens 20 Sekunden Zeit zur Verfügung, um die Zeitbegrenzung mit einer einfachen Handlung zu verlängern. Die Verlängerung kann mindestens 10mal vorgenommen werden.",
+        "- Echtzeit-Ausnahme",
+        " Die Zeitbegrenzung ist ein erforderlicher Teil eines Echtzeit-Ereignisses und es ist keine Alternative zur Zeitbegrenzung möglich.",
+        "- Unverzichtbare Ausnahmen",
+        " Die Zeitbegrenzung ist unverzichtbar und ihre Verlängerung würde den Vorgang ungültig machen.",
+        "- 20 Stunden Ausnahme",
+        " Die Zeitbegrenzung beträgt standardmäßig mehr als 20 Stunden."
+      ],
+      "rationaleWhyDe": [
+        "Manche Menschen benötigen mehr Zeit, um eine Aktion abzuschließen, insbesondere wenn sie motorisch oder kognitiv beeinträchtigt sind. Die individuelle Anpassung von Zeitlimits stellt sicher, dass Nutzende Aktionen bedienen und abschließen können."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Zeitbegrenzungen erfüllen mindestens eine der in den Anforderungen genannten Möglichkeiten."
+      ],
+      "negativeExamplesDe": [
+        "- Zeitbegrenzungen erfüllen keine der in den Anforderungen genannten Möglichkeiten, oder erfüllen sie nicht ausreichend."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#zeitvorgaben-anpassbar"
+    }
+  ]
+}

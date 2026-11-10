@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Aussagekräftige Beschriftungen von Links",
+  "sortOrder": 1590,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.2.4.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.2.4.4",
+      "originalTitleDe": "Aussagekräftige Beschriftungen von Links",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Verweise (Links) enthält."
+      ],
+      "requirementDe": [
+        "Der Zweck jedes Links kann allein aus dem Linktext oder aus dem Linktext zusammen mit seinem programmgesteuerten Linkkontext bestimmt werden, es sei denn, der Zweck des Links ist für Nutzende im Allgemeinen nicht eindeutig."
+      ],
+      "rationaleWhyDe": [
+        "Screenreader-Programme lesen jedes Linkelement einzeln und sind auf den Namen des Elements angewiesen, um seinen Zweck zu erkennen. Daher sollten die Namen der Elemente innerhalb eines Kontextes eindeutig sein.",
+        "",
+        "Wenn eine Linkbezeichnung mehrfach vorkommt, sollte ein Unterscheidungsmerkmal hinzugefügt werden, oder die erforderlichen Zusatzinformationen sollten aus dem Kontext einfach zu beschaffen sein."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "barrier"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Ein Formular ist in mehrere Abschnitte unterteilt, die jeweils durch einen Link „Bearbeiten“ für die Bearbeitung aktiviert werden. Das Screenreader-Programm gibt den Namen des Links aus und es kann mit einem Bedienschritt die Überschrift des Abschnitts ausgeben werden.",
+        "- erfüllt: In einer Anwendung symbolisiert der Link „Hilfe“ die kontextsensitive Hilfe zu bestimmten Bereichen. Im Tooltipp wird jeweils das Hilfethema genannt."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Ein Link wird nur als URL angezeigt und nicht als Linktext. Hinweis: Dieser Umstand ist nicht negativ zu bewerten, wenn der Link auch im PDF-Dokument als URL angezeigt wird und der Zweck des Links demzufolge für Nutzende im Allgemeinen nicht eindeutiger spezifiziert ist.",
+        "- Einschränkung: Es gibt mehrere Links mit der Bezeichnung „weiter“ im PDF-Dokument und der direkt den Link umgebende Text ist an jeder dieser Stellen identisch (z. B. „Gehen Sie weiter zu den Erläuterungen.“).",
+        "- Barriere: Ein für das Verständnis des PDF-Dokuments notwendiger Link wird nur als Symbol (z. B. Größerzeichen: >) angezeigt, besitzt aber keinen erläuternden ActualText bzw. „Originaltext“, wie er in Acrobat Pro genannt wird.",
+        "- Barriere: Ein Link befindet sich außerhalb eines Link-Tags. Screenreader-Programme geben dadurch beim Tabben nur „Link“ aus.",
+        "",
+        "Nicht eindeutige Linktexte sind eine Barriere oder eine Einschränkung, je nachdem wie aufwändig es ist, notwendige Zusatzinformationen zu ermitteln."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#aussagekräftige-beschriftungen-von-links"
+    }
+  ]
+}

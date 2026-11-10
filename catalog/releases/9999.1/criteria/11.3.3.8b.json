@@ -1,0 +1,80 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Zugängliche Zwei-Faktor-Authentifizierung",
+  "sortOrder": 910,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.3.8"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.3.8b",
+      "originalTitleDe": "Zugängliche Zwei-Faktor-Authentifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die vollständige Nutzung der Software eine Anmeldung mittels Zwei-Faktor-Authentifizierung voraussetzt. Der Prüfschritt bezieht sich hierbei nicht auf Registrierungsprozesse."
+      ],
+      "requirementDe": [
+        "Verwendet der Anmeldeprozess eine Zwei-Faktor-Authentifizierung und versendet im Rahmen der Anmeldung einen Verifizierungscode direkt an das genutzte Endgerät, muss der Verifizierungscode über die Kopieren- und Einfügeoption des Betriebssystems, oder über Komfortfunktionen des Betriebssystems in das Eingabefeld der Anmeldung übertragen werden können.",
+        "",
+        "Zwei-Faktor-Authentifizierungen, die ausschließlich über ein zweites Endgerät durchgeführt werden können, sind von dieser Anforderung ausgenommen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Ein Verifizierungscode, der als E-Mail auf das Endgerät geschickt wurde, kann über Kopieren und Einfügen direkt in das vorgesehene Eingabefeld übernommen werden",
+        "- Ein Verifizierungscode, der als SMS auf das Endgerät geschickt wurde, kann über die Komfortfunktion des Betriebssystems direkt in das vorgesehene Eingabefeld übernommen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Ein Verifizierungscode muss manuell in das Eingabefeld eingetragen werden, obwohl er an das gleiche Endgerät versendet wurde, da das Eingabefeld das direkte Einfügen verweigert."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#b-zugängliche-zwei-faktor-authentifizierung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.3.8b",
+      "originalTitleDe": "Zugängliche Zwei-Faktor-Authentifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die vollständige Nutzung der Mobile App eine Anmeldung mittels Zwei-Faktor-Authentifizierung voraussetzt. Der Prüfschritt bezieht sich hierbei nicht auf Registrierungsprozesse."
+      ],
+      "requirementDe": [
+        "Verwendet der Anmeldeprozess eine Zwei-Faktor-Authentifizierung und versendet im Rahmen der Anmeldung einen Verifizierungscode direkt an das genutzte Endgerät, muss der Verifizierungscode über die Kopieren- und Einfügeoption des Betriebssystems, oder über Komfortfunktionen des Betriebssystems in das Eingabefeld der Anmeldung übertragen werden können.",
+        "",
+        "Zwei-Faktor-Authentifizierungen, die ausschließlich über ein zweites Endgerät durchgeführt werden können, sind von dieser Anforderung ausgenommen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Ein Verifizierungscode, der als E-Mail auf das Endgerät geschickt wurde, kann über Kopieren und Einfügen direkt in das vorgesehene Eingabefeld übernommen werden",
+        "- Ein Verifizierungscode, der als SMS auf das Endgerät geschickt wurde, kann über die Komfortfunktion des Betriebssystems direkt in das vorgesehene Eingabefeld übernommen werden."
+      ],
+      "negativeExamplesDe": [
+        "- Ein Verifizierungscode muss manuell in das Eingabefeld eingetragen werden, obwohl er an das gleiche Endgerät versendet wurde, da das Eingabefeld das direkte Einfügen verweigert."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#b-zugängliche-zwei-faktor-authentifizierung"
+    }
+  ]
+}

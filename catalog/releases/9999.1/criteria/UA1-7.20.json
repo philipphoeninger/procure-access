@@ -1,0 +1,45 @@
+{
+  "kind": "requirement",
+  "titleDe": "Externe Objekte",
+  "sortOrder": 1820,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.20",
+      "originalTitleDe": "Externe Objekte",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument externe Objekte enthält."
+      ],
+      "requirementDe": [
+        "In einem PDF/UA konformen PDF-Dokument dürfen Reference XObjects nicht enthalten sein."
+      ],
+      "rationaleWhyDe": [
+        "Wenn externe Objekte korrekt eingebunden sind, können diese vom PDF-Anzeigeprogramm (z. B. Adobe Acrobat Reader) dargestellt werden und assistive Technologien können auf den eingebundenen Inhalt zugreifen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Externe Objekte wurden den Anforderungen entsprechend eingebunden und verursachen keinen Fehler im Prüfbericht von PAC."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Der Prüfbericht von PAC weist auf Fehler hin. Ein Screenreader-Programm identifiziert jedoch alle externen Objekte eindeutig und korrekt.",
+        "- Blockade: Der Prüfbericht von PAC weist auf Fehler hin und Screenreader-Programme können nicht alle externen Objekte eindeutig identifizieren."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.20-externe-objekte"
+    }
+  ]
+}

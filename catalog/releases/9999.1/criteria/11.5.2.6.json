@@ -1,0 +1,102 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Datentabellen",
+  "sortOrder": 980,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.6"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.6",
+      "originalTitleDe": "Datentabellen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Datentabellen oder eine visuelle Strukturierung von Informationen in Tabellenform vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Aufbau von Tabellen ist strukturell korrekt und programmatisch ermittelbar. Die Zuordnung jeder Zelle zu ihrer zugehörigen Zeile und Spalte, der Umfang an Zeilen und Spalten, als auch der Anfang und das Ende der Tabelle sind identifizierbar. Falls vorhanden, werden die Überschriften von Zeile und Spalte wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Screenreadernutzende und Menschen mit kognitiver Beeinträchtigung benötigen zur Orientierung in Tabellen besonderes Abstraktionsvermögen. Sie benötigen zu jeder Datenzelle Informationen zu Kontext und Bedeutung. Sind diese Informationen nicht vorhanden, ist die Bedeutung der erreichten Datenzelle unter Umständen nicht verständlich."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Informationen sind programmatisch korrekt ermittelbar.",
+        "- Die Überschrift wird bei der ersten Fokussierung einer Zelle korrekt wiedergegeben. Bei weiterer Bewegung durch die Tabelle wird die Wiedergabe gleichlautender Überschriften unterdrückt.",
+        "- Lediglich der Anfang oder das Ende einer Tabelle sind nicht korrekt ermittelbar."
+      ],
+      "negativeExamplesDe": [
+        "- Einige Informationen sind programmatisch nicht korrekt ermittelbar.",
+        "- Überschriften sind vorhanden, werden aber nicht als solche ermittelt.",
+        "- Es sind keine Überschriften für Zeilen und Kopfspalten vorhanden, obwohl die Daten nicht direkt verständlich sind.",
+        "- Die Daten verändern ihre Bedeutung, ohne dass dies durch neue Überschriften deutlich gemacht wird.",
+        "- Eine inhaltliche Änderung der Daten wird ausschließlich durch leere Tabellenzeilen verdeutlicht.",
+        "- Eine Tabelle wird ausschließlich für Layout oder Design verwendet.",
+        "- Die Tabelle ist nicht zellenweise navigierbar."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#datentabellen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.6",
+      "originalTitleDe": "Datentabellen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Datentabellen oder eine visuelle Strukturierung von Informationen in Tabellenform vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Aufbau von Tabellen ist strukturell korrekt und programmatisch ermittelbar. Die Zuordnung jeder Zelle zu ihrer zugehörigen Zeile und Spalte, der Umfang an Zeilen und Spalten, als auch der Anfang und das Ende der Tabelle sind identifizierbar. Falls vorhanden, werden die Überschriften von Zeile und Spalte wiedergegeben."
+      ],
+      "rationaleWhyDe": [
+        "Screenreadernutzende und Menschen mit kognitiver Beeinträchtigung benötigen zur Orientierung in Tabellen besonderes Abstraktionsvermögen. Sie benötigen zu jeder Datenzelle Informationen zu Kontext und Bedeutung. Sind diese Informationen nicht vorhanden, ist die Bedeutung der erreichten Datenzelle unter Umständen nicht verständlich."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle Informationen sind programmatisch korrekt ermittelbar.",
+        "- Die Überschrift wird bei der ersten Fokussierung einer Zelle korrekt wiedergegeben. Bei weiterer Bewegung durch die Tabelle wird die Wiedergabe gleichlautender Überschriften unterdrückt.",
+        "- Lediglich der Anfang oder das Ende einer Tabelle sind nicht korrekt ermittelbar."
+      ],
+      "negativeExamplesDe": [
+        "- Einige Informationen sind programmatisch nicht korrekt ermittelbar.",
+        "- Überschriften sind vorhanden, werden aber nicht als solche ermittelt.",
+        "- Es sind keine Überschriften für Zeilen und Kopfspalten vorhanden, obwohl die Daten nicht direkt verständlich sind.",
+        "- Die Daten verändern ihre Bedeutung, ohne dass dies durch neue Überschriften deutlich gemacht wird.",
+        "- Eine inhaltliche Änderung der Daten wird ausschließlich durch leere Tabellenzeilen verdeutlicht.",
+        "- Eine Tabelle wird ausschließlich für Layout oder Design verwendet.",
+        "- Die Tabelle ist nicht zellenweise navigierbar."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#datentabellen"
+    }
+  ]
+}

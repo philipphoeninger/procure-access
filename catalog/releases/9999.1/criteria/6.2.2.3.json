@@ -1,0 +1,80 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Sprecheridentifizierung",
+  "sortOrder": 160,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.2.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.2.3",
+      "originalTitleDe": "Sprecheridentifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Echtzeit-Textkommunikation (RTT = Realtime Text) zur Verfügung stellt, und dabei den aktiven Sprecher anhand der Sprache identifiziert:"
+      ],
+      "requirementDe": [
+        "Bietet die Software Echtzeit-Textkommunikation (RTT) an und identifiziert den aktiven Sprecher anhand der Sprache, sollen auch Menschen, die Texteingaben anstatt Sprache verwenden, gleichwertig identifiziert werden."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation des aktiven Redners essenziell, um im Kontext entsprechend reagieren zu können. Sprache und Text müssen daher gleichwertig behandelt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Sprach- und Texteingabe werden gleichwertig identifiziert, markiert bzw. hervorgehoben."
+      ],
+      "negativeExamplesDe": [
+        "- Nur eine der beiden Kommunikationsarten wird identifiziert, markiert bzw. hervorgehoben."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sprecheridentifizierung"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.2.3",
+      "originalTitleDe": "Sprecheridentifizierung",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Echtzeit-Textkommunikation (RTT = Realtime Text) zur Verfügung stellt, und dabei den aktiven Sprecher anhand der Sprache identifiziert:"
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Echtzeit-Textkommunikation (RTT) an und identifiziert den aktiven Sprecher anhand der Sprache, sollen auch Menschen, die Texteingaben anstatt Sprache verwenden, gleichwertig identifiziert werden."
+      ],
+      "rationaleWhyDe": [
+        "Für Teilnehmer in einer Kommunikation ist die Identifikation des aktiven Redners essenziell, um im Kontext entsprechend reagieren zu können. Sprache und Text müssen daher gleichwertig behandelt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Sprach- und Texteingabe werden gleichwertig identifiziert, markiert bzw. hervorgehoben."
+      ],
+      "negativeExamplesDe": [
+        "- Nur eine der beiden Kommunikationsarten wird identifiziert, markiert bzw. hervorgehoben."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sprecheridentifizierung"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Alternativtexte für informative Grafiken",
+  "sortOrder": 360,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.1.1.1a",
+      "originalTitleDe": "Alternativtexte für informative Grafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software informative, nicht interaktive Grafiken oder Objekte enthält, die zudem keine Interaktion ermöglichen."
+      ],
+      "requirementDe": [
+        "Alle informativen Grafiken und Objekte verfügen über eine Textalternative, die den Inhalt passend beschreibt. Die Software bleibt vollständig durch Alternativtexte nutzbar, auch wenn Grafiken oder Objekte nicht geladen werden oder vom Nutzenden aus technischen Gründen deaktiviert sind.",
+        "",
+        "Alternativtexte ersetzen das Objekt, wenn es beispielsweise nicht angezeigt werden kann oder mittels Screenreader fokussiert wird. Sie sind möglichst kurz. Hierbei ist darauf zu achten, dass der Alternativtext keine Bildbeschreibung darstellt, sondern ausschließlich die Kerninformation vermittelt. Der Text soll in seiner Struktur möglichst simpel und zusammengefasst formuliert sein. Ausführliche Beschreibungen, beziehungsweise weiterführende Informationen werden im Kontext der Abbildung erläutert."
+      ],
+      "rationaleWhyDe": [
+        "Medienalternativen helfen Menschen mit Sinnesbeeinträchtigungen, die visuelle oder auditive Inhalte nicht oder nur eingeschränkt wahrnehmen können. Text ist als Medienalternative vielfältig einsetzbar. So können beispielsweise Menschen, die taub-blind sind, den Text in Braille lesen. Darüber hinaus unterstützt Text die Möglichkeit, nach Medieninhalten zu suchen und Inhalte auf eine Vielzahl von Arten zu einem neuen Zweck zu verbinden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Informative Grafiken und Objekte verfügen über einen zum Inhalt passenden Alternativtext.",
+        "- Der Alternativtext von Multimedia-Objekten wie Audio- oder Video liefert eine Beschreibung des Inhalts."
+      ],
+      "negativeExamplesDe": [
+        "- Informative Grafiken und Objekte verfügen über keinen oder einen nicht zum Inhalt passenden Alternativtext.",
+        "- Der Alternativtext entsprechender Objekte ist zu lang."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#a-alternativtexte-für-informative-grafiken"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.1.1a",
+      "originalTitleDe": "Alternativtexte für informative Grafiken",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App informative, nicht interaktive Grafiken oder Objekte enthält, die zudem keine Interaktion ermöglichen."
+      ],
+      "requirementDe": [
+        "Alle informativen Grafiken und Objekte verfügen über eine Textalternative, die den Inhalt passend beschreibt. Die Mobile App bleibt vollständig durch Alternativtexte nutzbar, auch wenn Grafiken oder Objekte nicht geladen werden oder vom Nutzenden aus technischen Gründen deaktiviert sind.",
+        "",
+        "Alternativtexte ersetzen das Objekt, wenn es beispielsweise nicht angezeigt werden kann oder mittels Screenreader fokussiert wird. Sie sind möglichst kurz. Hierbei ist darauf zu achten, dass der Alternativtext keine Bildbeschreibung darstellt, sondern ausschließlich die Kerninformation vermittelt. Der Text soll in seiner Struktur möglichst simpel und zusammengefasst formuliert sein. Ausführliche Beschreibungen, beziehungsweise weiterführende Informationen werden im Kontext der Abbildung erläutert."
+      ],
+      "rationaleWhyDe": [
+        "Medienalternativen helfen Menschen mit Sinnesbeeinträchtigungen, die visuelle oder auditive Inhalte nicht oder nur eingeschränkt wahrnehmen können. Text ist als Medienalternative vielfältig einsetzbar. So können beispielsweise Menschen, die taub-blind sind, den Text in Braille lesen. Darüber hinaus unterstützt Text die Möglichkeit, nach Medieninhalten zu suchen und Inhalte auf eine Vielzahl von Arten zu einem neuen Zweck zu verbinden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Informative Grafiken und Objekte verfügen über einen zum Inhalt passenden Alternativtext.",
+        "- Der Alternativtext von Multimedia-Objekten wie Audio- oder Video liefert eine Beschreibung des Inhalts."
+      ],
+      "negativeExamplesDe": [
+        "- Informative Grafiken und Objekte verfügen über keinen oder einen nicht zum Inhalt passenden Alternativtext.",
+        "- Der Alternativtext entsprechender Objekte ist zu lang."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#a-alternativtexte-für-informative-grafiken"
+    }
+  ]
+}

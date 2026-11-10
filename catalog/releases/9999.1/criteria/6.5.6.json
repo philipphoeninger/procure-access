@@ -1,0 +1,86 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Sprecheridentifizierung bei Gebärdensprachen-Kommunikation",
+  "sortOrder": 260,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.5.6"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "twoWayVoice"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.5.6",
+      "originalTitleDe": "Sprecheridentifizierung bei Gebärdensprachen-Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Sprecheridentifizierung für Sprachnutzende zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Sprecheridentifizierung für sprechende Teilnehmende, sollen auch gebärdende Teilnehmende und Echtzeit-Gebärden gleichwertig identifiziert werden, sobald die Eingabe von Gebärden gestartet wurde. Das Sprecheridentifizierung für Gebärdensprache kann manuell aktiviert oder automatisch identifiziert werden:"
+      ],
+      "rationaleWhyDe": [
+        "Die Sprecheridentifizierung für gebärdende Teilnehmende ermöglicht Menschen mit Beeinträchtigung des Gehörs die Wahrnehmung des entsprechenden Teilnehmers."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Eingabe von Gebärden wird automatisiert erkannt und aktiviert die Sprecheridentifizierung.",
+        "- Eine manuelle Funktion aktiviert die Sprecheridentifizierung."
+      ],
+      "negativeExamplesDe": [
+        "- Eine Funktion zum automatischen Erkennen von Gebärdeneingaben steht zur Verfügung, aktiviert aber die Sprecheridentifizierung nicht oder mit Verspätung.",
+        "- Es steht keine manuelle Funktion zum Aktivieren der Sprecheridentifizierung zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#sprecheridentifizierung-bei-gebärdensprachen-kommunikation"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.5.6",
+      "originalTitleDe": "Sprecheridentifizierung bei Gebärdensprachen-Kommunikation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Sprecheridentifizierung für Sprachnutzende zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Sprecheridentifizierung für sprechende Teilnehmende, sollen auch gebärdende Teilnehmende und Echtzeit-Gebärden gleichwertig identifiziert werden, sobald die Eingabe von Gebärden gestartet wurde. Das Sprecheridentifizierung für Gebärdensprache kann manuell aktiviert oder automatisch identifiziert werden:"
+      ],
+      "rationaleWhyDe": [
+        "Die Sprecheridentifizierung für gebärdende Teilnehmende ermöglicht Menschen mit Beeinträchtigung des Gehörs die Wahrnehmung des entsprechenden Teilnehmers."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Eingabe von Gebärden wird automatisiert erkannt und aktiviert die Sprecheridentifizierung.",
+        "- Eine manuelle Funktion aktiviert die Sprecheridentifizierung."
+      ],
+      "negativeExamplesDe": [
+        "- Eine Funktion zum automatischen Erkennen von Gebärdeneingaben steht zur Verfügung, aktiviert aber die Sprecheridentifizierung nicht oder mit Verspätung.",
+        "- Es steht keine manuelle Funktion zum Aktivieren der Sprecheridentifizierung zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#sprecheridentifizierung-bei-gebärdensprachen-kommunikation"
+    }
+  ]
+}

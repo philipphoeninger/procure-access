@@ -1,0 +1,74 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sinnvolle Reihenfolge",
+  "sortOrder": 1380,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.2",
+      "originalTitleDe": "Sinnvolle Reihenfolge",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument informationstragende Elemente enthält."
+      ],
+      "requirementDe": [
+        "Wenn die Reihenfolge, in welcher Text präsentiert wird, dessen Bedeutung beeinflusst, muss die korrekte Textreihenfolge programmatisch ermittelbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Der Dokumenteninhalt muss auch mit assistiven Technologien so präsentiert werden, dass sein Inhalt verstanden werden kann. Wird beispielsweise von der assistiven Technologie nicht erkannt, dass ein Zeitungsartikel in zwei Spalten dargestellt wird, wird immer eine Zeile der ersten Spalte und folgend eine Zeile der zweiten Spalte vorgelesen. Die einzelnen Teile eines solchen Artikels heißen Beads. Der Faden, der die Beads verbindet, ist der Thread. Ein Screenreader-Programm kann mithilfe des Fadens von einem Bead zum nächsten führen.",
+        "",
+        "Ein Mensch, der ein Screenreader-Programm benutzt oder das PDF-Dokument mithilfe einer Braille-Zeile ausliest, soll sich mit einem Menschen, der das PDF-Dokument visuell erfasst, optimal über die Inhalte austauschen können. Um unmissverständlich über den fünften Absatz oder aber den Absatz, der auf die dritte Bild-Datei folgt, diskutieren zu können, ist eine möglichst identische Abfolge unerlässlich."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Insbesondere darf bei für sich selbst stehenden Angaben innerhalb eines Bereichs eine gegenüber der visuellen Darstellung abweichende Reihenfolge übermittelt werden, beispielsweise bei der Angabe der verfassenden Person und der Angabe des Publikationsdatums.",
+        "- erfüllt: Die erste Seite eines PDF-Dokumentes ist aufgeteilt in eine Marginalspalte und einen Contentbereich, der auf der ersten Seite vollständig abgebildet ist (z. B. Angaben zu Titel sowie Abstract). Die Marginalspalte steht rechts. Die Reihenfolge, die an die assistive Technologie übermittelt wird, ist nicht relevant.",
+        "  - Menschen, die das PDF-Dokument visuell erschließen, könnten sich bei einer Schriftart, die von links nach rechts gelesen wird, zunächst der Marginalspalte zuwenden, denn hier stehen die Metadaten. Das ist aber nicht gesagt. Menschen, die das PDF-Dokument visuell erschließen, könnten aufgrund der Anordnung und der Lesart der Schriftart genauso gut mit dem Erfassen des Content-Bereichs beginnen, der links steht.",
+        "- erfüllt: Die erste Seite eines PDF-Dokumentes ist aufgeteilt in eine Marginalspalte und einen Contentbereich, der auf der ersten Seite nicht vollständig abgebildet ist, sondern erst auf der zweiten Seite. Auf der zweiten Seite folgt im Anschluss eine Überschrift. Die Marginalspalte steht rechts. Die Reihenfolge, die an die assistive Technologie übermittelt wird, ist nicht relevant, solange der Inhalt des Content-Bereichs zusammenhängend übermittelt wird."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Die erste Seite eines PDF-Dokumentes ist aufgeteilt in eine Marginalspalte und einen Contentbereich, der auf der ersten Seite nicht vollständig abgebildet ist. Der assistiven Technologie wird zuerst der Content-Bereich übermittelt. Der Inhalt der Marginalspalte wird nach Abschluss eines Absatzes, jedoch an einer inhaltlich nicht klar abgegrenzten Stelle eingeschoben. D. h. inmitten eines zusammengehörigen Bereichs.",
+        "- Barriere: Die erste Seite eines PDF-Dokumentes ist aufgeteilt in eine Marginalspalte und einen Contentbereich, der auf der ersten Seite nicht vollständig abgebildet ist. Der assistiven Technologie wird zuerst der Content-Bereich übermittelt. Der Inhalt der Marginalspalte wird inmitten eines Absatzes und ggf. überdies inmitten einer Silbentrennung eingeschoben. Damit lässt sich die Information des unterbrochenen Absatzes nur mit größter Anstrengung sinnvoll vervollständigen.",
+        "- leichte Einschränkung: Ein PDF-Dokument enthält eine Bild-Datei und eine optisch direkt folgende Bildunterschrift sowie einen Copyright-Vermerk. Der Alternativtext für das Bild sowie die Bildunterschrift werden direkt aufeinander folgend an die assistive Technologie übermittelt. Anschließend folgen zunächst andere Textpassagen, bevor schließlich auch der Copyright-Vermerk übermittelt wird.",
+        "- Einschränkung: In einem Change Log werden Daten zur Veröffentlichung von unterschiedlichen Versionen der im PDF-Dokument dargestellten Inhalte sowie Hinweise auf die jeweils vorgenommenen Änderungen aufgeführt. An die assistive Technologie werden zunächst alle Datumsangaben und anschließend alle Änderungshinweise übermittelt. Gültigkeit hat der jeweils letzte, vorliegende Stand. In diesem Fall lässt sich die Information, wann genau welche Anpassung im Einzelnen vorgenommen worden war, als nebensächlich einstufen.",
+        "- Einschränkung: Die optische Darstellung der einzelnen Bereiche des PDF-Dokuments ist nicht eingehalten. Die Information im PDF-Dokument kann dennoch sinnvoll aufgenommen werden. Ein sehender Mensch nimmt allgemeine Informationen, die z. B. in einer Prüfungssituation oder für das Ausfüllen von Formularfeldern relevant sind, deutlich früher wahr als Menschen, die ein Screenreader-Programm nutzen. Die Anforderung wäre auch im umgekehrten Fall als nicht erfüllt anzusehen.",
+        "- Einschränkung: Das PDF-Dokument enthält eine Information zu einer Kontoverbindung. Diesbezüglich sind eine Bezeichnung und der zugehörige Wert visuell nebeneinander angeordnet und ein erstes Thema (z. B. IBAN) steht dabei vor einem zweiten Thema (z. B. BIC). Der assistiven Technologie wird die Beziehung zwischen Bezeichnung und zugehörigem Wert korrekt übermittelt, jedoch in vertauschter Reihenfolge. Die Reihenfolge der Themen ist korrekt eingehalten.",
+        "  - visuell:",
+        "    - IBAN DE12 3456 7890 1234 5678 09",
+        "    - BIC BANKDEXXX",
+        "  - Screenreader-Programm: DE12 3456 7890 1234 5678 09 IBAN BANKDEXXX BIC",
+        "- Barriere: Eine Bezeichnung und der zugehörige Wert sind visuell nebeneinander angeordnet und ein erstes Thema (z. B. IBAN) steht dabei weiterhin vor einem zweiten Thema (z. B. BIC). Der assistiven Technologie wird jedoch die Reihenfolge Bezeichnung Bezeichnung Wert Wert übermittelt.",
+        "  - Screenreader-Programm: IBAN BIC DE12 3456 7890 1234 5678 09 BANKDEXXX",
+        "- Barriere: Bei Kontoverbindungen handelt es sich um Inhalte mit besonderer Relevanz, die ggf. schwerwiegende Konsequenzen nach sich ziehen können. Diesbezüglich könnte es als kritisch eingestuft werden, wenn für eine blinde Person die erste Angabe zu den Kontodaten etwas anderes ist als die erste Angabe zu den Kontodaten, die die sehende Assistenz dieser blinden Person wahrnimmt.",
+        "  - Eine Bezeichnung und der zugehörige Wert sind visuell nebeneinander angeordnet und ein erstes Thema (z. B. IBAN) steht dabei weiterhin vor einem zweiten Thema (z. B. BIC). Der assistiven Technologie wird die Beziehung zwischen Bezeichnung und zugehörigem Wert korrekt übermittelt, doch die Reihenfolge der Themen ist vertauscht.",
+        "    - Screenreader-Programm: BIC BANKDEXXX IBAN DE12 3456 7890 1234 5678 09",
+        "- Barriere: Eine Vielzahl von Einschränkungen ist als Barriere zu bewerten.",
+        "- Blockade: Der Text wird derart durcheinander übermittelt, dass beispielsweise Uhrzeiten einer Agenda dem jeweiligen Punkt nicht mehr zugeordnet werden können.",
+        "- Blockade: Bei einem Wahlgang sind mehrere Stimmzettel auszufüllen, z. B. für die Landeslisten sowie für die Wahlkreislisten und außerdem zu einem Volksentscheid. Je nach Stimmzettel können unterschiedlich viele Stimmen abgegeben werden. Die Information dazu, wie viele Stimmen jeweils abgegeben werden können, lässt sich nicht zuordnen."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sinnvolle-reihenfolge"
+    }
+  ]
+}

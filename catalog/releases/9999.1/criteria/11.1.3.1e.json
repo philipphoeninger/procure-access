@@ -1,0 +1,53 @@
+{
+  "kind": "requirement",
+  "category": "Wahrnehmbarkeit",
+  "titleDe": "Strukturelemente für weitere Objekte",
+  "sortOrder": 480,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "appTest",
+      "originalNumber": "11.1.3.1e",
+      "originalTitleDe": "Strukturelemente für weitere Objekte",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn in der Mobile App weitere Strukturelemente vorhanden sind, die nicht explizit in den Prüfschritten 11.1.3.1a Strukturelemente für Überschriften, 11.1.3.1b Strukturelemente für Listen, Auflistungen und Aufzählungen, 11.1.3.1c Strukturelemente für Bedien- und Formularelemente und 11.1.3.1d Keine Strukturelemente für Layouttabellen genannt sind."
+      ],
+      "requirementDe": [
+        "Gliederung und Strukturierung von Inhalten werden durch geeignete Objekte visualisiert. Die visuell erkennbaren Objekte sind programmatisch ermittelbar und bedienbar, wichtige Informationen sind im Kontext für alle Nutzenden wahrnehmbar. Die Betriebssysteme iOS und Android bieten innerhalb der Bedienungshilfen umfangreiche Möglichkeiten, um durch Strukturobjekte zu navigieren, ohne den gesamten Inhalt durchlaufen zu müssen. Dazu gehören beispielsweise Container, Links, Formularelemente, Datentabellen, Artikel, Tasten, Text- und Suchfelder oder Bilder."
+      ],
+      "rationaleWhyDe": [
+        "Strukturobjekte strukturieren Inhalte für sehende Nutzende und schaffen so Orientierung. Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, müssen diese auch auf einer semantischen Ebene vermitteln. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können beispielsweise auch Nutzende von Screenreadern den Aufbau der Inhalte wahrnehmen und schnell navigieren."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Alle vorhandenen Strukturobjekte können mittels VoiceOver-Rotor beziehungsweise Android TalkBack-Menü separat annavigiert werden, ohne den gesamten Inhalt bis zum Erreichen des Objekts durchlaufen zu müssen."
+      ],
+      "negativeExamplesDe": [
+        "- Keine oder nicht alle vorhandenen Strukturobjekte können mittels VoiceOver-Rotor beziehungsweise Android TalkBack-Menü separat annavigiert werden, ohne den gesamten Inhalt bis zum Erreichen des Objekts durchlaufen zu müssen.",
+        "- Nach Auswahl eines Strukturobjekts mittels VoiceOver-Rotor beziehungsweise Android TalkBack-Menü gibt der Screenreader die Meldung aus, dass das gewählte Strukturobjekt nicht vorhanden sei."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#e-strukturelemente-für-weitere-objekte"
+    }
+  ]
+}

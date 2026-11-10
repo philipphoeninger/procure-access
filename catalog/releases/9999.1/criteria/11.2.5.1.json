@@ -1,0 +1,110 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Zeigergesten (Alternativen für komplexe Zeiger-Gesten)",
+  "sortOrder": 750,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.5.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.5.1",
+      "originalTitleDe": "Zeigergesten (Alternativen für komplexe Zeiger-Gesten)",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Anwendung, die auf Geräten mit Maus oder Touch-Bedienung funktioniert, Gesten zur Nutzung vorsieht, die über die vom Betriebssystem vorgesehenen Gesten hinausgehen."
+      ],
+      "requirementDe": [
+        "Komplexe Gesten umfassen pfadbasierte Bewegungen und Mehrpunkt-Gesten. Funktionen, zu deren Bedienung komplexe Gesten notwendig sind, benötigen eine zugängliche Alternative zum Auslösen der Funktion, beispielsweise Tippen, Doppeltippen, Tippen und Halten, oder entsprechende Bedienelemente, beispielsweise Tasten.",
+        "",
+        "Pfadbasierte Bewegungen sind beispielsweise Wischbewegungen, Schieberegler und Karussells, die von der Richtung der Interaktion abhängen, sowie andere Gesten, die einen vorgeschriebenen Pfad verfolgen, wie das Zeichnen einer spezifischen Form. Solche Pfade können mit einem Finger oder Stift auf einem Touchscreen, Grafiktablett oder Trackpad gezeichnet werden.",
+        "",
+        "Ziehen ist eine Bewegung, bei der der Nutzende ein Objekt mit einem Finger aufnimmt und es an eine andere Position bewegt. Diese Bewegung vom Startpunkt zum Endpunkt erfordert nicht, dass der Nutzende einem bestimmten Pfad oder einer bestimmten Richtung folgt. Das Ziehen ist daher nicht pfadbasiert.",
+        "",
+        "Mehrpunkt-Gesten sind beispielsweise das Zoomen durch Zusammenziehen von zwei Fingern, Steuerungen, bei denen ein Finger auf dem Bildschirm ruht und ein zweiter Finger tippt, oder ein Tipp oder Wisch mit zwei oder mehr Fingern.",
+        "",
+        "Von der Anforderung ausgenommen sind essenzielle Funktionen, für die pfadbasierte oder Mehrpunkt-Gesten unverzichtbar sind, beispielsweise das Signieren von Dokumenten mittels Unterschrift."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können komplexe Gesten oftmals nicht oder nur eingeschränkt ausführen. Sie benötigen einfache, zugängliche Alternativen zum Ausführen solcher Funktionen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Als Alternative für eine Zoom-Geste zum Vergrößern und Verkleinern von Inhalt sind Tasten verfügbar.",
+        "- Als Alternative für pfadbasierte Gesten wie „nach oben und dann nach links wischen“ oder „nach oben und dann nach rechts wischen“ zum Bedienen von E-Mails sind Tasten verfügbar.",
+        "- Als Alternative für das Bewegen innerhalb einer Karte kann ein Ort gesucht und mit einem Doppeltipp angeflogen werden.",
+        "- Als Alternative für die Mehrpunkt-Geste „ein Finger ruht, ein zweiter Finger wischt“ zum Drehen von Bildern kann das Bild fokussiert und mit einfachem Wisch gedreht werden.",
+        "- Als Alternative für Wischen vom Rand in die Mitte zum Ausklappen eines seitlichen Menüs reicht ein Tippen aus.",
+        "- Als Alternative für Wischen von oben nach unten zum Aktualisieren von Inhalt ist eine Taste verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Als Alternative für komplexe Gesten stehen Bedienelemente zur Verfügung, die sich jedoch nicht im unmittelbaren Kontext befinden.",
+        "- Es stehen keine Alternativen für komplexe Gesten zur Verfügung."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#zeigergesten-alternativen-für-komplexe-zeiger-gesten"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.5.1",
+      "originalTitleDe": "Alternativen für komplexe Gesten",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn zur Bedienung der Mobile App komplexe Gesten nötig sind, die über die Standards des Betriebssystems hinausgehen."
+      ],
+      "requirementDe": [
+        "Komplexe Gesten umfassen pfadbasierte Bewegungen und Mehrpunkt-Gesten. Funktionen, zu deren Bedienung komplexe Gesten notwendig sind, benötigen eine zugängliche Alternative zum Auslösen der Funktion, beispielsweise Tippen, Doppeltippen, Tippen und Halten, oder entsprechende Bedienelemente, beispielsweise Tasten.",
+        "",
+        "Pfadbasierte Bewegungen sind beispielsweise Wischbewegungen, Schieberegler und Karussells, die von der Richtung der Interaktion abhängen, sowie andere Gesten, die einen vorgeschriebenen Pfad verfolgen, wie das Zeichnen einer spezifischen Form. Solche Pfade können mit einem Finger oder Stift auf einem Touchscreen, Grafiktablett oder Trackpad gezeichnet werden.",
+        "",
+        "Ziehen ist eine Bewegung, bei der der Nutzende ein Objekt mit einem Finger aufnimmt und es an eine andere Position bewegt. Diese Bewegung vom Startpunkt zum Endpunkt erfordert nicht, dass der Nutzende einem bestimmten Pfad oder einer bestimmten Richtung folgt. Das Ziehen ist daher nicht pfadbasiert.",
+        "",
+        "Mehrpunkt-Gesten sind beispielsweise das Zoomen durch Zusammenziehen von zwei Fingern, Steuerungen, bei denen ein Finger auf dem Bildschirm ruht und ein zweiter Finger tippt, oder ein Tipp oder Wisch mit zwei oder mehr Fingern.",
+        "",
+        "Von der Anforderung ausgenommen sind essenzielle Funktionen, für die pfadbasierte oder Mehrpunkt-Gesten unverzichtbar sind, beispielsweise das Signieren von Dokumenten mittels Unterschrift."
+      ],
+      "rationaleWhyDe": [
+        "Menschen mit motorischen Beeinträchtigungen können komplexe Gesten oftmals nicht oder nur eingeschränkt ausführen. Sie benötigen einfache, zugängliche Alternativen zum Ausführen solcher Funktionen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Als Alternative für eine Zoom-Geste zum Vergrößern und Verkleinern von Inhalt sind Tasten verfügbar.",
+        "- Als Alternative für pfadbasierte Gesten wie „nach oben und dann nach links wischen“ oder „nach oben und dann nach rechts wischen“ zum Bedienen von E-Mails sind Tasten verfügbar.",
+        "- Als Alternative für das Bewegen innerhalb einer Karte kann ein Ort gesucht und mit einem Doppeltipp angeflogen werden.",
+        "- Als Alternative für die Mehrpunkt-Geste „ein Finger ruht, ein zweiter Finger wischt“ zum Drehen von Bildern kann das Bild fokussiert und mit einfachem Wisch gedreht werden.",
+        "- Als Alternative für Wischen vom Rand in die Mitte zum Ausklappen eines seitlichen Menüs reicht ein Tippen aus.",
+        "- Als Alternative für Wischen von oben nach unten zum Aktualisieren von Inhalt ist eine Taste verfügbar."
+      ],
+      "negativeExamplesDe": [
+        "- Als Alternative für komplexe Gesten stehen Bedienelemente zur Verfügung, die sich jedoch nicht im unmittelbaren Kontext befinden.",
+        "- Es stehen keine Alternativen für komplexe Gesten zur Verfügung."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#alternativen-für-komplexe-gesten"
+    }
+  ]
+}

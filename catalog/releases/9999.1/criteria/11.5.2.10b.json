@@ -1,0 +1,90 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Bearbeitbarer Text",
+  "sortOrder": 1030,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.10"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.10b",
+      "originalTitleDe": "Bearbeitbarer Text",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn bearbeitbarer Text, beispielsweise in Texteingabefeldern, vorhanden ist."
+      ],
+      "requirementDe": [
+        "Textinhalte werden analog zur visuellen Darstellung durch den Screenreader wiedergegeben.",
+        "",
+        "Textformatierungen werden idealerweise vom Screenreader nach der Ausgabe des Inhalts des fokussierten Textabschnitts wiedergegeben, sofern diese vom Nutzenden geändert werden können (beispielsweise Fett, Kursiv, Schriftgröße, Schriftart)."
+      ],
+      "rationaleWhyDe": [
+        "Nicht nur der Inhalt von Text, sondern auch die Formatierung vermittelt Informationen. Fetter oder kursiver Text deutet wichtige Informationen innerhalb eines Absatzes an. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit das dahinter liegende Kommunikationskonzept von allen Nutzenden nachvollzogen werden kann. Weiterhin ist bei speziellen Akronymen, Begriffen oder Werten die zeichenweise Ausgabe über den Screenreader zum besseren Verständnis essenziell. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit der Kontext von allen Nutzenden nachvollzogen werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der durch den Screenreader wiedergegebene Text entspricht der visuellen Darstellung.",
+        "- Der Screenreader gibt zusätzlich zum fokussierten Textinhalts Informationen zur vorgenommenen Formatierung aus."
+      ],
+      "negativeExamplesDe": [
+        "- Der durch den Screenreader wiedergegebene Text entspricht nicht der visuellen Darstellung.",
+        "- Der Screenreader gibt keine Informationen zur vorgenommenen Formatierung aus."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#b-bearbeitbarer-text"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.10b",
+      "originalTitleDe": "Bearbeitbarer Text",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn bearbeitbarer Text, beispielsweise in Texteingabefeldern, vorhanden ist."
+      ],
+      "requirementDe": [
+        "Textinhalte werden analog zur visuellen Darstellung durch den Screenreader wiedergegeben.",
+        "",
+        "Textformatierungen werden idealerweise vom Screenreader nach der Ausgabe des Inhalts des fokussierten Textabschnitts wiedergegeben, sofern diese vom Nutzenden geändert werden können (beispielsweise Fett, Kursiv, Schriftgröße, Schriftart)."
+      ],
+      "rationaleWhyDe": [
+        "Nicht nur der Inhalt von Text, sondern auch die Formatierung vermittelt Informationen. Fetter oder kursiver Text deutet wichtige Informationen innerhalb eines Absatzes an. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit das dahinter liegende Kommunikationskonzept von allen Nutzenden nachvollzogen werden kann. Weiterhin ist bei speziellen Akronymen, Begriffen oder Werten die zeichenweise Ausgabe über den Screenreader zum besseren Verständnis essenziell. Hilfsmitteltechnologien müssen diese Informationen erfassen können, damit der Kontext von allen Nutzenden nachvollzogen werden kann."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Der durch den Screenreader wiedergegebene Text entspricht der visuellen Darstellung.",
+        "- Der Screenreader gibt zusätzlich zum fokussierten Textinhalts Informationen zur vorgenommenen Formatierung aus."
+      ],
+      "negativeExamplesDe": [
+        "- Der durch den Screenreader wiedergegebene Text entspricht nicht der visuellen Darstellung.",
+        "- Der Screenreader gibt keine Informationen zur vorgenommenen Formatierung aus."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#b-bearbeitbarer-text"
+    }
+  ]
+}

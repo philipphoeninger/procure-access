@@ -1,0 +1,59 @@
+{
+  "kind": "requirement",
+  "titleDe": "Untertitel für aufgezeichnete Videos",
+  "sortOrder": 1250,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "video"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.2.2",
+      "originalTitleDe": "Untertitel für aufgezeichnete Videos",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, sobald im PDF-Dokument voraufgezeichnete Video-Dateien mit synchronisiertem Ton und Bild bereitgestellt werden."
+      ],
+      "requirementDe": [
+        "Untertitel werden für alle voraufgezeichneten Audio-Inhalte in synchronisierten Medien bereitgestellt, es sei denn, die Video-Datei stellt eine Medienalternative für Text dar und wird auch deutlich als solche gekennzeichnet."
+      ],
+      "rationaleWhyDe": [
+        "In diesem Prüfschritt geht es darum, gehörlosen oder schwerhörigen Menschen die Möglichkeit zu bieten, synchronisierte Medienpräsentationen vollständig zu erfassen. Untertitel liefern dabei den Teil des Inhalts, der über die Tonspur verfügbar ist. Untertitel müssen nicht nur Dialoge wiedergeben, sondern auch angeben, wer spricht. Sie enthalten darüber hinaus nichtsprachliche Informationen, die durch Ton vermittelt werden, einschließlich aussagekräftiger Soundeffekte."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Der Prüfschritt ist erfüllt, wenn alle per Video mit Tonspur zur Verfügung gestellten Informationen durch Untertitel allen Menschen (mit und ohne Behinderung) zugänglich sind."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Eine leichte Einschränkung liegt vor, wenn Untertitel zwar nicht alle Informationen der Tonspur wiedergeben, das Verständnis des gesamten PDF-Dokuments dadurch aber nicht eingeschränkt wird.",
+        "- Einschränkung: Eine Einschränkung liegt vor, wenn Untertitel zwar nicht alle Informationen der Tonspur wiedergeben, das Verständnis des gesamten PDF-Dokuments dadurch aber nur in geringem Maß eingeschränkt wird.",
+        "- Barriere: Eine Barriere liegt vor, wenn Untertitel nicht alle Informationen der Tonspur wiedergeben und das Verständnis des gesamten PDF-Dokuments dadurch in nicht geringem Maß eingeschränkt wird.",
+        "- Blockade: Eine Blockade liegt vor, wenn Untertitel nicht vorhanden sind oder nicht alle Informationen der Tonspur wiedergeben, obwohl dies zum Verständnis des gesamten PDF-Dokuments notwendig wäre.",
+        "",
+        "Sofern die Informationen für eine oder mehrere Gruppen von Menschen mit Behinderung nicht zugänglich sind (z. B. durch fehlende Untertitel), ist der Prüfschritt nicht erfüllt.",
+        "",
+        "Sofern die Informationen für eine oder mehrere Gruppen von Menschen mit Behinderung nicht vollständig zugänglich sind, ist der Prüfschritt nicht voll erfüllt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#untertitel-für-aufgezeichnete-videos"
+    }
+  ]
+}

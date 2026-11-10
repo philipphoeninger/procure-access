@@ -1,0 +1,94 @@
+{
+  "kind": "requirement",
+  "category": "Autorenwerkzeuge",
+  "titleDe": "Erhaltung von Barrierefreiheit bei Umwandlungen",
+  "sortOrder": 1150,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.8.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "authoringTool"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.8.3",
+      "originalTitleDe": "Erhaltung von Barrierefreiheit bei Umwandlungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Inhalte neu strukturiert, exportiert oder in neue Datenformate konvertiert werden können."
+      ],
+      "requirementDe": [
+        "Im Ausgangsformat vorhandene Unterstützungen und Informationen zur Barrierefreiheit bleiben bei Neustrukturierung, Export oder Konvertierung des Inhalts erhalten und gehen nicht verloren oder werden fehlerhaft verändert.",
+        "",
+        "Eine vollumfängliche Prüfung von neu generierten Dateiformaten ist im Rahmen dieses Testvorgehens nicht vorgesehen. Sie benötigen gegebenenfalls eine eigene Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Oberflächen-Elemente, die visuell bestimmte Charakteristiken aufweisen, und interaktive Elemente, die bestimmte Funktionalitäten bereitstellen, müssen diese Informationen auch an die assistiven Systeme vermitteln. Dies gilt auch für neu generierte Inhalte nach einer Neustrukturierung, einem Export oder einer Konvertierung in ein neues Dateiformat. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können auch Nutzende von assistiven Systemen den Aufbau der Inhalte wahrnehmen, durchsuchen und bedienen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bereits vorhandene Informationen zur Barrierefreiheit bleiben nach Strukturierung, Export oder Konvertierung erhalten.",
+        "- Nach Konvertierung eines barrierefreien Inhalts in das Dateiformat PDF und anschließender Prüfung der Datei, ist im Bericht von PAC lediglich die PDF/UA-Konformität gescheitert."
+      ],
+      "negativeExamplesDe": [
+        "- Bereits vorhandene Informationen zur Barrierefreiheit bleiben nach Strukturierung, Export oder Konvertierung nicht, fehlerhaft oder nicht vollumfänglich erhalten.",
+        "- Nach Konvertierung eines barrierefreien Inhalts in das Dateiformat PDF und anschließender Prüfung der Datei sind im Bericht von PAC-Fehler enthalten."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#erhaltung-von-barrierefreiheit-bei-umwandlungen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.8.3",
+      "originalTitleDe": "Erhaltung von Barrierefreiheit bei Umwandlungen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Inhalte mithilfe eines App-internen Autorenwerkzeugs importiert, neu strukturiert oder in neue Datenformate konvertiert werden können."
+      ],
+      "requirementDe": [
+        "Im Ausgangsformat vorhandene Unterstützungen und Informationen zur Barrierefreiheit bleiben bei Neustrukturierung, Import oder Konvertierung des Inhalts erhalten und gehen nicht verloren oder werden fehlerhaft verändert.",
+        "",
+        "Eine vollumfängliche Prüfung von neu generierten Inhalten ist im Rahmen dieses Testvorgehens nicht vorgesehen. Sie benötigen gegebenenfalls eine eigene Prüfung."
+      ],
+      "rationaleWhyDe": [
+        "Elemente, die visuell bestimmte Charakteristiken aufweisen oder bestimmte Funktionalitäten bereitstellen, müssen diese Informationen auch an assistive Systeme vermitteln. Dies gilt auch für neu generierte Inhalte nach einer Neustrukturierung, einem Import oder einer Konvertierung in ein neues Dateiformat. Hilfsmitteltechnologien können diese Informationen interpretieren und schaffen somit Orientierung und gezielte Navigationsmöglichkeiten für ihre jeweilige Nutzergruppe. So können auch Nutzende von assistiven Systemen den Aufbau der Inhalte wahrnehmen, durchsuchen und bedienen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Bereits vorhandene Informationen zur Barrierefreiheit bleiben nach Import, Neustrukturierung oder Konvertierung erhalten.",
+        "- Nach Konvertierung eines barrierefreien Inhalts in das Dateiformat PDF und anschließender Prüfung der Datei ist im Bericht von PAC 2021 lediglich die PDF/UA-Konformität gescheitert."
+      ],
+      "negativeExamplesDe": [
+        "- Bereits vorhandene Informationen zur Barrierefreiheit bleiben nach Import, Neustrukturierung oder Konvertierung nicht, fehlerhaft oder nicht vollumfänglich erhalten.",
+        "- Nach Konvertierung eines barrierefreien Inhalts in das Dateiformat PDF und anschließender Prüfung der Datei sind im Bericht von PAC 2021 Fehler enthalten."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#erhaltung-von-barrierefreiheit-bei-umwandlungen"
+    }
+  ]
+}

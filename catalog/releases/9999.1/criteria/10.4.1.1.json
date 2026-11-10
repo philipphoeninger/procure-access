@@ -1,0 +1,71 @@
+{
+  "kind": "requirement",
+  "titleDe": "Korrekte Syntax",
+  "sortOrder": 1740,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.4.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.4.1.1",
+      "originalTitleDe": "Korrekte Syntax",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die logische Struktur des PDF-Dokuments sollte korrekt sein.",
+        "",
+        "- Insbesondere benötigen alle Strukturelemente vollständige Start- und End-Tags.",
+        "- Strukturelemente müssen darüber hinaus gemäß ihren jeweiligen Spezifikationen verwendet werden.",
+        "- Die Verschachtelung mehrerer Strukturelemente muss gemäß ihren jeweiligen Spezifikationen erfolgen.",
+        "- Attribute müssen korrekt getaggt sein und gemäß ihren jeweiligen Spezifikationen sowie ohne Doppelungen verwendet werden.",
+        "- IDs müssen unique sein bzw. gemäß ihren Spezifikationen vergeben werden."
+      ],
+      "rationaleWhyDe": [
+        "Fehler in der logischen Struktur des PDF-Dokuments können dazu führen, dass assistive Technologien (wie insbesondere Screenreader-Programme) das PDF-Dokument nicht korrekt parsen bzw. auslesen können.",
+        "",
+        "Dabei können Fehler in der logischen Struktur auch das Auslesen von Strukturelementen beeinflussen, die für sich isoliert betrachtet korrekt getaggt wurden:",
+        "",
+        "- Ein Screenreader-Programm kann eine Überschrift nicht korrekt auslesen. Die Überschrift an sich ist korrekt getaggt. Doch der gesamte Abschnitt enthält Fehler in der logischen Struktur.",
+        "- Ein Screenreader-Programm kann den Alternativtext zu einem Grafik-Element nicht korrekt auslesen. Das Grafik-Element an sich wurde korrekt getaggt und ein zugehöriger Alternativtext ist hinterlegt. Das Problem des Screenreader-Programms könnte darauf zurückzuführen sein, dass ein vorangehender oder auch nachfolgender Abschnitt Fehler in der logischen Struktur aufweist.",
+        "",
+        "Eine korrekte logische Struktur ist darüber hinaus in jedem Fall erstrebenswert und dient in mehrfacher Hinsicht dazu, Qualitätsansprüche an das PDF-Dokument sicherzustellen.",
+        "",
+        "- Fehler in der logischen Struktur können sich auch auf das Design des PDF-Dokuments auswirken und ggf. unerwünschte Design-Effekte zur Folge haben. Beispielsweise könnte eine H2-Überschrift bei falscher Auszeichnung als H5-Überschrift fälschlicherweise auch wie eine H5-Überschrift dargestellt sein.",
+        "- Wird ein automatisiertes Verfahren bei der Erzeugung von PDF-Dokumenten angewendet, so erleichtert eine korrekte logische Struktur den Herstellungsprozess, indem sie die ordnungsgemäße, fehlerfreie Ausführung des automatisierten Verfahrens sicherstellt.",
+        "",
+        "Von einer korrekten logischen Struktur profitieren letztlich alle Personengruppen."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "slightRestriction"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Der Test mit dem Prüftool PAC weist keine (möglichen) Fehler in der Rubrik \"Logische Struktur\" auf."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Der Test mit dem Prüftool PAC weist (mögliche) Fehler in der Rubrik \"Logische Struktur\" auf.",
+        "- leichte Einschränkung: Es gibt (keine getaggten Inhalte und damit) keinen Strukturbaum. An dieser Stelle entfällt damit insbesondere explizit die Bewertungsalternative \"nicht anwendbar\".",
+        "",
+        "Auch wenn in diesem Prüfschritt Fehler bzw. mögliche Fehler in der logischen Struktur lediglich als leichte Einschränkung zu bewerten sind, so ist doch zu beachten, dass sie weitreichende Folgen nach sich ziehen können: Folgen, die in anderen Prüfschritten konkret geprüft werden und dort mit wesentlich stärkeren Einschränkungen bis hin zur Blockade zu bewerten sind.",
+        "",
+        "Damit kann dieser Prüfschritt als \"Mittel zum Zweck\" angesehen werden: ein Mittel, mit dem sich darüber hinaus anhand der sehr konkreten Fehlermeldungen weitreichende Fehler identifizieren und beheben lassen."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#korrekte-syntax"
+    }
+  ]
+}

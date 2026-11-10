@@ -1,0 +1,55 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Gruppierende Strukturelemente/BlockQuote, Index, NonStruct, Private",
+  "sortOrder": 1330,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1e",
+      "originalTitleDe": "Info und Beziehungen: Gruppierende Strukturelemente/BlockQuote, Index, NonStruct, Private",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument BlockQuote-, Index-, NonStruct- oder Private-Elemente enthält oder der Einsatz dieser Elemente erforderlich gewesen wäre."
+      ],
+      "requirementDe": [
+        "Durch geeignetes Taggen wird auf semantischer Ebene eine Entsprechung des sichtbaren Inhalts geschaffen."
+      ],
+      "rationaleWhyDe": [
+        "Gruppierende Strukturelemente informieren über den Aufbau des PDF-Dokuments. Es kommt zu Fehlinterpretationen, wenn sie nicht korrekt verwendet werden. Wird beispielsweise ein Text als Zitat markiert, obwohl es sich bei dem Text nicht um ein Zitat handelt, so ist dies irreführend."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Dieser Prüfschritt ist erfüllt, wenn im PDF-Dokument gruppierende Strukturelemente korrekt verwendet werden."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Gruppierende Elemente wie NonStruct oder Private werden verwendet, ohne die Übersichtlichkeit der Tag-Struktur merklich zu verbessern.",
+        "- Einschränkung: Gruppierende Strukturelemente könnten das PDF-Dokument leichter navigierbar machen, doch werden an Stelle von Div, Art, Part oder Sect nur die Elemente NonStruct und Private verwendet.",
+        "- Barriere: Gruppierende Strukturelemente werden nicht verwendet, obwohl dies der Übersichtlichkeit der Tag-Struktur dienlich wäre. Block-Zitate werden nicht mit BlockQuote ausgezeichnet, Indizes nicht mit Index.",
+        "",
+        "Werden gruppierende Strukturelemente nicht korrekt verwendet, ist die aus deren Verwendung abzuleitende Fehlinterpretation ausschlaggebend für die Bewertung leichte Einschränkung bis Barriere."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#e-info-und-beziehungen-gruppierende-strukturelementeblockquote-index-nonstruct-private"
+    }
+  ]
+}

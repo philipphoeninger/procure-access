@@ -1,0 +1,65 @@
+{
+  "kind": "requirement",
+  "titleDe": "Eingabezweck bestimmen",
+  "sortOrder": 1410,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.5"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.5",
+      "originalTitleDe": "Eingabezweck bestimmen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente zur Eingabe von personenbezogenen Daten wie Eingabefelder oder Auswahlschalter enthält."
+      ],
+      "requirementDe": [
+        "Der Eingabezweck bei interaktiven Elementen zur Eingabe von personenbezogenen Daten kann programmatisch festgelegt und ermittelt sowie konsistent an assistive Technologien übermittelt werden oder ist im Text verfügbar."
+      ],
+      "rationaleWhyDe": [
+        "Bei personenbezogenen Angaben gilt es, besondere Umsicht walten zu lassen.",
+        "",
+        "Die Möglichkeit, die in einem bestimmten Feld erwarteten Daten programmatisch festzulegen, erleichtert das Ausfüllen von Formularen, insbesondere für Menschen mit kognitiven Einschränkungen.",
+        "",
+        "Verständliche sichtbare Beschriftungen und Anweisungen sind notwendig, um den Zweck von Eingabefeldern zu verstehen. Eine Ausfüllhilfe mit passenden Vorschlägen, um sich häufig wiederholende Eingaben automatisch ausführen zu lassen, erleichtert allen Personenkreisen die Bedienung und stellt darüber hinaus insbesondere für Menschen mit kognitiven aber auch körperlichen Einschränkungen eine ganz besondere Erleichterung dar."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle Formularfelder für personenbezogene Daten besitzen korrekte sichtbare Beschriftungen (Label) und Tooltipps."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Alle Formularfelder für personenbezogene Daten besitzen an sich korrekte sichtbare Beschriftungen (Label) und Tooltipps, die sich jedoch teilweise unterscheiden.",
+        "- Einschränkung: Formularfelder für personenbezogene Daten besitzen zwar sichtbare Beschriftungen, aber teilweise keine Tooltipps.",
+        "- Einschränkung: Formularfelder für personenbezogene Daten besitzen zwar Tooltipps, aber teilweise keine sichtbaren Beschriftungen.",
+        "- Einschränkung: Die sichtbaren Beschriftungen und Tooltipps von Formularfeldern für personenbezogene Daten sind teilweise unverständlich.",
+        "- Barriere: Formularfelder für personenbezogene Daten besitzen zwar sichtbare Beschriftungen, aber keine Tooltipps. Die Beschriftungen können von Screenreadern erfasst werden.",
+        "- Barriere: Formularfelder für personenbezogene Daten besitzen zwar geeignete Tooltipps, aber keine sichtbaren Beschriftungen.",
+        "- Barriere: Die sichtbaren Beschriftungen und gleichlautenden Tooltipps von Formularfeldern für personenbezogene Daten sind unverständlich.",
+        "- Blockade: Formularfelder für personenbezogene Daten besitzen zwar sichtbare Beschriftungen, aber keine Tooltipps, und die Beschriftungen können darüber hinaus von Screenreadern nicht erfasst werden.",
+        "- Blockade: Formularfelder für personenbezogene Daten besitzen zwar Tooltipps, aber keine sichtbaren Beschriftungen. Die Tooltipps sind darüber hinaus teilweise oder vollständig unstimmig oder fehlerhaft.",
+        "- Blockade: Die sichtbaren Beschriftungen und gleichlautenden Tooltipps von Formularfeldern für personenbezogene Daten sind unverständlich und weichen darüber hinaus voneinander ab."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#eingabezweck-bestimmen"
+    }
+  ]
+}

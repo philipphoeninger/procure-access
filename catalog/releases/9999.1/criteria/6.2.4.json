@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Anforderungen an Technologien mit Zwei-Wege-Sprachkommunikation",
+  "titleDe": "Reaktionsgeschwindigkeit von RTT",
+  "sortOrder": 190,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "6.2.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "rtt"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "6.2.4",
+      "originalTitleDe": "Reaktionsgeschwindigkeit von RTT",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Software Echtzeit-Textkommunikation (RTT = Realtime Text) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Software Echtzeit-Textkommunikation (RTT = Realtime Text), so darf die Dauer der Übertragung von einem Endgerät auf ein anderes Endgerät für die kleinste Texteinheit (einzelne Zeichen, kurze Worte) maximal 1000 Millisekunden (= 1 Sekunde) betragen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die über Echtzeit-Textkommunikation (RTT = Realtime Text) und nicht über Sprache an einer Online-Kommunikation teilnehmen, dürfen gegenüber Sprachnutzenden nicht benachteiligt werden. Die Texteingaben sollen gleichwertig zu Sprache unmittelbar bzw. nur mit geringer Latenz für andere Teilnehmer in der Konferenz angezeigt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Texteingaben werden in Echtzeit bzw. mit nicht merkbarer Latenz empfangen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Texteingaben werden nicht empfangen.",
+        "- Die Texteingaben werden mit merkbarer Latenz (> 1000ms) empfangen."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#reaktionsgeschwindigkeit-von-rtt"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "6.2.4",
+      "originalTitleDe": "Reaktionsgeschwindigkeit von RTT",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn die Mobile App Echtzeit-Textkommunikation (RTT = Realtime Text) zur Verfügung stellt."
+      ],
+      "requirementDe": [
+        "Bietet die Mobile App Echtzeit-Textkommunikation (RTT = Realtime Text), so darf die Dauer der Übertragung von einem Endgerät auf ein anderes Endgerät für die kleinste Texteinheit (einzelne Zeichen, kurze Worte) maximal 1000 Millisekunden (= 1 Sekunde) betragen."
+      ],
+      "rationaleWhyDe": [
+        "Menschen, die über Echtzeit-Textkommunikation (RTT = Realtime Text) und nicht über Sprache an einer Online-Kommunikation teilnehmen, dürfen gegenüber Sprachnutzenden nicht benachteiligt werden. Die Texteingaben sollen gleichwertig zu Sprache unmittelbar bzw. nur mit geringer Latenz für andere Teilnehmer in der Konferenz angezeigt werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Texteingaben werden in Echtzeit bzw. mit nicht merkbarer Latenz empfangen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Texteingaben werden nicht empfangen.",
+        "- Die Texteingaben werden mit merkbarer Latenz (> 1000ms) empfangen."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#reaktionsgeschwindigkeit-von-rtt"
+    }
+  ]
+}

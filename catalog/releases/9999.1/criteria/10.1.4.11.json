@@ -1,0 +1,63 @@
+{
+  "kind": "requirement",
+  "titleDe": "Nicht-Text-Kontrast",
+  "sortOrder": 1480,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.11"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.11",
+      "originalTitleDe": "Nicht-Text-Kontrast",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument interaktive Elemente, grafische Bedienelemente oder informationstragende Grafiken enthält."
+      ],
+      "requirementDe": [
+        "Die visuelle Darstellung der folgenden Elemente hat ein Kontrastverhältnis von mindestens 3:1 zu benachbarten Farben:",
+        "",
+        "- visuelle Informationen, die erforderlich sind, um Komponenten und Zustände zu identifizieren, mit Ausnahme interaktiver Elemente zur Eingabe von Daten oder wenn das Erscheinungsbild der Komponente vom PDF-Anzeigeprogramm bestimmt und bei der Erstellung des PDF-Dokuments nicht explizit geändert wird;",
+        "- Teile von Grafiken, die erforderlich sind, um den Inhalt einer Grafik zu verstehen, es sei denn, eine bestimmte Präsentation von Grafiken ist für die übermittelten Informationen wesentlich."
+      ],
+      "rationaleWhyDe": [
+        "Wenn Vordergrund- und Hintergrundfarbe sich in der Helligkeit ähneln, haben Grafiken und grafische Bedienelemente unter Umständen zu wenig Kontrast. Gute Kontraste sorgen für bessere Bedienbarkeit und Verständnis von Dokumentinhalten",
+        "",
+        "Insbesondere Menschen, die aufgrund einer verringerten Sehschärfe, einer Farbfehlsichtigkeit oder aufgrund des Alters eine verminderte Kontrastempfindlichkeit haben, profitieren von guten Kontrasten."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle grafischen Darstellungen bieten zum Umfeld und innerhalb des Bereichs ein Kontrastverhältnis von mindestens 3:1, wenn dies für Auffinden, Identifizieren und/oder inhaltliches Verständnis geboten ist."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Das PDF-Dokument enthält keine grafischen Bedienelemente und keine informationstragenden Grafiken.",
+        "- leichte Einschränkung: In einem Diagramm wird für Flächen die Kontrastanforderung nicht erfüllt, aber die Flächen sind zusätzlich eindeutig abgegrenzt und direkt beschriftet, und zwar nicht nur über eine gesonderte Legende.",
+        "- Einschränkung: In grafischen Darstellungen mit inhaltlicher Relevanz, z. B. in Diagrammen, erreicht der Kontrast in Teilen nicht die Mindestanforderung, aber der dargestellte Sachverhalt wird in einem unmittelbar an die jeweilige grafische Darstellung angrenzenden Absatz in Textform mit direkter Bezugnahme zusätzlich umfänglich dargestellt.",
+        "- Barriere: In grafischen Darstellungen mit inhaltlicher Relevanz, z. B. in Diagrammen, erreicht der Kontrast in Teilen nicht die Mindestanforderung. Der dargestellte Sachverhalt wird zusätzlich in Textform dargestellt, jedoch in einem nicht unmittelbar angrenzenden Bereich bzw. mit ungenauer Bezugnahme und/oder nicht vollumfänglich.",
+        "- Blockade: Interaktive Elemente und/oder deren Zustände weisen zur Umgebung und/oder zum alternativen Zustand nur Unterscheidungsmerkmale auf, deren Kontrastverhältnis unter 3:1 liegt.",
+        "- Blockade: Textfelder, Checkboxen etc. werden ohne Rahmen dargestellt. Das Steuerelement ist im nicht ausgefüllten bzw. nicht aktivierten Zustand nicht auffindbar.",
+        "- Blockade: Für das Verständnis benötigte Informationen werden nur bildhaft dargestellt und bieten zur Identifikation der sachlichen Information insgesamt oder in Teilen nur ein Kontrastverhältnis unterhalb 3:1. Eine stets sichtbare alternative textliche Wiedergabe des Sachverhalts ist nicht vorhanden."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#nicht-text-kontrast"
+    }
+  ]
+}

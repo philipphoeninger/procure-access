@@ -1,0 +1,88 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Keine Tastaturfalle",
+  "sortOrder": 650,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.1.2",
+      "originalTitleDe": "Keine Tastaturfalle",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Der Fokus bei Tastaturnavigation muss nach Erreichen eines Elements auch wieder vom Element wegbewegt werden können. Die Inhalte dürfen an keiner Stelle Elemente, Bereiche oder Menüs enthalten, die Mausinterkationen oder einen erzwungenen Neustart der Software benötigen, um wieder verlassen werden zu können."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Software enthält keine Tastaturfallen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Software enthält Tastaturfallen.",
+        "",
+        "- Nach Erreichen eines Elements kann dieses mit der Tabulatortaste nicht mehr verlassen werden. Es muss ein anderes Element per Mausklick fokussiert werden, um das Element zu verlassen.",
+        "- Nach Aufruf eines Optionsmenüs (in aller Regel durch ein Icon mit 3 Punkten gekennzeichnet) kann das Menü ohne Neustart der Software nicht mehr verlassen werden, da die Option „Abbrechen/Beenden/Schließen“ fehlt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#keine-tastaturfalle"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.1.2",
+      "originalTitleDe": "Keine Tastaturfalle",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Der Fokus bei Tastaturnavigation als auch bei Wischnavigation bei aktivem Screenreader muss beim Erreichen eines Elements auch wieder vom Element wegbewegt werden können. Die Inhalte dürfen an keiner Stelle Elemente, Bereiche oder Menüs enthalten, die nicht ohne Wischen, direktes Antippen eines anderen Elements oder einen erzwungenen Neustart der Mobile App wieder verlassen werden können.",
+        "",
+        "Im Betriebssystem iOS sind in aller Regel Seitengrenzen definiert. Beim Erreichen des ersten und letzten Elements einer Seite ist das jeweilige Ende der Seite erreicht, diese Grenzen sind nicht als Fehler zu werten."
+      ],
+      "rationaleWhyDe": [
+        "Viele motorisch beeinträchtigte Menschen sind auf die Tastaturbedienung angewiesen. Ihre Feinmotorik reicht für die Bedienung mit Händen und Fingern nicht aus. Die Tastaturbedienbarkeit erhöht zudem die Gebrauchstauglichkeit für alle Menschen, da sie einen effizienten, alternativen Bedienweg bei intensiver Nutzung bereitstellt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die Mobile App enthält keine Tastaturfallen."
+      ],
+      "negativeExamplesDe": [
+        "- Die Mobile App enthält Tastaturfallen.",
+        "",
+        "- Nach Erreichen eines Elements kann dieses durch Rechts- oder Linkswisch nicht mehr verlassen werden. Es muss ein anderes Element per direktem Antippen fokussiert werden, um das Element zu verlassen.",
+        "- Nach Aufruf eines Optionsmenüs (in aller Regel durch ein Icon mit 3 Punkten gekennzeichnet) kann das Menü ohne Neustart der Mobile App nicht mehr verlassen werden, da die Option „Abbrechen/Beenden/Schließen“ fehlt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#keine-tastaturfalle"
+    }
+  ]
+}

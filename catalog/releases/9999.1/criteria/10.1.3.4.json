@@ -1,0 +1,54 @@
+{
+  "kind": "requirement",
+  "titleDe": "Bildschirmausrichtung anpassbar",
+  "sortOrder": 1400,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.4",
+      "originalTitleDe": "Bildschirmausrichtung anpassbar",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst."
+      ],
+      "requirementDe": [
+        "Die korrekte Darstellung des PDF-Dokuments darf nicht durch die gewählte Bildschirmausrichtung beeinflusst werden."
+      ],
+      "rationaleWhyDe": [
+        "Einige Menschen wählen aufgrund ihrer Beeinträchtigung eine fixe Bildschirmausrichtung oder sind nicht in der Lage, diese anzupassen. Es gibt Augenkrankheiten, die das Gesichtsfeld begrenzen. Einige körperbeeinträchtigte Personen können die Ausrichtung ihres Bildschirms nicht selbstständig ändern."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Ein PDF-Dokument wird nach Drehen des Bildschirms ins Querformat oder ins Hochformat vollständig angezeigt. Eventuell abgeschnittene Inhalte lassen sich durch Scrollen anzeigen. Die Vergrößerungsstufe lässt sich anpassen."
+      ],
+      "negativeExamplesDe": [
+        "- Einschränkung: Ein PDF-Dokument wird nach Drehen des Bildschirms ins Querformat bzw. ins Hochformat vergrößert dargestellt. Es kann zwar waagerecht und senkrecht gescrollt werden, aber die vergrößerte Darstellung lässt sich nicht ändern.",
+        "- Blockade: Ein PDF-Dokument wird nach Drehen des Bildschirms ins Hochformat bzw. ins Querformat nicht mehr vollständig angezeigt und waagerechtes bzw. senkrechtes Scrollen ist nicht möglich.",
+        "",
+        "Nichtbeachtung bedeutet eine Blockade, unzureichende Umsetzung eine Einschränkung."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#bildschirmausrichtung-anpassbar"
+    }
+  ]
+}

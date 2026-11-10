@@ -1,0 +1,46 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sicherheit",
+  "sortOrder": 1800,
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "UA1 7.16",
+      "originalTitleDe": "Sicherheit",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Sicherheitseinstellungen des PDF-Dokuments sollen assistiven Technologien (z. B. Screenreader-Programmen) einen vollwertigen Zugriff auf das PDF-Dokument ermöglichen."
+      ],
+      "rationaleWhyDe": [
+        "Assistive Technologien benötigen beim Zugriff auf PDF-Dokumente spezielle Zugriffsrechte. Sind die Sicherheitseinstellungen eines PDF-Dokuments zu restriktiv oder falsch gesetzt, können assistive Technologien nicht auf das PDF-Dokument zugreifen und das PDF-Dokument kann nicht gelesen werden.",
+        "",
+        "Indem gewährleistet wird, dass assistive Technologien (wie z. B. Screenreader-Programme) auf das PDF-Dokument zugreifen können, wird sichergestellt, dass die Inhalte des PDF-Dokuments Personen, die auf die Nutzung eines Screenreader-Programms angewiesen sind, vollumfänglich zur Verfügung stehen. Dies betrifft insbesondere Menschen ohne bzw. mit eingeschränktem Sehvermögen.",
+        "",
+        "Darüber hinaus sollte es möglich sein, ein PDF-Dokument in alternative Formate umzuwandeln, um den unterschiedlichsten Bedürfnissen gerecht zu werden."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Die Sicherheitseinstellungen ermöglichen einen vollständigen Zugriff von assistiven Technologien."
+      ],
+      "negativeExamplesDe": [
+        "- Blockade: Die Sicherheitseinstellungen verhindern einen Zugriff von assistiven Technologien."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#ua1-7.16-sicherheit"
+    }
+  ]
+}

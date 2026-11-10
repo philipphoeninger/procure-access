@@ -1,0 +1,54 @@
+{
+  "kind": "requirement",
+  "titleDe": "Textabstand",
+  "sortOrder": 1490,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.12"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.12",
+      "originalTitleDe": "Textabstand",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Text enthält.",
+        "",
+        "Die in diesem Prüfschritt zu beurteilenden Kriterien werden ggf. durch das gewählte Anwendungsprogramm bzw. die assistive Technologie beeinflusst.",
+        "",
+        "Der Prüfschritt ist mit „nicht anwendbar“ zu bewerten, so lange kein gängiges PDF-Anzeigeprogramm in der Lage ist, Textabstände zuverlässig umzusetzen."
+      ],
+      "requirementDe": [
+        "Die Anpassung der Zeilenhöhe auf das 1,5-Fache der Textgröße, des Abstands nach Absätzen auf das 2-Fache der Textgröße, von Buchstabenabständen auf das 0,12-Fache der Textgröße und von Wortabständen auf das 0,16-Fache der Textgröße führt nicht zu einem Verlust an Inhalten oder Funktionalitäten."
+      ],
+      "rationaleWhyDe": [
+        "Für Menschen mit Sehbehinderung sowie mit Lesebeeinträchtigung, kann die Lesbarkeit von Texten durch individuelle Textgestaltung verbessert werden. Dies erfolgt durch Änderung der Abstände zwischen Zeilen, Absätzen, Zeichen und Worten. Solche Anpassungen führen dazu, dass Texte ggf. mehr Platz benötigen und Inhalte entsprechend dynamisch angelegt sein müssen, um den längeren Text ohne Verlust zu zeigen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Mit geändertem Zeilenabstand kommt es nicht zu Textverlusten und alle Funktionalitäten bleiben bedienbar."
+      ],
+      "negativeExamplesDe": [
+        "- nicht anwendbar: Der Zeilenabstand lässt sich im PDF-Anzeigeprogramm nicht verändern.",
+        "- Blockade: Mit geändertem Zeilenabstand kommt es zu Textverlusten, weil Inhalte z. B. nicht mehr vollständig erreichbar sind bzw. nicht mehr vollständig abgebildet werden, und/oder zum Verlust von Funktionalitäten."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#textabstand"
+    }
+  ]
+}

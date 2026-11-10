@@ -1,0 +1,102 @@
+{
+  "kind": "requirement",
+  "category": "Verständlichkeit",
+  "titleDe": "Kontextänderung bei Eingabe",
+  "sortOrder": 830,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.3.2.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.3.2.2",
+      "originalTitleDe": "Kontextänderung bei Eingabe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularelemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Bedienung von Formularelementen (beispielsweise Checkbox, Radio-Button, Auswahlliste) und die Eingabe von Inhalten in Textfelder (Eingabefelder) bei Tastaturbedienung und bei Tastaturbedienung mit aktivem Screenreader darf nicht zu unerwarteten oder unangekündigten Kontextänderungen führen (beispielsweise unerwartetes Öffnen neuer Ansichten, unerwartetes Ausblenden der Tastatur während Texteingabe, oder automatische Großschreibung).",
+        "",
+        "Sinnvolle oder notwendige Kontextänderungen müssen unterhalb des auslösenden Elements erfolgen. Der Fokus darf dabei nicht versetzt werden.",
+        "",
+        "Warnhinweise erscheinen als Antwort aufgrund von Eingaben der Nutzenden. Sofern Sie als Warnung in einem modalen Dialog implementiert wurden, sind sie nicht Bestandteil der Anforderung.",
+        "",
+        "Eindeutige Kontextänderungen sind beispielsweise das Öffnen neuer Ansichten und das Einblenden neuer Inhalte auf derselben Ansicht, wenn diese Inhalte wie eine neue Seite wirken oder Inhalte in stark veränderter Anordnung erscheinen.",
+        "",
+        "Reine Inhaltsänderungen gelten nicht als unerwartete Kontextänderungen bei Eingabe."
+      ],
+      "rationaleWhyDe": [
+        "Unerwartete oder unangekündigte Kontextänderungen beeinträchtigen die Orientierung von Nutzenden. Sie lenken ab, verwirren, oder bleiben gerade bei Menschen mit Sehbeeinträchtigungen unbemerkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Inhalte einer nachfolgenden Auswahlliste werden dynamisch nach einer zuvor getroffenen Auswahl aktualisiert.",
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder unterhalb ein."
+      ],
+      "negativeExamplesDe": [
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder unterhalb ein, die neue Auswahlliste wird fokussiert.",
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder oberhalb ein."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#kontextänderung-bei-eingabe"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.3.2.2",
+      "originalTitleDe": "Kontextänderung bei Eingabe",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularelemente vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Bedienung von Formularelementen (beispielsweise Checkbox, Radio-Button, Auswahlliste) und die Eingabe von Inhalten in Textfelder (Eingabefelder) bei Bedienung mit einer externen Tastatur und bei Bedienung mit aktivem Screenreader darf nicht zu unerwarteten oder unangekündigten Kontextänderungen führen (beispielsweise unerwartetes Öffnen neuer Ansichten, unerwartetes Ausblenden der Tastatur während Texteingabe, oder automatische Großschreibung).",
+        "",
+        "Sinnvolle oder notwendige Kontextänderungen müssen unterhalb des auslösenden Elements erfolgen. Der Fokus darf dabei nicht versetzt werden.",
+        "",
+        "Warnhinweise erscheinen als Antwort aufgrund von Eingaben der Nutzenden. Sofern Sie als Warnung in einem modalen Dialog implementiert wurden, sind sie nicht Bestandteil der Anforderung.",
+        "",
+        "Eindeutige Kontextänderungen sind beispielsweise das Öffnen neuer Ansichten und das Einblenden neuer Inhalte auf derselben Ansicht, wenn diese Inhalte wie eine neue Seite wirken oder Inhalte in stark veränderter Anordnung erscheinen.",
+        "",
+        "Reine Inhaltsänderungen gelten nicht als unerwartete Kontextänderungen bei Eingabe."
+      ],
+      "rationaleWhyDe": [
+        "Unerwartete oder unangekündigte Kontextänderungen beeinträchtigen die Orientierung von Nutzenden. Sie lenken ab, verwirren, oder bleiben gerade bei Menschen mit Sehbeeinträchtigungen unbemerkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Inhalte einer nachfolgenden Auswahlliste werden dynamisch nach einer zuvor getroffenen Auswahl aktualisiert.",
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder unterhalb ein."
+      ],
+      "negativeExamplesDe": [
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder unterhalb ein, die neue Auswahlliste wird fokussiert.",
+        "- Das Aktivieren einer Checkbox blendet neue Eingabefelder oberhalb ein."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#kontextänderung-bei-eingabe"
+    }
+  ]
+}

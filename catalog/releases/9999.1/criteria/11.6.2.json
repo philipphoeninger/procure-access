@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Dokumentierte Nutzung",
+  "titleDe": "Keine Unterbrechung der Barrierefreiheitsfunktionen",
+  "sortOrder": 1110,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.6.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.6.2",
+      "originalTitleDe": "Keine Unterbrechung der Barrierefreiheitsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die assistiven Systeme des Betriebssystems, im Schwerpunkt die Systeme Screenreader, Bildschirmlupe, Sprachsteuerung und externe Tastatur, werden bei aktiver Nutzung nicht unterbrochen, verändert und frieren nicht ein, oder werden unerwartet beendet, ohne dass der Nutzende eine entsprechende Aktion ausführt oder im Vorfeld informiert wurde."
+      ],
+      "rationaleWhyDe": [
+        "Aktive assistive Systeme, und gegebenenfalls ihre jeweilige Einstellung, die durch den Nutzenden konfiguriert wurde, dürfen durch die Software nicht negativ beeinflusst oder verändert werden. Ansonsten werden Nutzende, die auf assistive Systeme angewiesen sind, eingeschränkt oder irritiert. Schlimmstenfalls ist die Software für manche Menschen nicht mehr nutzbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die assistiven Systeme werden während der aktiven Nutzung nicht unterbrochen, verändert, frieren nicht ein und werden nicht unerwartet beendet."
+      ],
+      "negativeExamplesDe": [
+        "- Ein assistives System wird während der aktiven Nutzung unterbrochen, verändert oder beendet.",
+        "- Ein assistives System friert während der Verwendung ein.",
+        "- Eine vergrößerte Darstellung, beispielsweise Schriftgröße, wird bei Aufruf einer neuen Seite beendet oder auf 100% zurückgesetzt."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#keine-unterbrechung-der-barrierefreiheitsfunktionen"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.6.2",
+      "originalTitleDe": "Keine Unterbrechung der Barrierefreiheitsfunktionen",
+      "applicabilityDe": [
+        "Der Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die assistiven Systeme des Betriebssystems, im Schwerpunkt die Systeme Screenreader, Bildschirmlupe, Sprachsteuerung und externe Tastatur, werden bei aktiver Nutzung nicht unterbrochen, verändert und frieren nicht ein, oder werden unerwartet beendet, ohne dass der Nutzende eine entsprechende Aktion ausführt oder im Vorfeld informiert wurde."
+      ],
+      "rationaleWhyDe": [
+        "Aktive assistive Systeme, und gegebenenfalls ihre jeweilige Einstellung, die durch den Nutzenden konfiguriert wurde, dürfen durch die mobile Applikation nicht negativ beeinflusst oder verändert werden. Ansonsten werden Nutzende, die auf die assistiven Systeme angewiesen sind, eingeschränkt oder irritiert. Schlimmstenfalls ist die mobile Applikation für manche Menschen nicht mehr nutzbar."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- Die assistiven Systeme werden während der aktiven Nutzung nicht unterbrochen, verändert, frieren nicht ein und werden nicht unerwartet beendet."
+      ],
+      "negativeExamplesDe": [
+        "- Ein assistives System wird während der aktiven Nutzung unterbrochen, verändert oder beendet.",
+        "- Ein assistives System friert während de4 Verwendung ein.",
+        "- Eine aktive Bildschirmlupe wird bei Aufruf einer neuen Seite beendet oder auf 100% zurückgesetzt."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#keine-unterbrechung-der-barrierefreiheitsfunktionen"
+    }
+  ]
+}

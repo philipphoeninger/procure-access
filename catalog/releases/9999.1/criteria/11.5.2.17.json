@@ -1,0 +1,84 @@
+{
+  "kind": "requirement",
+  "category": "Interoperabilität mit assistiven Technologien",
+  "titleDe": "Änderungen von Werten und Text",
+  "sortOrder": 1100,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.5.2.17"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.5.2.17",
+      "originalTitleDe": "Änderungen von Werten und Text",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularelemente zur Eingabe von Text vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Werte von Formularelementen, die durch Interaktion verändert werden können, können auch bei Nutzung assistiver Systeme verändert werden."
+      ],
+      "rationaleWhyDe": [
+        "Formularelemente, die bei aktivem Screenreader, mittels Sprachsteuerung oder bei aktiver Bildschirmlupe zur Eingabe von Text nicht genutzt werden können, blockieren den Nutzenden bei der Verwendung des digitalen Produkts. Bei Blockaden steht in aller Regel keine, oder nur eine über Umwege erreichbare Behelfslösung zur Verfügung, der Nutzende ist dann bei der Verwendung des Produkts unter Umständen stark eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Werte oder Texte von Formularfeldern können durch assistive Systeme einzeln oder in Kombination erwartungsgemäß verändert werden."
+      ],
+      "negativeExamplesDe": [
+        "- Werte oder Texte von Formularfeldern können durch assistive Systeme einzeln oder in Kombination nicht erwartungsgemäß verändert werden."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#änderungen-von-werten-und-text"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.5.2.17",
+      "originalTitleDe": "Änderungen von Werten und Text",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Formularelemente zur Eingabe von Text vorhanden sind."
+      ],
+      "requirementDe": [
+        "Die Werte von Formularelementen, die durch Interaktion verändert werden können, können auch bei Nutzung assistiver Systeme verändert werden."
+      ],
+      "rationaleWhyDe": [
+        "Formularelemente, die bei aktivem Screenreader, mittels Sprachsteuerung oder bei aktiver Bildschirmlupe zur Eingabe von Text nicht genutzt werden können, blockieren den Nutzenden bei der Verwendung des digitalen Produkts. Bei Blockaden steht in aller Regel keine, oder nur eine über Umwege erreichbare Behelfslösung zur Verfügung, der Nutzende ist dann bei der Verwendung des Produkts unter Umständen stark eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "restriction",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Werte oder Texte von Formularfeldern können durch assistive Systeme einzeln oder in Kombination erwartungsgemäß verändert werden."
+      ],
+      "negativeExamplesDe": [
+        "- Werte oder Texte von Formularfeldern können durch assistive Systeme einzeln oder in Kombination nicht erwartungsgemäß verändert werden."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#änderungen-von-werten-und-text"
+    }
+  ]
+}

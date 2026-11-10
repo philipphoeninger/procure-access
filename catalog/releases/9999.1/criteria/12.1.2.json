@@ -1,0 +1,108 @@
+{
+  "kind": "requirement",
+  "category": "Dokumentation und unterstützende Dienste",
+  "titleDe": "Barrierefreie Dokumentation",
+  "sortOrder": 1190,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "12.1.2"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "12.1.2",
+      "originalTitleDe": "Barrierefreie Dokumentation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Produktdokumentation beispielsweise als Handbuch, oder eine Erklärung zur Barrierefreiheit vorhanden sind."
+      ],
+      "requirementDe": [
+        "Sofern eine Dokumentation vorhanden ist, muss sie in mindestens einem der folgenden Formate verfügbar sein. Weiterhin muss sie den Anforderungen der jeweils relevanten Kapitel der EN 301549 entsprechen:",
+        "",
+        "- Eigener Bestandteil der Software, konform mit Kapitel 11 der EN 301549.",
+        "- Webformat, konform mit Kapitel 9 der EN 301549.",
+        "- Nicht-Web-Format (als Datei), konform mit Kapitel 10 der EN 301 549.",
+        "",
+        "Weitere, abweichende Formate für die Dokumentation, auch in nicht barrierefreien Formaten, können zusätzlich bereitgestellt werden.",
+        "",
+        "Eine Funktionalität, die eine automatische Medienkonvertierung unterstützt, ist vorteilhaft für die Verbesserung der Zugänglichkeit.",
+        "",
+        "Eine vollumfängliche Prüfung von Web-Formaten (geöffnet außerhalb der Software im Browser des Endgeräts) und von Nicht-Web-Formaten (bereitgestellt als Datei) ist im Rahmen dieses Testvorgehens nicht vorgesehen. Sie benötigen gegebenenfalls eine eigene Prüfung.",
+        "",
+        "Ist die Dokumentation im Dateiformat PDF verfügbar, kann mit Hilfe der Anwendung PAC eine erste Analyse zur Barrierefreiheit des Dokuments durchgeführt werden ([https://pac.pdf-accessibility.org/de](https://pac.pdf-accessibility.org/de))."
+      ],
+      "rationaleWhyDe": [
+        "Die Dokumentation, beziehungsweise die Erklärung zur Barrierefreiheit, ist oftmals der erste Anlaufpunkt für Menschen mit Beeinträchtigungen. Die entsprechende Dokumentation unterstützt sie dabei, einen Überblick über das Produkt zu bekommen. Erfüllt die Dokumentation nicht die jeweils relevanten Anforderungen, ist bereits der unter Umständen erste Kontakt zwischen dem Nutzenden und dem Produkt eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine bereitgestellte Dokumentation erfüllt die entsprechend anwendbaren Kriterien dieses Testvorgehens.",
+        "- Die Prüfung einer im Dateiformat PDF bereitgestellten Produktdokumentation mittels PAC ergibt keine Fehler."
+      ],
+      "negativeExamplesDe": [
+        "- Eine bereitgestellte Dokumentation erfüllt die entsprechend anwendbaren Kriterien dieses Testvorgehens nicht oder nicht vollumfänglich.",
+        "- Die Prüfung einer im Dateiformat PDF bereitgestellten Produktdokumentation mittels PAC ergibt Fehler."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#barrierefreie-dokumentation"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "12.1.2",
+      "originalTitleDe": "Barrierefreie Dokumentation",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn eine Produktdokumentation beispielsweise als Handbuch, oder eine Erklärung zur Barrierefreiheit vorhanden sind"
+      ],
+      "requirementDe": [
+        "Sofern eine Dokumentation vorhanden ist, muss sie in mindestens einem der folgenden Formate verfügbar sein. Weiterhin muss sie den Anforderungen der jeweils relevanten Kapitel der EN 301549 entsprechen:",
+        "",
+        "- Eigener Bestandteil der Mobile App, konform mit Kapitel 11 der EN 301549.",
+        "- Webformat, konform mit Kapitel 9 der EN 301549.",
+        "- Nicht-Web-Format (als Datei), konform mit Kapitel 10 der EN 301 549.",
+        "",
+        "Weitere, abweichende Formate für die Dokumentation, auch in nicht barrierefreien Formaten, können zusätzlich bereitgestellt werden.",
+        "",
+        "Eine Funktionalität, die eine automatische Medienkonvertierung unterstützt, ist vorteilhaft für die Verbesserung der Zugänglichkeit.",
+        "",
+        "Eine vollumfängliche Prüfung von Web-Formaten (geöffnet außerhalb der Mobile App im Browser des Endgeräts) und von Nicht-Web-Formaten (bereitgestellt als Datei) ist im Rahmen dieses Testvorgehens nicht vorgesehen. Sie benötigen gegebenenfalls eine eigene Prüfung.",
+        "",
+        "Ist die Dokumentation im Dateiformat PDF verfügbar, kann mit Hilfe der Anwendung PAC 2021 (Stand Januar 2024) der PDF/UA Foundation eine erste Analyse zur Barrierefreiheit des Dokuments durchgeführt werden ([https://pdfua.foundation/de/](https://pdfua.foundation/de/))."
+      ],
+      "rationaleWhyDe": [
+        "Die Dokumentation, beziehungsweise die Erklärung zur Barrierefreiheit, ist oftmals der erste Anlaufpunkt für Menschen mit Beeinträchtigungen. Die entsprechende Dokumentation unterstützt sie dabei, einen Überblick über das Produkt zu bekommen. Erfüllt die Dokumentation nicht die jeweils relevanten Anforderungen, ist bereits der unter Umständen erste Kontakt zwischen dem Nutzenden und dem Produkt eingeschränkt."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Eine bereitgestellte Dokumentation erfüllt die entsprechend anwendbaren Kriterien dieses Testvorgehens.",
+        "- Die Prüfung einer im Dateiformat PDF bereitgestellten Produktdokumentation mittels PAC 2021 ergibt keine Fehler."
+      ],
+      "negativeExamplesDe": [
+        "- Eine bereitgestellte Dokumentation erfüllt die entsprechend anwendbaren Kriterien dieses Testvorgehens nicht oder nicht vollumfänglich.",
+        "- Die Prüfung einer im Dateiformat PDF bereitgestellten Produktdokumentation mittels PAC 2021 ergibt Fehler."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#barrierefreie-dokumentation"
+    }
+  ]
+}

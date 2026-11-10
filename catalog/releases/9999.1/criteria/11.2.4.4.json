@@ -1,0 +1,98 @@
+{
+  "kind": "requirement",
+  "category": "Bedienbarkeit",
+  "titleDe": "Aussagekräftige Beschriftungen von Links",
+  "sortOrder": 710,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "11.2.4.4"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "web",
+        "softwareOpen",
+        "softwareClosed",
+        "mobileOpen",
+        "mobileClosed"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "softwareTest",
+      "originalNumber": "11.2.4.4",
+      "originalTitleDe": "Aussagekräftige Beschriftungen von Links",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Links vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Zweck oder das Ziel eines Links kann direkt aus Beschriftung des Links, oder im unmittelbaren Kontext des Links bestimmt werden. Die Beschriftung von Links ist eindeutig. Werden innerhalb eines Kontextes mehrere Links verwendet, muss eine Unterscheidung durch die Beschriftung des Links gewährleistet sein, oder es wird ein anderes unterscheidbares Merkmal verwendet. Dies kann über kontextbezogene, weitere Informationen wie beispielsweise eine verständliche Information auf der Seite, die Handhabung oder Besonderheiten der Links erklärt, durch den Alternativtext einer verlinkten Grafik, durch eine vorhergehende Überschrift, oder durch Piktogramme im Fall von Dokumenten-Links umgesetzt werden.",
+        "",
+        "Wird zum Öffnen des Ziels eine andere Anwendung außerhalb der zu testenden Software geöffnet, oder ist das Ziel ein Dokument, erhält der Nutzende eine entsprechende Information, sofern das Verlassen der Software nicht aus dem Kontext heraus ersichtlich ist.",
+        "",
+        "Verlinkte URLs, E-Mailadressen und Telefonnummern übermitteln ihren Zweck automatisch über das Format und werden nicht bewertet."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Screenreadern lesen Links einzeln und sind auf eine eindeutige Beschriftung angewiesen, um Zweck oder Ziel zu erkennen. Weiterhin bieten die Betriebssysteme die Möglichkeit, sämtliche Links einer Seite zu fokussieren. Der Zweck dieser Technik scheitert, wenn Linkbezeichnungen mehrfach vorkommen. Eine eindeutige Beschriftung unterstützt zudem Nutzende mit kognitiven Beeinträchtigungen oder Lernschwierigkeiten dabei, den Inhalt besser zu verstehen und zu verarbeiten."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Beschriftung von Links ist eindeutig.",
+        "- Die Beschriftung von Links ist nicht eindeutig, aber im unmittelbaren Kontext werden eindeutige Zusatzinformationen bereitgestellt.",
+        "- Die Beschriftung von Links ist visuell nicht eindeutig, aber bei aktivem Screenreader werden Zusatzinformationen übermittelt.",
+        "- Das Öffnen eines Links außerhalb der Software ist über die visuelle Beschriftung nicht identifizierbar, aber bei aktivem Screenreader werden entsprechende Zusatzinformationen übermittelt."
+      ],
+      "negativeExamplesDe": [
+        "- Die Beschriftung von Links ist nicht eindeutig.",
+        "- Die Informationen im unmittelbaren Kontext sind nicht eindeutig genug."
+      ],
+      "sourceUrl": "https://softwaretest.bit-inklusiv.de/#aussagekräftige-beschriftungen-von-links"
+    },
+    {
+      "testType": "appTest",
+      "originalNumber": "11.2.4.4",
+      "originalTitleDe": "Aussagekräftige Beschriftungen von Links",
+      "applicabilityDe": [
+        "Der Prüfschritt ist anwendbar, wenn Links vorhanden sind."
+      ],
+      "requirementDe": [
+        "Der Zweck oder das Ziel eines Links kann direkt aus Beschriftung des Links, oder im unmittelbaren Kontext des Links bestimmt werden. Die Beschriftung von Links ist eindeutig. Werden innerhalb eines Kontextes mehrere Links verwendet, muss eine Unterscheidung durch die Beschriftung des Links gewährleistet sein, oder es wird ein anderes unterscheidbares Merkmal verwendet. Dies kann über kontextbezogene, weitere Informationen wie beispielsweise eine verständliche Information auf der Seite, die Handhabung oder Besonderheiten der Links erklärt, durch den Alternativtext einer verlinkten Grafik, durch eine vorhergehende Überschrift, oder durch Piktogramme im Fall von Dokumenten-Links umgesetzt werden.",
+        "",
+        "Wird zum Öffnen des Ziels eine andere Anwendung außerhalb der Mobile App des Betriebssystems geöffnet, oder ist das Ziel ein Dokument, erhält der Nutzende eine entsprechende Information, sofern das Verlassen der Mobile App nicht aus dem Kontext heraus ersichtlich ist.",
+        "",
+        "Verlinkte URLs, E-Mailadressen und Telefonnummern übermitteln ihren Zweck automatisch über das Format und werden nicht bewertet."
+      ],
+      "rationaleWhyDe": [
+        "Nutzende von Screenreadern lesen Links einzeln und sind auf eine eindeutige Beschriftung angewiesen, um Zweck oder Ziel zu erkennen. Weiterhin bieten die Betriebssysteme die Möglichkeit, sämtliche Links einer Seite zu fokussieren. Der Zweck dieser Technik scheitert, wenn Linkbezeichnungen mehrfach vorkommen. Eine eindeutige Beschriftung unterstützt zudem Nutzende mit kognitiven Beeinträchtigungen oder Lernschwierigkeiten dabei, den Inhalt besser zu verstehen und zu verarbeiten."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade",
+        "notApplicable"
+      ],
+      "positiveExamplesDe": [
+        "- Die Beschriftung von Links ist eindeutig.",
+        "- Die Beschriftung von Links ist nicht eindeutig, aber im unmittelbaren Kontext werden eindeutige Zusatzinformationen bereitgestellt.",
+        "- Die Beschriftung von Links ist visuell nicht eindeutig, aber bei aktivem Screenreader werden Zusatzinformationen übermittelt.",
+        "- Das Öffnen eines Links außerhalb der Mobile App ist über die visuelle Beschriftung nicht identifizierbar, aber bei aktivem Screenreader werden entsprechende Zusatzinformationen übermittelt."
+      ],
+      "negativeExamplesDe": [
+        "- Die Beschriftung von Links ist nicht eindeutig.",
+        "- Die Informationen im unmittelbaren Kontext sind nicht eindeutig genug."
+      ],
+      "sourceUrl": "https://apptest.bit-inklusiv.de/#aussagekräftige-beschriftungen-von-links"
+    }
+  ]
+}

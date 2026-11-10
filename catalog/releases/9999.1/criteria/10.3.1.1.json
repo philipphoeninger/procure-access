@@ -1,0 +1,52 @@
+{
+  "kind": "requirement",
+  "titleDe": "Sprache des PDF-Dokuments",
+  "sortOrder": 1660,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.3.1.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.3.1.1",
+      "originalTitleDe": "Sprache des PDF-Dokuments",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Die Hauptsprache des PDF-Dokuments muss programmatisch ermittelbar sein."
+      ],
+      "rationaleWhyDe": [
+        "Mit diesem Prüfschritt soll sichergestellt werden, dass die textlichen Inhalte des PDF-Dokuments allen Personengruppen vollumfänglich zur Verfügung stehen.",
+        "",
+        "Screenreader-Programme verwenden verschiedene Sprachsynthesizer für die jeweilige natürliche Sprache. Der Synthesizer bestimmt, ob die Texte eines PDF-Dokuments (Inhalte, Beschriftungen, Alternativtexte) richtig ausgesprochen werden. Bei einer falschen Festlegung der Hauptsprache des PDF-Dokuments kann es z. B. passieren, dass deutscher Text mit englischer Sprachkonvention vorgelesen wird und damit nicht mehr verständlich ist.",
+        "",
+        "Wenn Menschen, die auf die Nutzung eines Screenreader-Programms angewiesen sind, manuell eingreifen müssen, um die Sprachausgabe umzuschalten, weil das Screenreader-Programm nicht automatisch zur richtigen Sprachausgabe wechselt, so behindert dies die Arbeitsabläufe."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Das korrekte Sprach-Attribut ist für das PDF-Dokument in den Metadaten hinterlegt."
+      ],
+      "negativeExamplesDe": [
+        "- Blockade: In den Metadaten wurde kein oder das falsche Sprach-Attribut hinterlegt."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#sprache-des-pdf-dokuments"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "kind": "requirement",
+  "titleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Tabellen",
+  "sortOrder": 1360,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.3.1"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.3.1h",
+      "originalTitleDe": "Info und Beziehungen: Blocklevel Strukturelemente/Tabellen",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist anwendbar, wenn das PDF-Dokument Tabellen enthält oder der Einsatz von Tabellen-Elementen erforderlich gewesen wäre."
+      ],
+      "requirementDe": [
+        "Wenn im PDF-Dokument Tabellen verwendet werden, sollten sie korrekt ausgezeichnet werden. Tabellen sollten nicht rein zu Layout-Zwecken eingesetzt werden, wenn dies semantisch nicht für die darin enthaltenen Strukturelemente geeignet ist."
+      ],
+      "rationaleWhyDe": [
+        "Personen mit der Fähigkeit, sich visuell zu orientieren, können für die Orientierung in einer Datentabelle sowohl Überschriften als auch den Wertebereich nutzen. Für diesen Personenkreis ist es ggf. auch möglich, strukturelle Mängel wie zum Beispiel einen Wechsel in der Bedeutung von Zeilen oder Spalten zu erkennen und damit umzugehen.",
+        "",
+        "Sehbehinderte und blinde Menschen erschließen sich das Angebot von Datentabellen dagegen eher analytisch. Sie entwickeln ausgehend von den Überschriften-Zellen und anderen im Kontext verfügbaren Informationen eine Vorstellung vom Aufbau der Tabelle. Diese Vorstellung ist die Grundlage für den Zugriff auf die angebotenen Daten. Damit das möglich ist und verlässlich funktioniert, müssen die folgenden Bedingungen erfüllt sein:",
+        "",
+        "- Die Tabelle muss eine klare Struktur haben.",
+        "- Die Bedeutung der Zeilen und Spalten muss erfassbar und den Überschriften oder unterstützenden Kontextinformationen zu entnehmen sein.",
+        "- Überschriften müssen korrekt ausgezeichnet sein. D. h. Überschriften müssen auffindbar sein und es muss klar sein, auf welche Daten sie sich beziehen.",
+        "",
+        "Eine klare Struktur ist die Grundlage für die Barrierefreiheit von Datentabellen. Es ist nicht möglich, eine mangelhaft strukturierte Datentabelle allein durch spezielle Auszeichnung barrierefrei zugänglich zu machen. Eine klare, nachvollziehbare Struktur ermöglicht die korrekte Auszeichnung, die z. B. bei Screenreader-Nutzung nützlich und unerlässlich ist.",
+        "",
+        "Mögliche Anwendungen der Auszeichnung von Tabellenüberschriften in Screenreader-Programmen:",
+        "",
+        "- Das Screenreader-Programm informiert über die Position und die Anzahl der Überschriftenreihen.",
+        "- Das Screenreader-Programm liest beim Wechsel der Tabellenzeile oder der Tabellenspalte die (neue) Zeilen- oder Spaltenüberschrift vor.",
+        "- Überschriften werden in einer besser geeigneten Form hervorgehoben.",
+        "",
+        "Bei komplexen Tabellen können Screenreader-Programme allein aus dem Tabellengerüst nicht erschließen, welche Bezüge es zwischen Daten- und Überschriften-Zellen gibt. Deshalb müssen diese Verknüpfungen mithilfe der in PDF-Dokumenten zur Verfügung stehenden Tabellen-Attribute ausdrücklich definiert werden.",
+        "",
+        "In der Praxis sind manchmal auch einfache Datentabellen mit header- und id-Attributen ausgezeichnet. Screenreader-Programme richten sich dann nicht nach den allgemeinen Regeln, sondern allein nach der vorliegenden spezifischen Auszeichnung. Deshalb muss eine vorgenommene Auszeichnung auch dann richtig sein, wenn sie eigentlich nicht nötig wäre. Denn bei falscher direkter Zuordnung von Datenzellen über Tabellen-Attribute werden die Überschriften nicht oder fehlerhaft ausgegeben.",
+        "",
+        "Selbst bei korrekter Auszeichnung sind komplexe Tabellen bei Screenreader-Nutzung schwerer zu erfassen als einfache Tabellen. Daher ist es empfehlenswert, Tabellen mit mehreren logischen Ebenen generell zu vermeiden. Komplexe Tabellen können in vielen Fällen geteilt und durch mehrere einfache Tabellen ersetzt werden. Als Faustregel gilt: Nur wenn es einen semantischen Grund für eine komplexe Datentabelle gibt, sollte eine komplexe Datentabelle eingesetzt werden. Wenn immer möglich, sollten einfache Tabellen bevorzugt werden. Davon profitieren alle Personengruppen."
+      ],
+      "allowedRatings": [
+        "notApplicable",
+        "fulfilled",
+        "slightRestriction",
+        "restriction",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Dieser Prüfschritt ist erfüllt, wenn im PDF-Dokument Tabellen verwendet und korrekt ausgezeichnet wurden."
+      ],
+      "negativeExamplesDe": [
+        "- leichte Einschränkung: Die Tabelle ist zwar korrekt ausgezeichnet, den Zeilen- oder Spalten-Überschriften fehlt jedoch das Scope-Attribut.",
+        "- Einschränkung: Eine Tabelle mit offensichtlichen Überschriften-Zellen am Anfang einer jeden Zeile besitzt nur Spalten-Überschriften.",
+        "- Barriere: Eine Tabelle besteht nur aus TD-Tags, besitzt aber visuell erkennbar Spalten-Überschriften.",
+        "- Blockade: In einer komplexen Tabelle mit mehrstufigen Überschriften-Zeilen wird kein Bezug zwischen Daten-Zellen und den korrespondierenden Überschriften-Zellen hergestellt.",
+        "",
+        "Sind Tabellen nicht korrekt ausgezeichnet, handelt es sich mindestens um eine leichte Einschränkung, da die Zuordnung der Informationen in den einzelnen Tabellenzellen, wenn überhaupt, nur im Kontext möglich ist. Falls auch das nicht gelingen kann, handelt es sich um eine Blockade."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#h-info-und-beziehungen-blocklevel-strukturelementetabellen"
+    }
+  ]
+}

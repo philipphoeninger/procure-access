@@ -1,0 +1,58 @@
+{
+  "kind": "requirement",
+  "titleDe": "Kontrast von Texten",
+  "sortOrder": 1440,
+  "standardReferences": [
+    {
+      "standard": "en301549",
+      "clause": "10.1.4.3"
+    }
+  ],
+  "applicability": [
+    {
+      "appTypes": [
+        "document"
+      ],
+      "productParts": [
+        "base"
+      ]
+    }
+  ],
+  "procedureTexts": [
+    {
+      "testType": "pdfTest",
+      "originalNumber": "10.1.4.3",
+      "originalTitleDe": "Kontrast von Texten",
+      "applicabilityDe": [
+        "Dieser Prüfschritt ist immer anwendbar."
+      ],
+      "requirementDe": [
+        "Das Kontrastverhältnis zwischen Vorder- und Hintergrundfarbe des Textes bzw. bei Schriftgrafiken in einem PDF-Dokument muss mindestens 4,5:1 betragen, bei großer Schrift mindestens 3:1. Davon ausgenommen sind die folgenden Fälle:",
+        "",
+        "- Text bei deaktivierten Funktionalitäten,",
+        "- Text als Bestandteil von Schmuckelementen (Artefakt),",
+        "- Text als Bestandteil von Bildern, bei denen andere visuelle Inhalte überwiegen,",
+        "- Text als Bestandteil von Firmenlogos sowie",
+        "- Text, der für niemanden sichtbar ist."
+      ],
+      "rationaleWhyDe": [
+        "Wenn Vordergrund- und Hintergrundfarbe sich in der Helligkeit ähneln, haben Texte unter Umständen zu wenig Kontrast. Gute Kontraste können für bessere Lesbarkeit von Texten sorgen. Insbesondere Menschen, die aufgrund einer verringerten Sehschärfe, einer Farbfehlsichtigkeit oder aufgrund des Alters eine verminderte Kontrastempfindlichkeit haben, profitieren von guten Kontrasten."
+      ],
+      "allowedRatings": [
+        "fulfilled",
+        "barrier",
+        "blockade"
+      ],
+      "positiveExamplesDe": [
+        "- erfüllt: Alle im PDF-Dokument enthaltenen Texte haben in allen Zuständen einen ausreichenden Kontrast.",
+        "- erfüllt: Ein Absende-Button kann erst ausgelöst werden, wenn alle erforderlichen Eintragungen in den Formularfeldern vorgenommen werden. Im deaktivierten Zustand müssen die Kontrastanforderungen nicht erfüllt sein.",
+        "- erfüllt: Die Beschriftung auf einem Straßenschild als Bestandteil eines Fotos einer verkehrsberuhigten Zone muss die Kontrastanforderungen nicht erfüllen."
+      ],
+      "negativeExamplesDe": [
+        "- Barriere: Unwesentliche Textinhalte haben einen unzureichenden Kontrast.",
+        "- Blockade: Ganze Textabsätze haben einen unzureichenden Kontrast."
+      ],
+      "sourceUrl": "https://pdftest.bit-inklusiv.de/#kontrast-von-texten"
+    }
+  ]
+}
