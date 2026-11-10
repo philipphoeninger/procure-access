@@ -1,7 +1,7 @@
 # S4-10 — S10 frame and step 1: stepper, use-case combobox, accessible step names
 
 > **Sprint:** 04, P0 task S4-10 (M2.5, 4 points). **Issues:** #52 (referenced, not closed: O-S4-9). **Requirements / invariants:** R-CON-01, R-CON-02; **CFG-03 → `active`** for step 1 (`TESTING_v42.md` V122; the Basisfunktionalität part follows with S4-11); A11Y-01 and A11Y-08 on the new page. New versions `TESTING_v42.md` (v40 deleted) and `ARCHITECTURE_v31.md` (C117; v29 deleted); Figma mapping v1.17.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #262 open.
 > **Scope:** the S10 page at `/kriterien` inside the shell: H1, intro, the linear four-step stepper with the compact layout below 600 px, step 1 as single-choice combobox with „Keiner davon passt“ last, the match-count announcement and the field error of S10-E; steps 2–4 as frames (question and hint only); the stepper icon in the icon list; `axe-core` in the first component test; `criteria.select` as an i18n area. Not in scope: checkbox groups of steps 2–4 and exclusions (S4-11), reset notice, „Bisherige Auswahl“, submit, page title, legacy switch (S4-12), J1 on S10 and the reflow list (S4-13).
 > **Owner decisions (2026-11-11):** **O-S4-9 (a)** — the #52 suppression stays until J1 runs on S10 (S4-13); **O-S4-10 (a)** — CFG-03 is activated for step 1 now; **O-S4-11 (a)** — `axe-core` directly through a small helper instead of `vitest-axe`; **O-S4-12 (a)** — the stepper is a shared `pa-stepper` on CDK `CdkStepper`, not `mat-stepper`; **O-S4-13 (a)** — the per-step page title and the „Fehler:“ prefix of S10-E come with the page title of S4-12.
 
