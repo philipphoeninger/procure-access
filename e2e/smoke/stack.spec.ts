@@ -13,7 +13,7 @@ test.describe('E2E stack', () => {
     await page.goto('/');
 
     // The start page title (UX copy shell.pageTitle.home + pageTitle.home) is built from de.json.
-    await expect(page).toHaveTitle('ProcureAccess – Barrierefreie Software beschaffen');
+    await expect(page).toHaveTitle('PROOF S4-01b: this test fails on purpose');
     await expect(page.getByRole('heading', { level: 1, name: 'Barrierefreie Software beschaffen – Schritt für Schritt' })).toBeVisible();
   });
 
