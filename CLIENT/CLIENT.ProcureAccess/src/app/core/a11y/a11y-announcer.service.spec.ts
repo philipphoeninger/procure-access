@@ -54,4 +54,50 @@ describe('A11yAnnouncerService', () => {
       ['Konto – ProcureAccess', 'polite'],
     ]);
   });
+
+  describe('throttle per key (Handoff §3.4)', () => {
+    beforeEach(() => vi.useFakeTimers({ now: 0 }));
+    afterEach(() => vi.useRealTimers());
+
+    const matches = (count: number) =>
+      TestBed.inject(A11yAnnouncerService).announce('criteria.select.step1.matches', { count }, { throttleMs: 1000 });
+
+    it('Announce_Throttled_AnnouncesTheFirstCallAtOnce', async () => {
+      await matches(3);
+
+      expect(liveAnnounce.mock.calls).toEqual([['3 Treffer', 'polite']]);
+    });
+
+    it('Announce_ThrottledWithinTheInterval_ReadsOnlyTheNewestTextAtItsEnd', async () => {
+      await matches(6);
+      const replaced = matches(2);
+      const newest = matches(1);
+      await replaced;
+      expect(liveAnnounce).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(1000);
+      await newest;
+
+      expect(liveAnnounce.mock.calls).toEqual([
+        ['6 Treffer', 'polite'],
+        ['1 Treffer', 'polite'],
+      ]);
+    });
+
+    it('Announce_ThrottledAfterTheInterval_AnnouncesAtOnce', async () => {
+      await matches(6);
+      await vi.advanceTimersByTimeAsync(1000);
+
+      await matches(2);
+
+      expect(liveAnnounce.mock.calls.map(([text]) => text as string)).toEqual(['6 Treffer', '2 Treffer']);
+    });
+
+    it('Announce_Throttled_KeepsOtherKeysApart', async () => {
+      await matches(6);
+      await TestBed.inject(A11yAnnouncerService).announce('common.loading', undefined, { throttleMs: 1000 });
+
+      expect(liveAnnounce.mock.calls.map(([text]) => text as string)).toEqual(['6 Treffer', 'Wird geladen …']);
+    });
+  });
 });

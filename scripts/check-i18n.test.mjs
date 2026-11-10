@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { check, flatten, keysOfCell, lookup, parseUxCopy, setText, syncAreas, templateKeys } from './check-i18n.mjs';
+import { check, flatten, inAreas, keysOfCell, lookup, parseUxCopy, setText, syncAreas, templateKeys } from './check-i18n.mjs';
 
 const ux = (rows) =>
   ['## 4. Before', '| Schlüssel | Element | Text | Hinweis |', '|---|---|---|---|', '| `shell.before` | x | not read | |',
@@ -103,6 +103,20 @@ test('check 1 fails on a missing or different text of an area', () => {
   assert.deepEqual(run(['| `shell.a` | x | Eins | |'], { shell: {} }), ['shell.a: missing in de.json (run with --write)']);
   assert.match(run(['| `shell.a` | x | Eins | |'], { shell: { a: 'Uno' } })[0], /differs from the UX copy/);
   assert.match(run(['| `shell.a` / `.b` | x | Eins | |'], { shell: {} })[0], /^UX copy: shell\.a: .*2 keys but 1 texts/);
+});
+
+test('an area can be a key prefix: check 1 and --write cover only the keys below it', () => {
+  assert.equal(inAreas('criteria.select.title', ['criteria.select']), true);
+  assert.equal(inAreas('criteria.select', ['criteria.select']), true);
+  assert.equal(inAreas('criteria.selection.x', ['criteria.select']), false); // a prefix ends at a dot
+  assert.equal(inAreas('criteria.list.title', ['criteria.select']), false);
+  const rows = ['| `criteria.select.title` | x | Wählen | |', '| `criteria.list.title` | x | Liste | |'];
+  const errors = (de) => check({ ...parseUxCopy(ux(rows)), de, templates: [], areas: ['criteria.select'] }).errors;
+  assert.deepEqual(errors({}), ['criteria.select.title: missing in de.json (run with --write)']);
+  const de = {};
+  assert.deepEqual(syncAreas(de, parseUxCopy(ux(rows)).texts, ['criteria.select']), ['criteria.select.title']);
+  assert.deepEqual(de, { criteria: { select: { title: 'Wählen' } } });
+  assert.deepEqual(errors(de), []);
 });
 
 test('check 2 fails on a lowercase key the UX copy lacks; uppercase legacy keys are free', () => {

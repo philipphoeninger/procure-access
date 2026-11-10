@@ -349,5 +349,75 @@
     "external.url": "(öffnet eine externe Seite)",
     "mailSubject": "Vorschlag für den Kriterienkatalog",
     "mailBody": "Mein Vorschlag betrifft das Kriterium: {{criterionKey}}%0A%0ABitte beschreiben Sie Ihren Vorschlag:"
+  },
+  "criteria": {
+    "select": {
+      "title": "Kriterien zusammenstellen",
+      "intro": "Beantworten Sie bis zu vier Fragen zu Ihrer Beschaffung. Daraus ergibt sich eine Liste mit Kriterien, die für Sie wichtig sind.",
+      "stepLabel": "Schritt {{current}} von {{total}}: {{name}}",
+      "summary": "{{layer}}: {{values}}",
+      "change": "Ändern",
+      "step1": {
+        "name": "Verwendungszweck",
+        "question": "Wofür setzen Sie das Produkt ein?",
+        "hint": "Wählen Sie einen Verwendungszweck. Er bestimmt, welche Anwendungstypen und Prüfverfahren passen. Wenn nichts passt, wählen Sie „Keiner davon passt“.",
+        "field": "Verwendungszweck",
+        "field.hint": "Tippen Sie, um die Liste zu filtern.",
+        "none": "Keiner davon passt",
+        "none.hint": "Es gelten die allgemeinen Empfehlungen.",
+        "matches": "{{count}} Treffer",
+        "noMatch": "Kein Verwendungszweck passt zu „{{query}}“. Wählen Sie „Keiner davon passt“."
+      },
+      "error": {
+        "noUseCase": "Bitte wählen Sie einen Verwendungszweck oder „Keiner davon passt“.",
+        "noAppType": "Bitte wählen Sie mindestens einen Anwendungstyp."
+      },
+      "step2": {
+        "name": "Anwendungstyp",
+        "question": "Was möchten Sie beschaffen?",
+        "hint": "Wählen Sie alle Anwendungstypen, die zutreffen. Einige passen nicht zum gewählten Verwendungszweck und lassen sich deshalb nicht auswählen.",
+        "open": {
+          "hint": "Eigene Hilfsmittel wie Screenreader lassen sich verwenden."
+        },
+        "closed": {
+          "hint": "Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden, etwa bei Kiosk-Terminals."
+        },
+        "closedMobile": {
+          "hint": "Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden."
+        }
+      },
+      "step3": {
+        "name": "Funktionsbereiche",
+        "question": "Welche Funktionen hat das Produkt?",
+        "hint": "Wählen Sie alle Funktionsbereiche, die das Produkt bietet. Basisfunktionalität gilt immer.",
+        "explain": {
+          "toggle": "Erklärungen anzeigen"
+        },
+        "base": {
+          "locked": "Immer ausgewählt."
+        }
+      },
+      "step4": {
+        "name": "Prüfverfahren (optional)",
+        "question": "Soll das Produkt nach einem bestimmten Verfahren geprüft sein? (optional)",
+        "hint": "Jedes gewählte Prüfverfahren kommt als eigenes Kriterium in Ihre Liste, zum Beispiel „Geprüft nach BIT inklusiv Software-Test“. Sie können diesen Schritt überspringen."
+      },
+      "submit": "Kriterienliste anzeigen",
+      "next": "Weiter",
+      "back": "Zurück",
+      "excluded": {
+        "useCase": "Passt nicht zum Verwendungszweck {{useCase}}",
+        "appType": "Passt nicht zum Anwendungstyp {{appTypes}}",
+        "both": "Passt nicht zum Verwendungszweck {{useCase}} und nicht zum Anwendungstyp {{appTypes}}"
+      },
+      "reset": {
+        "title": "Auswahl zurückgesetzt",
+        "text": {
+          "useCase": "Sie haben den Verwendungszweck geändert. Ihre Auswahl bei Anwendungstyp, Funktionsbereichen und Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus.",
+          "appType": "Sie haben den Anwendungstyp geändert. Ihre Auswahl bei Funktionsbereichen und Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus.",
+          "productPart": "Sie haben die Funktionsbereiche geändert. Ihre Auswahl bei den Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus."
+        }
+      }
+    }
   }
 }

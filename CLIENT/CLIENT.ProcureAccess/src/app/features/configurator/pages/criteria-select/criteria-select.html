@@ -1,0 +1,95 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1 class="pa-criteria-select__title">{{ 'criteria.select.title' | translate }}</h1>
+<p class="pa-criteria-select__intro">{{ 'criteria.select.intro' | translate }}</p>
+
+<pa-stepper linear stepLabelKey="criteria.select.stepLabel">
+  <cdk-step [label]="'criteria.select.step1.name' | translate" [completed]="useCaseAnswered()">
+    <mat-card class="pa-step" appearance="outlined">
+      <h2 class="pa-step__question">{{ 'criteria.select.step1.question' | translate }}</h2>
+      <p class="pa-step__hint">{{ 'criteria.select.step1.hint' | translate }}</p>
+
+      <mat-form-field class="pa-step__field pa-use-case" appearance="outline">
+        <mat-label>{{ 'criteria.select.step1.field' | translate }}</mat-label>
+        <input
+          #useCaseInput
+          matInput
+          type="text"
+          autocomplete="off"
+          [formControl]="useCaseField"
+          [matAutocomplete]="useCaseList"
+          matAutocompletePosition="below"
+          (input)="onUseCaseInput(useCaseInput.value)"
+          (focus)="onUseCaseFocus()"
+        />
+        <mat-hint>{{ 'criteria.select.step1.field.hint' | translate }}</mat-hint>
+        <mat-error>{{ 'criteria.select.error.noUseCase' | translate }}</mat-error>
+        <mat-autocomplete
+          #useCaseList="matAutocomplete"
+          class="pa-use-case__panel"
+          [displayWith]="displayEntry"
+          (optionSelected)="chooseUseCase($event.option.value)"
+          (opened)="fitPanelToVisualViewport()"
+          (closed)="onPanelClosed()"
+        >
+          @if (optionsLoaded()) {
+            @for (useCase of matches(); track useCase.id) {
+              <mat-option [value]="useCase">{{ useCase.name }}</mat-option>
+            } @empty {
+              @if (query()) {
+                <mat-option class="pa-use-case__no-match" disabled>
+                  {{ 'criteria.select.step1.noMatch' | translate: { query: query() } }}
+                </mat-option>
+              }
+            }
+            <!-- Always the last option, also while filtering (CFG-03) -->
+            <mat-option class="pa-use-case__none" [value]="NONE">
+              <!-- &ngsp; keeps a space between the two lines in the accessible name -->
+              <span class="pa-use-case__none-name">{{ 'criteria.select.step1.none' | translate }}</span>&ngsp;<span class="pa-use-case__none-hint">{{ 'criteria.select.step1.none.hint' | translate }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-card>
+
+    <div class="pa-step__actions">
+      <button matButton="filled" type="button" (click)="nextFromUseCase()">{{ 'criteria.select.next' | translate }}</button>
+    </div>
+  </cdk-step>
+
+  <!-- Steps 2–4: question and hint; their checkbox groups and checks come with S4-11 -->
+  <cdk-step [label]="'criteria.select.step2.name' | translate" [completed]="true">
+    <mat-card class="pa-step" appearance="outlined">
+      <h2 class="pa-step__question">{{ 'criteria.select.step2.question' | translate }}</h2>
+    </mat-card>
+    <div class="pa-step__actions">
+      <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
+      <button matButton="filled" type="button" (click)="next()">{{ 'criteria.select.next' | translate }}</button>
+    </div>
+  </cdk-step>
+
+  <cdk-step [label]="'criteria.select.step3.name' | translate" [completed]="true">
+    <mat-card class="pa-step" appearance="outlined">
+      <h2 class="pa-step__question">{{ 'criteria.select.step3.question' | translate }}</h2>
+      <p class="pa-step__hint">{{ 'criteria.select.step3.hint' | translate }}</p>
+    </mat-card>
+    <div class="pa-step__actions">
+      <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
+      <button matButton="filled" type="button" (click)="next()">{{ 'criteria.select.next' | translate }}</button>
+    </div>
+  </cdk-step>
+
+  <cdk-step [label]="'criteria.select.step4.name' | translate" optional>
+    <mat-card class="pa-step" appearance="outlined">
+      <h2 class="pa-step__question">{{ 'criteria.select.step4.question' | translate }}</h2>
+      <p class="pa-step__hint">{{ 'criteria.select.step4.hint' | translate }}</p>
+    </mat-card>
+    <div class="pa-step__actions">
+      <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
+    </div>
+  </cdk-step>
+</pa-stepper>
