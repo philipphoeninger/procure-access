@@ -62,11 +62,11 @@ No correctness or security bug left that affects current behaviour; no further r
 | C5 | `reuse lint` (Docker `fsfe/reuse`); `reuse spdx` for the fixture | Compliant, 1069 / 1069 files (with this protocol); fixture: `LicenseRef-AllRightsReserved`, `MIT`, copyright BSVH and `BIT inklusiv` |
 | C6 | `npm run typecheck && npm run lint` in `e2e/` (lints `scripts/*.mjs`) | Green |
 | C7 | `dotnet test --project tests/ProcureAccess.Tests.Integration --filter-class "*CriteriaFilterCharacterisationTests"` (reads the fixture) | 6 of 6 pass. No .NET or client code changed, so no further build; J1 (also reads the fixture) runs in CI |
-| C8 | CodeQL on the pull request | See the pull request; result recorded in P1 |
+| C8 | CI and CodeQL on pull request #254 (fc52d55) | All checks green, the five E2E browser projects included. The JavaScript/TypeScript analysis of `refs/pull/254/merge` has 0 results: alert 3 is not found there (its instances are only `main` at 9934952 and the old ref `refs/pull/157/head`), and R2 gave no new alert |
 
 ## 5. Open points
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge | Check after the merge (`gh api repos/philipphoeninger/procure-access/code-scanning/alerts/3`) and record the result here in a follow-up commit; #233 is closed by the merge |
+| P1 | Alert 3 closes when the analysis of `main` no longer finds it, i.e. after the merge | Check after the merge (`gh api repos/philipphoeninger/procure-access/code-scanning/alerts/3`) and record the result here in a follow-up commit; #233 is closed by the merge. If the alert stays open only because of the stale instance on `refs/pull/157/head`, dismiss it as fixed in the Security tab |
 | P2 | If the CAT-10 rewrite (S4-13, O-S4-5) adds or renames a fixture that quotes BIT inklusiv texts, it needs the same entry in `REUSE.toml` (R4) | In S4-13; #242 already names it |
