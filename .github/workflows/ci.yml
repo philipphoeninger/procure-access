@@ -251,10 +251,10 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
       - name: Install Playwright browser
         if: steps.browser-cache.outputs.cache-hit != 'true'
-        # Downloads the browser plus its apt packages; three browsers together took up to 8 minutes.
-        timeout-minutes: 15
+        # Only the browser (Playwright's CDN, about 30 s); its apt packages come in the next step.
+        timeout-minutes: 10
         working-directory: e2e
-        run: npx playwright install --with-deps "$BROWSER"
+        run: npx playwright install "$BROWSER"
         env:
           BROWSER: ${{ matrix.browser }}
       - name: Save Playwright browser
@@ -263,13 +263,22 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ steps.browser-cache.outputs.cache-primary-key }}
+      # The browser's apt packages, on every run. Usually 10–40 s, but a slow apt mirror (about
+      # 40 kB/s) made it take more than 10 minutes on a third of the runs on main (#203). So each
+      # attempt stops after 3 minutes and a second one follows: apt keeps the packages the first
+      # attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
       - name: Install Playwright system dependencies
-        if: steps.browser-cache.outputs.cache-hit == 'true'
-        # Usually under a minute. The limit stops a hanging apt mirror (once 45 minutes); 5 minutes
-        # were too short for a slow one (2026-11-05, up to 2 minutes per package).
-        timeout-minutes: 10
+        timeout-minutes: 8
         working-directory: e2e
-        run: npx playwright install-deps "$BROWSER"
+        run: |
+          for attempt in 1 2; do
+            status=0
+            timeout 3m npx playwright install-deps "$BROWSER" || status=$?
+            if [ "$status" -eq 0 ]; then exit 0; fi
+            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 = stopped after 3 minutes)"
+            sudo dpkg --configure -a
+          done
+          exit 1
         env:
           BROWSER: ${{ matrix.browser }}
       - name: Start E2E stack
