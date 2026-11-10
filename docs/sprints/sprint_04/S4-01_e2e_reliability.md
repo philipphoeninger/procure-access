@@ -1,6 +1,6 @@
 # S4-01 — E2E reliability: the Playwright apt step no longer fails `main`
 
-> **Sprint:** 04, P0 task S4-01 (debt, 1 point). **Issues:** #203. **Requirements / invariants:** none (CI, TESTING §8.2 stage 6); no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10); pull request __PR__, proof in the throwaway draft #246 (closed, not merged).
+> **Sprint:** 04, P0 task S4-01 (debt, 1 point). **Issues:** #203. **Requirements / invariants:** none (CI, TESTING §8.2 stage 6); no invariant activated, no new TESTING version. **Status:** done by Claude Code (2026-11-10); pull request #247, proof in the throwaway draft #246 (closed, not merged, branch deleted). **Deviation from the plan:** the planned retry (`timeout 3m npx …`) did not work; the proof found why (F6 – F8), so `timeout` runs as root and the retry waits for `dpkg`.
 > **Scope:** exactly the sprint row: the step that installs the browsers' apt packages in the E2E jobs of `.github/workflows/ci.yml`. Nothing else in the workflow changes.
 > **Owner decisions** (2026-11-10, before the start):
 > 1. **O-S4-1 (2):** a shorter limit plus one retry of the apt step. Option (1) (Playwright container image) only if `main` still goes red afterwards.
@@ -47,7 +47,17 @@ Checked with `/engineering:code-review` on the diff.
 
 ## 4. Checks
 
-__CHECKS__
+| # | Check | Result |
+|---|---|---|
+| 1 | Proof, final step (draft #246, run 42727555023, three attempts): first attempt cut off after 3 / 6 / 9 / 12 / 15 s, one value per browser job | **15 jobs, all green including their tests.** 13 took the retry path (mobile-chrome finished inside 12 s twice); every retry installed the packages; no `apt-get` or `dpkg` left after any stop. Apt step: 11 – 72 s with a stop, median 31 s |
+| 2 | Proof, root `timeout` without the `dpkg` wait (run 42726684084) | 5 jobs green; 4 retries, all installed; one `dpkg` outlived the stop (F8) |
+| 3 | Proof, plain `timeout` (runs 42724589474, 42725953007, 42726307356) | Retry failed in every job that took it (F6); the process tree and signal state found the cause (F7) |
+| 4 | CI of #247 (run 42727668061), normal path | All 14 jobs green, CodeQL green. Apt step 14 / 17 / 22 / 25 / 27 s (chromium, mobile-chrome, firefox, mobile-safari, webkit) — as before the change (median 17 s, F2) |
+| 5 | `actionlint` (Docker `rhysd/actionlint`, includes shellcheck; run ad hoc, not added to the repository) | Clean |
+| 6 | `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs`, `reuse lint` | Green |
+| 7 | Build and test levels | Not run locally: the change touches only CI; CI ran every stage (check 4) |
+
+**Install step now:** 10 – 40 s as before when the mirror is fast; with a slow mirror at most 3 minutes for the first attempt plus the second attempt (bounded by the step's 8 minutes) instead of a failed job after 10 minutes. Ten green runs on `main` are not the proof here (decision 2); `main` is watched until the close-out (P2).
 
 ## 5. Open points
 
@@ -55,4 +65,6 @@ __CHECKS__
 |---|---|---|
 | P1 | Runner failures outside the workflow (F4): `abandoned` jobs (42674440407, merge of #219) turn the required check red although no test failed; once the API showed a finished job as `queued` for hours | Re-run the job; no workflow change can prevent a lost runner. If it happens more than once per sprint, the aggregate check could name `abandoned` in its message so it is not mistaken for a test failure — owner's call, no issue proposed yet |
 | P2 | If `main` still goes red in the apt step after this change (both attempts slow), O-S4-1 option (1) is next: run the Playwright test step in the pinned `mcr.microsoft.com/playwright` image (`docker run --network host` next to the stack, digest pin, licence check) | Watch the runs on `main` until the sprint-04 close-out; count apt failures and `::warning::` retries there |
+| P4 | All proof runs hit the browser cache, so the cache-miss path (`playwright install` without `--with-deps`, then the apt step) has not run yet | It runs on the first Playwright version change: Dependabot #226 (`@playwright/test` 1.65) in S4-06; check its E2E jobs there |
+| P5 | `timeout` and `npm exec` run as root in the apt step (F7). If a later change wants Playwright's CLI to run without root, the alternative is to take the apt command from Playwright and run only that under `sudo timeout` | None now; noted for whoever changes the step |
 | P3 | GitHub reported "2 vulnerabilities on the default branch (2 moderate)" on the push of the proof branch (Dependabot alerts) | Belongs to S4-06 (Dependabot review), not to this task |
