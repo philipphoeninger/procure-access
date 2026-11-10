@@ -63,6 +63,8 @@ updates:
       interval: weekly
       day: monday
     labels: [dependencies]
+    # A pull request that changes @playwright/test fails CI until e2e/playwright-image/Dockerfile
+    # names the same version with its digest: push that change onto the pull request (S4-01b).
     groups:
       e2e:
         patterns: ["*"]
