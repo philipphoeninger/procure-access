@@ -6,6 +6,11 @@
 > 1. **The owner merged the pull requests**, instead of only receiving a recommendation (prompt: "Do not merge any of the Dependabot PRs"). Claude Code could not merge them: the permission check of Claude Code blocked `gh pr merge`.
 > 2. **Claude Code pushed fixes onto three Dependabot branches** at the owner's request ("Fix #226 yourself", "fix #229 and #252"): #226, #229 and #252 did not pass CI as Dependabot opened them (§1).
 > 3. **#252 was added** to the review: it was opened on 2026-11-10 and the owner asked for it to be fixed together with the others.
+>
+> **Order of the review — not as the prompt asks** (Claude Code, stated at the owner's question on 2026-11-10):
+> 4. **The changelogs came after the merge recommendation.** When the owner asked to merge the green pull requests, Claude Code recommended #226 – #228, #230 and #231 on the licence check (new versions and new transitive packages) and the CI result alone. The changelogs in §1.1 – §1.7, including the breaking changes of jsdom 31, were read only while writing this protocol, after the merges. They contain nothing that affects this project, so no recommendation would have changed; but for a major the changelog belongs before the recommendation.
+> 5. **No local run of the affected suites for jsdom 31.** The prompt asks for it, and S3-01 (check 5) ran the client's lint, unit tests and release build on the merged pull requests in a scratch worktree. Here the evidence is CI: the run of #230 and the run on `main` after #227, #228 and #230 together (F5), which covers the same commands. That was not a plan, it followed from the merges.
+> 6. **No plan before the work** (step 2 of the way of working), and the reading list was taken up late: the S3-01 protocol and TECH_DEBT_v3 §7 and §9.6 only after the merges. The alert check of §9.6 is in §1.8, the summary table of S3-01 in §1.9.
 
 ## 1. Starting point
 
@@ -18,6 +23,7 @@
 | F5 | #227, #228 and #230 all change the client's `package.json` and `package-lock.json`. They were merged within 33 seconds of each other, so the combination never ran in CI on a pull request | The CI run on `main` after the three merges (`4bc6c75`, run 42832704070) is green: the combination is tested there (§4) |
 | F6 | The sprint plan calls #231 "xunit.v3 4, a major". The pull request moves 4.0.2 → 4.0.3, a patch; the major (3 → 4) was taken earlier | No major review needed for #231 |
 | F7 | #230's green CI run (42712322924) is from 2026-11-09, before S4-01b; it passed on the old apt path | Its merge commit was tested on `main` (F5) |
+| F8 | None of the seven pull requests is a security update: no Dependabot alert was open for their packages, and none was closed by the merges. The two open alerts (#12, #13) concern `minimatch` (§1.8) | TECH_DEBT_v3 §9.6 check: nothing closed that should have been; TD-17 unchanged |
 
 ### 1.1 #226 — `@playwright/test` 1.64.1 → 1.65.0 (`e2e/`)
 
@@ -75,6 +81,31 @@ Apache-2.0, not shipped (backend tests). Patch (F6): crash detection no longer c
 
 Dependabot changed only the three module projects (F4). Commit `809088b` moves the same packages in `API`, `DAL`, `MODELS`, `SERVICES` and `Tests.Integration` to 10.0.15, `JwtBearer` included, so every Microsoft 10.0.x package has one version (`grep 'Version="10.0.14"'` is empty). Local checks after NuGet listed all packages: restore without HTTP cache, build with `-warnaserror` 0 warnings, `dotnet test --solution` 639 passed, `dotnet format --verify-no-changes` clean. `Npgsql.EntityFrameworkCore.PostgreSQL` stays 10.0.3. **CI:** green on `809088b` (run 42834127879). **Merged** (`31ed54a`).
 
+### 1.8 Dependabot alerts (TECH_DEBT_v3 §9.6)
+
+Read on 2026-11-10 after the merges (`gh api …/dependabot/alerts`):
+
+| Alert | Package | Where | Advisory | State | Effect of the seven pull requests |
+|---|---|---|---|---|---|
+| #12 | `minimatch` 10.2.6 | `CLIENT/CLIENT.ProcureAccess/package-lock.json` | GHSA-g3hv-75wg-m249 (moderate), fixed in 11.0.1 | open, scope development | None: only `eslint` 10, `@eslint/config-array` and `@typescript-eslint/typescript-estree` pull it in (`^10.2.x`), none of them was updated |
+| #13 | `minimatch` 10.2.6 | `e2e/package-lock.json` | same | open, scope development | None, same dependents |
+
+No other alert is open. The last alerts closed by an update were #1, #8 – #10 (AutoMapper, 2026-11-05, S3-07). This is TD-17: it stays open until an ESLint release moves to `minimatch` 11 (P5).
+
+### 1.9 Summary
+
+| PR | Recommendation | Reason in one line | Decision |
+|---|---|---|---|
+| #226 | Merge, with the image bump and the fixture fix | Apache-2.0, no new package; Playwright 1.65 breaks nothing we use; image pin must match (S4-01b), the WebKit fixture needed own colours | **Merged** by the owner (`c729ba2`) |
+| #227 | Merge | Angular patch releases, MIT, no new package | **Merged** (`706d6ac`) |
+| #228 | Merge | Vitest minor without breaking change, MIT, not shipped | **Merged** (`ef0e401`) |
+| #229 | Merge, with the regenerated icon subset | MIT/Apache-2.0 patch releases; subset must follow the pinned `material-symbols` (S3-25) | **Merged** (`9690a4b`) |
+| #230 | Merge | jsdom 31 (major): its breaking changes (canvas backend, CSS engine, parser, `load` on `window`) touch nothing in our component tests; new packages MIT/BSD-2-Clause, not shipped | **Merged** (`4bc6c75`) |
+| #231 | Merge | xunit.v3 patch (not a major, F6), Apache-2.0 | **Merged** (`9ee9585`) |
+| #252 | Merge, with every Microsoft 10.0.x package on 10.0.15 | .NET servicing release, MIT; all projects on one version | **Merged** (`31ed54a`) |
+
+The recommendations for #226 – #228, #230 and #231 were given before the changelogs were read (deviation 4); the reasons above include them.
+
 ## 2. Changes
 
 This pull request: only this protocol. The changes of the review went in with the Dependabot pull requests themselves:
@@ -95,7 +126,7 @@ This pull request: only this protocol. The changes of the review went in with th
 | Security | .NET servicing update taken the day it came out; no package with a known advisory left behind |
 | a11y | A11Y-01 and A11Y-08 green on all five browser projects after the Playwright update; no app page needed a change |
 
-**Findings sorted (CLAUDE §6.8):** fix — F1, F2, F3, F4 (done on the pull requests, §2). Won't fix — none. Follow-up — §5.
+**Findings sorted (CLAUDE §6.8):** fix — F1, F2, F3, F4 (done on the pull requests, §2); the order of the review (deviations 4 – 6) is stated, not repeated: the evidence is in §1 and §4. Won't fix — none. Follow-up — §5.
 
 ## 4. Checks
 
@@ -107,6 +138,8 @@ This pull request: only this protocol. The changes of the review went in with th
 | 4 | #252 locally after NuGet listed every 10.0.15 package | Build 0 warnings; 639 tests passed; format clean |
 | 5 | #229 locally | `check-icons.mjs` 0 errors; `reuse lint` compliant |
 | 6 | This pull request: `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs`, `reuse lint` | Green |
+| 7 | Dependabot alerts, open and closed since 2026-11-01 (`gh api …/dependabot/alerts`); `minimatch` and its dependents in both lockfiles | §1.8: two open (`minimatch`, development), none closed by these merges |
+| 8 | Release notes: Playwright 1.65.0, Vitest 5.1.0, jsdom 31.0.0, xunit.v3 4.0.3; `dotnet/core` `releases.json` (10.0.15 not yet listed) | Read after the merges (deviation 4); findings in §1.1 – §1.7 |
 
 ## 5. Open points
 
@@ -116,3 +149,5 @@ This pull request: only this protocol. The changes of the review went in with th
 | P2 | Dependabot's `nuget` group can open a pull request in the middle of a .NET servicing release (F4) and bump only part of the projects | No rule change: the build catches both. If it repeats, a `cooldown` of one or two days for the `nuget` ecosystem in `dependabot.yml` would let the release finish first |
 | P3 | Running the E2E tests on the image's Node 26 while `npm ci`, local runs and the client stay on 24 (F1) | Fine while `e2e/` has no native module. When the project moves to Node 26 (CLAUDE §3: `.nvmrc` and the client Dockerfile together), the two meet again |
 | P4 | S4-01b protocol: P1 (#226) is done by this review; F3 there names Node 24 for the image, true only for 1.64.1 | No change to the S4-01b protocol (it records the state of its PR); this protocol carries the update |
+| P5 | TD-17: `minimatch` alerts #12 and #13 stay open (§1.8) | Unchanged: take the ESLint release that moves to `minimatch` 11 when Dependabot offers it |
+| P6 | For later Dependabot reviews: read the changelog of every major before recommending a merge, and run the affected suites locally on the merged combination (as S3-01 check 5), also when the owner asks for a quick merge | Lesson of this task (deviations 4, 5) |
