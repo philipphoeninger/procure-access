@@ -278,8 +278,9 @@ jobs:
             echo "Attempt $attempt, limit $limit"
             ( sleep 2; echo "-- PROOF during attempt $attempt:"; ps -eo pid,ppid,pgid,sid,stat,etimes,args | grep -E "timeout|npm|node|sudo|sh -c|apt|dpkg|http" | grep -v grep
               for pid in $(pgrep -x 'apt-get|dpkg|sudo|sh|node|timeout'); do echo "$pid $(cat /proc/$pid/comm) $(grep -E '^Sig(Blk|Ign|Cgt)' /proc/$pid/status | tr -s '\t\n' '  ')"; done ) &
-            timeout --kill-after=5s "$limit" npx playwright install-deps "$BROWSER" || status=$?
+            sudo env "PATH=$PATH" timeout --kill-after=10s "$limit" npx playwright install-deps "$BROWSER" || status=$?
             echo "-- PROOF after attempt $attempt (exit $status):"; ps -eo pid,ppid,pgid,sid,stat,etimes,args | grep -E "timeout|npm|node|sudo|sh -c|apt|dpkg|http" | grep -v grep || true
+            echo "-- PROOF root-owned files in the workspace and home:"; find "$GITHUB_WORKSPACE" "$HOME" -xdev -user root 2>/dev/null | head -5 || true
             if [ "$status" -eq 0 ]; then exit 0; fi
             echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 = stopped after 3 minutes)"
             sudo dpkg --configure -a
