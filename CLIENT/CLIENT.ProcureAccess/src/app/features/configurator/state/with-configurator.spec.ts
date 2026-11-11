@@ -40,7 +40,13 @@ describe('withConfigurator', () => {
     backend = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => backend.verify());
+  /** Reports of a shown list (S4-18b); taken out before `verify`, so only their own tests count them. */
+  const shownReports = () => backend.match((r) => r.url === '/api/v1/configurator/criteria-list-shown');
+
+  afterEach(() => {
+    shownReports();
+    backend.verify();
+  });
 
   /** The next filter-options request; fails when there is none or more than one. */
   function nextRequest(): TestRequest {
@@ -620,6 +626,100 @@ describe('withConfigurator', () => {
 
       expect(store.configurator.list.searchInput()).toBe('');
       expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
+    });
+  });
+
+  describe('CriteriaListShown once per new selection (R-MET-01, R-CON-10, O-S4-55)', () => {
+    const listRequest = () => backend.expectOne((r) => r.url === '/api/v1/catalog/criteria');
+
+    async function listLoaded() {
+      const load = store.loadCriteriaList();
+      listRequest().flush(criteriaAnswer());
+      expect(await load).toBe('loaded');
+    }
+
+    async function chooseUseCase(id: string) {
+      store.chooseUseCase({ kind: 'useCase', id });
+      await answer();
+    }
+
+    it('reports a loaded list once and not again for the same selection', async () => {
+      await fillAllLayers();
+
+      await listLoaded();
+      expect(shownReports()).toHaveLength(1);
+
+      // „Auswahl ändern“ and back to S11 without a change, or S11 shown again.
+      await listLoaded();
+      expect(shownReports()).toHaveLength(0);
+    });
+
+    /** A complete selection with the given use case, Web and the given product parts. */
+    async function select(useCase: string, productParts: string[] = []) {
+      await chooseUseCase(useCase);
+      store.toggleAppType('web');
+      await answer();
+      for (const part of productParts) {
+        store.toggleProductPart(part);
+        await answer();
+      }
+    }
+
+    it('reports A → B → A three times (O-S4-55 (a), not once per distinct selection)', async () => {
+      await loaded();
+
+      await select('hr', ['audio']);
+      await listLoaded();
+      const first = store.configurator.list.selection();
+      await select('citizen');
+      await listLoaded();
+      await select('hr', ['audio']);
+      await listLoaded();
+
+      expect(store.configurator.list.selection()).toEqual(first);
+      expect(shownReports()).toHaveLength(3);
+    });
+
+    it('reports nothing when the list fails or no release is active', async () => {
+      await fillAllLayers();
+
+      let load = store.loadCriteriaList();
+      listRequest().flush(null, { status: 500, statusText: 'Server Error' });
+      expect(await load).toBe('failed');
+      load = store.loadCriteriaList();
+      listRequest().flush({ type: 'x/problems/not-found' }, { status: 404, statusText: 'Not Found' });
+      expect(await load).toBe('noRelease');
+
+      expect(shownReports()).toHaveLength(0);
+    });
+
+    it('reports only the answer that is applied, not a late one for another selection', async () => {
+      await loaded();
+      await select('hr');
+      const first = store.loadCriteriaList();
+      await select('citizen');
+      const second = store.loadCriteriaList();
+      const [older, newer] = backend.match((r) => r.url === '/api/v1/catalog/criteria');
+
+      newer?.flush(criteriaAnswer());
+      await second;
+      older?.flush(criteriaAnswer());
+      await first;
+
+      expect(shownReports()).toHaveLength(1);
+    });
+
+    it('keeps the list when the report fails and does not repeat it', async () => {
+      await fillAllLayers();
+      await listLoaded();
+
+      const [report] = shownReports();
+      report?.flush(null, { status: 503, statusText: 'Service Unavailable' });
+      await settle();
+      await listLoaded();
+
+      expect(store.configurator.list.status()).toBe('loaded');
+      expect(shownReports()).toHaveLength(0);
     });
   });
 

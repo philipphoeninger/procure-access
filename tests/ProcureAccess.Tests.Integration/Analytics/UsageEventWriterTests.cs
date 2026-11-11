@@ -165,33 +165,7 @@ public sealed class UsageEventWriterTests(ApiFixture api) : IntegrationTest(api)
 
     private IUsageEventWriter Writer => Api.Factory.Services.GetRequiredService<IUsageEventWriter>();
 
-    private async Task DeleteAllEventsAsync()
-    {
-        using var scope = Api.Factory.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
-            .ExecuteDeleteAsync(TestContext.Current.CancellationToken);
-    }
+    private Task DeleteAllEventsAsync() => UsageEventRows.DeleteAllAsync(Api);
 
-    /// <summary>
-    /// Waits (in real time, at most ten seconds) until the background service has stored
-    /// <paramref name="count"/> events, then returns all stored events.
-    /// </summary>
-    private async Task<List<UsageEvent>> StoredEventsAsync(int count)
-    {
-        using var patience = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
-        patience.CancelAfter(TimeSpan.FromSeconds(10));
-        while (true)
-        {
-            using var scope = Api.Factory.Services.CreateScope();
-            var stored = await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().UsageEvents
-                .AsNoTracking()
-                .ToListAsync(patience.Token);
-            if (stored.Count >= count)
-            {
-                return stored;
-            }
-
-            await Task.Delay(TimeSpan.FromMilliseconds(50), patience.Token);
-        }
-    }
+    private Task<List<UsageEvent>> StoredEventsAsync(int count) => UsageEventRows.WaitForAsync(Api, count);
 }

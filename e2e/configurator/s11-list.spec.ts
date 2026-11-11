@@ -10,7 +10,8 @@ import { chooseFirstOption } from '../support/combobox';
  * S11 around the list (S4-18a; R-LST-09, R-LST-10, R-LST-13) on the active test release T.1 of the
  * E2E stack: summary, notices, counts, „Kriterium vorschlagen“ and the action bar, which is in the
  * flow below 600 px width or height and sticky from there without covering the focused element
- * (WCAG 2.4.11). Axe in both appearances (A11Y-01, A11Y-08).
+ * (WCAG 2.4.11). Axe in both appearances (A11Y-01, A11Y-08). Since S4-18b also the usage event
+ * `CriteriaListShown`: one report per new selection.
  *
  * Axe runs before any name-based locator on S11: in Firefox such locators followed by axe crashed
  * the page process (S4-16 P5, the class of TESTING_v43 V129).
@@ -110,6 +111,34 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
       });
       expect(covered, 'focused element hidden behind the action bar').toBeNull();
     }
+  });
+
+  test('reports the shown list once (CriteriaListShown) and not again after a return without a change', async ({ page }) => {
+    // S4-18b, R-MET-01, R-CON-10, owner decision O-S4-55 (a).
+    const isReport = (request: { url(): string; method(): string }) =>
+      request.url().endsWith('/api/v1/configurator/criteria-list-shown') && request.method() === 'POST';
+    // Counted when sent, not when answered, so a second report shows up at once.
+    let sent = 0;
+    page.on('request', (request) => {
+      if (isReport(request)) sent++;
+    });
+    const answered = page.waitForResponse((response) => isReport(response.request()));
+
+    await toList(page);
+    expect((await answered).status()).toBe(204);
+
+    await page.getByRole('link', { name: 'Auswahl ändern' }).click();
+    await expect(combobox(page)).toHaveValue('HR-Anwendung');
+    for (let step = 0; step < 3; step++) {
+      await page.getByRole('button', { name: 'Weiter' }).click();
+    }
+    await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+    await expect(page.getByRole('main').getByRole('list')).toBeVisible();
+    // A wrong report would be sent in the task that applies the list; a short bounded wait covers it.
+    await page.waitForTimeout(500);
+
+    expect(sent).toBe(1);
   });
 
   test('„Liste exportieren“ opens the placeholder dialog by keyboard; Escape closes it and returns the focus', async ({ page }) => {

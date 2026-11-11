@@ -21,6 +21,7 @@ import { Criterion, CriteriaResponse, PriorityLevel } from '../models/criteria';
 import { CriteriaListFilter, CriterionDecisions, EMPTY_LIST_FILTER } from '../models/criteria-list';
 import { FilterOptionsLayers } from '../models/filter-options';
 import { CatalogApiService, CRITERIA_LIST_PROBLEMS } from '../services/api/catalog-api.service';
+import { ConfiguratorApiService } from '../services/api/configurator-api.service';
 import {
   filterCriteria,
   overridePriority,
@@ -96,6 +97,11 @@ export interface CriteriaListState {
   filter: CriteriaListFilter;
   /** The selection of the last list S11 asked for; a list for another one clears search and filter. */
   selection: CriteriaSelection | null;
+  /**
+   * The selection of the last list counted as `CriteriaListShown`; a loaded list for another one
+   * is counted (owner decision O-S4-55 (a)).
+   */
+  countedSelection: CriteriaSelection | null;
 }
 
 export const initialCriteriaListState: CriteriaListState = {
@@ -105,6 +111,7 @@ export const initialCriteriaListState: CriteriaListState = {
   searchInput: '',
   filter: EMPTY_LIST_FILTER,
   selection: null,
+  countedSelection: null,
 };
 
 export interface ConfiguratorState {
@@ -146,7 +153,12 @@ export const withConfigurator = () =>
   signalStoreFeature(
     withState({ configurator: initialConfiguratorState }),
     withLoading(),
-    withMethods((store, api = inject(CatalogApiService), weightRange = inject(PRIORITY_WEIGHT_RANGE)) => {
+    withMethods((
+      store,
+      api = inject(CatalogApiService),
+      weightRange = inject(PRIORITY_WEIGHT_RANGE),
+      usage = inject(ConfiguratorApiService),
+    ) => {
       let latestRequest = 0;
       let latestLoad: Promise<void> = Promise.resolve();
       let latestListRequest = 0;
@@ -296,6 +308,22 @@ export const withConfigurator = () =>
       }
 
       /**
+       * Counts a loaded list as `CriteriaListShown` when its selection differs from the last one
+       * counted (R-MET-01, R-CON-10; owner decision O-S4-55 (a)): A → B → A counts three times, a
+       * return to S10 without a change none. The selection is remembered before the request, so a
+       * failed one is not repeated; its failure shows nothing (`BACKGROUND_REQUEST`).
+       */
+      function countShownList(selection: CriteriaSelection): void {
+        const counted = store.configurator.list.countedSelection();
+        if (counted !== null && sameSelection(counted, selection)) {
+          return;
+        }
+        patchList(() => ({ countedSelection: selection }));
+        // Fire-and-forget: a lost event is never retried and never shown (SPEC §8.7).
+        usage.reportCriteriaListShown().catch(() => undefined);
+      }
+
+      /**
        * Loads the criteria of the draft for S11 with the pinned release (R-CON-10). The answer of a
        * named release is cached by the browser (ARCHITECTURE §9.6), so the request after the check
        * of „Kriterienliste anzeigen“ costs nothing. Only the latest request is applied; the
@@ -317,6 +345,7 @@ export const withConfigurator = () =>
           const answer = await api.getCriteria(selection, release ?? undefined, CRITERIA_LIST_PROBLEMS);
           if (request === latestListRequest) {
             patchList(() => ({ status: 'loaded', answer }));
+            countShownList(selection);
           }
         } catch (error: unknown) {
           if (request === latestListRequest) {

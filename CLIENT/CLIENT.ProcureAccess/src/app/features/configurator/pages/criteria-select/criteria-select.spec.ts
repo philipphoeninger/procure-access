@@ -17,6 +17,7 @@ import { provideTestTranslations } from '@app/testing/provide-test-translations'
 import { provideLayout } from '@app/testing/shell-test-doubles';
 import { FilterOptionsLayers, FilterOptionsResponse } from '../../models/filter-options';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
+import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { withConfigurator } from '../../state/with-configurator';
 import { excluded, filterOptions, filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CriteriaSelect } from './criteria-select';
@@ -90,6 +91,7 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         provideLayout(wide),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
+        { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
       ],
@@ -852,6 +854,7 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
           provideLayout(true),
           { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
           { provide: CatalogApiService, useValue: api },
+          { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
           { provide: A11yAnnouncerService, useValue: { announce } },
           { provide: PageTitleStrategy, useValue: { setPageTitleState } },
         ],
