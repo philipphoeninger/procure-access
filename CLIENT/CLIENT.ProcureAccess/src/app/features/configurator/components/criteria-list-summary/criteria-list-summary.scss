@@ -1,0 +1,43 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Summary of S11 (Figma `2101:3160`): the count, then one row per layer. Below 600 px each term
+// stands above its value; from 600 px the terms form a column of their own.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xxs);
+}
+
+.pa-criteria-list-summary__count {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-criteria-list-summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xxs);
+  margin: 0;
+}
+
+.pa-criteria-list-summary__row {
+  @media (min-width: 37.5em) {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    column-gap: var(--pa-space-md);
+  }
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-large);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+  }
+}

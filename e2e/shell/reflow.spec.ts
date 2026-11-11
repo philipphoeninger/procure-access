@@ -8,9 +8,10 @@ import { chooseFirstOption } from '../support/combobox';
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
  * 1280 × 1024 window at 400 % zoom, no page scrolls sideways and every link and button lies
- * inside the viewport. Covers the pages of the new shell and the rebuilt screens: S10 and the S11
- * placeholder since S4-13. The legacy screens are checked by hand until they are rebuilt (protocol
- * S2-18). A rebuilt screen joins this list in its step (TESTING_v26 V87).
+ * inside the viewport. Covers the pages of the new shell and the rebuilt screens: S10 since S4-13,
+ * S11 with its summary, notices, detail panel and action bar since S4-18a. The legacy screens are
+ * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
+ * step (TESTING_v26 V87).
  *
  * The width is compared with the set viewport, not with the document: mobile browsers widen the
  * layout viewport to fit content that is too wide, so the document alone would hide the overflow.
@@ -137,11 +138,15 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
   });
 
-  test('the S11 placeholder needs no horizontal scrolling', async ({ page }) => {
+  test('S11 with summary, notices, an open detail panel and the action bar needs no horizontal scrolling', async ({ page }) => {
     await toStep4(page);
     await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Liste exportieren' })).toBeVisible();
+    await expectReflow(page);
 
+    await page.getByRole('button', { name: 'Details anzeigen' }).first().click();
+    await expect(page.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
     await expectReflow(page);
   });
 });

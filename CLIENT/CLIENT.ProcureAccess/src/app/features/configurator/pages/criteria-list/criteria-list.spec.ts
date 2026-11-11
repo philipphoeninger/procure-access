@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { fireEvent } from '@testing-library/dom';
 import { provideRouter, Router } from '@angular/router';
-import { signalStore } from '@ngrx/signals';
+import { signalStore, withMethods, withState } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -21,17 +21,24 @@ import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CriteriaListPage } from './criteria-list';
 
-// The real configurator slice stands in for the root store, so the page runs the S4-14 rules.
-const ConfiguratorTestStore = signalStore(withConfigurator());
+// The real configurator slice stands in for the root store, so the page runs the S4-14 rules; the
+// legacy sign-in is a flag (`isAuthenticated` reads the token in localStorage in the root store).
+let signedIn = false;
+const ConfiguratorTestStore = signalStore(
+  withConfigurator(),
+  withState<{ user: { id: string } | null }>({ user: null }),
+  withMethods(() => ({ isAuthenticated: () => signedIn })),
+);
 
 @Component({ template: '' })
 class Blank {}
 
-describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
+describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
   let api: { getFilterOptions: ReturnType<typeof vi.fn>; getCriteria: ReturnType<typeof vi.fn> };
   let announce: ReturnType<typeof vi.fn>;
 
-  async function setUp(getCriteria: ReturnType<typeof vi.fn>) {
+  async function setUp(getCriteria: ReturnType<typeof vi.fn>, { signedIn: asUser = false } = {}) {
+    signedIn = asUser;
     api = {
       getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer()),
       getCriteria,
@@ -283,6 +290,8 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
   });
 
   describe('app types without criteria (R-LST-08)', () => {
+    // The priority note (R-LST-09) is a note too; this one names the app types.
+    const noCriteriaNotice = () => screen.queryAllByRole('note').find((note) => note.textContent?.includes('noch keine Kriterien')) ?? null;
     const hardware = { id: 'hardware', name: 'Hardware' };
     const relay = { id: 'relay', name: 'Vermittlungs- oder Notrufdienst' };
 
@@ -290,7 +299,8 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
       const answer = { ...criteriaAnswer(), appTypesWithoutCriteria: [hardware, relay] };
       const { fixture } = await setUp(vi.fn().mockResolvedValue(answer));
 
-      const notice = screen.getByRole('note');
+      const notice = noCriteriaNotice();
+      if (notice === null) throw new Error('notice shown');
       expect(notice.textContent).toContain(
         'Für Hardware und Vermittlungs- oder Notrufdienst gibt es noch keine Kriterien, weil BIT inklusiv dafür noch kein Prüfverfahren enthält.',
       );
@@ -312,7 +322,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
       const answer = { ...criteriaAnswer(), criteria: [], appTypesWithoutCriteria: [hardware] };
       await setUp(vi.fn().mockResolvedValue(answer));
 
-      expect(screen.getByRole('note').textContent).toContain('Für Hardware gibt es noch keine Kriterien');
+      expect(noCriteriaNotice()?.textContent).toContain('Für Hardware gibt es noch keine Kriterien');
       expect(screen.queryByRole('group', { name: 'Liste filtern' })).toBeNull();
       expect(screen.queryByRole('list')).toBeNull();
       expect(screen.queryByText(/Das sollte nicht vorkommen/)).toBeNull();
@@ -323,8 +333,102 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
       await setUp(vi.fn().mockResolvedValue({ ...criteriaAnswer(), criteria: [] }));
 
       expect(screen.getByText(/Für diese Auswahl gibt es keine Kriterien. Das sollte nicht vorkommen./)).toBeTruthy();
-      expect(screen.queryByRole('note')).toBeNull();
+      expect(noCriteriaNotice()).toBeNull();
       expect(screen.queryByRole('group', { name: 'Liste filtern' })).toBeNull();
+    });
+  });
+
+  describe('summary, notices, suggestion link and action bar (S4-18a, R-LST-09, R-LST-10, R-LST-13)', () => {
+    const order = (...elements: HTMLElement[]) =>
+      elements.every(
+        (element, i) => i === 0 || (elements[i - 1].compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+      );
+
+    it('shows summary, both notices and the counts above the filter row, the link and the action bar after the list', async () => {
+      await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      const summary = screen.getByText('3 Kriterien für Ihre Auswahl');
+      const [priorityNote] = screen.getAllByRole('note');
+      const draftNote = screen.getByText(/Ihre Auswahl wird nicht gespeichert, solange Sie nicht angemeldet sind/);
+      const counts = screen.getByText('1 Mindestanforderung, 1 Bewertungskriterium, 1 Hinweis');
+      const filter = screen.getByRole('group', { name: 'Liste filtern' });
+      const suggest = screen.getByRole('link', { name: /^Fehlt ein Kriterium oder ist eine Formulierung unklar\?/ });
+      const status = screen.getByText('4 von 4 Kriterien in Ihrer Liste');
+      const exportButton = screen.getByRole('button', { name: 'Liste exportieren' });
+
+      expect(priorityNote.textContent).toContain('Die Prioritäten sind eine Empfehlung des Projektteams');
+      expect(
+        order(summary, priorityNote, draftNote, counts, filter, screen.getByRole('list'), suggest, status, exportButton),
+      ).toBe(true);
+      expect(screen.queryByRole('button', { name: 'Liste speichern' })).toBeNull();
+      expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
+      expect(screen.queryByRole('button', { name: /schließen|ausblenden/i })).toBeNull();
+      await expectNoAxeViolations();
+    });
+
+    it('shows no draft note for a signed-in user', async () => {
+      await setUp(vi.fn().mockResolvedValue(criteriaAnswer()), { signedIn: true });
+
+      expect(screen.getByText(/Die Prioritäten sind eine Empfehlung des Projektteams/)).toBeTruthy();
+      expect(screen.queryByText(/Ihre Auswahl wird nicht gespeichert/)).toBeNull();
+    });
+
+    it('opens the configured suggestion channel with the mail subject and names where it leads (R-LST-13)', async () => {
+      await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      const link = screen.getByRole('link', { name: /^Fehlt ein Kriterium/ });
+      expect(link.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+        'Fehlt ein Kriterium oder ist eine Formulierung unklar? Schlagen Sie eine Änderung vor (öffnet Ihr E-Mail-Programm)',
+      );
+      expect(link.getAttribute('href')).toBe(
+        'mailto:kriterium-vorschlagen@example.invalid?subject=Vorschlag%20f%C3%BCr%20den%20Kriterienkatalog',
+      );
+    });
+
+    it('counts the level that applies now and announces the live counter only after the user’s change', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+      const card = () => screen.getAllByRole('listitem')[0];
+      expect(announce).not.toHaveBeenCalled();
+
+      within(card()).getByRole('checkbox', { name: /^In Liste aufnehmen Bilder/ }).click();
+      await fixture.whenStable();
+
+      expect(screen.getByText('3 von 4 Kriterien in Ihrer Liste')).toBeTruthy();
+      expect(announce).toHaveBeenCalledWith('criteria.list.status.count', { included: 3, total: 4 }, { throttleMs: 1000 });
+      // Excluded criteria keep their level in the counts (owner decision O-S4-51 (a)).
+      expect(screen.getByText('1 Mindestanforderung, 1 Bewertungskriterium, 1 Hinweis')).toBeTruthy();
+
+      within(card()).getByRole('button', { name: /^Priorität:/ }).click();
+      await fixture.whenStable();
+      screen.getByRole('menuitemradio', { name: 'Hinweis' }).click();
+      await fixture.whenStable();
+
+      expect(screen.getByText('0 Mindestanforderungen, 1 Bewertungskriterium, 2 Hinweise')).toBeTruthy();
+      expect(announce.mock.calls.filter(([key]) => key === 'criteria.list.status.count')).toHaveLength(1);
+    });
+
+    it('leaves the action bar out when the list has no card', async () => {
+      await setUp(vi.fn().mockResolvedValue({ ...criteriaAnswer(), criteria: [] }));
+
+      expect(screen.queryByRole('button', { name: 'Liste exportieren' })).toBeNull();
+      expect(screen.getByRole('link', { name: /^Fehlt ein Kriterium/ })).toBeTruthy();
+    });
+
+    it('opens the export placeholder with its title and „Schließen“ until S4-21', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      screen.getByRole('button', { name: 'Liste exportieren' }).click();
+      await fixture.whenStable();
+
+      const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+      await expectNoAxeViolations();
+      const close = within(dialog).getByRole('button', { name: 'Schließen' });
+      // The marker keeps the initial focus on „Schließen“ also on iOS (E2E mobile-safari).
+      expect(close.hasAttribute('cdkFocusInitial')).toBe(true);
+      close.click();
+      await fixture.whenStable();
+
+      expect(screen.queryByRole('dialog')).toBeNull();
     });
   });
 });

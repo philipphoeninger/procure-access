@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { InjectionToken } from '@angular/core';
+import { computed, inject, InjectionToken, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 
 import { environment } from '../../../environments/environment';
 
@@ -37,4 +39,22 @@ export function suggestionHref(channel: SuggestionChannel, mailSubject: string):
   return channel.kind === 'web'
     ? channel.url
     : `mailto:${channel.address}?subject=${encodeURIComponent(mailSubject)}`;
+}
+
+/** The configured channel with its link target, as the footer and S11 show it. */
+export interface SuggestionLink {
+  channel: SuggestionChannel;
+  /** Follows the language: the mail subject is `suggest.mailSubject`. */
+  href: Signal<string>;
+}
+
+/**
+ * The link of „Kriterium vorschlagen“ (R-SUG-01) for the footer and the end of the S11 list
+ * (R-LST-13). Call it in an injection context; it throws for a value that is not an accepted form.
+ * The link from the list names no criterion, so the mail has the subject only (SPEC v2.5-3).
+ */
+export function injectSuggestionLink(): SuggestionLink {
+  const channel = parseSuggestionChannel(inject(CRITERIA_SUGGESTION_CHANNEL));
+  const mailSubject = toSignal(inject(TranslateService).stream('suggest.mailSubject'), { initialValue: '' });
+  return { channel, href: computed(() => suggestionHref(channel, String(mailSubject()))) };
 }

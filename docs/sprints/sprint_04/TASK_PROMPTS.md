@@ -8,7 +8,7 @@
 
 ## Overview
 
-Prompts are listed in task-ID order. The recommended **working order** is: S4-01, S4-02, S4-03, S4-04, S4-05, S4-06, S4-07, S4-08, S4-23, S4-09, S4-10, S4-11, S4-12, S4-13, S4-29, S4-19, S4-20, S4-14, S4-15, S4-16, S4-17, S4-18, S4-21, S4-22, then the stretch tasks (S4-23 runs early because S11 uses the endpoints; S4-19 and S4-20 can run while S10 is built).
+Prompts are listed in task-ID order. The recommended **working order** is: S4-01, S4-02, S4-03, S4-04, S4-05, S4-06, S4-07, S4-08, S4-23, S4-09, S4-10, S4-11, S4-12, S4-13, S4-29, S4-19, S4-20, S4-14, S4-15, S4-16, S4-17, S4-18a, S4-18b, S4-21, S4-22, then the stretch tasks (S4-23 runs early because S11 uses the endpoints; S4-19 and S4-20 can run while S10 is built).
 
 | Task | Title | Issues | Can start |
 |---|---|---|---|
@@ -29,11 +29,12 @@ Prompts are listed in task-ID order. The recommended **working order** is: S4-01
 | S4-15 | Criterion card, detail panel and K5 | none | after S4-14 and O-S4-4 |
 | S4-16 | Priority override, include/exclude and notes | none | after S4-15 |
 | S4-17 | Search, priority filter, „Geprüft nach …“, empty state | none | after S4-16 |
-| S4-18 | S11 notices, action bar, suggestion link, event and page titles | none | after S4-14 – S4-17 |
+| S4-18a | S11 summary, notices, action bar, suggestion link and page titles | none | after S4-14 – S4-17 |
+| S4-18b | `CriteriaListShown` endpoint and its client caller | none | after S4-14 – S4-17; independent of S4-18a |
 | S4-19 | Export pipeline and POST /api/v1/exports | none | after S4-08 |
 | S4-20 | XLSX and CSV renderers | none | after S4-19 (O-S4-6 for one column) |
-| S4-21 | Export dialog S13, rate limit and /health/ready | #112 | after S4-19, S4-20, S4-18 |
-| S4-22 | J1 complete to the export; M2 exit check; bundle budget | #42 | after S4-13, S4-18, S4-21 |
+| S4-21 | Export dialog S13, rate limit and /health/ready | #112 | after S4-19, S4-20, S4-18a |
+| S4-22 | J1 complete to the export; M2 exit check; bundle budget | #42 | after S4-13, S4-18a, S4-18b, S4-21 |
 | S4-23 | Accept-Language on the catalog list endpoints | none | ready |
 | S4-29 | Figma light colours pinned in the theme | #240 (light part) | after S4-13 (O-S4-22 decided; before S4-14) |
 | S4-24 | Short description in the catalog model | #237 | stretch, after O-S4-6 |
@@ -494,6 +495,8 @@ Finish with a short report for my control chat: PR link, protocol path, owner de
 ```
 
 ### S4-18 — S11 notices, action bar, suggestion link, event and page titles
+
+> **Split 2026-11-11 (O-S4-52 (a)):** S4-18a builds everything below except the event; S4-18b builds the `CriteriaListShown` caller (O-S4-48 (a): `POST /api/v1/configurator/criteria-list-shown` in the Configurator module, called once per new selection; SPEC §8 contract, ARCHITECTURE entry, integration test). Owner decisions O-S4-48 – O-S4-53 in SPRINT_04.md. The prompt below was used for S4-18a; for S4-18b replace the title, the scope and the branch (`sprint04/S4-18b-criteria-list-shown`) and point to `docs/sprints/sprint_04/S4-18a_notices_actionbar_titles.md` for the decisions.
 
 ```text
 Task S4-18 from docs/sprints/sprint_04/SPRINT_04.md — S11 notices, action bar, suggestion link, event and page titles

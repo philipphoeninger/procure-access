@@ -10,6 +10,15 @@ SPDX-License-Identifier: MIT
 </div>
 
 @if (answer(); as answer) {
+  @if (selection(); as selection) {
+    <pa-criteria-list-summary [count]="counts().total" [names]="selection" />
+  }
+
+  <pa-notice kind="info">{{ 'criteria.list.priorityNote' | translate }}</pa-notice>
+  @if (!signedIn()) {
+    <pa-notice kind="attention">{{ 'criteria.list.draftNote' | translate }}</pa-notice>
+  }
+
   @if (appTypesWithoutCriteria(); as appTypes) {
     <pa-notice kind="info">
       {{ 'criteria.list.noCriteriaFor' | translate: { appTypes } }}
@@ -22,6 +31,20 @@ SPDX-License-Identifier: MIT
   }
 
   @if (answer.criteria.length > 0) {
+    @if (counts().total > 0) {
+      <p class="pa-criteria-list__counts">
+        {{
+          'criteria.list.counts'
+            | translate
+              : {
+                  a: ('criteria.list.counts.a' | translatePlural: counts().A),
+                  b: ('criteria.list.counts.b' | translatePlural: counts().B),
+                  info: ('criteria.list.counts.info' | translatePlural: counts().Info),
+                }
+        }}
+      </p>
+    }
+
     <pa-criteria-list-filter
       [searchText]="store.configurator.list.searchInput()"
       [levels]="store.configurator.list.filter.levels()"
@@ -56,5 +79,27 @@ SPDX-License-Identifier: MIT
         </button>
       </div>
     }
+  }
+
+  <p class="pa-criteria-list__suggest">
+    <a class="pa-criteria-list__link" [href]="suggest.href()"
+      >{{ 'criteria.list.suggest' | translate }}
+      <span class="cdk-visually-hidden">
+        @if (suggest.channel.kind === 'mail') {
+          {{ 'suggest.external' | translate }}
+        } @else {
+          {{ 'suggest.external.url' | translate }}
+        }
+      </span></a
+    >
+  </p>
+
+  @if (answer.criteria.length > 0) {
+    <div class="pa-criteria-list__actions" #actionBar>
+      <p class="pa-criteria-list__status">
+        {{ 'criteria.list.status.count' | translate: { included: included(), total: answer.criteria.length } }}
+      </p>
+      <button matButton="filled" type="button" (click)="openExport()">{{ 'criteria.list.export' | translate }}</button>
+    </div>
   }
 }

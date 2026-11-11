@@ -11,8 +11,10 @@ import {
   effectiveWeight,
   filterCriteria,
   hasPriorityOverride,
+  includedCount,
   isFilterActive,
   isWeightInRange,
+  levelCounts,
   matchesSearch,
   noteLengthError,
   overridePriority,
@@ -226,6 +228,33 @@ describe('criteria list rules', () => {
       expect(sameSelection(selection, { ...selection, appTypeIds: ['web'] })).toBe(false);
       expect(sameSelection(selection, { ...selection, productPartIds: ['base', 'audio'] })).toBe(false);
       expect(sameSelection(selection, { ...selection, testTypeIds: ['softwareTest'] })).toBe(false);
+    });
+  });
+
+  describe('levelCounts and includedCount (S4-18a, owner decision O-S4-51 (a))', () => {
+    const criteria = criteriaAnswer().criteria;
+
+    it('counts the requirement criteria by recommended level, without „Geprüft nach …“', () => {
+      expect(levelCounts(criteria, none)).toEqual({ total: 3, A: 1, B: 1, Info: 1 });
+    });
+
+    it('counts the level that applies now, also for an excluded criterion', () => {
+      const decisions: CriterionDecisions = {
+        '11.3.3': { ...DEFAULT_DECISION, overrideLevel: 'A' },
+        '11.2.2': { ...DEFAULT_DECISION, included: false },
+      };
+
+      expect(levelCounts(criteria, decisions)).toEqual({ total: 3, A: 2, B: 1, Info: 0 });
+    });
+
+    it('counts every included card, „Geprüft nach …“ too', () => {
+      expect(includedCount(criteria, none)).toBe(4);
+      expect(
+        includedCount(criteria, {
+          'PROC-softwareTest': { ...DEFAULT_DECISION, included: false },
+          '11.1.1': { ...DEFAULT_DECISION, included: false },
+        }),
+      ).toBe(2);
     });
   });
 });

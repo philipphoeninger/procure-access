@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 <footer class="pa-footer">
   <ul class="pa-footer__links">
     <li>
-      <a [href]="suggestHref()"
+      <a [href]="suggest.href()"
         >{{ 'shell.footer.suggest' | translate }}
         <span class="cdk-visually-hidden">
-          @if (suggestChannel.kind === 'mail') {
+          @if (suggest.channel.kind === 'mail') {
             {{ 'suggest.external' | translate }}
           } @else {
             {{ 'suggest.external.url' | translate }}
