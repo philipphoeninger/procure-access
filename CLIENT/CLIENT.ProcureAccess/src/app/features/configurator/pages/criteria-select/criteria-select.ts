@@ -36,11 +36,18 @@ import { injectWideLayout } from '@app/layout/shell/wide-layout';
 import { Notice } from '@app/shared/components/notice/notice';
 import { Stepper } from '@app/shared/components/stepper/stepper';
 import { FilterOptionCheckbox, OptionLink } from '../../components/filter-option/filter-option';
-import { CRITERIA_LIST_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
+import { ConfiguratorNavigationState, CRITERIA_LIST_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
 import { linkTo } from '../../state/catalog-names';
 import { CONFIGURATOR_LAYERS, ConfiguratorLayer, ResetReport } from '../../models/configurator-draft';
 import { FilterOption, TestTypeOption, UseCaseOption } from '../../models/filter-options';
-import { exclusionReasonLines, isExcluded, ReasonLine, selectedNames, stepError } from '../../state/selection-rules';
+import {
+  exclusionReasonLines,
+  isExcluded,
+  openingStep,
+  ReasonLine,
+  selectedNames,
+  stepError,
+} from '../../state/selection-rules';
 import { SubmitResult } from '../../state/with-configurator';
 
 /** „Keiner davon passt“: its own answer of step 1, not a use case (R-CON-02). */
@@ -202,8 +209,18 @@ export class CriteriaSelect {
   /** „Weiter“ was pressed on step 1 without an answer: the field shows its error (S10-E). */
   private readonly useCaseChecked = signal(false);
 
+  /**
+   * The step S10 opens at: step 1, or the one a link asked for in the router state (S11's
+   * `criteria.list.noCriteriaFor` → step 2, owner decision O-S4-47 (a)). Set before the stepper has its
+   * steps, so it emits no step change: the route change focuses the H1 and announces the title.
+   */
+  protected readonly firstStep = openingStep(
+    (this.router.currentNavigation()?.extras.state as ConfiguratorNavigationState | undefined)?.configuratorStep,
+    this.store.configurator.draft(),
+  );
+
   /** Index of the open step, for the page title („Schritt {{n}} von 4“). */
-  protected readonly currentStep = signal(0);
+  protected readonly currentStep = signal(this.firstStep);
 
   /** The server refused the selection; gone with the next change of it (R-CON-10). */
   protected readonly serverError = signal<ServerError | null>(null);

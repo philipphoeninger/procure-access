@@ -1,0 +1,32 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<div class="pa-criteria-list-filter" role="group" [attr.aria-label]="'criteria.list.filter.label' | translate">
+  <mat-form-field class="pa-criteria-list-filter__search" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'criteria.list.search' | translate }}</mat-label>
+    <input
+      #search
+      matInput
+      type="search"
+      autocomplete="off"
+      [value]="searchText()"
+      (input)="searchTextChange.emit(search.value)"
+    />
+  </mat-form-field>
+
+  <fieldset class="pa-criteria-list-filter__levels">
+    <legend class="pa-criteria-list-filter__legend">{{ 'criteria.list.filter.priority' | translate }}</legend>
+    @for (level of allLevels; track level) {
+      <mat-checkbox [checked]="levels().includes(level)" (change)="toggleLevel(level, $event.checked)">
+        {{ levelKey(level) | translate }}
+      </mat-checkbox>
+    }
+  </fieldset>
+
+  <mat-checkbox [checked]="onlyIncluded()" (change)="onlyIncludedChange.emit($event.checked)">
+    {{ 'criteria.list.filter.included' | translate }}
+  </mat-checkbox>
+</div>

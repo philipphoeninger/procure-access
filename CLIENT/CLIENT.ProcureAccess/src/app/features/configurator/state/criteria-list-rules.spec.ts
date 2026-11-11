@@ -17,6 +17,7 @@ import {
   noteLengthError,
   overridePriority,
   resetPriority,
+  sameSelection,
   setIncluded,
   setNote,
   setWeight,
@@ -210,6 +211,21 @@ describe('criteria list rules', () => {
       const filter = { query: '11', levels: ['B' as const], onlyIncluded: true };
 
       expect(filterCriteria(criteria, decisions, filter)).toEqual([]);
+    });
+  });
+
+  describe('selection of a list (owner decision O-S4-46 (a))', () => {
+    const selection = { useCase: 'hr', appTypeIds: ['web', 'document'], productPartIds: ['base'], testTypeIds: [] };
+
+    it('treats the same values in another order as the same selection', () => {
+      expect(sameSelection(selection, { ...selection, appTypeIds: ['document', 'web'] })).toBe(true);
+    });
+
+    it('tells a changed use case or a changed layer apart', () => {
+      expect(sameSelection(selection, { ...selection, useCase: undefined })).toBe(false);
+      expect(sameSelection(selection, { ...selection, appTypeIds: ['web'] })).toBe(false);
+      expect(sameSelection(selection, { ...selection, productPartIds: ['base', 'audio'] })).toBe(false);
+      expect(sameSelection(selection, { ...selection, testTypeIds: ['softwareTest'] })).toBe(false);
     });
   });
 });

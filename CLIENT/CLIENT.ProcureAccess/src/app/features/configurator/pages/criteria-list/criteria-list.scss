@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-// S11 (Handoff §5.1, §5.5): H1, „Auswahl ändern“ and the cards; more parts follow with S4-16 – S4-18.
+// S11 (Handoff §5.1, §5.5): H1, „Auswahl ändern“, the notice for app types without criteria, the
+// filter row, the cards and the empty states; summary, notices and action bar follow with S4-18.
 :host {
   display: flex;
   flex-direction: column;
@@ -29,4 +30,21 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.pa-criteria-list__link {
+  color: var(--mat-sys-primary);
+}
+
+// Empty states (Handoff §6.2): text and one action, left-aligned.
+.pa-criteria-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  margin: 0;
+
+  p {
+    margin: 0;
+  }
 }

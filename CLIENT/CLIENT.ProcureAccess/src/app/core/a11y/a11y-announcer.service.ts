@@ -16,6 +16,12 @@ export interface AnnounceOptions {
    * newest text is read. The promise of a replaced call resolves without an announcement.
    */
   throttleMs?: number;
+  /**
+   * The name the throttle counts under; the key by default. The plural forms of one counter
+   * (`<key>`, `<key>.one`, `<key>.zero`) pass their base key, so an older count is never read
+   * after a newer one in another form.
+   */
+  throttleKey?: string;
 }
 
 interface Throttle {
@@ -48,7 +54,7 @@ export class A11yAnnouncerService {
   async announce(key: string, params?: InterpolationParameters, options: AnnounceOptions = {}): Promise<void> {
     const politeness = options.politeness ?? 'polite';
     const send = () => this.enqueue(firstValueFrom(this.translate.get(key, params)) as Promise<string>, politeness);
-    await (options.throttleMs ? this.throttle(key, options.throttleMs, send) : send());
+    await (options.throttleMs ? this.throttle(options.throttleKey ?? key, options.throttleMs, send) : send());
   }
 
   /**
