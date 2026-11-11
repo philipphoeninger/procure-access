@@ -6,13 +6,11 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { ExternalLink } from '../../state/catalog-names';
 import { ReasonLine } from '../../state/selection-rules';
 
 /** A link after the hint line of a test type (`testType.link`, opens in a new tab). */
-export interface OptionLink {
-  url: string;
-  domain: string;
-}
+export type OptionLink = ExternalLink;
 
 /**
  * One option of the S10 checkbox groups (steps 2–4, Handoff §5.4): the checkbox and the lines

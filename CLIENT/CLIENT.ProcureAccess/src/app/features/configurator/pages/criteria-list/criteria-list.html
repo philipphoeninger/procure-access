@@ -8,3 +8,13 @@ SPDX-License-Identifier: MIT
 <div>
   <a matButton="outlined" [routerLink]="configuratorPath">{{ 'criteria.list.changeSelection' | translate }}</a>
 </div>
+
+@if (loaded()) {
+  <ul class="pa-criteria-list__items">
+    @for (criterion of criteria(); track criterion.key) {
+      <li>
+        <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" />
+      </li>
+    }
+  </ul>
+}

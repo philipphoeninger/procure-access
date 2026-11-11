@@ -87,7 +87,8 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
 | S4-14 | S11 state: criteria API client, list state in the draft (include/exclude, overrides with the recommendation kept, notes ≤ 1 000 characters), search (debounce 300 ms, client-side) and priority filter as logic | 3 | Store tests; the recommended level stays unchanged next to an override |
-| S4-15 | Criterion card (compact) and detail panel (R-LST-01, Handoff §5.5); **K5** `pa-priority-indicator` with rationale, matched rule (`appTypeAndUseCase` → `criteria.priority.rule.full`) and source „Empfehlung des Projektteams“ (R-LST-02); the Markdown lines of the texts as paragraphs and lists (S3-15 P6); `@figma` tags | 4 | Component tests by role and name with `vitest-axe`; Figma link check green |
+| S4-15a | Criterion card (compact) with K5 `pa-priority-indicator` (display; menu with S4-16) and the detail panel with its first section „Warum diese Priorität?“: rationale, matched rule (`appTypeAndUseCase` → `criteria.priority.rule.full`) and source „Empfehlung des Projektteams“ (R-LST-01, R-LST-02, CAT-02 FE part); S11 loads and lists the cards; `@figma` tags (split of S4-15, O-S4-28) | 2 | Component tests by role and name with axe (O-S4-11); Figma link check green |
+| S4-15b | Detail panel, catalog sections: the Markdown lines of the texts as paragraphs and lists (S3-15 P6, O-S4-30), tabs for several procedures, examples, „So wird es geprüft“, „Gilt für“ with `appliesTo[]` in the criteria answer (O-S4-29), source line (Handoff §5.5) | 2 | Component tests; SPEC §8.2 and the endpoint test for `appliesTo[]` |
 | S4-16 | Priority override via the K5 menu with reset (R-LST-03), include/exclude with excluded cards kept in the list (R-LST-04), note with length error (R-LST-05) | 3 | Component tests; errors per SPEC §7.1 |
 | S4-17 | Search and priority filter UI with the result announcement (R-LST-06), „Geprüft nach …“ cards (R-LST-07), empty state for app types without criteria (R-LST-08) | 2.5 | FE part of **CAT-20** `active` |
 | S4-18 | Notices (R-LST-09), action bar sticky from 600 px (R-LST-10; „Liste speichern“ leads to sign-in, as far as the UX copy says for anonymous users), „Kriterium vorschlagen“ at the end of the list (R-LST-13, M2.8), the first `CriteriaListShown` caller, page-title variants from UX copy v17 and `shell.pageTitle.error` (M2.6d) | 2 | S11 added to `reflow.spec.ts`; event written once per shown list |
@@ -142,7 +143,7 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | S4-13 | S4-12; **O-S4-5** | internal / Philipp |
 | S4-29 | S4-13 merged; **O-S4-22** | internal / Philipp (decided) |
 | S4-14 – S4-18 | S4-29 merged (S11 is built and axe-checked in the final light colours); S4-12 merged (S10 hands the selection over); **O-S4-4** (approved UX copy v17) for the texts | internal / Philipp |
-| S4-16, S4-17 | S4-15 | internal |
+| S4-16, S4-17 | S4-15a | internal |
 | S4-18 | S4-14 – S4-17 | internal |
 | S4-20 | S4-19; **O-S4-6** for the short-description column only | internal / Philipp |
 | S4-21 | S4-19, S4-20 (API part); S4-18 (the action bar opens the dialog) | internal |
@@ -182,6 +183,14 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-25 | S4-14: what the priority filter of S11 compares: (a) the level that applies now (override, else recommendation); (b) always the recommended level | S4-14 | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-26 | S4-14: what the S11 search looks at: (a) what the compact card shows — key/number, title, plain-language title, original titles of the procedure texts; (b) also the full BIT inklusiv texts; (c) (a) plus the user's notes | S4-14 | (a); **decided (a)**, owner 2026-11-11: case-insensitive substring, umlauts not folded |
 | O-S4-27 | S4-14: the weight of an override to B when the recommendation is A or Info (no recommended weight; R-LST-03 „editable 1–10“ 🔧): (a) empty until the user sets one; (b) a new 🔧 default | S4-14 | (a); **decided (a)**, owner 2026-11-11; the range 1–10 is a client setting in the environment files |
+| O-S4-28 | S4-15 is more than one session: (a) S4-15a K5, compact card, S11 list and the priority section of the panel; S4-15b the catalog text sections; (b) one task | S4-15 | (a); **decided (a)**, owner 2026-11-11 (the priority section moved into S4-15a so no card is shown without its rationale, CAT-02) |
+| O-S4-29 | „Gilt für“ (Handoff §5.5) has no data in the criteria answer (SPEC §8.2): (a) add `appliesTo[]` (the selected app types the criterion applies to) in S4-15b; (b) leave the section out | S4-15b | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-30 | Markdown of the catalog texts: (a) a small renderer into Angular nodes (paragraphs, `- ` lists, `**bold**`, no raw HTML); (b) the legacy `ngx-markdown`/`marked` | S4-15b | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-31 | Meta line when product part or EN 301 549 reference is missing: (a) clause from the `en301549` reference, two fragment keys (UX copy v18 U100); (b) the line only with both parts | S4-15a | (a); **decided (a)**, owner 2026-11-11; the wording of U100 waits for the owner's confirmation in the S4-15a pull request |
+| O-S4-32 | H2 while `plainLanguage` is null (2026.1 before O-1): (a) the catalog `title`; (b) the source title line | S4-15a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-33 | „Geprüft nach …“ panel: Handoff §5.5 (text and note only) vs. R-LST-02/CAT-02: (a) the panel starts with „Warum diese Priorität?“; (b) as the Handoff | S4-15a | (a); **decided (a)**, owner 2026-11-11 (Handoff 1.18) |
+| O-S4-34 | A failed S11 load (S4-14 P1): (a) no new text — the S11 request no longer suppresses the snackbar for `validation`/`selection-excluded`; (b) back to S10 with the error at the step; (c) a new key with „Erneut versuchen“ | S4-15a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-35 | The S11 frame shows „Prüfverfahren · aus Ihrer Auswahl in Schritt 4“ on „Geprüft nach …“ cards without a UX copy key: (a) leave it out; (b) a key in UX copy v18 | S4-15a | (a); **decided (a)**, owner 2026-11-11 |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 

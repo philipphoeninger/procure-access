@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
+import { CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
 import { signalStore } from '@ngrx/signals';
 
 import { CriteriaResponse } from '../models/criteria';
@@ -429,6 +430,8 @@ describe('withConfigurator', () => {
       const request = listRequest();
       expect(request.request.params.get('release')).toBe('T.1');
       expect(request.request.params.getAll('testTypeIds[]')).toEqual(['softwareTest']);
+      // A 400 on S11 gets the generic snackbar; only not-found is shown by the page (O-S4-34).
+      expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['not-found']);
       request.flush(criteriaAnswer());
 
       expect(await load).toBe('loaded');

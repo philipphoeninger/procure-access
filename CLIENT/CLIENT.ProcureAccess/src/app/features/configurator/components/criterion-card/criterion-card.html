@@ -1,0 +1,55 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (testType(); as testType) {
+  <h2 class="pa-criterion-card__title" [id]="titleId()">
+    {{ 'criteria.item.testedBy.title' | translate: { testType: (testTypeKey() | translate) } }}
+  </h2>
+  <p class="pa-criterion-card__text">
+    {{ 'criteria.item.testedBy.text' | translate: { testType: (testTypeKey() | translate) } }}
+  </p>
+  @if (testTypeLink(); as link) {
+    @let metaText = 'criteria.item.testedBy.meta' | translate: { link: linkMark };
+    <p class="pa-criterion-card__meta">
+      {{ beforeLink(metaText) }}<a class="pa-criterion-card__link" [href]="link.url" target="_blank" rel="noopener noreferrer"
+        >{{ link.domain }}&ngsp;<span class="cdk-visually-hidden">{{ 'common.newTab' | translate }}</span></a
+      >{{ afterLink(metaText) }}
+    </p>
+  }
+} @else {
+  <h2 class="pa-criterion-card__title" [id]="titleId()">{{ title() }}</h2>
+  @if (sourceTitle(); as source) {
+    <p class="pa-criterion-card__source">{{ source.key | translate: source.params }}</p>
+  }
+  @if (meta(); as meta) {
+    <p class="pa-criterion-card__meta">{{ meta.key | translate: meta.params }}</p>
+  }
+}
+
+<pa-priority-indicator [level]="level()" [recommendedLevel]="recommendedLevel()" [weight]="weight()" />
+
+<div class="pa-criterion-card__actions">
+  <button
+    matButton
+    type="button"
+    [attr.aria-expanded]="expanded()"
+    [attr.aria-controls]="panelId()"
+    [attr.aria-describedby]="titleId()"
+    (click)="toggle()"
+  >
+    {{ (expanded() ? 'criteria.item.hideDetails' : 'criteria.item.showDetails') | translate }}
+  </button>
+</div>
+
+<div class="pa-criterion-card__details" [id]="panelId()" [hidden]="!expanded()">
+  <section class="pa-criterion-card__section">
+    <h3 class="pa-criterion-card__section-title">{{ 'criteria.item.detail.priority' | translate }}</h3>
+    <pa-priority-rationale [rationale]="criterion().resolvedPriority.rationale" [rule]="rule()" />
+  </section>
+  @if (testType()) {
+    <p class="pa-criterion-card__text">{{ 'criteria.item.testedBy.note' | translate }}</p>
+  }
+</div>

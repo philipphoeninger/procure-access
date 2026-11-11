@@ -2,16 +2,17 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { PriorityLevel } from '@app/shared/components/priority-indicator/priority-level';
+
+// The levels live with K5, which shows them outside the configurator too.
+export { PRIORITY_LEVELS } from '@app/shared/components/priority-indicator/priority-level';
+export type { PriorityLevel } from '@app/shared/components/priority-indicator/priority-level';
+
 /** An app type the release has no requirement criterion for (SPEC §8.2). */
 export interface AppTypeWithoutCriteria {
   id: string;
   name: string;
 }
-
-/** Priority levels as the criteria endpoint sends them; they pick `criteria.priority.<level>` (SPEC §8.2). */
-export type PriorityLevel = 'A' | 'B' | 'Info';
-
-export const PRIORITY_LEVELS: readonly PriorityLevel[] = ['A', 'B', 'Info'];
 
 /**
  * `requirement`: a criterion of the catalog; `testProcedure`: a „Geprüft nach …“ criterion, one per

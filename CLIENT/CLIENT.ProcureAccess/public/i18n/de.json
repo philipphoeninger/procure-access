@@ -434,7 +434,100 @@
     },
     "list": {
       "title": "Ihre Kriterienliste",
-      "changeSelection": "Auswahl ändern"
+      "changeSelection": "Auswahl ändern",
+      "summary": {
+        "count": "{{count}} Kriterien für Ihre Auswahl",
+        "count.one": "1 Kriterium für Ihre Auswahl",
+        "useCase": "Verwendungszweck",
+        "appTypes": "Anwendungstyp",
+        "parts": "Funktionsbereiche",
+        "testTypes": "Prüfverfahren"
+      },
+      "projectCopy": "Diese Liste gehört zum Beschaffungsprojekt „{{project}}“. Verwendungszweck, Anwendungstyp, Funktionsbereiche und Prüfverfahren sind fest. Sie können Kriterien aufnehmen oder entfernen und Prioritäten und Notizen ändern.",
+      "priorityNote": "Die Prioritäten sind eine Empfehlung des Projektteams auf Grundlage fachlicher Erfahrung. Sie sind keine Vorgabe aus einer Norm. Prüfen Sie, ob sie zu Ihrer Beschaffung passen, und ändern Sie sie bei Bedarf.",
+      "counts": "{{a}} Mindestanforderungen, {{b}} Bewertungskriterien, {{info}} Hinweise",
+      "filter": {
+        "label": "Liste filtern",
+        "priority": "Priorität",
+        "included": "Nur aufgenommene Kriterien anzeigen"
+      },
+      "search": "In Kriterien suchen",
+      "save": "Liste speichern",
+      "export": "Liste exportieren",
+      "draftNote": "Ihre Auswahl wird nicht gespeichert, solange Sie nicht angemeldet sind. Wenn Sie die Seite neu laden oder schließen, geht sie verloren. Laden Sie die Liste herunter oder melden Sie sich an, um sie zu speichern.",
+      "unsaved": "Noch nicht gespeichert",
+      "status": {
+        "count": "{{included}} von {{total}} Kriterien in Ihrer Liste"
+      },
+      "share": "Freigabelink erstellen",
+      "suggest": "Fehlt ein Kriterium oder ist eine Formulierung unklar? Schlagen Sie eine Änderung vor",
+      "noCriteriaFor": "Für {{appTypes}} gibt es noch keine Kriterien, weil BIT inklusiv dafür noch kein Prüfverfahren enthält. Wählen Sie einen weiteren Anwendungstyp oder ein Prüfverfahren, oder ändern Sie Ihre Auswahl.",
+      "empty": "Für diese Auswahl gibt es keine Kriterien. Das sollte nicht vorkommen. Bitte ändern Sie Ihre Auswahl oder schreiben Sie uns.",
+      "emptyFilter": "Keine Kriterien passen zu Ihrem Filter. Filter zurücksetzen",
+      "olderRelease": "Diese Liste beruht auf der Katalogversion {{release}}. Inzwischen gibt es die Version {{latest}}. Ihre Liste bleibt unverändert, damit nachvollziehbar bleibt, was Sie verwendet haben. Wenn Sie die neue Fassung nutzen möchten, erstellen Sie eine neue Liste mit derselben Auswahl.",
+      "olderRelease.cta": "Neue Liste mit derselben Auswahl",
+      "copy": {
+        "done": "Neue Liste nach Katalogversion {{release}} erstellt. Ihre bisherige Liste bleibt unverändert.",
+        "dropped": "Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: {{values}}.",
+        "notCarried": "Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}.",
+        "notCarried.one": "Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}."
+      }
+    },
+    "item": {
+      "include": "In Liste aufnehmen",
+      "excluded": "Nicht in Ihrer Liste",
+      "sourceTitle": "{{number}} {{originalTitle}} · BIT inklusiv",
+      "meta": "{{productPart}} · EN 301 549 {{number}}",
+      "meta.part": "{{productPart}}",
+      "meta.standard": "EN 301 549 {{number}}",
+      "showDetails": "Details anzeigen",
+      "hideDetails": "Details ausblenden",
+      "detail": {
+        "priority": "Warum diese Priorität?",
+        "requirement": "Was wird verlangt?",
+        "applicability": "Wann gilt das?",
+        "why": "Wen betrifft es?",
+        "examples": "Woran erkennt man es?",
+        "examples.positive": "So ist es gut",
+        "examples.negative": "So ist es nicht gut",
+        "examples.more": "Alle {{count}} Beispiele anzeigen",
+        "ratings": "Wie wird bewertet?",
+        "howTested": "So wird es geprüft",
+        "howTested.link": "Prüfschritt {{number}} im {{testType}} (öffnet bit-inklusiv.de)",
+        "appliesTo": "Gilt für",
+        "source": "Texte: {{testType}}, Prüfschritt {{number}} „{{originalTitle}}“. Verwendet mit Erlaubnis.",
+        "tabs": "Software-Test / App-Test / PDF-Test"
+      },
+      "testedBy": {
+        "title": "Geprüft nach {{testType}}",
+        "text": "Der Anbieter oder eine unabhängige Stelle hat das Produkt nach dem {{testType}} geprüft und kann den Bericht vorlegen.",
+        "meta": "Prüfverfahren · {{link}}",
+        "note": "Im Beschaffungsprojekt ergibt sich Ja oder Nein aus dem Prüfnachweis des Produkts. Im Abgleich mit Kriterien zählt dieses Kriterium nicht mit, weil der Prüfstatus dort schon unter „Auf Barrierefreiheit geprüft“ steht."
+      },
+      "note": "Ihre Notiz zu diesem Kriterium (optional)"
+    },
+    "priority": {
+      "A": "A – Mindestanforderung",
+      "B": "B – Bewertungskriterium",
+      "Info": "Hinweis",
+      "weight": "Gewichtung {{weight}}",
+      "why": "Warum diese Priorität?",
+      "rationale": "{{rationale}}",
+      "rule": {
+        "full": "Diese Empfehlung gilt für {{appType}} mit dem Verwendungszweck {{useCase}}.",
+        "appType": "Diese Empfehlung gilt für {{appType}}, unabhängig vom Verwendungszweck.",
+        "useCase": "Diese Empfehlung gilt für den Verwendungszweck {{useCase}}, unabhängig vom Anwendungstyp.",
+        "default": "Das ist die allgemeine Empfehlung für alle Anwendungstypen."
+      },
+      "source": {
+        "expert": "Grundlage: Empfehlung des Projektteams WERTE.IT (fachliche Einschätzung, keine Vorgabe aus einer Norm)."
+      },
+      "change": "Priorität ändern",
+      "button": "Priorität: {{level}}",
+      "changed": "Priorität geändert auf {{level}}.",
+      "changeLabel": "Priorität für dieses Kriterium",
+      "overridden": "Von Ihnen geändert. Empfohlen war: {{recommended}}.",
+      "reset": "Empfehlung wiederherstellen"
     }
   },
   "testType": {
