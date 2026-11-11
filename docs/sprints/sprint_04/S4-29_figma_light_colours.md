@@ -1,7 +1,7 @@
 # S4-29 — Figma light colours pinned in the theme
 
 > **Sprint:** 04, P0 task S4-29 (general debt, 1 point; added 2026-11-11). **Issues:** #240 (light part; the issue stays open for the dark part). **Requirements / invariants:** R-SET-03 (development part), SPEC §7.5; A11Y-01 and A11Y-08 stay `active` and green; no invariant flipped, no new TESTING version.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #267 open.
 > **Scope:** the light value of every `--mat-sys-*` role of Handoff §1.2 pinned in `theme.scss` with `mat.theme-overrides`; an E2E test that compares the resolved light values with the Handoff table; the sprint documents of the S4-29 amendment (renumbered decision, order after S10). Not in scope: the dark values (O-S5), roles §1.2 does not list, the high-contrast design (Handoff H2).
 > **Owner decisions (2026-11-11):** **O-S4-22** (added as O-S4-7) — pin the light values of Handoff §1.2 now, the dark appearance stays generated until the Figma dark mode and its review (O-S5); with the planning defaults „as recommended“: (1) renumber to O-S4-22, because S4-03 already used O-S4-7; (2) S4-29 runs after S4-13 and before S4-14, because S10 was already merged; (3) the pinned values give way to the high-contrast override; (4) the P0 heading of SPRINT_04 says 50 points.
 
