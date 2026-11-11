@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v17 (10. November 2026) – v17 schlägt Texte für die Lücken aus Issue #181 vor (Sprint 04, S4-02): Einzahl- und Nullformen, Seitentitel-Varianten, Texte zu den Problemtypen, Grund am nicht verfügbaren Button „Konto endgültig löschen“, weiche Trennzeichen in zwei rechtlichen Titeln, Name des Konto-Buttons, Text der Vorschlags-E-Mail ohne kodierte Zeilenumbrüche. Dazu zwei Texte für S10 aus der Planung von S4-11: Grund für einen Ausschluss durch einen Funktionsbereich und der zweite Satz des Hinweises in Schritt 2 als eigener Schlüssel. **Alle neuen und geänderten Texte (U86–U89, U91–U96, U98, U99) sind Vorschläge**, bis der Product Owner sie im Pull Request bestätigt oder ändert (O-S4-4). v16 (9. November 2026) – v16 gibt dem Zusatz „(öffnet eine externe Seite)“ des Links „Kriterium vorschlagen“ einen eigenen Schlüssel (Sprint 03, S3-21). v15 (2. November 2026) – v15 schreibt die Seitentitel der Fehlerseiten aus und gibt der Startseite einen eigenen Titelschlüssel (Sprint 02, S2-16). v14 – Ergebnis von Phase 2, Schritt 7b („UX copy for key flows“) aus `ai_development_process.md`, angepasst an `ARCHITECTURE_v11.md` und ergänzt um die Texte aus dem Design-Review (7e, `design_critique_procureaccess_v1.md`) und der Barrierefreiheitsprüfung (7f, `accessibility_review_procureaccess_v1.md`), ergänzt um die nachgereichten Screens S40, S35 (Schritt 2), S42, S53 und S37 sowie um die Review-Punkte 1–6 vom 6. Oktober 2026 (Anwendungstypen, Funktionsbereiche, Verwendungszweck, Prüfverfahren, Ausschlussregeln, Kriterien aus BIT inklusiv) und die Nachträge desselben Tages (Überblick eines Produkts im Projekt, Erklärung der Bewertungsstufen, Filterreihenfolge in S40) sowie um die Texte aus Design-Review 2 (`design_critique_procureaccess_v2.md`), Barrierefreiheitsprüfung 2 (`accessibility_review_procureaccess_v2.md`) und den Mobile-first-Screens (12. Oktober 2026) sowie um die Korrekturen aus der Konsistenzprüfung vor SPEC_v1 und aus dem Architektur-Review (12. Oktober 2026) sowie um die Entscheidungen vom 13. Oktober 2026 (Anmeldemodell, Kriterienliste anpassen, Sitzungsdauer) und um die Projektübersicht S32 sowie um die Entscheidungen D1–D7 und die Befunde aus der Prüfung der Hauptdokumente (`pruefung_hauptdokumente_v1.md`, 13. Oktober 2026) sowie um die Texte aus der Feature-Spezifikation (`SPEC_v1.md` §14, 15. Oktober 2026); v14 übernimmt die Bestätigung der Vorschläge vom 19. Oktober 2026 (`SPEC_v2.md` SD19–SD23). Ersetzt v13. Enthält als Grundlage zusätzlich das Screen- und Komponenteninventar (Ersatz für den verschlankten Schritt 7a).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v17):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.8), `ARCHITECTURE_v27.md`, `TESTING_v39.md`, `design_handoff_procureaccess_v1.md` (1.15), `figma_code_mapping_procureaccess_v1.md` (1.15), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v17 (10. November 2026) – v17 schließt die Lücken aus Issue #181 (Sprint 04, S4-02): Einzahl- und Nullformen, Seitentitel-Varianten, Texte zu den Problemtypen, Grund am nicht verfügbaren Button „Konto endgültig löschen“, weiche Trennzeichen in zwei rechtlichen Titeln, Name des Konto-Buttons, Text der Vorschlags-E-Mail ohne kodierte Zeilenumbrüche. Dazu zwei Texte für S10 aus der Planung von S4-11: Grund für einen Ausschluss durch einen Funktionsbereich und der zweite Satz des Hinweises in Schritt 2 als eigener Schlüssel. Der Product Owner hat alle neuen und geänderten Texte (U86–U89, U91–U96, U98, U99) am 11. November 2026 unverändert bestätigt (O-S4-4). v16 (9. November 2026) – v16 gibt dem Zusatz „(öffnet eine externe Seite)“ des Links „Kriterium vorschlagen“ einen eigenen Schlüssel (Sprint 03, S3-21). v15 (2. November 2026) – v15 schreibt die Seitentitel der Fehlerseiten aus und gibt der Startseite einen eigenen Titelschlüssel (Sprint 02, S2-16). v14 – Ergebnis von Phase 2, Schritt 7b („UX copy for key flows“) aus `ai_development_process.md`, angepasst an `ARCHITECTURE_v11.md` und ergänzt um die Texte aus dem Design-Review (7e, `design_critique_procureaccess_v1.md`) und der Barrierefreiheitsprüfung (7f, `accessibility_review_procureaccess_v1.md`), ergänzt um die nachgereichten Screens S40, S35 (Schritt 2), S42, S53 und S37 sowie um die Review-Punkte 1–6 vom 6. Oktober 2026 (Anwendungstypen, Funktionsbereiche, Verwendungszweck, Prüfverfahren, Ausschlussregeln, Kriterien aus BIT inklusiv) und die Nachträge desselben Tages (Überblick eines Produkts im Projekt, Erklärung der Bewertungsstufen, Filterreihenfolge in S40) sowie um die Texte aus Design-Review 2 (`design_critique_procureaccess_v2.md`), Barrierefreiheitsprüfung 2 (`accessibility_review_procureaccess_v2.md`) und den Mobile-first-Screens (12. Oktober 2026) sowie um die Korrekturen aus der Konsistenzprüfung vor SPEC_v1 und aus dem Architektur-Review (12. Oktober 2026) sowie um die Entscheidungen vom 13. Oktober 2026 (Anmeldemodell, Kriterienliste anpassen, Sitzungsdauer) und um die Projektübersicht S32 sowie um die Entscheidungen D1–D7 und die Befunde aus der Prüfung der Hauptdokumente (`pruefung_hauptdokumente_v1.md`, 13. Oktober 2026) sowie um die Texte aus der Feature-Spezifikation (`SPEC_v1.md` §14, 15. Oktober 2026); v14 übernimmt die Bestätigung der Vorschläge vom 19. Oktober 2026 (`SPEC_v2.md` SD19–SD23). Ersetzt v13. Enthält als Grundlage zusätzlich das Screen- und Komponenteninventar (Ersatz für den verschlankten Schritt 7a).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v17):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.8), `ARCHITECTURE_v31.md`, `TESTING_v42.md`, `design_handoff_procureaccess_v1.md` (1.16), `figma_code_mapping_procureaccess_v1.md` (1.17), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -18,24 +18,24 @@
 
 ### Änderungen gegenüber v16
 
-Quelle: Issue #181 (TECH_DEBT_v3 §6, TD-15) mit den offenen Punkten aus Sprint 02 und 03. „Vorschlag (S4-02)“ heißt: Der Text ist von Claude formuliert und gilt erst, wenn der Product Owner ihn im Pull Request bestätigt. In den Tabellen von §5 und §6 steht dasselbe in der Spalte „Hinweis“.
+Quelle: Issue #181 (TECH_DEBT_v3 §6, TD-15) mit den offenen Punkten aus Sprint 02 und 03. Die Texte hat Claude formuliert; der Product Owner hat sie am 11. November 2026 unverändert bestätigt (O-S4-4). U98 und U99 kamen aus der Planung von S4-11 dazu. In den Tabellen von §5 und §6 nennt die Spalte „Hinweis“ die Änderungszeile.
 
 | # | Änderung | Warum so | Anlass |
 |---|---|---|---|
-| U86 | **Einzahl** (`.one`) für die 18 Zeilen mit Anzahl ohne Einzahl: `common.loaded`, `common.results.shown`, `criteria.list.summary.count`, `criteria.list.copy.notCarried`, `criteria.export.scope`, `projects.detail.criteriaAdded`, `candidate.overview.directory.linked`, `candidate.evidence.list.statusChange`, `directory.results` und die acht `signals.fulfillment.*` (§5.0, §5.5, §5.6, §5.8, §5.10, §5.11) | Derselbe Satz mit Substantiv und Verb in der Einzahl; die Zahl als Ziffer „1“ wie in `errors.summary.title.one`. Ausnahme `candidate.evidence.list.statusChange.one` ohne Zahl, weil „Ihr 1 Prüfnachweis“ holpert. **Vorschlag (S4-02)** | S2-12 P1, F2 |
-| U87 | **Nullform** (`.zero`) nur, wo die Anzahl 0 vorkommt und der Text ein Satz ist: `common.loaded`, `common.results.shown`, `directory.results`, `candidate.overview.directory.linked`, `projects.detail.meta` | „Kein Produkt gefunden.“ ist leichter zu hören als „0 Produkte gefunden.“ Die Zählwerte von K1 behalten die Ziffer 0, weil SIG-08 immer alle Werte als Zahl in fester Reihenfolge zeigt. **Vorschlag (S4-02)** | S2-12 P1 |
-| U88 | **„/“- und Hinweisformen als eigene Schlüssel:** `directory.result.useCaseLine`, `.vendorEntries`, `.independentEntries`, `.reports` (§5.10), `projects.detail.meta` und neu `projects.detail.row.tested.evidences` (§5.8) mit `.one` und, wo v16 eine Form für 0 hatte, `.zero` | Wortlaut aus v16, nur auf Schlüssel verteilt, damit der Code nach SD25 wählen kann. **Vorschlag (S4-02)** | S2-12 P1 |
-| U89 | `directory.product.entryCount` (§5.10) **entfällt**; die Zeile auf S41 besteht aus `directory.result.vendorEntries`, `.independentEntries` und `.reports` wie in S40 | Der Text hatte drei Anzahlen in einem Satz, ließ sich also nicht nach einer Anzahl in Einzahl oder Mehrzahl setzen; S40 sagt dieselben Fakten schon mit eigenen Schlüsseln je Anzahl. **Vorschlag (S4-02)** | S2-12 P1 |
+| U86 | **Einzahl** (`.one`) für die 18 Zeilen mit Anzahl ohne Einzahl: `common.loaded`, `common.results.shown`, `criteria.list.summary.count`, `criteria.list.copy.notCarried`, `criteria.export.scope`, `projects.detail.criteriaAdded`, `candidate.overview.directory.linked`, `candidate.evidence.list.statusChange`, `directory.results` und die acht `signals.fulfillment.*` (§5.0, §5.5, §5.6, §5.8, §5.10, §5.11) | Derselbe Satz mit Substantiv und Verb in der Einzahl; die Zahl als Ziffer „1“ wie in `errors.summary.title.one`. Ausnahme `candidate.evidence.list.statusChange.one` ohne Zahl, weil „Ihr 1 Prüfnachweis“ holpert. | S2-12 P1, F2 |
+| U87 | **Nullform** (`.zero`) nur, wo die Anzahl 0 vorkommt und der Text ein Satz ist: `common.loaded`, `common.results.shown`, `directory.results`, `candidate.overview.directory.linked`, `projects.detail.meta` | „Kein Produkt gefunden.“ ist leichter zu hören als „0 Produkte gefunden.“ Die Zählwerte von K1 behalten die Ziffer 0, weil SIG-08 immer alle Werte als Zahl in fester Reihenfolge zeigt. | S2-12 P1 |
+| U88 | **„/“- und Hinweisformen als eigene Schlüssel:** `directory.result.useCaseLine`, `.vendorEntries`, `.independentEntries`, `.reports` (§5.10), `projects.detail.meta` und neu `projects.detail.row.tested.evidences` (§5.8) mit `.one` und, wo v16 eine Form für 0 hatte, `.zero` | Wortlaut aus v16, nur auf Schlüssel verteilt, damit der Code nach SD25 wählen kann. | S2-12 P1 |
+| U89 | `directory.product.entryCount` (§5.10) **entfällt**; die Zeile auf S41 besteht aus `directory.result.vendorEntries`, `.independentEntries` und `.reports` wie in S40 | Der Text hatte drei Anzahlen in einem Satz, ließ sich also nicht nach einer Anzahl in Einzahl oder Mehrzahl setzen; S40 sagt dieselben Fakten schon mit eigenen Schlüsseln je Anzahl. | S2-12 P1 |
 | U90 | §5: Datei `public/i18n/de.json` statt `src/assets/i18n/de.json`. §7: Regel für Einzahl und Nullform (SD25) und für Schlüssel, die mit einem anderen Schlüssel mit Text beginnen (Name mit Punkt in `de.json`). §8: O9 erledigt | Keine Textänderung; beschreibt den Stand des Codes (S2-12, S2-13) | S2-12 P1, S2-13 P1 |
-| U91 | **Seitentitel:** `pageTitle.criteria.list` „Ihre Kriterienliste“ und neu `pageTitle.criteria.list.saved` „{{name}} – Gespeicherte Kriterienlisten“; `pageTitle.publish` „Eintrag veröffentlichen – {{product}}“ und neu `pageTitle.publish.step` „Schritt {{n}} von 4: {{step}} – Eintrag veröffentlichen – {{product}}“ (§5.16) | Ein Schlüssel je Variante. Ohne gespeicherte Liste und mit Stepper Wortlaut aus v16; die gespeicherte Liste folgt der Regel von §5.16 (vom Speziellen zum Allgemeinen) wie `pageTitle.project` und ordnet sich unter S14 ein. **Vorschlag (S4-02)** | S2-16 P2 |
-| U92 | **Problemtypen:** neue Texte `errors.antiforgery` (§6.2), `criteria.select.error.excluded` (§5.4, `selection-excluded`), `publish.error.profileMismatch` (§5.9), `vendor.error.withdrawn` (§5.13); neuer Abschnitt §6.3 ordnet jedem Problemtyp aus SPEC §8.6 einen Text zu; `locked-criteria-list`, `test-status-unknown`, `no-criteria-list` und `release-mismatch` nutzen bestehende Texte | Jeder Text sagt nach G5, was passiert ist, warum und was Sie tun können; bestehende Texte, wo der Screen den Fall schon erklärt (z. B. `projects.detail.criteriaLocked` für R-PRJ-04). **Vorschlag (S4-02)** | S2-11 P1, S3-20a P3 |
-| U93 | **Grund am nicht verfügbaren Button** „Konto endgültig löschen“: `account.delete.confirm.unavailable` (§5.14) | Nennt die Bedingung, die der Button prüft (genaue Übereinstimmung, auch Groß- und Kleinschreibung), statt nur „nicht verfügbar“; sichtbar nach CLAUDE §9 (`aria-disabled` mit Grund). **Vorschlag (S4-02)** | S2-01 P3 |
-| U94 | **Weiches Trennzeichen** (U+00AD) in `legal.privacy.title` (zwischen „Datenschutz“ und „hinweise“) und `legal.accessibility.title` (zwischen „Barriere“ und „freiheit“) (§5.19); `legal.imprint.title` bleibt | Browser trennen sonst „Datenschutzhin-weise“ (Chromium) oder „Datenschutzhinwei-se“ (Firefox) bei 320 px; an der Wortfuge bleibt das Wort lesbar. Das Zeichen ist unsichtbar und wird nicht vorgelesen; die Seitentitel (§5.16) bekommen es nicht. **Vorschlag (S4-02)** | S2-18 P3 |
-| U95 | **Konto-Button:** `shell.userMenu.label` „Konto, angemeldet als {{displayName}}“ statt „Menü für {{displayName}}“ (§5.1) | Der Name beginnt mit dem sichtbaren Text „Konto“, also findet ihn auch die Sprachsteuerung (WCAG 2.5.3); der Anzeigename bleibt hörbar. Dass ein Menü folgt, sagt `aria-haspopup="menu"` (Handoff §3.1). **Vorschlag (S4-02)** | S2-15 P4 |
-| U96 | **Vorschlags-E-Mail:** `suggest.mailBody` ohne `%0A%0A`, die Aufforderung steht im neuen Schlüssel `suggest.mailBody.prompt`; die Leerzeile dazwischen setzt der Code (§5.15) | Eine Tabellenzelle kann keinen Zeilenumbruch enthalten, und `check-i18n.mjs --write` übernimmt Texte zeichengenau: `%0A` oder `\n` stünden als Zeichen in `de.json`. Zwei Sätze ohne Steuerzeichen lassen sich prüfen und übersetzen. **Vorschlag (S4-02)** | S3-21 P1 |
+| U91 | **Seitentitel:** `pageTitle.criteria.list` „Ihre Kriterienliste“ und neu `pageTitle.criteria.list.saved` „{{name}} – Gespeicherte Kriterienlisten“; `pageTitle.publish` „Eintrag veröffentlichen – {{product}}“ und neu `pageTitle.publish.step` „Schritt {{n}} von 4: {{step}} – Eintrag veröffentlichen – {{product}}“ (§5.16) | Ein Schlüssel je Variante. Ohne gespeicherte Liste und mit Stepper Wortlaut aus v16; die gespeicherte Liste folgt der Regel von §5.16 (vom Speziellen zum Allgemeinen) wie `pageTitle.project` und ordnet sich unter S14 ein. | S2-16 P2 |
+| U92 | **Problemtypen:** neue Texte `errors.antiforgery` (§6.2), `criteria.select.error.excluded` (§5.4, `selection-excluded`), `publish.error.profileMismatch` (§5.9), `vendor.error.withdrawn` (§5.13); neuer Abschnitt §6.3 ordnet jedem Problemtyp aus SPEC §8.6 einen Text zu; `locked-criteria-list`, `test-status-unknown`, `no-criteria-list` und `release-mismatch` nutzen bestehende Texte | Jeder Text sagt nach G5, was passiert ist, warum und was Sie tun können; bestehende Texte, wo der Screen den Fall schon erklärt (z. B. `projects.detail.criteriaLocked` für R-PRJ-04). | S2-11 P1, S3-20a P3 |
+| U93 | **Grund am nicht verfügbaren Button** „Konto endgültig löschen“: `account.delete.confirm.unavailable` (§5.14) | Nennt die Bedingung, die der Button prüft (genaue Übereinstimmung, auch Groß- und Kleinschreibung), statt nur „nicht verfügbar“; sichtbar nach CLAUDE §9 (`aria-disabled` mit Grund). | S2-01 P3 |
+| U94 | **Weiches Trennzeichen** (U+00AD) in `legal.privacy.title` (zwischen „Datenschutz“ und „hinweise“) und `legal.accessibility.title` (zwischen „Barriere“ und „freiheit“) (§5.19); `legal.imprint.title` bleibt | Browser trennen sonst „Datenschutzhin-weise“ (Chromium) oder „Datenschutzhinwei-se“ (Firefox) bei 320 px; an der Wortfuge bleibt das Wort lesbar. Das Zeichen ist unsichtbar und wird nicht vorgelesen; die Seitentitel (§5.16) bekommen es nicht. | S2-18 P3 |
+| U95 | **Konto-Button:** `shell.userMenu.label` „Konto, angemeldet als {{displayName}}“ statt „Menü für {{displayName}}“ (§5.1) | Der Name beginnt mit dem sichtbaren Text „Konto“, also findet ihn auch die Sprachsteuerung (WCAG 2.5.3); der Anzeigename bleibt hörbar. Dass ein Menü folgt, sagt `aria-haspopup="menu"` (Handoff §3.1). | S2-15 P4 |
+| U96 | **Vorschlags-E-Mail:** `suggest.mailBody` ohne `%0A%0A`, die Aufforderung steht im neuen Schlüssel `suggest.mailBody.prompt`; die Leerzeile dazwischen setzt der Code (§5.15) | Eine Tabellenzelle kann keinen Zeilenumbruch enthalten, und `check-i18n.mjs --write` übernimmt Texte zeichengenau: `%0A` oder `\n` stünden als Zeichen in `de.json`. Zwei Sätze ohne Steuerzeichen lassen sich prüfen und übersetzen. | S3-21 P1 |
 | U97 | Kopf: aktuelle Fassungen der zugehörigen Dokumente; die bisherige Liste heißt „Grundlage (v14)“ | Keine Textänderung | TECH_DEBT_v3 TD-37 |
-| U98 | **Grund für einen Ausschluss durch einen Funktionsbereich:** neu `criteria.select.excluded.productPart` „Passt nicht zum Funktionsbereich {{productParts}}“ (§5.4). Schließen zusätzlich der Verwendungszweck oder ein Anwendungstyp aus, steht deren Grund (`.useCase`, `.appType` oder `.both`) in einer eigenen Zeile davor | Ein Funktionsbereich kann Prüfverfahren ausschließen (SPEC §8.1: `excludedBy[].layer` = `productPart`; Testrelease `T.1`: Audio schließt den BIT inklusiv Software-Test aus), v16 hatte dafür keinen Grund. Eigene Zeile statt weiterer Kombinationsschlüssel: Kriterienkatalog §3.2 verlangt, dass der Grund alle Auslöser nennt, und drei Schichten ergäben sonst vier Kombinationen. **Vorschlag (S4-11-Planung)** | Planung S4-11, Owner-Entscheidung 2026-11-11 |
-| U99 | **Hinweis in Schritt 2 geteilt:** `criteria.select.step2.hint` behält nur den ersten Satz; der zweite Satz steht unverändert im neuen Schlüssel `criteria.select.step2.hint.excluded` (§5.4) | v16 hielt beide Sätze in einem Schlüssel, der zweite soll aber nur erscheinen, wenn ein Anwendungstyp ausgeschlossen ist; der Wortlaut bleibt gleich. **Vorschlag (S4-11-Planung)** | S4-10 P2, Owner-Entscheidung 2026-11-11 |
+| U98 | **Grund für einen Ausschluss durch einen Funktionsbereich:** neu `criteria.select.excluded.productPart` „Passt nicht zum Funktionsbereich {{productParts}}“ (§5.4). Schließen zusätzlich der Verwendungszweck oder ein Anwendungstyp aus, steht deren Grund (`.useCase`, `.appType` oder `.both`) in einer eigenen Zeile davor | Ein Funktionsbereich kann Prüfverfahren ausschließen (SPEC §8.1: `excludedBy[].layer` = `productPart`; Testrelease `T.1`: Audio schließt den BIT inklusiv Software-Test aus), v16 hatte dafür keinen Grund. Eigene Zeile statt weiterer Kombinationsschlüssel: Kriterienkatalog §3.2 verlangt, dass der Grund alle Auslöser nennt, und drei Schichten ergäben sonst vier Kombinationen. | Planung S4-11, Owner-Entscheidung 2026-11-11 |
+| U99 | **Hinweis in Schritt 2 geteilt:** `criteria.select.step2.hint` behält nur den ersten Satz; der zweite Satz steht unverändert im neuen Schlüssel `criteria.select.step2.hint.excluded` (§5.4) | v16 hielt beide Sätze in einem Schlüssel, der zweite soll aber nur erscheinen, wenn ein Anwendungstyp ausgeschlossen ist; der Wortlaut bleibt gleich. | S4-10 P2, Owner-Entscheidung 2026-11-11 |
 
 `pageTitle.notFound` / `.forbidden` / `.server` aus Issue #181 sind seit v15 ausgeschrieben (U83); v17 ändert sie nicht.
 
@@ -398,8 +398,8 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `common.optional` | Feldzusatz | (optional) | Pflichtfelder werden nicht markiert, optionale schon – weniger Sternchen, besser hörbar |
 | `common.loading` | Ladeanzeige (Ansage) | Wird geladen … | per Live-Region, höchstens einmal |
 | `common.loaded` | Ansage | {{count}} Ergebnisse geladen. | |
-| `common.loaded.one` | Ansage (Einzahl) | 1 Ergebnis geladen. | Vorschlag (S4-02, U86) |
-| `common.loaded.zero` | Ansage (keine Ergebnisse) | Keine Ergebnisse geladen. | Vorschlag (S4-02, U87) |
+| `common.loaded.one` | Ansage (Einzahl) | 1 Ergebnis geladen. | U86 |
+| `common.loaded.zero` | Ansage (keine Ergebnisse) | Keine Ergebnisse geladen. | U87 |
 | `common.date.published` | Label | Veröffentlicht am {{date}} | |
 | `common.catalogRelease` | Label | Katalogversion {{release}} | |
 | `common.yes` / `common.no` | Wert | Ja / Nein | |
@@ -410,8 +410,8 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `common.date.hint` | Hint unter Datumsfeldern | Format: TT.MM.JJJJ, zum Beispiel {{example}} | Beispiel = heutiges Datum, lokalisiert |
 | `common.date.openCalendar` | Name des Kalender-Buttons | Kalender öffnen | `mat-datepicker-toggle`; Texteingabe bleibt möglich |
 | `common.results.shown` | Ansage nach Suche oder Filter | {{count}} Kriterien angezeigt. | Live-Region, polite, gedrosselt |
-| `common.results.shown.one` | Ansage (Einzahl) | 1 Kriterium angezeigt. | Vorschlag (S4-02, U86) |
-| `common.results.shown.zero` | Ansage (keine Treffer) | Keine Kriterien angezeigt. | Vorschlag (S4-02, U87); sichtbar steht dann `criteria.list.emptyFilter` |
+| `common.results.shown.one` | Ansage (Einzahl) | 1 Kriterium angezeigt. | U86 |
+| `common.results.shown.zero` | Ansage (keine Treffer) | Keine Kriterien angezeigt. | U87; sichtbar steht dann `criteria.list.emptyFilter` |
 | `common.multiSelect.hint` | Supporting text an Mehrfachauswahl-Feldern | Mehrfachauswahl möglich | U30; S40 Anwendungstyp und Prüfverfahren; unter 600 px stattdessen im Filterbereich `directory.filter.hint.mobile` |
 | `common.newTab` | Unsichtbarer Zusatz an Links, die in einem neuen Tab öffnen | (öffnet in neuem Tab) | U32; als `cdk-visually-hidden`-Text am Linkende, nicht als `title` |
 | `common.stepper.done` | Unsichtbarer Zusatz an erledigten Schritten | erledigt | U14; Häkchen-Symbol ist `aria-hidden` |
@@ -434,7 +434,7 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `shell.nav.account` | Menü | Konto | |
 | `shell.nav.login` | Button | Anmelden | |
 | `shell.nav.logout` | Menü | Abmelden | |
-| `shell.userMenu.label` | `aria-label` des Buttons „Konto“ (`shell.nav.account`) | Konto, angemeldet als {{displayName}} | Vorschlag (S4-02, U95); beginnt mit dem sichtbaren Text (WCAG 2.5.3) |
+| `shell.userMenu.label` | `aria-label` des Buttons „Konto“ (`shell.nav.account`) | Konto, angemeldet als {{displayName}} | U95; beginnt mit dem sichtbaren Text (WCAG 2.5.3) |
 | `shell.org.active` | Anzeige | Organisation: {{name}} | bei mehreren Mitgliedschaften als Auswahl |
 | `shell.org.switch` | `aria-label` | Organisation wechseln | |
 | `shell.footer.about` | Link | Über ProcureAccess | |
@@ -541,13 +541,13 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | **Schritt 2 – Anwendungstyp** | | | |
 | `criteria.select.step2.name` | Schrittname | Anwendungstyp | |
 | `criteria.select.step2.question` | H2 / `legend` | Was möchten Sie beschaffen? | Checkbox-Gruppe |
-| `criteria.select.step2.hint` | Hint | Wählen Sie alle Anwendungstypen, die zutreffen. | Vorschlag (S4-11-Planung, U99): nur noch der erste Satz |
-| `criteria.select.step2.hint.excluded` | Zweiter Satz des Hints | Einige passen nicht zum gewählten Verwendungszweck und lassen sich deshalb nicht auswählen. | Vorschlag (S4-11-Planung, U99); nur, wenn mindestens ein Anwendungstyp ausgeschlossen ist; direkt nach `criteria.select.step2.hint` |
+| `criteria.select.step2.hint` | Hint | Wählen Sie alle Anwendungstypen, die zutreffen. | U99: nur noch der erste Satz |
+| `criteria.select.step2.hint.excluded` | Zweiter Satz des Hints | Einige passen nicht zum gewählten Verwendungszweck und lassen sich deshalb nicht auswählen. | U99; nur, wenn mindestens ein Anwendungstyp ausgeschlossen ist; direkt nach `criteria.select.step2.hint` |
 | `criteria.select.step2.open.hint` | Hint bei „(offen)“ | Eigene Hilfsmittel wie Screenreader lassen sich verwenden. | |
 | `criteria.select.step2.closed.hint` | Hint bei „Software (geschlossen)“ | Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden, etwa bei Kiosk-Terminals. | EN 301 549, BIT inklusiv „Geschlossene Funktionalität“ |
 | `criteria.select.step2.closedMobile.hint` | Hint bei „Mobile Anwendung (geschlossen)“ | Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden. | |
 | `criteria.select.error.noAppType` | Feldfehler | Bitte wählen Sie mindestens einen Anwendungstyp. | |
-| `criteria.select.error.excluded` | Feldfehler (Server, Problemtyp `selection-excluded`) | Diese Angabe passt nicht zu Ihrer übrigen Auswahl. Bitte ändern Sie sie oder Ihre Auswahl in einem vorherigen Schritt. | Vorschlag (S4-02, U92); nur möglich, wenn eine Auswahl von außen kommt, z. B. über einen alten Link; am Feld, das die Problem Details nennen (SPEC §8.2) |
+| `criteria.select.error.excluded` | Feldfehler (Server, Problemtyp `selection-excluded`) | Diese Angabe passt nicht zu Ihrer übrigen Auswahl. Bitte ändern Sie sie oder Ihre Auswahl in einem vorherigen Schritt. | U92; nur möglich, wenn eine Auswahl von außen kommt, z. B. über einen alten Link; am Feld, das die Problem Details nennen (SPEC §8.2) |
 | **Schritt 3 – Funktionsbereiche** | | | |
 | `criteria.select.step3.name` | Schrittname | Funktionsbereiche | |
 | `criteria.select.step3.question` | H2 / `legend` | Welche Funktionen hat das Produkt? | Checkbox-Gruppe |
@@ -572,7 +572,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.select.excluded.useCase` | Grund unter einer ausgeschlossenen Option | Passt nicht zum Verwendungszweck {{useCase}} | `aria-describedby`; Option `aria-disabled`, fokussierbar |
 | `criteria.select.excluded.appType` | | Passt nicht zum Anwendungstyp {{appTypes}} | mehrere Typen mit „ oder “ verbinden |
 | `criteria.select.excluded.both` | | Passt nicht zum Verwendungszweck {{useCase}} und nicht zum Anwendungstyp {{appTypes}} | |
-| `criteria.select.excluded.productPart` | | Passt nicht zum Funktionsbereich {{productParts}} | Vorschlag (S4-11-Planung, U98); mehrere Funktionsbereiche mit „ oder “ verbinden; schließen auch Verwendungszweck oder Anwendungstyp aus, steht deren Grund (`.useCase`, `.appType`, `.both`) in einer eigenen Zeile davor; beide Zeilen über `aria-describedby` |
+| `criteria.select.excluded.productPart` | | Passt nicht zum Funktionsbereich {{productParts}} | U98; mehrere Funktionsbereiche mit „ oder “ verbinden; schließen auch Verwendungszweck oder Anwendungstyp aus, steht deren Grund (`.useCase`, `.appType`, `.both`) in einer eigenen Zeile davor; beide Zeilen über `aria-describedby` |
 | **Zurücksetzen** | | | |
 | `criteria.select.reset.title` | Titel `pa-notice` (Attention) | Auswahl zurückgesetzt | `role="status"` |
 | `criteria.select.reset.text.useCase` | Text | Sie haben den Verwendungszweck geändert. Ihre Auswahl bei Anwendungstyp, Funktionsbereichen und Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus. | U39; Basisfunktionalität bleibt ausgewählt |
@@ -585,7 +585,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 |---|---|---|---|
 | `criteria.list.title` | H1 | Ihre Kriterienliste | bei gespeicherter Liste: Name der Liste |
 | `criteria.list.summary.count` | Text über der Liste | {{count}} Kriterien für Ihre Auswahl | U28; ersetzt `criteria.list.summary` |
-| `criteria.list.summary.count.one` | Text über der Liste (Einzahl) | 1 Kriterium für Ihre Auswahl | Vorschlag (S4-02, U86) |
+| `criteria.list.summary.count.one` | Text über der Liste (Einzahl) | 1 Kriterium für Ihre Auswahl | U86 |
 | `criteria.list.summary.useCase` | `<dt>` | Verwendungszweck | Wert `<dd>`: Name oder „Keiner davon passt“ |
 | `criteria.list.summary.appTypes` | `<dt>` | Anwendungstyp | Werte mit Komma getrennt |
 | `criteria.list.summary.parts` | `<dt>` | Funktionsbereiche | |
@@ -659,7 +659,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.list.copy.done` | Ansage und Hinweis (`pa-notice` Info) in der neuen Liste | Neue Liste nach Katalogversion {{release}} erstellt. Ihre bisherige Liste bleibt unverändert. | U66 |
 | `criteria.list.copy.dropped` | Teil des Hinweises (nur wenn zutreffend) | Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: {{values}}. | U66; Werte mit Komma |
 | `criteria.list.copy.notCarried` | Teil des Hinweises (nur wenn zutreffend) | Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U66 |
-| `criteria.list.copy.notCarried.one` | Teil des Hinweises (Einzahl) | Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | Vorschlag (S4-02, U86) |
+| `criteria.list.copy.notCarried.one` | Teil des Hinweises (Einzahl) | Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U86 |
 
 ### 5.6 S12–S16 Speichern, Exportieren, Teilen (`criteria.save.`, `criteria.export.`, `criteria.share.`)
 
@@ -678,7 +678,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.export.xlsx` | Option | Excel-Datei (.xlsx) – für Vergabeunterlagen | Vorauswahl |
 | `criteria.export.csv` | Option | CSV-Datei – für andere Programme | |
 | `criteria.export.scope` | Text | Exportiert werden {{count}} Kriterien aus Ihrer Liste mit Priorität, Gewichtung und Ihren Notizen. Nicht aufgenommene Kriterien sind nicht enthalten. | |
-| `criteria.export.scope.one` | Text (Einzahl) | Exportiert wird 1 Kriterium aus Ihrer Liste mit Priorität, Gewichtung und Ihren Notizen. Nicht aufgenommene Kriterien sind nicht enthalten. | Vorschlag (S4-02, U86) |
+| `criteria.export.scope.one` | Text (Einzahl) | Exportiert wird 1 Kriterium aus Ihrer Liste mit Priorität, Gewichtung und Ihren Notizen. Nicht aufgenommene Kriterien sind nicht enthalten. | U86 |
 | `criteria.export.anonymousNote` | Hinweis (nur ohne Anmeldung) | Die Datei enthält Ihre Auswahl und Ihre Änderungen. ProcureAccess speichert davon nichts. Wenn Sie später daran weiterarbeiten möchten, melden Sie sich an und speichern Sie die Liste. | E7; EXP-05 |
 | `criteria.export.releaseNote` | Text | Die Datei nennt die Katalogversion {{release}}. So bleibt später nachvollziehbar, welche Fassung der Kriterien Sie verwendet haben. | EXP-03 |
 | `criteria.export.legalNote` | Hinweis | Kriterien in Vergabeunterlagen können rechtlich verbindlich werden. Prüfen Sie die Liste vor der Übernahme mit der für Ihr Verfahren zuständigen Stelle. | Text durch rechtliche Prüfung bestätigen lassen (⚖️) |
@@ -761,9 +761,9 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `projects.status.label` | Label | Stand | |
 | `projects.status.open` / `.done` / `.archived` | Werte | Laufend / Abgeschlossen / Archiviert | an `ProcurementProject.Status` anpassen |
 | **S32 Projektübersicht** (Figma S32, S32-M) | | | U52 |
-| `projects.detail.meta` | Zeile unter H1 | Stand: {{status}} · {{count}} Produkte · nur für Ihre Organisation sichtbar | `status` = `projects.status.*`; Vorschlag (S4-02, U88) |
-| `projects.detail.meta.one` | Zeile unter H1 (Einzahl) | Stand: {{status}} · 1 Produkt · nur für Ihre Organisation sichtbar | Vorschlag (S4-02, U88) |
-| `projects.detail.meta.zero` | Zeile unter H1 (neues Projekt) | Stand: {{status}} · noch keine Produkte · nur für Ihre Organisation sichtbar | Vorschlag (S4-02, U87) |
+| `projects.detail.meta` | Zeile unter H1 | Stand: {{status}} · {{count}} Produkte · nur für Ihre Organisation sichtbar | `status` = `projects.status.*`; U88 |
+| `projects.detail.meta.one` | Zeile unter H1 (Einzahl) | Stand: {{status}} · 1 Produkt · nur für Ihre Organisation sichtbar | U88 |
+| `projects.detail.meta.zero` | Zeile unter H1 (neues Projekt) | Stand: {{status}} · noch keine Produkte · nur für Ihre Organisation sichtbar | U87 |
 | `projects.detail.edit` | Button (outlined) | Projekt bearbeiten | Name und Stand |
 | `projects.detail.criteria.title` | H2 der Karte | Kriterienliste | |
 | `projects.detail.criteria.adjust` | Button (Text) | Kriterienliste anpassen | → S11 der zugeordneten Liste; bleibt auch nach Einschätzungen verfügbar (C51) |
@@ -775,8 +775,8 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `projects.detail.addProduct.new` | Menüpunkt | Neu erfassen | → S33 |
 | `projects.detail.orderNote` | Text über der Liste | Reihenfolge: zuletzt hinzugefügt zuerst. Die Liste ist kein Ranking – ein Gesamturteil gibt es bewusst nicht. | D3, §8.4 |
 | `projects.detail.row.tested` | `dt` | Auf Barrierefreiheit geprüft | `dd`: `projects.detail.row.tested.evidences` (Ja mit Prüfnachweisen), „Ja“ (ohne Nachweis), „Nein“, „Nicht bekannt“ (U60) |
-| `projects.detail.row.tested.evidences` | `dd` (Ja mit Prüfnachweisen) | Ja – {{count}} Prüfnachweise: {{types}} | Arten der Prüfung mit Komma, z. B. „Ja – 2 Prüfnachweise: BIT inklusiv Software-Test, BIK BITV-Test (Web)“ (U60); Vorschlag (S4-02, U88) |
-| `projects.detail.row.tested.evidences.one` | `dd` (Einzahl) | Ja – 1 Prüfnachweis: {{types}} | Vorschlag (S4-02, U88) |
+| `projects.detail.row.tested.evidences` | `dd` (Ja mit Prüfnachweisen) | Ja – {{count}} Prüfnachweise: {{types}} | Arten der Prüfung mit Komma, z. B. „Ja – 2 Prüfnachweise: BIT inklusiv Software-Test, BIK BITV-Test (Web)“ (U60); U88 |
+| `projects.detail.row.tested.evidences.one` | `dd` (Einzahl) | Ja – 1 Prüfnachweis: {{types}} | U88 |
 | `projects.detail.row.progress` | `dt` | Einschätzung | `dd` = `candidate.assessment.progress` |
 | `projects.detail.row.counts` | `dt` | Abgleich | `dd`: „Erfüllt: {{fulfilled}} · Leichte Einschränkung: {{slightRestriction}} · Einschränkung: {{restriction}} · Barriere: {{barrier}} · Blockade: {{blockade}} · Nicht anwendbar: {{notApplicable}} · Nicht eingeschätzt: {{unknown}}“ (U54) – immer alle sieben Werte, feste Reihenfolge, auch 0; als Liste ausgezeichnet, jedes Element ohne Umbruch (`white-space: nowrap`), Trennzeichen nur per CSS (wie `directory.entry.row.*`); unter 600 px ein Element je Zeile. Beispiel: „Erfüllt: 22 · Leichte Einschränkung: 3 · Einschränkung: 6 · Barriere: 2 · Blockade: 1 · Nicht anwendbar: 2 · Nicht eingeschätzt: 10“ |
 | `projects.detail.row.publication` | `dt` | Veröffentlichung | `dd`: „Im Produktverzeichnis seit {{date}}“ mit Link `projects.detail.lookup`, oder „Nicht veröffentlicht“ (U60) |
@@ -786,7 +786,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `projects.detail.noCriteria.cta` | Button | Kriterienliste zuordnen | |
 | `projects.detail.criteriaLocked` | Hinweis (statt Button „Kriterienliste wechseln“) | Die Kriterienliste kann nicht mehr gegen eine andere ausgetauscht werden, weil schon Produkte danach eingeschätzt wurden. Sie können die Liste aber weiter anpassen: Kriterien aufnehmen oder entfernen, Prioritäten und Notizen ändern. Für eine Liste nach einer neueren Katalogversion legen Sie ein neues Projekt an. | U48, U49, U63; WSP-02, WSP-03; „eingeschätzt“ = mindestens ein Wert außer „Nicht eingeschätzt“ |
 | `projects.detail.criteriaAdded` | Ansage und Hinweis nach dem Aufnehmen von Kriterien | {{count}} Kriterien neu in der Liste. Sie sind bei allen Produkten noch nicht eingeschätzt. | U49; WSP-03 |
-| `projects.detail.criteriaAdded.one` | Ansage und Hinweis (Einzahl) | 1 Kriterium neu in der Liste. Es ist bei allen Produkten noch nicht eingeschätzt. | Vorschlag (S4-02, U86) |
+| `projects.detail.criteriaAdded.one` | Ansage und Hinweis (Einzahl) | 1 Kriterium neu in der Liste. Es ist bei allen Produkten noch nicht eingeschätzt. | U86 |
 | `projects.detail.empty` | Leerzustand | Noch keine Produkte in diesem Projekt. Fügen Sie die Produkte hinzu, die Sie in Betracht ziehen. | |
 | `projects.detail.lookup` | Link im `dd` „Veröffentlichung“ (bei veröffentlichten Produkten) | Im Produktverzeichnis ansehen | U60; Produktname per `aria-describedby`; → S41 |
 | `projects.detail.noResults.werteit` | Hinweis (P1) | Sie finden keine passenden Produkte? Das Projekt WERTE.IT berät Sie gern. | PRD P1 |
@@ -810,8 +810,8 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `candidate.overview.appType` | `dt` | Anwendungstyp | Wert aus der Kriterienliste des Projekts, mehrere mit Komma; ohne Liste „Noch keine Kriterienliste“ |
 | `candidate.overview.directory` | `dt` | Im Produktverzeichnis | |
 | `candidate.overview.directory.linked` | `dd` (Link) | Verknüpft: {{product}} – {{count}} veröffentlichte Einträge ansehen | → S41; ohne Verknüpfung: „Nicht verknüpft“ |
-| `candidate.overview.directory.linked.one` | `dd` (Link, Einzahl) | Verknüpft: {{product}} – 1 veröffentlichten Eintrag ansehen | Vorschlag (S4-02, U86) |
-| `candidate.overview.directory.linked.zero` | `dd` (Link, keine sichtbaren Einträge) | Verknüpft: {{product}} – im Produktverzeichnis ansehen | Vorschlag (S4-02, U87); z. B. wenn alle Einträge zurückgezogen sind |
+| `candidate.overview.directory.linked.one` | `dd` (Link, Einzahl) | Verknüpft: {{product}} – 1 veröffentlichten Eintrag ansehen | U86 |
+| `candidate.overview.directory.linked.zero` | `dd` (Link, keine sichtbaren Einträge) | Verknüpft: {{product}} – im Produktverzeichnis ansehen | U87; z. B. wenn alle Einträge zurückgezogen sind |
 | `candidate.overview.status.title` | H2 | Stand der Bewertung | |
 | `candidate.overview.status.evidence` | H3 | Prüfnachweis | |
 | `candidate.overview.status.tested` | Text | Auf Barrierefreiheit geprüft: {{status}} | Ja / Nein / Nicht bekannt |
@@ -847,7 +847,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `candidate.evidence.list.removed` | Ansage | Prüfnachweis entfernt. | |
 | `candidate.evidence.list.duplicate` | Feldfehler | Für dieses Prüfverfahren gibt es schon einen Prüfnachweis. | WSP-01 |
 | `candidate.evidence.list.statusChange` | Dialog-Text (Wechsel von „Ja“ auf „Nein“ oder „Nicht bekannt“ bei vorhandenen Nachweisen) | Ihre {{count}} Prüfnachweise werden dabei entfernt. Möchten Sie fortfahren? | Buttons „Nachweise entfernen“ / „Abbrechen“ |
-| `candidate.evidence.list.statusChange.one` | Dialog-Text (Einzahl) | Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren? | Vorschlag (S4-02, U86); ohne Zahl, weil „Ihr 1 Prüfnachweis“ holpert |
+| `candidate.evidence.list.statusChange.one` | Dialog-Text (Einzahl) | Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren? | U86; ohne Zahl, weil „Ihr 1 Prüfnachweis“ holpert |
 | `candidate.evidence.qualification` | Label | Ihre Notiz zur Qualifikation der prüfenden Stelle | Teil des privaten Bereichs, mit `candidate.form.privateSection.text`; nur in S34a |
 | **Einschätzung (K6)** | | | |
 | `candidate.assessment.intro` | Text | Schätzen Sie für jedes Kriterium ein, wie gut das Produkt es erfüllt. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. Grundlage können eigene Tests, Prüfberichte oder Angaben des Anbieters sein. Notieren Sie, worauf Sie sich stützen. | |
@@ -915,7 +915,7 @@ Stepper mit vier Schritten. Immer als unabhängige Angabe (E9). Solange der Prü
 | `publish.blocked.noCriteria` | Hinweis vor Schritt 1 (statt Stepper, solange dem Projekt keine Kriterienliste zugeordnet ist) | Bevor Sie veröffentlichen, ordnen Sie dem Projekt eine Kriterienliste zu. Der Eintrag zeigt dann, wie das Produkt diese Kriterien erfüllt. | U63; D2, PUB-14; Button `projects.detail.noCriteria.cta` |
 | `publish.blocked.nextSteps` | Text unter dem Button | Danach folgen: Produkt zuordnen, Inhalt prüfen, Namen wählen, bestätigen. | 7e; ersetzt den deaktivierten Stepper |
 | `publish.error.testStatus` | Feldfehler (Server, falls der Status sich zwischenzeitlich geändert hat) | Bitte wählen Sie Ja oder Nein. „Nicht bekannt“ kann nicht veröffentlicht werden. | SIG-10; Problem Details auf `testStatus`, an der Radio Group in S34a angezeigt |
-| `publish.error.profileMismatch` | Fehler (`pa-notice` Fehler in Schritt 3, Problemtyp `profile-mismatch`) | Dieser Eintrag ist unter einem anderen Beitragsprofil veröffentlicht. Aktualisieren können Sie ihn nur unter diesem Profil. Wenn Sie unter einem anderen Profil veröffentlichen möchten, ziehen Sie die bisherige Veröffentlichung zuerst zurück. | Vorschlag (S4-02, U92); 409 (ARCHITECTURE C55, D3); gilt auch beim Aktualisieren in S55 |
+| `publish.error.profileMismatch` | Fehler (`pa-notice` Fehler in Schritt 3, Problemtyp `profile-mismatch`) | Dieser Eintrag ist unter einem anderen Beitragsprofil veröffentlicht. Aktualisieren können Sie ihn nur unter diesem Profil. Wenn Sie unter einem anderen Profil veröffentlichen möchten, ziehen Sie die bisherige Veröffentlichung zuerst zurück. | U92; 409 (ARCHITECTURE C55, D3); gilt auch beim Aktualisieren in S55 |
 | `publish.step1.name` | Schritt | Produkt zuordnen | |
 | `publish.step1.question` | `legend` | Welches Produkt im Verzeichnis ist gemeint? | |
 | `publish.step1.matches` | Text | Diese Produkte im Verzeichnis haben einen ähnlichen Namen: | Trigram-Treffer (PUB-07) |
@@ -974,22 +974,22 @@ Stepper mit vier Schritten. Immer als unabhängige Angabe (E9). Solange der Prü
 | `directory.filter.source.independent` | Option | Unabhängige Angaben | |
 | `directory.filter.hasReport` | Option | Mit Konformitätsbericht | |
 | `directory.results` | Text über der Ergebnisliste und Ansage | {{count}} Produkte gefunden. | sichtbar und als Live-Region (polite, gedrosselt) |
-| `directory.results.one` | Text und Ansage (Einzahl) | 1 Produkt gefunden. | Vorschlag (S4-02, U86) |
-| `directory.results.zero` | Text und Ansage (keine Treffer) | Kein Produkt gefunden. | Vorschlag (S4-02, U87); wie der Anfang von `directory.empty` |
+| `directory.results.one` | Text und Ansage (Einzahl) | 1 Produkt gefunden. | U86 |
+| `directory.results.zero` | Text und Ansage (keine Treffer) | Kein Produkt gefunden. | U87; wie der Anfang von `directory.empty` |
 | `directory.results.useCaseNote` | Erster Absatz des Hinweises über der Ergebnisliste (`pa-notice` Info, nur bei gewähltem Verwendungszweck) | Gezeigt werden Produkte mit mindestens einem Eintrag für den Verwendungszweck „{{useCase}}“. Einträge ohne Angabe zum Verwendungszweck sind dabei nicht berücksichtigt. | U36, U58; DIR-01; danach im **selben** Hinweis als zweiter Absatz `directory.results.orderNote` (S40-V) |
 | `directory.results.orderNote` | Hinweis über der Ergebnisliste (`pa-notice` Info); bei gewähltem Verwendungszweck zweiter Absatz nach `directory.results.useCaseNote` | Die Reihenfolge richtet sich nur nach Name, Aktualität oder Anzahl der Einträge. Sie sagt nichts darüber aus, wie barrierefrei ein Produkt ist. Ein Gesamturteil gibt es bewusst nicht. | U13; D3, G7 |
 | **Ergebnis `pa-product-result`** | | | nur Fakten, keine Bewertung |
 | `directory.result.vendorLine` | Zeile | Anbieter: {{vendor}} · {{appTypes}} | Anwendungstypen aus den Einträgen, mit Komma getrennt; ohne Angabe nur „Anbieter: {{vendor}}“ |
-| `directory.result.useCaseLine` | Zeile (nur bei gewähltem Verwendungszweck) | {{count}} Einträge für „{{useCase}}“ | U36; Figma S40; Vorschlag (S4-02, U88) |
-| `directory.result.useCaseLine.one` | Zeile (Einzahl) | 1 Eintrag für „{{useCase}}“ | Vorschlag (S4-02, U88); keine Nullform: die Zeile erscheint nur bei mindestens einem Eintrag |
-| `directory.result.vendorEntries` | Teil der Einträge-Zeile | {{count}} Einträge der Anbieterseite | Vorschlag (S4-02, U88) |
-| `directory.result.vendorEntries.one` | Teil der Einträge-Zeile (Einzahl) | 1 Eintrag der Anbieterseite | Vorschlag (S4-02, U88) |
-| `directory.result.vendorEntries.zero` | Teil der Einträge-Zeile (0) | Keine Einträge der Anbieterseite | Vorschlag (S4-02, U88); Wortlaut aus v16 |
-| `directory.result.independentEntries` | Teil der Einträge-Zeile | {{count}} unabhängige Einträge | Vorschlag (S4-02, U88) |
-| `directory.result.independentEntries.one` | Teil der Einträge-Zeile (Einzahl) | 1 unabhängiger Eintrag | Vorschlag (S4-02, U88) |
-| `directory.result.independentEntries.zero` | Teil der Einträge-Zeile (0) | keine unabhängigen Einträge | Vorschlag (S4-02, U88); Wortlaut aus v16, klein, weil der Teil nach einem Komma steht |
-| `directory.result.reports` | Teil der Einträge-Zeile | {{count}} Erfahrungsberichte | bei 0 weglassen; Vorschlag (S4-02, U88) |
-| `directory.result.reports.one` | Teil der Einträge-Zeile (Einzahl) | 1 Erfahrungsbericht | Vorschlag (S4-02, U88) |
+| `directory.result.useCaseLine` | Zeile (nur bei gewähltem Verwendungszweck) | {{count}} Einträge für „{{useCase}}“ | U36; Figma S40; U88 |
+| `directory.result.useCaseLine.one` | Zeile (Einzahl) | 1 Eintrag für „{{useCase}}“ | U88; keine Nullform: die Zeile erscheint nur bei mindestens einem Eintrag |
+| `directory.result.vendorEntries` | Teil der Einträge-Zeile | {{count}} Einträge der Anbieterseite | U88 |
+| `directory.result.vendorEntries.one` | Teil der Einträge-Zeile (Einzahl) | 1 Eintrag der Anbieterseite | U88 |
+| `directory.result.vendorEntries.zero` | Teil der Einträge-Zeile (0) | Keine Einträge der Anbieterseite | U88; Wortlaut aus v16 |
+| `directory.result.independentEntries` | Teil der Einträge-Zeile | {{count}} unabhängige Einträge | U88 |
+| `directory.result.independentEntries.one` | Teil der Einträge-Zeile (Einzahl) | 1 unabhängiger Eintrag | U88 |
+| `directory.result.independentEntries.zero` | Teil der Einträge-Zeile (0) | keine unabhängigen Einträge | U88; Wortlaut aus v16, klein, weil der Teil nach einem Komma steht |
+| `directory.result.reports` | Teil der Einträge-Zeile | {{count}} Erfahrungsberichte | bei 0 weglassen; U88 |
+| `directory.result.reports.one` | Teil der Einträge-Zeile (Einzahl) | 1 Erfahrungsbericht | U88 |
 | `directory.result.updated` | Zeile | Zuletzt veröffentlicht am {{date}} | |
 | `directory.sort.label` | Label | Sortieren nach | Nur Name, Aktualität, Anzahl Einträge – **nie** nach Abgleich (D3, G7) |
 | `directory.sort.name` / `.recent` / `.entries` | Optionen | Name / Zuletzt veröffentlicht / Anzahl der Einträge | auf S41 Vorauswahl „Zuletzt veröffentlicht“ |
@@ -1006,7 +1006,7 @@ Stepper mit vier Schritten. Immer als unabhängige Angabe (E9). Solange der Prü
 | `directory.product.addToProject.title` | Dialog-Titel | Zu welchem Projekt hinzufügen? | Liste der laufenden Projekte |
 | `directory.product.addToProject.done` | Ansage | „{{product}}“ wurde zum Projekt „{{project}}“ hinzugefügt. | |
 | `directory.product.compare.projectCopy` | Option im Vergleich | Kriterienliste des Projekts „{{project}}“ | R-ENT-04 |
-| ~~`directory.product.entryCount`~~ | ~~Text~~ | ~~{{vendorCount}} Einträge der Anbieterseite, {{independentCount}} unabhängige Einträge, {{reportCount}} Erfahrungsberichte~~ | Vorschlag (S4-02, U89): entfällt; die Zeile besteht aus `directory.result.vendorEntries`, `.independentEntries` und `.reports` wie in S40, mit Komma getrennt (E13: Berichte getrennt gezählt) |
+| ~~`directory.product.entryCount`~~ | ~~Text~~ | ~~{{vendorCount}} Einträge der Anbieterseite, {{independentCount}} unabhängige Einträge, {{reportCount}} Erfahrungsberichte~~ | U89: entfällt; die Zeile besteht aus `directory.result.vendorEntries`, `.independentEntries` und `.reports` wie in S40, mit Komma getrennt (E13: Berichte getrennt gezählt) |
 | `directory.product.noVerdict` | Hinweis | Die Einträge zeigen, was Anbieter, Prüfstellen und Nutzende veröffentlicht haben. Ein Gesamturteil gibt es bewusst nicht: Ob ein Produkt für Sie geeignet ist, hängt von Ihren Kriterien ab. | G7, erklärt fehlenden Score |
 | `directory.product.compare.label` | Label (nur angemeldet mit Organisation) | Mit welcher Kriterienliste vergleichen? | Select; Auswahl ruft konfigurationsbezogene Variante auf |
 | `directory.product.compare.none` | Option | Keine – Angaben so anzeigen, wie sie veröffentlicht wurden | öffentliche Variante |
@@ -1123,21 +1123,21 @@ Gemeinsame Liste für S10 Schritt 4, S34a, S55 Schritt 2, Filter S40, K2 und K4.
 | `signals.fulfillment.intro.config` | Text | So wurden die Kriterien Ihrer Liste in diesem Eintrag eingeschätzt: | |
 | `signals.fulfillment.intro.public` | Text | So wurden die Kriterien in diesem Eintrag eingeschätzt: | |
 | `signals.fulfillment.fulfilled` | Begriff + Wert | Erfüllt: {{count}} Kriterien | Reihenfolge fest (SIG-08) |
-| `signals.fulfillment.fulfilled.one` | Einzahl | Erfüllt: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.fulfilled.one` | Einzahl | Erfüllt: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.slightRestriction` | | Leichte Einschränkung: {{count}} Kriterien | |
-| `signals.fulfillment.slightRestriction.one` | Einzahl | Leichte Einschränkung: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.slightRestriction.one` | Einzahl | Leichte Einschränkung: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.restriction` | | Einschränkung: {{count}} Kriterien | |
-| `signals.fulfillment.restriction.one` | Einzahl | Einschränkung: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.restriction.one` | Einzahl | Einschränkung: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.barrier` | | Barriere: {{count}} Kriterien | |
-| `signals.fulfillment.barrier.one` | Einzahl | Barriere: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.barrier.one` | Einzahl | Barriere: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.blockade` | | Blockade: {{count}} Kriterien | |
-| `signals.fulfillment.blockade.one` | Einzahl | Blockade: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.blockade.one` | Einzahl | Blockade: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.notApplicable` | | Nicht anwendbar: {{count}} Kriterien | |
-| `signals.fulfillment.notApplicable.one` | Einzahl | Nicht anwendbar: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.notApplicable.one` | Einzahl | Nicht anwendbar: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.unknown` | | Nicht eingeschätzt: {{count}} Kriterien | |
-| `signals.fulfillment.unknown.one` | Einzahl | Nicht eingeschätzt: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.unknown.one` | Einzahl | Nicht eingeschätzt: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.notCovered` | | Damals nicht im Katalog: {{count}} Kriterien | eigene Zeile, abgesetzt (CAT-04); nur im Produktverzeichnis, nicht im Projekt (U38) |
-| `signals.fulfillment.notCovered.one` | Einzahl | Damals nicht im Katalog: 1 Kriterium | Vorschlag (S4-02, U86); keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
+| `signals.fulfillment.notCovered.one` | Einzahl | Damals nicht im Katalog: 1 Kriterium | U86; keine Nullform: K1 zeigt alle Werte als Zahl (SIG-08) |
 | `signals.fulfillment.notCovered.explain` | Erklärung (direkt sichtbar, wenn Wert > 0) | Diese Kriterien gab es noch nicht, als der Eintrag veröffentlicht wurde. Sie konnten deshalb nicht eingeschätzt werden. Das ist kein Mangel des Produkts. | „nicht Teil des damaligen Katalogs“ (ARCH §5.1) |
 | `signals.fulfillment.unknown.explain` | Erklärung (eingeklappt) | Zu diesen Kriterien hat die veröffentlichende Stelle keine Einschätzung abgegeben. Das heißt nicht, dass das Produkt sie nicht erfüllt. | |
 | `signals.fulfillment.details` | Button | Einschätzung je Kriterium anzeigen | aufklappbare Tabelle Kriterium – Einschätzung – Begründung |
@@ -1262,7 +1262,7 @@ Stepper mit fünf Schritten. ⚖️ = Text vorläufig, abhängig von der gebünd
 | `vendor.republish.title` | H1 (S55 im Modus „aktualisieren“) | Neues Prüfergebnis für {{product}} | |
 | `vendor.republish.intro` | Text | Ihre bisherigen Angaben sind vorausgefüllt. Die neue Fassung ersetzt die bisherige Anzeige; die frühere Fassung bleibt als Version erhalten. | PUB-05, `PublishedEntryVersion` |
 | `vendor.republish.consentNote` | Hinweis in Schritt 4 | ⚖️ Für jede neue Fassung brauchen wir die Zustimmung der auftraggebenden Stelle erneut. Die Angaben aus der letzten Fassung sind nicht vorausgefüllt. | PUB-05, PUB-08; bewusst keine Vorbelegung, damit die Zustimmung aktiv bestätigt wird |
-| `vendor.error.withdrawn` | Fehler (`pa-notice` Fehler, Problemtyp `entry-withdrawn`) | Dieser Eintrag wurde zurückgezogen und kann nicht mehr aktualisiert werden. Veröffentlichen Sie das Prüfergebnis bitte als neuen Eintrag. | Vorschlag (S4-02, U92); 409 beim Aktualisieren (ARCHITECTURE C55) |
+| `vendor.error.withdrawn` | Fehler (`pa-notice` Fehler, Problemtyp `entry-withdrawn`) | Dieser Eintrag wurde zurückgezogen und kann nicht mehr aktualisiert werden. Veröffentlichen Sie das Prüfergebnis bitte als neuen Eintrag. | U92; 409 beim Aktualisieren (ARCHITECTURE C55) |
 
 ### 5.14 S60–S61 Einstellungen und Konto (`settings.`, `account.`)
 
@@ -1293,7 +1293,7 @@ Stepper mit fünf Schritten. ⚖️ = Text vorläufig, abhängig von der gebünd
 | `account.delete.confirm.title` | Dialog-Titel | Konto endgültig löschen? | |
 | `account.delete.confirm.body` | Text | Das lässt sich nicht rückgängig machen. Geben Sie zur Bestätigung Ihre E-Mail-Adresse ein. | |
 | `account.delete.confirm.cta` | Button | Konto endgültig löschen | |
-| `account.delete.confirm.unavailable` | Grund am Button (solange die Eingabe nicht passt) | Das Löschen ist erst möglich, wenn Sie Ihre E-Mail-Adresse genau so eingeben, wie sie in Ihrem Konto steht. | Vorschlag (S4-02, U93); Button `aria-disabled`, fokussierbar, Grund per `aria-describedby` sichtbar darunter (CLAUDE §9) |
+| `account.delete.confirm.unavailable` | Grund am Button (solange die Eingabe nicht passt) | Das Löschen ist erst möglich, wenn Sie Ihre E-Mail-Adresse genau so eingeben, wie sie in Ihrem Konto steht. | U93; Button `aria-disabled`, fokussierbar, Grund per `aria-describedby` sichtbar darunter (CLAUDE §9) |
 | `account.delete.confirm.keep` | Button | Konto behalten | |
 | `account.delete.soleOwner` | Fehler | Sie sind das einzige Mitglied mit der Rolle „Verwalten“ in {{org}}. Geben Sie diese Rolle zuerst einem anderen Mitglied, bevor Sie Ihr Konto löschen. | U74; TEN-11 |
 
@@ -1306,8 +1306,8 @@ Stepper mit fünf Schritten. ⚖️ = Text vorläufig, abhängig von der gebünd
 | `suggest.external` | Visuell ausgeblendeter Zusatz | (öffnet Ihr E-Mail-Programm) | Kanal `mailto:` (U85) |
 | `suggest.external.url` | Visuell ausgeblendeter Zusatz | (öffnet eine externe Seite) | Kanal mit URL (U85) |
 | `suggest.mailSubject` | `mailto`-Betreff | Vorschlag für den Kriterienkatalog | |
-| `suggest.mailBody` | `mailto`-Text, erste Zeile | Mein Vorschlag betrifft das Kriterium: {{criterionKey}} | Kriterium vorbelegen, wenn aus der Liste aufgerufen; Vorschlag (S4-02, U96): ohne `%0A%0A` |
-| `suggest.mailBody.prompt` | `mailto`-Text, nach einer Leerzeile | Bitte beschreiben Sie Ihren Vorschlag: | Vorschlag (S4-02, U96); die Leerzeile setzt der Code, nicht der Text |
+| `suggest.mailBody` | `mailto`-Text, erste Zeile | Mein Vorschlag betrifft das Kriterium: {{criterionKey}} | Kriterium vorbelegen, wenn aus der Liste aufgerufen; U96: ohne `%0A%0A` |
+| `suggest.mailBody.prompt` | `mailto`-Text, nach einer Leerzeile | Bitte beschreiben Sie Ihren Vorschlag: | U96; die Leerzeile setzt der Code, nicht der Text |
 
 Offen: Kontaktadresse bzw. Formular-URL bei WERTE.IT (§8).
 
@@ -1386,8 +1386,8 @@ Die Inhalte liefert WERTE.IT; sie liegen als Markdown im Repository (SPEC_v1 R-S
 | Schlüssel | Element | Text | Hinweis |
 |---|---|---|---|
 | `legal.imprint.title` | H1 | Impressum | |
-| `legal.privacy.title` | H1 | Datenschutz­hinweise | Vorschlag (S4-02, U94): weiches Trennzeichen (U+00AD) zwischen „Datenschutz“ und „hinweise“, unsichtbar |
-| `legal.accessibility.title` | H1 | Erklärung zur Barriere­freiheit | Pflichtseite (BITV); Vorschlag (S4-02, U94): weiches Trennzeichen (U+00AD) zwischen „Barriere“ und „freiheit“, unsichtbar |
+| `legal.privacy.title` | H1 | Datenschutz­hinweise | U94: weiches Trennzeichen (U+00AD) zwischen „Datenschutz“ und „hinweise“, unsichtbar |
+| `legal.accessibility.title` | H1 | Erklärung zur Barriere­freiheit | Pflichtseite (BITV); U94: weiches Trennzeichen (U+00AD) zwischen „Barriere“ und „freiheit“, unsichtbar |
 | `legal.placeholder` | Hinweis (nur außerhalb der Produktion) | Platzhalter: Der Inhalt dieser Seite fehlt noch. | Produktions-Build schlägt fehl (R-SHL-07) |
 
 ---
@@ -1426,13 +1426,13 @@ Fehler werden erst beim Absenden geprüft, nicht beim Tippen. Feldfehler stehen 
 | `errors.server.body` | Text | Das ist ein Fehler bei uns. Ihre Eingaben wurden nicht gespeichert. Bitte versuchen Sie es in einigen Minuten erneut. | |
 | `errors.offline` | Hinweis | Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung. | |
 | `errors.rateLimit` | Hinweis | Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie {{minutes}} Minuten und versuchen Sie es dann erneut. | 429, API-05 |
-| `errors.antiforgery` | Hinweis (`pa-notice` Fehler, Problemtyp `antiforgery`) | Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut. | Vorschlag (S4-02, U92); Button `common.actions.retry`; Ihre Eingaben bleiben erhalten |
+| `errors.antiforgery` | Hinweis (`pa-notice` Fehler, Problemtyp `antiforgery`) | Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut. | U92; Button `common.actions.retry`; Ihre Eingaben bleiben erhalten |
 | `errors.home` | Button | Zur Startseite | |
 | `errors.email.sendFailed` | Hinweis (`pa-notice` Fehler) | Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut. | U72; die Aktion selbst bleibt gespeichert |
 
 ### 6.3 Problemtypen und ihre Texte – neu in v17
 
-Jeder Problemtyp aus SPEC §8.6 hat einen Text (SPEC_v2 v2.8). Bis der Screen eines Problemtyps umgebaut ist, zeigt der Client dafür den allgemeinen Hinweis. Die Zuordnung ist ein Vorschlag (S4-02, U92).
+Jeder Problemtyp aus SPEC §8.6 hat einen Text (SPEC_v2 v2.8). Bis der Screen eines Problemtyps umgebaut ist, zeigt der Client dafür den allgemeinen Hinweis. Die Zuordnung ist ein U92.
 
 | Problemtyp | Schlüssel | Hinweis |
 |---|---|---|

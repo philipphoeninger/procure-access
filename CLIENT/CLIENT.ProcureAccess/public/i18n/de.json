@@ -173,7 +173,7 @@
     "appName": "ProcureAccess",
     "appClaim": "Barrierefreie Software beschaffen",
     "userMenu": {
-      "label": "Menü für {{displayName}}"
+      "label": "Konto, angemeldet als {{displayName}}"
     },
     "org": {
       "active": "Organisation: {{name}}",
@@ -237,7 +237,9 @@
     "no": "Nein",
     "requiredNote": "Alle Felder ohne „(optional)“ müssen ausgefüllt werden.",
     "results": {
-      "shown": "{{count}} Kriterien angezeigt."
+      "shown": "{{count}} Kriterien angezeigt.",
+      "shown.one": "1 Kriterium angezeigt.",
+      "shown.zero": "Keine Kriterien angezeigt."
     },
     "multiSelect": {
       "hint": "Mehrfachauswahl möglich"
@@ -245,7 +247,9 @@
     "newTab": "(öffnet in neuem Tab)",
     "stepper": {
       "done": "erledigt"
-    }
+    },
+    "loaded.one": "1 Ergebnis geladen.",
+    "loaded.zero": "Keine Ergebnisse geladen."
   },
   "auth": {
     "confirm": {
@@ -285,17 +289,18 @@
     "home": "Zur Startseite",
     "email": {
       "sendFailed": "Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut."
-    }
+    },
+    "antiforgery": "Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut."
   },
   "legal": {
     "imprint": {
       "title": "Impressum"
     },
     "privacy": {
-      "title": "Datenschutzhinweise"
+      "title": "Datenschutz­hinweise"
     },
     "accessibility": {
-      "title": "Erklärung zur Barrierefreiheit"
+      "title": "Erklärung zur Barriere­freiheit"
     },
     "placeholder": "Platzhalter: Der Inhalt dieser Seite fehlt noch."
   },
@@ -348,7 +353,8 @@
     "external": "(öffnet Ihr E-Mail-Programm)",
     "external.url": "(öffnet eine externe Seite)",
     "mailSubject": "Vorschlag für den Kriterienkatalog",
-    "mailBody": "Mein Vorschlag betrifft das Kriterium: {{criterionKey}}%0A%0ABitte beschreiben Sie Ihren Vorschlag:"
+    "mailBody": "Mein Vorschlag betrifft das Kriterium: {{criterionKey}}",
+    "mailBody.prompt": "Bitte beschreiben Sie Ihren Vorschlag:"
   },
   "criteria": {
     "select": {
@@ -370,12 +376,13 @@
       },
       "error": {
         "noUseCase": "Bitte wählen Sie einen Verwendungszweck oder „Keiner davon passt“.",
-        "noAppType": "Bitte wählen Sie mindestens einen Anwendungstyp."
+        "noAppType": "Bitte wählen Sie mindestens einen Anwendungstyp.",
+        "excluded": "Diese Angabe passt nicht zu Ihrer übrigen Auswahl. Bitte ändern Sie sie oder Ihre Auswahl in einem vorherigen Schritt."
       },
       "step2": {
         "name": "Anwendungstyp",
         "question": "Was möchten Sie beschaffen?",
-        "hint": "Wählen Sie alle Anwendungstypen, die zutreffen. Einige passen nicht zum gewählten Verwendungszweck und lassen sich deshalb nicht auswählen.",
+        "hint": "Wählen Sie alle Anwendungstypen, die zutreffen.",
         "open": {
           "hint": "Eigene Hilfsmittel wie Screenreader lassen sich verwenden."
         },
@@ -384,7 +391,8 @@
         },
         "closedMobile": {
           "hint": "Eigene Hilfsmittel wie Screenreader lassen sich nicht verwenden."
-        }
+        },
+        "hint.excluded": "Einige passen nicht zum gewählten Verwendungszweck und lassen sich deshalb nicht auswählen."
       },
       "step3": {
         "name": "Funktionsbereiche",
@@ -408,7 +416,8 @@
       "excluded": {
         "useCase": "Passt nicht zum Verwendungszweck {{useCase}}",
         "appType": "Passt nicht zum Anwendungstyp {{appTypes}}",
-        "both": "Passt nicht zum Verwendungszweck {{useCase}} und nicht zum Anwendungstyp {{appTypes}}"
+        "both": "Passt nicht zum Verwendungszweck {{useCase}} und nicht zum Anwendungstyp {{appTypes}}",
+        "productPart": "Passt nicht zum Funktionsbereich {{productParts}}"
       },
       "reset": {
         "title": "Auswahl zurückgesetzt",

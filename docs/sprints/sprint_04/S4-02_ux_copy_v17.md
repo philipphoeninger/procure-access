@@ -1,6 +1,6 @@
 # S4-02 — UX copy v17: proposals for every gap of #181
 
-> **Sprint:** 04, P0 task S4-02 (debt TD-15, 1.5 points). **Issues:** #181. **Requirements / invariants:** CLAUDE §6.5 (UI strings only from the UX copy); SPEC SD25; no invariant activated, no new TESTING version. **Status:** draft pull request by Claude Code (2026-11-10), waiting for the owner's review (O-S4-4).
+> **Sprint:** 04, P0 task S4-02 (debt TD-15, 1.5 points). **Issues:** #181. **Requirements / invariants:** CLAUDE §6.5 (UI strings only from the UX copy); SPEC SD25; no invariant activated, no new TESTING version. **Status:** done — the owner approved every proposal unchanged on 2026-11-11 (O-S4-4); approval commit made, pull request #248 ready to merge.
 > **Scope:** exactly the sprint row: `docs/ux_copy_procureaccess_v17.md` with a proposal for every gap of #181, the problem-type keys in SPEC §8.6 (v2.8; v2.7 was taken by S4-07), and the documents that name them. No change to `de.json`, code, tests or ⚖️ texts.
 > **Owner decisions** (2026-11-10, before the start):
 > 1. **(1a)** The proposals stand in the text tables of §5/§6 and are marked only outside the „Text“ column (change list and „Hinweis“). The draft stays red on `check-i18n.mjs` while it is reviewed. After the owner approves or edits the texts, `node scripts/check-i18n.mjs --write` runs as the last commit of this pull request, so `de.json` changes only with approved texts.
@@ -61,7 +61,7 @@ Every new or changed text carries „Vorschlag (S4-02, U8x/U9x)“ (U98, U99: �
 |---|---|---|
 | `docs/ux_copy_procureaccess_v17.md` (new) | v16 plus the rows of §2.1, the new §6.3 „Problemtypen und ihre Texte“, change list U86–U99, header | The task; U98, U99 from the planning of S4-11 (owner decision 3) |
 | `docs/ux_copy_procureaccess_v15.md` | deleted | Only the two newest versions stay (CLAUDE §2) |
-| `docs/SPEC_v2.md` | v2.8: change row v2.8-1 and a table in §8.6 with the UX key of each problem type; „proposal until O-S4-4“ | Row: „also name them for SPEC §8.6“ |
+| `docs/SPEC_v2.md` | v2.8: change row v2.8-1 and a table in §8.6 with the UX key of each problem type; approved with O-S4-4 | Row: „also name them for SPEC §8.6“ |
 | `CLAUDE.md` | header; §3: `pageTitle` variants split in v17, problem-type keys in SPEC §8.6 / UX copy §6.3 | DoD; the §3 sentence „some rows … still hold variants“ was outdated |
 
 Alternatives considered for the proposals the owner may want to change:
@@ -96,13 +96,14 @@ Alternatives considered for the proposals the owner may want to change:
 | C5 | `node scripts/check-figma-links.mjs` | Passed (2 checked, 24 not built yet, 0 pending) |
 | C6 | `reuse lint` | 1064 / 1064 files compliant |
 | C7 | Build, backend tests, E2E | Not run: no code change |
+| C8 | Approval commit (2026-11-11), after merging `main` | `check-i18n.mjs` 0 errors (158 keys incl. `criteria.select`); `npx ng test` 38 of 38 files pass; e2e type check and ESLint pass; invariant gate and Figma link check pass; `reuse lint` compliant; E2E left to CI |
 
 ## 5. Open points
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | **Approval commit (O-S4-4):** apply the owner's edits to v17, replace „Vorschlag (S4-02, Uxx)“ and „Vorschlag (S4-11-Planung, Uxx)“ in the „Hinweis“ cells by „Uxx“, run `node scripts/check-i18n.mjs --write`; if U94 stays, update the tests that name the legal titles (`legal-page.spec.ts`, `e2e/shell/shell.spec.ts`, `e2e/shell/reflow.spec.ts`; `footer.spec.ts` and `route-change.spec.ts` use the footer link and `<title>`, which keep the plain words) | Last commit of this pull request, after the review |
+| P1 | ~~Approval commit (O-S4-4)~~ **done 2026-11-11:** no edits by the owner; the „Vorschlag“ markers are replaced by the change row, `check-i18n.mjs --write` wrote `de.json` (0 errors), and the tests that name the legal H1s follow U94 (`legal-page.spec.ts` with U+00AD; `e2e/shell/shell.spec.ts` and `reflow.spec.ts` match the part before the soft hyphen, because it is not certain that every browser keeps U+00AD in the accessible name). Before it, `main` was merged in: SPEC v2.7 was taken by S4-07, so the change here is v2.8. UX copy v17 names the current document versions | — |
 | P2 | S11/S35/S41 use the new keys when they are built: `pageTitle` as an `AREAS` root (M2.6d), `translatePlural` for the count rows, `suggest.mailBody` + blank line + `suggest.mailBody.prompt`, `PROBLEM_TYPE_KEYS` from SPEC §8.6 | With the screens (S4-14 – S4-18 and later steps) |
 | P3 | Assumptions the owner may correct in the review: `profile-mismatch` also for the S55 republish (R4); exact e-mail match in U93 (R5); `release-mismatch` = `criteria.export.outdated` | Review of this pull request |
-| P5 | `criteria.select` became an `AREAS` entry of `check-i18n.mjs` with S4-10 (merged after this branch was cut): once this branch takes up `main`, `check-i18n.mjs` is also red on `criteria.select.step2.hint` (shortened, U99), `criteria.select.step2.hint.excluded` and `criteria.select.excluded.productPart` (new) until the approval commit writes them | Approval commit (P1) |
+| P5 | ~~`check-i18n.mjs` red on the U98/U99 keys after taking up `main`~~ done with the approval commit | — |
 | P4 | #181 can be closed with the merge; TECH_DEBT_v3 TD-15 is then done (next TECH_DEBT version at the sprint close-out) | Merge |
