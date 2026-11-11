@@ -80,7 +80,7 @@ test.describe('Appearance', () => {
 
   test('uses the Figma values of Handoff §1.2 in the light appearance', async ({ page }) => {
     const figma = handoffLightColours();
-    expect(Object.keys(figma)).toHaveLength(21);
+    expect(Object.keys(figma)).toHaveLength(22);
 
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');

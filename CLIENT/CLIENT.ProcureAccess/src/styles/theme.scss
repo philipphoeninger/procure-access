@@ -19,6 +19,7 @@
 // Light values of Handoff §1.2 (the Figma variables „Schemes/…“). Roles the table does not list
 // keep the generated value. e2e/shell/appearance.spec.ts compares them with the Handoff.
 $figma-light: (
+  background: #fef7ff,
   surface: #fef7ff,
   surface-container-lowest: #ffffff,
   surface-container-low: #f7f2fa,
