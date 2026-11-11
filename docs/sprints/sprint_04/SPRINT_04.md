@@ -4,6 +4,7 @@
 > **Based on:** `ROADMAP_v4.md` (rest of M2), `TECH_DEBT_v3.md` (§3, §6, §9.1, §9.2), the highest versions of TESTING (§4.2, §4.2a, §4.6, §4.9, §4.11, §6.3, §9 step 2), ARCHITECTURE (§5.1, §7, §12 step 2, ADR-014, ADR-015), SPEC (§7.3, §8.1 – §8.3, §9.1, R-CON-*, R-LST-*), the Design handoff (§4.5 K5, §5.1, §5.4, §5.5), UX copy (§5.4 – §5.6, §5.16), `CLAUDE.md`, the sprint-03 close-out and protocols in `docs/sprints/sprint_03/`, and the GitHub issues and pull requests as of 2026-11-10 (28 open issues, all in `TECH_DEBT_v3.md`; Dependabot PRs #226 – #231 open).
 > **Language:** English. **Dates:** none by design — the sprint is described in working days (D1 … D8) and halves, not calendar dates.
 > **Task prompts:** `TASK_PROMPTS.md` in this folder (one ready-to-paste prompt per task).
+> **Amended 2026-11-11:** S4-29 added (Figma light colours pinned, owner request, decision O-S4-22; +1 point committed). It came after S10 had been merged (S4-13), so it runs before S11 (S4-14).
 
 ---
 
@@ -26,6 +27,7 @@ This is the first sprint that builds screens of the target design. The legacy fi
 - [ ] **Export** `POST /api/v1/exports` with XLSX and CSV per SPEC §8.3 and dialog S13: **EXP-01 – EXP-05, EXP-07**, **TEN-04**, **API-05** (anonymous export) and the export part of **CAT-12** `active`; the ARC-03 rule for `AdHocSelectionSource` written; `ExportCreated` written.
 - [ ] **J1** (anonymous part: select → list → export) passes keyboard-only (**A11Y-02**, J1 part) and with axe in both appearances on all five browser projects; CAT-10 follows O-S4-5.
 - [ ] **API-06** `active`; #42 bundle budget tightened after the rebuild.
+- [ ] **Figma colours:** the light appearance uses the values of Handoff §1.2 (pinned with `mat.theme-overrides`); the dark appearance stays generated until the Figma dark mode and its review (O-S5); A11Y-01 and A11Y-08 stay green (S4-29).
 - [ ] **Debt of TECH_DEBT_v3 §9.1 closed:** #203 (E2E reliability), #205, #233, #242, #239, #243; the Dependabot PRs reviewed.
 - [ ] M2 exit criteria met except the manual screen-reader check of an exported file (TESTING §7.2), which the accessibility tester does after the sprint.
 
@@ -40,7 +42,7 @@ This is the first sprint that builds screens of the target design. The legacy fi
 
 **Basis:** sprint 02 ≈ 8, sprint 03 ≈ 16 points per development day (average ≈ 11). This sprint assumes ≈ 9 per day: it is the first screen sprint, with component tests, axe in two appearances, keyboard journeys and an E2E rewrite, and the spread between the two measurements is large. Sprints have so far ended early; the plan counts what fits into 8 days, not how long it will take.
 
-**Planned load:** **49 points committed (70 %** of the assumed capacity), of which 5.5 points are general debt (S4-01 – S4-07; 8 %) and 9 points are M2 debt rows (M2.4d 1, M2.5d 4, M2.6d 1, M2.7d 3), + **6.5 points stretch**.
+**Planned load:** **50 points committed (71 %** of the assumed capacity; 49 before S4-29), of which 6.5 points are general debt (S4-01 – S4-07, S4-29; 9 %) and 9 points are M2 debt rows (M2.4d 1, M2.5d 4, M2.6d 1, M2.7d 3), + **6.5 points stretch**.
 
 ---
 
@@ -48,9 +50,9 @@ This is the first sprint that builds screens of the target design. The legacy fi
 
 Points use the roadmap scale; task estimates add up to the package estimates of `ROADMAP_v4.md`, debt items use the register's sizes. One task ≈ one Claude Code session and, as a rule, one pull request; a task may be split (like S3-20a/b) if its plan shows more than one session. Order = recommended working order (Sequence below). Invariants per task are a **proposal**; Claude Code confirms them against TESTING §4 in its plan.
 
-### P0 — committed (49 points)
+### P0 — committed (50 points)
 
-#### Debt and preparation — 5.5 points
+#### Debt and preparation — 6.5 points (S4-29 added 2026-11-11)
 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
@@ -61,6 +63,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | S4-05 | Validate every release folder under `catalog/releases/` in CI per **O-S4-2** (#239) | 0.5 | A broken test folder fails CI with the validator's message; #239 closed |
 | S4-06 | Review the open Dependabot PRs #226 (`@playwright/test` 1.65), #227 (Angular group), #228 (Vitest group), #229 (other group), #230 (**jsdom 31, a major**), #231 (xunit.v3 4.0.3): licences, changelogs, CI | 0.5 | Each PR merged or closed by the owner with the reason in the protocol |
 | S4-07 | Documentation session (#243, TD-37): the sprint-03 findings in ARCHITECTURE, TESTING, SPEC, Handoff and the Figma mapping, and their headers naming current versions. ROADMAP v4 and the SPRINT_03 close-out are already done in the control chat; PRD, Kriterienkatalog and UX copy are the owner's | 1 | #243 closed for Claude's part; owner documents listed in the protocol |
+| S4-29 | *(added 2026-11-11, after S10, before S11)* Figma light colours: the light values of Handoff §1.2 (the Figma variables) pinned with `mat.theme-overrides` instead of the generated palette (SPEC §7.5; TD-34, owner decision **O-S4-22**); the dark appearance stays generated until O-S5. A Figma value that breaks a contrast rule is reported, not changed | 1 | Every `--mat-sys-*` role of Handoff §1.2 has its Figma value in the light appearance (test or protocol table); A11Y-01 and A11Y-08 green; #240 keeps only its dark part |
 
 #### M2.5 Configurator S10 — 13 points (+ 4 points M2.5d)
 
@@ -118,7 +121,7 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 |---|---|---|---|
 | Start | D1 | S4-01 (first), S4-02, S4-03 – S4-07, S4-08, S4-23 | CI reliable; UX copy proposals in review; **owner decisions O-S4-1 – O-S4-3, O-S4-5 taken** |
 | First half | D1–D4 | S4-09 – S4-13 (S10); S4-19, S4-20 (export backend, independent of the screens) | **Mid-sprint check (end of D4):** S10 merged with J1 on it and the export endpoint live (≈ 30 points). If not: drop the stretch, then S4-22 and S4-17 move to sprint 05 |
-| Second half | D5–D8 | **O-S4-4 approved**; S4-14 – S4-18 (S11); S4-21, S4-22 | Core flow end to end; M2 exit check |
+| Second half | D5–D8 | **O-S4-4 approved**; S4-29 (added, before S11), S4-14 – S4-18 (S11); S4-21, S4-22 | Core flow end to end; M2 exit check |
 | Buffer | remaining | stretch S4-24 – S4-28 | – |
 
 Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-19 – S4-21 API part, S4-23) can run in parallel sessions (worktrees). Local E2E runs share the host ports: in parallel sessions only one runs E2E locally, the others rely on CI.
@@ -137,7 +140,8 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | S4-10 | S4-09 | internal |
 | S4-11, S4-12 | S4-10 | internal |
 | S4-13 | S4-12; **O-S4-5** | internal / Philipp |
-| S4-14 – S4-18 | S4-12 merged (S10 hands the selection over); **O-S4-4** (approved UX copy v17) for the texts | internal / Philipp |
+| S4-29 | S4-13 merged; **O-S4-22** | internal / Philipp (decided) |
+| S4-14 – S4-18 | S4-29 merged (S11 is built and axe-checked in the final light colours); S4-12 merged (S10 hands the selection over); **O-S4-4** (approved UX copy v17) for the texts | internal / Philipp |
 | S4-16, S4-17 | S4-15 | internal |
 | S4-18 | S4-14 – S4-17 | internal |
 | S4-20 | S4-19; **O-S4-6** for the short-description column only | internal / Philipp |
@@ -172,6 +176,8 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-19 | S4-12, hand-over to S11 (R-CON-10): (a) „Kriterienliste anzeigen“ calls `GET /api/v1/catalog/criteria` with button spinner, accepted → placeholder `/kriterien/ergebnis`, refused → error at the step; (b) open S11 at once and leave the check to S4-14 | S4-12 | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-20 | S4-12: when the reset notice appears: (a) only when a lower layer held a selection (Basisfunktionalität does not count); (b) on every change of a higher layer | S4-12 | (a); **decided (a)**, owner 2026-11-11, with the defaults of the S4-12 plan (S11 placeholder, „Ändern“ per layer, page title without announcement, no S10 empty states, only the legacy filter's `LiveAnnouncer`) |
 | O-S4-21 | S4-13 (O-S4-9 said „#52 closes with S4-13“): the legacy `/filters` stays live where no release is active, and two shell tests still opened it: (a) move those tests to `/kriterien`, drop the suppression, keep #52 open until the legacy filter goes; (b) the same, but close #52 now; (c) keep the suppression and #52 until the legacy filter goes | S4-13 | (a); **decided (a)**, owner 2026-11-11 (TESTING_v45 V137) |
+| O-S4-22 | Theme colours (#240, TD-34): pin the light values of Handoff §1.2 now; the dark values wait for the Figma dark mode (O-S5). Added as O-S4-7, which S4-03 already used | S4-29 | **Decided 2026-11-11** (owner: add S4-29 to sprint 04), with the defaults of the S4-29 planning: renumbered to O-S4-22; S4-29 after S4-13 and before S4-14; the pinned values give way to the legacy contrast setting (`.contrast-more`); P0 heading 50 points |
+| O-S4-23 | S4-29: the page background of the shell is `--mat-sys-background` (Material paints `mat-sidenav-content` with it), which Handoff §1.2 does not list, so it keeps the generated `#FDF8FD`, while §1.2 says the page background is Surface `#FEF7FF`: (a) pin `background` to the Surface value and add the row Schemes/Background to §1.2; (b) leave it generated until O-S5 | follow-up of S4-29 | (a): one line in `$figma-light`, invisible difference (1 step per channel), and §1.2 then names every colour the page shows |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 

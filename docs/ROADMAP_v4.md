@@ -98,7 +98,7 @@ The arrows are the only order that is fixed. Two things may be pulled forward: t
 | M1.3 | Problem Details middleware with field-keyed `errors`, problem types, client mapping to UX keys | SPEC §7.1, §8.6 | 3 | **Done** (S2-10, S2-11) |
 | M1.4 | Application shell: landmarks, anonymous header, footer, start page, error pages, loading/empty/system states, page title and H1 focus with announcement, 320 px / 400 % zoom | R-SHL-01, R-SHL-04, R-SHL-05, R-SHL-06, R-SHL-08, R-SHL-09, R-SHL-10 | 8 | **Done** (S2-15 – S2-18) |
 | M1.4d | *(debt)* #120 English accessible names, #101 key conflict, #110 Figma link check, #122 `/api/Health` → `/health/ready` | TECH_DEBT_v1 §9.2 | 2 | **Done** (S2-13, S2-15, S2-19, S2-22) |
-| M1.5 | Theme foundation: tokens, `color-scheme: light dark`, appearance without account, reduced motion; dark theme in development with the generated palette; strong focus indicators (#184) | R-SET-02, R-SET-03 (development part), SPEC §7.5 | 5 | **Done** (S3-09, S3-10); colour review with O-S5 (#240) |
+| M1.5 | Theme foundation: tokens, `color-scheme: light dark`, appearance without account, reduced motion; dark theme in development with the generated palette; strong focus indicators (#184) | R-SET-02, R-SET-03 (development part), SPEC §7.5 | 5 | **Done** (S3-09, S3-10); light values of Handoff §1.2 pinned in sprint 04 (S4-29, owner 2026-11-11); dark values with O-S5 (#240) |
 | M1.6 | ngx-translate with `de.json` from the UX copy; pluralisation approach | UX-O9 | 3 | **Done** (S2-12, S2-13; UX-O9 → SD25) |
 | M1.6d | *(debt)* TypeScript lint rules #119; client coverage exclusions #97; CI one-liners #104 – #107 | TECH_DEBT_v1 §9.2 | 2 | **Done** (S2-14, S2-20, S2-23) |
 | M1.7 | `UsageEvent` table and writer | R-MET-01 | 1 | **Done** (S1-23) |
@@ -292,7 +292,7 @@ Rating models, tender-text generator, market overview, import, further use cases
 | 01 | 28 + 4 | **34** (M0 28, M1.2 3, M1.7 1, M1.8 2) | ≈ 3 points (dependency, documentation and key PRs of the register review) | Development days used were not recorded |
 | 02 | 28.5 + 3.5 | **32** (M1 28 incl. its debt rows, general debt 4.5) | small follow-ups #140 – #142 | All 23 tasks incl. stretch in **about 4 development days** (owner, 2026-11-05) → ≈ 8 points per day |
 | 03 | 42.5 + 5.5 (after O-S3-5) | **48** (M1 10, M2 29.5, general debt 8.5) | — | All 28 protocols incl. stretch in **about 3 development days** (owner, 2026-11-10) → ≈ 16 points per day |
-| 04 | 49 + 6.5 | | | Plan: `docs/sprints/sprint_04/SPRINT_04.md` (capacity assumption ~70) |
+| 04 | 50 + 6.5 (incl. S4-29, added 2026-11-11) | | | Plan: `docs/sprints/sprint_04/SPRINT_04.md` (capacity assumption ~70) |
 
 **Forecast (three sprints, not a commitment):** sprint 02 gave ≈ 8 and sprint 03 ≈ 16 points per development day (on average ≈ 11). Sprints in practice end when their scope is done (sprint 02 after about 4, sprint 03 after about 3 development days), so the forecast counts sprints of the planned size, not weeks. Sprint 04 is planned with **~70 points** of capacity for 8 days (≈ 9 per day, discounted because it is the first screen sprint). With 55–70 points per sprint and +15 % for the debt that M3 – M7 will add (M1 +33 %, M2 +16 %):
 
