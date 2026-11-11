@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 // UX copy areas that de.json carries in full: a key root (`shell`) or a deeper prefix
 // (`criteria.select`), when only part of a root has its screen yet. Add an area with the step that
 // builds its screens.
-export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'criteria.select', 'criteria.list', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value'];
+export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle'];
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = 'CLIENT/CLIENT.ProcureAccess';

@@ -4,7 +4,7 @@
 > **Based on:** `ROADMAP_v4.md` (rest of M2), `TECH_DEBT_v3.md` (§3, §6, §9.1, §9.2), the highest versions of TESTING (§4.2, §4.2a, §4.6, §4.9, §4.11, §6.3, §9 step 2), ARCHITECTURE (§5.1, §7, §12 step 2, ADR-014, ADR-015), SPEC (§7.3, §8.1 – §8.3, §9.1, R-CON-*, R-LST-*), the Design handoff (§4.5 K5, §5.1, §5.4, §5.5), UX copy (§5.4 – §5.6, §5.16), `CLAUDE.md`, the sprint-03 close-out and protocols in `docs/sprints/sprint_03/`, and the GitHub issues and pull requests as of 2026-11-10 (28 open issues, all in `TECH_DEBT_v3.md`; Dependabot PRs #226 – #231 open).
 > **Language:** English. **Dates:** none by design — the sprint is described in working days (D1 … D8) and halves, not calendar dates.
 > **Task prompts:** `TASK_PROMPTS.md` in this folder (one ready-to-paste prompt per task).
-> **Amended 2026-11-11:** S4-29 added (Figma light colours pinned, owner request, decision O-S4-22; +1 point committed). It came after S10 had been merged (S4-13), so it runs before S11 (S4-14).
+> **Amended 2026-11-11:** S4-18 split into S4-18a (S11 summary, notices, action bar, suggestion link, page titles) and S4-18b (the `CriteriaListShown` event), owner decision O-S4-52. S4-29 added (Figma light colours pinned, owner request, decision O-S4-22; +1 point committed). It came after S10 had been merged (S4-13), so it runs before S11 (S4-14).
 
 ---
 
@@ -91,7 +91,8 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | S4-15b | Detail panel, catalog sections: the Markdown lines of the texts as paragraphs and lists (S3-15 P6, O-S4-30), tabs for several procedures, examples, „So wird es geprüft“, „Gilt für“ with `appliesTo[]` in the criteria answer (O-S4-29), source line (Handoff §5.5) | 2 | Component tests; SPEC §8.2 and the endpoint test for `appliesTo[]` |
 | S4-16 | Priority override via the K5 menu with reset (R-LST-03), include/exclude with excluded cards kept in the list (R-LST-04), note with length error (R-LST-05) | 3 | Component tests; errors per SPEC §7.1 |
 | S4-17 | Search and priority filter UI with the result announcement (R-LST-06), „Geprüft nach …“ cards (R-LST-07), empty state for app types without criteria (R-LST-08) | 2.5 | FE part of **CAT-20** `active` |
-| S4-18 | Summary of the selection and the counts above the list (`criteria.list.summary.*`, `criteria.list.counts`; moved from S4-17 with O-S4-47), notices (R-LST-09), action bar sticky from 600 px (R-LST-10; „Liste speichern“ leads to sign-in, as far as the UX copy says for anonymous users), „Kriterium vorschlagen“ at the end of the list (R-LST-13, M2.8), the first `CriteriaListShown` caller, page-title variants from UX copy v17 and `shell.pageTitle.error` (M2.6d) | 2 | S11 added to `reflow.spec.ts`; event written once per shown list |
+| S4-18a | Summary of the selection and the counts above the list (`criteria.list.summary.*`, `criteria.list.counts` with one plural key per level, UX copy v22 U106, O-S4-50; moved from S4-17 with O-S4-47), notices (R-LST-09; the draft note at the top, O-S4-53), action bar in the flow and sticky from 600 px width and height (R-LST-10; „Liste exportieren“ opens a placeholder until S4-21, „Liste speichern“ waits for step 3, O-S4-49), „Kriterium vorschlagen“ at the end of the list (R-LST-13, M2.8), `pageTitle` as an `AREAS` root (M2.6d; split of S4-18, O-S4-52) | 1.5 | S11 in `reflow.spec.ts` with summary, notices, an open panel and the action bar; component tests with axe |
+| S4-18b | The first `CriteriaListShown` caller (R-MET-01, R-CON-10): `POST /api/v1/configurator/criteria-list-shown` in the Configurator module, called by the client once per shown selection without any system state on failure (O-S4-48) | 0.5 | Event written once per shown list (integration and store tests) |
 
 #### M2.7 Export — 8 points (+ 3 points M2.7d)
 
@@ -144,10 +145,11 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | S4-29 | S4-13 merged; **O-S4-22** | internal / Philipp (decided) |
 | S4-14 – S4-18 | S4-29 merged (S11 is built and axe-checked in the final light colours); S4-12 merged (S10 hands the selection over); **O-S4-4** (approved UX copy v17) for the texts | internal / Philipp |
 | S4-16, S4-17 | S4-15a | internal |
-| S4-18 | S4-14 – S4-17 | internal |
+| S4-18a | S4-14 – S4-17 | internal |
+| S4-18b | S4-14 – S4-17 (independent of S4-18a) | internal |
 | S4-20 | S4-19; **O-S4-6** for the short-description column only | internal / Philipp |
-| S4-21 | S4-19, S4-20 (API part); S4-18 (the action bar opens the dialog) | internal |
-| S4-22 | S4-13, S4-18, S4-21 | internal |
+| S4-21 | S4-19, S4-20 (API part); S4-18a (the action bar opens the dialog) | internal |
+| S4-22 | S4-13, S4-18a, S4-18b, S4-21 | internal |
 | S4-24 | **O-S4-6** | Philipp |
 | **Invariant flips** | S4-10 – S4-13, S4-17, S4-19 – S4-21, S4-23 write a new TESTING version. Preferably one at a time; if two run in parallel, the later PR rebases and renumbers its TESTING version (as done for SPEC in S3-27) | internal |
 | Outside the sprint | Staging redeployed from `main` with `ASPNETCORE_ENVIRONMENT` checked (#236, TD-28); M1 milestone closed; O-1/K-1 and O-6 from the project team; the accessibility tester's screen-reader check of an exported file | Philipp, project team, tester |
@@ -203,6 +205,12 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-45 | S4-17: „Filter zurücksetzen“ was the second sentence of `criteria.list.emptyFilter`: (a) split it into the sentence and the button key `criteria.list.emptyFilter.reset` (UX copy v21 U105, same wording); (b) the whole text without a button | S4-17 | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-46 | S4-17 (S4-14 P3): search and filter when S11 shows the list of a changed selection: (a) cleared for a changed selection, kept for the same; (b) always kept; (c) always cleared | S4-17 | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-47 | S4-17: „Auswahl ändern“ of `criteria.list.noCriteriaFor` leads to S10 step 2 (UX copy), but S10 always opened at step 1: (a) S10 opens at step 2 from the router state, never from the URL; (b) the same link as the title row (step 1) | S4-17 | (a); **decided (a)**, owner 2026-11-11, with the move of the S11 summary (`criteria.list.summary.*`, `criteria.list.counts`), which no task row named, to S4-18 |
+| O-S4-48 | S4-18: SPEC names no trigger for `CriteriaListShown` (once per selection shown, no client-side tracking): (a) `POST /api/v1/configurator/criteria-list-shown` (204, no body) in the Configurator module, called by the client once per new selection, `signedIn` from the request's sign-in; (b) the criteria request writes it when S11 marks it (Catalog would depend on Platform; the browser cache of a pinned release hides repeats); (c) wait for step 3 | S4-18b | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-49 | S4-18: „Liste speichern“ leads an anonymous user to S01 with `auth.login.reasonSave`, but S01 and saving come with step 3: (a) leave the button and `criteria.list.unsaved` out until step 3; (b) link the legacy login (a dead end: nothing can be saved after it); (c) show it `aria-disabled` (no text for the reason) | S4-18a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-50 | S4-18: `criteria.list.counts` holds three counts in one key without singulars („1 Mindestanforderungen“): (a) one plural key per level with `.one`, the frame keeps only the commas (UX copy v22 U106); (b) keep the key; (c) leave the counts out | S4-18a | (a); **decided (a)**, owner 2026-11-11, wording of U106 approved as proposed |
+| O-S4-51 | S4-18: what the counts count: (a) the requirement criteria of the answer by the level that applies now, without „Geprüft nach …“ (Handoff S32), so the levels add up to `criteria.list.summary.count`; inclusion only in the live counter of the action bar; (b) only included criteria | S4-18a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-52 | S4-18 is more than one session: (a) S4-18a frontend (summary, notices, action bar, suggestion link, page titles), S4-18b the event; (b) one task | S4-18 | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-53 | S4-18: the UX copy puts `criteria.list.draftNote` „oberhalb der Aktionen“, Handoff §5.1 and the Figma frame `2020:70` at the top below the priority note: (a) at the top (Handoff over UX copy for layout); UX copy v22 says „oberhalb der Liste“; (b) directly above the action bar | S4-18a | (a); **decided (a)**, owner 2026-11-11 |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 

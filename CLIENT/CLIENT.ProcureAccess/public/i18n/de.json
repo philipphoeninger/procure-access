@@ -308,7 +308,10 @@
     "home": "Barrierefreie Software beschaffen",
     "criteria": {
       "step": "Kriterien zusammenstellen – Schritt {{n}} von 4",
-      "list": "Ihre Kriterienliste"
+      "list": "Ihre Kriterienliste",
+      "list.saved": "{{name}} – Gespeicherte Kriterienlisten",
+      "saved": "Gespeicherte Kriterienlisten",
+      "shared": "Geteilte Kriterienliste: {{name}}"
     },
     "settings": "Einstellungen",
     "account": "Konto",
@@ -319,7 +322,23 @@
     },
     "notFound": "Seite nicht gefunden",
     "forbidden": "Kein Zugriff",
-    "server": "Etwas ist schiefgelaufen"
+    "server": "Etwas ist schiefgelaufen",
+    "projects": "Beschaffungsprojekte",
+    "project": "{{project}} – Beschaffungsprojekte",
+    "candidate": "{{tab}} – {{product}} – {{project}}",
+    "publish": "Eintrag veröffentlichen – {{product}}",
+    "publish.step": "Schritt {{n}} von 4: {{step}} – Eintrag veröffentlichen – {{product}}",
+    "directory": "Produktverzeichnis",
+    "directory.product": "{{product}} – Produktverzeichnis",
+    "directory.entry": "Eintrag von {{displayName}} – {{product}} – Produktverzeichnis",
+    "contribute": "Meine Beiträge",
+    "contribute.report": "Erfahrungsbericht schreiben – {{product}}",
+    "vendor": {
+      "step": "Schritt {{n}} von 5: {{step}} – Prüfergebnis veröffentlichen"
+    },
+    "admin": {
+      "requests": "Produktvorschläge – Verwaltung"
+    }
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",
@@ -445,7 +464,7 @@
       },
       "projectCopy": "Diese Liste gehört zum Beschaffungsprojekt „{{project}}“. Verwendungszweck, Anwendungstyp, Funktionsbereiche und Prüfverfahren sind fest. Sie können Kriterien aufnehmen oder entfernen und Prioritäten und Notizen ändern.",
       "priorityNote": "Die Prioritäten sind eine Empfehlung des Projektteams auf Grundlage fachlicher Erfahrung. Sie sind keine Vorgabe aus einer Norm. Prüfen Sie, ob sie zu Ihrer Beschaffung passen, und ändern Sie sie bei Bedarf.",
-      "counts": "{{a}} Mindestanforderungen, {{b}} Bewertungskriterien, {{info}} Hinweise",
+      "counts": "{{a}}, {{b}}, {{info}}",
       "filter": {
         "label": "Liste filtern",
         "priority": "Priorität",
@@ -472,7 +491,13 @@
         "notCarried": "Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}.",
         "notCarried.one": "Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}."
       },
-      "emptyFilter.reset": "Filter zurücksetzen"
+      "emptyFilter.reset": "Filter zurücksetzen",
+      "counts.a": "{{count}} Mindestanforderungen",
+      "counts.a.one": "1 Mindestanforderung",
+      "counts.b": "{{count}} Bewertungskriterien",
+      "counts.b.one": "1 Bewertungskriterium",
+      "counts.info": "{{count}} Hinweise",
+      "counts.info.one": "1 Hinweis"
     },
     "item": {
       "include": "In Liste aufnehmen",
@@ -537,6 +562,22 @@
       "reset": "Empfehlung wiederherstellen",
       "weightLabel": "Gewichtung",
       "overridden.weight": "Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}."
+    },
+    "export": {
+      "title": "Kriterienliste exportieren",
+      "format": "Dateiformat",
+      "xlsx": "Excel-Datei (.xlsx) – für Vergabeunterlagen",
+      "csv": "CSV-Datei – für andere Programme",
+      "scope": "Exportiert werden {{count}} Kriterien aus Ihrer Liste mit Priorität, Gewichtung und Ihren Notizen. Nicht aufgenommene Kriterien sind nicht enthalten.",
+      "scope.one": "Exportiert wird 1 Kriterium aus Ihrer Liste mit Priorität, Gewichtung und Ihren Notizen. Nicht aufgenommene Kriterien sind nicht enthalten.",
+      "anonymousNote": "Die Datei enthält Ihre Auswahl und Ihre Änderungen. ProcureAccess speichert davon nichts. Wenn Sie später daran weiterarbeiten möchten, melden Sie sich an und speichern Sie die Liste.",
+      "releaseNote": "Die Datei nennt die Katalogversion {{release}}. So bleibt später nachvollziehbar, welche Fassung der Kriterien Sie verwendet haben.",
+      "legalNote": "Kriterien in Vergabeunterlagen können rechtlich verbindlich werden. Prüfen Sie die Liste vor der Übernahme mit der für Ihr Verfahren zuständigen Stelle.",
+      "submit": "Datei herunterladen",
+      "success": "Die Datei wird heruntergeladen.",
+      "error.title": "Export fehlgeschlagen",
+      "error": "Die Datei konnte nicht erstellt werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
+      "outdated": "Die Datei konnte nicht erstellt werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen."
     }
   },
   "testType": {

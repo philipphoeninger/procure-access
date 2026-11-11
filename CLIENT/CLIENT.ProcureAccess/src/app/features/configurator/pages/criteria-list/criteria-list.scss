@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-// S11 (Handoff §5.1, §5.5): H1, „Auswahl ändern“, the notice for app types without criteria, the
-// filter row, the cards and the empty states; summary, notices and action bar follow with S4-18.
+// S11 (Handoff §5.1, §5.5; Figma `2020:70`): H1, „Auswahl ändern“, summary, notices, counts, the
+// filter row, the cards and the empty states, the suggestion link and the action bar.
 :host {
   display: flex;
   flex-direction: column;
@@ -47,4 +47,41 @@
   p {
     margin: 0;
   }
+}
+
+.pa-criteria-list__counts,
+.pa-criteria-list__suggest {
+  margin: 0;
+}
+
+// Action bar (Handoff §2.1, §5.1): in the flow after the list; sticky at the bottom from 600 px
+// width AND 600 px height (keep the query in step with STICKY_ACTION_BAR_QUERY). Status and button
+// stack below 600 px and share a row from there; DOM order = visual order.
+.pa-criteria-list__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border-radius: var(--mat-sys-corner-medium);
+  background-color: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @media (min-width: 37.5em) and (min-height: 37.5em) {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 1;
+  }
+}
+
+.pa-criteria-list__status {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
 }

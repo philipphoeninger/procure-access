@@ -1,0 +1,27 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<p class="pa-criteria-list-summary__count">{{ 'criteria.list.summary.count' | translatePlural: count() }}</p>
+<dl class="pa-criteria-list-summary__rows">
+  <div class="pa-criteria-list-summary__row">
+    <dt>{{ 'criteria.list.summary.useCase' | translate }}</dt>
+    <dd>{{ names().useCase ?? ('criteria.select.step1.none' | translate) }}</dd>
+  </div>
+  <div class="pa-criteria-list-summary__row">
+    <dt>{{ 'criteria.list.summary.appTypes' | translate }}</dt>
+    <dd>{{ appTypes() }}</dd>
+  </div>
+  <div class="pa-criteria-list-summary__row">
+    <dt>{{ 'criteria.list.summary.parts' | translate }}</dt>
+    <dd>{{ productParts() }}</dd>
+  </div>
+  @if (names().testTypes.length > 0) {
+    <div class="pa-criteria-list-summary__row">
+      <dt>{{ 'criteria.list.summary.testTypes' | translate }}</dt>
+      <dd>{{ testTypes() }}</dd>
+    </div>
+  }
+</dl>

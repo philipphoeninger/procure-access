@@ -2,16 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
-import {
-  CRITERIA_SUGGESTION_CHANNEL,
-  parseSuggestionChannel,
-  suggestionHref,
-} from '@app/core/contact/criteria-suggestion';
+import { injectSuggestionLink } from '@app/core/contact/criteria-suggestion';
 
 /** The public repository of the project (CLAUDE §1). */
 export const SOURCE_CODE_URL = 'https://github.com/philipphoeninger/procure-access';
@@ -35,12 +30,5 @@ export const SOURCE_CODE_URL = 'https://github.com/philipphoeninger/procure-acce
 })
 export class Footer {
   protected readonly sourceCodeUrl = SOURCE_CODE_URL;
-  protected readonly suggestChannel = parseSuggestionChannel(inject(CRITERIA_SUGGESTION_CHANNEL));
-
-  private readonly mailSubject = toSignal(inject(TranslateService).stream('suggest.mailSubject'), {
-    initialValue: '',
-  });
-  protected readonly suggestHref = computed(() =>
-    suggestionHref(this.suggestChannel, String(this.mailSubject())),
-  );
+  protected readonly suggest = injectSuggestionLink();
 }

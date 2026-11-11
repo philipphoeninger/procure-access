@@ -181,6 +181,39 @@ export function filterCriteria(
   });
 }
 
+/** Requirement criteria by the level that applies now (`criteria.list.counts`). */
+export interface LevelCounts {
+  /** Requirement criteria of the answer; the levels add up to it (`criteria.list.summary.count`). */
+  total: number;
+  A: number;
+  B: number;
+  Info: number;
+}
+
+/**
+ * Counts the requirement criteria of the answer by the level that applies now, included or not
+ * (owner decision O-S4-51 (a)); „Geprüft nach …“ criteria are not counted (Handoff S32: they are
+ * named apart and never counted). Whether a criterion is in the list shows in the action bar
+ * ({@link includedCount}).
+ */
+export function levelCounts(criteria: readonly Criterion[], decisions: CriterionDecisions): LevelCounts {
+  const counts: LevelCounts = { total: 0, A: 0, B: 0, Info: 0 };
+  for (const criterion of criteria) {
+    if (criterion.kind !== 'requirement') continue;
+    counts.total++;
+    counts[effectiveLevel(criterion, decisionOf(decisions, criterion.key))]++;
+  }
+  return counts;
+}
+
+/**
+ * The cards in the user's list, „Geprüft nach …“ included, because they can be removed too
+ * (`criteria.list.status.count`, R-LST-04, R-LST-10).
+ */
+export function includedCount(criteria: readonly Criterion[], decisions: CriterionDecisions): number {
+  return criteria.filter((criterion) => decisionOf(decisions, criterion.key).included).length;
+}
+
 function withDecision(decisions: CriterionDecisions, key: string, decision: CriterionDecision): CriterionDecisions {
   const next = { ...decisions };
   if (isDefault(decision)) {
