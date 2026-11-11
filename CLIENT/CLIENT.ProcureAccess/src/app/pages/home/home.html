@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
     <mat-card class="pa-home__card" appearance="outlined">
       <h2 class="pa-home__card-title">{{ 'home.card.criteria.title' | translate }}</h2>
       <p class="pa-home__card-text">{{ 'home.card.criteria.text' | translate }}</p>
-      <a matButton="filled" class="pa-home__card-cta" routerLink="/filters">{{ 'home.card.criteria.cta' | translate }}</a>
+      <a matButton="filled" class="pa-home__card-cta" [routerLink]="criteriaPath">{{ 'home.card.criteria.cta' | translate }}</a>
     </mat-card>
   </li>
   <li>

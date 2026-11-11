@@ -23,7 +23,7 @@ describe('Home (S04, R-SHL-05)', () => {
 
     const [criteria, directory] = cards;
     expect(within(criteria).getByRole('heading', { level: 2, name: 'Kriterien zusammenstellen' })).toBeTruthy();
-    expect(within(criteria).getByRole('link', { name: 'Kriterien zusammenstellen' }).getAttribute('href')).toBe('/filters');
+    expect(within(criteria).getByRole('link', { name: 'Kriterien zusammenstellen' }).getAttribute('href')).toBe('/kriterien');
     expect(within(directory).getByRole('heading', { level: 2, name: 'Produkte nachschlagen' })).toBeTruthy();
     expect(within(directory).getByRole('link', { name: 'Produktverzeichnis öffnen' }).getAttribute('href')).toBe('/products');
   });

@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
   <ul class="pa-main-nav__list">
     <li>
       <!-- cdkFocusInitial: the compact menu moves the focus to the first item when it opens -->
-      <a matButton class="pa-main-nav__item" routerLink="/filters"
-        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+      <a matButton class="pa-main-nav__item" [routerLink]="criteriaPath"
+        [class.pa-main-nav__item--active]="criteriaCurrent()" [attr.aria-current]="criteriaCurrent() ? 'page' : null"
         [attr.cdkFocusInitial]="layout() === 'drawer' ? '' : null"
         (click)="navigated.emit()">{{ 'shell.nav.criteria' | translate }}</a>
     </li>

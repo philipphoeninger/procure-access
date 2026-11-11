@@ -33,6 +33,13 @@ export const PROBLEM_TYPE_KEYS: Readonly<Record<string, string>> = {
 export const FORM_SHOWS_FIELD_ERRORS = new HttpContextToken<boolean>(() => false);
 
 /**
+ * Problem types (SPEC §8.6) whose answer the caller shows itself, so the error interceptor shows
+ * no snackbar for them, e.g. `not-found` of the filter options, which means „no active release“
+ * (O-S4-3). 5xx answers and requests without an answer keep their system states.
+ */
+export const CALLER_HANDLES_PROBLEMS = new HttpContextToken<readonly string[]>(() => []);
+
+/**
  * The name of the problem type: `type` is `<base>/problems/<name>` (SPEC §8.6). The base URI is
  * configurable on the server, so only the path counts.
  */
@@ -72,6 +79,11 @@ export function applyServerErrors(
       field.control.markAsTouched();
       return { message, field: { id: field.id, labelKey: field.labelKey } };
     });
+}
+
+/** The field errors of a problem, keyed by field path as the client sent it (SPEC §8.6); empty without. */
+export function problemFieldErrors(error: unknown): Readonly<Record<string, string[]>> {
+  return problemDetails(error)?.errors ?? {};
 }
 
 function problemDetails(error: unknown): ProblemDetails | undefined {

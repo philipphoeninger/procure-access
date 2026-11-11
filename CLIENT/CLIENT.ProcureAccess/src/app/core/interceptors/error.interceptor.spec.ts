@@ -11,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
+import { CALLER_HANDLES_PROBLEMS, FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
 import { ConnectionStatus } from '../errors/system-errors';
 import { SnackbarService } from '../services/snackbar.service';
 import { errorInterceptor } from './error.interceptor';
@@ -65,6 +65,25 @@ describe('errorInterceptor', () => {
     expect(snackbar.showError).toHaveBeenCalledWith(
       TestBed.inject(TranslateService).instant('ERROR.GENERIC'),
     );
+  });
+
+  it('shows no snackbar for a problem type the caller handles itself', async () => {
+    const request = firstValueFrom(
+      http.get('/api/x', { context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['not-found']) }),
+    );
+    backend.expectOne('/api/x').flush({ type: `${base}not-found` }, { status: 404, statusText: 'Not Found' });
+    await expect(request).rejects.toBeDefined();
+
+    expect(snackbar.showError).not.toHaveBeenCalled();
+  });
+
+  it('keeps the snackbar for a problem type the caller did not name', async () => {
+    await failWith(
+      { type: `${base}validation`, errors: { name: ['Required.'] } },
+      new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['not-found']),
+    );
+
+    expect(snackbar.showError).toHaveBeenCalledOnce();
   });
 
   it('shows the UX text of a mapped problem type', async () => {

@@ -5,6 +5,7 @@
 import {
   CatalogSelection,
   ConfiguratorDraft,
+  CriteriaSelection,
   ConfiguratorLayer,
   ResetReport,
   StepError,
@@ -188,6 +189,44 @@ export function toCatalogSelection(draft: ConfiguratorDraft): CatalogSelection {
     appTypeIds: draft.appTypeIds,
     productPartIds: draft.productPartIds,
   };
+}
+
+/** The selection as the criteria endpoint reads it: the filter selection plus the test types (SPEC §8.2). */
+export function toCriteriaSelection(draft: ConfiguratorDraft): CriteriaSelection {
+  return { ...toCatalogSelection(draft), testTypeIds: draft.testTypeIds };
+}
+
+/**
+ * Names of the selected values of a multi-choice layer in the order of the options, for
+ * „Bisherige Auswahl“ (R-CON-08). Always-selected product parts are part of the selection and
+ * named too; an id the options no longer list is left out.
+ */
+export function selectedNames(
+  draft: ConfiguratorDraft,
+  options: FilterOptionsLayers,
+  layer: Exclude<ConfiguratorLayer, 'useCase'>,
+): string[] {
+  const [values, ids] = {
+    appType: [options.appTypes, draft.appTypeIds],
+    productPart: [options.productParts, draft.productPartIds],
+    testType: [options.testTypes, draft.testTypeIds],
+  }[layer] as [FilterOption[], string[]];
+  return values.filter((o) => ids.includes(o.id)).map((o) => o.name);
+}
+
+/**
+ * The layer of a field path in the Problem Details of the criteria endpoint (SPEC §8.2: keys as
+ * sent, e.g. `appTypeIds[1]`), so S10 can show the error at its step; null for any other path.
+ */
+export function layerOfField(path: string): ConfiguratorLayer | null {
+  const name = path.replace(/\[\d*\]$/, '');
+  const layers: Readonly<Record<string, ConfiguratorLayer>> = {
+    useCase: 'useCase',
+    appTypeIds: 'appType',
+    productPartIds: 'productPart',
+    testTypeIds: 'testType',
+  };
+  return Object.hasOwn(layers, name) ? layers[name] : null;
 }
 
 function unchanged(draft: ConfiguratorDraft): SelectionChange {

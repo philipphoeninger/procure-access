@@ -301,6 +301,108 @@ describe('withConfigurator', () => {
     });
   });
 
+  describe('before S10 opens (O-S4-3)', () => {
+    it('loads the options and reports their status', async () => {
+      const ready = store.filterOptionsReady();
+      await answer();
+
+      expect(await ready).toBe('loaded');
+    });
+
+    it('reports noRelease for a 404, and asks again on the next call', async () => {
+      const first = store.filterOptionsReady();
+      nextRequest().flush({ type: 'x/problems/not-found' }, { status: 404, statusText: 'Not Found' });
+      expect(await first).toBe('noRelease');
+
+      const second = store.filterOptionsReady();
+      await answer();
+      expect(await second).toBe('loaded');
+    });
+
+    it('waits for a request that is already running and sends no second one', async () => {
+      const load = store.loadFilterOptions();
+      const ready = store.filterOptionsReady();
+      await answer();
+      await load;
+
+      expect(await ready).toBe('loaded');
+    });
+
+    it('answers at once when the options are loaded', async () => {
+      await loaded();
+
+      expect(await store.filterOptionsReady()).toBe('loaded');
+    });
+  });
+
+  describe('„Kriterienliste anzeigen“ (R-CON-10)', () => {
+    const criteriaUrl = '/api/v1/catalog/criteria';
+    const criteriaRequest = () => backend.expectOne((r) => r.url === criteriaUrl);
+
+    it('sends the whole selection with the pinned release and reports acceptance', async () => {
+      await fillAllLayers();
+
+      const submit = store.submitSelection();
+      const request = criteriaRequest();
+      expect(request.request.params.get('release')).toBe('T.1');
+      expect(request.request.params.get('useCase')).toBe('hr');
+      expect(request.request.params.getAll('appTypeIds[]')).toEqual(['web']);
+      expect(request.request.params.getAll('productPartIds[]')).toEqual(['base', 'audio']);
+      expect(request.request.params.getAll('testTypeIds[]')).toEqual(['softwareTest']);
+      request.flush({ release: 'T.1', criteria: [], appTypesWithoutCriteria: [] });
+
+      expect(await submit).toEqual({ kind: 'accepted' });
+    });
+
+    it('reports the first field error of selection-excluded with its layer', async () => {
+      await fillAllLayers();
+
+      const submit = store.submitSelection();
+      criteriaRequest().flush(
+        { type: 'x/problems/selection-excluded', errors: { 'appTypeIds[0]': ['Excluded.'], useCase: ['Other.'] } },
+        { status: 400, statusText: 'Bad Request' },
+      );
+
+      expect(await submit).toEqual({
+        kind: 'rejected',
+        problem: 'selection-excluded',
+        layer: 'appType',
+        message: 'Excluded.',
+      });
+    });
+
+    it('reports a validation problem whose path names no layer without a layer', async () => {
+      await fillAllLayers();
+
+      const submit = store.submitSelection();
+      criteriaRequest().flush(
+        { type: 'x/problems/validation', errors: { release: ['Unknown.'] } },
+        { status: 400, statusText: 'Bad Request' },
+      );
+
+      expect(await submit).toEqual({ kind: 'rejected', problem: 'validation', layer: null, message: 'Unknown.' });
+    });
+
+    it('reports a 404 as noRelease, so the next visit asks for the options again', async () => {
+      await fillAllLayers();
+
+      const submit = store.submitSelection();
+      criteriaRequest().flush({ type: 'x/problems/not-found' }, { status: 404, statusText: 'Not Found' });
+
+      expect(await submit).toEqual({ kind: 'noRelease' });
+      expect(store.configurator.optionsStatus()).toBe('noRelease');
+    });
+
+    it('reports any other failure as failed', async () => {
+      await fillAllLayers();
+
+      const submit = store.submitSelection();
+      criteriaRequest().flush(null, { status: 500, statusText: 'Server Error' });
+
+      expect(await submit).toEqual({ kind: 'failed' });
+    });
+  });
+
   describe('memory only (R-CON-09)', () => {
     it('writes nothing to browser storage and still works while storage is blocked', async () => {
       const blocked = () => {

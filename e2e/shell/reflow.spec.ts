@@ -83,7 +83,8 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
     await page.getByRole('button', { name: 'Menü', exact: true }).click();
     await page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link', { name: 'Kriterien' }).click();
-    await expect(page.getByRole('main').getByRole('status')).toContainText('Keine Verbindung zum Server.');
+    // S10 has a status region of its own (reset notice), so the notice is found by its text.
+    await expect(page.getByRole('main').getByRole('status').filter({ hasText: 'Keine Verbindung zum Server' })).toBeVisible();
 
     await expectReflow(page);
   });

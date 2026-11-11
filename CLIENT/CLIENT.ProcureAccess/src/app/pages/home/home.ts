@@ -8,10 +8,12 @@ import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Notice } from '@app/shared/components/notice/notice';
+import { CONFIGURATOR_PATH } from '@app/features/configurator/guards/configurator-guards';
 
 /**
  * S04 Startseite (R-SHL-05): H1, intro, entry cards, disclaimer. Only cards whose target exists
- * are shown: „Kriterien zusammenstellen“ and „Produkte nachschlagen“ open the legacy screens; the
+ * are shown: „Kriterien zusammenstellen“ opens S10 (or, without an active catalog release, the
+ * legacy filter through the guard of S10, O-S4-3) and „Produkte nachschlagen“ the legacy list; the
  * cards for projects (S30) and contributions (S53) and the vendor link (S55) come with their
  * migration steps (owner decision S2-17, 1A). No card needs an account.
  *
@@ -24,4 +26,6 @@ import { Notice } from '@app/shared/components/notice/notice';
   styleUrl: './home.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Home {}
+export class Home {
+  protected readonly criteriaPath = CONFIGURATOR_PATH;
+}

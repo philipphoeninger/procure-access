@@ -24,6 +24,8 @@ import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { CriteriaSelect } from './features/configurator/pages/criteria-select/criteria-select';
+import { CriteriaListPage } from './features/configurator/pages/criteria-list/criteria-list';
+import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -67,11 +69,20 @@ export const routes: Routes = [
     component: Settings,
     data: { [PAGE_TITLE_KEY]: 'pageTitle.settings' },
   },
-  // S10 configurator (R-CON-01): not linked yet — start page and header switch to it in S4-12
-  // (O-S4-3); its per-step page title comes with S4-12 too
+  // S10 configurator (R-CON-01): start page and header link it; without an active catalog release
+  // the guard opens the legacy /filters instead (O-S4-3). The page fills the step number of its title.
   {
     path: 'kriterien',
     component: CriteriaSelect,
+    canActivate: [configuratorReleaseGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.step' },
+  },
+  // S11 (R-CON-10): placeholder until S4-14 – S4-18; only with a complete selection from S10
+  {
+    path: 'kriterien/ergebnis',
+    component: CriteriaListPage,
+    canActivate: [completeSelectionGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.list' },
   },
   {
     path: 'filters',

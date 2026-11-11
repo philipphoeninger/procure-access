@@ -2,12 +2,15 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
@@ -66,16 +69,21 @@ function catalog(): FilterOptionsLayers {
   return layers;
 }
 
-describe('CriteriaSelect (S10, R-CON-01 – R-CON-06)', () => {
+describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
   let fixture: ComponentFixture<CriteriaSelect>;
   let store: InstanceType<typeof ConfiguratorTestStore>;
   let announce: ReturnType<typeof vi.fn>;
 
-  let api: { getFilterOptions: ReturnType<typeof vi.fn> };
+  let api: { getFilterOptions: ReturnType<typeof vi.fn>; getCriteria: ReturnType<typeof vi.fn> };
+  let setPageTitleState: ReturnType<typeof vi.fn>;
 
   async function setUp({ wide = true, layers = options() } = {}) {
     announce = vi.fn().mockResolvedValue(undefined);
-    api = { getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer(layers)) };
+    setPageTitleState = vi.fn();
+    api = {
+      getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer(layers)),
+      getCriteria: vi.fn().mockResolvedValue({ release: 'T.1', criteria: [], appTypesWithoutCriteria: [] }),
+    };
     const rendered = await render(CriteriaSelect, {
       providers: [
         provideTestTranslations(),
@@ -83,6 +91,7 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-06)', () => {
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
         { provide: A11yAnnouncerService, useValue: { announce } },
+        { provide: PageTitleStrategy, useValue: { setPageTitleState } },
       ],
     });
     fixture = rendered.fixture;
@@ -94,7 +103,8 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-06)', () => {
   const combobox = () => screen.getByRole('combobox', { name: 'Verwendungszweck' });
   const optionNames = () => screen.getAllByRole('option').map((o) => text(o));
   const button = (name: string) => screen.getByRole('button', { name });
-  const stepItems = () => within(screen.getByRole('list')).getAllByRole('listitem');
+  // The first list is the stepper; „Bisherige Auswahl“ is a list too from step 2 on.
+  const stepItems = () => within(screen.getAllByRole('list')[0]).getAllByRole('listitem');
   const text = (element: Element) => element.textContent?.replace(/\s+/g, ' ').trim();
 
   /** Focus opens the list; a field that already has the focus opens it on click. */
@@ -559,6 +569,268 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-06)', () => {
 
         expect(store.configurator.options()?.useCases.map((u) => u.id)).not.toContain('hr');
         expect((combobox() as HTMLInputElement).value).toBe('HR-Anwendung');
+      });
+    });
+  });
+
+  describe('reset, „Bisherige Auswahl“ and hand-over to S11 (R-CON-07, R-CON-08, R-CON-10)', () => {
+    const checkbox = (name: string) => screen.getByRole<HTMLInputElement>('checkbox', { name });
+    const statusRegion = () => screen.getByRole('status');
+    const submitButton = () => button('Kriterienliste anzeigen');
+
+    async function next(): Promise<void> {
+      button('Weiter').click();
+      await fixture.whenStable();
+    }
+
+    /** Fills steps 1–4 (HR-Anwendung, Website, Audio, BIK BITV-Test) and stays on step 4. */
+    async function fillAllSteps(): Promise<void> {
+      await setUp({ layers: catalog() });
+      await choose('HR-Anwendung');
+      await next();
+      checkbox('Website oder Webanwendung').click();
+      await fixture.whenStable();
+      await next();
+      checkbox('Audio').click();
+      await fixture.whenStable();
+      await next();
+      checkbox('BIK BITV-Test (Web)').click();
+      await fixture.whenStable();
+    }
+
+    function changeButton(description: string): HTMLElement {
+      return screen.getByRole('button', { name: 'Ändern', description });
+    }
+
+    function problem(type: string, errors: Record<string, string[]>): HttpErrorResponse {
+      return new HttpErrorResponse({
+        status: 400,
+        error: { type: `https://procureaccess.de/problems/${type}`, errors },
+      });
+    }
+
+    describe('reset notice (R-CON-07)', () => {
+      it('INV:CFG-01 clears steps 2–4 except Basisfunktionalität and shows the notice in a status region, without moving the focus', async () => {
+        await fillAllSteps();
+
+        changeButton('Verwendungszweck: HR-Anwendung').click();
+        await fixture.whenStable();
+        await choose('Reporting-Anwendung');
+
+        expect(store.configurator.draft()).toEqual({
+          useCase: { kind: 'useCase', id: 'reporting' },
+          appTypeIds: [],
+          productPartIds: ['base'],
+          testTypeIds: [],
+        });
+        expect(within(statusRegion()).getByText(/Auswahl zurückgesetzt/)).toBeTruthy();
+        expect(within(statusRegion()).getByText(
+          'Sie haben den Verwendungszweck geändert. Ihre Auswahl bei Anwendungstyp, ' +
+            'Funktionsbereichen und Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus.',
+        )).toBeTruthy();
+        expect(document.activeElement).toBe(combobox());
+
+        await next();
+        expect(text(statusRegion())).toContain('Auswahl zurückgesetzt');
+        expect(checkbox('Website oder Webanwendung').checked).toBe(false);
+        await expectNoAxeViolations();
+      });
+
+      it('INV:CFG-01 names the changed layer: a new app type clears product parts and test types', async () => {
+        await fillAllSteps();
+
+        changeButton('Anwendungstyp: Website oder Webanwendung').click();
+        await fixture.whenStable();
+        checkbox('Mobile Anwendung (offen)').click();
+        await fixture.whenStable();
+
+        expect(text(statusRegion())).toContain(
+          'Sie haben den Anwendungstyp geändert. Ihre Auswahl bei Funktionsbereichen und Prüfverfahren wurde deshalb zurückgesetzt.',
+        );
+        expect(store.configurator.draft().productPartIds).toEqual(['base']);
+        expect(store.configurator.draft().testTypeIds).toEqual([]);
+      });
+
+      it('INV:CFG-01 the notice disappears with the next selection; the status region stays', async () => {
+        await fillAllSteps();
+        changeButton('Verwendungszweck: HR-Anwendung').click();
+        await fixture.whenStable();
+        await choose('Reporting-Anwendung');
+        await next();
+
+        checkbox('Website oder Webanwendung').click();
+        await fixture.whenStable();
+
+        expect(text(statusRegion())).toBe('');
+      });
+
+      it('shows no notice when the lower steps held nothing to clear (O-S4-20)', async () => {
+        await setUp({ layers: catalog() });
+        await choose('HR-Anwendung');
+        await next();
+
+        changeButton('Verwendungszweck: HR-Anwendung').click();
+        await fixture.whenStable();
+        await choose('Reporting-Anwendung');
+
+        expect(text(statusRegion())).toBe('');
+      });
+    });
+
+    describe('„Bisherige Auswahl“ (R-CON-08)', () => {
+      it('is not shown on step 1', async () => {
+        await setUp({ layers: catalog() });
+
+        expect(screen.queryByRole('button', { name: 'Ändern' })).toBeNull();
+      });
+
+      it('names the earlier steps from step 2 on, each with „Ändern“ described by it', async () => {
+        await fillAllSteps();
+
+        const changes = screen.getAllByRole('button', { name: 'Ändern' });
+        expect(changes).toHaveLength(3);
+        expect(changeButton('Verwendungszweck: HR-Anwendung')).toBe(changes[0]);
+        expect(changeButton('Anwendungstyp: Website oder Webanwendung')).toBe(changes[1]);
+        expect(changeButton('Funktionsbereiche: Basisfunktionalität und Audio')).toBe(changes[2]);
+        await expectNoAxeViolations();
+      });
+
+      it('names „Keiner davon passt“ as the use case', async () => {
+        await setUp({ layers: catalog() });
+        await choose(NONE_OPTION);
+        await next();
+
+        expect(changeButton('Verwendungszweck: Keiner davon passt')).toBeTruthy();
+      });
+
+      it('„Ändern“ opens the step of its layer with the selection kept', async () => {
+        await fillAllSteps();
+
+        changeButton('Anwendungstyp: Website oder Webanwendung').click();
+        await fixture.whenStable();
+
+        const question = screen.getByRole('heading', { level: 2, name: 'Was möchten Sie beschaffen?' });
+        expect(document.activeElement).toBe(question);
+        expect(checkbox('Website oder Webanwendung').checked).toBe(true);
+      });
+    });
+
+    describe('„Kriterienliste anzeigen“ (R-CON-10)', () => {
+      it('INV:CFG-04 is available without a test type and lets the server check the selection, then opens S11', async () => {
+        await setUp({ layers: catalog() });
+        const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+        await choose('HR-Anwendung');
+        await next();
+        checkbox('Website oder Webanwendung').click();
+        await fixture.whenStable();
+        await next();
+        await next();
+
+        expect(submitButton().hasAttribute('disabled')).toBe(false);
+        expect(submitButton().hasAttribute('aria-disabled')).toBe(false);
+        submitButton().click();
+        await fixture.whenStable();
+
+        expect(api.getCriteria).toHaveBeenCalledWith(
+          { useCase: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
+          'T.1',
+        );
+        expect(navigate).toHaveBeenCalledWith('/kriterien/ergebnis');
+      });
+
+      it('shows a spinner and aria-disabled while the server checks, and sends once', async () => {
+        await fillAllSteps();
+        vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+        let accept!: (value: unknown) => void;
+        api.getCriteria.mockReturnValue(new Promise((resolve) => (accept = resolve)));
+
+        submitButton().click();
+        await fixture.whenStable();
+        expect(submitButton().getAttribute('aria-disabled')).toBe('true');
+        expect(submitButton().querySelector('mat-progress-spinner')).not.toBeNull();
+        expect(text(submitButton())).toBe('Kriterienliste anzeigen');
+        submitButton().click();
+        await fixture.whenStable();
+        expect(api.getCriteria).toHaveBeenCalledOnce();
+
+        accept({ release: 'T.1', criteria: [], appTypesWithoutCriteria: [] });
+        await vi.waitFor(async () => {
+          await fixture.whenStable();
+          expect(submitButton().hasAttribute('aria-disabled')).toBe(false);
+        });
+        expect(submitButton().querySelector('mat-progress-spinner')).toBeNull();
+      });
+
+      it('shows a refused value at its step: error under the group, focus on its first available option', async () => {
+        await fillAllSteps();
+        api.getCriteria.mockRejectedValue(problem('selection-excluded', { 'appTypeIds[0]': ['Excluded.'] }));
+
+        submitButton().click();
+        await fixture.whenStable();
+        await fixture.whenStable();
+
+        const message = 'Diese Angabe passt nicht zu Ihrer übrigen Auswahl. Bitte ändern Sie sie oder Ihre Auswahl in einem vorherigen Schritt.';
+        expect(screen.getByRole('group', { name: 'Was möchten Sie beschaffen?', description: new RegExp(message.slice(0, 40)) })).toBeTruthy();
+        expect(screen.getByText(message)).toBeTruthy();
+        expect(document.activeElement).toBe(checkbox('Website oder Webanwendung'));
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 2 }, error: true });
+
+        checkbox('Mobile Anwendung (offen)').click();
+        await fixture.whenStable();
+        expect(screen.queryByText(message)).toBeNull();
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 2 }, error: false });
+      });
+
+      it('shows a validation message of the use case at the combobox, marked invalid and focused', async () => {
+        await fillAllSteps();
+        api.getCriteria.mockRejectedValue(problem('validation', { useCase: ['Unknown use case.'] }));
+
+        submitButton().click();
+        await fixture.whenStable();
+        await fixture.whenStable();
+
+        expect(combobox().getAttribute('aria-invalid')).toBe('true');
+        expect(screen.getByRole('combobox', { name: 'Verwendungszweck', description: /Unknown use case\./ })).toBe(combobox());
+        expect(document.activeElement).toBe(combobox());
+      });
+
+      it('opens the legacy filter when the server knows no release any more (O-S4-3)', async () => {
+        await fillAllSteps();
+        const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+        api.getCriteria.mockRejectedValue(new HttpErrorResponse({ status: 404, error: { type: 'x/problems/not-found' } }));
+
+        submitButton().click();
+        await fixture.whenStable();
+
+        expect(navigate).toHaveBeenCalledWith('/filters');
+      });
+
+      it('stays on step 4 after any other failure, which the error interceptor shows', async () => {
+        await fillAllSteps();
+        const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+        api.getCriteria.mockRejectedValue(new HttpErrorResponse({ status: 500 }));
+
+        submitButton().click();
+        await fixture.whenStable();
+
+        expect(navigate).not.toHaveBeenCalled();
+        expect(submitButton().hasAttribute('aria-disabled')).toBe(false);
+      });
+    });
+
+    describe('page title (UX copy §5.16, §6.1)', () => {
+      it('names the open step and adds „Fehler:“ while a step error is shown', async () => {
+        await setUp({ layers: catalog() });
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 1 }, error: false });
+
+        await next();
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 1 }, error: true });
+
+        await choose('HR-Anwendung');
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 1 }, error: false });
+
+        await next();
+        expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 2 }, error: false });
       });
     });
   });

@@ -306,6 +306,10 @@
   },
   "pageTitle": {
     "home": "Barrierefreie Software beschaffen",
+    "criteria": {
+      "step": "Kriterien zusammenstellen – Schritt {{n}} von 4",
+      "list": "Ihre Kriterienliste"
+    },
     "settings": "Einstellungen",
     "account": "Konto",
     "legal": {
@@ -427,6 +431,10 @@
           "productPart": "Sie haben die Funktionsbereiche geändert. Ihre Auswahl bei den Prüfverfahren wurde deshalb zurückgesetzt. Bitte wählen Sie erneut aus."
         }
       }
+    },
+    "list": {
+      "title": "Ihre Kriterienliste",
+      "changeSelection": "Auswahl ändern"
     }
   },
   "testType": {

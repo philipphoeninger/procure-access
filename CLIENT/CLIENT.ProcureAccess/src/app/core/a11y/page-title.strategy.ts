@@ -14,6 +14,13 @@ import { A11yAnnouncerService } from './a11y-announcer.service';
 /** Route data key: the `pageTitle.*` key of the page (UX copy §5.16). */
 export const PAGE_TITLE_KEY = 'pageTitleKey';
 
+/** What a page adds to its title: the parameters of its key and the error prefix (UX copy §5.16, §6.1). */
+export interface PageTitleState {
+  params?: Record<string, unknown>;
+  /** „Fehler: …“ after a failed submit, until the errors are fixed (UX copy U8). */
+  error?: boolean;
+}
+
 const HOME_PAGE_TITLE = 'pageTitle.home';
 
 /**
@@ -27,6 +34,10 @@ const HOME_PAGE_TITLE = 'pageTitle.home';
  *   page without an H1) and the title is announced. The first page load only sets the title, so
  *   the skip link stays the first stop of the Tab key. Dialogs, the legacy login outlet and
  *   query parameters leave title and focus alone.
+ * - A page can fill the parameters of its key and switch the error prefix
+ *   (`shell.pageTitle.error`, UX copy §6.1) with {@link setPageTitleState}, e.g. S10 its step
+ *   number and „Fehler:“ while a field error is shown. Neither is announced: the page announces its
+ *   own changes. Both are cleared when the primary path changes.
  *
  * @spec docs/SPEC_v2.md R-SHL-04; docs/design_handoff_procureaccess_v1.md §3.4, §7
  * @invariants A11Y-03
@@ -42,9 +53,12 @@ export class PageTitleStrategy extends TitleStrategy {
   private readonly appName = this.title.getTitle();
 
   private pageKey: string | undefined;
+  private pageState: PageTitleState = {};
   private primaryPath: string | undefined;
   /** Counts title updates, so a late translation never overwrites a newer title. */
   private updates = 0;
+  /** The title update started last, so the announcement waits for the title the page set last. */
+  private latestTitle: Promise<string | undefined> = Promise.resolve(undefined);
 
   constructor() {
     super();
@@ -58,34 +72,62 @@ export class PageTitleStrategy extends TitleStrategy {
     const firstPage = this.primaryPath === undefined;
     this.primaryPath = path;
     this.pageKey = deepestPageTitleKey(snapshot.root);
+    this.pageState = {};
 
-    const title = this.applyTitle();
+    void this.applyTitle();
     if (firstPage) return;
     afterNextRender(
       () => {
         this.focusMainHeading();
-        void title.then((text) => (text ? this.announcer.announcePageTitle(text) : undefined));
+        // The page may have filled its parameters while it rendered: announce the newest title.
+        void this.settledTitle().then((text) => (text ? this.announcer.announcePageTitle(text) : undefined));
       },
       { injector: this.injector },
     );
   }
 
   /**
+   * Parameters of the page's `pageTitle.*` key and the error prefix of the current page; the
+   * title follows without an announcement. Call it from the page after it has opened (e.g. in an
+   * `effect`), because a route change clears it.
+   */
+  setPageTitleState(state: PageTitleState): void {
+    this.pageState = state;
+    void this.applyTitle();
+  }
+
+  /**
    * Sets `<title>` for the current page. Resolves to the title, or to `undefined` if a newer
    * update won or no language is active yet (then the language change sets it).
    */
-  private async applyTitle(): Promise<string | undefined> {
-    const update = ++this.updates;
+  private applyTitle(): Promise<string | undefined> {
+    this.latestTitle = this.resolveTitle(++this.updates);
+    return this.latestTitle;
+  }
+
+  private async resolveTitle(update: number): Promise<string | undefined> {
     const pageKey = this.pageKey;
+    const { params, error } = this.pageState;
     if (pageKey && !this.translate.getCurrentLang()) return undefined;
     let text = this.appName;
     if (pageKey) {
-      const page = (await firstValueFrom(this.translate.get(pageKey))) as string;
-      const frame = pageKey === HOME_PAGE_TITLE ? 'shell.pageTitle.home' : 'shell.pageTitle';
+      const page = (await firstValueFrom(this.translate.get(pageKey, params))) as string;
+      const frame = error ? 'shell.pageTitle.error' : pageKey === HOME_PAGE_TITLE ? 'shell.pageTitle.home' : 'shell.pageTitle';
       text = (await firstValueFrom(this.translate.get(frame, { page }))) as string;
     }
     if (update !== this.updates) return undefined;
     this.title.setTitle(text);
+    return text;
+  }
+
+  /** The title of the newest update, also when another update started while waiting. */
+  private async settledTitle(): Promise<string | undefined> {
+    let pending: Promise<string | undefined>;
+    let text: string | undefined;
+    do {
+      pending = this.latestTitle;
+      text = await pending;
+    } while (pending !== this.latestTitle);
     return text;
   }
 
