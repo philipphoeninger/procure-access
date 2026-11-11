@@ -34,7 +34,7 @@
 | `features/configurator/models/criteria.ts` | Re-exports `PriorityLevel`/`PRIORITY_LEVELS` from K5 | F8 |
 | `features/configurator/testing/criteria-fixture.ts` | `procedureText()` exported | Tests |
 | `public/i18n/de.json`, `scripts/check-i18n.mjs` | `criteria.list`, `criteria.item`, `criteria.priority` added to `AREAS`; `--write` copied their texts (with U100) | Row |
-| `docs/ux_copy_procureaccess_v18.md` (new; v16 deleted) | U100: `criteria.item.meta.part` „{{productPart}}“, `criteria.item.meta.standard` „EN 301 549 {{number}}“ — **proposal, the owner confirms it in this pull request** | O-S4-31 |
+| `docs/ux_copy_procureaccess_v18.md` (new; v16 deleted) | U100: `criteria.item.meta.part` „{{productPart}}“, `criteria.item.meta.standard` „EN 301 549 {{number}}“ — proposal, confirmed unchanged by the owner in this pull request (2026-11-11) | O-S4-31 |
 | `docs/TESTING_v46.md` (new; v44 deleted) | V139: CAT-02 frontend part, level FE; input documents updated | CAT-02 |
 | `docs/design_handoff_procureaccess_v1.md` 1.18 | §5.5: „Geprüft nach …“ panel with the priority section; anchor is the title id | O-S4-33 |
 | `docs/figma_code_mapping_procureaccess_v1.md` 1.19 | K5 built (display only), §3 notes for `level`, `Show why button`, rationale; related line | Mapping upkeep |
@@ -83,7 +83,7 @@ No correctness or security bug left that affects current behaviour; no further r
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | U100 (`criteria.item.meta.part`, `.standard`) is a proposal | Owner confirms or edits the wording in this pull request; the code reads the keys only |
+| P1 | U100 (`criteria.item.meta.part`, `.standard`) was a proposal | Closed: the owner confirmed the wording unchanged in this pull request (2026-11-11) |
 | P2 | S4-15b: catalog sections (Markdown renderer O-S4-30, tabs, examples, „So wird es geprüft“, source line) and `appliesTo[]` in SPEC §8.2 / the endpoint (O-S4-29) | Next task |
 | P3 | The K5 toggle „Warum diese Priorität?“ / „Begründung ausblenden“ (Figma 2011:92) has no UX copy key for the hide state | With the first screen that shows K5 outside a detail panel (workspace); a UX copy key then |
 | P4 | Before S4-16: no UX copy key for the „Notiz hinzufügen“ button and none for a weight input label (S4-14 P4) | One UX copy proposal before S4-16 |
