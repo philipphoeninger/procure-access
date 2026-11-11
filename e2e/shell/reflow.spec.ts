@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { expect, test, type Page } from '@playwright/test';
+import { chooseFirstOption } from '../support/combobox';
 
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
@@ -39,11 +40,7 @@ const combobox = (page: Page) => page.getByRole('combobox', { name: 'Verwendungs
 async function chooseUseCase(page: Page, typed: string, name: string): Promise<void> {
   await combobox(page).focus();
   await page.keyboard.type(typed);
-  // ArrowDown takes the first option: wait until the list is filtered.
-  await expect(page.getByRole('listbox').getByRole('option').first()).toHaveAccessibleName(name);
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Enter');
-  await expect(combobox(page)).toHaveValue(name);
+  await chooseFirstOption(page, combobox(page), name);
 }
 
 async function next(page: Page, heading: string | RegExp): Promise<void> {

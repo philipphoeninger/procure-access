@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { recordThirdPartyRequests, thirdPartyLinksInDocument } from '../support/third-party-requests';
+import { chooseFirstOption } from '../support/combobox';
 
 /**
  * J1, configurator without account (TESTING §5.4), on S10 and the active test release T.1 of the
@@ -116,14 +117,12 @@ test.describe('J1 configurator without account', () => {
       const combobox = page.getByRole('combobox', { name: 'Verwendungszweck' });
       await tabTo(page, combobox);
       await page.keyboard.type('HR');
-      // ArrowDown takes the first option: wait until the list is filtered.
+      // Wait for the filtered list, so axe checks it.
       await expect(page.getByRole('listbox').getByRole('option').first()).toHaveAccessibleName('HR-Anwendung');
       await settled(page.getByRole('listbox'));
       await expectNoAxeViolations(page, testInfo, 'j1 step 1, list filtered');
 
-      await page.keyboard.press('ArrowDown');
-      await page.keyboard.press('Enter');
-      await expect(combobox).toHaveValue('HR-Anwendung');
+      await chooseFirstOption(page, combobox, 'HR-Anwendung');
       await next(page, 'Was möchten Sie beschaffen?');
     });
 

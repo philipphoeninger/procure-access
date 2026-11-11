@@ -4,6 +4,7 @@
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
+import { chooseFirstOption } from '../support/combobox';
 
 /**
  * S10 reset notice, „Bisherige Auswahl“ and the hand-over to S11 (S4-12; R-CON-07, R-CON-08,
@@ -31,11 +32,7 @@ async function settled(locator: Locator): Promise<void> {
 async function chooseUseCase(page: Page, typed: string, name: string): Promise<void> {
   await combobox(page).focus();
   await page.keyboard.type(typed);
-  // ArrowDown takes the first option: wait until the list is filtered.
-  await expect(page.getByRole('listbox').getByRole('option').first()).toHaveAccessibleName(name);
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Enter');
-  await expect(combobox(page)).toHaveValue(name);
+  await chooseFirstOption(page, combobox(page), name);
 }
 
 async function pressSpace(box: Locator): Promise<void> {

@@ -4,6 +4,7 @@
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
+import { chooseFirstOption } from '../support/combobox';
 
 /**
  * S10 steps 2–4 (S4-11; R-CON-03 – R-CON-06) on the active test release T.1 of the E2E stack,
@@ -32,9 +33,7 @@ async function toStep2(page: Page, viewport: { width: number; height: number }):
   await combobox.focus();
   await page.keyboard.type('HR');
   await expect(page.getByRole('listbox').getByRole('option')).toHaveCount(2);
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Enter');
-  await expect(combobox).toHaveValue('HR-Anwendung');
+  await chooseFirstOption(page, combobox, 'HR-Anwendung');
   await next(page).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Was möchten Sie beschaffen?' })).toBeFocused();
 }

@@ -4,6 +4,7 @@
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
+import { chooseFirstOption } from '../support/combobox';
 
 /**
  * S10 frame and step 1 (S4-10; R-CON-01, R-CON-02) on the active test release T.1 of the E2E
@@ -74,11 +75,8 @@ test.describe('S10 Kriterien zusammenstellen, step 1', () => {
 
     await openList(page);
     await page.keyboard.type('HR');
-    // Wait for the filtered list: an arrow key before it would mark an option that is replaced.
     await expect(options(page)).toHaveCount(2);
-    await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('Enter');
-    await expect(combobox(page)).toHaveValue('HR-Anwendung');
+    await chooseFirstOption(page, combobox(page), 'HR-Anwendung');
 
     await page.keyboard.press('Tab');
     await expect(page.getByRole('button', { name: 'Weiter' })).toBeFocused();
