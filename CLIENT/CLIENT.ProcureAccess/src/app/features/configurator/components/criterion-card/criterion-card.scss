@@ -78,3 +78,10 @@ p {
 .pa-criterion-card__section-title {
   font: var(--mat-sys-title-small);
 }
+
+.pa-criterion-card__tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  padding-block-start: var(--pa-space-md);
+}

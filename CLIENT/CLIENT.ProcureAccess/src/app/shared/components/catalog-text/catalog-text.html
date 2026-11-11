@@ -1,0 +1,59 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<ng-template #inline let-content>
+  @for (part of content; track $index) {
+    @switch (part.kind) {
+      @case ('strong') {
+        <strong>{{ part.text }}</strong>
+      }
+      @case ('link') {
+        <a class="pa-catalog-text__link" [href]="part.url" target="_blank" rel="noopener noreferrer"
+          >{{ part.text }}&ngsp;<span class="cdk-visually-hidden">{{
+            'common.newTab' | translate
+          }}</span></a
+        >
+      }
+      @default {
+        <!-- In a container of its own, so no space from this template joins the text. -->
+        <ng-container>{{ part.text }}</ng-container>
+      }
+    }
+  }
+</ng-template>
+
+<ng-template #nested let-items>
+  <ul>
+    @for (item of items; track $index) {
+      <li>
+        <ng-container *ngTemplateOutlet="inline; context: { $implicit: item.content }" />
+        @if (item.children.length > 0) {
+          <ng-container *ngTemplateOutlet="nested; context: { $implicit: item.children }" />
+        }
+      </li>
+    }
+  </ul>
+</ng-template>
+
+@for (shownBlock of shown(); track $index) {
+  @if (shownBlock.block.kind === 'paragraph') {
+    <p>
+      <ng-container *ngTemplateOutlet="inline; context: { $implicit: shownBlock.block.content }" />
+    </p>
+  } @else {
+    <ul>
+      @for (item of itemsOf(shownBlock.block); track $index) {
+        @let index = shownBlock.firstItem + $index;
+        <li [attr.data-pa-item]="index" [attr.tabindex]="index === focusableItem() ? -1 : null">
+          <ng-container *ngTemplateOutlet="inline; context: { $implicit: item.content }" />
+          @if (item.children.length > 0) {
+            <ng-container *ngTemplateOutlet="nested; context: { $implicit: item.children }" />
+          }
+        </li>
+      }
+    </ul>
+  }
+}

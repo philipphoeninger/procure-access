@@ -496,7 +496,11 @@
         "howTested.link": "Prüfschritt {{number}} im {{testType}} (öffnet bit-inklusiv.de)",
         "appliesTo": "Gilt für",
         "source": "Texte: {{testType}}, Prüfschritt {{number}} „{{originalTitle}}“. Verwendet mit Erlaubnis.",
-        "tabs": "Software-Test / App-Test / PDF-Test"
+        "tabs": {
+          "softwareTest": "Software-Test",
+          "appTest": "App-Test",
+          "pdfTest": "PDF-Test"
+        }
       },
       "testedBy": {
         "title": "Geprüft nach {{testType}}",
@@ -545,5 +549,24 @@
     "other": "Andere Prüfung",
     "other.hint": "Sie geben den Namen des Verfahrens an.",
     "own": "Eigene Prüfung ohne festes Verfahren"
+  },
+  "assessment": {
+    "value": {
+      "fulfilled": "Erfüllt",
+      "slightRestriction": "Leichte Einschränkung",
+      "restriction": "Einschränkung",
+      "barrier": "Barriere",
+      "blockade": "Blockade",
+      "notApplicable": "Nicht anwendbar",
+      "notApplicable.hint": "Das Kriterium betrifft eine Funktion, die das Produkt nicht hat.",
+      "unknown": "Nicht eingeschätzt",
+      "fulfilled.explain": "Die Anforderung ist vollständig umgesetzt. Niemand wird bei dieser Funktion behindert.",
+      "slightRestriction.explain": "Kleine Mängel. Die Nutzung ist kaum erschwert.",
+      "restriction.explain": "Spürbare Mängel. Betroffene Menschen können die Funktion nutzen, aber nur mit Mehraufwand oder über Umwege.",
+      "barrier.explain": "Erhebliche Mängel. Betroffene Menschen können die Funktion nur mit großer Mühe oder mit fremder Hilfe nutzen.",
+      "blockade.explain": "Betroffene Menschen können die Funktion gar nicht nutzen.",
+      "notApplicable.explain": "Das Produkt hat die Funktion nicht, um die es im Kriterium geht, zum Beispiel keine Videos. Das ist weder ein Mangel noch ein Pluspunkt.",
+      "unknown.explain": "Zu diesem Kriterium gibt es noch keine Bewertung. Das heißt nicht, dass es nicht erfüllt ist."
+    }
   }
 }

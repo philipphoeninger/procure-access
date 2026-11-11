@@ -167,6 +167,32 @@ public class CriteriaResolverTests
         Criterion(mini, Keys.PriorityAllLevels).ProductPart.ShouldBeNull();
     }
 
+    [Fact]
+    public void Resolve_AppliesTo_IsTheSelectedAppTypesTheCriterionAppliesToInSortOrder()
+    {
+        // Owner decision O-S4-29 (a): „Gilt für“ in the detail panel. Mobile applies only with Audio.
+        var release = ReleaseOf(ARevision().WithKey("T-APPLIES")
+            .AppliesTo(V.MobileOpen, V.Audio).AppliesTo(V.SoftwareOpen).AppliesTo(V.Web, V.Video)
+            .WithDefaultPriority(PriorityLevel.B)
+            .Build());
+
+        var withVideo = Resolve(release, Selection(null, ["mobileOpen", "softwareOpen", "web"], ["base", "video"]));
+        var withAudio = Resolve(release, Selection(null, ["mobileOpen", "web"], ["base", "audio"]));
+
+        Criterion(withVideo, "T-APPLIES").AppliesTo.ShouldBe(
+            [new AppTypeItem("web", "Website oder Webanwendung"), new AppTypeItem("softwareOpen", "Software (offen)")]);
+        Criterion(withAudio, "T-APPLIES").AppliesTo.ShouldBe([new AppTypeItem("mobileOpen", "Mobile Anwendung (offen)")]);
+    }
+
+    [Fact]
+    public void Resolve_ProcedureCriterion_AppliesToNothing()
+    {
+        var response = Resolve(Catalog.T1, Selection(null, ["web"], ["base"], ["softwareTest"]));
+
+        Criterion(response, Keys.ProcedureSoftwareTest).AppliesTo.ShouldBeEmpty();
+        Criterion(response, Keys.DefaultOnly).AppliesTo.ShouldBe([new AppTypeItem("web", "Website oder Webanwendung")]);
+    }
+
     [Fact(DisplayName = "INV:CAT-02 " + nameof(Resolve_Criterion_CarriesItsContentAndExplainedPriority))]
     [Trait("Invariant", "CAT-02")]
     public void Resolve_Criterion_CarriesItsContentAndExplainedPriority()

@@ -1,0 +1,46 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+h3,
+p {
+  margin: 0;
+}
+
+.pa-procedure-sections__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+}
+
+.pa-procedure-sections__title {
+  font: var(--mat-sys-title-small);
+}
+
+// The allowed ratings in one line with „ · “ between them (UX copy `criteria.item.detail.ratings`);
+// a list, so a screen reader counts them, and the separator only in CSS.
+.pa-procedure-sections__ratings {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--mat-sys-body-medium);
+
+  li + li::before {
+    content: '\00a0·\00a0';
+    // Not part of the text a screen reader reads.
+    content: '\00a0·\00a0' / '';
+  }
+}
+
+.pa-procedure-sections__link {
+  color: var(--mat-sys-primary);
+  overflow-wrap: anywhere;
+}

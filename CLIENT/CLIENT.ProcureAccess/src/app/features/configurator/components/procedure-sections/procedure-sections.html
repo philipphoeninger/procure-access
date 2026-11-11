@@ -1,0 +1,61 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@for (kind of shownKinds(); track kind) {
+  <section class="pa-procedure-sections__section">
+    <h3 class="pa-procedure-sections__title">{{ titleKeys[kind] | translate }}</h3>
+    @switch (kind) {
+      @case ('requirement') {
+        <pa-catalog-text [text]="text().requirement ?? ''" />
+      }
+      @case ('applicability') {
+        <pa-catalog-text [text]="text().applicability ?? ''" />
+      }
+      @case ('why') {
+        <pa-catalog-text [text]="text().rationaleWhy ?? ''" />
+      }
+      @case ('examples') {
+        @if (text().positiveExamples; as positive) {
+          <pa-example-group
+            titleKey="criteria.item.detail.examples.positive"
+            [text]="positive"
+            [headingId]="idPrefix() + '-positive'"
+            [criterionTitleId]="criterionTitleId()"
+          />
+        }
+        @if (text().negativeExamples; as negative) {
+          <pa-example-group
+            titleKey="criteria.item.detail.examples.negative"
+            [text]="negative"
+            [headingId]="idPrefix() + '-negative'"
+            [criterionTitleId]="criterionTitleId()"
+          />
+        }
+      }
+      @case ('ratings') {
+        <ul class="pa-procedure-sections__ratings">
+          @for (rating of ratings(); track rating) {
+            <li>{{ ratingKeys[rating] | translate }}</li>
+          }
+        </ul>
+      }
+    }
+  </section>
+}
+
+@if (howTested() && stepUrl(); as url) {
+  <section class="pa-procedure-sections__section">
+    <h3 class="pa-procedure-sections__title">{{ 'criteria.item.detail.howTested' | translate }}</h3>
+    <p>
+      <a class="pa-procedure-sections__link" [href]="url" target="_blank" rel="noopener noreferrer"
+        >{{
+          'criteria.item.detail.howTested.link'
+            | translate: { number: text().originalNumber, testType: (testTypeKey() | translate) }
+        }}&ngsp;<span class="cdk-visually-hidden">{{ 'common.newTab' | translate }}</span></a
+      >
+    </p>
+  </section>
+}
