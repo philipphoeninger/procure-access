@@ -428,5 +428,21 @@
         }
       }
     }
+  },
+  "testType": {
+    "softwareTest.hint": "Für Software und vorerst auch für Websites.",
+    "link": "Verfahren ansehen ({{domain}})",
+    "appTest.hint": "Für mobile Anwendungen.",
+    "pdfTest.hint": "Für PDF-Dokumente.",
+    "bikWeb.hint": "Für Websites und Webanwendungen.",
+    "bikApp.hint": "Für mobile Anwendungen.",
+    "softwareTest": "BIT inklusiv Software-Test",
+    "appTest": "BIT inklusiv App-Test",
+    "pdfTest": "BIT inklusiv PDF-Test",
+    "bikWeb": "BIK BITV-Test (Web)",
+    "bikApp": "BIK BITV-Test (App)",
+    "other": "Andere Prüfung",
+    "other.hint": "Sie geben den Namen des Verfahrens an.",
+    "own": "Eigene Prüfung ohne festes Verfahren"
   }
 }

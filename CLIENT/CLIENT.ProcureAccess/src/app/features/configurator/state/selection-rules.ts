@@ -44,6 +44,47 @@ export function exclusionReasons(option: FilterOption): Record<ExcludingLayer, s
   return reasons;
 }
 
+/** One reason line under an excluded option: a `criteria.select.excluded.*` key and its values. */
+export interface ReasonLine {
+  key:
+    | 'criteria.select.excluded.useCase'
+    | 'criteria.select.excluded.appType'
+    | 'criteria.select.excluded.both'
+    | 'criteria.select.excluded.productPart';
+  params: Record<string, string>;
+}
+
+/**
+ * The reason lines of an excluded option (R-CON-06, Handoff §5.4, UX copy U98): use case and app
+ * types share one line (`both` when both exclude it), product parts get a line of their own after
+ * it, so the reason names every value that excludes the option. `joinNames` joins several names of
+ * one layer („A oder B“); an available option has no line.
+ */
+export function exclusionReasonLines(
+  option: FilterOption,
+  joinNames: (names: string[]) => string,
+): ReasonLine[] {
+  const { useCase, appType, productPart } = exclusionReasons(option);
+  const lines: ReasonLine[] = [];
+  if (useCase.length > 0 && appType.length > 0) {
+    lines.push({
+      key: 'criteria.select.excluded.both',
+      params: { useCase: joinNames(useCase), appTypes: joinNames(appType) },
+    });
+  } else if (useCase.length > 0) {
+    lines.push({ key: 'criteria.select.excluded.useCase', params: { useCase: joinNames(useCase) } });
+  } else if (appType.length > 0) {
+    lines.push({ key: 'criteria.select.excluded.appType', params: { appTypes: joinNames(appType) } });
+  }
+  if (productPart.length > 0) {
+    lines.push({
+      key: 'criteria.select.excluded.productPart',
+      params: { productParts: joinNames(productPart) },
+    });
+  }
+  return lines;
+}
+
 /** Ids of the product parts that are always selected (Basisfunktionalität, R-CON-04). */
 export function alwaysSelectedPartIds(options: FilterOptionsLayers): string[] {
   return options.productParts.filter((part) => part.alwaysSelected).map((part) => part.id);

@@ -61,21 +61,68 @@ SPDX-License-Identifier: MIT
     </div>
   </cdk-step>
 
-  <!-- Steps 2–4: question and hint; their checkbox groups and checks come with S4-11 -->
-  <cdk-step [label]="'criteria.select.step2.name' | translate" [completed]="true">
+  <cdk-step [label]="'criteria.select.step2.name' | translate" [completed]="appTypeAnswered()">
     <mat-card class="pa-step" appearance="outlined">
-      <h2 class="pa-step__question">{{ 'criteria.select.step2.question' | translate }}</h2>
+      <fieldset
+        #appTypeGroup
+        class="pa-step__group"
+        [attr.aria-describedby]="appTypeErrorShown() ? 'pa-step2-hint pa-step2-error' : 'pa-step2-hint'"
+      >
+        <legend class="pa-step__legend">
+          <h2 class="pa-step__question">{{ 'criteria.select.step2.question' | translate }}</h2>
+        </legend>
+        <p class="pa-step__hint" id="pa-step2-hint">
+          {{ 'criteria.select.step2.hint' | translate }}
+          @if (someAppTypeExcluded()) {
+            {{ 'criteria.select.step2.hint.excluded' | translate }}
+          }
+        </p>
+        @if (appTypeErrorShown()) {
+          <p class="pa-step__error" id="pa-step2-error">{{ 'criteria.select.error.noAppType' | translate }}</p>
+        }
+        @for (appType of appTypes(); track appType.id) {
+          <pa-filter-option
+            [optionId]="'pa-app-type-' + appType.id"
+            [name]="appType.name"
+            [checked]="selectedAppTypes().has(appType.id)"
+            [reasons]="reasons().appType.get(appType.id) ?? []"
+            [hintKey]="appTypeHintKey(appType.id)"
+            (toggled)="toggleAppType(appType.id)"
+          />
+        }
+      </fieldset>
     </mat-card>
     <div class="pa-step__actions">
       <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
-      <button matButton="filled" type="button" (click)="next()">{{ 'criteria.select.next' | translate }}</button>
+      <button matButton="filled" type="button" (click)="nextFromAppTypes()">{{ 'criteria.select.next' | translate }}</button>
     </div>
   </cdk-step>
 
   <cdk-step [label]="'criteria.select.step3.name' | translate" [completed]="true">
     <mat-card class="pa-step" appearance="outlined">
-      <h2 class="pa-step__question">{{ 'criteria.select.step3.question' | translate }}</h2>
-      <p class="pa-step__hint">{{ 'criteria.select.step3.hint' | translate }}</p>
+      <fieldset class="pa-step__group" aria-describedby="pa-step3-hint">
+        <legend class="pa-step__legend">
+          <h2 class="pa-step__question">{{ 'criteria.select.step3.question' | translate }}</h2>
+        </legend>
+        <p class="pa-step__hint" id="pa-step3-hint">{{ 'criteria.select.step3.hint' | translate }}</p>
+        <mat-slide-toggle
+          class="pa-step__toggle"
+          [checked]="showExplanations()"
+          (change)="showExplanations.set($event.checked)"
+          >{{ 'criteria.select.step3.explain.toggle' | translate }}</mat-slide-toggle
+        >
+        @for (part of productParts(); track part.id) {
+          <pa-filter-option
+            [optionId]="'pa-product-part-' + part.id"
+            [name]="part.name"
+            [checked]="part.alwaysSelected || selectedProductParts().has(part.id)"
+            [locked]="part.alwaysSelected"
+            [reasons]="reasons().productPart.get(part.id) ?? []"
+            [explanation]="showExplanations() ? part.explanation : null"
+            (toggled)="toggleProductPart(part.id)"
+          />
+        }
+      </fieldset>
     </mat-card>
     <div class="pa-step__actions">
       <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
@@ -83,10 +130,26 @@ SPDX-License-Identifier: MIT
     </div>
   </cdk-step>
 
+  <!-- Step 4 may stay empty (CFG-04); „Kriterienliste anzeigen“ comes with S4-12 -->
   <cdk-step [label]="'criteria.select.step4.name' | translate" optional>
     <mat-card class="pa-step" appearance="outlined">
-      <h2 class="pa-step__question">{{ 'criteria.select.step4.question' | translate }}</h2>
-      <p class="pa-step__hint">{{ 'criteria.select.step4.hint' | translate }}</p>
+      <fieldset class="pa-step__group" aria-describedby="pa-step4-hint">
+        <legend class="pa-step__legend">
+          <h2 class="pa-step__question">{{ 'criteria.select.step4.question' | translate }}</h2>
+        </legend>
+        <p class="pa-step__hint" id="pa-step4-hint">{{ 'criteria.select.step4.hint' | translate }}</p>
+        @for (testType of testTypes(); track testType.id) {
+          <pa-filter-option
+            [optionId]="'pa-test-type-' + testType.id"
+            [name]="testType.name"
+            [checked]="selectedTestTypes().has(testType.id)"
+            [reasons]="reasons().testType.get(testType.id) ?? []"
+            [hintKey]="testTypeHintKey(testType.id)"
+            [link]="testTypeLink(testType)"
+            (toggled)="toggleTestType(testType.id)"
+          />
+        }
+      </fieldset>
     </mat-card>
     <div class="pa-step__actions">
       <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>

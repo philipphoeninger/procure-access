@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ConfiguratorDraft, EMPTY_DRAFT } from '../models/configurator-draft';
+import { ConfiguratorDraft, ConfiguratorLayer, EMPTY_DRAFT } from '../models/configurator-draft';
+import { ExcludingLayer, ExcludingValue, FilterOptionsLayers } from '../models/filter-options';
 import { excluded, filterOptions } from '../testing/filter-options-fixture';
 import {
   alwaysSelectedPartIds,
   chooseUseCase,
+  exclusionReasonLines,
   exclusionReasons,
   isComplete,
   isExcluded,
@@ -174,6 +176,84 @@ describe('selection rules', () => {
         appType: ['Web', 'Closed'],
         productPart: [],
       });
+    });
+  });
+
+  describe('reason lines of an excluded option (R-CON-06, UX copy U98)', () => {
+    const join = (names: string[]) => names.join(' | ');
+    const byHr = { layer: 'useCase', id: 'hr', name: 'HR' } as const;
+    const byWeb = { layer: 'appType', id: 'web', name: 'Web' } as const;
+    const byClosed = { layer: 'appType', id: 'closed', name: 'Closed' } as const;
+    const byAudio = { layer: 'productPart', id: 'audio', name: 'Audio' } as const;
+    const byVideo = { layer: 'productPart', id: 'video', name: 'Video' } as const;
+    const linesFor = (...by: ExcludingValue[]) =>
+      exclusionReasonLines(excluded(options, 'testTypes', 'pdfTest', ...by).testTypes[1], join);
+
+    it('gives an available option no line', () => {
+      expect(exclusionReasonLines(options.testTypes[1], join)).toEqual([]);
+    });
+
+    it('names the use case, the app types or both in one line', () => {
+      expect(linesFor(byHr)).toEqual([{ key: 'criteria.select.excluded.useCase', params: { useCase: 'HR' } }]);
+      expect(linesFor(byWeb, byClosed)).toEqual([
+        { key: 'criteria.select.excluded.appType', params: { appTypes: 'Web | Closed' } },
+      ]);
+      expect(linesFor(byHr, byWeb)).toEqual([
+        { key: 'criteria.select.excluded.both', params: { useCase: 'HR', appTypes: 'Web' } },
+      ]);
+    });
+
+    it('gives the product parts a line of their own after the other one', () => {
+      expect(linesFor(byAudio, byVideo)).toEqual([
+        { key: 'criteria.select.excluded.productPart', params: { productParts: 'Audio | Video' } },
+      ]);
+      expect(linesFor(byAudio, byHr, byWeb)).toEqual([
+        { key: 'criteria.select.excluded.both', params: { useCase: 'HR', appTypes: 'Web' } },
+        { key: 'criteria.select.excluded.productPart', params: { productParts: 'Audio' } },
+      ]);
+    });
+  });
+
+  describe('exclusion rules between every pair of layers (CAT-12, configurator part)', () => {
+    type Pair = [ExcludingLayer, Exclude<ConfiguratorLayer, 'useCase'>];
+    const PAIRS: Pair[] = [
+      ['useCase', 'appType'],
+      ['useCase', 'productPart'],
+      ['useCase', 'testType'],
+      ['appType', 'productPart'],
+      ['appType', 'testType'],
+      ['productPart', 'testType'],
+    ];
+    const SOURCES = {
+      useCase: { layer: 'useCase', id: 'hr', name: 'HR' },
+      appType: { layer: 'appType', id: 'web', name: 'Web' },
+      productPart: { layer: 'productPart', id: 'audio', name: 'Audio' },
+    } as const;
+    const TARGETS = {
+      appType: { list: 'appTypes', id: 'document' },
+      productPart: { list: 'productParts', id: 'video' },
+      testType: { list: 'testTypes', id: 'pdfTest' },
+    } as const;
+    const REASON_KEYS = {
+      useCase: 'criteria.select.excluded.useCase',
+      appType: 'criteria.select.excluded.appType',
+      productPart: 'criteria.select.excluded.productPart',
+    } as const;
+    const toggles = {
+      appType: toggleAppType,
+      productPart: toggleProductPart,
+      testType: toggleTestType,
+    };
+
+    it.each(PAIRS)('INV:CAT-12 a value of %s excludes a %s: the configurator refuses it and names the reason', (source, target) => {
+      const { list, id } = TARGETS[target];
+      const layers: FilterOptionsLayers = excluded(options, list, id, SOURCES[source]);
+      const option = layers[list].find((o) => o.id === id)!;
+
+      expect(toggles[target](filled, id, layers).draft).toBe(filled);
+      expect(exclusionReasonLines(option, (names) => names.join()).map((line) => line.key)).toEqual([
+        REASON_KEYS[source],
+      ]);
     });
   });
 

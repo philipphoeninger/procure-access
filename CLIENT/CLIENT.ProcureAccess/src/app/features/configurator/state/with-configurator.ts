@@ -74,11 +74,31 @@ export const withConfigurator = () =>
     withLoading(),
     withMethods((store, api = inject(CatalogApiService)) => {
       let latestRequest = 0;
+      let latestLoad: Promise<void> = Promise.resolve();
 
       const patch = (changes: Partial<ConfiguratorState>) =>
         patchState(store, (state) => ({ configurator: { ...state.configurator, ...changes } }));
 
-      async function loadFilterOptions(): Promise<void> {
+      function loadFilterOptions(): Promise<void> {
+        latestLoad = load();
+        return latestLoad;
+      }
+
+      /**
+       * Waits until the options answer the current draft (R-CON-01: „Weiter“ leads to a step whose
+       * choices are current). True when they do; false when the last request failed or nothing
+       * was loaded, so the caller stays on its step.
+       */
+      async function optionsCurrent(): Promise<boolean> {
+        // A change during the wait starts a newer request: wait for that one too.
+        while (store.configurator().changedSinceAnswer !== null && store.configurator().optionsStatus === 'loading') {
+          await latestLoad;
+        }
+        const { changedSinceAnswer, options } = store.configurator();
+        return changedSinceAnswer === null && options !== null;
+      }
+
+      async function load(): Promise<void> {
         const request = ++latestRequest;
         const { draft, release } = store.configurator();
         patch({ optionsStatus: 'loading' });
@@ -133,6 +153,7 @@ export const withConfigurator = () =>
 
       return {
         loadFilterOptions,
+        optionsCurrent,
         chooseUseCase(choice: Exclude<UseCaseChoice, { kind: 'unanswered' }>): void {
           change('useCase', (draft, options) => chooseUseCase(draft, choice, options));
         },
