@@ -4,10 +4,28 @@ SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-@if (testType(); as testType) {
-  <h2 class="pa-criterion-card__title" [id]="titleId()">
-    {{ 'criteria.item.testedBy.title' | translate: { testType: (testTypeKey() | translate) } }}
-  </h2>
+<div class="pa-criterion-card__title-row">
+  <mat-checkbox
+    class="pa-criterion-card__include"
+    [checked]="decision().included"
+    [aria-labelledby]="includeLabelId() + ' ' + titleId()"
+    (change)="includedChange.emit($event.checked)"
+  >
+    <span class="cdk-visually-hidden" [id]="includeLabelId()">{{ 'criteria.item.include' | translate }}</span>
+  </mat-checkbox>
+  @if (testType()) {
+    <h2 class="pa-criterion-card__title" [id]="titleId()">
+      {{ 'criteria.item.testedBy.title' | translate: { testType: (testTypeKey() | translate) } }}
+    </h2>
+  } @else {
+    <h2 class="pa-criterion-card__title" [id]="titleId()">{{ title() }}</h2>
+  }
+  @if (!decision().included) {
+    <p class="pa-criterion-card__status">{{ 'criteria.item.excluded' | translate }}</p>
+  }
+</div>
+
+@if (testType()) {
   <p class="pa-criterion-card__text">
     {{ 'criteria.item.testedBy.text' | translate: { testType: (testTypeKey() | translate) } }}
   </p>
@@ -27,7 +45,6 @@ SPDX-License-Identifier: MIT
     </p>
   }
 } @else {
-  <h2 class="pa-criterion-card__title" [id]="titleId()">{{ title() }}</h2>
   @if (sourceTitle(); as source) {
     <p class="pa-criterion-card__source">{{ source.key | translate: source.params }}</p>
   }
@@ -40,6 +57,12 @@ SPDX-License-Identifier: MIT
   [level]="level()"
   [recommendedLevel]="recommendedLevel()"
   [weight]="weight()"
+  [recommendedWeight]="recommendedWeight()"
+  [criterionTitleId]="titleId()"
+  [weightRange]="weightRange"
+  (levelChange)="levelChange.emit($event)"
+  (weightChange)="emitWeight($event)"
+  (restoreRecommendation)="priorityReset.emit()"
 />
 
 <div class="pa-criterion-card__actions">
@@ -53,6 +76,33 @@ SPDX-License-Identifier: MIT
   >
     {{ (expanded() ? 'criteria.item.hideDetails' : 'criteria.item.showDetails') | translate }}
   </button>
+  <button
+    matButton
+    type="button"
+    [attr.aria-expanded]="noteOpen()"
+    [attr.aria-controls]="noteId()"
+    [attr.aria-describedby]="titleId()"
+    (click)="toggleNote()"
+  >
+    {{ (decision().note === '' ? 'criteria.item.note.add' : 'criteria.item.note.edit') | translate }}
+  </button>
+</div>
+
+<div class="pa-criterion-card__note" [id]="noteId()" [hidden]="!noteOpen()">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ 'criteria.item.note' | translate }}</mat-label>
+    <textarea
+      #noteField
+      matInput
+      cdkTextareaAutosize
+      cdkAutosizeMinRows="3"
+      [formControl]="noteControl"
+      [attr.aria-describedby]="titleId()"
+    ></textarea>
+    @if (noteError(); as error) {
+      <mat-error>{{ 'errors.field.maxLength' | translate: error }}</mat-error>
+    }
+  </mat-form-field>
 </div>
 
 <div class="pa-criterion-card__details" [id]="panelId()" [hidden]="!expanded()">

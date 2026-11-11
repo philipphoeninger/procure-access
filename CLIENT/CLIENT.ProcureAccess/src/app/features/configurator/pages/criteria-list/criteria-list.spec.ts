@@ -4,6 +4,8 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { fireEvent } from '@testing-library/dom';
 import { provideRouter, Router } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
@@ -23,7 +25,7 @@ const ConfiguratorTestStore = signalStore(withConfigurator());
 @Component({ template: '' })
 class Blank {}
 
-describe('CriteriaListPage (S11, R-LST-01, R-LST-02)', () => {
+describe('CriteriaListPage (S11, R-LST-01 – R-LST-05)', () => {
   let api: { getFilterOptions: ReturnType<typeof vi.fn>; getCriteria: ReturnType<typeof vi.fn> };
 
   async function setUp(getCriteria: ReturnType<typeof vi.fn>) {
@@ -40,6 +42,8 @@ describe('CriteriaListPage (S11, R-LST-01, R-LST-02)', () => {
         ]),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
+        // jsdom never ends a CSS transition, so the K5 menu would never finish closing.
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
     });
     await rendered.fixture.whenStable();
@@ -114,5 +118,55 @@ describe('CriteriaListPage (S11, R-LST-01, R-LST-02)', () => {
     expect(screen.getByRole('link', { name: 'Auswahl ändern' })).toBeTruthy();
     expect(screen.queryByRole('list')).toBeNull();
     expect(fixture.debugElement.injector.get(Router).url).toBe('/');
+  });
+
+  it('keeps the user’s changes of a card in the draft; an excluded card stays in the list (R-LST-03 – R-LST-05)', async () => {
+    const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+    const store = fixture.debugElement.injector.get<InstanceType<typeof ConfiguratorTestStore>>(ProcureAccessStore);
+    const act = async (element: HTMLElement) => {
+      element.click();
+      await fixture.whenStable();
+    };
+    const card = () => screen.getAllByRole('listitem')[0];
+
+    await act(within(card()).getByRole('checkbox', { name: /^In Liste aufnehmen Bilder/ }));
+    await act(within(card()).getByRole('button', { name: /^Priorität:/ }));
+    await act(screen.getByRole('menuitemradio', { name: 'Hinweis' }));
+    await act(within(card()).getByRole('button', { name: 'Notiz hinzufügen' }));
+    const note = within(card()).getByRole('textbox', { name: 'Ihre Notiz zu diesem Kriterium (optional)' });
+    (note as HTMLTextAreaElement).value = 'Nur für die Webanwendung.';
+    fireEvent.input(note);
+    await fixture.whenStable();
+
+    expect(store.configurator.list.decisions()['11.1.1']).toEqual({
+      included: false,
+      overrideLevel: 'Info',
+      overrideWeight: null,
+      note: 'Nur für die Webanwendung.',
+    });
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    expect(within(card()).getByText('Nicht in Ihrer Liste')).toBeTruthy();
+    expect(within(card()).getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
+    expect(within(card()).getByRole('button', { name: 'Notiz bearbeiten' })).toBeTruthy();
+    await expectNoAxeViolations();
+
+    await act(within(card()).getByRole('button', { name: 'Empfehlung wiederherstellen' }));
+
+    expect(store.configurator.list.decisions()['11.1.1']?.overrideLevel).toBeNull();
+    expect(within(card()).queryByText(/Von Ihnen geändert/)).toBeNull();
+  });
+
+  it('sets the weight of a recommended B in the draft', async () => {
+    const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+    const store = fixture.debugElement.injector.get<InstanceType<typeof ConfiguratorTestStore>>(ProcureAccessStore);
+    const card = screen.getAllByRole('listitem')[1];
+
+    within(card).getByRole('combobox', { name: 'Gewichtung' }).click();
+    await fixture.whenStable();
+    screen.getByRole('option', { name: '6' }).click();
+    await fixture.whenStable();
+
+    expect(store.configurator.list.decisions()['11.2.2']?.overrideWeight).toBe(6);
+    expect(within(card).getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
   });
 });

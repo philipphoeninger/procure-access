@@ -6,6 +6,7 @@
     "add_2",
     "app_registration",
     "arrow_downward",
+    "arrow_drop_down",
     "box",
     "check",
     "checklist",
@@ -38,5 +39,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "64472e95a34d3f6a5c0904f9d61c9e1432c75f21257b12b8e002bd4754ba556e"
+  "sha256": "3fa0cfff5209eb751ef60a49f908f606659e6e2d08d5275faf1d24973ec6ff43"
 }

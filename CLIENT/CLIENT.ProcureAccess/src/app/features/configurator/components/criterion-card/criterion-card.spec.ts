@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { fireEvent } from '@testing-library/dom';
 import { render, screen } from '@testing-library/angular';
 
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { Criterion, ProcedureText } from '../../models/criteria';
-import { CriterionDecision, DEFAULT_DECISION } from '../../models/criteria-list';
+import { CriterionDecision, DEFAULT_DECISION, NOTE_MAX_LENGTH } from '../../models/criteria-list';
 import { CatalogNames, catalogNames } from '../../state/catalog-names';
 import { criterion, procedureText } from '../../testing/criteria-fixture';
 import { filterOptions } from '../../testing/filter-options-fixture';
@@ -105,6 +106,13 @@ async function show(
   decision: CriterionDecision = DEFAULT_DECISION,
   catalog: CatalogNames = names(),
 ) {
+  const events = {
+    includedChange: vi.fn(),
+    levelChange: vi.fn(),
+    weightChange: vi.fn(),
+    priorityReset: vi.fn(),
+    noteChange: vi.fn(),
+  };
   const rendered = await render(CriterionCard, {
     providers: [
       provideTestTranslations(),
@@ -112,13 +120,20 @@ async function show(
       { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
     ],
     inputs: { criterion: c, decision, names: catalog },
+    on: events,
   });
+  // mat-select shows its value once its options exist.
+  await rendered.fixture.whenStable();
   const toggle = () => screen.getByRole('button', { name: /Details (anzeigen|ausblenden)/ });
   async function click(): Promise<void> {
     toggle().click();
     await rendered.fixture.whenStable();
   }
-  return { ...rendered, toggle, click };
+  async function act(element: HTMLElement): Promise<void> {
+    element.click();
+    await rendered.fixture.whenStable();
+  }
+  return { ...rendered, events, toggle, click, act };
 }
 
 describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
@@ -208,10 +223,10 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       ).toBeTruthy();
     });
 
-    it('shows the weight of a recommended B', async () => {
+    it('shows the weight of a recommended B in the weight field', async () => {
       await show(criterion('11.2.2', 'B', 3));
 
-      expect(screen.getByText('Gewichtung 3')).toBeTruthy();
+      expect(screen.getByRole('combobox', { name: 'Gewichtung' }).textContent).toContain('3');
     });
   });
 
@@ -440,6 +455,144 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       expect(screen.queryByRole('button', { name: /Beispiele anzeigen/ })).toBeNull();
       expect(document.activeElement?.textContent?.trim()).toBe('Gut 4');
       await expectNoAxeViolations();
+    });
+  });
+
+  describe('include and exclude (R-LST-04)', () => {
+    it('names the checkbox „In Liste aufnehmen“ with the criterion title and reports a change', async () => {
+      const { events, act } = await show(keyboardCriterion());
+      const checkbox = screen.getByRole('checkbox', {
+        name: 'In Liste aufnehmen Formulare lassen sich vollständig mit der Tastatur bedienen',
+      });
+      expect((checkbox as HTMLInputElement).checked).toBe(true);
+      expect(screen.queryByText('Nicht in Ihrer Liste')).toBeNull();
+
+      await act(checkbox);
+
+      expect(events.includedChange).toHaveBeenCalledWith(false);
+    });
+
+    it('keeps an excluded criterion as a marked card with every control', async () => {
+      const { container, events, act } = await show(keyboardCriterion(), { ...DEFAULT_DECISION, included: false });
+
+      const checkbox = screen.getByRole('checkbox', { name: /^In Liste aufnehmen/ });
+      expect((checkbox as HTMLInputElement).checked).toBe(false);
+      expect(screen.getByText('Nicht in Ihrer Liste')).toBeTruthy();
+      expect(container.classList).toContain('pa-criterion-card--excluded');
+      expect(screen.getByRole('button', { name: /^Priorität:/ })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Details anzeigen' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Notiz hinzufügen' })).toBeTruthy();
+      await expectNoAxeViolations();
+
+      await act(checkbox);
+
+      expect(events.includedChange).toHaveBeenCalledWith(true);
+    });
+
+    it('lets a „Geprüft nach …“ card be deselected too', async () => {
+      await show(procedureCriterion());
+
+      expect(
+        screen.getByRole('checkbox', { name: 'In Liste aufnehmen Geprüft nach BIT inklusiv Software-Test' }),
+      ).toBeTruthy();
+    });
+  });
+
+  describe('priority override (R-LST-03)', () => {
+    it('reports a level chosen in the K5 menu', async () => {
+      const { events, act } = await show(keyboardCriterion());
+      const levelButton = screen.getByRole('button', { name: /^Priorität:/ });
+      expect(levelButton.getAttribute('aria-describedby')).toBe('k-11-2-1-1');
+
+      await act(levelButton);
+      await act(screen.getByRole('menuitemradio', { name: 'Hinweis' }));
+
+      expect(events.levelChange).toHaveBeenCalledWith('Info');
+    });
+
+    it('reports a chosen weight and „Empfehlung wiederherstellen“', async () => {
+      const { events, act } = await show(criterion('11.2.2', 'B', 3), { ...DEFAULT_DECISION, overrideWeight: 5 });
+
+      expect(screen.getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
+      await act(screen.getByRole('combobox', { name: 'Gewichtung' }));
+      await act(screen.getByRole('option', { name: '8' }));
+      expect(events.weightChange).toHaveBeenCalledWith(8);
+
+      await act(screen.getByRole('button', { name: 'Empfehlung wiederherstellen' }));
+      expect(events.priorityReset).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('note (R-LST-05, O-S4-42, O-S4-43)', () => {
+    function noteField(): HTMLTextAreaElement {
+      return screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Ihre Notiz zu diesem Kriterium (optional)' });
+    }
+
+    async function type(text: string, fixture: { whenStable(): Promise<unknown> }): Promise<void> {
+      const field = noteField();
+      field.value = text;
+      fireEvent.input(field);
+      await fixture.whenStable();
+    }
+
+    it('opens the note field from „Notiz hinzufügen“ with the focus in it', async () => {
+      const { container, act } = await show(keyboardCriterion());
+      const button = screen.getByRole('button', { name: 'Notiz hinzufügen' });
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+      expect(button.getAttribute('aria-describedby')).toBe('k-11-2-1-1');
+      const region = container.querySelector(`#${button.getAttribute('aria-controls')}`);
+      expect(region?.hasAttribute('hidden')).toBe(true);
+
+      await act(button);
+
+      expect(button.getAttribute('aria-expanded')).toBe('true');
+      expect(region?.hasAttribute('hidden')).toBe(false);
+      expect(document.activeElement).toBe(noteField());
+      expect(noteField().getAttribute('aria-describedby')).toContain('k-11-2-1-1');
+      await expectNoAxeViolations();
+    });
+
+    it('reports the note as typed', async () => {
+      const { events, act, fixture } = await show(keyboardCriterion());
+      await act(screen.getByRole('button', { name: 'Notiz hinzufügen' }));
+
+      await type('Im Lastenheft unter 4.2 aufführen.', fixture);
+
+      expect(events.noteChange).toHaveBeenLastCalledWith('Im Lastenheft unter 4.2 aufführen.');
+    });
+
+    it('shows an existing note open, behind „Notiz bearbeiten“', async () => {
+      await show(keyboardCriterion(), { ...DEFAULT_DECISION, note: 'Schon notiert.' });
+
+      const button = screen.getByRole('button', { name: 'Notiz bearbeiten' });
+      expect(button.getAttribute('aria-expanded')).toBe('true');
+      expect(noteField().value).toBe('Schon notiert.');
+    });
+
+    it('shows the length error only after the field was left, keeps the text, and clears it once it fits', async () => {
+      const { events, act, fixture } = await show(keyboardCriterion());
+      await act(screen.getByRole('button', { name: 'Notiz hinzufügen' }));
+      const tooLong = 'x'.repeat(NOTE_MAX_LENGTH + 1);
+
+      await type(tooLong, fixture);
+      expect(screen.queryByText(/Bitte kürzen Sie den Text/)).toBeNull();
+      expect(noteField().getAttribute('aria-invalid')).toBe('false');
+
+      fireEvent.blur(noteField());
+      await fixture.whenStable();
+
+      const error = screen.getByText('Bitte kürzen Sie den Text auf höchstens 1000 Zeichen. Derzeit sind es 1001.');
+      expect(noteField().getAttribute('aria-invalid')).toBe('true');
+      expect(noteField().getAttribute('aria-describedby')).toContain(error.id);
+      expect(noteField().value).toHaveLength(NOTE_MAX_LENGTH + 1);
+      expect(noteField().hasAttribute('maxlength')).toBe(false);
+      expect(events.noteChange).toHaveBeenLastCalledWith(tooLong);
+      await expectNoAxeViolations();
+
+      await type('x'.repeat(NOTE_MAX_LENGTH), fixture);
+
+      expect(screen.queryByText(/Bitte kürzen Sie den Text/)).toBeNull();
+      expect(noteField().getAttribute('aria-invalid')).toBe('false');
     });
   });
 });

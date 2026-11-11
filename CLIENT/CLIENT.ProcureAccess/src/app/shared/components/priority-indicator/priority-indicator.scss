@@ -2,41 +2,58 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Handoff §4.5, Figma 2011:203: the level in primary-container, Hinweis in surface-container-highest,
-// corner-small, label-large; the weight in label-medium next to it. The override line stacks below.
+// Handoff §4.5, Figma 2011:203: the level button in primary-container, Hinweis in
+// surface-container-highest, corner-small, label-large, 32 px visible height; Material keeps its
+// 48 px touch target around it. The weight in label-medium. The row wraps; the override line and
+// „Empfehlung wiederherstellen“ stack below it.
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
 }
 
-.pa-priority-indicator__row,
-.pa-priority-indicator__overridden {
-  margin: 0;
+.pa-priority-indicator__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pa-space-sm);
 }
 
 .pa-priority-indicator__level {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--pa-space-xs);
-  padding: var(--pa-space-xxs) var(--pa-space-sm);
+  --mat-button-text-container-height: 2rem;
+  --mat-button-text-container-shape: var(--mat-sys-corner-small);
+  --mat-button-text-label-text-color: var(--mat-sys-on-primary-container);
+  --mat-button-text-label-text-font: var(--mat-sys-label-large-font);
+  --mat-button-text-horizontal-padding: var(--pa-space-sm);
+
   border: 1px solid var(--mat-sys-outline);
-  border-radius: var(--mat-sys-corner-small);
   background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-  font: var(--mat-sys-label-large);
 }
 
 .pa-priority-indicator__level--info {
+  --mat-button-text-label-text-color: var(--mat-sys-on-surface);
+
   background: var(--mat-sys-surface-container-highest);
-  color: var(--mat-sys-on-surface);
 }
 
 .pa-priority-indicator__weight {
+  margin-inline-start: var(--pa-space-xs);
   font: var(--mat-sys-label-medium);
 }
 
+// The menu keeps the text of every level at the same place; only the checked one shows its mark.
+.pa-priority-indicator__unchecked {
+  visibility: hidden;
+}
+
+.pa-priority-indicator__override {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .pa-priority-indicator__overridden {
-  margin-block-start: var(--pa-space-xs);
+  margin: 0;
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-body-medium);
 }

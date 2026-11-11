@@ -508,7 +508,9 @@
         "meta": "Prüfverfahren · {{link}}",
         "note": "Im Beschaffungsprojekt ergibt sich Ja oder Nein aus dem Prüfnachweis des Produkts. Im Abgleich mit Kriterien zählt dieses Kriterium nicht mit, weil der Prüfstatus dort schon unter „Auf Barrierefreiheit geprüft“ steht."
       },
-      "note": "Ihre Notiz zu diesem Kriterium (optional)"
+      "note": "Ihre Notiz zu diesem Kriterium (optional)",
+      "note.add": "Notiz hinzufügen",
+      "note.edit": "Notiz bearbeiten"
     },
     "priority": {
       "A": "A – Mindestanforderung",
@@ -531,7 +533,9 @@
       "changed": "Priorität geändert auf {{level}}.",
       "changeLabel": "Priorität für dieses Kriterium",
       "overridden": "Von Ihnen geändert. Empfohlen war: {{recommended}}.",
-      "reset": "Empfehlung wiederherstellen"
+      "reset": "Empfehlung wiederherstellen",
+      "weightLabel": "Gewichtung",
+      "overridden.weight": "Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}."
     }
   },
   "testType": {
