@@ -29,7 +29,7 @@
 | `features/configurator/pages/criteria-list/*` | The page hands each card output to the store method of S4-14; two tests with the real `withConfigurator()` slice: exclude + override + note land in the draft, the excluded card stays in the list, reset; weight of a recommended B | R-LST-03 – R-LST-05 |
 | `src/assets/fonts/material-symbols-icons.json`, `material-symbols-outlined.woff2`, `.manifest.json` | `arrow_drop_down` added, subset regenerated (36 icons, 24 208 bytes) | Icon check V117 |
 | `public/i18n/de.json` | `criteria.priority.weightLabel`, `criteria.priority.overridden.weight`, `criteria.item.note.add`, `criteria.item.note.edit` through `check-i18n.mjs --write` | U102 – U104 |
-| `docs/ux_copy_procureaccess_v20.md` (new; v18 deleted) | U102 `criteria.priority.weightLabel` „Gewichtung“, U103 `criteria.priority.overridden.weight` „Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}.“, U104 `criteria.item.note.add` „Notiz hinzufügen“ / `.edit` „Notiz bearbeiten“ — proposals, the owner's confirmation is open (P1) | O-S4-40 – O-S4-42 |
+| `docs/ux_copy_procureaccess_v20.md` (new; v18 deleted) | U102 `criteria.priority.weightLabel` „Gewichtung“, U103 `criteria.priority.overridden.weight` „Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}.“, U104 `criteria.item.note.add` „Notiz hinzufügen“ / `.edit` „Notiz bearbeiten“ — proposals, confirmed unchanged by the owner in this pull request (2026-11-11) | O-S4-40 – O-S4-42 |
 | `docs/design_handoff_procureaccess_v1.md` 1.20 | §4.5: weight field, weight-only override line, inputs `recommendedWeight`/`weightRange`, output `restoreRecommendation`, menu details; §5.5: title row and excluded card, note disclosure and length error | Handoff upkeep |
 | `docs/figma_code_mapping_procureaccess_v1.md` 1.20 | K5 row and §3 property notes; related line names the current versions | Mapping upkeep |
 | `docs/sprints/sprint_04/SPRINT_04.md` | O-S4-40 – O-S4-43 | — |
@@ -67,7 +67,7 @@ Checked without finding: no `innerHTML`, no new dependency; every text by key, `
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | U102 – U104 are proposals of Claude | Owner confirms or edits the wording in this pull request |
+| P1 | U102 – U104 were proposals of Claude | Closed: the owner confirmed the wording unchanged in this pull request (2026-11-11) |
 | P2 | A too-long note in a closed field shows no error until the export (R2, O-S4-43 (a)) | S4-21: the export dialog refuses while a note is too long and leads to the field (open it, focus, error) |
 | P3 | CAT-08 („`ConfigurationCriterion` keeps `ResolvedLevel` unchanged when an override is set“) describes the stored entity of step 3; the client keeps `resolvedPriority` unchanged since S4-14 and K5 shows both | Stays `planned`; flipped with the saved lists of step 3 (and the export's „recommended vs. decided“ columns in S4-19/S4-20 cover the ad-hoc case) |
 | P4 | UX copy `criteria.priority.change` is unused and the hint of `changeLabel` says „Label Select“, while the Handoff has a menu (F6, R3) | Next UX copy round: drop `change` or give it a use, reword the hint to „Name des Menüs“ |
