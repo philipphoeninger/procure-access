@@ -1,7 +1,7 @@
 # S4-18b — The first `CriteriaListShown` caller
 
 > **Sprint:** 04, P0 task S4-18b (M2.8; 0.5 points, split from S4-18 by O-S4-52). **Issues:** none. **Requirements / invariants:** R-MET-01 (exactly the events of SPEC §9.1, fire-and-forget), R-CON-10 („a `CriteriaListShown` usage event is written once per complete selection shown“); PRV-05 stays green (no new column). No invariant changes status, so no new TESTING version.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #276 open.
 > **Scope:** `POST /api/v1/configurator/criteria-list-shown` in the Configurator module, the client call once per new selection shown on S11, silent on failure; SPEC §8.7 and the §7.3 row of its rate limit. Not here: the rate limiter itself (S4-21, O-S4-56 (b)), `ExportCreated` (S4-21), antiforgery (step 3, SEC-02).
 > **Owner decisions (2026-11-11):** **O-S4-48 (a)** (before S4-18a) — an endpoint of its own in the Configurator module, called once per new selection, `signedIn` from the request's sign-in; **O-S4-55 (a)** — count when the selection shown differs from the last one counted (A → B → A three times, a return without a change none); **O-S4-56 (b)** — a SPEC §7.3 row now (client IP, 30 per 10 minutes 🔧), built with the limiter of S4-21. **Defaults accepted with the plan:** no antiforgery until step 3, which covers this endpoint like every other non-GET one; a failure shows nothing and is not repeated, and the request stays off the loading bar; only a loaded list counts (not `failed`, not `noRelease`), also one without criteria; `signedIn` from the legacy JWT until step 3.
 
