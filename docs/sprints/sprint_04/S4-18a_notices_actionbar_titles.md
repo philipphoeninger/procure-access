@@ -18,6 +18,7 @@
 | F7 | The S11 route already had its title `pageTitle.criteria.list`; S10 already uses `shell.pageTitle.error`; `pageTitle` was typed into `de.json` by hand | `pageTitle` becomes an `AREAS` root (M2.6d); S11 needs no error prefix |
 | F8 | The page scrolls, not `mat-sidenav-content` (`app.scss`) | `scroll-padding-bottom` goes on `<html>` |
 | F9 | Firefox ignores `scroll-padding` when the focus moves: it scrolls only an element outside the viewport, so a control just above the bottom edge stayed partly behind the sticky bar (found by the new E2E test: 12 px of a 40 px checkbox) | A `focusin` handler scrolls such an element above the bar |
+| F10 | CI (mobile Safari) found „Schließen“ not focused when the placeholder opened: on iOS the CDK counts only text fields and selects as tabbable, so `MatDialog` focused its container | `cdkFocusInitial` on „Schließen“ (CDK checks only that the marked element is focusable), as Handoff §5 asks of every dialog (S13: initial focus by `cdkFocusInitial`) |
 
 ## 2. Changes
 
@@ -26,7 +27,7 @@
 | `features/configurator/components/criteria-list-summary/` (new: `.ts`, `.html`, `.scss`, `.spec.ts`) | `pa-criteria-list-summary`: `criteria.list.summary.count` (plural), `<dl>` of use case („Keiner davon passt“ = `criteria.select.step1.none`), app types, product parts and — only with a selection — test types; names joined by `Intl.ListFormat` | UX copy §5.5, U28; O-S4-51 |
 | `features/configurator/state/selection-names.ts` (new, + spec) | `selectionNames(selection, options)`: names by layer in option order; an unlisted id is shown as it is; null use case = „Keiner davon passt“ | Summary |
 | `features/configurator/state/criteria-list-rules.ts` (+ spec) | `levelCounts` (requirement criteria by `effectiveLevel`, included or not) and `includedCount` (every card) | O-S4-51 |
-| `features/configurator/dialogs/export-placeholder/export-placeholder-dialog.ts` (new) | `mat-dialog` with `criteria.export.title` and „Schließen“ | R-LST-10, until S4-21 |
+| `features/configurator/dialogs/export-placeholder/export-placeholder-dialog.ts` (new) | `mat-dialog` with `criteria.export.title` and „Schließen“, which takes the initial focus (`cdkFocusInitial`) | R-LST-10, until S4-21; F10 |
 | `features/configurator/pages/criteria-list/criteria-list.{ts,html,scss,spec.ts}` | Summary, priority note, draft note (legacy sign-in through `store.user()` + `isAuthenticated()`), counts before the filter row, suggestion link after the list, action bar (only with a card) with the counter and „Liste exportieren“; live counter announced through `A11yAnnouncerService` (≤ 1/s) only after an include/exclude by the user; sticky from `STICKY_ACTION_BAR_QUERY`; while sticky its height is `scroll-padding-bottom` on `<html>` (`ResizeObserver`), and a `focusin` handler scrolls an overlapped focused element above the bar, keeping its top in view; tests with a sign-in flag in the test store | R-LST-09, R-LST-10, R-LST-13; O-S4-49 – O-S4-51, O-S4-53; F8, F9 |
 | `core/contact/criteria-suggestion.ts`, `layout/footer/footer.{ts,html}` | `injectSuggestionLink()` (channel + href with the mail subject), used by the footer and S11 | R-SUG-01, R-LST-13 |
 | `scripts/check-i18n.mjs` | `AREAS` + `criteria.export`, `pageTitle` | M2.6d, F6 |
@@ -63,6 +64,7 @@ Checked without finding: no `innerHTML`, no new dependency; the link target is t
 | C6 | `e2e/`: `npm run typecheck`, `npm run lint` | Pass |
 | C7 | E2E on the local E2E stack (dev stack stopped and started again): the whole suite in Chromium, Firefox and mobile Chrome | 204 of 204 pass; after R1 `s11-list`, `reflow` and `journeys` again in Chromium and Firefox: 34 of 34; `s11-list` in Firefox repeated 4 times: 16 of 16. WebKit and mobile Safari only in CI |
 | C8 | .NET build and tests | Not run: no backend file changed |
+| C9 | CI run of the first push | Red in `6. E2E + a11y (mobile-safari)` only: F10. After the fix: the S11 page tests (23 of 23) and the client lint pass locally; WebKit and mobile Safari again only in CI |
 
 ## 5. Open points
 

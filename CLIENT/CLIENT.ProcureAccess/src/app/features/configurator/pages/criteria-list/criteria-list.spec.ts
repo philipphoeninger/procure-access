@@ -422,7 +422,10 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
 
       const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
       await expectNoAxeViolations();
-      within(dialog).getByRole('button', { name: 'Schließen' }).click();
+      const close = within(dialog).getByRole('button', { name: 'Schließen' });
+      // The marker keeps the initial focus on „Schließen“ also on iOS (E2E mobile-safari).
+      expect(close.hasAttribute('cdkFocusInitial')).toBe(true);
+      close.click();
       await fixture.whenStable();
 
       expect(screen.queryByRole('dialog')).toBeNull();

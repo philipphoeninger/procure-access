@@ -11,6 +11,9 @@ import { TranslatePipe } from '@ngx-translate/core';
  * Placeholder of the export dialog S13, opened by „Liste exportieren“ in the S11 action bar
  * (R-LST-10): the title `criteria.export.title` and „Schließen“ only. S4-21 replaces it with S13
  * (R-LST-11: format, scope, notes, the export itself).
+ *
+ * „Schließen“ takes the initial focus through `cdkFocusInitial`: on iOS the CDK counts no button
+ * as tabbable, so without the marker the dialog would focus its container there.
  */
 @Component({
   selector: 'pa-export-placeholder-dialog',
@@ -18,7 +21,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   template: `
     <h2 mat-dialog-title>{{ 'criteria.export.title' | translate }}</h2>
     <mat-dialog-actions>
-      <button matButton="filled" type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+      <button matButton="filled" type="button" mat-dialog-close cdkFocusInitial>{{ 'common.actions.close' | translate }}</button>
     </mat-dialog-actions>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
