@@ -12,9 +12,12 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
 import { signalStore } from '@ngrx/signals';
 
+import { CriteriaResponse } from '../models/criteria';
 import { FilterOptionsLayers } from '../models/filter-options';
+import { criteriaAnswer } from '../testing/criteria-fixture';
 import { excluded, filterOptions, filterOptionsAnswer } from '../testing/filter-options-fixture';
-import { withConfigurator } from './with-configurator';
+import { PRIORITY_WEIGHT_RANGE } from './priority-weight-range';
+import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from './with-configurator';
 
 const ConfiguratorTestStore = signalStore(withConfigurator());
 const url = '/api/v1/catalog/filter-options';
@@ -403,6 +406,192 @@ describe('withConfigurator', () => {
     });
   });
 
+  describe('criteria list of S11 (R-LST-01 – R-LST-06)', () => {
+    const listUrl = '/api/v1/catalog/criteria';
+    const listRequest = () => backend.expectOne((r) => r.url === listUrl);
+    const visibleKeys = () => store.visibleCriteria().map((c) => c.key);
+
+    async function listLoaded(response: CriteriaResponse = criteriaAnswer()) {
+      const load = store.loadCriteriaList();
+      listRequest().flush(response);
+      await load;
+    }
+
+    afterEach(() => vi.useRealTimers());
+
+    it('loads the criteria of the draft with the pinned release', async () => {
+      await fillAllLayers();
+      expect(store.configurator.list.status()).toBe('notLoaded');
+
+      const load = store.loadCriteriaList();
+      expect(store.configurator.list.status()).toBe('loading');
+      expect(store.isLoading()).toBe(true);
+      const request = listRequest();
+      expect(request.request.params.get('release')).toBe('T.1');
+      expect(request.request.params.getAll('testTypeIds[]')).toEqual(['softwareTest']);
+      request.flush(criteriaAnswer());
+
+      expect(await load).toBe('loaded');
+      expect(store.configurator.list.answer()).toEqual(criteriaAnswer());
+      expect(visibleKeys()).toEqual(['11.1.1', '11.2.2', '11.3.3', 'PROC-softwareTest']);
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('applies only the answer of the latest request', async () => {
+      await fillAllLayers();
+      const first = store.loadCriteriaList();
+      const second = store.loadCriteriaList();
+      const [older, newer] = backend.match((r) => r.url === listUrl);
+
+      newer?.flush({ ...criteriaAnswer(), criteria: criteriaAnswer().criteria.slice(0, 1) });
+      older?.flush(criteriaAnswer());
+      await Promise.all([first, second]);
+
+      expect(visibleKeys()).toEqual(['11.1.1']);
+    });
+
+    it('reports a 404 as noRelease, so the next visit of S10 asks for the options again', async () => {
+      await fillAllLayers();
+      const load = store.loadCriteriaList();
+      listRequest().flush({ type: 'x/problems/not-found' }, { status: 404, statusText: 'Not Found' });
+
+      expect(await load).toBe('noRelease');
+      expect(store.configurator.optionsStatus()).toBe('noRelease');
+      expect(store.visibleCriteria()).toEqual([]);
+    });
+
+    it('reports any other failure as failed', async () => {
+      await fillAllLayers();
+      const load = store.loadCriteriaList();
+      listRequest().flush(null, { status: 500, statusText: 'Server Error' });
+
+      expect(await load).toBe('failed');
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('keeps the recommended level unchanged next to an override (R-LST-03)', async () => {
+      await fillAllLayers();
+      await listLoaded();
+
+      store.overrideCriterionPriority('11.1.1', 'Info');
+
+      expect(store.configurator.list.decisions()['11.1.1']?.overrideLevel).toBe('Info');
+      expect(store.configurator.list.answer()?.criteria[0]?.resolvedPriority.level).toBe('A');
+
+      store.resetCriterionPriority('11.1.1');
+      expect(store.configurator.list.decisions()).toEqual({});
+    });
+
+    it('records inclusion, weight and note, and ignores a key the list does not hold', async () => {
+      await fillAllLayers();
+      await listLoaded();
+
+      store.setCriterionIncluded('11.3.3', false);
+      store.setCriterionWeight('11.2.2', 9);
+      store.setCriterionNote('11.2.2', 'Im Pilot prüfen');
+      store.setCriterionIncluded('99.9', false);
+
+      expect(store.configurator.list.decisions()).toEqual({
+        '11.3.3': { included: false, overrideLevel: null, overrideWeight: null, note: '' },
+        '11.2.2': { included: true, overrideLevel: null, overrideWeight: 9, note: 'Im Pilot prüfen' },
+      });
+    });
+
+    it('reads the weight range from the environment setting (🔧)', async () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          ConfiguratorTestStore,
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: API_URL, useValue: '/api' },
+          { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 12 } },
+        ],
+      });
+      store = TestBed.inject(ConfiguratorTestStore);
+      backend = TestBed.inject(HttpTestingController);
+      await fillAllLayers();
+      await listLoaded();
+
+      store.setCriterionWeight('11.2.2', 12);
+
+      expect(store.configurator.list.decisions()['11.2.2']?.overrideWeight).toBe(12);
+    });
+
+    it('keeps the decisions when the selection changes and applies them when a criterion returns (O-S4-24 (a))', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      store.setCriterionIncluded('PROC-softwareTest', false);
+      store.setCriterionNote('11.1.1', 'Notiz');
+
+      store.toggleTestType('softwareTest');
+      await listLoaded({ ...criteriaAnswer(), criteria: criteriaAnswer().criteria.slice(0, 3) });
+      expect(store.configurator.list.decisions()['PROC-softwareTest']?.included).toBe(false);
+
+      store.chooseUseCase({ kind: 'useCase', id: 'citizen' });
+      await answer();
+      store.toggleAppType('web');
+      await answer();
+      store.toggleTestType('softwareTest');
+      await listLoaded();
+
+      store.showOnlyIncludedCriteria(true);
+      expect(visibleKeys()).toEqual(['11.1.1', '11.2.2', '11.3.3']);
+      expect(store.configurator.list.decisions()['11.1.1']?.note).toBe('Notiz');
+    });
+
+    it('filters by the level that applies now and by inclusion (R-LST-04, R-LST-06)', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      store.overrideCriterionPriority('11.3.3', 'B');
+      store.setCriterionIncluded('11.2.2', false);
+
+      store.filterCriteriaByPriority(['B']);
+      expect(visibleKeys()).toEqual(['11.2.2', '11.3.3', 'PROC-softwareTest']);
+
+      store.showOnlyIncludedCriteria(true);
+      expect(visibleKeys()).toEqual(['11.3.3', 'PROC-softwareTest']);
+
+      store.filterCriteriaByPriority([]);
+      store.showOnlyIncludedCriteria(false);
+      expect(visibleKeys()).toEqual(['11.1.1', '11.2.2', '11.3.3', 'PROC-softwareTest']);
+    });
+
+    it('applies the search 300 ms after the last keystroke (R-LST-06)', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      vi.useFakeTimers();
+
+      store.searchCriteria('tast');
+      expect(store.configurator.list.searchInput()).toBe('tast');
+      vi.advanceTimersByTime(CRITERIA_SEARCH_DEBOUNCE_MS - 1);
+      store.searchCriteria('tastatur');
+      vi.advanceTimersByTime(CRITERIA_SEARCH_DEBOUNCE_MS - 1);
+      expect(store.configurator.list.filter.query()).toBe('');
+      expect(visibleKeys()).toHaveLength(4);
+
+      vi.advanceTimersByTime(1);
+      expect(store.configurator.list.filter.query()).toBe('tastatur');
+      expect(visibleKeys()).toEqual(['11.2.2']);
+    });
+
+    it('clears search, levels and inclusion at once and drops a pending search', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      vi.useFakeTimers();
+      store.filterCriteriaByPriority(['A']);
+      store.showOnlyIncludedCriteria(true);
+      store.searchCriteria('tastatur');
+
+      store.clearCriteriaFilter();
+      vi.advanceTimersByTime(CRITERIA_SEARCH_DEBOUNCE_MS);
+
+      expect(store.configurator.list.searchInput()).toBe('');
+      expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
+      expect(visibleKeys()).toHaveLength(4);
+    });
+  });
+
   describe('memory only (R-CON-09)', () => {
     it('writes nothing to browser storage and still works while storage is blocked', async () => {
       const blocked = () => {
@@ -414,10 +603,16 @@ describe('withConfigurator', () => {
       const clear = vi.spyOn(Storage.prototype, 'clear').mockImplementation(blocked);
       try {
         await fillAllLayers();
+        const load = store.loadCriteriaList();
+        backend.expectOne((r) => r.url === '/api/v1/catalog/criteria').flush(criteriaAnswer());
+        await load;
+        store.setCriterionNote('11.1.1', 'Notiz');
+        store.overrideCriterionPriority('11.2.2', 'A');
         store.chooseUseCase({ kind: 'none' });
         await answer();
 
         expect(store.configurator.draft.useCase()).toEqual({ kind: 'none' });
+        expect(Object.keys(store.configurator.list.decisions())).toEqual(['11.1.1', '11.2.2']);
         expect(setItem).not.toHaveBeenCalled();
         expect(getItem).not.toHaveBeenCalled();
         expect(removeItem).not.toHaveBeenCalled();

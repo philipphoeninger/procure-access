@@ -16,8 +16,19 @@ import {
   ResetReport,
   UseCaseChoice,
 } from '../models/configurator-draft';
+import { Criterion, CriteriaResponse, PriorityLevel } from '../models/criteria';
+import { CriteriaListFilter, CriterionDecisions, EMPTY_LIST_FILTER } from '../models/criteria-list';
 import { FilterOptionsLayers } from '../models/filter-options';
 import { CatalogApiService } from '../services/api/catalog-api.service';
+import {
+  filterCriteria,
+  overridePriority,
+  resetPriority,
+  setIncluded,
+  setNote,
+  setWeight,
+} from './criteria-list-rules';
+import { PRIORITY_WEIGHT_RANGE } from './priority-weight-range';
 import {
   chooseUseCase,
   isComplete,
@@ -59,6 +70,37 @@ export type SubmitResult =
   | { kind: 'noRelease' }
   | { kind: 'failed' };
 
+/**
+ * - `notLoaded`: S11 has not asked yet
+ * - `loading`: a request is running; the list of an earlier selection is gone
+ * - `loaded`: `answer` holds the criteria of the current selection
+ * - `noRelease`: 404 — the pinned release is unknown or no release is active (O-S4-3)
+ * - `failed`: any other failure, also a 400 for a selection S10 had sent successfully
+ */
+export type CriteriaListStatus = 'notLoaded' | 'loading' | 'loaded' | 'noRelease' | 'failed';
+
+/** Search applies this long after the last keystroke (R-LST-06, Handoff §5.1 S11). */
+export const CRITERIA_SEARCH_DEBOUNCE_MS = 300;
+
+/** The criteria list S11 for the draft (R-LST-01 – R-LST-06), in memory like the draft (R-CON-09). */
+export interface CriteriaListState {
+  status: CriteriaListStatus;
+  answer: CriteriaResponse | null;
+  /** By criterion key; kept when the selection changes (owner decision O-S4-24 (a)). */
+  decisions: CriterionDecisions;
+  /** The search field as typed; `filter.query` follows it after {@link CRITERIA_SEARCH_DEBOUNCE_MS}. */
+  searchInput: string;
+  filter: CriteriaListFilter;
+}
+
+export const initialCriteriaListState: CriteriaListState = {
+  status: 'notLoaded',
+  answer: null,
+  decisions: {},
+  searchInput: '',
+  filter: EMPTY_LIST_FILTER,
+};
+
 export interface ConfiguratorState {
   /** Release of the first answer; every later request names it, so one draft never mixes releases (ADR-002). */
   release: string | null;
@@ -72,6 +114,7 @@ export interface ConfiguratorState {
   changedSinceAnswer: ResetReport['changedLayer'] | null;
   /** What the last change cleared, for the reset notice; gone with the next selection (R-CON-07). */
   reset: ResetReport | null;
+  list: CriteriaListState;
 }
 
 export const initialConfiguratorState: ConfiguratorState = {
@@ -81,25 +124,56 @@ export const initialConfiguratorState: ConfiguratorState = {
   optionsStatus: 'notLoaded',
   changedSinceAnswer: null,
   reset: null,
+  list: initialCriteriaListState,
 };
 
 /**
- * Configurator S10 state (ARCHITECTURE §8.1, R-CON-09): the four-layer draft and the filter options
- * answered for it. Memory only — never written to browser storage, so a reload loses the draft
- * (S11 says so, `criteria.list.draftNote`). Everything lives under `configurator`, because the root
- * store still has the legacy `appTypes`/`productParts`/`testTypes` of `withFilters()`.
- * Options load after every change of steps 1–3; only the answer of the latest request is applied.
+ * Configurator state (ARCHITECTURE §8.1, R-CON-09): the four-layer draft of S10 and the filter
+ * options answered for it, and the criteria list of S11 with the user's decisions (`list`, C119).
+ * Memory only — never written to browser storage, so a reload loses both (S11 says so,
+ * `criteria.list.draftNote`). Everything lives under `configurator`, because the root store still
+ * has the legacy `appTypes`/`productParts`/`testTypes` of `withFilters()` and `criteria` of
+ * `withCriteria()`. Options load after every change of steps 1–3, the list when S11 asks; only the
+ * answer of the latest request is applied.
  */
 export const withConfigurator = () =>
   signalStoreFeature(
     withState({ configurator: initialConfiguratorState }),
     withLoading(),
-    withMethods((store, api = inject(CatalogApiService)) => {
+    withMethods((store, api = inject(CatalogApiService), weightRange = inject(PRIORITY_WEIGHT_RANGE)) => {
       let latestRequest = 0;
       let latestLoad: Promise<void> = Promise.resolve();
+      let latestListRequest = 0;
+      let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
       const patch = (changes: Partial<ConfiguratorState>) =>
         patchState(store, (state) => ({ configurator: { ...state.configurator, ...changes } }));
+
+      const patchList = (changes: (list: CriteriaListState) => Partial<CriteriaListState>) =>
+        patchState(store, (state) => ({
+          configurator: {
+            ...state.configurator,
+            list: { ...state.configurator.list, ...changes(state.configurator.list) },
+          },
+        }));
+
+      /** Applies a rule to the decisions of a criterion of the loaded list; unknown keys change nothing. */
+      function decide(key: string, rule: (decisions: CriterionDecisions, criterion: Criterion) => CriterionDecisions): void {
+        const { answer, decisions } = store.configurator.list();
+        const criterion = answer?.criteria.find((c) => c.key === key);
+        if (criterion === undefined) {
+          return;
+        }
+        const next = rule(decisions, criterion);
+        if (next !== decisions) {
+          patchList(() => ({ decisions: next }));
+        }
+      }
+
+      function cancelSearchTimer(): void {
+        clearTimeout(searchTimer);
+        searchTimer = undefined;
+      }
 
       function loadFilterOptions(): Promise<void> {
         latestLoad = load();
@@ -209,8 +283,81 @@ export const withConfigurator = () =>
         }
       }
 
+      /**
+       * Loads the criteria of the draft for S11 with the pinned release (R-CON-10). The answer of a
+       * named release is cached by the browser (ARCHITECTURE §9.6), so the request after the check
+       * of „Kriterienliste anzeigen“ costs nothing. Only the latest request is applied; the
+       * decisions stay (owner decision O-S4-24 (a)).
+       */
+      async function loadCriteriaList(): Promise<CriteriaListStatus> {
+        const request = ++latestListRequest;
+        const { draft, release } = store.configurator();
+        patchList(() => ({ status: 'loading', answer: null }));
+        store.incrementLoadingCount();
+        try {
+          const answer = await api.getCriteria(toCriteriaSelection(draft), release ?? undefined);
+          if (request === latestListRequest) {
+            patchList(() => ({ status: 'loaded', answer }));
+          }
+        } catch (error: unknown) {
+          if (request === latestListRequest) {
+            const notFound = error instanceof HttpErrorResponse && error.status === 404;
+            patchList(() => ({ status: notFound ? 'noRelease' : 'failed' }));
+            if (notFound) {
+              patch({ optionsStatus: 'noRelease' });
+            }
+          }
+        } finally {
+          store.decrementLoadingCount();
+        }
+        return store.configurator.list.status();
+      }
+
       return {
         loadFilterOptions,
+        loadCriteriaList,
+        /** Includes or excludes a criterion; excluded ones stay in the list (R-LST-04). */
+        setCriterionIncluded(key: string, included: boolean): void {
+          decide(key, (decisions) => setIncluded(decisions, key, included));
+        },
+        /** Overrides the level; the recommendation stays next to it (R-LST-03). */
+        overrideCriterionPriority(key: string, level: PriorityLevel): void {
+          decide(key, (decisions, criterion) => overridePriority(decisions, criterion, level));
+        },
+        /** Sets the weight of a criterion whose level is B, inside the 🔧 range (R-LST-03). */
+        setCriterionWeight(key: string, weight: number): void {
+          decide(key, (decisions, criterion) => setWeight(decisions, criterion, weight, weightRange));
+        },
+        /** „Empfehlung wiederherstellen“ (R-LST-03). */
+        resetCriterionPriority(key: string): void {
+          decide(key, (decisions) => resetPriority(decisions, key));
+        },
+        /** Keeps the note as typed; the length error comes from `noteLengthError` (R-LST-05). */
+        setCriterionNote(key: string, note: string): void {
+          decide(key, (decisions) => setNote(decisions, key, note));
+        },
+        /** The search field as typed; the search applies 300 ms after the last call (R-LST-06). */
+        searchCriteria(text: string): void {
+          patchList(() => ({ searchInput: text }));
+          cancelSearchTimer();
+          searchTimer = setTimeout(() => {
+            searchTimer = undefined;
+            patchList((list) => ({ filter: { ...list.filter, query: text } }));
+          }, CRITERIA_SEARCH_DEBOUNCE_MS);
+        },
+        /** Levels the list shows; empty = every level (R-LST-06, owner decision O-S4-25 (a)). */
+        filterCriteriaByPriority(levels: PriorityLevel[]): void {
+          patchList((list) => ({ filter: { ...list.filter, levels: [...levels] } }));
+        },
+        /** „Nur aufgenommene Kriterien anzeigen“ (R-LST-04). */
+        showOnlyIncludedCriteria(onlyIncluded: boolean): void {
+          patchList((list) => ({ filter: { ...list.filter, onlyIncluded } }));
+        },
+        /** „Filter zurücksetzen“ of `criteria.list.emptyFilter`: search, levels and inclusion at once. */
+        clearCriteriaFilter(): void {
+          cancelSearchTimer();
+          patchList(() => ({ searchInput: '', filter: EMPTY_LIST_FILTER }));
+        },
         optionsCurrent,
         filterOptionsReady,
         submitSelection,
@@ -230,6 +377,11 @@ export const withConfigurator = () =>
     }),
     withComputed((store) => ({
       configuratorComplete: computed(() => isComplete(store.configurator.draft())),
+      /** The criteria S11 shows under the filter, in the order of the answer (R-LST-04, R-LST-06). */
+      visibleCriteria: computed(() => {
+        const { answer, decisions, filter } = store.configurator.list();
+        return answer === null ? [] : filterCriteria(answer.criteria, decisions, filter);
+      }),
     })),
   );
 

@@ -8,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
 import { CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
 
+import { criteriaAnswer as typedCriteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CatalogApiService } from './catalog-api.service';
 
@@ -82,9 +83,9 @@ describe('CatalogApiService', () => {
 
   describe('getCriteria (SPEC §8.2)', () => {
     const criteriaUrl = '/api/v1/catalog/criteria';
-    const criteriaAnswer = { release: 'T.1', criteria: [], appTypesWithoutCriteria: [] };
+    const criteriaAnswer = typedCriteriaAnswer();
 
-    it('sends the release, the selection and the test types', async () => {
+    it('sends the release, the selection and the test types, and returns the criteria as answered', async () => {
       const answer = api.getCriteria(
         { useCase: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: ['softwareTest', 'pdfTest'] },
         'T.1',
