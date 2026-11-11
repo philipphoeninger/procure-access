@@ -1,7 +1,7 @@
 # S4-14b — E2E flake: S10 use-case combobox keeps the typed text
 
 > **Sprint:** 04, unplanned fix found while S4-14 (#268) was in CI (owner decision 2026-11-11: a separate pull request before #268). **Issues:** #269. **Requirements / invariants:** none changed; keeps A11Y-02 (J1 by keyboard only) stable. No TESTING version.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #270 open.
 > **Scope:** the E2E helpers that pick a use case in the S10 combobox. No app change.
 
 ## 1. Starting point
