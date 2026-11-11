@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test, type Page, type Route } from '@playwright/test';
 import { recordThirdPartyRequests } from '../support/third-party-requests';
 
@@ -9,7 +11,8 @@ import { recordThirdPartyRequests } from '../support/third-party-requests';
  * Theme foundation (S3-09): light and dark appearance from the system setting (R-SET-02,
  * SPEC §7.5), strong focus indicators on Material components (Handoff §1.1, §1.6, #184), the
  * self-hosted Roboto font (Handoff §1.3) and reduced motion (Handoff §1.7). The axe run in the
- * dark appearance is A11Y-08 (S3-10).
+ * dark appearance is A11Y-08 (S3-10). The light colours are the Figma values of Handoff §1.2
+ * (S4-29).
  */
 const COMPACT = { width: 360, height: 780 };
 const API = '**/api/**';
@@ -22,6 +25,41 @@ const htmlState = (page: Page) =>
 
 const pageBackground = (page: Page) =>
   page.locator('mat-sidenav-container').evaluate((element) => getComputedStyle(element).backgroundColor);
+
+/** Role → hex value of every row of the colour table in Handoff §1.2 (the highest version). */
+function handoffLightColours(): Record<string, string> {
+  const docs = join(__dirname, '..', '..', 'docs');
+  const version = (name: string) => Number(/_v(\d+)\.md$/.exec(name)?.[1] ?? -1);
+  const [handoff] = readdirSync(docs)
+    .filter((name) => /^design_handoff_procureaccess_v\d+\.md$/.test(name))
+    .sort((a, b) => version(b) - version(a));
+  const text = readFileSync(join(docs, handoff), 'utf8');
+  const section = text.slice(text.indexOf('### 1.2 '), text.indexOf('### 1.3 '));
+  const colours: Record<string, string> = {};
+  for (const [, role, hex] of section.matchAll(/^\| Schemes\/[^|]+\| `(--mat-sys-[a-z-]+)` \| `(#[0-9A-Fa-f]{6})`/gm)) {
+    colours[role] = hex.toLowerCase();
+  }
+  return colours;
+}
+
+/** The colour each role resolves to on the page, as #rrggbb; anything not opaque stays as the browser wrote it. */
+const resolvedColours = (page: Page, roles: string[]) =>
+  page.evaluate((names) => {
+    const probe = document.createElement('div');
+    document.body.append(probe);
+    const hex = (rgb: string) => {
+      const channels = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(rgb);
+      return channels ? '#' + channels.slice(1).map((n) => Number(n).toString(16).padStart(2, '0')).join('') : rgb;
+    };
+    const result = Object.fromEntries(
+      names.map((name) => {
+        probe.style.backgroundColor = `var(${name})`;
+        return [name, hex(getComputedStyle(probe).backgroundColor)];
+      }),
+    );
+    probe.remove();
+    return result;
+  }, roles);
 
 test.describe('Appearance', () => {
   test('follows the system appearance and its changes without a reload', async ({ page, baseURL }) => {
@@ -38,6 +76,17 @@ test.describe('Appearance', () => {
     await expect.poll(() => htmlState(page)).toEqual({ classes: ['theme-light'], colorScheme: 'light' });
     await expect.poll(() => pageBackground(page)).not.toBe(dark);
     expect(thirdParty).toEqual([]);
+  });
+
+  test('uses the Figma values of Handoff §1.2 in the light appearance', async ({ page }) => {
+    const figma = handoffLightColours();
+    expect(Object.keys(figma)).toHaveLength(22);
+
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/');
+    await expect.poll(() => htmlState(page)).toEqual({ classes: ['theme-light'], colorScheme: 'light' });
+
+    expect(await resolvedColours(page, Object.keys(figma))).toEqual(figma);
   });
 
   test('shows the 3 px focus ring on a Material button reached with the keyboard', async ({ page }) => {

@@ -1,6 +1,6 @@
 # Sprint 04 — task prompts for Claude Code
 
-> **Status:** v1 (2026-11-10). Companion to `SPRINT_04.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_03/TASK_PROMPTS.md` (repeated, updated, at the end of this file). Claude Code implements; the owner's control chat for sprint 04 takes the decisions and reviews the reports.
+> **Status:** v1.1 (2026-11-11; v1.1: S4-29 added — Figma light colours, owner decision O-S4-22, first added as O-S4-7, an ID S4-03 already used). v1 (2026-11-10). Companion to `SPRINT_04.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_03/TASK_PROMPTS.md` (repeated, updated, at the end of this file). Claude Code implements; the owner's control chat for sprint 04 takes the decisions and reviews the reports.
 > **How to use:** copy the block of the task into a new Claude Code session (or a worktree session for parallel work). Replace only the placeholders in `<…>` after "Owner decisions for this task" (decisions not yet taken, see "Open placeholders"). `<invariant ID>`, `<NN>`, `<n>`, `<Name>` or `<date>` elsewhere in a prompt are naming patterns for Claude Code, not placeholders for you. Everything else is filled in from `SPRINT_04.md`, `TECH_DEBT_v3.md` and the GitHub issues and pull requests as of 2026-11-10.
 > **Changes to the template since sprint 03:** reads `TECH_DEBT_v3.md`; document names in "Also read" carry **no version numbers** (sprint 03 had to correct its prompts when ARCHITECTURE and TESTING moved on, v1.1 of its prompts); step 2 asks for a split when a task needs more than one session; step 3 renumbers a TESTING version after a rebase instead of forbidding parallel flips; step 4 leaves E2E to CI when another session holds the local E2E stack; step 5 also names `LEGACY_EXCEPTIONS`.
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Prompts are listed in task-ID order. The recommended **working order** is: S4-01, S4-02, S4-03, S4-04, S4-05, S4-06, S4-07, S4-08, S4-23, S4-09, S4-10, S4-11, S4-12, S4-13, S4-19, S4-20, S4-14, S4-15, S4-16, S4-17, S4-18, S4-21, S4-22, then the stretch tasks (S4-23 runs early because S11 uses the endpoints; S4-19 and S4-20 can run while S10 is built).
+Prompts are listed in task-ID order. The recommended **working order** is: S4-01, S4-02, S4-03, S4-04, S4-05, S4-06, S4-07, S4-08, S4-23, S4-09, S4-10, S4-11, S4-12, S4-13, S4-29, S4-19, S4-20, S4-14, S4-15, S4-16, S4-17, S4-18, S4-21, S4-22, then the stretch tasks (S4-23 runs early because S11 uses the endpoints; S4-19 and S4-20 can run while S10 is built).
 
 | Task | Title | Issues | Can start |
 |---|---|---|---|
@@ -35,6 +35,7 @@ Prompts are listed in task-ID order. The recommended **working order** is: S4-01
 | S4-21 | Export dialog S13, rate limit and /health/ready | #112 | after S4-19, S4-20, S4-18 |
 | S4-22 | J1 complete to the export; M2 exit check; bundle budget | #42 | after S4-13, S4-18, S4-21 |
 | S4-23 | Accept-Language on the catalog list endpoints | none | ready |
+| S4-29 | Figma light colours pinned in the theme | #240 (light part) | after S4-13 (O-S4-22 decided; before S4-14) |
 | S4-24 | Short description in the catalog model | #237 | stretch, after O-S4-6 |
 | S4-25 | M3.4 groundwork: contributor profiles and the Moderator role | none | stretch, ready |
 | S4-26 | Encrypt the Data Protection key ring and document it | #235 | stretch, ready |
@@ -51,6 +52,7 @@ Prompts are listed in task-ID order. The recommended **working order** is: S4-01
 | O-S4-4 (UX copy v17 approved) | S4-15 – S4-18 | the owner's review of the S4-02 PR |
 | O-S4-5 (CAT-10 after S10) | S4-13 | owner choice (any time before S4-13) |
 | O-S4-6 (short description) | S4-20, S4-24 | owner choice (before S4-20) |
+| O-S4-22 (theme colours) | S4-29 | **decided 2026-11-11** — already filled in |
 
 ## Rules for running tasks
 
@@ -637,6 +639,31 @@ Way of working:
 4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. If another session runs the E2E stack locally at the same time, leave E2E to CI. Sort review findings per CLAUDE §6.8.
 5. Write the protocol docs/sprints/sprint_04/S4-23_accept_language.md in the structure of the earlier sprints (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, Figma mapping, LEGACY_EXCEPTIONS …).
 6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
+
+Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
+```
+
+### S4-29 — Figma light colours pinned in the theme
+
+```text
+Task S4-29 from docs/sprints/sprint_04/SPRINT_04.md — Figma light colours pinned in the theme
+Issues: #240 (light part only; the dark part stays open)
+Requirements / invariants: R-SET-03 (development part), SPEC §7.5; A11Y-01, A11Y-08 stay green
+Depends on: S4-13 (S10 is already merged); merge before S4-14 so S11 is built in the final light colours
+
+Read first: CLAUDE.md; in SPRINT_04.md the row of S4-29 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issue named above (gh issue view 240) and its entry in TECH_DEBT_v3.md (TD-34); always the highest version of each document in docs/ (document names below carry no version on purpose).
+Also read: Design handoff §1.1, §1.2 (colour tokens: Figma variable, CSS role, value), §1.4 if present (focus ring); SPEC §7.5; CLIENT src/styles/theme.scss; docs/sprints/sprint_03/S3-09_theme_foundation.md (P1, P6) and S3-10_dark_appearance_axe.md (P4)
+
+Owner decisions for this task: O-S4-22: pin the light values of Handoff §1.2 (the Figma variables) now with mat.theme-overrides; the dark appearance stays on the generated palette until the Figma dark mode and its accessibility review (O-S5) (decided 2026-11-11)
+Additional instructions: For every --mat-sys-* role listed in Handoff §1.2, set the light appearance to its value there, via mat.theme-overrides in theme.scss (the mechanism SPEC §7.5 names) — never as hex values in components. Roles the Handoff does not list keep the generated value; list them in the protocol. Show the result as a table role | generated value | Figma value | contrast against its background, and with a test or script that reads the computed custom properties in the light appearance. If a Figma value breaks a contrast rule of SPEC §7.5 or fails axe, do not change it: report it as an owner decision. The dark appearance must not change (A11Y-08 green, same values as before). Do not close #240; comment which part is done. Update Handoff §1.2 only if a value there is ambiguous, and the TD-34 note in the protocol.
+
+Way of working:
+1. Branch sprint04/S4-29-figma-light-colours from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
+2. Before changing code, give me a short plan: starting point, files, invariants the task activates, tests. If the plan shows more than one session, propose a split (as S3-20a/b). Stop and ask if the row, the documents and the code contradict each other, if a UX copy key or its wording is missing, or if the task needs an owner decision that is not given above (CLAUDE §2, §6.5, §6.6). Do not decide for me: give options with a recommendation.
+3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:CFG-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there; if another PR merged the same TESTING version first, rebase and renumber yours. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
+4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. If another session runs the E2E stack locally at the same time, leave E2E to CI. Sort review findings per CLAUDE §6.8.
+5. Write the protocol docs/sprints/sprint_04/S4-29_figma_light_colours.md in the structure of the earlier sprints (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CLAUDE.md §3/§4/§5, ARCHITECTURE, SPEC §13, Figma mapping, LEGACY_EXCEPTIONS …).
+6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Refs #240" (the issue stays open for the dark part). Do not merge.
 
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
 ```

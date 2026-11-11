@@ -8,11 +8,59 @@
 // The palettes in _theme-colors.scss are generated from the Handoff colours. `theme-type:
 // color-scheme` emits every --mat-sys-* colour as light-dark(), so the active appearance is the
 // one of `color-scheme` on html: the system setting, or the class theme-light / theme-dark that
-// core/a11y/appearance.ts sets (R-SET-02). The dark values stay generated until the dark scheme
-// is designed and reviewed (O-S5); nothing is pinned yet.
+// core/a11y/appearance.ts sets (R-SET-02). The light values of Handoff §1.2 are pinned below
+// (S4-29, O-S4-22); the dark values stay generated until the dark scheme is designed and
+// reviewed (O-S5).
 
+@use 'sass:map';
 @use '@angular/material' as mat;
 @use './theme-colors' as custom-colors;
+
+// Light values of Handoff §1.2 (the Figma variables „Schemes/…“). Roles the table does not list
+// keep the generated value. e2e/shell/appearance.spec.ts compares them with the Handoff.
+$figma-light: (
+  background: #fef7ff,
+  surface: #fef7ff,
+  surface-container-lowest: #ffffff,
+  surface-container-low: #f7f2fa,
+  surface-container: #f3edf7,
+  surface-container-high: #ece6f0,
+  surface-container-highest: #e6e0e9,
+  on-surface: #1d1b20,
+  on-surface-variant: #49454f,
+  primary: #6750a4,
+  on-primary: #ffffff,
+  primary-container: #eaddff,
+  on-primary-container: #4f378a,
+  secondary: #625b71,
+  secondary-container: #e8def8,
+  on-secondary-container: #4a4459,
+  outline: #79747e,
+  outline-variant: #cac4d0,
+  error: #b3261e,
+  error-container: #f9dedc,
+  on-error-container: #852221,
+  scrim: #000000,
+);
+
+// The same palettes as the dark half of mat.theme below, so the dark value of a pinned role
+// stays the generated one.
+$_generated-dark: mat.define-theme((
+  color: (
+    primary: custom-colors.$primary-palette,
+    tertiary: custom-colors.$tertiary-palette,
+    theme-type: dark,
+  ),
+));
+
+@function _light-only($figma-light) {
+  $overrides: ();
+  @each $role, $light in $figma-light {
+    $dark: mat.get-theme-color($_generated-dark, $role);
+    $overrides: map.set($overrides, $role, light-dark($light, $dark));
+  }
+  @return $overrides;
+}
 
 html {
   color-scheme: light dark;
@@ -29,6 +77,9 @@ html {
     ),
     density: 0,
   ));
+  // After mat.theme, so these declarations win. The legacy .contrast-more (on html, higher
+  // specificity) still replaces them.
+  @include mat.theme-overrides(_light-only($figma-light));
   // 3 px ring in --mat-sys-secondary on :focus-visible (Handoff §1.6, WCAG 2.4.7)
   @include mat.strong-focus-indicators((border-style: solid, border-width: 3px));
 
