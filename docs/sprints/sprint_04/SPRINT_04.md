@@ -211,6 +211,7 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-51 | S4-18: what the counts count: (a) the requirement criteria of the answer by the level that applies now, without „Geprüft nach …“ (Handoff S32), so the levels add up to `criteria.list.summary.count`; inclusion only in the live counter of the action bar; (b) only included criteria | S4-18a | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-52 | S4-18 is more than one session: (a) S4-18a frontend (summary, notices, action bar, suggestion link, page titles), S4-18b the event; (b) one task | S4-18 | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-53 | S4-18: the UX copy puts `criteria.list.draftNote` „oberhalb der Aktionen“, Handoff §5.1 and the Figma frame `2020:70` at the top below the priority note: (a) at the top (Handoff over UX copy for layout); UX copy v22 says „oberhalb der Liste“; (b) directly above the action bar | S4-18a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-54 | S4-18a review: until step 3 `criteria.list.draftNote` asks anonymous users to sign in „um sie zu speichern“, but signing in saves nothing yet: (a) keep the approved wording until step 3; (b) a temporary text in the UX copy | S4-18a | (a); **decided (a)**, owner 2026-11-11 (pull request #275) |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 
