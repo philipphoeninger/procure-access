@@ -22,6 +22,7 @@ internal sealed record CriterionItem(
     string Title,
     string? PlainLanguage,
     string? ProductPart,
+    IReadOnlyList<AppTypeItem> AppliesTo,
     IReadOnlyList<StandardReferenceItem> StandardReferences,
     IReadOnlyList<string> AllowedRatings,
     IReadOnlyList<ProcedureTextItem> ProcedureTexts,

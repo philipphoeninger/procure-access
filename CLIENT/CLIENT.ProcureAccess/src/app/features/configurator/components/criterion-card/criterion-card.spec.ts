@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { render, screen } from '@testing-library/angular';
 
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { Criterion } from '../../models/criteria';
+import { Criterion, ProcedureText } from '../../models/criteria';
 import { CriterionDecision, DEFAULT_DECISION } from '../../models/criteria-list';
 import { CatalogNames, catalogNames } from '../../state/catalog-names';
 import { criterion, procedureText } from '../../testing/criteria-fixture';
@@ -22,8 +23,23 @@ function names(): CatalogNames {
     ...options,
     useCases: [{ id: 'hr', name: 'HR-Anwendung', hint: null, excludedBy: [] }],
     appTypes: [{ id: 'web', name: 'Website oder Webanwendung', hint: null, excludedBy: [] }],
-    productParts: [{ id: 'base', name: 'Basisfunktionalität', explanation: '', alwaysSelected: true, excludedBy: [] }],
-    testTypes: [{ id: 'softwareTest', name: 'Software', url: 'https://softwaretest.bit-inklusiv.de/', excludedBy: [] }],
+    productParts: [
+      {
+        id: 'base',
+        name: 'Basisfunktionalität',
+        explanation: '',
+        alwaysSelected: true,
+        excludedBy: [],
+      },
+    ],
+    testTypes: [
+      {
+        id: 'softwareTest',
+        name: 'Software',
+        url: 'https://softwaretest.bit-inklusiv.de/',
+        excludedBy: [],
+      },
+    ],
   });
 }
 
@@ -46,18 +62,55 @@ function keyboardCriterion(overrides: Partial<Criterion> = {}): Criterion {
 
 function procedureCriterion(): Criterion {
   return {
-    ...criterion('PROC-softwareTest', 'B', null, { title: 'Geprüft nach Softwaretest', plainLanguage: null }),
+    ...criterion('PROC-softwareTest', 'B', null, {
+      title: 'Geprüft nach Softwaretest',
+      plainLanguage: null,
+    }),
     kind: 'testProcedure',
     number: null,
     productPart: null,
+    appliesTo: [],
     standardReferences: [],
     allowedRatings: [],
   };
 }
 
-async function show(c: Criterion, decision: CriterionDecision = DEFAULT_DECISION, catalog: CatalogNames = names()) {
+/** The full Software-Test text of a criterion, as a 2026.1 release folder holds it (joined lines). */
+function softwareText(overrides: Partial<ProcedureText> = {}): ProcedureText {
+  return {
+    testType: 'softwareTest',
+    originalNumber: '11.2.1.1',
+    originalTitle: 'Ohne Maus nutzbar',
+    applicability: 'Der Prüfschritt ist immer anwendbar.',
+    requirement: 'Alle Funktionen sind mit der Tastatur bedienbar.\n\n- Menüs\n- Dialoge',
+    rationaleWhy: 'Viele Menschen nutzen keine Maus.',
+    allowedRatings: ['notApplicable', 'blockade', 'fulfilled', 'barrier'],
+    positiveExamples: '- Gut 1\n- Gut 2',
+    negativeExamples: '- Schlecht 1\n- Schlecht 2',
+    sourceUrl: 'https://softwaretest.bit-inklusiv.de/#ohne-maus',
+    ...overrides,
+  };
+}
+
+function h3Names(): string[] {
+  return screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent?.trim() ?? '');
+}
+
+function listItems(list: HTMLElement): string[] {
+  return Array.from(list.children).map((li) => li.textContent?.replace(/\s+/g, ' ').trim() ?? '');
+}
+
+async function show(
+  c: Criterion,
+  decision: CriterionDecision = DEFAULT_DECISION,
+  catalog: CatalogNames = names(),
+) {
   const rendered = await render(CriterionCard, {
-    providers: [provideTestTranslations()],
+    providers: [
+      provideTestTranslations(),
+      // jsdom never ends a CSS transition, so the tab body would wait for it forever.
+      { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
+    ],
     inputs: { criterion: c, decision, names: catalog },
   });
   const toggle = () => screen.getByRole('button', { name: /Details (anzeigen|ausblenden)/ });
@@ -74,7 +127,10 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       const { toggle } = await show(keyboardCriterion());
 
       expect(
-        screen.getByRole('heading', { level: 2, name: 'Formulare lassen sich vollständig mit der Tastatur bedienen' }),
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Formulare lassen sich vollständig mit der Tastatur bedienen',
+        }),
       ).toBeTruthy();
       expect(screen.getByText('11.2.1.1 Ohne Maus nutzbar · BIT inklusiv')).toBeTruthy();
       expect(screen.getByText('Basisfunktionalität · EN 301 549 11.2.1.1')).toBeTruthy();
@@ -121,7 +177,9 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       expect(document.activeElement).toBe(toggle());
       const sections = screen.getAllByRole('heading', { level: 3 });
       expect(sections[0]?.textContent?.trim()).toBe('Warum diese Priorität?');
-      expect(screen.getByText('Viele Mitarbeitende arbeiten ausschließlich mit der Tastatur.')).toBeTruthy();
+      expect(
+        screen.getByText('Viele Mitarbeitende arbeiten ausschließlich mit der Tastatur.'),
+      ).toBeTruthy();
       expect(
         screen.getByText(
           'Diese Empfehlung gilt für Website oder Webanwendung mit dem Verwendungszweck HR-Anwendung.',
@@ -145,7 +203,9 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       await show(keyboardCriterion(), { ...DEFAULT_DECISION, overrideLevel: 'B' });
 
       expect(screen.getByText('Priorität: B – Bewertungskriterium')).toBeTruthy();
-      expect(screen.getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
+      expect(
+        screen.getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.'),
+      ).toBeTruthy();
     });
 
     it('shows the weight of a recommended B', async () => {
@@ -159,13 +219,17 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
     it('shows title, text and the test type link that opens in a new tab', async () => {
       await show(procedureCriterion());
 
-      expect(screen.getByRole('heading', { level: 2, name: 'Geprüft nach BIT inklusiv Software-Test' })).toBeTruthy();
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Geprüft nach BIT inklusiv Software-Test' }),
+      ).toBeTruthy();
       expect(
         screen.getByText(
           'Der Anbieter oder eine unabhängige Stelle hat das Produkt nach dem BIT inklusiv Software-Test geprüft und kann den Bericht vorlegen.',
         ),
       ).toBeTruthy();
-      const link = screen.getByRole('link', { name: 'softwaretest.bit-inklusiv.de (öffnet in neuem Tab)' });
+      const link = screen.getByRole('link', {
+        name: 'softwaretest.bit-inklusiv.de (öffnet in neuem Tab)',
+      });
       expect(link.getAttribute('href')).toBe('https://softwaretest.bit-inklusiv.de/');
       expect(link.getAttribute('target')).toBe('_blank');
       expect(link.parentElement?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
@@ -180,19 +244,202 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
 
       await click();
 
-      expect(screen.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' })).toBeTruthy();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }),
+      ).toBeTruthy();
       expect(screen.getByText('Rationale PROC-softwareTest')).toBeTruthy();
-      expect(screen.getByText('Das ist die allgemeine Empfehlung für alle Anwendungstypen.')).toBeTruthy();
+      expect(
+        screen.getByText('Das ist die allgemeine Empfehlung für alle Anwendungstypen.'),
+      ).toBeTruthy();
       expect(screen.getByText(SOURCE_LINE)).toBeTruthy();
       expect(screen.getByText(/Im Beschaffungsprojekt ergibt sich Ja oder Nein/)).toBeTruthy();
       await expectNoAxeViolations();
     });
 
+    it('has no catalog sections in the details', async () => {
+      const { click } = await show(procedureCriterion());
+
+      await click();
+
+      expect(h3Names()).toEqual(['Warum diese Priorität?']);
+    });
+
     it('leaves out the meta line when the options name no URL for the test type', async () => {
-      const { container } = await show(procedureCriterion(), DEFAULT_DECISION, { ...names(), testTypeUrls: {} });
+      const { container } = await show(procedureCriterion(), DEFAULT_DECISION, {
+        ...names(),
+        testTypeUrls: {},
+      });
 
       expect(container.textContent).not.toContain('Prüfverfahren ·');
       expect(screen.queryByRole('link')).toBeNull();
+    });
+  });
+
+  describe('catalog sections of the details (S4-15b, Handoff §5.5)', () => {
+    it('shows the sections of one procedure in order, without tabs', async () => {
+      const { click } = await show(
+        keyboardCriterion({
+          procedureTexts: [softwareText()],
+          appliesTo: [
+            { id: 'web', name: 'Website oder Webanwendung' },
+            { id: 'softwareOpen', name: 'Software (offen)' },
+          ],
+        }),
+      );
+
+      await click();
+
+      expect(h3Names()).toEqual([
+        'Warum diese Priorität?',
+        'Was wird verlangt?',
+        'Wann gilt das?',
+        'Wen betrifft es?',
+        'Woran erkennt man es?',
+        'Wie wird bewertet?',
+        'So wird es geprüft',
+        'Gilt für',
+      ]);
+      expect(screen.getByText('Alle Funktionen sind mit der Tastatur bedienbar.').tagName).toBe(
+        'P',
+      );
+      expect(screen.getByText('Menüs').tagName).toBe('LI');
+      expect(
+        screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent?.trim()),
+      ).toEqual(['So ist es gut', 'So ist es nicht gut']);
+      const ratings = screen.getByText('Erfüllt').parentElement as HTMLElement;
+      expect(listItems(ratings)).toEqual(['Erfüllt', 'Barriere', 'Blockade', 'Nicht anwendbar']);
+      const step = screen.getByRole('link', {
+        name: 'Prüfschritt 11.2.1.1 im BIT inklusiv Software-Test (öffnet bit-inklusiv.de) (öffnet in neuem Tab)',
+      });
+      expect(step.getAttribute('href')).toBe('https://softwaretest.bit-inklusiv.de/#ohne-maus');
+      expect(step.getAttribute('target')).toBe('_blank');
+      expect(screen.getByText('Website oder Webanwendung und Software (offen)')).toBeTruthy();
+      expect(
+        screen.getByText(
+          'Texte: BIT inklusiv Software-Test, Prüfschritt 11.2.1.1 „Ohne Maus nutzbar“. Verwendet mit Erlaubnis.',
+        ),
+      ).toBeTruthy();
+      expect(screen.queryByRole('tablist')).toBeNull();
+      await expectNoAxeViolations();
+    });
+
+    it('leaves out sections without text, „Gilt für“ without app types and a step link that is not http(s)', async () => {
+      const { click } = await show(
+        keyboardCriterion({
+          procedureTexts: [
+            softwareText({
+              applicability: null,
+              positiveExamples: null,
+              negativeExamples: null,
+              allowedRatings: [],
+              sourceUrl: 'javascript:alert(1)',
+            }),
+          ],
+          appliesTo: [],
+        }),
+      );
+
+      await click();
+
+      expect(h3Names()).toEqual([
+        'Warum diese Priorität?',
+        'Was wird verlangt?',
+        'Wen betrifft es?',
+      ]);
+      expect(screen.queryByRole('link')).toBeNull();
+    });
+
+    it('shows only priority and „Gilt für“ for a criterion without procedure texts', async () => {
+      const { click } = await show(keyboardCriterion({ procedureTexts: [] }));
+
+      await click();
+
+      expect(h3Names()).toEqual(['Warum diese Priorität?', 'Gilt für']);
+      expect(screen.queryByText(/^Texte:/)).toBeNull();
+    });
+
+    it('puts sections with the same text above one tab per procedure (U101)', async () => {
+      const { click, fixture } = await show(
+        keyboardCriterion({
+          procedureTexts: [
+            softwareText(),
+            softwareText({
+              testType: 'appTest',
+              originalTitle: 'Ohne Maus bedienbar',
+              requirement: 'Alle Funktionen der App sind mit externer Tastatur bedienbar.',
+              sourceUrl: 'https://apptest.bit-inklusiv.de/#ohne-maus',
+            }),
+          ],
+        }),
+      );
+
+      await click();
+
+      const tabs = screen.getAllByRole('tab');
+      expect(tabs.map((tab) => tab.textContent?.trim())).toEqual(['Software-Test', 'App-Test']);
+      expect(h3Names()).toEqual([
+        'Warum diese Priorität?',
+        'Wann gilt das?',
+        'Wen betrifft es?',
+        'Woran erkennt man es?',
+        'Wie wird bewertet?',
+        'Was wird verlangt?',
+        'So wird es geprüft',
+        'Gilt für',
+      ]);
+      expect(screen.getByText('Alle Funktionen sind mit der Tastatur bedienbar.')).toBeTruthy();
+      expect(screen.getByText(/Prüfschritt 11\.2\.1\.1 „Ohne Maus nutzbar“/)).toBeTruthy();
+      await expectNoAxeViolations();
+
+      tabs[1]?.click();
+      await fixture.whenStable();
+
+      expect(
+        screen.getByText('Alle Funktionen der App sind mit externer Tastatur bedienbar.'),
+      ).toBeTruthy();
+      expect(
+        screen.getByRole('link', {
+          name: 'Prüfschritt 11.2.1.1 im BIT inklusiv App-Test (öffnet bit-inklusiv.de) (öffnet in neuem Tab)',
+        }),
+      ).toBeTruthy();
+      expect(
+        screen.getByText(/BIT inklusiv App-Test, Prüfschritt 11\.2\.1\.1 „Ohne Maus bedienbar“/),
+      ).toBeTruthy();
+    });
+
+    it('shows three examples per group, then all on request with the focus on the fourth (O-S4-37)', async () => {
+      const { click, fixture } = await show(
+        keyboardCriterion({
+          procedureTexts: [
+            softwareText({
+              positiveExamples:
+                '- Gut 1\n- Gut 2\n  - Gut 2a\n- Gut 3\n- Gut 4\n- Gut 5\n\nEine Notiz zu den Beispielen.',
+              negativeExamples: '- Schlecht 1',
+            }),
+          ],
+        }),
+      );
+      await click();
+
+      expect(screen.queryByText('Gut 4')).toBeNull();
+      expect(screen.getByText('Gut 2a')).toBeTruthy();
+      expect(screen.getByText('Eine Notiz zu den Beispielen.')).toBeTruthy();
+      const more = screen.getByRole('button', { name: 'Alle 5 Beispiele anzeigen' });
+      const describedBy = (more.getAttribute('aria-describedby') ?? '').split(' ');
+      expect(describedBy.map((id) => document.getElementById(id)?.textContent?.trim())).toEqual([
+        'So ist es gut',
+        'Formulare lassen sich vollständig mit der Tastatur bedienen',
+      ]);
+      expect(screen.getAllByRole('button', { name: /Beispiele anzeigen/ })).toHaveLength(1);
+      await expectNoAxeViolations();
+
+      more.click();
+      await fixture.whenStable();
+
+      expect(screen.getByText('Gut 5')).toBeTruthy();
+      expect(screen.queryByRole('button', { name: /Beispiele anzeigen/ })).toBeNull();
+      expect(document.activeElement?.textContent?.trim()).toBe('Gut 4');
+      await expectNoAxeViolations();
     });
   });
 });

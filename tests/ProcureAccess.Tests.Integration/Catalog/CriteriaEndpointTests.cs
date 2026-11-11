@@ -65,7 +65,7 @@ public sealed class CriteriaEndpointTests(ApiFixture api) : IntegrationTest(api)
         foreach (var criterion in criteria)
         {
             Names(criterion!).ShouldBe([
-                "revisionId", "key", "kind", "number", "title", "plainLanguage", "productPart",
+                "revisionId", "key", "kind", "number", "title", "plainLanguage", "productPart", "appliesTo",
                 "standardReferences", "allowedRatings", "procedureTexts", "resolvedPriority"]);
             var priority = criterion!["resolvedPriority"]!;
             Names(priority).ShouldBe(["level", "weight", "rationale", "source", "matchedRule"]);
@@ -82,10 +82,12 @@ public sealed class CriteriaEndpointTests(ApiFixture api) : IntegrationTest(api)
         (resolved["level"]!.GetValue<string>(), resolved["weight"], resolved["rationale"]!.GetValue<string>())
             .ShouldBe(("A", (JsonNode?)null, "Testbegründung A für web und hr."));
         resolved["matchedRule"]!.ToJsonString().ShouldBe("""{"kind":"appTypeAndUseCase","appType":"web","useCase":"hr"}""");
+        allLevels["appliesTo"]!.ToJsonString().ShouldBe("""[{"id":"web","name":"Website oder Webanwendung"}]""");
         Names(Find(json, Keys.DefaultOnly)["standardReferences"]![0]!).ShouldBe(["standard", "clause", "url"]);
         var procedure = Find(json, Keys.ProcedureSoftwareTest);
         procedure["kind"]!.GetValue<string>().ShouldBe("testProcedure");
         procedure["number"].ShouldBeNull();
+        procedure["appliesTo"]!.AsArray().ShouldBeEmpty();
         procedure["allowedRatings"]!.AsArray().ShouldBeEmpty();
         json["appTypesWithoutCriteria"]!.AsArray().ShouldBeEmpty();
     }

@@ -14,8 +14,15 @@ SPDX-License-Identifier: MIT
   @if (testTypeLink(); as link) {
     @let metaText = 'criteria.item.testedBy.meta' | translate: { link: linkMark };
     <p class="pa-criterion-card__meta">
-      {{ beforeLink(metaText) }}<a class="pa-criterion-card__link" [href]="link.url" target="_blank" rel="noopener noreferrer"
-        >{{ link.domain }}&ngsp;<span class="cdk-visually-hidden">{{ 'common.newTab' | translate }}</span></a
+      {{ beforeLink(metaText)
+      }}<a
+        class="pa-criterion-card__link"
+        [href]="link.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        >{{ link.domain }}&ngsp;<span class="cdk-visually-hidden">{{
+          'common.newTab' | translate
+        }}</span></a
       >{{ afterLink(metaText) }}
     </p>
   }
@@ -29,7 +36,11 @@ SPDX-License-Identifier: MIT
   }
 }
 
-<pa-priority-indicator [level]="level()" [recommendedLevel]="recommendedLevel()" [weight]="weight()" />
+<pa-priority-indicator
+  [level]="level()"
+  [recommendedLevel]="recommendedLevel()"
+  [weight]="weight()"
+/>
 
 <div class="pa-criterion-card__actions">
   <button
@@ -46,10 +57,66 @@ SPDX-License-Identifier: MIT
 
 <div class="pa-criterion-card__details" [id]="panelId()" [hidden]="!expanded()">
   <section class="pa-criterion-card__section">
-    <h3 class="pa-criterion-card__section-title">{{ 'criteria.item.detail.priority' | translate }}</h3>
+    <h3 class="pa-criterion-card__section-title">
+      {{ 'criteria.item.detail.priority' | translate }}
+    </h3>
     <pa-priority-rationale [rationale]="criterion().resolvedPriority.rationale" [rule]="rule()" />
   </section>
   @if (testType()) {
     <p class="pa-criterion-card__text">{{ 'criteria.item.testedBy.note' | translate }}</p>
+  } @else {
+    @let detail = layout();
+    @if (detail.procedures[0]; as first) {
+      <pa-procedure-sections
+        [text]="first"
+        [kinds]="detail.shared"
+        [howTested]="!detail.tabbed"
+        [idPrefix]="titleId() + '-' + first.testType"
+        [criterionTitleId]="titleId()"
+      />
+    }
+    @if (detail.tabbed) {
+      <mat-tab-group class="pa-criterion-card__tabs">
+        @for (procedure of detail.procedures; track procedure.testType) {
+          <mat-tab [label]="tabLabelKey(procedure.testType) | translate">
+            <div class="pa-criterion-card__tab">
+              <pa-procedure-sections
+                [text]="procedure"
+                [kinds]="detail.perProcedure"
+                [howTested]="true"
+                [idPrefix]="titleId() + '-tab-' + procedure.testType"
+                [criterionTitleId]="titleId()"
+              />
+              <ng-container *ngTemplateOutlet="source; context: { $implicit: procedure }" />
+            </div>
+          </mat-tab>
+        }
+      </mat-tab-group>
+    }
+    @if (appliesTo(); as appTypes) {
+      <section class="pa-criterion-card__section">
+        <h3 class="pa-criterion-card__section-title">
+          {{ 'criteria.item.detail.appliesTo' | translate }}
+        </h3>
+        <p class="pa-criterion-card__text">{{ appTypes }}</p>
+      </section>
+    }
+    @if (!detail.tabbed && detail.procedures[0]; as first) {
+      <ng-container *ngTemplateOutlet="source; context: { $implicit: first }" />
+    }
   }
 </div>
+
+<ng-template #source let-procedure>
+  <p class="pa-criterion-card__source">
+    {{
+      'criteria.item.detail.source'
+        | translate
+          : {
+              testType: ('testType.' + procedure.testType | translate),
+              number: procedure.originalNumber,
+              originalTitle: procedure.originalTitle,
+            }
+    }}
+  </p>
+</ng-template>

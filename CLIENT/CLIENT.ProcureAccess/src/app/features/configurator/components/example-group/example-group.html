@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h4 class="pa-example-group__title" [id]="headingId()">{{ titleKey() | translate }}</h4>
+<pa-catalog-text [text]="text()" [maxItems]="limited() ? EXAMPLES_SHOWN : null" />
+@if (limited()) {
+  <div>
+    <button
+      matButton
+      type="button"
+      [attr.aria-describedby]="describedBy()"
+      (click)="showAllExamples()"
+    >
+      {{ 'criteria.item.detail.examples.more' | translate: { count: count() } }}
+    </button>
+  </div>
+}

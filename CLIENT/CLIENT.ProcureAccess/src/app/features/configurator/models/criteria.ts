@@ -8,8 +8,8 @@ import { PriorityLevel } from '@app/shared/components/priority-indicator/priorit
 export { PRIORITY_LEVELS } from '@app/shared/components/priority-indicator/priority-level';
 export type { PriorityLevel } from '@app/shared/components/priority-indicator/priority-level';
 
-/** An app type the release has no requirement criterion for (SPEC §8.2). */
-export interface AppTypeWithoutCriteria {
+/** An app type by key and name, as the criteria answer names it (SPEC §8.2). */
+export interface AppTypeName {
   id: string;
   name: string;
 }
@@ -49,12 +49,7 @@ export interface StandardReference {
 
 /** Rating levels a criterion allows; `unknown` is always allowed and never listed (SPEC §8.2). */
 export type RatingName =
-  | 'fulfilled'
-  | 'slightRestriction'
-  | 'restriction'
-  | 'barrier'
-  | 'blockade'
-  | 'notApplicable';
+  'fulfilled' | 'slightRestriction' | 'restriction' | 'barrier' | 'blockade' | 'notApplicable';
 
 /** The BIT inklusiv text of one test procedure, verbatim catalog content (Markdown lines joined). */
 export interface ProcedureText {
@@ -81,6 +76,8 @@ export interface Criterion {
   /** Null while the release has no plain-language title yet (O-1, K-1). */
   plainLanguage: string | null;
   productPart: string | null;
+  /** The selected app types the criterion applies to, in catalog order; empty for „Geprüft nach …“ (O-S4-29, „Gilt für“). */
+  appliesTo: AppTypeName[];
   standardReferences: StandardReference[];
   allowedRatings: RatingName[];
   procedureTexts: ProcedureText[];
@@ -91,5 +88,6 @@ export interface Criterion {
 export interface CriteriaResponse {
   release: string;
   criteria: Criterion[];
-  appTypesWithoutCriteria: AppTypeWithoutCriteria[];
+  /** The selected app types the release has no requirement criterion for. */
+  appTypesWithoutCriteria: AppTypeName[];
 }

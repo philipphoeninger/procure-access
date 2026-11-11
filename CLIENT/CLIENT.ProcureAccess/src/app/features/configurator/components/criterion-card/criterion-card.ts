@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { PriorityIndicator } from '@app/shared/components/priority-indicator/priority-indicator';
@@ -21,6 +23,8 @@ import {
   ruleText,
   sourceTitle,
 } from '../../state/criterion-card-rules';
+import { detailLayout, tabLabelKey } from '../../state/criterion-detail-rules';
+import { ProcedureSections } from '../procedure-sections/procedure-sections';
 
 /** Stands for the link inside `criteria.item.testedBy.meta`; a private-use character no text holds. */
 const LINK_MARK = '';
@@ -34,8 +38,12 @@ const LINK_MARK = '';
  * - „Geprüft nach …“ (R-LST-07): `criteria.item.testedBy.*` with the test type's link, K5; the
  *   panel adds `criteria.item.testedBy.note` (owner decision O-S4-33 (a)).
  * - The panel starts with „Warum diese Priorität?“: rationale, matched rule and source (R-LST-02,
- *   CAT-02); K5 itself has no toggle here (`showRationaleToggle=false`, U28). The catalog text
- *   sections follow with S4-15b; the checkbox and „Notiz hinzufügen“ with S4-16.
+ *   CAT-02); K5 itself has no toggle here (`showRationaleToggle=false`, U28). The catalog sections
+ *   of the procedure texts follow (`pa-procedure-sections`, S4-15b), then „Gilt für“ (`appliesTo`,
+ *   O-S4-29) and the source line of the texts. With several procedures the sections whose text is
+ *   the same in all stand above a `mat-tab-group` with one tab per procedure (U101); each tab holds
+ *   the other sections, „So wird es geprüft“ and its source line. The checkbox and „Notiz
+ *   hinzufügen“ follow with S4-16.
  *
  * The toggle keeps the focus and names the criterion through `aria-describedby`; the panel stays in
  * the DOM while hidden, so `aria-controls` always points at it. The title carries the anchor
@@ -46,7 +54,15 @@ const LINK_MARK = '';
  */
 @Component({
   selector: 'pa-criterion-card',
-  imports: [MatButtonModule, PriorityIndicator, PriorityRationale, TranslatePipe],
+  imports: [
+    MatButtonModule,
+    MatTabsModule,
+    NgTemplateOutlet,
+    PriorityIndicator,
+    PriorityRationale,
+    ProcedureSections,
+    TranslatePipe,
+  ],
   templateUrl: './criterion-card.html',
   styleUrl: './criterion-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,7 +96,23 @@ export class CriterionCard {
   protected readonly level = computed(() => effectiveLevel(this.criterion(), this.decision()));
   protected readonly recommendedLevel = computed(() => this.criterion().resolvedPriority.level);
   protected readonly weight = computed(() => effectiveWeight(this.criterion(), this.decision()));
-  protected readonly rule = computed(() => ruleText(this.criterion().resolvedPriority.matchedRule, this.names()));
+  protected readonly rule = computed(() =>
+    ruleText(this.criterion().resolvedPriority.matchedRule, this.names()),
+  );
+
+  protected readonly layout = computed(() => detailLayout(this.criterion()));
+  protected readonly tabLabelKey = tabLabelKey;
+  private readonly appTypeList = new Intl.ListFormat(
+    inject(DOCUMENT).documentElement.lang || 'de',
+    {
+      type: 'conjunction',
+    },
+  );
+  /** „Gilt für“: the selected app types the criterion applies to, joined in the document language. */
+  protected readonly appliesTo = computed(() => {
+    const names = this.criterion().appliesTo.map((appType) => appType.name);
+    return names.length === 0 ? null : this.appTypeList.format(names);
+  });
 
   protected toggle(): void {
     this.expanded.update((expanded) => !expanded);

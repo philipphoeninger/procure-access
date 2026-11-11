@@ -191,6 +191,10 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-33 | „Geprüft nach …“ panel: Handoff §5.5 (text and note only) vs. R-LST-02/CAT-02: (a) the panel starts with „Warum diese Priorität?“; (b) as the Handoff | S4-15a | (a); **decided (a)**, owner 2026-11-11 (Handoff 1.18) |
 | O-S4-34 | A failed S11 load (S4-14 P1): (a) no new text — the S11 request no longer suppresses the snackbar for `validation`/`selection-excluded`; (b) back to S10 with the error at the step; (c) a new key with „Erneut versuchen“ | S4-15a | (a); **decided (a)**, owner 2026-11-11 |
 | O-S4-35 | The S11 frame shows „Prüfverfahren · aus Ihrer Auswahl in Schritt 4“ on „Geprüft nach …“ cards without a UX copy key: (a) leave it out; (b) a key in UX copy v18 | S4-15a | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-36 | Links in catalog texts (`[url](url)` in 12.1.2 and 12.2.4), outside the subset of O-S4-30: (a) a link, http(s) only, new tab with `common.newTab`; (b) the link text as plain text | S4-15b | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-37 | „Alle {{count}} Beispiele anzeigen“: three examples (a) per group („So ist es gut“ / „So ist es nicht gut“), each with its own button and count, notes after the list always visible; (b) three in total | S4-15b | (a); **decided (a)**, owner 2026-11-11 |
+| O-S4-38 | Tab labels: `criteria.item.detail.tabs` holds the description „Software-Test / App-Test / PDF-Test“: (a) three keys with that wording (UX copy v19 U101); (b) the full names `testType.*` | S4-15b | (a); **decided (a)**, owner 2026-11-11; the wording of U101 waits for the owner's confirmation in the S4-15b pull request |
+| O-S4-39 | „#todo#“ in the Software-Test requirement of 11.1.3.2 (2026.1): (a) shown verbatim, listed in the gap list (`kriterienkatalog_2026_1_luecken_v2.md` Z-7); (b) removed from the folder | S4-15b | (a); **decided (a)**, owner 2026-11-11 |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |
 

@@ -24,6 +24,9 @@ namespace ProcureAccess.Modules.Catalog.Criteria;
 /// S3-20 decision 3).</item>
 /// <item><b><c>productPart</c> (decision 2):</b> of the applicability rows that match the
 /// selection, the named product part with the lowest sort order; null when none names a part.</item>
+/// <item><b><c>appliesTo</c> (owner decision O-S4-29 (a)):</b> the selected app types the
+/// criterion applies to (<see cref="CriterionRules.AppTypesApplyingTo"/>), in sort order, for
+/// „Gilt für“ in the detail panel; empty for a procedure criterion.</item>
 /// <item><b><c>number</c>:</b> the key of a requirement criterion (the EN 301 549 number, S3-15);
 /// null for a procedure criterion, as its export row has no number (SPEC §8.3).</item>
 /// <item><b><c>appTypesWithoutCriteria</c> (CAT-20):</b> the selected app types to which no
@@ -44,6 +47,9 @@ internal static class CriteriaResolver
 
         var testTypeOrder = values.TestTypes.ToDictionary(t => t.Key, t => t.SortOrder, StringComparer.Ordinal);
         var partOrder = values.ProductParts.ToDictionary(p => p.Key, p => p.SortOrder, StringComparer.Ordinal);
+        var appTypesInOrder = values.AppTypes
+            .OrderBy(a => a.SortOrder).ThenBy(a => a.Key, StringComparer.Ordinal)
+            .ToList();
         var mappedTestTypes = release.Procedures
             .Where(p => selection.AppTypes.Contains(p.AppType))
             .Select(p => p.TestType)
@@ -81,6 +87,7 @@ internal static class CriteriaResolver
                 criterion.TitleDe,
                 criterion.PlainLanguageDe,
                 isProcedure ? null : ProductPartOf(criterion.Rules, selection, partOrder),
+                isProcedure ? [] : AppTypesOf(criterion.Rules, selection, appTypesInOrder),
                 [.. criterion.StandardReferences.Select(r => new StandardReferenceItem(StandardName(r.Standard), r.Clause, r.Url))],
                 RatingNames(allowed),
                 [.. texts.Select(t => new ProcedureTextItem(
@@ -111,6 +118,12 @@ internal static class CriteriaResolver
             .ToList();
 
         return new CriteriaResponse(release.Version, criteria, withoutCriteria);
+    }
+
+    private static List<AppTypeItem> AppTypesOf(CriterionRules rules, CriteriaSelection selection, List<AppType> appTypesInOrder)
+    {
+        var applying = rules.AppTypesApplyingTo(selection);
+        return [.. appTypesInOrder.Where(a => applying.Contains(a.Key)).Select(a => new AppTypeItem(a.Key, a.NameDe))];
     }
 
     /// <summary>Owner, S3-20 decision 2: SPEC §8.2 sends one part (Kriterienkatalog K-4).</summary>

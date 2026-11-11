@@ -1,0 +1,30 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// Catalog text in the detail panel (Handoff §5.5): body/medium, wrapping, never truncated (§8.1).
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding-inline-start: var(--pa-space-lg);
+}
+
+li + li,
+li > ul {
+  margin-block-start: var(--pa-space-xs);
+}
+
+.pa-catalog-text__link {
+  color: var(--mat-sys-primary);
+}
