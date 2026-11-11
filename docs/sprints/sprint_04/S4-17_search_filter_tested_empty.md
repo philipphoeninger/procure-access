@@ -70,7 +70,7 @@ Checked without finding: no `innerHTML`, no new dependency; every text by key, `
 | # | Point | Next step |
 |---|---|---|
 | P1 | The Figma S11 frames (`2020:70`, `2039:2546`) show no priority filter (R4) | Design owner: add the checkbox group „Priorität“ to the filter row |
-| P2 | U105 (`criteria.list.emptyFilter.reset`) is a proposal of Claude | Owner confirms the wording in this pull request |
+| P2 | U105 (`criteria.list.emptyFilter.reset`) was a proposal of Claude | Closed: the owner confirmed the wording unchanged in this pull request (2026-11-11) |
 | P3 | E2E of the filter, the empty filter and the notice on `T.1` (Hardware has no criteria there) | S4-18 (reflow list) and J1 to the export (S4-22) |
 | P4 | CAT-16 export part (both export sources) | S4-19/S4-20 |
 | P5 | The summary of the selection and the counts above the list | S4-18 (moved by the owner, O-S4-47) |
