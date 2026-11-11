@@ -5,6 +5,7 @@
 > **Owner decisions** (2026-11-10, before the start):
 > 1. **(1a)** The proposals stand in the text tables of §5/§6 and are marked only outside the „Text“ column (change list and „Hinweis“). The draft stays red on `check-i18n.mjs` while it is reviewed. After the owner approves or edits the texts, `node scripts/check-i18n.mjs --write` runs as the last commit of this pull request, so `de.json` changes only with approved texts.
 > 2. The #181 row „write out `pageTitle.notFound` / `.forbidden` / `.server`“ (S2-13 P3), missing from the sprint row, is in scope.
+> 3. (2026-11-11, planning of S4-11) Two S10 texts join this pull request as proposals: the reason for an exclusion by a product part (U98) and the step-2 hint split into two keys (U99, S4-10 P2). S4-11 starts after this pull request is merged.
 
 ## 1. Starting point
 
@@ -49,14 +50,16 @@
 | Account button name vs visible „Konto“ (S2-15 P4) | `shell.userMenu.label` „Konto, angemeldet als {{displayName}}“ | U95 |
 | Line breaks of `suggest.mailBody` (S3-21 P1) | `suggest.mailBody` without `%0A%0A`, new `suggest.mailBody.prompt`; the blank line is set by the code | U96 |
 | Header naming the current document versions (TD-37) | new header line „Aktuelle Fassungen …“; the old list is „Grundlage (v14)“ | U97 |
+| No reason text for an option excluded by a product part (`excludedBy[].layer` = `productPart`, T.1: audio → softwareTest; planning of S4-11) | `criteria.select.excluded.productPart`; with a use-case or app-type reason as well, one line per layer | U98 |
+| `criteria.select.step2.hint` holds a second sentence meant only for the excluded case (S4-10 P2) | `criteria.select.step2.hint` (first sentence), `criteria.select.step2.hint.excluded` (second sentence, wording unchanged) | U99 |
 
-Every new or changed text carries „Vorschlag (S4-02, U8x/U9x)“ in its „Hinweis“ cell (the `pageTitle` table has no such column; its rows are marked in the change list). The change list gives one line „Warum so“ per proposal.
+Every new or changed text carries „Vorschlag (S4-02, U8x/U9x)“ (U98, U99: „Vorschlag (S4-11-Planung, …)“) in its „Hinweis“ cell (the `pageTitle` table has no such column; its rows are marked in the change list). The change list gives one line „Warum so“ per proposal.
 
 ### 2.2 Files
 
 | File | Change | Why |
 |---|---|---|
-| `docs/ux_copy_procureaccess_v17.md` (new) | v16 plus the rows of §2.1, the new §6.3 „Problemtypen und ihre Texte“, change list U86–U97, header | The task |
+| `docs/ux_copy_procureaccess_v17.md` (new) | v16 plus the rows of §2.1, the new §6.3 „Problemtypen und ihre Texte“, change list U86–U99, header | The task; U98, U99 from the planning of S4-11 (owner decision 3) |
 | `docs/ux_copy_procureaccess_v15.md` | deleted | Only the two newest versions stay (CLAUDE §2) |
 | `docs/SPEC_v2.md` | v2.7: change row v2.7-1 and a table in §8.6 with the UX key of each problem type; „proposal until O-S4-4“ | Row: „also name them for SPEC §8.6“ |
 | `CLAUDE.md` | header; §3: `pageTitle` variants split in v17, problem-type keys in SPEC §8.6 / UX copy §6.3 | DoD; the §3 sentence „some rows … still hold variants“ was outdated |
@@ -98,7 +101,8 @@ Alternatives considered for the proposals the owner may want to change:
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | **Approval commit (O-S4-4):** apply the owner's edits to v17, replace „Vorschlag (S4-02, Uxx)“ in the „Hinweis“ cells by „Uxx“, run `node scripts/check-i18n.mjs --write`; if U94 stays, update the tests that name the legal titles (`legal-page.spec.ts`, `e2e/shell/shell.spec.ts`, `e2e/shell/reflow.spec.ts`; `footer.spec.ts` and `route-change.spec.ts` use the footer link and `<title>`, which keep the plain words) | Last commit of this pull request, after the review |
+| P1 | **Approval commit (O-S4-4):** apply the owner's edits to v17, replace „Vorschlag (S4-02, Uxx)“ and „Vorschlag (S4-11-Planung, Uxx)“ in the „Hinweis“ cells by „Uxx“, run `node scripts/check-i18n.mjs --write`; if U94 stays, update the tests that name the legal titles (`legal-page.spec.ts`, `e2e/shell/shell.spec.ts`, `e2e/shell/reflow.spec.ts`; `footer.spec.ts` and `route-change.spec.ts` use the footer link and `<title>`, which keep the plain words) | Last commit of this pull request, after the review |
 | P2 | S11/S35/S41 use the new keys when they are built: `pageTitle` as an `AREAS` root (M2.6d), `translatePlural` for the count rows, `suggest.mailBody` + blank line + `suggest.mailBody.prompt`, `PROBLEM_TYPE_KEYS` from SPEC §8.6 | With the screens (S4-14 – S4-18 and later steps) |
 | P3 | Assumptions the owner may correct in the review: `profile-mismatch` also for the S55 republish (R4); exact e-mail match in U93 (R5); `release-mismatch` = `criteria.export.outdated` | Review of this pull request |
+| P5 | `criteria.select` became an `AREAS` entry of `check-i18n.mjs` with S4-10 (merged after this branch was cut): once this branch takes up `main`, `check-i18n.mjs` is also red on `criteria.select.step2.hint` (shortened, U99), `criteria.select.step2.hint.excluded` and `criteria.select.excluded.productPart` (new) until the approval commit writes them | Approval commit (P1) |
 | P4 | #181 can be closed with the merge; TECH_DEBT_v3 TD-15 is then done (next TECH_DEBT version at the sprint close-out) | Merge |
