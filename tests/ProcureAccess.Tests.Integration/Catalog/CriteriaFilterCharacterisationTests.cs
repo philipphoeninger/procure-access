@@ -18,9 +18,10 @@ namespace ProcureAccess.Tests.Integration.Catalog;
 /// </summary>
 /// <remarks>
 /// The expected sets live in <c>Catalog/Fixtures/cat-10-criteria-filter.json</c>. They were
-/// recorded from the endpoint before migration step 2; step 2 must keep them true for the
-/// migrated catalog (TESTING §4.2, status 0→2). Only the fields listed in
-/// <c>comparedFields</c> are compared, and the order is ignored.
+/// recorded from the endpoint before migration step 2. The legacy filter keeps answering from the
+/// legacy tables until 2026.1 is activated, so the test stays until the legacy filter goes; its
+/// E2E part was retired when J1 moved to S10 (S4-13, O-S4-5 (a)). Only the fields listed in
+/// <c>comparedFields</c> are compared, with their JSON kind, and the order is ignored.
 /// </remarks>
 public sealed class CriteriaFilterCharacterisationTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -37,7 +38,7 @@ public sealed class CriteriaFilterCharacterisationTests(ApiFixture api) : Integr
     public async ValueTask InitializeAsync()
     {
         await Api.ResetDatabaseAsync();
-        await StoreAsync(ExistingCatalogSeed.All());
+        await StoreAsync(Api.ExistingCatalogSeed.All());
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -64,6 +65,33 @@ public sealed class CriteriaFilterCharacterisationTests(ApiFixture api) : Integr
         actual.Except(expected).ShouldBeEmpty("criteria returned that the recording does not contain");
         expected.Except(actual).ShouldBeEmpty("recorded criteria missing from the response");
         actual.Count.ShouldBe(expected.Count, "the response contains a criterion more than once");
+    }
+}
+
+/// <summary>The comparison key of CAT-10 tells values of different JSON kinds apart (#91).</summary>
+public sealed class CriteriaFilterKeyTests
+{
+    private static readonly CriteriaFilterFixture Fixture = new("CAT-10", "key test", ["id", "name"], []);
+
+    [Theory]
+    [InlineData("""{"id": 1, "name": "a"}""", """{"id": "1", "name": "a"}""")]
+    [InlineData("""{"id": 1, "name": null}""", """{"id": 1, "name": ""}""")]
+    [InlineData("""{"id": 1, "name": "a"}""", """{"id": 1.0, "name": "a"}""")]
+    public void KeyOf_SameTextDifferentJsonValue_GivesDifferentKeys(string recorded, string answered)
+    {
+        using var recordedJson = JsonDocument.Parse(recorded);
+        using var answeredJson = JsonDocument.Parse(answered);
+
+        Fixture.KeyOf(answeredJson.RootElement).ShouldNotBe(Fixture.KeyOf(recordedJson.RootElement));
+    }
+
+    [Fact]
+    public void KeyOf_SameValues_GivesTheSameKey()
+    {
+        using var recorded = JsonDocument.Parse("""{"id": 1, "name": "a", "extra": true}""");
+        using var answered = JsonDocument.Parse("""{"name": "a", "id": 1}""");
+
+        Fixture.KeyOf(answered.RootElement).ShouldBe(Fixture.KeyOf(recorded.RootElement));
     }
 }
 
@@ -94,11 +122,13 @@ internal sealed record CriteriaFilterFixture(
 
     /// <summary>
     /// The compared fields of one criterion as a single comparable string, e.g.
-    /// <c>id=1 | name=5.2 … | criteriaFilterId=1</c>. Used for the response and the recording alike.
+    /// <c>id=Number:1 | name=String:"5.2 …" | criteriaFilterId=Number:1</c>. Used for the response
+    /// and the recording alike. The JSON kind and the raw text keep <c>1</c> and <c>"1"</c>, or
+    /// <c>null</c> and <c>""</c>, apart (#91).
     /// </summary>
     public string KeyOf(JsonElement criterion) => string.Join(" | ", ComparedFields.Select(field =>
         criterion.TryGetProperty(field, out var value)
-            ? $"{field}={value}"
+            ? $"{field}={value.ValueKind}:{value.GetRawText()}"
             : throw new ShouldAssertException($"Criterion {criterion} has no field '{field}'.")));
 }
 

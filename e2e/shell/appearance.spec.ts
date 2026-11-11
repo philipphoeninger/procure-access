@@ -90,7 +90,8 @@ test.describe('Appearance', () => {
         await route.continue();
       });
 
-      await page.goto('/filters');
+      // S10 loads its filter options before it opens, so the bar shows while they are held.
+      await page.goto('/kriterien');
       const bar = page.getByRole('main').getByRole('progressbar', { name: 'Wird geladen …' });
       await expect(bar).toBeVisible();
 

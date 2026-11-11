@@ -157,12 +157,13 @@ test.describe('System states', () => {
       await route.continue();
     });
 
-    await page.goto('/filters');
+    await page.goto('/kriterien');
 
     // The text exists only once de.json has answered, so this checks the state after that answer.
-    await expect(page.getByRole('main').getByRole('status')).toContainText(
-      'Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.',
-    );
+    // S10 has status regions of its own (reset notice), so the notice is found by its text.
+    await expect(
+      page.getByRole('main').getByRole('status').filter({ hasText: 'Keine Verbindung zum Server' }),
+    ).toContainText('Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.');
     await expect(page.getByRole('progressbar')).toBeHidden();
   });
 

@@ -29,8 +29,8 @@ public sealed class LegacyCatalogReadTests(ApiFixture api) : IntegrationTest(api
         var product = new Product("Product with a filter") { CreatedAt = TestData.DefaultCreatedAt };
         product.ProductCriteriaFilters.Add(new ProductCriteriaFilter { CriteriaFilterId = FirstFilterId });
         await StoreAsync([
-            .. ExistingCatalogSeed.FilterTypes(),
-            .. ExistingCatalogSeed.CriteriaFilters(),
+            .. Api.ExistingCatalogSeed.FilterTypes(),
+            .. Api.ExistingCatalogSeed.CriteriaFilters(),
             new CriteriaFilterExclusion { CriteriaFilterId = FirstFilterId, ExclusionId = SecondFilterId },
             product,
         ]);
@@ -47,7 +47,7 @@ public sealed class LegacyCatalogReadTests(ApiFixture api) : IntegrationTest(api
         var exclusion = first.GetProperty("exclusions").EnumerateArray().ShouldHaveSingleItem();
         exclusion.GetProperty("id").GetInt32().ShouldBe(SecondFilterId);
         exclusion.GetProperty("name").GetString().ShouldBe(NameOfFilter(SecondFilterId));
-        first.GetProperty("filterTypeId").GetInt32().ShouldBe(ExistingCatalogSeed.CriteriaFilters().Single(f => f.Id == FirstFilterId).FilterTypeId);
+        first.GetProperty("filterTypeId").GetInt32().ShouldBe(Api.ExistingCatalogSeed.CriteriaFilters().Single(f => f.Id == FirstFilterId).FilterTypeId);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class LegacyCatalogReadTests(ApiFixture api) : IntegrationTest(api
         filter.GetProperty("name").GetString().ShouldBe(NameOfFilter(FirstFilterId));
     }
 
-    private static string NameOfFilter(int id) => ExistingCatalogSeed.CriteriaFilters().Single(filter => filter.Id == id).Name;
+    private string NameOfFilter(int id) => Api.ExistingCatalogSeed.CriteriaFilters().Single(filter => filter.Id == id).Name;
 
     /// <summary>Calls the endpoint anonymously and returns the elements of the <c>Result</c> wrapper's value.</summary>
     private async Task<List<JsonElement>> GetValuesAsync(string path)
