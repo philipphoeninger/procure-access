@@ -78,8 +78,9 @@ test.describe('App shell', () => {
 
     for (const [link, title] of [
       ['Impressum', 'Impressum'],
-      ['Datenschutz', 'Datenschutzhinweise'],
-      ['Erklärung zur Barrierefreiheit', 'Erklärung zur Barrierefreiheit'],
+      // Both H1s carry a soft hyphen (U94): match the part before it (Playwright matches a substring).
+      ['Datenschutz', 'Datenschutz'],
+      ['Erklärung zur Barrierefreiheit', 'Erklärung zur Barriere'],
     ]) {
       await page.getByRole('contentinfo').getByRole('link', { name: link }).click();
       await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();

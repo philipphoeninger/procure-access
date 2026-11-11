@@ -11,8 +11,9 @@ import { LegalPage, LegalPageKind } from './legal-page';
 describe('LegalPage', () => {
   it.each<[LegalPageKind, string]>([
     ['imprint', 'Impressum'],
-    ['privacy', 'Datenschutzhinweise'],
-    ['accessibility', 'Erklärung zur Barrierefreiheit'],
+    // The H1 carries a soft hyphen (U+00AD, UX copy U94), so long words break at the right place.
+    ['privacy', 'Datenschutz\u00ADhinweise'],
+    ['accessibility', 'Erklärung zur Barriere\u00ADfreiheit'],
   ])('shows the %s page with its H1 and the placeholder notice', async (legalPage, title) => {
     await render(LegalPage, {
       providers: [

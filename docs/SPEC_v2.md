@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.7 (2026-11-10; v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-07, issue #243): R-SHL-10, R-SET-03 and §11 name the invariants that check them, and the header names the current versions, recorded in the same way.
+> **Status:** v2.8 (2026-11-10; v2.7 of 2026-11-10, v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-07, issue #243): R-SHL-10, R-SET-03 and §11 name the invariants that check them, and the header names the current versions, recorded in the same way. **v2.8** (2026-11-10, sprint 04 task S4-02, issue #181): §8.6 names the UX key of each problem type (UX copy v17 §6.3), recorded in the same way; the owner approved the keys with UX copy v17 on 2026-11-11 (O-S4-4).
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -108,6 +108,14 @@ Recorded in this file like v2.1 – v2.6; SPEC_v3 stays the P1 version. Source: 
 | v2.7-2 | R-SET-03: the second acceptance criterion names A11Y-08 (axe in both appearances, `active` since `TESTING_v29.md`) instead of „TESTING follow-up, §14“ | S3-10 P3 |
 | v2.7-3 | §11 step 1 lists the invariants that TESTING §9 activates for it: API-05 (registration, password reset), A11Y-08 and A11Y-09 were missing | S3-10 P3 |
 | v2.7-4 | Header: the current versions of the related documents (ARCHITECTURE v28, TESTING v40, UX copy v16, Handoff and Figma mapping 1.16) | TD-37 |
+
+#### Changes in v2.8 (2026-11-10)
+
+Recorded in this file like v2.1 – v2.7; SPEC_v3 stays the P1 version. Source: sprint 04 task S4-02 (`docs/sprints/sprint_04/S4-02_ux_copy_v17.md`, issue #181, S2-11 P1). No behaviour or acceptance criterion changes.
+
+| # | Change | Source |
+|---|---|---|
+| v2.8-1 | §8.6 names the UX key the client shows for each problem type, as UX copy v17 §6.3 lists them: new keys for `antiforgery`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`; existing texts for `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `release-mismatch`. Approved by the owner with UX copy v17 on 2026-11-11 (O-S4-4) | Sprint 04, S4-02; S2-11 P1, S3-20a P3 |
 
 ---
 
@@ -734,7 +742,23 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 
 ### 8.6 Problem types
 
-`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded` (v2.4: a selection with a value excluded by the rules of its release, §8.2), `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas.
+`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded` (v2.4: a selection with a value excluded by the rules of its release, §8.2), `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas and in this table (v2.8; UX copy v17 §6.3). Until the screen of a type is rebuilt, the client keeps the generic snackbar text for it (S2-11).
+
+| Problem type | UX key |
+|---|---|
+| `validation` | field errors at the fields; heading `errors.summary.title` (API-02) |
+| `antiforgery` | `errors.antiforgery` |
+| `rate-limit` | `errors.rateLimit` |
+| `conflict` | conflict dialog S37 (`conflict.*`, API-03) |
+| `locked-criteria-list` | `projects.detail.criteriaLocked` (R-PRJ-04) |
+| `test-status-unknown` | `publish.error.testStatus` on the field `testStatus`; without a field `publish.blocked.testStatus` (R-PUB-02) |
+| `no-criteria-list` | `publish.blocked.noCriteria` (R-PUB-02) |
+| `profile-mismatch` | `publish.error.profileMismatch` |
+| `entry-withdrawn` | `vendor.error.withdrawn` |
+| `selection-excluded` | `criteria.select.error.excluded` on the fields named in `errors` |
+| `release-mismatch` | `criteria.export.outdated` |
+| `email-unconfirmed` | `auth.confirm.required` |
+| `not-found` | error page `errors.notFound.*` |
 
 ---
 

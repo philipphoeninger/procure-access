@@ -44,8 +44,9 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     ['/unauthorized', 'Kein Zugriff'],
     ['/error', 'Etwas ist schiefgelaufen'],
     ['/impressum', 'Impressum'],
-    ['/datenschutz', 'Datenschutzhinweise'],
-    ['/barrierefreiheit', 'Erklärung zur Barrierefreiheit'],
+    // Both H1s carry a soft hyphen (U94): match the part before it (Playwright matches a substring).
+    ['/datenschutz', 'Datenschutz'],
+    ['/barrierefreiheit', 'Erklärung zur Barriere'],
   ] as const) {
     test(`${path} („${heading}“) needs no horizontal scrolling`, async ({ page }) => {
       await page.goto(path);
