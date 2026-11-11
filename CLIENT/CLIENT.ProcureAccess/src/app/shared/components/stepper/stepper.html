@@ -1,0 +1,39 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (wide()) {
+  <ol class="pa-stepper__steps">
+    @for (step of steps; track step; let i = $index) {
+      <li
+        class="pa-stepper__step"
+        [class.pa-stepper__step--current]="i === selectedIndex"
+        [attr.aria-current]="i === selectedIndex ? 'step' : null"
+      >
+        <span class="pa-stepper__marker" [class.pa-stepper__marker--active]="i <= selectedIndex" aria-hidden="true">
+          @if (i < selectedIndex) {
+            <mat-icon class="pa-stepper__check">check</mat-icon>
+          } @else {
+            {{ i + 1 }}
+          }
+        </span>
+        <span class="pa-stepper__label">
+          {{ step.label }}
+          @if (i < selectedIndex) {
+            <span class="cdk-visually-hidden">{{ 'common.stepper.done' | translate }}</span>
+          }
+        </span>
+      </li>
+    }
+  </ol>
+} @else {
+  <p class="pa-stepper__line">{{ stepLabelKey() | translate: stepLabelParams() }}</p>
+}
+
+<div #content class="pa-stepper__content" [id]="_getStepContentId(selectedIndex)">
+  @if (selected; as step) {
+    <ng-container [ngTemplateOutlet]="step.content" />
+  }
+</div>

@@ -19,8 +19,10 @@ import { readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// UX copy areas (key roots) that de.json carries in full. Add a root with the step that builds its screens.
-export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest'];
+// UX copy areas that de.json carries in full: a key root (`shell`) or a deeper prefix
+// (`criteria.select`), when only part of a root has its screen yet. Add an area with the step that
+// builds its screens.
+export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'criteria.select'];
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = 'CLIENT/CLIENT.ProcureAccess';
@@ -160,7 +162,8 @@ export function flatten(dict, prefix = '') {
  * Sets `key` to `text`. Where a shorter key in `textKeys` holds a text, the rest of the key
  * goes into one property name with dots next to it (file header).
  * A segment `__proto__`, `constructor` or `prototype` is rejected: it would write into the
- * prototype of every object instead of into de.json (#182).
+ * prototype of every object instead of into de.json (#182). All segments are checked before
+ * anything is written, so a rejected key leaves `dict` unchanged.
  */
 export function setText(dict, key, text, textKeys) {
   const segs = key.split('.');
@@ -169,6 +172,10 @@ export function setText(dict, key, text, textKeys) {
   let cur = dict;
   for (let i = 0; i < segs.length; i++) {
     const name = segs[i];
+    // Unreachable after the check above; CodeQL counts only a check on `name` itself (#233).
+    if (name === '__proto__' || name === 'constructor' || name === 'prototype') {
+      throw new Error(`${key}: the segment "${name}" is not allowed in a key`);
+    }
     if (i === segs.length - 1) {
       if (cur[name] !== null && typeof cur[name] === 'object') throw new Error(`${key}: is a group of keys in de.json, cannot hold a text`);
       cur[name] = text;
@@ -184,9 +191,14 @@ export function setText(dict, key, text, textKeys) {
   }
 }
 
+/** True if `key` is an area or lies below one (`criteria.select.title` is in `criteria.select`). */
+export function inAreas(key, areas) {
+  return areas.some((area) => key === area || key.startsWith(`${area}.`));
+}
+
 /** Copies the texts of `areas` from the UX copy into `de`. Returns the keys it added or changed. */
 export function syncAreas(de, texts, areas) {
-  const wanted = [...texts.keys()].filter((k) => areas.includes(k.split('.')[0]));
+  const wanted = [...texts.keys()].filter((k) => inAreas(k, areas));
   const textKeys = new Set([...flatten(de).map(([k]) => k), ...wanted]);
   const changed = [];
   for (const key of wanted) {
@@ -218,10 +230,10 @@ export function check({ texts, problems, de, templates, areas }) {
   const errors = [];
   const notices = [];
   for (const [key, why] of problems) {
-    if (areas.includes(key.split('.')[0]) || lookup(de, key) !== undefined) errors.push(`UX copy: ${key}: ${why}`);
+    if (inAreas(key, areas) || lookup(de, key) !== undefined) errors.push(`UX copy: ${key}: ${why}`);
   }
   for (const [key, text] of texts) {
-    if (!areas.includes(key.split('.')[0])) continue;
+    if (!inAreas(key, areas)) continue;
     const actual = lookup(de, key);
     if (actual === undefined) errors.push(`${key}: missing in de.json (run with --write)`);
     else if (actual !== text) errors.push(`${key}: de.json "${actual}" differs from the UX copy "${text}" (run with --write)`);
@@ -279,9 +291,9 @@ function main() {
   const { errors, notices } = check({ texts, problems, de, templates, areas: AREAS });
   for (const n of notices) console.log(inActions ? `::notice title=i18n check::${n}` : `- ${n}`);
   for (const e of errors) console.error(`✗ ${e}`);
-  const inAreas = [...texts.keys()].filter((k) => AREAS.includes(k.split('.')[0])).length;
+  const areaKeys = [...texts.keys()].filter((k) => inAreas(k, AREAS)).length;
   console.log(
-    `i18n check (${uxFile}): ${inAreas} keys of ${AREAS.join(', ')}, ${templates.length} client files, ` +
+    `i18n check (${uxFile}): ${areaKeys} keys of ${AREAS.join(', ')}, ${templates.length} client files, ` +
       `${errors.length} errors, ${notices.length} keys not checked.`,
   );
   process.exit(errors.length ? 1 : 0);

@@ -206,12 +206,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { project: chromium, browser: chromium }
-          - { project: firefox, browser: firefox }
-          - { project: webkit, browser: webkit }
-          - { project: mobile-chrome, browser: chromium }
-          - { project: mobile-safari, browser: webkit }
+        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari]
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -241,57 +236,44 @@ jobs:
         id: playwright
         working-directory: e2e
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-      # Restore and save are separate steps, so the browsers are saved right after the install,
-      # also when the tests fail later (#105).
-      - name: Restore Playwright browsers
-        id: browser-cache
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
-      - name: Install Playwright browser
-        if: steps.browser-cache.outputs.cache-hit != 'true'
-        # Only the browser (Playwright's CDN, about 30 s); its apt packages come in the next step.
-        timeout-minutes: 10
-        working-directory: e2e
-        run: npx playwright install "$BROWSER"
+      # Playwright runs in its own image (O-S4-1 (1), #203): browsers and their system packages
+      # are in it, so no job downloads about 100 MB from the apt mirror, which at times served
+      # them at 40-300 kB/s and failed the job even with a retry (S4-01b). The pin lives in
+      # e2e/playwright-image/Dockerfile and must match @playwright/test of the lockfile.
+      - name: Check the Playwright image
+        id: image
         env:
-          BROWSER: ${{ matrix.browser }}
-      - name: Save Playwright browser
-        if: steps.browser-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ steps.browser-cache.outputs.cache-primary-key }}
-      # The browser's apt packages, on every run. Usually 10–40 s, but a slow apt mirror (about
-      # 40 kB/s) made one job hit the former 10-minute limit in a third of the runs on main (#203).
-      # So each attempt stops after 3 minutes and a second one follows: apt keeps the packages the
-      # first attempt downloaded, and `dpkg --configure -a` finishes an install the stop interrupted.
-      # `timeout` runs as root: a user's signals do not reach the root apt-get under sudo, which
-      # then kept apt's lock and failed the second attempt. apt starts dpkg in its own session, out
-      # of timeout's reach, so the retry waits until dpkg has finished.
-      - name: Install Playwright system dependencies
-        timeout-minutes: 8
-        working-directory: e2e
+          VERSION: ${{ steps.playwright.outputs.version }}
         run: |
-          for attempt in 1 2; do
-            status=0
-            sudo env "PATH=$PATH" timeout --kill-after=10s 3m npx playwright install-deps "$BROWSER" || status=$?
-            if [ "$status" -eq 0 ]; then exit 0; fi
-            echo "::warning::Attempt $attempt of 2 to install the system packages failed (exit $status; 124 or 137 = stopped after 3 minutes)"
-            while pgrep -x dpkg > /dev/null; do sleep 2; done
-            sudo dpkg --configure -a
-          done
-          exit 1
+          image="$(sed -n 's/^FROM //p' e2e/playwright-image/Dockerfile)"
+          case "$image" in
+            "mcr.microsoft.com/playwright:v${VERSION}-noble@sha256:"*)
+              echo "image=$image" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error file=e2e/playwright-image/Dockerfile::FROM must be mcr.microsoft.com/playwright:v${VERSION}-noble@sha256:<digest>, the version of @playwright/test in e2e/package-lock.json (found: ${image:-nothing}). Digest: docker buildx imagetools inspect mcr.microsoft.com/playwright:v${VERSION}-noble"
+              exit 1 ;;
+          esac
+      - name: Pull the Playwright image
+        timeout-minutes: 10
+        run: docker pull --quiet "$IMAGE"
         env:
-          BROWSER: ${{ matrix.browser }}
+          IMAGE: ${{ steps.image.outputs.image }}
       - name: Start E2E stack
         working-directory: e2e
         run: npm run stack:up
+      # The host network reaches the stack on localhost like a local run. e2e/node_modules comes
+      # from `npm ci` above; it has no native module, so it runs on the image's Node. The runner's
+      # user keeps the reports writable for the next steps. GITHUB_WORKSPACE inside the container
+      # lets the `github` reporter name the right files in its annotations.
       - name: Playwright (${{ matrix.project }})
-        working-directory: e2e
-        run: npx playwright test --project="$PROJECT"
+        run: >-
+          docker run --rm --init --ipc=host --network=host
+          --user "$(id -u):$(id -g)" -e HOME=/tmp
+          -e CI -e GITHUB_ACTIONS -e GITHUB_WORKSPACE=/work -e PROJECT
+          -v "$GITHUB_WORKSPACE:/work" -w /work/e2e
+          "$IMAGE" npx playwright test --project="$PROJECT"
         env:
+          IMAGE: ${{ steps.image.outputs.image }}
           PROJECT: ${{ matrix.project }}
       - name: Collect stack logs
         if: failure()

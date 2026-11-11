@@ -23,6 +23,7 @@ import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
+import { CriteriaSelect } from './features/configurator/pages/criteria-select/criteria-select';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -65,6 +66,12 @@ export const routes: Routes = [
     path: 'settings',
     component: Settings,
     data: { [PAGE_TITLE_KEY]: 'pageTitle.settings' },
+  },
+  // S10 configurator (R-CON-01): not linked yet — start page and header switch to it in S4-12
+  // (O-S4-3); its per-step page title comes with S4-12 too
+  {
+    path: 'kriterien',
+    component: CriteriaSelect,
   },
   {
     path: 'filters',

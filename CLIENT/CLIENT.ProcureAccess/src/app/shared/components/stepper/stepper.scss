@@ -1,0 +1,78 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// pa-stepper (Handoff §2.2, S10): the step list from 600 px, the text line below. The list only
+// shows progress; nothing in it is interactive.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-stepper__line {
+  margin: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-stepper__steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pa-space-xs) var(--pa-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pa-stepper__step {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--pa-space-xs);
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface);
+
+  &:last-child {
+    flex: none;
+  }
+
+  // The line between two steps, as in mat-stepper; it shrinks away when the list wraps.
+  &:not(:last-child)::after {
+    flex: 1 1 var(--pa-space-xl);
+    min-inline-size: 0;
+    border-block-start: 1px solid var(--mat-sys-outline-variant);
+    content: '';
+  }
+}
+
+// Only the current step label is bold (Handoff §5.1, S55 stepper rule).
+.pa-stepper__step--current {
+  font-weight: 700;
+}
+
+.pa-stepper__marker {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: 50%;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface-container-highest);
+}
+
+.pa-stepper__marker--active {
+  color: var(--mat-sys-on-primary);
+  background-color: var(--mat-sys-primary);
+}
+
+.pa-stepper__check {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  font-size: 1.125rem;
+}

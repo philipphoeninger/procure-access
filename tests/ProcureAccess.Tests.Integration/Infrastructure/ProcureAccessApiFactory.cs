@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Security.Cryptography;
+using API.ProcureAccess.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -43,6 +44,10 @@ public sealed class ProcureAccessApiFactory(
         // host settings (UseSetting); values added through ConfigureAppConfiguration arrive too late.
         builder.UseSetting("ConnectionStrings:ProcureAccess", connectionString);
         builder.UseSetting("RebuildDatabase", "false");
+
+        // No test catalog release (S4-08): appsettings.Development.json names one, and a host in
+        // Development would seed it. Tests of the seeder set the path themselves.
+        builder.UseSetting(TestCatalogSeedExtensions.PathKey, "");
 
         // Secrets never live in the repository (CLAUDE.md §10): a fresh random key per test run.
         builder.UseSetting("JWTSettings:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));

@@ -86,6 +86,9 @@ try
     // Sample data only in Development, whatever the configuration says (SEC-06)
     await app.RebuildDatabaseIfAllowedAsync();
 
+    // Test catalog release (T.1) only in Development and E2E, when the stack mounts it (S4-08, O-S4-3)
+    await app.SeedTestCatalogIfAllowedAsync();
+
     // First in the pipeline: errors of every later middleware become Problem Details (S2-10)
     app.UsePlatformMiddleware();
 

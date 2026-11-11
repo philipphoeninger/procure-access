@@ -1,7 +1,7 @@
 # S4-02 — UX copy v17: proposals for every gap of #181
 
 > **Sprint:** 04, P0 task S4-02 (debt TD-15, 1.5 points). **Issues:** #181. **Requirements / invariants:** CLAUDE §6.5 (UI strings only from the UX copy); SPEC SD25; no invariant activated, no new TESTING version. **Status:** draft pull request by Claude Code (2026-11-10), waiting for the owner's review (O-S4-4).
-> **Scope:** exactly the sprint row: `docs/ux_copy_procureaccess_v17.md` with a proposal for every gap of #181, the problem-type keys in SPEC §8.6 (v2.7), and the documents that name them. No change to `de.json`, code, tests or ⚖️ texts.
+> **Scope:** exactly the sprint row: `docs/ux_copy_procureaccess_v17.md` with a proposal for every gap of #181, the problem-type keys in SPEC §8.6 (v2.8; v2.7 was taken by S4-07), and the documents that name them. No change to `de.json`, code, tests or ⚖️ texts.
 > **Owner decisions** (2026-11-10, before the start):
 > 1. **(1a)** The proposals stand in the text tables of §5/§6 and are marked only outside the „Text“ column (change list and „Hinweis“). The draft stays red on `check-i18n.mjs` while it is reviewed. After the owner approves or edits the texts, `node scripts/check-i18n.mjs --write` runs as the last commit of this pull request, so `de.json` changes only with approved texts.
 > 2. The #181 row „write out `pageTitle.notFound` / `.forbidden` / `.server`“ (S2-13 P3), missing from the sprint row, is in scope.
@@ -44,7 +44,7 @@
 | §7 key rule of SD25, mark O9 done (S2-12 P1); dotted-key storage rule, `de.json` path (S2-13 P1) | §5 header, §7, §8 O9 | U90 |
 | `pageTitle.notFound` / `.forbidden` / `.server` (S2-13 P3) | done in v15 (U83); unchanged | — |
 | Page-title variants (S2-16 P2) | `pageTitle.criteria.list`, `pageTitle.criteria.list.saved`, `pageTitle.publish`, `pageTitle.publish.step` | U91 |
-| UX keys of the problem types (S2-11 P1, S3-20a P3), also in SPEC §8.6 | `errors.antiforgery`, `criteria.select.error.excluded`, `publish.error.profileMismatch`, `vendor.error.withdrawn`; mapping of all 13 types in the new §6.3 and in SPEC §8.6 (v2.7-1) | U92 |
+| UX keys of the problem types (S2-11 P1, S3-20a P3), also in SPEC §8.6 | `errors.antiforgery`, `criteria.select.error.excluded`, `publish.error.profileMismatch`, `vendor.error.withdrawn`; mapping of all 13 types in the new §6.3 and in SPEC §8.6 (v2.8-1) | U92 |
 | Reason for the unavailable „Löschen“ (S2-01 P3) | `account.delete.confirm.unavailable` (at the step-3 button `account.delete.confirm.cta`) | U93 |
 | Soft hyphen in the legal titles (S2-18 P3) | `legal.privacy.title`, `legal.accessibility.title` (U+00AD); `legal.imprint.title` is short | U94 |
 | Account button name vs visible „Konto“ (S2-15 P4) | `shell.userMenu.label` „Konto, angemeldet als {{displayName}}“ | U95 |
@@ -61,7 +61,7 @@ Every new or changed text carries „Vorschlag (S4-02, U8x/U9x)“ (U98, U99: �
 |---|---|---|
 | `docs/ux_copy_procureaccess_v17.md` (new) | v16 plus the rows of §2.1, the new §6.3 „Problemtypen und ihre Texte“, change list U86–U99, header | The task; U98, U99 from the planning of S4-11 (owner decision 3) |
 | `docs/ux_copy_procureaccess_v15.md` | deleted | Only the two newest versions stay (CLAUDE §2) |
-| `docs/SPEC_v2.md` | v2.7: change row v2.7-1 and a table in §8.6 with the UX key of each problem type; „proposal until O-S4-4“ | Row: „also name them for SPEC §8.6“ |
+| `docs/SPEC_v2.md` | v2.8: change row v2.8-1 and a table in §8.6 with the UX key of each problem type; „proposal until O-S4-4“ | Row: „also name them for SPEC §8.6“ |
 | `CLAUDE.md` | header; §3: `pageTitle` variants split in v17, problem-type keys in SPEC §8.6 / UX copy §6.3 | DoD; the §3 sentence „some rows … still hold variants“ was outdated |
 
 Alternatives considered for the proposals the owner may want to change:

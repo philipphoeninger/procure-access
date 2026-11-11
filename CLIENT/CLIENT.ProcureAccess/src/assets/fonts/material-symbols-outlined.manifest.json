@@ -1,12 +1,13 @@
 {
   "package": "material-symbols",
-  "version": "0.48.2",
+  "version": "0.48.3",
   "icons": [
     "add",
     "add_2",
     "app_registration",
     "arrow_downward",
     "box",
+    "check",
     "checklist",
     "contrast",
     "contrast_rtl_off",
@@ -37,5 +38,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "1973d12439b11c1eb6b8a892dabb97827d0f31d58cae1309618e2d7fd9e6f282"
+  "sha256": "64472e95a34d3f6a5c0904f9d61c9e1432c75f21257b12b8e002bd4754ba556e"
 }

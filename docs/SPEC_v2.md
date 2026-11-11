@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.7 (2026-11-10; v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-02, issue #181): §8.6 names the UX key of each problem type (UX copy v17 §6.3), recorded in the same way; the keys are proposals until the owner approves UX copy v17 (O-S4-4).
+> **Status:** v2.8 (2026-11-10; v2.7 of 2026-11-10, v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-07, issue #243): R-SHL-10, R-SET-03 and §11 name the invariants that check them, and the header names the current versions, recorded in the same way. **v2.8** (2026-11-10, sprint 04 task S4-02, issue #181): §8.6 names the UX key of each problem type (UX copy v17 §6.3), recorded in the same way; the keys are proposals until the owner approves UX copy v17 (O-S4-4).
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -10,7 +10,7 @@
 >
 > **Aligned follow-up documents (v2):** `ARCHITECTURE_v12.md`, `TESTING_v10.md`, `ux_copy_procureaccess_v14.md`, `design_handoff_procureaccess_v1.md` (1.14), `CLAUDE_v3.md`.
 >
-> **Current versions of the related documents (v2.4):** `ARCHITECTURE_v24.md`, `TESTING_v36.md`, `ux_copy_procureaccess_v15.md`, `design_handoff_procureaccess_v1.md` (1.15), `figma_code_mapping_procureaccess_v1.md` (1.15), `CLAUDE.md`.
+> **Current versions of the related documents (v2.7):** `ARCHITECTURE_v28.md`, `TESTING_v40.md`, `ux_copy_procureaccess_v16.md`, `design_handoff_procureaccess_v1.md` (1.16), `figma_code_mapping_procureaccess_v1.md` (1.16), `CLAUDE.md`.
 >
 > **Language:** English (project convention for technical documents). UI terms are quoted in German exactly as defined in the UX copy §2; the UX copy remains the only source for UI wording.
 >
@@ -100,11 +100,22 @@ Recorded in this file like v2.1 – v2.5; SPEC_v3 stays the P1 version. Source: 
 
 #### Changes in v2.7 (2026-11-10)
 
-Recorded in this file like v2.1 – v2.6; SPEC_v3 stays the P1 version. Source: sprint 04 task S4-02 (`docs/sprints/sprint_04/S4-02_ux_copy_v17.md`, issue #181, S2-11 P1). No behaviour or acceptance criterion changes.
+Recorded in this file like v2.1 – v2.6; SPEC_v3 stays the P1 version. Source: sprint 04 task S4-07 (`docs/sprints/sprint_04/S4-07_documentation_session.md`, issue #243, `TECH_DEBT_v3.md` TD-37). The acceptance criteria name the invariants that check them since sprint 03; behaviour is unchanged.
 
 | # | Change | Source |
 |---|---|---|
-| v2.7-1 | §8.6 names the UX key the client shows for each problem type, as UX copy v17 §6.3 lists them: new keys for `antiforgery`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`; existing texts for `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `release-mismatch`. Proposal until the owner approves UX copy v17 (O-S4-4) | Sprint 04, S4-02; S2-11 P1, S3-20a P3 |
+| v2.7-1 | R-SHL-10: the first acceptance criterion names A11Y-09 (reflow at 320 × 256 CSS px, `active` since `TESTING_v26.md`) for the pages of the new shell and every rebuilt screen; legacy screens stay a manual check per TESTING §7.2 until they are rebuilt | S3-05 P4 |
+| v2.7-2 | R-SET-03: the second acceptance criterion names A11Y-08 (axe in both appearances, `active` since `TESTING_v29.md`) instead of „TESTING follow-up, §14“ | S3-10 P3 |
+| v2.7-3 | §11 step 1 lists the invariants that TESTING §9 activates for it: API-05 (registration, password reset), A11Y-08 and A11Y-09 were missing | S3-10 P3 |
+| v2.7-4 | Header: the current versions of the related documents (ARCHITECTURE v28, TESTING v40, UX copy v16, Handoff and Figma mapping 1.16) | TD-37 |
+
+#### Changes in v2.8 (2026-11-10)
+
+Recorded in this file like v2.1 – v2.7; SPEC_v3 stays the P1 version. Source: sprint 04 task S4-02 (`docs/sprints/sprint_04/S4-02_ux_copy_v17.md`, issue #181, S2-11 P1). No behaviour or acceptance criterion changes.
+
+| # | Change | Source |
+|---|---|---|
+| v2.8-1 | §8.6 names the UX key the client shows for each problem type, as UX copy v17 §6.3 lists them: new keys for `antiforgery`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`; existing texts for `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `release-mismatch`. Proposal until the owner approves UX copy v17 (O-S4-4) | Sprint 04, S4-02; S2-11 P1, S3-20a P3 |
 
 ---
 
@@ -229,7 +240,7 @@ Every feature area lists user stories, requirements with priority and acceptance
 | R-SHL-07 | P0 | Legal pages as static routes `/impressum`, `/datenschutz`, `/barrierefreiheit` (SD17) | ☐ content is loaded from versioned Markdown files in the repository (`content/legal/*.de.md`), rendered as accessible HTML with real headings ☐ missing content shows a visible placeholder in non-production environments and fails the production build (so the site never goes live without them) |
 | R-SHL-08 | P0 | Error pages S80 for 404, 403, 500 (`errors.*`) and the offline notice | ☐ foreign resources return 404, not 403 (TEN-03) ☐ page title = H1 ☐ `errors.home` button |
 | R-SHL-09 | P0 | Loading, empty and system states per Handoff §6.2–§6.5 | ☐ `mat-progress-bar` + one `common.loading` announcement ☐ no skeleton screens ☐ empty states are text + one action |
-| R-SHL-10 | P0 | Every page usable at 320 px CSS width and 400 % zoom without horizontal page scrolling (Handoff §2.2) | ☐ manual check per TESTING §7.2 ☐ DOM order = visual order |
+| R-SHL-10 | P0 | Every page usable at 320 px CSS width and 400 % zoom without horizontal page scrolling (Handoff §2.2) | ☐ A11Y-09 for the pages of the new shell and every rebuilt screen; legacy screens: manual check per TESTING §7.2 ☐ DOM order = visual order |
 
 ### FA-02 Account, sign-in, session and e-mail
 
@@ -269,7 +280,7 @@ Every feature area lists user stories, requirements with priority and acceptance
 |---|---|---|---|
 | R-SET-01 | P0 | Settings page S60 with: language (only „Deutsch“ selectable in v1), appearance (system / hell / dunkel), motion (system / reduziert), contrast (only „Wie im Betriebssystem eingestellt“ until H2 is done) | ☐ saved in `UserPreferences`, applied on every device after sign-in (A11Y-06) ☐ change takes effect without reload and announces `settings.saved` ☐ no text-size setting (SD12) |
 | R-SET-02 | P0 | Appearance without an account | ☐ anonymous users follow `prefers-color-scheme` and `prefers-reduced-motion` ☐ a signed-in user's explicit choice overrides the system preference ☐ no browser storage is required for this (works with storage blocked) |
-| R-SET-03 | P0 | Dark theme (SD11) — implementation per §7.5 | ☐ every screen and component of the Handoff renders in both appearances ☐ A11Y-01 runs on each journey state in both appearances (TESTING follow-up, §14) ☐ release blocked until the dark scheme is designed in Figma and has passed an accessibility review (O-S5) |
+| R-SET-03 | P0 | Dark theme (SD11) — implementation per §7.5 | ☐ every screen and component of the Handoff renders in both appearances ☐ A11Y-01 runs on each journey state in both appearances (A11Y-08) ☐ release blocked until the dark scheme is designed in Figma and has passed an accessibility review (O-S5) |
 | R-SET-04 | P1 | „Hoher Kontrast“ option | ☐ enabled only after H2 (design + review); target before the pilot |
 
 ### FA-04 Criteria configurator (S10)
@@ -731,7 +742,7 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 
 ### 8.6 Problem types
 
-`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded` (v2.4: a selection with a value excluded by the rules of its release, §8.2), `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas and in this table (v2.7; UX copy v17 §6.3). Until the screen of a type is rebuilt, the client keeps the generic snackbar text for it (S2-11).
+`https://procureaccess.de/problems/<name>` 🔧 (base URI configurable): `validation`, `antiforgery`, `rate-limit`, `conflict` (409 with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded` (v2.4: a selection with a value excluded by the rules of its release, §8.2), `release-mismatch`, `email-unconfirmed` (v2.3), `not-found`. The client maps them to the UX keys named in the feature areas and in this table (v2.8; UX copy v17 §6.3). Until the screen of a type is rebuilt, the client keeps the generic snackbar text for it (S2-11).
 
 | Problem type | UX key |
 |---|---|
@@ -814,7 +825,7 @@ Not from PRD §9 but needed: FA-02 (accounts, session, e-mail), FA-07 (organisat
 | Step (`ARCH §12`) | Feature areas / requirements delivered | Invariants activated (TESTING §9) |
 |---|---|---|
 | 0 Platform upgrade, test foundation | – (no user-visible change) | ARC-06, OPS-03, CAT-10, A11Y-01 |
-| 1 Foundations | R-SHL-01, -04, -08, -09; R-SET-02 (system preferences incl. dark scheme scaffolding); R-MET-01 (table) ; §7.1 | ARC-01–03, API-01/02, OPS-01/02, SEC-06, PRV-05, A11Y-03/05 |
+| 1 Foundations | R-SHL-01, -04, -08, -09; R-SET-02 (system preferences incl. dark scheme scaffolding); R-MET-01 (table) ; §7.1 | ARC-01–03, API-01/02, API-05 (registration, password reset), OPS-01/02, SEC-06, PRV-05, A11Y-03/05, A11Y-08 (system appearance), A11Y-09 (shell pages) |
 | 2 Catalog versioning and export | FA-04, FA-05 (anonymous part), FA-15, R-ADM-01 | CAT-*, CFG-*, EXP-01–05, -07, TEN-04, API-05/06 |
 | 3 Identity, tenancy, session, saved lists | FA-02 (except R-AUTH-06), FA-06, FA-07, R-SET-01, R-SHL-02/03, R-ADM-03, §7.6 | TEN-01/02/05/06/08/09, SEC-01–03, SEC-09, EXP-06, CAT-22, OPS-04, A11Y-06 |
 | 4 Session warning and hardening | R-AUTH-06, R-AUTH-07 completion | SEC-07, SEC-08, A11Y-04 |

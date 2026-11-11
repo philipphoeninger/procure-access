@@ -59,8 +59,9 @@ SPDX-License-Identifier = "MIT"
 # that carry the criteria seed data (EF Core repeats it in every designer file
 # and in the model snapshot, so new migrations are covered by the glob), the
 # catalog migrations that carry the product-part explanations of the filter-value
-# seed (quoted from the Standardanforderungskatalog; S3-11 P8, S3-13) and the
-# catalog release data (SPEC SD20). The code is MIT, the quoted texts are not.
+# seed (quoted from the Standardanforderungskatalog; S3-11 P8, S3-13), the
+# catalog release data (SPEC SD20) and the CAT-10 fixture, which quotes the
+# criterion names of the seed (#242). The code is MIT, the quoted texts are not.
 # The seed data itself (SeedData/CriteronSeed.cs, Persistence/Seed/FilterValueSeed.cs)
 # carries the same in its header.
 # Must stay below the migrations and JSON blocks: the last matching block wins.
@@ -73,6 +74,7 @@ path = [
   "src/ProcureAccess.Modules.Catalog/Persistence/Migrations/*.Designer.cs",
   "src/ProcureAccess.Modules.Catalog/Persistence/Migrations/CatalogDbContextModelSnapshot.cs",
   "catalog/releases/**",
+  "tests/ProcureAccess.Tests.Integration/Catalog/Fixtures/cat-10-criteria-filter.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = ["BIT inklusiv", "2026 Blinden- und Sehbehindertenverein Hamburg e.V."]
