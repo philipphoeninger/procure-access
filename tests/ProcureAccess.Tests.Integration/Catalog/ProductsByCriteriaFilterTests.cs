@@ -31,8 +31,8 @@ public sealed class ProductsByCriteriaFilterTests(ApiFixture api) : IntegrationT
     {
         await Api.ResetDatabaseAsync();
         await StoreAsync([
-            .. ExistingCatalogSeed.FilterTypes(),
-            .. ExistingCatalogSeed.CriteriaFilters(),
+            .. Api.ExistingCatalogSeed.FilterTypes(),
+            .. Api.ExistingCatalogSeed.CriteriaFilters(),
             AProduct("Product with both filters", FirstFilterId, SecondFilterId),
             AProduct("Product with the first filter", FirstFilterId),
             AProduct("Product without filters"),

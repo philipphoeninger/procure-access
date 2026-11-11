@@ -2,51 +2,77 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.EntityFrameworkCore.Metadata;
 using MODELS.ProcureAccess.Entities;
-using MODELS.ProcureAccess.SeedData;
-using ProcureAccess.Tests.Shared.Builders;
 
 namespace ProcureAccess.Tests.Shared.Fixtures;
 
 /// <summary>
 /// The criteria catalog of the existing data model as migration <c>AddSeedData</c> inserts it:
-/// filter types, criteria filters and criteria, with their fixed ids. This is the data that
-/// migration step 2 moves into catalog release 2026.1, so the characterisation test CAT-10 runs
-/// on it. Removed when the catalog import replaces the seed (step 2).
+/// filter types, criteria filters and criteria, with their fixed ids. The characterisation test
+/// CAT-10 and the legacy catalog read tests run on it. Removed with the legacy filter.
 /// </summary>
 /// <remarks>
-/// Each call returns new entity instances with scalar values only. The seed arrays are the
-/// static instances that the EF model uses for <c>HasData</c>; adding those to a context would
-/// let EF fix up their navigations. <c>CreatedAt</c> is the fixed <see cref="TestData.DefaultCreatedAt"/>.
+/// The rows are read from the seed data (<c>HasData</c>) of the legacy context's design-time
+/// model, the same source the migrations are generated from, and every value of a row is copied
+/// into a new entity (#92). So a column seeded later is carried over without a change here, and a
+/// seeded value this copy cannot carry (a shadow property, a filled navigation) fails instead of
+/// being dropped. New instances are needed because the seed arrays are the static instances of
+/// the EF model; adding those to a context would let EF fix up their navigations (S1-15 F5). As in
+/// the migration, <c>CreatedAt</c> is not seeded, so the database sets it.
 /// Exclusions, products and product links are left out: the criteria filter does not read them.
 /// </remarks>
-public static class ExistingCatalogSeed
+/// <param name="designTimeModel">
+/// The design-time model of the legacy context (<c>IDesignTimeModel</c>); the runtime model
+/// carries no seed data.
+/// </param>
+public sealed class ExistingCatalogSeed(IModel designTimeModel)
 {
     /// <summary>All rows in insert order (filter types, criteria filters, criteria).</summary>
-    public static object[] All() => [.. FilterTypes(), .. CriteriaFilters(), .. Criteria()];
+    public object[] All() => [.. FilterTypes(), .. CriteriaFilters(), .. Criteria()];
 
-    public static IEnumerable<FilterType> FilterTypes() =>
-        FilterTypeSeed.Data.Select(seed => new FilterType(seed.Name, seed.Description)
-        {
-            Id = seed.Id,
-            IsDeleted = seed.IsDeleted,
-            CreatedAt = TestData.DefaultCreatedAt,
-        });
+    public IEnumerable<FilterType> FilterTypes() => Rows<FilterType>();
 
-    public static IEnumerable<CriteriaFilter> CriteriaFilters() =>
-        CriteriaFilterSeed.Data.Select(seed => new CriteriaFilter(seed.Name, seed.FilterTypeId, seed.Description)
-        {
-            Id = seed.Id,
-            IsDeleted = seed.IsDeleted,
-            CreatedAt = TestData.DefaultCreatedAt,
-        });
+    public IEnumerable<CriteriaFilter> CriteriaFilters() => Rows<CriteriaFilter>();
 
-    public static IEnumerable<Criterion> Criteria() =>
-        CriterionSeed.Data.Select(seed => new Criterion(seed.Name, seed.Description)
+    public IEnumerable<Criterion> Criteria() => Rows<Criterion>();
+
+    private IEnumerable<T> Rows<T>()
+        where T : new()
+    {
+        var entityType = designTimeModel.FindEntityType(typeof(T))
+            ?? throw new InvalidOperationException($"The model does not map {typeof(T).Name}.");
+        var seed = entityType.GetSeedData().ToList();
+        if (seed.Count == 0)
         {
-            Id = seed.Id,
-            CriteriaFilterId = seed.CriteriaFilterId,
-            IsDeleted = seed.IsDeleted,
-            CreatedAt = TestData.DefaultCreatedAt,
-        });
+            throw new InvalidOperationException(
+                $"{typeof(T).Name} has no seed data: pass the design-time model, not the runtime model.");
+        }
+
+        return seed.Select(row => Copy<T>(entityType, row)).ToList();
+    }
+
+    private static T Copy<T>(IEntityType entityType, IDictionary<string, object?> row)
+        where T : new()
+    {
+        var entity = new T();
+        foreach (var (name, value) in row)
+        {
+            // Seeded from entity instances, a row also lists their navigations, empty here.
+            if (entityType.FindNavigation(name) is not null && IsEmpty(value))
+            {
+                continue;
+            }
+
+            var property = entityType.FindProperty(name)?.PropertyInfo
+                ?? throw new InvalidOperationException(
+                    $"The seed of {entityType.ClrType.Name} sets '{name}', which this copy cannot carry over.");
+            property.SetValue(entity, value);
+        }
+
+        return entity;
+    }
+
+    private static bool IsEmpty(object? navigation) =>
+        navigation is null || (navigation is System.Collections.IEnumerable items && !items.GetEnumerator().MoveNext());
 }

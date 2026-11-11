@@ -4,6 +4,8 @@
 
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Npgsql;
@@ -11,6 +13,7 @@ using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Tests.Shared.Fixtures;
 using Respawn.Graph;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -62,6 +65,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private Respawner? _respawner;
     private ProcureAccessApiFactory? _factory;
+    private ExistingCatalogSeed? _existingCatalogSeed;
 
     /// <summary>
     /// The clock the API reads (<see cref="TimeProvider"/>). It only moves when a test calls
@@ -69,6 +73,13 @@ public sealed class ApiFixture : IAsyncLifetime
     /// cannot go back), so tests work with times relative to <c>Clock.GetUtcNow()</c>.
     /// </summary>
     public FakeTimeProvider Clock { get; } = new(ClockStart);
+
+    /// <summary>
+    /// The criteria catalog of migration <c>AddSeedData</c>, read from the legacy context's
+    /// design-time model (#92). Set by <see cref="InitializeAsync"/>.
+    /// </summary>
+    public ExistingCatalogSeed ExistingCatalogSeed =>
+        _existingCatalogSeed ?? throw new InvalidOperationException("The fixture is not initialised.");
 
     /// <summary>The API host. One per test run (TESTING §3.1).</summary>
     public ProcureAccessApiFactory Factory =>
@@ -83,6 +94,8 @@ public sealed class ApiFixture : IAsyncLifetime
         await using (var context = CreateDbContext())
         {
             await context.Database.MigrateAsync();
+            // The runtime model carries no seed data; the design-time model is built on request.
+            _existingCatalogSeed = new ExistingCatalogSeed(context.GetService<IDesignTimeModel>().Model);
         }
 
         await using (var context = CreatePlatformDbContext())
