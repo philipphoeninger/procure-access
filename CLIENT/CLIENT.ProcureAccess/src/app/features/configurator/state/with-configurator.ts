@@ -19,7 +19,7 @@ import {
 import { Criterion, CriteriaResponse, PriorityLevel } from '../models/criteria';
 import { CriteriaListFilter, CriterionDecisions, EMPTY_LIST_FILTER } from '../models/criteria-list';
 import { FilterOptionsLayers } from '../models/filter-options';
-import { CatalogApiService } from '../services/api/catalog-api.service';
+import { CatalogApiService, CRITERIA_LIST_PROBLEMS } from '../services/api/catalog-api.service';
 import {
   filterCriteria,
   overridePriority,
@@ -75,7 +75,8 @@ export type SubmitResult =
  * - `loading`: a request is running; the list of an earlier selection is gone
  * - `loaded`: `answer` holds the criteria of the current selection
  * - `noRelease`: 404 — the pinned release is unknown or no release is active (O-S4-3)
- * - `failed`: any other failure, also a 400 for a selection S10 had sent successfully
+ * - `failed`: any other failure, also a 400 for a selection S10 had sent successfully (the error
+ *   interceptor shows the generic snackbar for it, owner decision O-S4-34 (a))
  */
 export type CriteriaListStatus = 'notLoaded' | 'loading' | 'loaded' | 'noRelease' | 'failed';
 
@@ -295,7 +296,7 @@ export const withConfigurator = () =>
         patchList(() => ({ status: 'loading', answer: null }));
         store.incrementLoadingCount();
         try {
-          const answer = await api.getCriteria(toCriteriaSelection(draft), release ?? undefined);
+          const answer = await api.getCriteria(toCriteriaSelection(draft), release ?? undefined, CRITERIA_LIST_PROBLEMS);
           if (request === latestListRequest) {
             patchList(() => ({ status: 'loaded', answer }));
           }

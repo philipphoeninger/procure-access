@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-// Placeholder of S11 until S4-14 – S4-18 (Handoff §5.1).
+// S11 (Handoff §5.1, §5.5): H1, „Auswahl ändern“ and the cards; more parts follow with S4-16 – S4-18.
 :host {
   display: flex;
   flex-direction: column;
@@ -20,4 +20,13 @@
   @media (min-width: 37.5em) {
     font: var(--mat-sys-headline-large);
   }
+}
+
+.pa-criteria-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

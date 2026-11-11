@@ -12,6 +12,15 @@ import { CatalogSelection, CriteriaSelection } from '../../models/configurator-d
 import { CriteriaResponse } from '../../models/criteria';
 import { FilterOptionsResponse } from '../../models/filter-options';
 
+/** Problem types „Kriterienliste anzeigen“ shows at the step of S10 (R-CON-10). */
+export const SELECTION_CHECK_PROBLEMS: readonly string[] = ['validation', 'selection-excluded', 'not-found'];
+
+/**
+ * Problem types the list S11 shows itself: only `not-found`, which opens the legacy filter. A 400
+ * for a selection S10 had sent successfully gets the generic snackbar (owner decision O-S4-34 (a)).
+ */
+export const CRITERIA_LIST_PROBLEMS: readonly string[] = ['not-found'];
+
 /**
  * Client of the catalog endpoints under `/api/v1/catalog` (ARCHITECTURE §7.2, SPEC §8.1, §8.2).
  * The answers are plain JSON without the legacy `TResult` wrapper; errors are Problem Details
@@ -40,9 +49,15 @@ export class CatalogApiService {
   /**
    * Criteria of a complete selection with their resolved priorities. The server checks the
    * selection again (R-CON-10, CAT-12): 400 `validation` or `selection-excluded` with field errors
-   * as sent (`appTypeIds[1]`), 404 `not-found`; S10 shows all three itself.
+   * as sent (`appTypeIds[1]`), 404 `not-found`. `callerHandles` names the problem types the caller
+   * shows itself: S10 all three ({@link SELECTION_CHECK_PROBLEMS}), S11 only `not-found`
+   * ({@link CRITERIA_LIST_PROBLEMS}).
    */
-  getCriteria(selection: CriteriaSelection, release?: string): Promise<CriteriaResponse> {
+  getCriteria(
+    selection: CriteriaSelection,
+    release?: string,
+    callerHandles: readonly string[] = SELECTION_CHECK_PROBLEMS,
+  ): Promise<CriteriaResponse> {
     let params = selectionParams(selection, release);
     for (const id of selection.testTypeIds) {
       params = params.append('testTypeIds[]', id);
@@ -50,7 +65,7 @@ export class CatalogApiService {
     return lastValueFrom(
       this.http.get<CriteriaResponse>(`${this.apiUrl}/v1/catalog/criteria`, {
         params,
-        context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['validation', 'selection-excluded', 'not-found']),
+        context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, callerHandles),
       }),
     );
   }

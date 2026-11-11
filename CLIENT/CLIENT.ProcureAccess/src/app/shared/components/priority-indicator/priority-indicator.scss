@@ -1,0 +1,42 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// Handoff §4.5, Figma 2011:203: the level in primary-container, Hinweis in surface-container-highest,
+// corner-small, label-large; the weight in label-medium next to it. The override line stacks below.
+:host {
+  display: block;
+}
+
+.pa-priority-indicator__row,
+.pa-priority-indicator__overridden {
+  margin: 0;
+}
+
+.pa-priority-indicator__level {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--pa-space-xs);
+  padding: var(--pa-space-xxs) var(--pa-space-sm);
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font: var(--mat-sys-label-large);
+}
+
+.pa-priority-indicator__level--info {
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+}
+
+.pa-priority-indicator__weight {
+  font: var(--mat-sys-label-medium);
+}
+
+.pa-priority-indicator__overridden {
+  margin-block-start: var(--pa-space-xs);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}

@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<p class="pa-priority-indicator__row">
+  <span class="pa-priority-indicator__level" [class.pa-priority-indicator__level--info]="level() === 'Info'">
+    <span class="cdk-visually-hidden">{{ 'criteria.priority.button' | translate: { level: (levelKey() | translate) } }}</span>
+    <span aria-hidden="true">{{ levelKey() | translate }}</span>
+    @if (shownWeight(); as weight) {
+      <span class="pa-priority-indicator__weight">{{ 'criteria.priority.weight' | translate: { weight } }}</span>
+    }
+  </span>
+</p>
+@if (overridden()) {
+  <p class="pa-priority-indicator__overridden">
+    {{ 'criteria.priority.overridden' | translate: { recommended: (recommendedKey() | translate) } }}
+  </p>
+}

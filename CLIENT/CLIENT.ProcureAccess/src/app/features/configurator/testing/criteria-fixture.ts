@@ -65,7 +65,8 @@ export function criterion(
   };
 }
 
-function procedureText(originalTitle: string): ProcedureText {
+/** A BIT inklusiv text of the Software-Test with the given original title. */
+export function procedureText(originalTitle: string): ProcedureText {
   return {
     testType: 'softwareTest',
     originalNumber: '1.1',

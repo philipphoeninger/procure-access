@@ -10,7 +10,7 @@ import { CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
 
 import { criteriaAnswer as typedCriteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
-import { CatalogApiService } from './catalog-api.service';
+import { CatalogApiService, CRITERIA_LIST_PROBLEMS } from './catalog-api.service';
 
 const url = '/api/v1/catalog/filter-options';
 
@@ -111,6 +111,20 @@ describe('CatalogApiService', () => {
         'not-found',
       ]);
       expect(request.request.params.has('useCase')).toBe(false);
+      request.flush(criteriaAnswer);
+
+      await answer;
+    });
+
+    it('lets S11 show only not-found itself, so a 400 on the list gets the snackbar (O-S4-34)', async () => {
+      const answer = api.getCriteria(
+        { useCase: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
+        'T.1',
+        CRITERIA_LIST_PROBLEMS,
+      );
+
+      const request = backend.expectOne((r) => r.url === criteriaUrl);
+      expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['not-found']);
       request.flush(criteriaAnswer);
 
       await answer;

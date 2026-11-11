@@ -37,6 +37,7 @@ import { Notice } from '@app/shared/components/notice/notice';
 import { Stepper } from '@app/shared/components/stepper/stepper';
 import { FilterOptionCheckbox, OptionLink } from '../../components/filter-option/filter-option';
 import { CRITERIA_LIST_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
+import { linkTo } from '../../state/catalog-names';
 import { CONFIGURATOR_LAYERS, ConfiguratorLayer, ResetReport } from '../../models/configurator-draft';
 import { FilterOption, TestTypeOption, UseCaseOption } from '../../models/filter-options';
 import { exclusionReasonLines, isExcluded, ReasonLine, selectedNames, stepError } from '../../state/selection-rules';
@@ -111,15 +112,6 @@ const MIN_PANEL_HEIGHT_PX = 144;
 
 function isNone(entry: UseCaseEntry): entry is NoneEntry {
   return 'kind' in entry && entry.kind === 'none';
-}
-
-/** The domain of the link text „Verfahren ansehen ({{domain}})“; null for a URL that cannot be read. */
-function linkTo(url: string): OptionLink | null {
-  try {
-    return { url, domain: new URL(url).hostname.replace(/^www\./, '') };
-  } catch {
-    return null;
-  }
 }
 
 function normalize(text: string): string {

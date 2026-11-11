@@ -1,0 +1,80 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// Handoff §5.5, Figma S11 2020:70: an outlined card on surface-container-lowest, corner-medium;
+// the detail panel on surface-container-low, corner-small, padding md. Mobile first: md padding,
+// lg from 600 px.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+}
+
+@media (min-width: 37.5em) {
+  :host {
+    padding: var(--pa-space-lg);
+  }
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.pa-criterion-card__title {
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+  // The anchor #k-… is the title; it keeps some room above it when a link scrolls there.
+  scroll-margin-block-start: var(--pa-space-lg);
+}
+
+.pa-criterion-card__source,
+.pa-criterion-card__meta {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.pa-criterion-card__text {
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-criterion-card__link {
+  color: var(--mat-sys-primary);
+  overflow-wrap: anywhere;
+}
+
+.pa-criterion-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pa-space-xs);
+}
+
+.pa-criterion-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  padding: var(--pa-space-md);
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--mat-sys-surface-container-low);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.pa-criterion-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+}
+
+.pa-criterion-card__section-title {
+  font: var(--mat-sys-title-small);
+}
