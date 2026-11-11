@@ -1,0 +1,40 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<mat-checkbox
+  [id]="optionId()"
+  [checked]="checked()"
+  [disabled]="unavailable()"
+  disabledInteractive
+  [aria-describedby]="describedBy()"
+  (change)="onChange($event)"
+  >{{ name() }}</mat-checkbox
+>
+@if (reasons().length > 0) {
+  @for (line of reasons(); track line.key) {
+    <p class="pa-filter-option__line" [id]="reasonId($index)">{{ line.key | translate: line.params }}</p>
+  }
+} @else if (locked() || hintKey() || explanation() || link()) {
+  <!-- &ngsp; keeps the spaces between the parts of one line -->
+  <p class="pa-filter-option__line">
+    @if (locked()) {
+      <span [id]="lockedId()">{{ 'criteria.select.step3.base.locked' | translate }}</span>&ngsp;
+    }
+    @if (hintKey(); as key) {
+      <span [id]="hintId()">{{ key | translate }}</span>&ngsp;
+    }
+    @if (explanation(); as text) {
+      <span [id]="explanationId()">{{ text }}</span>&ngsp;
+    }
+    @if (link(); as target) {
+      <a class="pa-filter-option__link" [href]="target.url" target="_blank" rel="noopener noreferrer"
+        >{{ 'testType.link' | translate: { domain: target.domain } }}&ngsp;<span class="cdk-visually-hidden">{{
+          'common.newTab' | translate
+        }}</span></a
+      >
+    }
+  </p>
+}

@@ -233,6 +233,42 @@ describe('withConfigurator', () => {
     });
   });
 
+  describe('waiting for current options („Weiter“, R-CON-01)', () => {
+    it('answers at once when the options match the draft', async () => {
+      await loaded();
+
+      await expect(store.optionsCurrent()).resolves.toBe(true);
+    });
+
+    it('waits for a running reload, also for one started during the wait', async () => {
+      await loaded();
+      store.chooseUseCase({ kind: 'useCase', id: 'hr' });
+      let current: boolean | undefined;
+      const waiting = store.optionsCurrent().then((value) => (current = value));
+
+      store.chooseUseCase({ kind: 'useCase', id: 'citizen' });
+      const [first, second] = backend.match((r) => r.url === url);
+      first.flush(filterOptionsAnswer());
+      await settle();
+      expect(current).toBeUndefined();
+
+      second.flush(filterOptionsAnswer());
+      await waiting;
+      expect(current).toBe(true);
+    });
+
+    it('answers false when the reload failed or nothing was loaded', async () => {
+      await expect(store.optionsCurrent()).resolves.toBe(false);
+
+      await loaded();
+      store.chooseUseCase({ kind: 'useCase', id: 'hr' });
+      const waiting = store.optionsCurrent();
+      nextRequest().flush(null, { status: 500, statusText: 'Server Error' });
+
+      await expect(waiting).resolves.toBe(false);
+    });
+  });
+
   describe('reset of the lower layers (R-CON-07)', () => {
     it('clears steps 2–4 except Basisfunktionalität and reports the cleared layers', async () => {
       await fillAllLayers();
