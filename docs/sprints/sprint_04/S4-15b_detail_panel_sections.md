@@ -1,7 +1,7 @@
 # S4-15b — Catalog sections of the detail panel
 
 > **Sprint:** 04, P0 task S4-15b (M2.6; second half of S4-15, 2 points). **Issues:** none. **Requirements / invariants:** R-LST-01 (detail panel with H3 sections), Handoff §5.5; no invariant changes (TESTING stays at v46; CAT-02 keeps its S4-15a parts).
-> **Status:** done — pull request open (number in the PR).
+> **Status:** done — pull request #272 open.
 > **Scope:** the row of S4-15b: the Markdown lines of the catalog texts as paragraphs and lists (S3-15 P6), the sections „Was wird verlangt?“ … „Wie wird bewertet?“, „So wird es geprüft“, tabs for several procedures, examples, „Gilt für“ with `appliesTo[]` in the criteria answer, the source line. Not here: the checkbox, notes and the K5 menu (S4-16); E2E of the card list (S4-18, S4-22).
 > **Owner decisions (2026-11-11, all (a)):** before the task **O-S4-29** (`appliesTo[]` in the answer) and **O-S4-30** (own renderer, no `marked`); with the plan **O-S4-36** — http(s) links in catalog texts open in a new tab; **O-S4-37** — three examples per group, each group with its own „Alle {{count}} Beispiele anzeigen“, notes always visible; **O-S4-38** — short tab labels as three keys (UX copy v19 U101, a proposal the owner confirms in the pull request); **O-S4-39** — „#todo#“ in 11.1.3.2 shown verbatim and listed in the gap list. Defaults accepted with the plan: nested lists and continuation lines; HTML in a text stays text; `appliesTo[]` as `{ id, name }`; ratings through `assessment.value.*`; „So wird es geprüft“ is the link only; the source line per procedure; sections with the same text above the tabs; after „Alle … anzeigen“ the button goes and the focus moves to the fourth example; no short description (no data).
 
