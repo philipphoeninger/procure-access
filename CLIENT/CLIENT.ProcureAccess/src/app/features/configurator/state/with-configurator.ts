@@ -12,6 +12,7 @@ import {
   CONFIGURATOR_LAYERS,
   ConfiguratorDraft,
   ConfiguratorLayer,
+  CriteriaSelection,
   EMPTY_DRAFT,
   ResetReport,
   UseCaseChoice,
@@ -24,6 +25,7 @@ import {
   filterCriteria,
   overridePriority,
   resetPriority,
+  sameSelection,
   setIncluded,
   setNote,
   setWeight,
@@ -92,6 +94,8 @@ export interface CriteriaListState {
   /** The search field as typed; `filter.query` follows it after {@link CRITERIA_SEARCH_DEBOUNCE_MS}. */
   searchInput: string;
   filter: CriteriaListFilter;
+  /** The selection of the last list S11 asked for; a list for another one clears search and filter. */
+  selection: CriteriaSelection | null;
 }
 
 export const initialCriteriaListState: CriteriaListState = {
@@ -100,6 +104,7 @@ export const initialCriteriaListState: CriteriaListState = {
   decisions: {},
   searchInput: '',
   filter: EMPTY_LIST_FILTER,
+  selection: null,
 };
 
 export interface ConfiguratorState {
@@ -174,6 +179,12 @@ export const withConfigurator = () =>
       function cancelSearchTimer(): void {
         clearTimeout(searchTimer);
         searchTimer = undefined;
+      }
+
+      /** Search, levels and inclusion at once; a pending search is dropped. */
+      function clearFilter(): void {
+        cancelSearchTimer();
+        patchList(() => ({ searchInput: '', filter: EMPTY_LIST_FILTER }));
       }
 
       function loadFilterOptions(): Promise<void> {
@@ -288,15 +299,22 @@ export const withConfigurator = () =>
        * Loads the criteria of the draft for S11 with the pinned release (R-CON-10). The answer of a
        * named release is cached by the browser (ARCHITECTURE §9.6), so the request after the check
        * of „Kriterienliste anzeigen“ costs nothing. Only the latest request is applied; the
-       * decisions stay (owner decision O-S4-24 (a)).
+       * decisions stay (owner decision O-S4-24 (a)). Search and filter stay for the same selection
+       * and are cleared for another one, so they never hide criteria of a list the user has not
+       * filtered yet (owner decision O-S4-46 (a)).
        */
       async function loadCriteriaList(): Promise<CriteriaListStatus> {
         const request = ++latestListRequest;
         const { draft, release } = store.configurator();
-        patchList(() => ({ status: 'loading', answer: null }));
+        const selection = toCriteriaSelection(draft);
+        const previous = store.configurator.list.selection();
+        if (previous !== null && !sameSelection(previous, selection)) {
+          clearFilter();
+        }
+        patchList(() => ({ status: 'loading', answer: null, selection }));
         store.incrementLoadingCount();
         try {
-          const answer = await api.getCriteria(toCriteriaSelection(draft), release ?? undefined, CRITERIA_LIST_PROBLEMS);
+          const answer = await api.getCriteria(selection, release ?? undefined, CRITERIA_LIST_PROBLEMS);
           if (request === latestListRequest) {
             patchList(() => ({ status: 'loaded', answer }));
           }
@@ -355,10 +373,7 @@ export const withConfigurator = () =>
           patchList((list) => ({ filter: { ...list.filter, onlyIncluded } }));
         },
         /** „Filter zurücksetzen“ of `criteria.list.emptyFilter`: search, levels and inclusion at once. */
-        clearCriteriaFilter(): void {
-          cancelSearchTimer();
-          patchList(() => ({ searchInput: '', filter: EMPTY_LIST_FILTER }));
-        },
+        clearCriteriaFilter: clearFilter,
         optionsCurrent,
         filterOptionsReady,
         submitSelection,

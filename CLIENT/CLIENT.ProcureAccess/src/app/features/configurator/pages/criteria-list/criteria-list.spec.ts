@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
@@ -10,11 +11,12 @@ import { provideRouter, Router } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
-import { withConfigurator } from '../../state/with-configurator';
+import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from '../../state/with-configurator';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CriteriaListPage } from './criteria-list';
@@ -25,14 +27,16 @@ const ConfiguratorTestStore = signalStore(withConfigurator());
 @Component({ template: '' })
 class Blank {}
 
-describe('CriteriaListPage (S11, R-LST-01 – R-LST-05)', () => {
+describe('CriteriaListPage (S11, R-LST-01 – R-LST-08)', () => {
   let api: { getFilterOptions: ReturnType<typeof vi.fn>; getCriteria: ReturnType<typeof vi.fn> };
+  let announce: ReturnType<typeof vi.fn>;
 
   async function setUp(getCriteria: ReturnType<typeof vi.fn>) {
     api = {
       getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer()),
       getCriteria,
     };
+    announce = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(CriteriaListPage, {
       providers: [
         provideTestTranslations(),
@@ -42,6 +46,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-05)', () => {
         ]),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
+        { provide: A11yAnnouncerService, useValue: { announce } },
         // jsdom never ends a CSS transition, so the K5 menu would never finish closing.
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
@@ -168,5 +173,158 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-05)', () => {
 
     expect(store.configurator.list.decisions()['11.2.2']?.overrideWeight).toBe(6);
     expect(within(card).getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
+  });
+
+  describe('search and priority filter (R-LST-06)', () => {
+    const titles = () =>
+      within(screen.getByRole('list'))
+        .getAllByRole('heading', { level: 2 })
+        .map((heading) => heading.textContent?.trim());
+    const resultAnnouncements = () =>
+      (announce.mock.calls as [string, unknown, unknown][]).filter(([key]) => key.startsWith('common.results.shown'));
+
+    async function typeSearch(fixture: { whenStable(): Promise<unknown> }, text: string) {
+      const search = screen.getByRole<HTMLInputElement>('searchbox', { name: 'In Kriterien suchen' });
+      search.value = text;
+      fireEvent.input(search);
+      await new Promise((resolve) => setTimeout(resolve, CRITERIA_SEARCH_DEBOUNCE_MS + 20));
+      await fixture.whenStable();
+    }
+
+    it('shows the filter row above the cards and announces nothing on the first load', async () => {
+      await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      const filter = screen.getByRole('group', { name: 'Liste filtern' });
+      expect(filter.compareDocumentPosition(screen.getByRole('list')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(resultAnnouncements()).toEqual([]);
+      await expectNoAxeViolations();
+    });
+
+    it('applies the search 300 ms after the last keystroke and announces the result once', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      await typeSearch(fixture, 'tastatur');
+
+      expect(titles()).toEqual(['Alles geht mit der Tastatur']);
+      expect(resultAnnouncements()).toEqual([
+        [
+          'common.results.shown.one',
+          { count: 1 },
+          { throttleMs: 1000, throttleKey: 'common.results.shown' },
+        ],
+      ]);
+    });
+
+    it('filters by the levels checked and announces each change in its plural form', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      screen.getByRole('checkbox', { name: 'B – Bewertungskriterium' }).click();
+      await fixture.whenStable();
+
+      expect(titles()).toEqual(['Alles geht mit der Tastatur', 'Geprüft nach BIT inklusiv Software-Test']);
+      expect(resultAnnouncements().map(([key, params]) => [key, params])).toEqual([['common.results.shown', { count: 2 }]]);
+    });
+
+    it('hides excluded cards with „Nur aufgenommene Kriterien anzeigen“ (R-LST-04)', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+      within(screen.getAllByRole('listitem')[0]).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+      expect(resultAnnouncements()).toEqual([]);
+
+      screen.getByRole('checkbox', { name: 'Nur aufgenommene Kriterien anzeigen' }).click();
+      await fixture.whenStable();
+
+      expect(titles()).toEqual([
+        'Alles geht mit der Tastatur',
+        'Überschriften',
+        'Geprüft nach BIT inklusiv Software-Test',
+      ]);
+    });
+
+    it('shows the empty state of the filter; „Filter zurücksetzen“ brings the list back with the focus in the search', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+
+      await typeSearch(fixture, 'gibt es nicht');
+
+      expect(screen.queryByRole('list')).toBeNull();
+      expect(screen.getByText('Keine Kriterien passen zu Ihrem Filter.')).toBeTruthy();
+      expect(resultAnnouncements().at(-1)?.[0]).toBe('common.results.shown.zero');
+      await expectNoAxeViolations();
+
+      screen.getByRole('button', { name: 'Filter zurücksetzen' }).click();
+      await fixture.whenStable();
+
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+      expect(document.activeElement).toBe(screen.getByRole('searchbox', { name: 'In Kriterien suchen' }));
+      expect((document.activeElement as HTMLInputElement).value).toBe('');
+      expect(resultAnnouncements().at(-1)?.slice(0, 2)).toEqual(['common.results.shown', { count: 4 }]);
+    });
+  });
+
+  describe('„Geprüft nach …“ cards (R-LST-07)', () => {
+    it('INV:CAT-16 lists the procedure criterion with priority B and lets the user deselect it; it stays in the list', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+      const store = fixture.debugElement.injector.get<InstanceType<typeof ConfiguratorTestStore>>(ProcureAccessStore);
+      const card = () => screen.getAllByRole('listitem')[3];
+
+      expect(within(card()).getByText('B – Bewertungskriterium')).toBeTruthy();
+      within(card()).getByRole('checkbox', { name: 'In Liste aufnehmen Geprüft nach BIT inklusiv Software-Test' }).click();
+      await fixture.whenStable();
+
+      expect(store.configurator.list.decisions()['PROC-softwareTest']?.included).toBe(false);
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+      expect(within(card()).getByText('Nicht in Ihrer Liste')).toBeTruthy();
+
+      within(card()).getByRole('button', { name: 'Details anzeigen' }).click();
+      await fixture.whenStable();
+      expect(within(card()).getByRole('heading', { level: 3, name: 'Warum diese Priorität?' })).toBeTruthy();
+      expect(within(card()).getByText(/Im Abgleich mit Kriterien zählt dieses Kriterium nicht mit/)).toBeTruthy();
+    });
+  });
+
+  describe('app types without criteria (R-LST-08)', () => {
+    const hardware = { id: 'hardware', name: 'Hardware' };
+    const relay = { id: 'relay', name: 'Vermittlungs- oder Notrufdienst' };
+
+    it('INV:CAT-20 shows the info notice above the list, not an error, with „Auswahl ändern“ to step 2', async () => {
+      const answer = { ...criteriaAnswer(), appTypesWithoutCriteria: [hardware, relay] };
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(answer));
+
+      const notice = screen.getByRole('note');
+      expect(notice.textContent).toContain(
+        'Für Hardware und Vermittlungs- oder Notrufdienst gibt es noch keine Kriterien, weil BIT inklusiv dafür noch kein Prüfverfahren enthält.',
+      );
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(notice.compareDocumentPosition(screen.getByRole('list')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+      await expectNoAxeViolations();
+
+      within(notice).getByRole('link', { name: 'Auswahl ändern' }).click();
+      await fixture.whenStable();
+
+      const router = fixture.debugElement.injector.get(Router);
+      expect(router.url).toBe('/kriterien');
+      const state = fixture.debugElement.injector.get(Location).getState() as { configuratorStep?: string } | null;
+      expect(state?.configuratorStep).toBe('appType');
+    });
+
+    it('INV:CAT-20 shows the notice as the empty state without filter row when no criterion is left', async () => {
+      const answer = { ...criteriaAnswer(), criteria: [], appTypesWithoutCriteria: [hardware] };
+      await setUp(vi.fn().mockResolvedValue(answer));
+
+      expect(screen.getByRole('note').textContent).toContain('Für Hardware gibt es noch keine Kriterien');
+      expect(screen.queryByRole('group', { name: 'Liste filtern' })).toBeNull();
+      expect(screen.queryByRole('list')).toBeNull();
+      expect(screen.queryByText(/Das sollte nicht vorkommen/)).toBeNull();
+      await expectNoAxeViolations();
+    });
+
+    it('shows „criteria.list.empty“ for an empty answer without such app types', async () => {
+      await setUp(vi.fn().mockResolvedValue({ ...criteriaAnswer(), criteria: [] }));
+
+      expect(screen.getByText(/Für diese Auswahl gibt es keine Kriterien. Das sollte nicht vorkommen./)).toBeTruthy();
+      expect(screen.queryByRole('note')).toBeNull();
+      expect(screen.queryByRole('group', { name: 'Liste filtern' })).toBeNull();
+    });
   });
 });

@@ -1,0 +1,46 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// Filter row of S11 (Handoff §5.1): stacked below 600 px; from 600 px the search field and the
+// priority group share a row and wrap when the space runs out. DOM order = visual order.
+:host {
+  display: block;
+}
+
+.pa-criteria-list-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+
+  @media (min-width: 37.5em) {
+    flex-flow: row wrap;
+    align-items: center;
+    column-gap: var(--pa-space-lg);
+  }
+}
+
+.pa-criteria-list-filter__search {
+  inline-size: 100%;
+
+  @media (min-width: 37.5em) {
+    flex: 1 1 18em;
+    inline-size: auto;
+  }
+}
+
+// The checkboxes wrap next to each other; the legend stays a label above them.
+.pa-criteria-list-filter__levels {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--pa-space-md);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pa-criteria-list-filter__legend {
+  padding: 0;
+  font: var(--mat-sys-label-large);
+}

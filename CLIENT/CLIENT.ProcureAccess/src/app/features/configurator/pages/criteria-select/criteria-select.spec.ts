@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router, RouterOutlet } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
@@ -832,6 +832,60 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         await next();
         expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 2 }, error: false });
       });
+    });
+  });
+
+  describe('opening step (owner decision O-S4-47 (a))', () => {
+    /** Renders S10 behind the router, so a link's router state reaches it as in the app. */
+    async function openThroughRouter(state: Record<string, unknown> | undefined, fill: boolean) {
+      announce = vi.fn().mockResolvedValue(undefined);
+      setPageTitleState = vi.fn();
+      api = {
+        getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer(options())),
+        getCriteria: vi.fn(),
+      };
+      const rendered = await render('<router-outlet />', {
+        imports: [RouterOutlet],
+        routes: [{ path: 'kriterien', component: CriteriaSelect }],
+        providers: [
+          provideTestTranslations(),
+          provideLayout(true),
+          { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
+          { provide: CatalogApiService, useValue: api },
+          { provide: A11yAnnouncerService, useValue: { announce } },
+          { provide: PageTitleStrategy, useValue: { setPageTitleState } },
+        ],
+      });
+      store = TestBed.inject<InstanceType<typeof ConfiguratorTestStore>>(ProcureAccessStore);
+      await store.loadFilterOptions();
+      if (fill) {
+        store.chooseUseCase({ kind: 'useCase', id: 'hr' });
+        await store.optionsCurrent();
+      }
+      await TestBed.inject(Router).navigateByUrl('/kriterien', state ? { state } : {});
+      await rendered.fixture.whenStable();
+    }
+
+    it('opens step 2 when the link asks for it in the router state, without a step announcement', async () => {
+      await openThroughRouter({ configuratorStep: 'appType' }, true);
+
+      expect(screen.getByRole('heading', { level: 2, name: 'Was möchten Sie beschaffen?' })).toBeTruthy();
+      expect(stepItems().map((item) => item.getAttribute('aria-current'))).toEqual([null, 'step', null, null]);
+      expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { n: 2 }, error: false });
+      expect(announce).not.toHaveBeenCalledWith('criteria.select.stepLabel', expect.anything());
+      await expectNoAxeViolations();
+    });
+
+    it('opens step 1 while the use case is unanswered, whatever the state asks', async () => {
+      await openThroughRouter({ configuratorStep: 'appType' }, false);
+
+      expect(screen.getByRole('heading', { level: 2, name: 'Wofür setzen Sie das Produkt ein?' })).toBeTruthy();
+    });
+
+    it('opens step 1 without router state, also with a kept draft', async () => {
+      await openThroughRouter(undefined, true);
+
+      expect(screen.getByRole('heading', { level: 2, name: 'Wofür setzen Sie das Produkt ein?' })).toBeTruthy();
     });
   });
 });

@@ -99,5 +99,22 @@ describe('A11yAnnouncerService', () => {
 
       expect(liveAnnounce.mock.calls.map(([text]) => text as string)).toEqual(['6 Treffer', 'Wird geladen …']);
     });
+
+    it('Announce_SameThrottleKey_ReadsOnlyTheNewestPluralForm', async () => {
+      const shown = (key: string, count: number) =>
+        TestBed.inject(A11yAnnouncerService).announce(key, { count }, { throttleMs: 1000, throttleKey: 'common.results.shown' });
+      await shown('common.results.shown', 3);
+      const replaced = shown('common.results.shown.zero', 0);
+      const newest = shown('common.results.shown.one', 1);
+      await replaced;
+
+      await vi.advanceTimersByTimeAsync(1000);
+      await newest;
+
+      expect(liveAnnounce.mock.calls.map(([text]) => text as string)).toEqual([
+        '3 Kriterien angezeigt.',
+        '1 Kriterium angezeigt.',
+      ]);
+    });
   });
 });

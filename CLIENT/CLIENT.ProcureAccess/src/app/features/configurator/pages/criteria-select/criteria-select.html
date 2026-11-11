@@ -7,7 +7,12 @@ SPDX-License-Identifier: MIT
 <h1 class="pa-criteria-select__title">{{ 'criteria.select.title' | translate }}</h1>
 <p class="pa-criteria-select__intro">{{ 'criteria.select.intro' | translate }}</p>
 
-<pa-stepper linear stepLabelKey="criteria.select.stepLabel" (selectionChange)="currentStep.set($event.selectedIndex)">
+<pa-stepper
+  linear
+  stepLabelKey="criteria.select.stepLabel"
+  [selectedIndex]="firstStep"
+  (selectionChange)="currentStep.set($event.selectedIndex)"
+>
   <cdk-step [label]="'criteria.select.step1.name' | translate" [completed]="useCaseAnswered()">
     <mat-card class="pa-step" appearance="outlined">
       <h2 class="pa-step__question">{{ 'criteria.select.step1.question' | translate }}</h2>

@@ -13,6 +13,7 @@ import {
   isComplete,
   isExcluded,
   layerOfField,
+  openingStep,
   selectedNames,
   stepError,
   toCatalogSelection,
@@ -94,6 +95,27 @@ describe('selection rules', () => {
       expect(isComplete({ ...filled, useCase: { kind: 'none' } })).toBe(true);
       expect(isComplete({ ...filled, appTypeIds: [] })).toBe(false);
       expect(isComplete({ ...filled, useCase: { kind: 'unanswered' } })).toBe(false);
+    });
+  });
+
+  describe('opening step of S10 (owner decision O-S4-47 (a))', () => {
+    it('opens step 1 without a request', () => {
+      expect(openingStep(undefined, filled)).toBe(0);
+    });
+
+    it('opens the requested step when every earlier step is answered', () => {
+      expect(openingStep('appType', filled)).toBe(1);
+      expect(openingStep('appType', { ...filled, appTypeIds: [] })).toBe(1);
+      expect(openingStep('testType', filled)).toBe(3);
+    });
+
+    it('never opens past the first unanswered step', () => {
+      expect(openingStep('appType', EMPTY_DRAFT)).toBe(0);
+      expect(openingStep('testType', { ...filled, appTypeIds: [] })).toBe(1);
+    });
+
+    it('opens step 1 for a value that is not a layer', () => {
+      expect(openingStep('nonsense' as ConfiguratorLayer, filled)).toBe(0);
     });
   });
 

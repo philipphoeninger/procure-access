@@ -7,6 +7,8 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { ProcureAccessStore } from '@app/core/state/app.store';
 
+import { ConfiguratorLayer } from '../models/configurator-draft';
+
 /** Where the criteria lead while no catalog release is active: the legacy filter (O-S4-3). */
 export const LEGACY_FILTER_PATH = '/filters';
 
@@ -15,6 +17,17 @@ export const CONFIGURATOR_PATH = '/kriterien';
 
 /** S11, opened after the server accepted the selection (R-CON-10). */
 export const CRITERIA_LIST_PATH = '/kriterien/ergebnis';
+
+/**
+ * Router state of a link to S10 that opens a later step (owner decision O-S4-47 (a)): the step lives
+ * in the navigation state, never in the URL, like the selection itself (R-CON-09).
+ */
+export interface ConfiguratorNavigationState {
+  configuratorStep?: ConfiguratorLayer;
+}
+
+/** „Auswahl ändern“ of `criteria.list.noCriteriaFor`: S10 at step 2, Anwendungstyp. */
+export const APP_TYPE_STEP_STATE: ConfiguratorNavigationState = { configuratorStep: 'appType' };
 
 /**
  * The one switch between S10 and the legacy filter (O-S4-3, owner decision O-S4-17 (a)): start

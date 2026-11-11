@@ -593,6 +593,34 @@ describe('withConfigurator', () => {
       expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
       expect(visibleKeys()).toHaveLength(4);
     });
+
+    it('keeps search and filter when S11 asks again for the same selection (O-S4-46 (a))', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      store.filterCriteriaByPriority(['A']);
+      store.searchCriteria('tastatur');
+
+      await listLoaded();
+
+      expect(store.configurator.list.searchInput()).toBe('tastatur');
+      expect(store.configurator.list.filter.levels()).toEqual(['A']);
+    });
+
+    it('clears search and filter, also a pending search, when the list is for another selection (O-S4-46 (a))', async () => {
+      await fillAllLayers();
+      await listLoaded();
+      vi.useFakeTimers();
+      store.filterCriteriaByPriority(['A']);
+      store.showOnlyIncludedCriteria(true);
+      store.searchCriteria('tastatur');
+      store.toggleTestType('softwareTest');
+
+      await listLoaded();
+      vi.advanceTimersByTime(CRITERIA_SEARCH_DEBOUNCE_MS);
+
+      expect(store.configurator.list.searchInput()).toBe('');
+      expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
+    });
   });
 
   describe('memory only (R-CON-09)', () => {

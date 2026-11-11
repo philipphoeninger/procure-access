@@ -4,6 +4,7 @@
 
 import {
   CatalogSelection,
+  CONFIGURATOR_LAYERS,
   ConfiguratorDraft,
   CriteriaSelection,
   ConfiguratorLayer,
@@ -175,6 +176,17 @@ export function stepError(layer: ConfiguratorLayer, draft: ConfiguratorDraft): S
     return 'noAppType';
   }
   return null;
+}
+
+/**
+ * The step S10 opens at (owner decision O-S4-47 (a)): the requested layer, but never past the first
+ * step the draft has not answered yet — the linear stepper would not let the user get there either.
+ * Without a request S10 opens at step 1.
+ */
+export function openingStep(requested: ConfiguratorLayer | undefined, draft: ConfiguratorDraft): number {
+  const index = requested === undefined ? 0 : Math.max(0, CONFIGURATOR_LAYERS.indexOf(requested));
+  const firstOpen = CONFIGURATOR_LAYERS.findIndex((layer) => stepError(layer, draft) !== null);
+  return firstOpen === -1 ? index : Math.min(index, firstOpen);
 }
 
 /** True when „Kriterienliste anzeigen“ may send the selection (the server checks it again, R-CON-10). */

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CriteriaSelection } from '../models/configurator-draft';
 import { Criterion, PriorityLevel } from '../models/criteria';
 import {
   CriteriaListFilter,
@@ -139,6 +140,21 @@ export function matchesSearch(criterion: Criterion, query: string): boolean {
     ...criterion.procedureTexts.map((t) => t.originalTitle),
   ];
   return fields.some((field) => field?.toLocaleLowerCase('de').includes(needle) ?? false);
+}
+
+/**
+ * True when two selections ask for the same criteria: the same use case and the same values in each
+ * layer, in any order. S11 clears search and filter when its list is for another selection (owner
+ * decision O-S4-46 (a)).
+ */
+export function sameSelection(a: CriteriaSelection, b: CriteriaSelection): boolean {
+  const same = (x: string[], y: string[]) => x.length === y.length && x.every((value) => y.includes(value));
+  return (
+    a.useCase === b.useCase &&
+    same(a.appTypeIds, b.appTypeIds) &&
+    same(a.productPartIds, b.productPartIds) &&
+    same(a.testTypeIds, b.testTypeIds)
+  );
 }
 
 /** True when any part of the filter hides criteria. */

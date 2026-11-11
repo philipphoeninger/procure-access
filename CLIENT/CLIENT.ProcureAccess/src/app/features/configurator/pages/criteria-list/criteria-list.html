@@ -9,21 +9,52 @@ SPDX-License-Identifier: MIT
   <a matButton="outlined" [routerLink]="configuratorPath">{{ 'criteria.list.changeSelection' | translate }}</a>
 </div>
 
-@if (loaded()) {
-  <ul class="pa-criteria-list__items">
-    @for (criterion of criteria(); track criterion.key) {
-      <li>
-        <pa-criterion-card
-          [criterion]="criterion"
-          [decision]="decision(criterion.key)"
-          [names]="names()"
-          (includedChange)="store.setCriterionIncluded(criterion.key, $event)"
-          (levelChange)="store.overrideCriterionPriority(criterion.key, $event)"
-          (weightChange)="store.setCriterionWeight(criterion.key, $event)"
-          (priorityReset)="store.resetCriterionPriority(criterion.key)"
-          (noteChange)="store.setCriterionNote(criterion.key, $event)"
-        />
-      </li>
+@if (answer(); as answer) {
+  @if (appTypesWithoutCriteria(); as appTypes) {
+    <pa-notice kind="info">
+      {{ 'criteria.list.noCriteriaFor' | translate: { appTypes } }}
+      <a class="pa-criteria-list__link" [routerLink]="configuratorPath" [state]="appTypeStepState">{{
+        'criteria.list.changeSelection' | translate
+      }}</a>
+    </pa-notice>
+  } @else if (answer.criteria.length === 0) {
+    <p class="pa-criteria-list__empty">{{ 'criteria.list.empty' | translate }}</p>
+  }
+
+  @if (answer.criteria.length > 0) {
+    <pa-criteria-list-filter
+      [searchText]="store.configurator.list.searchInput()"
+      [levels]="store.configurator.list.filter.levels()"
+      [onlyIncluded]="store.configurator.list.filter.onlyIncluded()"
+      (searchTextChange)="store.searchCriteria($event)"
+      (levelsChange)="store.filterCriteriaByPriority($event)"
+      (onlyIncludedChange)="store.showOnlyIncludedCriteria($event)"
+    />
+
+    @if (criteria().length > 0) {
+      <ul class="pa-criteria-list__items">
+        @for (criterion of criteria(); track criterion.key) {
+          <li>
+            <pa-criterion-card
+              [criterion]="criterion"
+              [decision]="decision(criterion.key)"
+              [names]="names()"
+              (includedChange)="store.setCriterionIncluded(criterion.key, $event)"
+              (levelChange)="store.overrideCriterionPriority(criterion.key, $event)"
+              (weightChange)="store.setCriterionWeight(criterion.key, $event)"
+              (priorityReset)="store.resetCriterionPriority(criterion.key)"
+              (noteChange)="store.setCriterionNote(criterion.key, $event)"
+            />
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="pa-criteria-list__empty">
+        <p>{{ 'criteria.list.emptyFilter' | translate }}</p>
+        <button matButton="outlined" type="button" (click)="resetFilter()">
+          {{ 'criteria.list.emptyFilter.reset' | translate }}
+        </button>
+      </div>
     }
-  </ul>
+  }
 }

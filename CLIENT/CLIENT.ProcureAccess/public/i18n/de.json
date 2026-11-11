@@ -463,7 +463,7 @@
       "suggest": "Fehlt ein Kriterium oder ist eine Formulierung unklar? Schlagen Sie eine Änderung vor",
       "noCriteriaFor": "Für {{appTypes}} gibt es noch keine Kriterien, weil BIT inklusiv dafür noch kein Prüfverfahren enthält. Wählen Sie einen weiteren Anwendungstyp oder ein Prüfverfahren, oder ändern Sie Ihre Auswahl.",
       "empty": "Für diese Auswahl gibt es keine Kriterien. Das sollte nicht vorkommen. Bitte ändern Sie Ihre Auswahl oder schreiben Sie uns.",
-      "emptyFilter": "Keine Kriterien passen zu Ihrem Filter. Filter zurücksetzen",
+      "emptyFilter": "Keine Kriterien passen zu Ihrem Filter.",
       "olderRelease": "Diese Liste beruht auf der Katalogversion {{release}}. Inzwischen gibt es die Version {{latest}}. Ihre Liste bleibt unverändert, damit nachvollziehbar bleibt, was Sie verwendet haben. Wenn Sie die neue Fassung nutzen möchten, erstellen Sie eine neue Liste mit derselben Auswahl.",
       "olderRelease.cta": "Neue Liste mit derselben Auswahl",
       "copy": {
@@ -471,7 +471,8 @@
         "dropped": "Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: {{values}}.",
         "notCarried": "Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}.",
         "notCarried.one": "Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}."
-      }
+      },
+      "emptyFilter.reset": "Filter zurücksetzen"
     },
     "item": {
       "include": "In Liste aufnehmen",
