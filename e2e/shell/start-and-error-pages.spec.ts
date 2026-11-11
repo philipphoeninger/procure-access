@@ -66,8 +66,9 @@ test.describe('Start page', () => {
     await expect(page).toHaveURL(/\/products$/);
 
     await page.goto('/');
+    // S10, because the E2E stack has an active catalog release (O-S4-3)
     await page.getByRole('main').getByRole('link', { name: 'Kriterien zusammenstellen' }).click();
-    await expect(page).toHaveURL(/\/filters$/);
+    await expect(page).toHaveURL(/\/kriterien$/);
   });
 
   test('the legacy address /home leads to the start page', async ({ page }) => {
@@ -115,7 +116,8 @@ test.describe('Error pages S80', () => {
     const heading = page.getByRole('heading', { level: 1, name: 'Etwas ist schiefgelaufen' });
     await expect(heading).toBeFocused();
     await expect(page).toHaveTitle('Etwas ist schiefgelaufen – ProcureAccess');
-    await expect(page).toHaveURL(/\/filters$/);
+    // S10 waits for its options before it opens (O-S4-3), so the page in place is the start page.
+    await expect(page).toHaveURL(/:\d+\/$/);
     await settled(criteria);
     await expectNoAxeViolations(page, testInfo, '500 page');
   });
@@ -133,7 +135,8 @@ test.describe('System states', () => {
     const criteria = mainNav(page).getByRole('link', { name: 'Kriterien' });
     await criteria.click();
 
-    const notice = page.getByRole('main').getByRole('status');
+    // S10 has status regions of its own (reset notice), so the notice is found by its text.
+    const notice = page.getByRole('main').getByRole('status').filter({ hasText: 'Keine Verbindung zum Server' });
     await expect(notice).toContainText('Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung.');
     // A failed load ends the loading state (#168).
     await expect(page.getByRole('progressbar')).toBeHidden();
@@ -177,12 +180,16 @@ test.describe('System states', () => {
     await criteria.click();
 
     await expect(page.getByRole('main').getByRole('progressbar', { name: 'Wird geladen …' })).toBeVisible();
-    // Both reach the live region: the page title of the route change does not swallow the loading text.
-    await expect.poll(announcements).toEqual(expect.arrayContaining(['Wird geladen …', 'ProcureAccess']));
+    await expect.poll(announcements).toEqual(expect.arrayContaining(['Wird geladen …']));
     await settled(criteria);
     await expectNoAxeViolations(page, testInfo, 'loading');
 
+    // S10 opens once its options answered (O-S4-3). Both reach the live region: the page title of
+    // the route change does not swallow the loading text.
     release();
     await expect(page.getByRole('progressbar')).toBeHidden();
+    await expect.poll(announcements).toEqual(
+      expect.arrayContaining(['Wird geladen …', 'Kriterien zusammenstellen – Schritt 1 von 4 – ProcureAccess']),
+    );
   });
 });

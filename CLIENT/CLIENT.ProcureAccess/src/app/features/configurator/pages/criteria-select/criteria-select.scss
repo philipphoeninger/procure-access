@@ -72,6 +72,50 @@
   font: var(--mat-sys-body-medium);
 }
 
+// The status region stays in the DOM while empty (R-CON-07); it takes back the gap it adds then.
+.pa-step__status:not(:has(pa-notice)) {
+  margin-block-start: calc(-1 * var(--pa-space-sm));
+}
+
+// „Bisherige Auswahl“ (Handoff §5.1, S10-R): one entry per earlier step with its „Ändern“;
+// stacked below 600 px (S10-M), in one row from 600 px.
+.pa-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  margin: 0;
+  padding: var(--pa-space-xs) var(--pa-space-md);
+  list-style: none;
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--mat-sys-surface-container-low);
+
+  @media (min-width: 37.5em) {
+    flex-flow: row wrap;
+    column-gap: var(--pa-space-lg);
+  }
+}
+
+.pa-summary:empty {
+  display: none;
+}
+
+.pa-summary__entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--pa-space-xs);
+}
+
+.pa-summary__text {
+  font: var(--mat-sys-body-medium);
+}
+
+// Button spinner (Handoff §6.2): 20 px before the label, in the label colour.
+.pa-step__spinner {
+  margin-inline-end: var(--pa-space-xs);
+  --mat-progress-spinner-active-indicator-color: currentColor;
+}
+
 .pa-step__toggle {
   margin-block: var(--pa-space-xs);
 }

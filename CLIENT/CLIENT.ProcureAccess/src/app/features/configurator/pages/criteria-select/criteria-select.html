@@ -7,11 +7,17 @@ SPDX-License-Identifier: MIT
 <h1 class="pa-criteria-select__title">{{ 'criteria.select.title' | translate }}</h1>
 <p class="pa-criteria-select__intro">{{ 'criteria.select.intro' | translate }}</p>
 
-<pa-stepper linear stepLabelKey="criteria.select.stepLabel">
+<pa-stepper linear stepLabelKey="criteria.select.stepLabel" (selectionChange)="currentStep.set($event.selectedIndex)">
   <cdk-step [label]="'criteria.select.step1.name' | translate" [completed]="useCaseAnswered()">
     <mat-card class="pa-step" appearance="outlined">
       <h2 class="pa-step__question">{{ 'criteria.select.step1.question' | translate }}</h2>
       <p class="pa-step__hint">{{ 'criteria.select.step1.hint' | translate }}</p>
+      <!-- Exists before the notice, so screen readers read it when it appears (R-CON-07, CFG-01) -->
+      <div class="pa-step__status" role="status">
+        @if (resetTextKey(); as textKey) {
+          <pa-notice kind="attention" [title]="'criteria.select.reset.title' | translate">{{ textKey | translate }}</pa-notice>
+        }
+      </div>
 
       <mat-form-field class="pa-step__field pa-use-case" appearance="outline">
         <mat-label>{{ 'criteria.select.step1.field' | translate }}</mat-label>
@@ -27,7 +33,13 @@ SPDX-License-Identifier: MIT
           (focus)="onUseCaseFocus()"
         />
         <mat-hint>{{ 'criteria.select.step1.field.hint' | translate }}</mat-hint>
-        <mat-error>{{ 'criteria.select.error.noUseCase' | translate }}</mat-error>
+        <mat-error>
+          @if (serverError(); as error) {
+            {{ error.key | translate: error.params }}
+          } @else {
+            {{ 'criteria.select.error.noUseCase' | translate }}
+          }
+        </mat-error>
         <mat-autocomplete
           #useCaseList="matAutocomplete"
           class="pa-use-case__panel"
@@ -66,7 +78,7 @@ SPDX-License-Identifier: MIT
       <fieldset
         #appTypeGroup
         class="pa-step__group"
-        [attr.aria-describedby]="appTypeErrorShown() ? 'pa-step2-hint pa-step2-error' : 'pa-step2-hint'"
+        [attr.aria-describedby]="groupError('appType') ? 'pa-step2-hint pa-step2-error' : 'pa-step2-hint'"
       >
         <legend class="pa-step__legend">
           <h2 class="pa-step__question">{{ 'criteria.select.step2.question' | translate }}</h2>
@@ -77,8 +89,22 @@ SPDX-License-Identifier: MIT
             {{ 'criteria.select.step2.hint.excluded' | translate }}
           }
         </p>
-        @if (appTypeErrorShown()) {
-          <p class="pa-step__error" id="pa-step2-error">{{ 'criteria.select.error.noAppType' | translate }}</p>
+        <!-- Exists before the notice, so screen readers read it when it appears (R-CON-07, CFG-01) -->
+        <div class="pa-step__status" role="status">
+          @if (resetTextKey(); as textKey) {
+            <pa-notice kind="attention" [title]="'criteria.select.reset.title' | translate">{{ textKey | translate }}</pa-notice>
+          }
+        </div>
+        <ul class="pa-summary">
+          @for (entry of summaryBefore(2); track entry.layer) {
+            <li class="pa-summary__entry">
+              <span class="pa-summary__text" [id]="'pa-summary-' + entry.layer">{{ 'criteria.select.summary' | translate: { layer: (entry.nameKey | translate), values: entry.values } }}</span>
+              <button matButton type="button" [attr.aria-describedby]="'pa-summary-' + entry.layer" (click)="changeLayer(entry.layer)">{{ 'criteria.select.change' | translate }}</button>
+            </li>
+          }
+        </ul>
+        @if (groupError('appType'); as error) {
+          <p class="pa-step__error" id="pa-step2-error">{{ error.key | translate: error.params }}</p>
         }
         @for (appType of appTypes(); track appType.id) {
           <pa-filter-option
@@ -100,11 +126,32 @@ SPDX-License-Identifier: MIT
 
   <cdk-step [label]="'criteria.select.step3.name' | translate" [completed]="true">
     <mat-card class="pa-step" appearance="outlined">
-      <fieldset class="pa-step__group" aria-describedby="pa-step3-hint">
+      <fieldset
+        #productPartGroup
+        class="pa-step__group"
+        [attr.aria-describedby]="groupError('productPart') ? 'pa-step3-hint pa-step3-error' : 'pa-step3-hint'"
+      >
         <legend class="pa-step__legend">
           <h2 class="pa-step__question">{{ 'criteria.select.step3.question' | translate }}</h2>
         </legend>
         <p class="pa-step__hint" id="pa-step3-hint">{{ 'criteria.select.step3.hint' | translate }}</p>
+        <!-- Exists before the notice, so screen readers read it when it appears (R-CON-07, CFG-01) -->
+        <div class="pa-step__status" role="status">
+          @if (resetTextKey(); as textKey) {
+            <pa-notice kind="attention" [title]="'criteria.select.reset.title' | translate">{{ textKey | translate }}</pa-notice>
+          }
+        </div>
+        <ul class="pa-summary">
+          @for (entry of summaryBefore(3); track entry.layer) {
+            <li class="pa-summary__entry">
+              <span class="pa-summary__text" [id]="'pa-summary-' + entry.layer">{{ 'criteria.select.summary' | translate: { layer: (entry.nameKey | translate), values: entry.values } }}</span>
+              <button matButton type="button" [attr.aria-describedby]="'pa-summary-' + entry.layer" (click)="changeLayer(entry.layer)">{{ 'criteria.select.change' | translate }}</button>
+            </li>
+          }
+        </ul>
+        @if (groupError('productPart'); as error) {
+          <p class="pa-step__error" id="pa-step3-error">{{ error.key | translate: error.params }}</p>
+        }
         <mat-slide-toggle
           class="pa-step__toggle"
           [checked]="showExplanations()"
@@ -130,14 +177,35 @@ SPDX-License-Identifier: MIT
     </div>
   </cdk-step>
 
-  <!-- Step 4 may stay empty (CFG-04); „Kriterienliste anzeigen“ comes with S4-12 -->
+  <!-- Step 4 may stay empty (CFG-04): „Kriterienliste anzeigen“ works without a test type -->
   <cdk-step [label]="'criteria.select.step4.name' | translate" optional>
     <mat-card class="pa-step" appearance="outlined">
-      <fieldset class="pa-step__group" aria-describedby="pa-step4-hint">
+      <fieldset
+        #testTypeGroup
+        class="pa-step__group"
+        [attr.aria-describedby]="groupError('testType') ? 'pa-step4-hint pa-step4-error' : 'pa-step4-hint'"
+      >
         <legend class="pa-step__legend">
           <h2 class="pa-step__question">{{ 'criteria.select.step4.question' | translate }}</h2>
         </legend>
         <p class="pa-step__hint" id="pa-step4-hint">{{ 'criteria.select.step4.hint' | translate }}</p>
+        <!-- Exists before the notice, so screen readers read it when it appears (R-CON-07, CFG-01) -->
+        <div class="pa-step__status" role="status">
+          @if (resetTextKey(); as textKey) {
+            <pa-notice kind="attention" [title]="'criteria.select.reset.title' | translate">{{ textKey | translate }}</pa-notice>
+          }
+        </div>
+        <ul class="pa-summary">
+          @for (entry of summaryBefore(4); track entry.layer) {
+            <li class="pa-summary__entry">
+              <span class="pa-summary__text" [id]="'pa-summary-' + entry.layer">{{ 'criteria.select.summary' | translate: { layer: (entry.nameKey | translate), values: entry.values } }}</span>
+              <button matButton type="button" [attr.aria-describedby]="'pa-summary-' + entry.layer" (click)="changeLayer(entry.layer)">{{ 'criteria.select.change' | translate }}</button>
+            </li>
+          }
+        </ul>
+        @if (groupError('testType'); as error) {
+          <p class="pa-step__error" id="pa-step4-error">{{ error.key | translate: error.params }}</p>
+        }
         @for (testType of testTypes(); track testType.id) {
           <pa-filter-option
             [optionId]="'pa-test-type-' + testType.id"
@@ -153,6 +221,19 @@ SPDX-License-Identifier: MIT
     </mat-card>
     <div class="pa-step__actions">
       <button matButton type="button" (click)="previous()">{{ 'criteria.select.back' | translate }}</button>
+      <!-- While the server checks: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->
+      <button
+        matButton="filled"
+        type="button"
+        class="pa-step__submit"
+        [attr.aria-disabled]="submitting() ? 'true' : null"
+        (click)="submit()"
+      >
+        @if (submitting()) {
+          <mat-progress-spinner class="pa-step__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'criteria.select.submit' | translate }}
+      </button>
     </div>
   </cdk-step>
 </pa-stepper>

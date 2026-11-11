@@ -59,3 +59,8 @@ export interface CatalogSelection {
   appTypeIds: string[];
   productPartIds: string[];
 }
+
+/** The selection as `GET /api/v1/catalog/criteria` reads it: the filter selection plus the test types (SPEC §8.2). */
+export interface CriteriaSelection extends CatalogSelection {
+  testTypeIds: string[];
+}

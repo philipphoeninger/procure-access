@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
@@ -38,6 +38,18 @@ class LoginOutlet {}
 })
 class SomeDialog {}
 
+/** Fills its title parameter while it renders, as S10 does with its step number. */
+@Component({
+  template: '<h1>Kriterien zusammenstellen</h1>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class PageWithTitleParams {
+  constructor() {
+    const strategy = inject(PageTitleStrategy);
+    effect(() => strategy.setPageTitleState({ params: { n: 2 } }));
+  }
+}
+
 /** The shell's `main#main` with the primary outlet, plus the legacy login outlet. */
 @Component({
   imports: [RouterOutlet],
@@ -60,6 +72,7 @@ const ROUTES: Routes = [
     children: [{ path: '', component: PageWithoutHeading, data: { [PAGE_TITLE_KEY]: 'pageTitle.account' } }],
   },
   { path: 'legacy', component: PageWithoutHeading },
+  { path: 'kriterien', component: PageWithTitleParams, data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.step' } },
   { path: 'auth', component: LoginOutlet, outlet: 'login' },
 ];
 
@@ -73,7 +86,7 @@ describe('PageTitleStrategy', () => {
       providers: [
         provideRouter(ROUTES),
         provideTestTranslations(),
-        { provide: TitleStrategy, useClass: PageTitleStrategy },
+        { provide: TitleStrategy, useExisting: PageTitleStrategy },
       ],
     });
     vi.spyOn(TestBed.inject(A11yAnnouncerService), 'announcePageTitle').mockImplementation((title) => {
@@ -194,5 +207,46 @@ describe('PageTitleStrategy', () => {
 
     expect(document.title).toBe('Settings | ProcureAccess');
     expect(announced).toEqual([]);
+  });
+
+  it('RouteChangeToPageThatFillsItsParams_AnnouncesTheFilledTitle INV:A11Y-03', async () => {
+    const fixture = await startOn('/settings');
+    await settle(fixture);
+
+    await TestBed.inject(Router).navigateByUrl('/kriterien');
+    await settle(fixture);
+
+    expect(document.title).toBe('Kriterien zusammenstellen – Schritt 2 von 4 – ProcureAccess');
+    await vi.waitFor(() =>
+      expect(announced).toEqual(['Kriterien zusammenstellen – Schritt 2 von 4 – ProcureAccess']),
+    );
+  });
+
+  it('PageTitleState_ParamsAndErrorPrefix_FollowWithoutAnnouncement', async () => {
+    const fixture = await startOn('/kriterien');
+    await settle(fixture);
+    const strategy = TestBed.inject(PageTitleStrategy);
+
+    strategy.setPageTitleState({ params: { n: 3 }, error: true });
+    await settle(fixture);
+    expect(document.title).toBe('Fehler: Kriterien zusammenstellen – Schritt 3 von 4 – ProcureAccess');
+
+    strategy.setPageTitleState({ params: { n: 3 } });
+    await settle(fixture);
+    expect(document.title).toBe('Kriterien zusammenstellen – Schritt 3 von 4 – ProcureAccess');
+    expect(announced).toEqual([]);
+  });
+
+  it('RouteChange_ClearsThePageTitleStateOfThePreviousPage', async () => {
+    const fixture = await startOn('/impressum');
+    await settle(fixture);
+    TestBed.inject(PageTitleStrategy).setPageTitleState({ error: true });
+    await settle(fixture);
+    expect(document.title).toBe('Fehler: Impressum – ProcureAccess');
+
+    await TestBed.inject(Router).navigateByUrl('/settings');
+    await settle(fixture);
+
+    expect(document.title).toBe('Einstellungen – ProcureAccess');
   });
 });

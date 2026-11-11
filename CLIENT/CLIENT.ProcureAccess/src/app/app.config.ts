@@ -37,7 +37,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     // Page title, H1 focus and announcement on every route change (R-SHL-04, A11Y-03)
-    { provide: TitleStrategy, useClass: PageTitleStrategy },
+    { provide: TitleStrategy, useExisting: PageTitleStrategy },
     // Light/dark appearance and reduced motion from the system settings (R-SET-02, SPEC §7.5)
     provideAppearance(),
     // Every mat-icon uses the self-hosted Material Symbols Outlined font (design handoff §1.8).

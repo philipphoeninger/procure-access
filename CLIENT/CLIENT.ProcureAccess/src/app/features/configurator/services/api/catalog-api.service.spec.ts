@@ -6,6 +6,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
+import { CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
 
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CatalogApiService } from './catalog-api.service';
@@ -67,5 +68,51 @@ describe('CatalogApiService', () => {
       .flush({ title: 'Not Found' }, { status: 404, statusText: 'Not Found' });
 
     await expect(answer).rejects.toMatchObject({ status: 404 });
+  });
+
+  it('handles a 404 of the filter options itself, so the interceptor shows no snackbar (O-S4-3)', async () => {
+    const answer = api.getFilterOptions({ appTypeIds: [], productPartIds: [] });
+
+    const request = backend.expectOne((r) => r.url === url);
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['not-found']);
+    request.flush(filterOptionsAnswer());
+
+    await answer;
+  });
+
+  describe('getCriteria (SPEC §8.2)', () => {
+    const criteriaUrl = '/api/v1/catalog/criteria';
+    const criteriaAnswer = { release: 'T.1', criteria: [], appTypesWithoutCriteria: [] };
+
+    it('sends the release, the selection and the test types', async () => {
+      const answer = api.getCriteria(
+        { useCase: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: ['softwareTest', 'pdfTest'] },
+        'T.1',
+      );
+
+      const request = backend.expectOne((r) => r.url === criteriaUrl);
+      const params = request.request.params;
+      expect(request.request.method).toBe('GET');
+      expect(params.keys()).toEqual(['release', 'useCase', 'appTypeIds[]', 'productPartIds[]', 'testTypeIds[]']);
+      expect(params.getAll('testTypeIds[]')).toEqual(['softwareTest', 'pdfTest']);
+      request.flush(criteriaAnswer);
+
+      expect(await answer).toEqual(criteriaAnswer);
+    });
+
+    it('shows the server check of the selection itself: no snackbar for validation, selection-excluded, not-found', async () => {
+      const answer = api.getCriteria({ appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] });
+
+      const request = backend.expectOne((r) => r.url === criteriaUrl);
+      expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual([
+        'validation',
+        'selection-excluded',
+        'not-found',
+      ]);
+      expect(request.request.params.has('useCase')).toBe(false);
+      request.flush(criteriaAnswer);
+
+      await answer;
+    });
   });
 });

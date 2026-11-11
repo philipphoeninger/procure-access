@@ -5,6 +5,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
+import { problemFieldErrors, problemTypeName } from '@app/core/errors/problem-details';
 import { withLoading } from '@app/shared/state/with-loading';
 
 import {
@@ -20,8 +21,10 @@ import { CatalogApiService } from '../services/api/catalog-api.service';
 import {
   chooseUseCase,
   isComplete,
+  layerOfField,
   SelectionChange,
   toCatalogSelection,
+  toCriteriaSelection,
   toggleAppType,
   toggleProductPart,
   toggleTestType,
@@ -36,6 +39,25 @@ import {
  * - `failed`: any other failure; `loadFilterOptions()` tries again
  */
 export type FilterOptionsStatus = 'notLoaded' | 'loading' | 'loaded' | 'noRelease' | 'failed';
+
+/**
+ * What the server said to „Kriterienliste anzeigen“ (R-CON-10):
+ * - `accepted`: S11 may show the selection
+ * - `rejected`: 400 `validation` or `selection-excluded`; `layer` of the first field error (null
+ *   when the path names no layer) and its message
+ * - `noRelease`: 404 — the pinned release is unknown or no release is active (O-S4-3)
+ * - `failed`: any other failure; the error interceptor already shows the system state
+ */
+export type SubmitResult =
+  | { kind: 'accepted' }
+  | {
+      kind: 'rejected';
+      problem: 'validation' | 'selection-excluded';
+      layer: ConfiguratorLayer | null;
+      message: string;
+    }
+  | { kind: 'noRelease' }
+  | { kind: 'failed' };
 
 export interface ConfiguratorState {
   /** Release of the first answer; every later request names it, so one draft never mixes releases (ADR-002). */
@@ -151,9 +173,47 @@ export const withConfigurator = () =>
         void loadFilterOptions();
       }
 
+      /**
+       * The status once the options request that is running, or a new one, has answered. The
+       * guard of S10 calls it before the page opens: `noRelease` leads to the legacy filter
+       * (O-S4-3). A former `noRelease` or failure asks again, because a release may have been
+       * activated since.
+       */
+      async function filterOptionsReady(): Promise<FilterOptionsStatus> {
+        const { optionsStatus } = store.configurator();
+        if (optionsStatus === 'loading') {
+          await latestLoad;
+        } else if (optionsStatus !== 'loaded') {
+          await loadFilterOptions();
+        }
+        return store.configurator().optionsStatus;
+      }
+
+      /** Sends the complete selection to the criteria endpoint, which checks it again (R-CON-10, CAT-12). */
+      async function submitSelection(): Promise<SubmitResult> {
+        const { draft, release } = store.configurator();
+        try {
+          await api.getCriteria(toCriteriaSelection(draft), release ?? undefined);
+          return { kind: 'accepted' };
+        } catch (error: unknown) {
+          const problem = problemTypeName(error);
+          if (problem === 'validation' || problem === 'selection-excluded') {
+            const [path, messages] = Object.entries(problemFieldErrors(error))[0] ?? ['', []];
+            return { kind: 'rejected', problem, layer: layerOfField(path), message: messages.join(' ') };
+          }
+          if (error instanceof HttpErrorResponse && error.status === 404) {
+            patch({ optionsStatus: 'noRelease' });
+            return { kind: 'noRelease' };
+          }
+          return { kind: 'failed' };
+        }
+      }
+
       return {
         loadFilterOptions,
         optionsCurrent,
+        filterOptionsReady,
+        submitSelection,
         chooseUseCase(choice: Exclude<UseCaseChoice, { kind: 'unanswered' }>): void {
           change('useCase', (draft, options) => chooseUseCase(draft, choice, options));
         },

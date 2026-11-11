@@ -10,7 +10,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { catchError, switchMap, tap, throwError } from 'rxjs';
 import { SnackbarService } from '../services/snackbar.service';
 import { ERROR_TRANSLATIONS } from '../models/error-translation.map';
-import { FORM_SHOWS_FIELD_ERRORS, PROBLEM_TYPE_KEYS, problemTypeName } from '../errors/problem-details';
+import {
+  CALLER_HANDLES_PROBLEMS,
+  FORM_SHOWS_FIELD_ERRORS,
+  PROBLEM_TYPE_KEYS,
+  problemTypeName,
+} from '../errors/problem-details';
 import { ConnectionStatus, SERVER_ERROR_PATH } from '../errors/system-errors';
 
 /** Error body of the legacy identity endpoints (until migration step 3). */
@@ -56,6 +61,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       // The form shows these at its fields and in its error summary (API-02).
       if (problemType === 'validation' && req.context.get(FORM_SHOWS_FIELD_ERRORS)) {
+        return throwError(() => error);
+      }
+
+      // The caller explains these itself, e.g. the configurator's „no active release“.
+      if (problemType && req.context.get(CALLER_HANDLES_PROBLEMS).includes(problemType)) {
         return throwError(() => error);
       }
 

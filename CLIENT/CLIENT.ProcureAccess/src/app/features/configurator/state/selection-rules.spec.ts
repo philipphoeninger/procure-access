@@ -12,8 +12,11 @@ import {
   exclusionReasons,
   isComplete,
   isExcluded,
+  layerOfField,
+  selectedNames,
   stepError,
   toCatalogSelection,
+  toCriteriaSelection,
   toggleAppType,
   toggleProductPart,
   toggleTestType,
@@ -258,7 +261,7 @@ describe('selection rules', () => {
   });
 
   describe('reset of the lower layers (R-CON-07)', () => {
-    it('clears steps 2–4 except Basisfunktionalität when the use case changes', () => {
+    it('INV:CFG-01 clears steps 2–4 except Basisfunktionalität when the use case changes', () => {
       const { draft, reset } = chooseUseCase(filled, { kind: 'none' }, options);
 
       expect(draft).toEqual({
@@ -317,6 +320,45 @@ describe('selection rules', () => {
         appTypeIds: ['web', 'closed'],
         productPartIds: ['base', 'audio'],
       });
+    });
+
+    it('adds the test types for the criteria endpoint (SPEC §8.2)', () => {
+      expect(toCriteriaSelection(filled)).toEqual({
+        useCase: 'hr',
+        appTypeIds: ['web', 'closed'],
+        productPartIds: ['base', 'audio'],
+        testTypeIds: ['softwareTest'],
+      });
+      expect(toCriteriaSelection({ ...filled, useCase: { kind: 'none' } }).useCase).toBeUndefined();
+    });
+  });
+
+  describe('„Bisherige Auswahl“ (R-CON-08)', () => {
+    it('names the selected values in the order of the options, Basisfunktionalität included', () => {
+      const draft: ConfiguratorDraft = { ...filled, appTypeIds: ['closed', 'web'] };
+
+      expect(selectedNames(draft, options, 'appType')).toEqual(['Web', 'Closed']);
+      expect(selectedNames(draft, options, 'productPart')).toEqual(['Base', 'Audio']);
+      expect(selectedNames(draft, options, 'testType')).toEqual(['Software']);
+    });
+
+    it('leaves out an id the options no longer list', () => {
+      expect(selectedNames({ ...filled, appTypeIds: ['web', 'gone'] }, options, 'appType')).toEqual(['Web']);
+    });
+  });
+
+  describe('field paths of the server check (R-CON-10)', () => {
+    it.each([
+      ['useCase', 'useCase'],
+      ['appTypeIds[1]', 'appType'],
+      ['appTypeIds', 'appType'],
+      ['productPartIds[0]', 'productPart'],
+      ['testTypeIds[2]', 'testType'],
+      ['release', null],
+      ['$', null],
+      ['toString', null],
+    ])('maps %s to %s', (path, layer) => {
+      expect(layerOfField(path)).toBe(layer);
     });
   });
 });

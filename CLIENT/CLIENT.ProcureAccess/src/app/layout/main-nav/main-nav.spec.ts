@@ -30,7 +30,7 @@ describe('MainNav', () => {
 
     const links = within(mainNav()).getAllByRole('link');
     expect(links.map((link) => [link.textContent?.trim(), link.getAttribute('href')])).toEqual([
-      ['Kriterien', '/filters'],
+      ['Kriterien', '/kriterien'],
       ['Produkte', '/products'],
       ['Beitragen', '/product-proposal/0'],
     ]);
@@ -48,6 +48,19 @@ describe('MainNav', () => {
     expect(screen.getByRole('link', { name: 'Kriterien' }).hasAttribute('aria-current')).toBe(false);
     expect(screen.getByRole('link', { name: 'Beitragen' }).hasAttribute('aria-current')).toBe(false);
   });
+
+  it.each(['/kriterien', '/kriterien/ergebnis', '/filters'])(
+    'marks „Kriterien“ as current on %s, also on the legacy filter that stands in for S10 (O-S4-3)',
+    async (url) => {
+      const { fixture } = await renderNav();
+
+      await TestBed.inject(Router).navigateByUrl(url);
+      await fixture.whenStable();
+
+      expect(screen.getByRole('link', { name: 'Kriterien' }).getAttribute('aria-current')).toBe('page');
+      expect(screen.getByRole('link', { name: 'Produkte' }).hasAttribute('aria-current')).toBe(false);
+    },
+  );
 
   it('opens the login and reports the action when „Anmelden“ is pressed', async () => {
     const { fixture, authService, navigated } = await renderNav();

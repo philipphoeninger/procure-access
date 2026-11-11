@@ -19,7 +19,6 @@ import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/ma
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { map, Observable, startWith, tap } from 'rxjs';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { FiltersApiService } from '../services/api/filters-api.service';
 import { EnFilterTypeName } from '../models/filterTypes.enum';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
@@ -88,8 +87,6 @@ export class FiltersSelection implements OnInit {
     //       ? this.allProductTypes.filter(productType => productType.toLowerCase().includes(currentProductType))
     //       : this.allProductTypes.slice();
     //   });
-
-    readonly announcer = inject(LiveAnnouncer);
 
     constructor() {
       this.filteredProductTypes = this.myControl.valueChanges.pipe(

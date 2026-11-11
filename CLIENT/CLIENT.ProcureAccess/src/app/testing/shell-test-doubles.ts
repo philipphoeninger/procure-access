@@ -18,6 +18,8 @@ class TestPage {}
 /** Every route the shell links to. */
 export const SHELL_TEST_ROUTES: Routes = [
   '',
+  'kriterien',
+  'kriterien/ergebnis',
   'filters',
   'products',
   'product-proposal/:id',
