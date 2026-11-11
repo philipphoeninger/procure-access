@@ -4,17 +4,65 @@ SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-<p class="pa-priority-indicator__row">
-  <span class="pa-priority-indicator__level" [class.pa-priority-indicator__level--info]="level() === 'Info'">
+<div class="pa-priority-indicator__row">
+  <button
+    #levelButton
+    matButton
+    type="button"
+    class="pa-priority-indicator__level"
+    [class.pa-priority-indicator__level--info]="level() === 'Info'"
+    [matMenuTriggerFor]="levelMenu"
+    [attr.aria-describedby]="criterionTitleId()"
+  >
     <span class="cdk-visually-hidden">{{ 'criteria.priority.button' | translate: { level: (levelKey() | translate) } }}</span>
     <span aria-hidden="true">{{ levelKey() | translate }}</span>
-    @if (shownWeight(); as weight) {
+    @if (buttonWeight(); as weight) {
       <span class="pa-priority-indicator__weight">{{ 'criteria.priority.weight' | translate: { weight } }}</span>
     }
-  </span>
-</p>
-@if (overridden()) {
-  <p class="pa-priority-indicator__overridden">
-    {{ 'criteria.priority.overridden' | translate: { recommended: (recommendedKey() | translate) } }}
-  </p>
+    <mat-icon iconPositionEnd aria-hidden="true">arrow_drop_down</mat-icon>
+  </button>
+
+  @if (weightEditable()) {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'criteria.priority.weightLabel' | translate }}</mat-label>
+      <mat-select
+        [id]="weightFieldId"
+        [value]="weight()"
+        [aria-describedby]="criterionTitleId() ?? ''"
+        (selectionChange)="chooseWeight($event.value)"
+      >
+        @for (option of weightOptions(); track option) {
+          <mat-option [value]="option">{{ option }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+</div>
+
+<mat-menu #levelMenu="matMenu" [aria-label]="'criteria.priority.changeLabel' | translate">
+  @for (option of levels; track option) {
+    <button
+      mat-menu-item
+      type="button"
+      role="menuitemradio"
+      [attr.aria-checked]="option === level()"
+      (click)="choose(option)"
+    >
+      <mat-icon aria-hidden="true" [class.pa-priority-indicator__unchecked]="option !== level()">check</mat-icon>
+      <span>{{ levelKeyOf(option) | translate }}</span>
+    </button>
+  }
+</mat-menu>
+
+@if (override(); as line) {
+  <div class="pa-priority-indicator__override">
+    <p class="pa-priority-indicator__overridden">
+      {{ line.key | translate: { recommended: (line.recommendedKey | translate), weight: line.weight } }}
+    </p>
+    <div>
+      <button matButton type="button" [attr.aria-describedby]="criterionTitleId()" (click)="restore()">
+        {{ 'criteria.priority.reset' | translate }}
+      </button>
+    </div>
+  </div>
 }

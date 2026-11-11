@@ -13,7 +13,16 @@ SPDX-License-Identifier: MIT
   <ul class="pa-criteria-list__items">
     @for (criterion of criteria(); track criterion.key) {
       <li>
-        <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" />
+        <pa-criterion-card
+          [criterion]="criterion"
+          [decision]="decision(criterion.key)"
+          [names]="names()"
+          (includedChange)="store.setCriterionIncluded(criterion.key, $event)"
+          (levelChange)="store.overrideCriterionPriority(criterion.key, $event)"
+          (weightChange)="store.setCriterionWeight(criterion.key, $event)"
+          (priorityReset)="store.resetCriterionPriority(criterion.key)"
+          (noteChange)="store.setCriterionNote(criterion.key, $event)"
+        />
       </li>
     }
   </ul>

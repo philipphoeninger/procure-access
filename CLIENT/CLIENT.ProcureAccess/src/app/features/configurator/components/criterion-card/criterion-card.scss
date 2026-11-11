@@ -16,6 +16,16 @@
   color: var(--mat-sys-on-surface);
 }
 
+// R-LST-04, Handoff §5.5: an excluded card stays in the list on surface-container-low with
+// „Nicht in Ihrer Liste“; never opacity. Its detail panel moves one step up, so it stays distinct.
+:host(.pa-criterion-card--excluded) {
+  background: var(--mat-sys-surface-container-low);
+
+  .pa-criterion-card__details {
+    background: var(--mat-sys-surface-container);
+  }
+}
+
 @media (min-width: 37.5em) {
   :host {
     padding: var(--pa-space-lg);
@@ -28,7 +38,28 @@ p {
   margin: 0;
 }
 
+// Checkbox, title and the status „Nicht in Ihrer Liste“ (top right, Figma S11); the status wraps
+// below the title when the row is narrow.
+.pa-criterion-card__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--pa-space-xs);
+}
+
+.pa-criterion-card__include {
+  flex: none;
+}
+
+.pa-criterion-card__status {
+  margin-inline-start: auto;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+}
+
 .pa-criterion-card__title {
+  flex: 1 1 12rem;
+  min-width: 0;
   font: var(--mat-sys-title-medium);
   overflow-wrap: anywhere;
   // The anchor #k-… is the title; it keeps some room above it when a link scrolls there.
@@ -84,4 +115,13 @@ p {
   flex-direction: column;
   gap: var(--pa-space-md);
   padding-block-start: var(--pa-space-md);
+}
+
+.pa-criterion-card__note {
+  display: flex;
+  flex-direction: column;
+
+  &[hidden] {
+    display: none;
+  }
 }
