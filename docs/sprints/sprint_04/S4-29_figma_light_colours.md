@@ -91,6 +91,7 @@ Checked with `/engineering:code-review` on the diff against `main`.
 | C7 | `check-figma-links.mjs`, `check-i18n.mjs`, `check-icons.mjs` | Pass (0 errors) |
 | C8 | `reuse lint` | Compliant |
 | C9 | Backend build and tests | Not touched |
+| C10 | CI on #267 | All 18 checks green, E2E in all five browser projects (WebKit and mobile-safari included) and CodeQL |
 
 ## 5. Open points
 
