@@ -1,7 +1,7 @@
 # S4-28 — Dead code: dialog service, unused logger, assets location
 
 > **Sprint:** 04, P2 stretch task S4-28 (0.5 points). **Issues:** none. **Requirements / invariants:** none; `TECH_DEBT_v3.md` TD-32; no invariant activated, no new TESTING version.
-> **Status:** done by Claude Code (2026-11-13) — pull request open.
+> **Status:** done by Claude Code (2026-11-13) — pull request #307 open.
 > **Scope:** exactly the sprint row: delete `core/services/dialog.service.ts`, remove the unused `Logger` of `BaseCrudController` and the `location ^~ /assets/` of the client's `nginx.conf`, each after checking that nothing references it. No behaviour change.
 > **Owner decisions:** the task prompt named none. **O-S4-94** (asked with the plan, owner 2026-11-13: (a)) — the type parameter `TController` of `BaseCrudController`, which only typed the logger, goes too.
 
