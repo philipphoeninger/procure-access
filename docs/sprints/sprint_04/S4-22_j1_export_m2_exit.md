@@ -1,7 +1,7 @@
 # S4-22 — J1 complete to the export; M2 exit check; bundle budget
 
 > **Sprint:** 04, P0 task S4-22 (M2.7d, the end of M2). **Issues:** #42. **Requirements / invariants:** A11Y-02 (J1 anonymous part, complete); A11Y-01, A11Y-08, A11Y-09 stay green; no invariant changes status.
-> **Status:** done — pull request opened, not merged.
+> **Status:** done — pull request #295 open.
 > **Scope:** J1 extended from the hand-over through S11 and S13 to the downloaded XLSX, keyboard only, axe in both appearances; an XLSX reader for E2E; lazy-loaded feature routes and the tightened initial budget (#42); the M2 exit criteria with their state; SPEC v2.13 §11, TESTING_v52. Not here: the J1 save part (step 3), the reload flow after `release-mismatch` (O-S4-72), the 2026.1 priorities (O-1/K-1).
 > **Owner decisions (2026-11-12, before the task, all (a)):** **O-S4-75** — load the feature pages with their route, then set the budget to the measured size plus a margin. **O-S4-76** — J1 exports XLSX and reads it with a small reader on Node's `zlib`, no dependency; it also checks the rows J1 changed (override, excluded criterion, note). **O-S4-77** — SPEC §11 step 2 lists A11Y-02 (SPEC v2.13).
 
@@ -85,7 +85,7 @@ M2 can be closed as a development milestone after X7 (or with API-06 moved), but
 
 | # | Point | Who / when |
 |---|---|---|
-| P1 | Pull request opened; not merged | Owner |
+| P1 | Pull request #295 opened; not merged | Owner |
 | P2 | Screen-reader check of an exported XLSX and the A11Y-07 pass of step 2 (X2, X3) | Accessibility tester |
 | P3 | Proposed issue: after a deployment, an open tab cannot load a lazy page it has not opened yet (R1) — a navigation error handler (`withNavigationErrorHandler`) that loads the target URL in full when a chunk fails to load | Owner: create the issue; before the first production release |
 | P4 | `provideMarkdown()` (≈ 75 kB of the first download) moves to the route of the legacy criteria list, or goes with it | With the legacy filter (activation of 2026.1) |
