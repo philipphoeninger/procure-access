@@ -15,6 +15,7 @@
 | F4 | The API image (`aspnet` base) has no system fonts and no fontconfig | Nothing measures text (fixed widths, no `AdjustToContents`); checked in the image (C6) |
 | F5 | An Excel table needs at least one data row | A list without criteria gets one empty data row |
 | F6 | SixLabors.Fonts resolves to 1.0.0 (Apache-2.0), but ClosedXML accepts up to 3.0, and 2.0+ carries the Six Labors Split License | Dependabot ignore rule and `ClosedXmlLicenceTests` |
+| F7 | The first CI run of #287 failed in „3. Unit (Angular)“ in a test this task does not touch: `priority-indicator.spec.ts` „changes the level from the menu …“ found the K5 menu panel still in the DOM. With animations disabled, Material detaches the panel in a `setTimeout`, which `fixture.whenStable()` does not wait for in a zoneless app; the focus returns synchronously | The test waits for the panel with `vi.waitFor` (as `snackbar.service.spec.ts` does); no other test asserts a closed menu |
 
 ## 2. Changes
 
@@ -32,6 +33,7 @@
 | `docs/ARCHITECTURE_v39.md` (new; v37 deleted) | C125; D12 names SixLabors.Fonts 2.0+ among the rejected | — |
 | `docs/ux_copy_procureaccess_v24.md` | Records the owner's confirmation of U109 (#286); current document versions | — |
 | `CLAUDE.md` | §3, §4, §5 | — |
+| `CLIENT/CLIENT.ProcureAccess/src/app/shared/components/priority-indicator/priority-indicator.spec.ts` | Waits with `vi.waitFor` until the closed menu is gone (F7) | — (flaky test) |
 
 SPEC unchanged: v2.11 (S4-20a) already describes the table, the tool URL and the cell content.
 
@@ -62,7 +64,8 @@ Checked without finding: no new endpoint, query or log line; the workbook lives 
 | C5 | `reuse lint`; `dotnet list … package --vulnerable --include-transitive` on the Export module | Compliant; no vulnerable package |
 | C6 | By hand in the API image (built from this branch, `Development`, throwaway PostgreSQL, `T.1` mounted, port 5099; the image has no `/usr/share/fonts` and no fontconfig) | XLSX and CSV → 200, `no-store`, file names as SPEC §8.3; the XLSX package: sheets „Kriterien“, „Info“, table `Kriterien` A1:M10 with all stripes off, pane frozen below row 1, no formula, no solid fill, creator and last modified by „ProcureAccess“, created = the export time; the CSV starts with the BOM. The log shows only EF's history queries against the new database. Containers, network and image removed |
 | C7 | `.github/dependabot.yml` parsed | The nuget ignore list holds the SixLabors.Fonts rule |
-| C8 | Client, E2E | No client or E2E change; left to CI (the dev stack was running) |
+| C8 | Client, E2E | No client code or E2E change; left to CI (the dev stack was running) |
+| C9 | `npx ng test --include …/priority-indicator.spec.ts` three times, `eslint` on the spec (after F7) | 14 of 14 pass in each run; lint clean |
 
 ## 5. Open points
 
