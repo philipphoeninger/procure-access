@@ -52,7 +52,7 @@ Prompts are listed in task-ID order. The recommended **working order** is: S4-01
 | O-S4-3 (S10 vs legacy filter while no release is active) | S4-08, S4-12 | owner choice (D1) |
 | O-S4-4 (UX copy v17 approved) | S4-15 – S4-18 | the owner's review of the S4-02 PR |
 | O-S4-5 (CAT-10 after S10) | S4-13 | owner choice (any time before S4-13) |
-| O-S4-6 (short description) | S4-20, S4-24 | owner choice (before S4-20) |
+| O-S4-6 (short description) | S4-20, S4-24 | **decided (a) 2026-11-12** — the column is written empty; S4-24 adds the field |
 | O-S4-22 (theme colours) | S4-29 | **decided 2026-11-11** — already filled in |
 
 ## Rules for running tasks

@@ -4,13 +4,15 @@
 
 // i18n check (CLAUDE §6.5, CI stage 1). Node, no dependencies:
 //   node scripts/check-i18n.mjs           check only
-//   node scripts/check-i18n.mjs --write   first copy the texts of AREAS from the UX copy into de.json
+//   node scripts/check-i18n.mjs --write   first copy the texts of the areas from the UX copy into each de.json
 // Source of the texts: the tables of §5 and §6 in the highest docs/ux_copy_procureaccess_v*.md.
-// Checks:
-//   1. every UX copy key of AREAS is in de.json with exactly the UX copy text;
-//   2. every lowercase key in de.json is a UX copy key with the same text (uppercase = legacy);
-//   3. every text in de.json is found under its own path (no two keys hide each other);
-//   4. every literal key before `| translate` / `| translatePlural` in the client resolves.
+// Two text files (TARGETS): the client's de.json (AREAS) and the export file texts of the Export
+// module (EXPORT_AREAS, S4-20a, owner decision O-S4-63). Checks, per file:
+//   1. every UX copy key of its areas is in it with exactly the UX copy text;
+//   2. every lowercase key in it is a UX copy key with the same text (uppercase = legacy);
+//   3. every text in it is found under its own path (no two keys hide each other);
+//   4. client only: every literal key before `| translate` / `| translatePlural` resolves. The
+//      Export module checks its keys itself: ExportTexts refuses to start without one.
 // A key with text can also be the start of a longer key (`shell.nav.menu`, `shell.nav.menu.close`;
 // SPEC SD25 `.one`/`.zero`). Nested JSON cannot hold both, so the longer key is stored as one
 // property name with dots next to the text: "menu": "Menü", "menu.close": "Menü schließen".
@@ -24,9 +26,33 @@ import { fileURLToPath } from 'node:url';
 // builds its screens.
 export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle'];
 
+// UX copy keys of the export files (XLSX, CSV; UX copy §5.6 „Exportdatei“), in the Export module.
+// Areas can be whole keys: the files reuse single texts of the screens. A whole key also takes its
+// longer keys (`criteria.select.step1.none.hint` comes with `.none`), never its siblings.
+export const EXPORT_AREAS = [
+  'exportFile',
+  'shell.appName',
+  'criteria.list.summary.useCase',
+  'criteria.list.summary.appTypes',
+  'criteria.list.summary.parts',
+  'criteria.list.summary.testTypes',
+  'criteria.select.step1.none',
+  'criteria.priority.A',
+  'criteria.priority.B',
+  'criteria.priority.Info',
+  'criteria.list.priorityNote',
+  'criteria.export.legalNote',
+];
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = 'CLIENT/CLIENT.ProcureAccess';
 const DE_JSON = `${CLIENT}/public/i18n/de.json`;
+
+// The text files and their areas; `sources`: the folder whose templates check 4 reads.
+const TARGETS = [
+  { file: DE_JSON, areas: AREAS, sources: `${CLIENT}/src` },
+  { file: 'src/ProcureAccess.Modules.Export/Texts/de.json', areas: EXPORT_AREAS },
+];
 const KEY = /^[a-z][A-Za-z0-9]*(\.[A-Za-z0-9]+)+$/;
 
 /** Splits a Markdown table row into trimmed cells; `\|` stays inside a cell. */
@@ -273,30 +299,37 @@ function clientSources(dir) {
   });
 }
 
+function checkTarget({ file, areas, sources }, { texts, problems, uxFile, write, inActions }) {
+  const de = JSON.parse(readFileSync(join(ROOT, file), 'utf8'));
+  if (write) {
+    const changed = syncAreas(de, texts, areas);
+    if (changed.length) writeFileSync(join(ROOT, file), JSON.stringify(de, null, 2) + '\n');
+    console.log(`${file}: ${changed.length} keys added or changed from ${uxFile}`);
+    for (const key of changed) console.log(`  ${key}`);
+  }
+
+  const templates = sources
+    ? clientSources(sources).map((f) => ({ file: f, source: readFileSync(join(ROOT, f), 'utf8') }))
+    : [];
+  const { errors, notices } = check({ texts, problems, de, templates, areas });
+  for (const n of notices) console.log(inActions ? `::notice title=i18n check::${n}` : `- ${n}`);
+  for (const e of errors) console.error(`✗ ${file}: ${e}`);
+  const areaKeys = [...texts.keys()].filter((k) => inAreas(k, areas)).length;
+  console.log(
+    `i18n check of ${file} (${uxFile}): ${areaKeys} keys of ${areas.join(', ')}, ${templates.length} client files, ` +
+      `${errors.length} errors, ${notices.length} keys not checked.`,
+  );
+  return errors.length;
+}
+
 function main() {
   const write = process.argv.includes('--write');
   const inActions = process.env.GITHUB_ACTIONS === 'true';
   const uxFile = highestUxCopy();
   const { texts, problems } = parseUxCopy(readFileSync(join(ROOT, uxFile), 'utf8'));
-  const de = JSON.parse(readFileSync(join(ROOT, DE_JSON), 'utf8'));
-
-  if (write) {
-    const changed = syncAreas(de, texts, AREAS);
-    if (changed.length) writeFileSync(join(ROOT, DE_JSON), JSON.stringify(de, null, 2) + '\n');
-    console.log(`${DE_JSON}: ${changed.length} keys added or changed from ${uxFile}`);
-    for (const key of changed) console.log(`  ${key}`);
-  }
-
-  const templates = clientSources(`${CLIENT}/src`).map((file) => ({ file, source: readFileSync(join(ROOT, file), 'utf8') }));
-  const { errors, notices } = check({ texts, problems, de, templates, areas: AREAS });
-  for (const n of notices) console.log(inActions ? `::notice title=i18n check::${n}` : `- ${n}`);
-  for (const e of errors) console.error(`✗ ${e}`);
-  const areaKeys = [...texts.keys()].filter((k) => inAreas(k, AREAS)).length;
-  console.log(
-    `i18n check (${uxFile}): ${areaKeys} keys of ${AREAS.join(', ')}, ${templates.length} client files, ` +
-      `${errors.length} errors, ${notices.length} keys not checked.`,
-  );
-  process.exit(errors.length ? 1 : 0);
+  let errors = 0;
+  for (const target of TARGETS) errors += checkTarget(target, { texts, problems, uxFile, write, inActions });
+  process.exit(errors ? 1 : 0);
 }
 
 // Real paths on both sides: through a symlinked path the check would otherwise skip itself and pass.

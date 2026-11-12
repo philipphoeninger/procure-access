@@ -19,6 +19,11 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
   </ItemGroup>
 
+  <!-- The texts of the export files (S4-20a), copied from the UX copy by scripts/check-i18n.mjs in its write mode. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Texts/de.json" LogicalName="ProcureAccess.Modules.Export.Texts.de.json" />
+  </ItemGroup>
+
   <!-- The test projects reach the internal pipeline (S4-19), as for the Catalog module. -->
   <ItemGroup>
     <InternalsVisibleTo Include="ProcureAccess.Tests.Unit" />

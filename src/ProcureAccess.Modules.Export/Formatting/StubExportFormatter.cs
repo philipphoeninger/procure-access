@@ -8,10 +8,10 @@ using ProcureAccess.Modules.Export.Documents;
 namespace ProcureAccess.Modules.Export.Formatting;
 
 /// <summary>
-/// Placeholder of the XLSX and CSV renderers of S4-20 (SPEC §8.3), so the pipeline runs end to end
-/// before them: plain UTF-8 text with the release and one line per row (key, level that applies).
-/// It already answers with the content type and file name extension of its format; only the body
-/// is not yet that format. No screen calls the export before S4-21.
+/// Placeholder of the XLSX renderer of S4-20b (SPEC §8.3), so the pipeline runs end to end before
+/// it: plain UTF-8 text with the release and one line per row (key, level that applies). It already
+/// answers with the content type and file name extension of its format; only the body is not yet
+/// that format. No screen calls the export before S4-21. The CSV has its renderer since S4-20a.
 /// </summary>
 internal sealed class StubExportFormatter(ExportFormat format) : IExportFormatter
 {

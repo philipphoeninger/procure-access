@@ -1,0 +1,61 @@
+{
+  "shell": {
+    "appName": "ProcureAccess"
+  },
+  "criteria": {
+    "select": {
+      "step1": {
+        "none": "Keiner davon passt",
+        "none.hint": "Es gelten die allgemeinen Empfehlungen."
+      }
+    },
+    "list": {
+      "summary": {
+        "useCase": "Verwendungszweck",
+        "appTypes": "Anwendungstyp",
+        "parts": "Funktionsbereiche",
+        "testTypes": "Prüfverfahren"
+      },
+      "priorityNote": "Die Prioritäten sind eine Empfehlung des Projektteams auf Grundlage fachlicher Erfahrung. Sie sind keine Vorgabe aus einer Norm. Prüfen Sie, ob sie zu Ihrer Beschaffung passen, und ändern Sie sie bei Bedarf."
+    },
+    "priority": {
+      "A": "A – Mindestanforderung",
+      "B": "B – Bewertungskriterium",
+      "Info": "Hinweis"
+    },
+    "export": {
+      "legalNote": "Kriterien in Vergabeunterlagen können rechtlich verbindlich werden. Prüfen Sie die Liste vor der Übernahme mit der für Ihr Verfahren zuständigen Stelle."
+    }
+  },
+  "exportFile": {
+    "sheet": {
+      "criteria": "Kriterien",
+      "info": "Info"
+    },
+    "column": {
+      "release": "Katalogversion",
+      "index": "Nr.",
+      "key": "Kriterium",
+      "number": "Nummer",
+      "title": "Titel",
+      "originalTitle": "Originaltitel",
+      "shortDescription": "Kurzbeschreibung",
+      "productPart": "Funktionsbereich",
+      "recommended": "Priorität (empfohlen)",
+      "chosen": "Priorität (Ihre Wahl)",
+      "weight": "Gewichtung",
+      "rationale": "Begründung der Empfehlung",
+      "note": "Ihre Notiz",
+      "testStep": "Link zum Prüfschritt"
+    },
+    "info": {
+      "tool": "Werkzeug",
+      "url": "Adresse",
+      "generated": "Erstellt am",
+      "release": "Katalogversion",
+      "counts": "Kriterien je Priorität",
+      "notes": "Hinweise",
+      "source": "Die Originaltitel, Prüfschritte und Links stammen aus den Prüfverfahren von BIT inklusiv. Verwendet mit Erlaubnis."
+    }
+  }
+}
