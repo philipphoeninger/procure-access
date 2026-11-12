@@ -1,7 +1,7 @@
 # S4-26 — Encrypt the Data Protection key ring at rest and document it
 
 > **Sprint:** 04, P2 stretch task S4-26 (1 point). **Issues:** #235. **Requirements / invariants:** `TECH_DEBT_v3.md` TD-27; ARCHITECTURE §9.1, §10.4, C60, C112 (3) → C131; **OPS-04 stays `planned`** (cookie session, step 3); no invariant activated, so no new TESTING version and no SPEC change.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #303 open.
 > **Scope:** the key ring in `identity."DataProtectionKeys"` is encrypted at rest with a key from the environment; key store, backup, restore and rotation documented as a section that `TECHNICAL.md` (#4) can take over (§6). **Not here:** `TECHNICAL.md` itself (#4, process step 16), the OPS-04 test, deleting the plain rows on staging (an owner action, §6.6).
 > **Owner decisions (2026-11-12, asked before the task, all (a) as recommended):** **O-S4-87** — the built-in `ProtectKeysWithCertificate` with an X.509 certificate: a base64 PFX from an environment variable, plus an optional previous certificate for a rotation (not a hand-written `IXmlEncryptor`, not „document why not“). **O-S4-88** — the certificate is required outside Development and E2E, where the start fails without it; local stacks and CI stay unencrypted. **O-S4-89** — key rows stored in plain text before are deleted once by hand after the first encrypted start; no code deletes keys. Also accepted with the plan: the documentation lives in this protocol (§6) until `TECHNICAL.md` exists; the certificate is self-signed with `openssl`, its expiry does not matter.
 
