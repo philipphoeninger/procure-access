@@ -77,7 +77,7 @@ Checked without finding: no new query (the snapshot already loads the revision; 
 | # | Point | Next step |
 |---|---|---|
 | P1 | Pull request #298 opened; not merged | Owner |
-| P2 | The criteria answer (SPEC §8.2) and the S11 card (Handoff §5.5, Kriterienkatalog §6.1: under the source title) do not show the short description; the S11 search (O-S4-26) does not look at it | Proposed issue: „S11: show the short description on the criterion card“ — `shortDescription` in the criteria answer (SPEC §8.2, contract test), the card line, and an owner decision on the search |
+| P2 | The criteria answer (SPEC §8.2) and the S11 card (Handoff §5.5, Kriterienkatalog §6.1: under the source title) do not show the short description; the S11 search (O-S4-26) does not look at it | Issue #299 „S11: show the short description (Kurzbeschreibung) on the criterion card“ — `shortDescription` in the criteria answer (SPEC §8.2, contract test), the card line, and an owner decision on the search |
 | P3 | The project team writes the texts (K-1); release 2026.1 has none | Gap list v3; with the priorities (O-1) in a later 2026.x folder |
 | P4 | A kept dev database stores `T.1` without the short description of `99.1` (a stored release never changes) | `docker compose down -v` before using the dev stack with this branch; CI and the E2E stack start empty |
 | P5 | TD-30 is resolved; TECH_DEBT and ROADMAP still name gap list v1 (R5) | End of sprint 04 (process step 14) |
