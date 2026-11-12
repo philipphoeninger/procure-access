@@ -1,7 +1,7 @@
 # S4-20b — XLSX renderer
 
 > **Sprint:** 04, P0 task S4-20b (second part of S4-20, M2.7; split by O-S4-68). **Issues:** none. **Requirements / invariants:** R-LST-12 (file format per SPEC §8.3); EXP-01, EXP-02 → `active`; EXP-03 complete for the ad-hoc source; the XLSX file row of CAT-16.
-> **Status:** done — pull request open (see §5 P1 for the number).
+> **Status:** done — pull request #287 open.
 > **Scope:** `XlsxExportFormatter` with ClosedXML 0.105.1 in place of the placeholder of S4-19 — sheet „Kriterien“ as an Excel table, sheet „Info“ —, the 🔧 setting `Export:ToolUrl`, the Dependabot rule and a test guard for the licence of SixLabors.Fonts; TESTING_v50, ARCHITECTURE_v39. Not here: the persisted source (step 3, EXP-06), the short-description field (S4-24), the export dialog S13, rate limit and `ExportCreated` (S4-21), J1 to the downloaded file (S4-22).
 > **Owner decisions (2026-11-12, all (a), taken in the planning of S4-20):** **O-S4-64** — the tool URL is the 🔧 server setting `Export:ToolUrl` = `https://procureaccess.de`. **O-S4-66** — the data range of „Kriterien“ is an Excel table `Kriterien` without a colour style. **O-S4-68** — S4-20 split; ClosedXML 0.105.1 approved. The wording of UX copy v24 U109 was confirmed unchanged in pull request #286 (recorded in the UX copy).
 
@@ -68,7 +68,7 @@ Checked without finding: no new endpoint, query or log line; the workbook lives 
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request number to be filled in after it is opened | This protocol, in the pull request |
+| P1 | Pull request #287 opened; not merged | Owner |
 | P2 | Licence notices of ClosedXML and its packages in the API image | #187 (S4-27) |
 | P3 | The accessibility tester's screen-reader check of an exported file (O-S4-66 assumes the table is announced well) | Outside the sprint (SPRINT_04) |
 | P4 | EXP-01/EXP-03 for the persisted source, EXP-06 | Step 3 |
