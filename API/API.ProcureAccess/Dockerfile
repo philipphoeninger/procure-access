@@ -44,6 +44,9 @@ RUN dotnet publish API/API.ProcureAccess/API.ProcureAccess.csproj -c Release --n
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
+# Licence notices of the shipped NuGet packages (#187, S4-27); scripts/check-api-notices.mjs keeps
+# the file in step with the packages. The runtime's own are in /usr/share/dotnet of the base image.
+COPY API/API.ProcureAccess/THIRD-PARTY-NOTICES.txt ./
 # Catalog release folders for `catalog import <version>` (S3-16 decision 2): the reviewed folders
 # ship with the image; Catalog:ReleasesPath (catalog/releases) is relative to /app.
 COPY catalog/releases/ catalog/releases/
