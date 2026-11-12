@@ -6,13 +6,11 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : BaseCrudController<Product, ProductDto, ProductsController>
+public class ProductsController : BaseCrudController<Product, ProductDto>
 {
     private readonly IProductService _productService;
 
-    public ProductsController(
-        IAppLogging<ProductsController> logger,
-        IProductService service) : base(logger, service)
+    public ProductsController(IProductService service) : base(service)
     {
         _productService = service;
     }

@@ -6,11 +6,9 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class FilterTypesController : BaseCrudController<FilterType, FilterTypeDto, FilterTypesController>
+public class FilterTypesController : BaseCrudController<FilterType, FilterTypeDto>
 {
-    public FilterTypesController(
-        IAppLogging<FilterTypesController> logger,
-        IFilterTypeService service) : base(logger, service)
+    public FilterTypesController(IFilterTypeService service) : base(service)
     {
     }
 
