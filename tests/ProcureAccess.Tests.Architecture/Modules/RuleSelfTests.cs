@@ -40,6 +40,16 @@ public class RuleSelfTests
     }
 
     [Fact]
+    public void TypeUsingAny_SubjectUsingForbiddenInternals_IsReportedAndItsNeighbourIsNot()
+    {
+        // UsesPlatformInternals uses a forbidden type; the rule on UsesPlatformContracts, in the same
+        // namespace, must not report it.
+        ModuleRules.TypeUsingAny(typeof(UsesPlatformInternals), [ModuleRules.Load(Platform)])
+            .ShouldBe([typeof(UsesPlatformInternals).FullName!]);
+        ModuleRules.TypeUsingAny(typeof(UsesPlatformContracts), [ModuleRules.Load(Platform)]).ShouldBeEmpty();
+    }
+
+    [Fact]
     public void UnexpectedPublicTypes_ProbeTypes_ReportsOnlyTheStrayType()
     {
         var exported = typeof(RuleSelfTests).Assembly.GetExportedTypes().Where(type => type.Namespace == VisibilityProbes);

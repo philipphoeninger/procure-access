@@ -41,7 +41,7 @@ builder.Services.AddPlatformModule(builder.Configuration)
                 .AddIdentityAccessModule(builder.Configuration)
                 .AddCatalogModule(builder.Configuration)
                 .AddConfiguratorModule()
-                .AddExportModule()
+                .AddExportModule(builder.Configuration)
                 .AddDirectoryModule()
                 .AddWorkspaceModule()
                 .AddModerationModule();
@@ -106,7 +106,8 @@ try
        .MapGroup("/api/v{version:apiVersion}")
        .HasApiVersion(1, 0)
        .MapCatalogEndpoints()
-       .MapConfiguratorEndpoints();
+       .MapConfiguratorEndpoints()
+       .MapExportEndpoints();
 
     app.ConfigureSwaggerExplorer();
 
