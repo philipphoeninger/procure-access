@@ -1,7 +1,7 @@
 # S4-19 — Export pipeline and `POST /api/v1/exports`
 
 > **Sprint:** 04, P0 task S4-19 (M2.4; 4 points). **Issues:** none. **Requirements / invariants:** R-LST-12 (anonymous export, file format per SPEC §8.3); EXP-05, EXP-07, TEN-04 → `active`; the export part of CAT-12; the `AdHocSelectionSource` part of ARC-03 (V74); in passing the ad-hoc source part of CAT-16 (deferred to S4-19/S4-20 by V141).
-> **Status:** done — pull request open (see §5).
+> **Status:** done — pull request #277 open.
 > **Scope:** the export pipeline in the Export module — `IExportSource` with `AdHocSelectionSource`, the file model, the formatter interface with a placeholder per format, `POST /api/v1/exports` — and `ICatalogSelectionResolver` in `Catalog.Contracts`; the "persists nothing" helper and a test logger; TESTING_v48, ARCHITECTURE_v37. Not here: the XLSX and CSV renderers and the short-description column (S4-20, O-S4-6), the export dialog S13, the rate limit and `ExportCreated` (S4-21), the persisted source (step 3).
 > **Owner decisions (2026-11-12):** **O-S4-57 (a)** — the request names every criterion of the selection exactly once; a missing, repeated or foreign one is a 400 `validation`. **O-S4-58 (a)** — the weight range is a server setting `Configurator:PriorityWeight` (1–10 🔧), a weight only while B applies. **O-S4-59 (a)** — a hand-written test logger instead of `Serilog.Sinks.InMemory`. **O-S4-60 (a)** — only the active release is exported; a stored, inactive one is 400 `release-mismatch` (`criteria.export.outdated`), an unknown one 404. **TEN-04 reworded** to ARCHITECTURE §9.6 (`no-cache` for the active release). Plan approved without changes.
 
