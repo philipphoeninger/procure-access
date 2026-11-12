@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using ProcureAccess.Modules.Platform.Contracts.Analytics;
+using ProcureAccess.Modules.Platform.Contracts.RateLimiting;
 
 namespace ProcureAccess.Modules.Configurator.Usage;
 
@@ -20,8 +21,9 @@ namespace ProcureAccess.Modules.Configurator.Usage;
 /// <remarks>
 /// The client decides what a new selection is (O-S4-55 (a)) and sends nothing about it: the event
 /// stores only its day and the dimension (PRV-05). The writer only queues, so the answer never
-/// waits for the database and never fails because of it. A rate limit follows with the mechanism
-/// of S4-21 (SPEC §7.3, O-S4-56 (b)).
+/// waits for the database and never fails because of it. Rate limit (SPEC §7.3, O-S4-56 (b)):
+/// policy <see cref="RateLimitPolicies.CriteriaListShown"/>, per client IP, 30 per 10 minutes 🔧,
+/// so a script cannot fill the bounded event queue; the client ignores the 429.
 /// </remarks>
 internal static class CriteriaListShownEndpoint
 {
@@ -30,12 +32,14 @@ internal static class CriteriaListShownEndpoint
     public static RouteHandlerBuilder Map(IEndpointRouteBuilder routes) =>
         routes.MapPost(Path, Handle)
             .AllowAnonymous()
+            .RequireRateLimiting(RateLimitPolicies.CriteriaListShown)
             .WithName("PostCriteriaListShown")
             .WithSummary("Counts that S11 shows the criteria list of a new complete selection")
             .WithDescription(
                 "Writes the usage event CriteriaListShown with the dimension signedIn or anonymous. " +
                 "No body; the client calls it once per new selection.")
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
     private static NoContent Handle(ClaimsPrincipal user, IUsageEventWriter usageEvents)
     {

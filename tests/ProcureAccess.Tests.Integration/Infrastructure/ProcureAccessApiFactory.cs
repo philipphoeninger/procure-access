@@ -36,6 +36,8 @@ public sealed class ProcureAccessApiFactory(
 {
     public const string EnvironmentName = "Testing";
 
+    private const string RelaxedPermitLimit = "1000000";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(environmentName);
@@ -51,6 +53,12 @@ public sealed class ProcureAccessApiFactory(
 
         // Secrets never live in the repository (CLAUDE.md §10): a fresh random key per test run.
         builder.UseSetting("JWTSettings:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));
+
+        // Every request of the test server comes from no address, so all tests share one counter
+        // per rate-limit policy: limits far above what a test run sends. Tests of the limits pass
+        // small ones in settings (S4-21a, API-05).
+        builder.UseSetting("RateLimits:AnonymousExport:PermitLimit", RelaxedPermitLimit);
+        builder.UseSetting("RateLimits:CriteriaListShown:PermitLimit", RelaxedPermitLimit);
 
         foreach (var (key, value) in settings ?? new Dictionary<string, string?>())
         {

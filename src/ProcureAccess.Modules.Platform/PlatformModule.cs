@@ -12,6 +12,7 @@ using ProcureAccess.Modules.Platform.Errors;
 using ProcureAccess.Modules.Platform.Health;
 using ProcureAccess.Modules.Platform.Logging;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Platform.RateLimiting;
 
 namespace ProcureAccess.Modules.Platform;
 
@@ -19,8 +20,9 @@ namespace ProcureAccess.Modules.Platform;
 /// Registration of the Platform module (ARCHITECTURE §4.3): the technical services every module
 /// may use through <c>Platform.Contracts</c>. Since S2-07 it holds the platform code built ahead
 /// in sprint 01: time, logging with retention, usage events and the health endpoints, with their
-/// own database context (ADR-014); since S2-10 Problem Details for every error response. Share
-/// links, file storage, e-mail sending, rate limiting, i18n and caching follow with their steps.
+/// own database context (ADR-014); since S2-10 Problem Details for every error response; since
+/// S4-21a the client address behind the proxies and rate limiting. Share links, file storage,
+/// e-mail sending, i18n and caching follow with their steps.
 /// </summary>
 public static class PlatformModule
 {
@@ -62,8 +64,12 @@ public static class PlatformModule
         // request path, stored by a background service without retrying inserts (#115).
         services.AddUsageEvents(connectionString);
 
-        // /health/live and /health/ready (ARCHITECTURE §9.5)
-        services.AddPlatformHealthChecks();
+        // /health/live and /health/ready (ARCHITECTURE §9.5); the ready check is limited (#112)
+        services.AddPlatformHealthChecks(configuration);
+
+        // Client IP from the trusted proxies and the rate limits of SPEC §7.3 (ARCHITECTURE §9.2)
+        services.AddClientAddress(configuration);
+        services.AddPlatformRateLimiting(configuration);
 
         // Errors as RFC 9457 Problem Details with the problem types of SPEC §8.6 (API-01)
         services.AddPlatformProblemDetails(configuration);
@@ -72,11 +78,20 @@ public static class PlatformModule
     }
 
     /// <summary>
-    /// Adds the middleware of the Platform module: Problem Details for unhandled exceptions and for
-    /// error responses without a body. Call it first, before any other middleware of the pipeline.
+    /// Adds the middleware of the Platform module: the client address from the trusted proxies,
+    /// then Problem Details for unhandled exceptions and for error responses without a body. Call
+    /// it first, before any other middleware of the pipeline.
     /// </summary>
     public static IApplicationBuilder UsePlatformMiddleware(this IApplicationBuilder app) =>
-        app.UsePlatformProblemDetails();
+        app.UseClientAddress()
+           .UsePlatformProblemDetails();
+
+    /// <summary>
+    /// Adds the rate limiter (SPEC §7.3). Call it after CORS, so a 429 carries the CORS headers a
+    /// browser on another origin needs to read it, and after authentication.
+    /// </summary>
+    public static IApplicationBuilder UsePlatformRateLimiting(this IApplicationBuilder app) =>
+        app.UseRateLimiter();
 
     /// <summary>Maps the endpoints of the Platform module: <c>/health/live</c> and <c>/health/ready</c>.</summary>
     public static IEndpointRouteBuilder MapPlatformEndpoints(this IEndpointRouteBuilder endpoints) =>
