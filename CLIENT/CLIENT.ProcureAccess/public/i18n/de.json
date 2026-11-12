@@ -291,7 +291,8 @@
     "email": {
       "sendFailed": "Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut."
     },
-    "antiforgery": "Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut."
+    "antiforgery": "Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut.",
+    "rateLimit.one": "Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie 1 Minute und versuchen Sie es dann erneut."
   },
   "legal": {
     "imprint": {

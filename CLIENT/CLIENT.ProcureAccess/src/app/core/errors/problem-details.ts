@@ -15,6 +15,8 @@ export interface ProblemDetails {
   detail?: string;
   /** Field path as the client sent it (`product.link`, `items[0].note`) → messages; `$` = the body as a whole. */
   errors?: Record<string, string[]>;
+  /** Of a `rate-limit` problem (429): whole minutes until the action works again (SPEC §7.3, `errors.rateLimit`). */
+  retryAfterMinutes?: number;
 }
 
 /**
@@ -45,6 +47,15 @@ export const CALLER_HANDLES_PROBLEMS = new HttpContextToken<readonly string[]>((
  * snackbar, no offline notice, no server page. An answer still counts as the API being reachable.
  */
 export const BACKGROUND_REQUEST = new HttpContextToken<boolean>(() => false);
+
+/**
+ * Set on a request the user asked for whose failure the caller shows itself in place, whatever it
+ * is — e.g. the export of S13, whose dialog shows every error with „Erneut versuchen“
+ * (R-LST-11; owner decision O-S4-74 (a)): the error interceptor shows no snackbar and no server
+ * page for it. A request without an answer still turns the offline notice on, because that
+ * notice is the state of the connection, not of the request.
+ */
+export const CALLER_SHOWS_FAILURES = new HttpContextToken<boolean>(() => false);
 
 /**
  * The name of the problem type: `type` is `<base>/problems/<name>` (SPEC §8.6). The base URI is
@@ -93,8 +104,37 @@ export function problemFieldErrors(error: unknown): Readonly<Record<string, stri
   return problemDetails(error)?.errors ?? {};
 }
 
-function problemDetails(error: unknown): ProblemDetails | undefined {
-  return error instanceof HttpErrorResponse && typeof error.error === 'object' && error.error !== null
+/**
+ * The Problem Details of a failed request; undefined for any other error body. A request for a
+ * file answers its errors as a `Blob`: the error interceptor reads it first ({@link withProblemBody}).
+ */
+export function problemDetails(error: unknown): ProblemDetails | undefined {
+  return error instanceof HttpErrorResponse &&
+    typeof error.error === 'object' &&
+    error.error !== null &&
+    !(error.error instanceof Blob)
     ? (error.error as ProblemDetails)
     : undefined;
+}
+
+/**
+ * The same error with its body read as JSON when a request for a file (`responseType: 'blob'`)
+ * got a JSON answer such as Problem Details; any other error unchanged. A body that is not JSON
+ * stays a `Blob`.
+ */
+export async function withProblemBody(error: HttpErrorResponse): Promise<HttpErrorResponse> {
+  const body: unknown = error.error;
+  if (!(body instanceof Blob) || !/json/i.test(body.type)) return error;
+  try {
+    const parsed: unknown = JSON.parse(await body.text());
+    return new HttpErrorResponse({
+      error: parsed,
+      headers: error.headers,
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url ?? undefined,
+    });
+  } catch {
+    return error;
+  }
 }

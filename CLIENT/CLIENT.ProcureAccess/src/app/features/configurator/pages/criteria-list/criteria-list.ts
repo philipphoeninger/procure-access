@@ -28,7 +28,7 @@ import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plur
 import { CriteriaListFilterRow } from '../../components/criteria-list-filter/criteria-list-filter';
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
-import { ExportPlaceholderDialog } from '../../dialogs/export-placeholder/export-placeholder-dialog';
+import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
 import { APP_TYPE_STEP_STATE, CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
 import { CriteriaListFilter } from '../../models/criteria-list';
 import { CriteriaResponse } from '../../models/criteria';
@@ -74,7 +74,7 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
  * now (`criteria.list.counts`, U106, owner decisions O-S4-50, O-S4-51 (a)). After the list the link
  * „Kriterium vorschlagen“ to the configured channel (R-LST-13). Last the action bar (R-LST-10): the
  * live counter `criteria.list.status.count` — announced, throttled, only when the user includes or
- * excludes a criterion — and „Liste exportieren“, which opens a placeholder until S4-21; „Liste
+ * excludes a criterion — and „Liste exportieren“, which opens the export dialog S13; „Liste
  * speichern“ and `criteria.list.unsaved` wait for step 3 (owner decision O-S4-49 (a)). The bar is in
  * the flow below 600 px width or height and sticky from there; while it is sticky its height is the
  * page's `scroll-padding-bottom`, so it never covers the focused element (WCAG 2.4.11). Not
@@ -82,7 +82,7 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2546 (320 px)
- * @spec docs/SPEC_v2.md R-CON-10, R-LST-01 – R-LST-10, R-LST-13 (the export R-LST-11/12 with S4-19 – S4-21)
+ * @spec docs/SPEC_v2.md R-CON-10, R-LST-01 – R-LST-11, R-LST-13
  * @invariants CAT-02, CAT-16, CAT-20
  */
 @Component({
@@ -198,9 +198,9 @@ export class CriteriaListPage {
     this.keepFocusAboveActionBar();
   }
 
-  /** „Liste exportieren“: a placeholder until the export dialog S13 of S4-21. */
+  /** „Liste exportieren“: the export dialog S13 (R-LST-11). */
   protected openExport(): void {
-    this.dialog.open(ExportPlaceholderDialog);
+    ExportDialog.open(this.dialog);
   }
 
   /** „Filter zurücksetzen“: the button goes with the empty state, so the focus goes to the search. */

@@ -140,19 +140,86 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
 
     expect(sent).toBe(1);
   });
+});
 
-  test('„Liste exportieren“ opens the placeholder dialog by keyboard; Escape closes it and returns the focus', async ({ page }) => {
+/**
+ * The export dialog S13 (S4-21b; R-LST-11), by keyboard on T.1. Axe in both appearances on the
+ * dialog and its error state S13-E (A11Y-01, A11Y-08). The dialog is found by role before axe runs,
+ * its texts only afterwards (Firefox, see above).
+ */
+test.describe('S13 export dialog', () => {
+  const XLSX = 'Excel-Datei (.xlsx) – für Vergabeunterlagen';
+  const CSV = 'CSV-Datei – für andere Programme';
+
+  /** Opens S13 from the action bar by keyboard and returns the button that opened it. */
+  async function openExport(page: Page): Promise<Locator> {
     await toList(page);
-    const exportButton = page.getByRole('button', { name: 'Liste exportieren' });
+    const exportButton = actionBar(page).getByRole('button');
     await exportButton.focus();
     await page.keyboard.press('Enter');
+    // The dialog moves the focus to the selected format once it is open; keys go there only then.
+    await expect(page.getByRole('dialog').locator('input[type="radio"]:checked')).toBeFocused();
+    return exportButton;
+  }
 
-    const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
-    await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('button', { name: 'Schließen' })).toBeFocused();
+  test('INV:A11Y-01 INV:A11Y-08 opens by keyboard on the preselected XLSX format; Escape closes it and returns the focus', async ({ page }, testInfo) => {
+    const exportButton = await openExport(page);
+    const dialog = page.getByRole('dialog');
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's13 export dialog');
+
+    await expect(dialog).toHaveAccessibleName('Kriterienliste exportieren');
+    const xlsx = dialog.getByRole('radio', { name: XLSX });
+    await expect(xlsx).toBeChecked();
+    await expect(xlsx).toBeFocused();
+    await expect(dialog.getByRole('group', { name: 'Dateiformat' })).toBeVisible();
+    await expect(dialog).toContainText('Die Datei nennt die Katalogversion T.1.');
+    await expect(dialog).toContainText('ProcureAccess speichert davon nichts.');
     await page.keyboard.press('Escape');
 
     await expect(dialog).toHaveCount(0);
     await expect(exportButton).toBeFocused();
+  });
+
+  test('downloads the CSV chosen by keyboard, then closes and returns the focus', async ({ page }) => {
+    const exportButton = await openExport(page);
+    const dialog = page.getByRole('dialog');
+    await page.keyboard.press('ArrowDown');
+    await expect(dialog.getByRole('radio', { name: CSV })).toBeChecked();
+    await page.keyboard.press('Tab');
+    await expect(dialog.getByRole('button', { name: 'Abbrechen' })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(dialog.getByRole('button', { name: 'Datei herunterladen' })).toBeFocused();
+
+    const download = page.waitForEvent('download');
+    await page.keyboard.press('Enter');
+
+    expect((await download).suggestedFilename()).toMatch(/^ProcureAccess_Kriterien_T\.1_\d{4}-\d{2}-\d{2}\.csv$/);
+    await expect(dialog).toHaveCount(0);
+    await expect(exportButton).toBeFocused();
+  });
+
+  test('INV:A11Y-01 INV:A11Y-08 shows a rate limit as an alert above the actions, without a snackbar, and keeps the focus on „Erneut versuchen“', async ({ page }, testInfo) => {
+    await page.route('**/api/v1/exports', (route) =>
+      route.fulfill({
+        status: 429,
+        contentType: 'application/problem+json',
+        body: JSON.stringify({ type: 'https://procureaccess.de/problems/rate-limit', status: 429, retryAfterMinutes: 1 }),
+      }),
+    );
+    await openExport(page);
+    const dialog = page.getByRole('dialog');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    const alert = dialog.getByRole('alert');
+    await expect(alert).toBeVisible();
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's13 export error');
+
+    await expect(alert).toContainText('Export fehlgeschlagen');
+    await expect(alert).toContainText('Bitte warten Sie 1 Minute und versuchen Sie es dann erneut.');
+    await expect(dialog.getByRole('button', { name: 'Erneut versuchen' })).toBeFocused();
+    await expect(page.locator('mat-snack-bar-container')).toHaveCount(0);
   });
 });
