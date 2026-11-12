@@ -2,17 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { readFile } from 'node:fs/promises';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { recordThirdPartyRequests, thirdPartyLinksInDocument } from '../support/third-party-requests';
 import { chooseFirstOption } from '../support/combobox';
+import { readXlsxSheet } from '../support/xlsx';
 
 /**
  * J1, configurator without account (TESTING §5.4), on S10 and the active test release T.1 of the
  * E2E stack, with the keyboard only (A11Y-02): the test never clicks, taps or moves the pointer,
  * and it reaches every control with Tab from where the page put the focus. Axe runs on every state
- * in both appearances (A11Y-01, A11Y-08). J1 ends at the hand-over to S11 for now; the list, the
- * priority change and the export follow with S4-22 (S4-13).
+ * in both appearances (A11Y-01, A11Y-08). After the hand-over (S4-13) it goes on on S11 — the
+ * rationale of a priority, a priority change, a note, an excluded criterion and the „Geprüft nach …“
+ * card — and exports the list as XLSX through S13, then opens the downloaded file and checks it
+ * (S4-22). The second part (save after sign-in) comes with step 3.
  *
  * The selection meets an exclusion by each higher layer of T.1
  * (`tests/ProcureAccess.Tests.Shared/Fixtures/Releases/T.1/exclusions.json`): HR-Anwendung excludes
@@ -26,7 +30,34 @@ import { chooseFirstOption } from '../support/combobox';
  */
 const EXPECTED_KEYS = ['99.1', '99.2', '99.3', '99.4', '99.6', '99.7', '99.8', '99.10a', '99.10b', 'PROC-bikWeb'];
 
-const MAX_TABS = 60;
+/** The criteria J1 changes on S11, by their catalog title in T.1. */
+const CHANGED = {
+  priority: { key: '99.1', title: 'Testkriterium mit Regeln auf allen vier Ebenen' },
+  note: { key: '99.2', title: 'Testkriterium für mehrere Anwendungstypen' },
+  excluded: { key: '99.7', title: 'Testkriterium 99.7' },
+} as const;
+
+const NOTE = 'Mit der Vergabestelle abstimmen: gilt auch für das Bewerberportal.';
+
+/** The header row of the sheet „Kriterien“ (SPEC §8.3, UX copy `exportFile.column.*`). */
+const XLSX_HEADERS = [
+  'Nr.',
+  'Kriterium',
+  'Nummer',
+  'Titel',
+  'Originaltitel',
+  'Kurzbeschreibung',
+  'Funktionsbereich',
+  'Priorität (empfohlen)',
+  'Priorität (Ihre Wahl)',
+  'Gewichtung',
+  'Begründung der Empfehlung',
+  'Ihre Notiz',
+  'Link zum Prüfschritt',
+];
+
+// S11 with an open detail panel has more tab stops than S10.
+const MAX_TABS = 80;
 
 interface CriteriaAnswer {
   readonly release: string;
@@ -87,10 +118,32 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
+/**
+ * The texts an element's `aria-labelledby` points to, i.e. its accessible name. Used for the include
+ * checkbox of an S11 card: Playwright's own name computation of that checkbox crashes the page in
+ * Firefox once axe has run on S11 (S4-22; the class of TESTING V129 and S4-16 P5).
+ */
+function labelledBy(locator: Locator): Promise<string> {
+  return locator.evaluate((element) =>
+    (element.getAttribute('aria-labelledby') ?? '')
+      .split(/\s+/)
+      .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
+      .join(' '),
+  );
+}
+
+/** The S11 card whose H2 is the title. */
+function card(page: Page, title: string): Locator {
+  return page
+    .getByRole('main')
+    .getByRole('listitem')
+    .filter({ has: page.getByRole('heading', { level: 2, name: title, exact: true }) });
+}
+
 test.describe('J1 configurator without account', () => {
   test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 anonymous visitor chooses a selection on S10 by keyboard and gets the criteria of T.1', async ({ page, baseURL }, testInfo) => {
-    // Seven states, each checked by axe in two appearances, take longer than the default 30 s.
-    test.slow();
+    // Twelve states, each checked by axe in two appearances, take far longer than the default 30 s.
+    test.setTimeout(240_000);
     // CLAUDE §8: fonts, icons and the API all come from the app's own origin (#43).
     const appOrigin = new URL(baseURL!).origin;
     const thirdPartyRequests = recordThirdPartyRequests(page, appOrigin);
@@ -186,7 +239,122 @@ test.describe('J1 configurator without account', () => {
 
       await expect(page).toHaveURL(/\/kriterien\/ergebnis$/);
       await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+      await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(EXPECTED_KEYS.length);
+      await settled(page.getByRole('main'));
       await expectNoAxeViolations(page, testInfo, 'j1 s11');
+    });
+
+    await test.step('S11: change the priority of 99.1 from A to Hinweis with the K5 menu (R-LST-03)', async () => {
+      const priority = card(page, CHANGED.priority.title);
+      const levelButton = priority.getByRole('button', { name: 'Priorität: A – Mindestanforderung' });
+      await tabTo(page, levelButton);
+      await page.keyboard.press('Enter');
+
+      const menu = page.getByRole('menu', { name: 'Priorität für dieses Kriterium' });
+      await expect(menu.getByRole('menuitemradio', { name: 'A – Mindestanforderung' })).toBeFocused();
+      await settled(menu);
+      await expectNoAxeViolations(page, testInfo, 'j1 s11 priority menu');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('ArrowDown');
+      await expect(menu.getByRole('menuitemradio', { name: 'Hinweis' })).toBeFocused();
+      await page.keyboard.press('Enter');
+
+      // The menu closes, the focus returns to the level button, and the card names the recommendation.
+      await expect(menu).toHaveCount(0);
+      await expect(priority.getByRole('button', { name: 'Priorität: Hinweis' })).toBeFocused();
+      await expect(priority).toContainText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.');
+      await expect(priority.getByRole('button', { name: 'Empfehlung wiederherstellen' })).toBeVisible();
+    });
+
+    await test.step('S11: the detail panel of 99.1 explains the recommended priority (CAT-02)', async () => {
+      const priority = card(page, CHANGED.priority.title);
+      const details = priority.getByRole('button', { name: 'Details anzeigen' });
+      await tabTo(page, details);
+      await page.keyboard.press('Enter');
+
+      await expect(priority.getByRole('button', { name: 'Details ausblenden' })).toHaveAttribute('aria-expanded', 'true');
+      await expect(priority.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' })).toBeVisible();
+      await expect(priority).toContainText('Testbegründung A für web und hr.');
+      await expect(priority).toContainText('Diese Empfehlung gilt für Website oder Webanwendung mit dem Verwendungszweck HR-Anwendung.');
+      await expect(priority).toContainText('Grundlage: Empfehlung des Projektteams WERTE.IT');
+      await settled(page.getByRole('main'));
+      await expectNoAxeViolations(page, testInfo, 'j1 s11 details and override');
+    });
+
+    await test.step('S11: a note on 99.2 (R-LST-05)', async () => {
+      const noted = card(page, CHANGED.note.title);
+      await tabTo(page, noted.getByRole('button', { name: 'Notiz hinzufügen' }));
+      await page.keyboard.press('Enter');
+
+      const field = noted.getByRole('textbox', { name: 'Ihre Notiz zu diesem Kriterium (optional)' });
+      await expect(field).toBeFocused();
+      await page.keyboard.type(NOTE);
+      await expect(field).toHaveValue(NOTE);
+    });
+
+    await test.step('S11: 99.7 left out of the list (R-LST-04)', async () => {
+      const excluded = card(page, CHANGED.excluded.title);
+      // The card has one checkbox; its name is read through `labelledBy` (Firefox, see there).
+      const include = excluded.getByRole('checkbox');
+      await tabTo(page, include);
+      expect(await labelledBy(include)).toBe(`In Liste aufnehmen ${CHANGED.excluded.title}`);
+      await expect(include).toBeChecked();
+      await page.keyboard.press('Space');
+
+      await expect(include).not.toBeChecked();
+      await expect(excluded).toContainText('Nicht in Ihrer Liste');
+      // The excluded card stays in the list; the counter of the action bar counts it out.
+      await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(EXPECTED_KEYS.length);
+      await expect(page.getByRole('main')).toContainText(`${EXPECTED_KEYS.length - 1} von ${EXPECTED_KEYS.length} Kriterien in Ihrer Liste`);
+      await settled(page.getByRole('main'));
+      await expectNoAxeViolations(page, testInfo, 'j1 s11 note and excluded');
+    });
+
+    await test.step('S11: the procedure criterion „Geprüft nach BIK BITV-Test (Web)“ (CAT-17)', async () => {
+      const testedBy = card(page, 'Geprüft nach BIK BITV-Test (Web)');
+      await expect(testedBy).toContainText('Der Anbieter oder eine unabhängige Stelle hat das Produkt nach dem BIK BITV-Test (Web) geprüft');
+      const include = testedBy.getByRole('checkbox');
+      expect(await labelledBy(include)).toBe('In Liste aufnehmen Geprüft nach BIK BITV-Test (Web)');
+      await expect(include).toBeChecked();
+    });
+
+    await test.step('S13: „Liste exportieren“ opens the dialog on the preselected XLSX format', async () => {
+      await tabTo(page, page.getByRole('button', { name: 'Liste exportieren' }));
+      await page.keyboard.press('Enter');
+
+      const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+      await expect(dialog.getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' })).toBeFocused();
+      await expect(dialog.getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' })).toBeChecked();
+      await expect(dialog).toContainText(`Exportiert werden ${EXPECTED_KEYS.length - 1} Kriterien aus Ihrer Liste`);
+      await settled(dialog);
+      await expectNoAxeViolations(page, testInfo, 'j1 s13');
+    });
+
+    await test.step('S13: „Datei herunterladen“ downloads the XLSX, which holds the list as changed on S11 (EXP-01)', async () => {
+      const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+      await tabTo(page, dialog.getByRole('button', { name: 'Datei herunterladen' }));
+      const downloaded = page.waitForEvent('download');
+      await page.keyboard.press('Enter');
+      const download = await downloaded;
+
+      // The dialog closes and MatDialog returns the focus to the button that opened it.
+      await expect(dialog).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Liste exportieren' })).toBeFocused();
+
+      expect(download.suggestedFilename()).toMatch(/^ProcureAccess_Kriterien_T\.1_\d{4}-\d{2}-\d{2}\.xlsx$/);
+      const rows = readXlsxSheet(await readFile(await download.path()), 'Kriterien');
+      const [header, ...criteria] = rows;
+      expect(header).toEqual(XLSX_HEADERS);
+
+      // One row per criterion in the list, in catalog order, without the excluded one.
+      const column = (name: string) => XLSX_HEADERS.indexOf(name);
+      expect(criteria.map((row) => row[column('Kriterium')])).toEqual(EXPECTED_KEYS.filter((key) => key !== CHANGED.excluded.key));
+      const row = (key: string) => criteria.find((cells) => cells[column('Kriterium')] === key)!;
+      expect(row(CHANGED.priority.key)[column('Priorität (empfohlen)')]).toBe('A – Mindestanforderung');
+      expect(row(CHANGED.priority.key)[column('Priorität (Ihre Wahl)')]).toBe('Hinweis');
+      expect(row(CHANGED.priority.key)[column('Begründung der Empfehlung')]).toBe('Testbegründung A für web und hr.');
+      expect(row(CHANGED.note.key)[column('Ihre Notiz')]).toBe(NOTE);
+      expect(row('PROC-bikWeb')[column('Titel')]).toBe('Geprüft nach BIK BITV-Test (Web)');
     });
 
     await test.step('no request and no link went to a third-party origin', async () => {

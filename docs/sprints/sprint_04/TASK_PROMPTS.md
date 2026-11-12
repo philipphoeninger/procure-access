@@ -607,7 +607,7 @@ Depends on: S4-13, S4-18, S4-21 merged
 Read first: CLAUDE.md; in SPRINT_04.md the row of S4-22 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 42) and their entries in TECH_DEBT_v3.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: ROADMAP M2 exit criteria; TESTING §5.4, §7.2 (manual screen-reader check of the exported file — the tester's part); angular.json budgets; TECH_DEBT_v3 §3.3 (#42)
 
-Owner decisions for this task: none
+Owner decisions for this task: O-S4-75 (a), O-S4-76 (a) with changed rows, O-S4-77 (a) (decided 2026-11-12, before the task)
 Additional instructions: Extend J1: select on S10 → list on S11 (override, exclude, note) → export on S13 with keyboard only and axe in both appearances; check the downloaded file's name and first row. Tighten the bundle budget to what the rebuilt client needs plus a margin (#42). List the M2 exit criteria in the protocol with their state, and name the manual screen-reader check of an exported XLSX as the tester's open item.
 
 Way of working:
