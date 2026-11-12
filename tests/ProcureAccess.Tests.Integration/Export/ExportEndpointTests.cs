@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json.Nodes;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -91,6 +92,51 @@ public sealed class ExportEndpointTests(ApiFixture api) : IntegrationTest(api), 
         var changedRow = rows.Single(row => Cell(row, "Kriterium") == changed);
         Cell(changedRow, "Priorität (Ihre Wahl)").ShouldBe("Hinweis");
         Cell(changedRow, "Ihre Notiz").ShouldBe("Mit Anbieter klären; \"bald\"");
+    }
+
+    [Fact(DisplayName = "INV:EXP-01 " + nameof(Export_Xlsx_ReopenedWithClosedXml_MatchesTheSelectionAndTheUsersDecisions))]
+    [Trait("Invariant", "EXP-01")]
+    public async Task Export_Xlsx_ReopenedWithClosedXml_MatchesTheSelectionAndTheUsersDecisions()
+    {
+        await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
+        using var client = CreateClient();
+        var criteria = await CriteriaAsync(client, MiniCatalog.T1Version, WebSelection, Cancellation);
+        var keys = criteria.Select(c => c!["key"]!.GetValue<string>()).ToList();
+        var recommended = criteria.ToDictionary(
+            c => c!["key"]!.GetValue<string>(), c => c!["resolvedPriority"]!["level"]!.GetValue<string>());
+        var (left, changed) = (keys[0], keys[1]);
+        var body = Body("xlsx", MiniCatalog.T1Version, WebSelection, criteria, (key, entry) =>
+        {
+            if (key == left)
+            {
+                entry["isIncluded"] = false;
+            }
+            else if (key == changed)
+            {
+                entry["overrideLevel"] = "B";
+                entry["overrideWeight"] = 9;
+                entry["note"] = "=Mit Anbieter klären";
+            }
+        });
+
+        using var response = await PostAsync(client, body);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
+        using var workbook = new XLWorkbook(new MemoryStream(await response.Content.ReadAsByteArrayAsync(Cancellation)));
+        var table = workbook.Table("Kriterien");
+        var header = table.HeadersRow().Cells().Select(c => c.GetString()).ToList();
+        var rows = table.DataRange.Rows().ToList();
+        IXLCell Cell(IXLRangeRow row, string column) => row.Cell(header.IndexOf(column) + 1);
+        rows.Select(row => Cell(row, "Kriterium").GetString()).ShouldBe(keys.Where(key => key != left));
+        rows.Select(row => Cell(row, "Priorität (empfohlen)").GetString())
+            .ShouldBe(keys.Where(key => key != left).Select(key => Label(recommended[key])));
+        var changedRow = rows.Single(row => Cell(row, "Kriterium").GetString() == changed);
+        Cell(changedRow, "Priorität (Ihre Wahl)").GetString().ShouldBe("B – Bewertungskriterium");
+        Cell(changedRow, "Gewichtung").GetValue<int>().ShouldBe(9);
+        Cell(changedRow, "Ihre Notiz").GetString().ShouldBe("=Mit Anbieter klären");
+        Cell(changedRow, "Ihre Notiz").HasFormula.ShouldBeFalse();
+        var releaseLine = workbook.Worksheet("Info").RowsUsed().Single(row => row.Cell(1).GetString() == "Katalogversion");
+        releaseLine.Cell(2).GetString().ShouldBe(MiniCatalog.T1Version);
     }
 
     [Fact(DisplayName = "INV:EXP-07 " + nameof(Export_RecommendedLevelInTheRequest_IsRefused))]
@@ -251,6 +297,13 @@ public sealed class ExportEndpointTests(ApiFixture api) : IntegrationTest(api), 
     }
 
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
+
+    private static string Label(string level) => level switch
+    {
+        "A" => "A – Mindestanforderung",
+        "B" => "B – Bewertungskriterium",
+        _ => "Hinweis",
+    };
 
     private static Task<HttpResponseMessage> PostAsync(HttpClient client, JsonObject body) =>
         client.PostAsJsonAsync(ExportPath, body, Cancellation);

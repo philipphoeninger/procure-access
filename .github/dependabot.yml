@@ -22,6 +22,10 @@ updates:
     ignore:
       # v14 is the last MIT version; v15+ is RPL/commercial. Replaced in step 1 (#31).
       - dependency-name: AutoMapper
+      # Comes with ClosedXML (S4-20b), which accepts [1.0.0, 3.0.0); NuGet resolves 1.0.0
+      # (Apache-2.0). 2.0+ is under the Six Labors Split License, which fails D12.
+      - dependency-name: SixLabors.Fonts
+        versions: [">= 2.0.0"]
       # .NET stays on the LTS line (ADR-013); a new major is a migration, not an update.
       - dependency-name: "Microsoft.*"
         update-types: [version-update:semver-major]

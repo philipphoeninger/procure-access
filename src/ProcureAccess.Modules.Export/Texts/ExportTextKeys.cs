@@ -13,6 +13,8 @@ namespace ProcureAccess.Modules.Export.Texts;
 /// </summary>
 internal static class ExportTextKeys
 {
+    public const string SheetCriteria = "exportFile.sheet.criteria";
+    public const string SheetInfo = "exportFile.sheet.info";
     public const string ColumnRelease = "exportFile.column.release";
     public const string ColumnIndex = "exportFile.column.index";
     public const string ColumnKey = "exportFile.column.key";
@@ -28,6 +30,24 @@ internal static class ExportTextKeys
     public const string ColumnNote = "exportFile.column.note";
     public const string ColumnTestStep = "exportFile.column.testStep";
 
+    public const string InfoTool = "exportFile.info.tool";
+    public const string InfoUrl = "exportFile.info.url";
+    public const string InfoGenerated = "exportFile.info.generated";
+    public const string InfoRelease = "exportFile.info.release";
+    public const string InfoCounts = "exportFile.info.counts";
+    public const string InfoNotes = "exportFile.info.notes";
+    public const string InfoSource = "exportFile.info.source";
+
+    // Screen texts the sheet „Info“ reuses (UX copy U109).
+    public const string AppName = "shell.appName";
+    public const string UseCase = "criteria.list.summary.useCase";
+    public const string AppTypes = "criteria.list.summary.appTypes";
+    public const string ProductParts = "criteria.list.summary.parts";
+    public const string TestTypes = "criteria.list.summary.testTypes";
+    public const string NoUseCase = "criteria.select.step1.none";
+    public const string PriorityNote = "criteria.list.priorityNote";
+    public const string LegalNote = "criteria.export.legalNote";
+
     /// <summary>The label of a priority level, as the S11 chip shows it (SPEC SD6, provisional until O-14).</summary>
     public static string Level(PriorityLevel level) => level switch
     {
@@ -40,9 +60,12 @@ internal static class ExportTextKeys
     /// <summary>Every key the renderers read; a key missing in <c>de.json</c> stops the start.</summary>
     public static IReadOnlyList<string> Required { get; } =
     [
+        SheetCriteria, SheetInfo,
         ColumnRelease, ColumnIndex, ColumnKey, ColumnNumber, ColumnTitle, ColumnOriginalTitle,
         ColumnShortDescription, ColumnProductPart, ColumnRecommended, ColumnChosen, ColumnWeight,
         ColumnRationale, ColumnNote, ColumnTestStep,
+        InfoTool, InfoUrl, InfoGenerated, InfoRelease, InfoCounts, InfoNotes, InfoSource,
+        AppName, UseCase, AppTypes, ProductParts, TestTypes, NoUseCase, PriorityNote, LegalNote,
         .. Enum.GetValues<PriorityLevel>().Select(Level),
     ];
 }

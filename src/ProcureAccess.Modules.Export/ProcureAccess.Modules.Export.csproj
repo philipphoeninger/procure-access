@@ -31,4 +31,10 @@ SPDX-License-Identifier: MIT
     <InternalsVisibleTo Include="ProcureAccess.Tests.Architecture" />
   </ItemGroup>
 
+  <!-- XLSX renderer (S4-20b, ARCHITECTURE D12; MIT, never EPPlus). Its SixLabors.Fonts must stay 1.x (Apache-2.0):
+       2.0+ is the Six Labors Split License, so Dependabot ignores it and ClosedXmlLicenceTests fails on it. -->
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+  </ItemGroup>
+
 </Project>
