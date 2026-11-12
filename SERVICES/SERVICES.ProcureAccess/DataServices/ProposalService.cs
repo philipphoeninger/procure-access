@@ -41,7 +41,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
             entity = await MainRepo.Context.Proposals
                 .FirstAsync(p => p.Id == cmd.Id.Value);
 
-            if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
+            if (!userPermissions.Any(x => x == Permissions.ModerationReview) &&
                 entity.ProposerId != userId)
                 throw new Exception("User is not authorized to update this proposal.");
         }
@@ -93,7 +93,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
                         .Where(x => x.Type == CustomClaimTypes.Permission)
                         .Select(x => x.Value);
 
-        if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
+        if (!userPermissions.Any(x => x == Permissions.ModerationReview) &&
             dto.ProposerId != user.FindFirstValue(ClaimTypes.NameIdentifier))
             return null; //gate
 
@@ -112,7 +112,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
 
         List<Proposal> entities = new List<Proposal>();
 
-        if (userPermissions.Any(x => x == Permissions.ObjectsApprove))
+        if (userPermissions.Any(x => x == Permissions.ModerationReview))
         {
             entities = MainRepo.Context.Proposals
                 .Include(x => x.Product)
@@ -164,7 +164,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
         if (proposal.FinishedAt != null)
             throw new Exception("Proposal already finalized.");
 
-        if (!userPermissions.Any(x => x == Permissions.ObjectsApprove) &&
+        if (!userPermissions.Any(x => x == Permissions.ModerationReview) &&
             proposal.ProposerId != userId)
             throw new Exception("User is not authorized to update this proposal.");
 
@@ -193,7 +193,7 @@ public class ProposalService : BaseService<Proposal, ProposalDto>, IProposalServ
                 .Claims
                 .Where(x => x.Type == CustomClaimTypes.Permission)
                 .Select(x => x.Value);
-        if (!userPermissions.Any(x => x == Permissions.ObjectsApprove))
+        if (!userPermissions.Any(x => x == Permissions.ModerationReview))
             throw new Exception("User is not authorized to approve proposals.");
 
         string? userId = user.FindFirstValue(ClaimTypes.NameIdentifier);

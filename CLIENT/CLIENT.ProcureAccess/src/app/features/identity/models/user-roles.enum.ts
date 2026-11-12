@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+/** Role names of the legacy JWT; the platform roles of ARCHITECTURE §9.1 since S4-25. */
 export enum EnUserRole {
     member = 'Member',
-    approver = 'Approver',
-    admin = 'Admin'
+    moderator = 'Moderator',
+    catalogEditor = 'CatalogEditor',
+    platformAdmin = 'PlatformAdmin'
 }

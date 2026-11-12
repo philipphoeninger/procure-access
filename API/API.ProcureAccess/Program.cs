@@ -10,6 +10,12 @@ if (CatalogModule.IsCommand(args))
     return await CatalogCommandHost.RunAsync(args);
 }
 
+// `roles list|grant|revoke …` grants and revokes platform roles and exits (SPEC R-ADM-03, S4-25).
+if (RoleCommandLine.IsCommand(args))
+{
+    return await RoleCommandHost.RunAsync(args);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -28,6 +34,7 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
                 .AddIdentityAuth(builder.Configuration)
+                .AddAuthorizationPolicies()
                 .AddRepositories()
                 .AddDataServices()
                 .AddLocalization(options => options.ResourcesPath = "Resources");

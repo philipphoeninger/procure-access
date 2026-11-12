@@ -97,7 +97,7 @@ test.describe('Error pages S80', () => {
   });
 
   test('INV:A11Y-01 INV:A11Y-08 a page without the permission shows „Kein Zugriff“', async ({ page }, testInfo) => {
-    // The legacy approver list: the permission guard sends visitors without the role here.
+    // The legacy proposal list for moderators: the permission guard sends visitors without the permission here.
     await page.goto('/proposals');
 
     await expect(page).toHaveURL(/\/unauthorized$/);

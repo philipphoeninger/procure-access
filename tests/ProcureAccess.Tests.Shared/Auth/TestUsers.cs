@@ -39,15 +39,18 @@ public static class TestUsers
         Roles: [Roles.Member],
         Permissions: []);
 
-    /// <summary>A signed-in user with the <c>Approver</c> role and its permission, as granted by the role claims.</summary>
-    public static readonly TestUser Approver = new(
-        Name: "approver",
+    /// <summary>
+    /// A signed-in user with the <c>Moderator</c> role and its permission, as granted by the role
+    /// claims (formerly <c>Approver</c>, S4-25).
+    /// </summary>
+    public static readonly TestUser Moderator = new(
+        Name: "moderator",
         Id: "00000000-0000-0000-0000-00000000a002",
-        Email: "approver@example.test",
-        Roles: [Roles.Member, Roles.Approver],
-        Permissions: [MODELS.ProcureAccess.Entities.Authorization.Permissions.ObjectsApprove]);
+        Email: "moderator@example.test",
+        Roles: [Roles.Member, Roles.Moderator],
+        Permissions: [MODELS.ProcureAccess.Entities.Authorization.Permissions.ModerationReview]);
 
     /// <summary>All fixture users, looked up by <see cref="TestUser.Name"/>.</summary>
     public static readonly IReadOnlyDictionary<string, TestUser> ByName =
-        new[] { Member, Approver }.ToDictionary(u => u.Name, StringComparer.Ordinal);
+        new[] { Member, Moderator }.ToDictionary(u => u.Name, StringComparer.Ordinal);
 }

@@ -64,7 +64,7 @@ public class ProposalsController : BaseCrudController<Proposal, ProposalDto, Pro
 
     [HttpPost("approve")]
     [ApiVersion("1.0")]
-    [AuthApproverAttribute]
+    [Authorize(Policy = AuthorizationPolicies.ModerationReview)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -29,7 +29,8 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// <remarks>
 /// Test classes derive from <see cref="IntegrationTest"/>, which empties the database before
 /// each class. Respawn deletes every row except the migration histories, the four catalog
-/// filter-value tables and the Data Protection key ring, including the reference data that migration <c>AddSeedData</c> inserts:
+/// filter-value tables, the Data Protection key ring and the legacy roles with their permissions
+/// (S4-25), including the reference data that migration <c>AddSeedData</c> inserts:
 /// each test stores the data it needs. The filter values (use cases, app types, product parts, test
 /// types) are static reference data that only the catalog migration writes (O-S3-5 D1), so tests
 /// read them instead of storing their own.
@@ -62,6 +63,17 @@ public sealed class ApiFixture : IAsyncLifetime
     /// </summary>
     private static readonly Table DataProtectionKeysTable =
         new(IdentityAccessDbContext.Schema, DataProtectionKeyConfiguration.Table);
+
+    /// <summary>
+    /// The legacy role tables: migration <c>RenamePlatformRoles</c> writes the platform roles and
+    /// their permission (S4-25, O-S4-82), so they are reference data like the filter values.
+    /// Grants (<c>UserRoles</c>) are deleted with the users.
+    /// </summary>
+    private static readonly Table[] LegacyRoleTables =
+    [
+        new("identity", "Roles"),
+        new("identity", "RoleClaims"),
+    ];
 
     private Respawner? _respawner;
     private ProcureAccessApiFactory? _factory;
@@ -126,6 +138,7 @@ public sealed class ApiFixture : IAsyncLifetime
                     new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
                     .. CatalogFilterValueTables,
                     DataProtectionKeysTable,
+                    .. LegacyRoleTables,
                 ],
             });
         }
@@ -133,7 +146,10 @@ public sealed class ApiFixture : IAsyncLifetime
         _factory = new ProcureAccessApiFactory(_database.GetConnectionString(), Clock);
     }
 
-    /// <summary>Deletes all rows except the migration histories, the catalog filter values and the Data Protection keys.</summary>
+    /// <summary>
+    /// Deletes all rows except the migration histories, the catalog filter values, the Data
+    /// Protection keys and the legacy roles.
+    /// </summary>
     public async Task ResetDatabaseAsync()
     {
         if (_respawner is null)
@@ -148,7 +164,8 @@ public sealed class ApiFixture : IAsyncLifetime
     /// <summary>
     /// Stores entities through the application's own context that maps them, never through raw
     /// SQL, so the EF configuration is exercised (TESTING §6.1): the module contexts
-    /// (<see cref="PlatformDbContext"/>, <see cref="CatalogDbContext"/>) for their entities, the
+    /// (<see cref="PlatformDbContext"/>, <see cref="CatalogDbContext"/>,
+    /// <see cref="IdentityAccessDbContext"/>) for their entities, the
     /// legacy <see cref="ApplicationDBContext"/> for all others.
     /// </summary>
     public async Task StoreAsync(params object[] entities)
@@ -159,6 +176,7 @@ public sealed class ApiFixture : IAsyncLifetime
         [
             scope.ServiceProvider.GetRequiredService<PlatformDbContext>(),
             scope.ServiceProvider.GetRequiredService<CatalogDbContext>(),
+            scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>(),
         ];
         foreach (var entity in entities)
         {
