@@ -77,6 +77,9 @@ jobs:
         run: |
           node --test scripts/check-icons.test.mjs
           node scripts/check-icons.mjs
+      # Only the self-test here: the check itself needs the .NET build and runs in stage 2.
+      - name: API licence notices self-test
+        run: node --test scripts/check-api-notices.test.mjs
       # Only the self-test here: the gate itself runs in stage 7 (TESTING §8.3).
       - name: Invariant gate self-test
         run: node --test scripts/check-invariants.test.mjs
@@ -125,6 +128,11 @@ jobs:
         run: |
           npm ci
           npm run build:release
+      # The licence notices of the API image list exactly the NuGet packages it ships (#187, S4-27):
+      # the check publishes the API built above (--no-build) and compares the committed file, so a
+      # NuGet update stays red until the file is regenerated (--write) and its diff reviewed.
+      - name: API licence notices
+        run: node scripts/check-api-notices.mjs
 
   dotnet-tests:
     name: ${{ matrix.stage }}
