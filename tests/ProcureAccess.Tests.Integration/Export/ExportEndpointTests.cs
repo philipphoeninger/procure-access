@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Api;
 using ProcureAccess.Tests.Integration.Infrastructure;
+using ProcureAccess.Tests.Shared.Export;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
 using Xunit;
@@ -52,7 +53,44 @@ public sealed class ExportEndpointTests(ApiFixture api) : IntegrationTest(api), 
         disposition.DispositionType.ShouldBe("attachment");
         var day = Clock.GetUtcNow().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         disposition.FileNameStar.ShouldBe($"ProcureAccess_Kriterien_T.1_{day}.{format}");
-        (await response.Content.ReadAsStringAsync(Cancellation)).ShouldStartWith("Katalogversion: T.1");
+    }
+
+    [Fact(DisplayName = "INV:EXP-03 " + nameof(Export_Csv_ListsTheIncludedCriteriaWithTheReleaseAndTheUsersDecisions))]
+    [Trait("Invariant", "EXP-03")]
+    public async Task Export_Csv_ListsTheIncludedCriteriaWithTheReleaseAndTheUsersDecisions()
+    {
+        await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
+        using var client = CreateClient();
+        var criteria = await CriteriaAsync(client, MiniCatalog.T1Version, WebSelection, Cancellation);
+        var keys = criteria.Select(c => c!["key"]!.GetValue<string>()).ToList();
+        var (left, changed) = (keys[0], keys[1]);
+        var body = Body("csv", MiniCatalog.T1Version, WebSelection, criteria, (key, entry) =>
+        {
+            if (key == left)
+            {
+                entry["isIncluded"] = false;
+            }
+            else if (key == changed)
+            {
+                entry["overrideLevel"] = "Info";
+                entry["note"] = "Mit Anbieter klären; \"bald\"";
+            }
+        });
+
+        using var response = await PostAsync(client, body);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
+        var records = CsvReader.Read(await response.Content.ReadAsByteArrayAsync(Cancellation));
+        var header = records[0].ToList();
+        var rows = records.Skip(1).ToList();
+        string Cell(IReadOnlyList<string> row, string column) => row[header.IndexOf(column)];
+        rows.Select(row => Cell(row, "Katalogversion")).ShouldAllBe(release => release == MiniCatalog.T1Version);
+        rows.Select(row => Cell(row, "Nr.")).ShouldBe(Enumerable.Range(1, keys.Count - 1).Select(n => n.ToString(CultureInfo.InvariantCulture)));
+        rows.Select(row => Cell(row, "Kriterium")).ShouldBe(keys.Where(key => key != left));
+        rows.Select(row => Cell(row, "Kriterium")).ShouldContain("PROC-softwareTest");
+        var changedRow = rows.Single(row => Cell(row, "Kriterium") == changed);
+        Cell(changedRow, "Priorität (Ihre Wahl)").ShouldBe("Hinweis");
+        Cell(changedRow, "Ihre Notiz").ShouldBe("Mit Anbieter klären; \"bald\"");
     }
 
     [Fact(DisplayName = "INV:EXP-07 " + nameof(Export_RecommendedLevelInTheRequest_IsRefused))]

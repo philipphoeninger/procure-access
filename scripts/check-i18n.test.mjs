@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { check, flatten, inAreas, keysOfCell, lookup, parseUxCopy, setText, syncAreas, templateKeys } from './check-i18n.mjs';
+import { AREAS, EXPORT_AREAS, check, flatten, inAreas, keysOfCell, lookup, parseUxCopy, setText, syncAreas, templateKeys } from './check-i18n.mjs';
 
 const ux = (rows) =>
   ['## 4. Before', '| Schlüssel | Element | Text | Hinweis |', '|---|---|---|---|', '| `shell.before` | x | not read | |',
@@ -117,6 +117,24 @@ test('an area can be a key prefix: check 1 and --write cover only the keys below
   assert.deepEqual(syncAreas(de, parseUxCopy(ux(rows)).texts, ['criteria.select']), ['criteria.select.title']);
   assert.deepEqual(de, { criteria: { select: { title: 'Wählen' } } });
   assert.deepEqual(errors(de), []);
+});
+
+test('an area can be one key: --write takes it with its longer keys, never its siblings', () => {
+  const rows = [
+    '| `criteria.priority.A` | x | A – Mindestanforderung | |',
+    '| `criteria.priority.A.hint` | x | Erklärung | |',
+    '| `criteria.priority.B` | x | B – Bewertungskriterium | |',
+  ];
+  const de = {};
+  syncAreas(de, parseUxCopy(ux(rows)).texts, ['criteria.priority.A']);
+  assert.deepEqual(de, { criteria: { priority: { A: 'A – Mindestanforderung', 'A.hint': 'Erklärung' } } });
+});
+
+test('the export file texts are their own file: no client area holds them', () => {
+  // The client de.json carries `criteria.export` in full; `exportFile.*` lives in the Export
+  // module only (UX copy U109, O-S4-63).
+  assert.equal(EXPORT_AREAS.includes('exportFile'), true);
+  assert.equal(inAreas('exportFile.column.key', AREAS), false);
 });
 
 test('check 2 fails on a lowercase key the UX copy lacks; uppercase legacy keys are free', () => {
