@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.Net.Http.Headers;
+
 namespace API.ProcureAccess.Extensions;
 
 public static class AppConfigExtensions
@@ -11,7 +13,9 @@ public static class AppConfigExtensions
     /// <summary>
     /// Registers the CORS policy for the Angular client. Allowed origins come from
     /// the configuration key <c>Cors:AllowedOrigins</c> (array). No configured origin
-    /// means no cross-origin request is allowed.
+    /// means no cross-origin request is allowed. <c>Content-Disposition</c> is exposed, so the
+    /// export dialog can read the file name of <c>POST /api/v1/exports</c> also when the client
+    /// runs on another origin (<c>npm start</c>, S4-21a).
     /// </summary>
     public static IServiceCollection AddFrontendCors(this IServiceCollection services, IConfiguration config)
     {
@@ -21,7 +25,8 @@ public static class AppConfigExtensions
             options.AddPolicy(FrontendCorsPolicy, policy => policy
                 .WithOrigins(allowedOrigins)
                 .AllowAnyHeader()
-                .AllowAnyMethod()));
+                .AllowAnyMethod()
+                .WithExposedHeaders(HeaderNames.ContentDisposition)));
         return services;
     }
 

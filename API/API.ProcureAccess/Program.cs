@@ -116,6 +116,9 @@ try
 
     app.ConfigureCORS()
        .AddIdentityAuthMiddlewares();
+
+    // Rate limits of SPEC §7.3 (S4-21a): after CORS, so a 429 reaches a browser on another origin
+    app.UsePlatformRateLimiting();
 }
 catch (Exception ex)
 {

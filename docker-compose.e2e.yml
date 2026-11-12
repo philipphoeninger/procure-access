@@ -14,14 +14,17 @@
 # - the test release folders mounted read-only, so the API seeds and activates T.1 at startup
 #   (S4-08, #241; catalog part of the seeder of TESTING §6.3, Development/E2E only);
 # - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
-#   client answers and the API reaches its database.
+#   client answers and the API reaches its database;
+# - relaxed rate limits of the anonymous export and of CriteriaListShown (SPEC §7.3, S4-21a): every
+#   test of a run comes from the same address, so the 30 per 10 minutes of production would fail
+#   the run, not test it. The limit itself is checked by the .NET integration tests (API-05).
 #
 # The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml):
 # stop one before starting the other.
 #
 # Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment of its own, the
-# users and products of the seeder, Mailpit, the test clock endpoint and the relaxed export rate
-# limit. Until then the API runs as Development, like the dev stack.
+# users and products of the seeder, Mailpit and the test clock endpoint. Until then the API runs
+# as Development, like the dev stack.
 name: procureaccess-e2e
 
 services:
@@ -39,6 +42,9 @@ services:
       # Active test release T.1 (MiniCatalog), seeded at startup in Development/E2E only (S4-08, #241)
       Catalog__TestRelease__Path: /app/catalog/test-releases
       Catalog__TestRelease__Version: T.1
+      # Relaxed rate limits (S4-21a): all tests share one client address
+      RateLimits__AnonymousExport__PermitLimit: "10000"
+      RateLimits__CriteriaListShown__PermitLimit: "10000"
     volumes:
       - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
 

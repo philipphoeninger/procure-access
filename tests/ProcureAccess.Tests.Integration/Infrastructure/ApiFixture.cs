@@ -175,6 +175,12 @@ public sealed class ApiFixture : IAsyncLifetime
     }
 
     /// <summary>
+    /// Connection string of the shared, migrated database, for a test that needs an API host of
+    /// its own with other settings but no database of its own (e.g. small rate limits, S4-21a).
+    /// </summary>
+    public string ConnectionString => _database.GetConnectionString();
+
+    /// <summary>
     /// Connection string for a database with a new, unique name on the same server. The database
     /// does not exist yet; a test that creates it also drops it. Used where the shared, already
     /// migrated database does not fit, e.g. migrating an empty database (OPS-03).
