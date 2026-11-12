@@ -17,8 +17,8 @@ namespace ProcureAccess.Modules.Export;
 /// Registration of the Export module (ARCHITECTURE §4.3): the format renderers (XLSX, CSV) and the
 /// export sources. Since S4-19 it holds the export pipeline — <see cref="AdHocSelectionSource"/>
 /// behind <c>POST /api/v1/exports</c> (<see cref="MapExportEndpoints"/>). The CSV renderer and the
-/// texts of the files came with S4-20a; the XLSX renderer is a placeholder until S4-20b. The source
-/// of saved configurations follows in step 3.
+/// texts of the files came with S4-20a, the XLSX renderer with S4-20b. The source of saved
+/// configurations follows in step 3.
 /// </summary>
 public static class ExportModule
 {
@@ -36,10 +36,9 @@ public static class ExportModule
 
         // Read once here, so a key missing in Texts/de.json stops the start, not an export.
         services.AddSingleton(ExportTexts.LoadGerman());
+        services.AddSingleton(ExportToolUrl.From(configuration));
         services.AddSingleton<IExportFormatter, CsvExportFormatter>();
-
-        // Placeholder until the XLSX renderer of S4-20b.
-        services.AddSingleton<IExportFormatter>(new StubExportFormatter(ExportFormat.Xlsx));
+        services.AddSingleton<IExportFormatter, XlsxExportFormatter>();
         return services;
     }
 

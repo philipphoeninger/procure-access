@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
 > **Status:** v24 (12. November 2026) – v24 ergänzt die Texte der Exportdatei: Namen der Tabellenblätter, Spaltenköpfe und die Zeilen des Blatts „Info“ (`exportFile.*`, §5.6; Sprint 04, S4-20a, U109).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v24):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.11), `ARCHITECTURE_v38.md`, `TESTING_v49.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Aktuelle Fassungen der zugehörigen Dokumente (v24):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.11), `ARCHITECTURE_v39.md`, `TESTING_v50.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -18,7 +18,7 @@
 
 ### Änderungen gegenüber v23
 
-Quelle: Planung von S4-20 (XLSX- und CSV-Export), Owner-Entscheidungen O-S4-62 – O-S4-65 (a) vom 12. November 2026. SPEC §8.3 nennt die Spalten der Exportdatei, die UX-Copy hatte aber keine Schlüssel für die Dateitexte. Die Spaltenköpfe sind die deutschen Teile der Spaltenliste von SPEC §8.3; die übrigen Texte sind Vorschläge von Claude, die der Product Owner im Pull Request von S4-20a bestätigt.
+Quelle: Planung von S4-20 (XLSX- und CSV-Export), Owner-Entscheidungen O-S4-62 – O-S4-65 (a) vom 12. November 2026. SPEC §8.3 nennt die Spalten der Exportdatei, die UX-Copy hatte aber keine Schlüssel für die Dateitexte. Die Spaltenköpfe sind die deutschen Teile der Spaltenliste von SPEC §8.3; die übrigen Texte sind Vorschläge von Claude. Der Product Owner hat den Wortlaut am 12. November 2026 im Pull Request von S4-20a (#286) unverändert bestätigt.
 
 | # | Änderung | Warum so | Anlass |
 |---|---|---|---|
