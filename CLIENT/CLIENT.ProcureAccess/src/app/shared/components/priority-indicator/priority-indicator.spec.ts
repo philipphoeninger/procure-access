@@ -130,7 +130,8 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
 
     expect(host.level()).toBe('Info');
     expect(host.recommendedLevel()).toBe('A');
-    expect(screen.queryByRole('menu')).toBeNull();
+    // Without animations Material removes the panel in a setTimeout, which whenStable() does not wait for.
+    await vi.waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     expect(document.activeElement).toBe(levelButton());
     expect(levelButton().textContent).toContain('Hinweis');
     expect(announce).toHaveBeenCalledWith('criteria.priority.changed', { level: 'Hinweis' });
