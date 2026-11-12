@@ -79,7 +79,7 @@ Findings sorted per CLAUDE §6.8. No correctness or security bug that affects cu
 
 | # | Point | Proposal |
 |---|---|---|
-| P1 | **Registration outside Development may fail:** `UserService` adds every new user to `Member`, but only the Development rebuild creates that role (F2). On a database without it, `AddToRoleAsync` throws. Whether staging has the row is not known here | Proposed issue: check staging; if missing, add `Member` to a migration like the platform roles, or drop the global role with step 3 (M3.3 makes it an organisation role) |
+| P1 | **Registration outside Development may fail:** `UserService` adds every new user to `Member`, but only the Development rebuild creates that role (F2). On a database without it, `AddToRoleAsync` throws. Whether staging has the row is not known here | Issue #301: check staging; if missing, owner decision between a migration that adds `Member` like the platform roles (proposed), registration without the role, or waiting for step 3 (M3.3 makes it an organisation role) |
 | P2 | Display-name normalisation (trim, Unicode NFC) before the uniqueness check | With the S50 endpoint (step 6); the factory then normalises or refuses |
 | P3 | The collation in `public` assumes the application's database user may create objects there (R4) | Note for TECHNICAL.md when another hosting is set up |
 | P4 | Role grants are logged only to the console (R8) | Decide with R-ADM-02 (administration actions logged with user and timestamp) whether platform-role changes need a stored trail |
