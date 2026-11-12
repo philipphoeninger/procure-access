@@ -85,6 +85,9 @@ internal sealed class CriterionJson
 
     public string? PlainLanguageDe { get; set; }
 
+    /// <summary>One or two plain sentences, no Markdown (Kurzbeschreibung, ADR-016).</summary>
+    public string? ShortDescriptionDe { get; set; }
+
     /// <summary>Lines of Markdown, joined with line breaks.</summary>
     public List<string?>? RationaleDe { get; set; }
 

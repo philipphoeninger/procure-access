@@ -18,7 +18,7 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("catalog")
-                .HasAnnotation("ProductVersion", "10.0.14")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -436,6 +436,9 @@ namespace ProcureAccess.Modules.Catalog.Persistence.Migrations
 
                     b.Property<int>("RevisionNumber")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ShortDescriptionDe")
+                        .HasColumnType("text");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");

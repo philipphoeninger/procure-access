@@ -77,6 +77,7 @@ internal sealed record CriterionSnapshot(
     string? TestType,
     string TitleDe,
     string? PlainLanguageDe,
+    string? ShortDescriptionDe,
     int SortOrder,
     IReadOnlyList<StandardReferenceSnapshot> StandardReferences,
     IReadOnlyList<ProcedureTextSnapshot> ProcedureTexts)
@@ -90,6 +91,7 @@ internal sealed record CriterionSnapshot(
             revision.Criterion.TestType?.Key,
             revision.TitleDe,
             revision.PlainLanguageDe,
+            revision.ShortDescriptionDe,
             revision.SortOrder,
             [.. revision.StandardReferences
                 .OrderBy(r => r.Standard).ThenBy(r => r.Clause, StringComparer.Ordinal)

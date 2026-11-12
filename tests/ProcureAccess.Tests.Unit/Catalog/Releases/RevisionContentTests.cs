@@ -56,6 +56,8 @@ public class RevisionContentTests
         [
             definition with { TitleDe = definition.TitleDe + " (neu)" },
             definition with { PlainLanguageDe = "Einfach" },
+            definition with { ShortDescriptionDe = definition.ShortDescriptionDe + " Geändert." },
+            definition with { ShortDescriptionDe = null },
             definition with { RationaleDe = "Warum" },
             definition with { SortOrder = definition.SortOrder + 1 },
             definition with { Applicability = [.. definition.Applicability.Skip(1)] },

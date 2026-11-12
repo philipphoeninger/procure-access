@@ -236,6 +236,16 @@ public class MiniCatalogTests
         texts["softwareTest"].ShouldNotBe(texts["appTest"]);
     }
 
+    [Fact]
+    public void ShortDescription_OnlyPriorityAllLevelsHasOne()
+    {
+        _catalog.Releases.SelectMany(r => r.Criteria).Select(c => c.Revision)
+            .Where(r => r.ShortDescriptionDe is not null)
+            .Select(r => r.Criterion.Key)
+            .Distinct()
+            .ShouldBe([Keys.PriorityAllLevels]);
+    }
+
     private static List<string> KeysOf(CatalogRelease release) =>
         [.. release.Criteria.Select(c => c.Revision.Criterion.Key)];
 }

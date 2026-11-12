@@ -22,7 +22,7 @@ internal sealed record ExportContent(
 
 /// <summary>
 /// One included criterion with the values of the columns of SPEC §8.3; the running number is its
-/// position in <see cref="ExportContent.Rows"/>. The short description waits for O-S4-6 (S4-20).
+/// position in <see cref="ExportContent.Rows"/>.
 /// </summary>
 /// <param name="Number">The EN 301 549 number; null for a „Geprüft nach …“ row (<c>PROC-…</c>).</param>
 /// <param name="RecommendedLevel">Resolved on the server, never taken from the client (EXP-07).</param>
@@ -34,6 +34,7 @@ internal sealed record ExportRow(
     string? Number,
     string Title,
     string? PlainLanguageTitle,
+    string? ShortDescription,
     string? OriginalTitle,
     string? ProductPart,
     PriorityLevel RecommendedLevel,

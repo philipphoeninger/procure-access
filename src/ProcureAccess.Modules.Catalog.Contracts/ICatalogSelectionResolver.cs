@@ -87,6 +87,7 @@ public sealed record CatalogValueName(string Key, string Name);
 /// <param name="RevisionId">The criterion revision of the release, which clients name in their decisions.</param>
 /// <param name="Number">The EN 301 549 number of a requirement criterion; null for a procedure criterion („Geprüft nach …“).</param>
 /// <param name="PlainLanguageTitle">Null until the project team writes it (O-1, K-1).</param>
+/// <param name="ShortDescription">The Kurzbeschreibung; null until the project team writes it (K-1, ADR-016).</param>
 /// <param name="OriginalTitle">The BIT inklusiv title of the first procedure text that applies; null without one.</param>
 /// <param name="ProductPart">Name of the product part of the matching applicability rule; null when none names a part.</param>
 /// <param name="TestStepUrl">The test step of the first procedure text that applies, or for a procedure criterion the page of its test type.</param>
@@ -97,6 +98,7 @@ public sealed record ResolvedCatalogCriterion(
     string? Number,
     string Title,
     string? PlainLanguageTitle,
+    string? ShortDescription,
     string? OriginalTitle,
     string? ProductPart,
     CatalogPriority RecommendedPriority,

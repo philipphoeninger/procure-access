@@ -32,7 +32,8 @@ public sealed class CatalogPersistenceTests(ApiFixture api) : IntegrationTest(ap
             "Titel der Anforderung",
             plainLanguageDe: "Einfache Sprache",
             rationaleDe: "Begründung",
-            sortOrder: 10);
+            sortOrder: 10,
+            shortDescriptionDe: "Kurzbeschreibung");
         requirement.AddStandardReference(reference);
 
         // The procedure criterion names a seeded test type, so the release is stored through the
@@ -70,6 +71,7 @@ public sealed class CatalogPersistenceTests(ApiFixture api) : IntegrationTest(ap
         loadedRequirement.RevisionNumber.ShouldBe(1);
         loadedRequirement.TitleDe.ShouldBe("Titel der Anforderung");
         loadedRequirement.PlainLanguageDe.ShouldBe("Einfache Sprache");
+        loadedRequirement.ShortDescriptionDe.ShouldBe("Kurzbeschreibung");
         loadedRequirement.RationaleDe.ShouldBe("Begründung");
         loadedRequirement.SortOrder.ShouldBe(10);
         var loadedReference = loadedRequirement.StandardReferences.ShouldHaveSingleItem();

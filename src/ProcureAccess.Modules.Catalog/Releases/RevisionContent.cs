@@ -24,6 +24,7 @@ internal static class RevisionContent
         return revision.Criterion.Key == definition.Key
             && revision.TitleDe == definition.TitleDe
             && revision.PlainLanguageDe == definition.PlainLanguageDe
+            && revision.ShortDescriptionDe == definition.ShortDescriptionDe
             && revision.RationaleDe == definition.RationaleDe
             && revision.SortOrder == definition.SortOrder
             && SameSet(

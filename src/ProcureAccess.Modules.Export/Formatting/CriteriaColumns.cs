@@ -31,8 +31,8 @@ internal static class CriteriaColumns
         new(ExportTextKeys.ColumnTitle, (row, _, _) => row.PlainLanguageTitle ?? row.Title),
         new(ExportTextKeys.ColumnOriginalTitle, (row, _, _) => row.OriginalTitle),
 
-        // Empty until the catalog has the field (owner decision O-S4-6 (a), S4-24).
-        new(ExportTextKeys.ColumnShortDescription, (_, _, _) => null),
+        // Empty while the project team has not written it (ADR-016).
+        new(ExportTextKeys.ColumnShortDescription, (row, _, _) => row.ShortDescription),
         new(ExportTextKeys.ColumnProductPart, (row, _, _) => row.ProductPart),
         new(ExportTextKeys.ColumnRecommended, (row, _, texts) => texts.Level(row.RecommendedLevel)),
 

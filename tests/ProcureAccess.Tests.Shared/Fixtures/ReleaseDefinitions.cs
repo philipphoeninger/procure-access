@@ -37,6 +37,7 @@ internal static class ReleaseDefinitions
                 [.. predecessors[r.Criterion.Key].Order(StringComparer.Ordinal)],
                 r.TitleDe,
                 r.PlainLanguageDe,
+                r.ShortDescriptionDe,
                 r.RationaleDe,
                 r.SortOrder,
                 [.. r.StandardReferences.Select(s => new StandardReferenceDefinition(s.Standard, s.Clause, s.Url))],
