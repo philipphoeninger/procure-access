@@ -53,9 +53,9 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
         var requests = WriteRequestsWithInvalidInput();
         requests.ShouldNotBeEmpty("endpoint discovery found no write endpoint");
 
-        // The approver passes every authorisation check of today's write endpoints, so each request
+        // The moderator passes every authorisation check of today's write endpoints, so each request
         // reaches model binding.
-        using var client = CreateClient(TestUsers.Approver);
+        using var client = CreateClient(TestUsers.Moderator);
         var failures = new List<string>();
         foreach (var (method, path) in requests)
         {

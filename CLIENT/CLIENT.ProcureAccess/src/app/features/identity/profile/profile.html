@@ -37,7 +37,7 @@ SPDX-License-Identifier: MIT
   <button mat-flat-button class="delete-btn error" (click)="deleteAccount()">{{ 'COMMON.DELETE' | translate }}</button>
 </div>
 
-<div *appHasNotPermission="'objects:approve'" class="proposals-container">
+<div *appHasNotPermission="'moderation:review'" class="proposals-container">
   <div class="proposal-title">
     <h3>{{ 'PROPOSALS.OPEN_HEADER' | translate }}</h3>
     <button

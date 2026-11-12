@@ -43,7 +43,7 @@ export const routes: Routes = [
     path: 'proposals',
     loadComponent: () => import('./features/proposal/list/proposal-list').then((m) => m.ProposalList),
     canActivate: [PermissionGuard],
-    data: { permission: 'objects:approve' }
+    data: { permission: 'moderation:review' }
   },
   {
     path: 'profile',

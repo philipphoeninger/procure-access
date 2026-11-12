@@ -58,9 +58,9 @@ public sealed class GenericCrudWriteTests(ApiFixture api) : IntegrationTest(api)
     [InlineData("POST", "/api/FilterTypes")]
     [InlineData("PUT", "/api/FilterTypes/{0}")]
     [InlineData("DELETE", "/api/FilterTypes/{0}")]
-    public async Task GenericWrite_SignedInApprover_IsRejectedAndRecordStays(string method, string pathFormat)
+    public async Task GenericWrite_SignedInModerator_IsRejectedAndRecordStays(string method, string pathFormat)
     {
-        await AssertWriteRejectedAsync(method, pathFormat, TestUsers.Approver);
+        await AssertWriteRejectedAsync(method, pathFormat, TestUsers.Moderator);
     }
 
     private async Task AssertWriteRejectedAsync(string method, string pathFormat, TestUser? user)

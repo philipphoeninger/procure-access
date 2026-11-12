@@ -45,7 +45,7 @@ public static class DatabaseRebuildExtensions
         await SampleDataInitializer.ClearDatabase(dbContext, userManager);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await app.AddRolesAndPermissionsAsync(roleManager);
+        await app.AddMemberRoleAsync(roleManager);
 
         var seeded = await SampleDataInitializer.InitializeData(
             dbContext, userManager, app.Configuration[SampleUserPasswordKey]);

@@ -4,30 +4,39 @@
 
 namespace API.ProcureAccess.Extensions;
 
+/// <summary>Names of the claim-based authorization policies (ARCHITECTURE §9.1).</summary>
+public static class AuthorizationPolicies
+{
+    /// <summary>
+    /// Requires the permission <see cref="Permissions.ModerationReview"/> (roles Moderator and
+    /// PlatformAdmin). Replaces <c>AuthApproverAttribute</c>, which answered 500 (S4-25, O-S4-85):
+    /// a signed-in user without it gets 403, an anonymous request 401.
+    /// </summary>
+    public const string ModerationReview = "ModerationReview";
+}
+
 public static class AuthorizationExtensions
 {
-    public static async Task AddRolesAndPermissionsAsync(this WebApplication app, RoleManager<IdentityRole> roleManager)
+    /// <summary>Registers the policies of <see cref="AuthorizationPolicies"/>.</summary>
+    public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
     {
-        // set approver permissions
-        string[] roles = { Roles.Admin, Roles.Approver };
-        foreach (var roleName in roles)
-        {
-            var role = await roleManager.FindByNameAsync(roleName);
-            if (role is null)
-            {
-                await roleManager.CreateAsync(role = new IdentityRole(roleName));
-                await roleManager.AddClaimAsync(
-                    role,
-                    new Claim(CustomClaimTypes.Permission, Permissions.ObjectsApprove));
-            }
-        }
+        services.AddAuthorizationBuilder()
+                .AddPolicy(AuthorizationPolicies.ModerationReview, policy => policy
+                    .RequireAuthenticatedUser()
+                    .RequireClaim(CustomClaimTypes.Permission, Permissions.ModerationReview));
+        return services;
+    }
 
-        // TODO: set member permissions
-        var memberRole = await roleManager.FindByNameAsync(Roles.Member);
-        if (memberRole is null)
+    /// <summary>
+    /// Creates the legacy <see cref="Roles.Member"/> role if it is missing (Development rebuild only,
+    /// SEC-06). The platform roles and their permission come from the legacy migration
+    /// <c>RenamePlatformRoles</c> (S4-25), so every environment has them.
+    /// </summary>
+    public static async Task AddMemberRoleAsync(this WebApplication app, RoleManager<IdentityRole> roleManager)
+    {
+        if (await roleManager.FindByNameAsync(Roles.Member) is null)
         {
-            await roleManager.CreateAsync(memberRole = new IdentityRole(Roles.Member));
-            // ...
+            await roleManager.CreateAsync(new IdentityRole(Roles.Member));
         }
     }
 }

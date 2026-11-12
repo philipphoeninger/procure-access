@@ -60,7 +60,7 @@ Name, Link, Description, Tests, Product Type, App Type, Parts, Contact Persons?
           {{ proposalId() ? ('COMMON.SAVE' | translate) : ('COMMON.SEND' | translate) }}
         </button>
       </div>
-      <div *appHasPermission="'objects:approve'" id="approval-btns">
+      <div *appHasPermission="'moderation:review'" id="approval-btns">
         <button mat-button color="warn" (click)="approve(false)" type="button">{{ 'COMMON.REJECT' | translate }}</button>
         <button
           id="approve-button"
