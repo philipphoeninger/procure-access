@@ -7,9 +7,10 @@
 //   node scripts/check-api-notices.mjs           check API/API.ProcureAccess/THIRD-PARTY-NOTICES.txt
 //   node scripts/check-api-notices.mjs --write   regenerate it (after a NuGet update)
 //   … --deps <file>                              use this deps.json, e.g. the one of a built image
-// Without --deps both run `dotnet publish --no-build` on the API (build it first) and read the
-// published deps.json, so the file lists exactly the NuGet packages the image ships — not the
-// design-time packages a plain build lists. Which packages ship depends on the .NET SDK (newer
+// Without --deps both run `dotnet publish --no-build -c Debug` on the API (after `dotnet build`,
+// which builds Debug; publish alone would default to Release) and read the published deps.json,
+// so the file lists exactly the NuGet packages the image ships — not the design-time packages a
+// plain build lists. Debug and Release publish the same packages. Which packages ship depends on the .NET SDK (newer
 // SDKs prune packages the shared framework already has), so generate the file with the SDK that
 // CI and the image's sdk:10.0 use (the latest 10.0), or from the image's deps.json:
 //   docker run --rm --entrypoint cat <api image> /app/API.ProcureAccess.deps.json > deps.json
@@ -236,13 +237,15 @@ export function buildNotices(packages, readText, { packageTexts = PACKAGE_TEXTS,
 function publishedDeps() {
   const out = mkdtempSync(join(tmpdir(), 'api-notices-'));
   try {
-    execFileSync('dotnet', ['publish', API_PROJECT, '--no-build', '-o', out, '-p:UseAppHost=false', '-v', 'q', '-nologo'], {
-      cwd: ROOT,
-      stdio: ['ignore', 'ignore', 'inherit'],
-    });
+    const args = ['publish', API_PROJECT, '--no-build', '-c', 'Debug', '-o', out, '-p:UseAppHost=false', '-v', 'q', '-nologo'];
+    execFileSync('dotnet', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     return JSON.parse(readFileSync(join(out, DEPS_FILE), 'utf8'));
   } catch (error) {
-    throw new Error(`dotnet publish --no-build of the API failed: build it first`, { cause: error });
+    // MSBuild writes its errors to stdout.
+    const output = `${error.stdout ?? ''}${error.stderr ?? ''}`.trim();
+    throw new Error(`dotnet publish --no-build of the API failed (run \`dotnet build ProcureAccess.sln\` first)${output ? `:\n${output}` : ''}`, {
+      cause: error,
+    });
   } finally {
     rmSync(out, { recursive: true, force: true });
   }

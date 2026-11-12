@@ -43,6 +43,7 @@ Checklist: security, correctness, N+1, edge cases, a11y; `/engineering:code-revi
 | R4 | An `EMBEDDED` entry with a licence outside `STANDARD_TEXTS` would crash instead of failing with a message | Won't fix: configuration only, and the self-test loads the repository's entries |
 | R5 | The shipped set depends on the .NET SDK (F8): generated with 10.0.114, the file missed one package of the image | Fixed: regenerated from the image's `deps.json` (`--deps`), the mismatch message names the SDK, CLAUDE §5 and the script header say how; the drift between CI and image as §5 P2 |
 | R6 | Licence or notice files outside the package root are not seen | Won't fix: none of the 50 packages has one; a `<license type="file">` path in a subfolder is read |
+| R8 | **Found by CI on the first run:** `dotnet publish` defaults to Release since .NET 8, so `--no-build` found no Release build in stage 2 (locally an earlier Release publish had left one); MSBuild's error went to stdout, which the script discarded | Fixed: the script publishes `-c Debug` (the configuration `dotnet build` builds; both ship the same packages, checked with SDK 10.0.402 in the `sdk:10.0` container on a fresh Debug build: 50 packages, 0 errors) and prints MSBuild's output when the publish fails |
 | R7 | Security: no secret, no network access in the script (it reads only the local package folder), nothing served over HTTP | – |
 
 No correctness or security finding left that affects behaviour today; no further review round needed.
@@ -57,7 +58,7 @@ No correctness or security finding left that affects behaviour today; no further
 | `npm run lint` in `e2e/` (ESLint on `scripts/*.mjs`) | clean |
 | `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs` | passed, unchanged |
 | `reuse lint` | compliant (1 273 files) |
-| `ci.yml` | parses; the stage-2 check runs in CI for the first time with this PR |
+| `ci.yml` | parses; stage 2 failed on the first run (§3 R8), fixed in the second commit |
 | .NET build and tests, Vitest, E2E | not affected (no C#, client or E2E change) — left to CI |
 
 ## 5. Open points
