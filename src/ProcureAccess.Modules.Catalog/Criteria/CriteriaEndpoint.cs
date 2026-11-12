@@ -38,7 +38,7 @@ internal static class CriteriaEndpoint
             .WithDescription(
                 "Without release the active release applies. A selection names at most one useCase, at least one app type " +
                 "and every always-selected product part. 400 validation for an incomplete selection, 400 selection-excluded " +
-                "for a value excluded by the rules of the release.")
+                "for a value excluded by the rules of the release." + CatalogLanguage.OpenApiNote)
             .Produces<CriteriaResponse>(StatusCodes.Status200OK, "application/json")
             .Produces(StatusCodes.Status304NotModified)
             .ProducesValidationProblem()
@@ -83,7 +83,9 @@ internal static class CriteriaEndpoint
                 : TypedResults.ValidationProblem(errors);
         }
 
+        // Every release has German texts only so far; the language is named for API-06.
+        var language = CatalogLanguage.Negotiate(context.Request.Headers.AcceptLanguage, CatalogLanguage.OfReleases);
         var response = CriteriaResolver.Resolve(values, snapshot, result.Selection);
-        return CatalogJsonAnswer.Create(response, namedRelease, jsonOptions.Value.SerializerOptions, context);
+        return CatalogJsonAnswer.Create(response, namedRelease, language, jsonOptions.Value.SerializerOptions, context);
     }
 }

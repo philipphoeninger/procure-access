@@ -34,7 +34,7 @@ internal static class FilterOptionsEndpoint
             .WithSummary("Filter values of the four layers with the selected values that exclude them")
             .WithDescription(
                 "Without release the rules of the active release apply. Without a selection every excludedBy is empty. " +
-                "Inactive use cases are not listed but are accepted in useCase.")
+                "Inactive use cases are not listed but are accepted in useCase." + CatalogLanguage.OpenApiNote)
             .Produces<FilterOptionsResponse>(StatusCodes.Status200OK, "application/json")
             .Produces(StatusCodes.Status304NotModified)
             .ProducesValidationProblem()
@@ -68,7 +68,9 @@ internal static class FilterOptionsEndpoint
             return TypedResults.ValidationProblem(errors);
         }
 
+        // Every release has German texts only so far; the language is named for API-06.
+        var language = CatalogLanguage.Negotiate(context.Request.Headers.AcceptLanguage, CatalogLanguage.OfReleases);
         var response = FilterOptionsResolver.Resolve(values, snapshot, selection);
-        return CatalogJsonAnswer.Create(response, namedRelease, jsonOptions.Value.SerializerOptions, context);
+        return CatalogJsonAnswer.Create(response, namedRelease, language, jsonOptions.Value.SerializerOptions, context);
     }
 }
