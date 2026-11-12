@@ -1,7 +1,7 @@
 # S4-23 — Accept-Language on the catalog list endpoints
 
 > **Sprint:** 04, P0 task S4-23 (1 point, early backend task). **Issues:** none. **Requirements / invariants:** ARCHITECTURE §7.1 („All list endpoints honour `Accept-Language`“), SPEC §8.1, §8.2, §3 (English user interface later); API-06 → `active` for the two catalog endpoints.
-> **Status:** done — pull request open, not merged.
+> **Status:** done — pull request #297 open.
 > **Scope:** `GET /api/v1/catalog/filter-options` and `GET /api/v1/catalog/criteria` choose their language from `Accept-Language` (`de`, `en`), answer German while a release has German texts only, and name the language in `Content-Language`; `Vary: Accept-Language` and the language in the `ETag`; TESTING_v53, ARCHITECTURE_v42 (C128), SPEC v2.14. Not here: English texts in a release (format and storage need an ADR), the language of the export files, Problem Details texts, the legacy controllers, the client.
 > **Owner decisions:** none needed. The defaults stated before the task and accepted by the owner on 2026-11-12: (1) no language in the release format yet; (2) only the two catalog endpoints; (3) every other language, no header and a header that cannot be read get German, never 406; (4) `Vary: Accept-Language`, `Content-Language` also on a 304, the language in the `ETag`; (5) only the header counts, not the host's request localization; (6) API-06 `active` with the other list endpoints deferred, as API-05 does.
 
@@ -60,7 +60,7 @@ Checked without finding: no database access added (the language is chosen per re
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request opened; not merged | Owner |
+| P1 | Pull request #297 opened; not merged | Owner |
 | P2 | English catalog texts: where a release stores them (folder format, `CriterionRevision`, filter-value names) and how `CatalogLanguage.OfReleases` becomes a property of the release | ADR when the project team plans English texts (SPEC §3: English UI later) |
 | P3 | The export files are German only; SPEC §8.3 says export language = UI language (`ExportTexts` would get a second resource) | With English texts (C124 (1)) |
 | P4 | The other list endpoints (directory, workspace) honour `Accept-Language` with their steps; API-06 says so (V167) | Steps 5/6 |
