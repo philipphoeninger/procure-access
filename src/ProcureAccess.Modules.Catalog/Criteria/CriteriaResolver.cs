@@ -37,6 +37,58 @@ internal static class CriteriaResolver
 {
     public static CriteriaResponse Resolve(CatalogFilterValues values, CatalogReleaseSnapshot release, CriteriaSelection selection)
     {
+        var criteria = ResolveCriteria(values, release, selection)
+            .Select(r => new CriterionItem(
+                r.Criterion.RevisionId,
+                r.Criterion.Rules.Key,
+                r.IsProcedure ? "testProcedure" : "requirement",
+                r.Number,
+                r.Criterion.TitleDe,
+                r.Criterion.PlainLanguageDe,
+                r.ProductPart,
+                [.. r.AppliesTo.Select(a => new AppTypeItem(a.Key, a.NameDe))],
+                [.. r.Criterion.StandardReferences.Select(s => new StandardReferenceItem(StandardName(s.Standard), s.Clause, s.Url))],
+                RatingNames(r.AllowedRatings),
+                [.. r.Texts.Select(t => new ProcedureTextItem(
+                    t.TestType,
+                    t.OriginalNumber,
+                    t.OriginalTitleDe,
+                    t.ApplicabilityDe,
+                    t.RequirementDe,
+                    t.RationaleWhyDe,
+                    RatingNames(t.AllowedRatings),
+                    t.PositiveExamplesDe,
+                    t.NegativeExamplesDe,
+                    t.SourceUrl))],
+                new ResolvedPriorityItem(
+                    r.Priority.Level.ToString(),
+                    r.Priority.Weight,
+                    r.Priority.RationaleDe,
+                    SourceName(r.Priority.Source),
+                    new MatchedRuleItem(RuleKindName(r.Priority.MatchedRule.Kind), r.Priority.MatchedRule.AppType, r.Priority.MatchedRule.UseCase))))
+            .ToList();
+
+        var withoutCriteria = values.AppTypes
+            .Where(a => selection.AppTypes.Contains(a.Key))
+            .Where(a => !release.Criteria.Any(c =>
+                c.Rules.Kind == CriterionKind.Requirement && c.Rules.AppTypesApplyingTo(selection).Contains(a.Key)))
+            .OrderBy(a => a.SortOrder).ThenBy(a => a.Key, StringComparer.Ordinal)
+            .Select(a => new AppTypeItem(a.Key, a.NameDe))
+            .ToList();
+
+        return new CriteriaResponse(release.Version, criteria, withoutCriteria);
+    }
+
+    /// <summary>
+    /// The criteria of the selection with their resolved priority, texts, ratings, product part and
+    /// app types, in list order: the one resolution path of the criteria endpoint and of
+    /// <see cref="CatalogSelectionResolver"/> (the export, S4-19).
+    /// </summary>
+    public static IReadOnlyList<ResolvedCriterion> ResolveCriteria(
+        CatalogFilterValues values,
+        CatalogReleaseSnapshot release,
+        CriteriaSelection selection)
+    {
         ArgumentNullException.ThrowIfNull(values);
         ArgumentNullException.ThrowIfNull(release);
         ArgumentNullException.ThrowIfNull(selection);
@@ -55,7 +107,7 @@ internal static class CriteriaResolver
             .Select(p => p.TestType)
             .ToHashSet(StringComparer.Ordinal);
 
-        var criteria = new List<CriterionItem>();
+        var criteria = new List<ResolvedCriterion>();
         foreach (var criterion in release.Criteria)
         {
             var isProcedure = criterion.Rules.Kind == CriterionKind.TestProcedure;
@@ -79,51 +131,22 @@ internal static class CriteriaResolver
                 ? Rating.None
                 : texts.Count == 0 ? Rating.All : texts.Aggregate(Rating.None, (union, t) => union | t.AllowedRatings);
 
-            criteria.Add(new CriterionItem(
-                criterion.RevisionId,
-                criterion.Rules.Key,
-                isProcedure ? "testProcedure" : "requirement",
-                isProcedure ? null : criterion.Rules.Key,
-                criterion.TitleDe,
-                criterion.PlainLanguageDe,
+            criteria.Add(new ResolvedCriterion(
+                criterion,
+                priority,
+                texts,
+                allowed,
                 isProcedure ? null : ProductPartOf(criterion.Rules, selection, partOrder),
-                isProcedure ? [] : AppTypesOf(criterion.Rules, selection, appTypesInOrder),
-                [.. criterion.StandardReferences.Select(r => new StandardReferenceItem(StandardName(r.Standard), r.Clause, r.Url))],
-                RatingNames(allowed),
-                [.. texts.Select(t => new ProcedureTextItem(
-                    t.TestType,
-                    t.OriginalNumber,
-                    t.OriginalTitleDe,
-                    t.ApplicabilityDe,
-                    t.RequirementDe,
-                    t.RationaleWhyDe,
-                    RatingNames(t.AllowedRatings),
-                    t.PositiveExamplesDe,
-                    t.NegativeExamplesDe,
-                    t.SourceUrl))],
-                new ResolvedPriorityItem(
-                    priority.Level.ToString(),
-                    priority.Weight,
-                    priority.RationaleDe,
-                    SourceName(priority.Source),
-                    new MatchedRuleItem(RuleKindName(priority.MatchedRule.Kind), priority.MatchedRule.AppType, priority.MatchedRule.UseCase))));
+                isProcedure ? [] : AppTypesOf(criterion.Rules, selection, appTypesInOrder)));
         }
 
-        var withoutCriteria = values.AppTypes
-            .Where(a => selection.AppTypes.Contains(a.Key))
-            .Where(a => !release.Criteria.Any(c =>
-                c.Rules.Kind == CriterionKind.Requirement && c.Rules.AppTypesApplyingTo(selection).Contains(a.Key)))
-            .OrderBy(a => a.SortOrder).ThenBy(a => a.Key, StringComparer.Ordinal)
-            .Select(a => new AppTypeItem(a.Key, a.NameDe))
-            .ToList();
-
-        return new CriteriaResponse(release.Version, criteria, withoutCriteria);
+        return criteria;
     }
 
-    private static List<AppTypeItem> AppTypesOf(CriterionRules rules, CriteriaSelection selection, List<AppType> appTypesInOrder)
+    private static List<AppType> AppTypesOf(CriterionRules rules, CriteriaSelection selection, List<AppType> appTypesInOrder)
     {
         var applying = rules.AppTypesApplyingTo(selection);
-        return [.. appTypesInOrder.Where(a => applying.Contains(a.Key)).Select(a => new AppTypeItem(a.Key, a.NameDe))];
+        return [.. appTypesInOrder.Where(a => applying.Contains(a.Key))];
     }
 
     /// <summary>Owner, S3-20 decision 2: SPEC §8.2 sends one part (Kriterienkatalog K-4).</summary>
@@ -173,4 +196,19 @@ internal static class CriteriaResolver
         MatchedRuleKind.Default => "default",
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown rule kind."),
     };
+}
+
+/// <summary>A criterion of a selection as <see cref="CriteriaResolver.ResolveCriteria"/> resolves it.</summary>
+internal sealed record ResolvedCriterion(
+    CriterionSnapshot Criterion,
+    ResolvedPriority Priority,
+    IReadOnlyList<ProcedureTextSnapshot> Texts,
+    Rating AllowedRatings,
+    string? ProductPart,
+    IReadOnlyList<AppType> AppliesTo)
+{
+    public bool IsProcedure => Criterion.Rules.Kind == CriterionKind.TestProcedure;
+
+    /// <summary>The key of a requirement criterion (the EN 301 549 number, S3-15); null for a procedure criterion (SPEC §8.3).</summary>
+    public string? Number => IsProcedure ? null : Criterion.Rules.Key;
 }

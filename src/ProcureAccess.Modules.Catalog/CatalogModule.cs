@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Catalog.Commands;
+using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Catalog.Criteria;
 using ProcureAccess.Modules.Catalog.FilterOptions;
 using ProcureAccess.Modules.Catalog.Persistence;
@@ -24,7 +25,8 @@ namespace ProcureAccess.Modules.Catalog;
 /// their own database context (ADR-014); since S3-16 the command <c>catalog import</c>, since S3-17
 /// <c>catalog activate</c> and the cached catalog reads (<see cref="CatalogReader"/>), since S3-19
 /// the endpoint <c>GET /api/v1/catalog/filter-options</c> (<see cref="MapCatalogEndpoints"/>), since
-/// S4-08 the test-release seeder of development and E2E stacks (<see cref="SeedTestReleaseAsync"/>). The legacy
+/// S4-08 the test-release seeder of development and E2E stacks (<see cref="SeedTestReleaseAsync"/>), since
+/// S4-19 <see cref="ICatalogSelectionResolver"/> for the export. The legacy
 /// criteria code in API, DAL, MODELS and SERVICES keeps serving the old screens until they are
 /// replaced (O-S3-5).
 /// </summary>
@@ -57,6 +59,9 @@ public static class CatalogModule
         // Catalog reads, cached by release (ARCHITECTURE §9.6, D10; CAT-09, S3-17).
         services.AddMemoryCache();
         services.AddScoped<CatalogReader>();
+
+        // Server-side resolution of a selection for other modules, e.g. the ad-hoc export (EXP-07, S4-19).
+        services.AddScoped<ICatalogSelectionResolver, CatalogSelectionResolver>();
 
         return services;
     }

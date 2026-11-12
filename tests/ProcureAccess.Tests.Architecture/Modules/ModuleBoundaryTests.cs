@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.Export.Sources;
 using Shouldly;
 using Xunit;
 
@@ -16,6 +17,7 @@ public class ModuleBoundaryTests
     private const string Catalog = ModuleMap.Prefix + "Catalog";
     private const string Workspace = ModuleMap.Prefix + "Workspace";
     private const string Directory = ModuleMap.Prefix + "Directory";
+    private const string Export = ModuleMap.Prefix + "Export";
     private const string Contracts = ModuleMap.ContractsSuffix;
 
     private static readonly ProjectGraph Graph = ProjectGraph.LoadSolution();
@@ -60,5 +62,23 @@ public class ModuleBoundaryTests
         ModuleRules.TypesUsingAny(ModuleRules.Load(Workspace + Contracts), Workspace + Contracts, directoryInternals).ShouldBeEmpty();
         ModuleRules.TypesUsingAny(ModuleRules.Load(Directory), Directory, workspaceAll).ShouldBeEmpty();
         ModuleRules.TypesUsingAny(ModuleRules.Load(Directory + Contracts), Directory + Contracts, workspaceAll).ShouldBeEmpty();
+    }
+
+    /// <summary>
+    /// ARC-03, the part deferred to step 2 (TESTING V74): the ad-hoc export source reads the catalog
+    /// only through <c>Catalog.Contracts</c> (ARCHITECTURE §4.4, C62) — no saved configuration, no
+    /// other module, no legacy project. Its own module and Platform's contracts are allowed.
+    /// </summary>
+    [Fact(DisplayName = "INV:ARC-03 " + nameof(AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContracts))]
+    [Trait("Invariant", "ARC-03")]
+    public void AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContracts()
+    {
+        string[] allowed = [Export, Export + Contracts, Catalog + Contracts, ModuleMap.PlatformContracts];
+        var forbidden = ModuleMap.AllModuleProjects
+            .Except(allowed)
+            .Concat(ModuleMap.LegacyProjects)
+            .Select(ModuleRules.Load);
+
+        ModuleRules.TypeUsingAny(typeof(AdHocSelectionSource), forbidden).ShouldBeEmpty();
     }
 }

@@ -44,6 +44,28 @@ internal static class ModuleRules
     }
 
     /// <summary>
+    /// <paramref name="subject"/> and its nested types if they use a type of one of the
+    /// <paramref name="forbidden"/> assemblies; empty when the rule holds. For a rule on one type,
+    /// e.g. <c>AdHocSelectionSource</c> (ARC-03).
+    /// </summary>
+    public static IReadOnlyList<string> TypeUsingAny(Type subject, IEnumerable<Assembly> forbidden)
+    {
+        ArgumentNullException.ThrowIfNull(subject);
+        var forbiddenTypes = forbidden.SelectMany(OwnTopLevelTypeNames).ToArray();
+        if (forbiddenTypes.Length == 0)
+        {
+            return [];
+        }
+
+        var result = Types.InAssembly(subject.Assembly)
+            .That().ResideInNamespace(subject.Namespace).And().HaveNameStartingWith(subject.Name)
+            .ShouldNot().HaveDependencyOnAny(forbiddenTypes)
+            .GetResult();
+
+        return result.IsSuccessful ? [] : [.. result.FailingTypeNames];
+    }
+
+    /// <summary>
     /// The public types among <paramref name="exportedTypes"/> that are neither the module
     /// registration class nor a controller (ARCHITECTURE §4.3); empty when the rule holds. A
     /// generated EF migration left <c>public</c> shows up here (S2-07 R3).
