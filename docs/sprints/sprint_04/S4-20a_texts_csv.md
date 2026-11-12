@@ -1,7 +1,7 @@
 # S4-20a — Texts of the export files and the CSV renderer
 
 > **Sprint:** 04, P0 task S4-20a (first part of S4-20, M2.7; split by O-S4-68). **Issues:** none. **Requirements / invariants:** R-LST-12 (file format per SPEC §8.3); EXP-04 → `active`, EXP-03 → `active` with its CSV part; the CSV file row of CAT-16.
-> **Status:** done — pull request open (see §5 P1 for the number).
+> **Status:** done — pull request #286 open.
 > **Scope:** the texts of the export files as UX copy keys (UX copy v24 `exportFile.*`), embedded in the Export module and checked by `check-i18n.mjs` as its second target; the column model shared by every format; the CSV renderer; TESTING_v49, ARCHITECTURE_v38, SPEC v2.11. Not here: the XLSX renderer, the sheet „Info“, `Export:ToolUrl` and ClosedXML (S4-20b); the short-description field in the catalog (S4-24); the export dialog S13, rate limit and `ExportCreated` (S4-21).
 > **Owner decisions (2026-11-12, all (a)):** **O-S4-6** — the short description becomes a catalog field (S4-24, ADR); the column is written empty until then. **O-S4-62** — Claude drafts the missing file texts in UX copy v24, the owner confirms the wording in this pull request. **O-S4-63** — the texts are an embedded `de.json` in the Export module, checked by `check-i18n.mjs`. **O-S4-64** — the tool URL is the 🔧 server setting `Export:ToolUrl` = `https://procureaccess.de` (S4-20b). **O-S4-65** — „Priorität (Ihre Wahl)“ holds the level that applies. **O-S4-66** — the „Kriterien“ data range is an Excel table `Kriterien` (S4-20b). **O-S4-67** — the CSV guards text cells against formulas. **O-S4-68** — S4-20 is split into S4-20a and S4-20b. ClosedXML 0.105.1 approved for S4-20b.
 
@@ -69,7 +69,7 @@ Checked without finding: no new endpoint, query or log line; the texts are read 
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request number to be filled in after it is opened | This protocol, in the pull request |
+| P1 | Pull request #286 opened; not merged | Owner |
 | P2 | Owner: confirm the wording of U109 (UX copy v24 §5.6 „Exportdatei“), especially „Nummer“ (SPEC writes „Nummer (EN 301 549 / BIT inklusiv)“; the parenthesis read as an explanation like „(running)“) and the source line, which should be checked against the BIT inklusiv permission | Owner, in this pull request (O-S4-62) |
 | P3 | XLSX renderer, sheet „Info“, `Export:ToolUrl`, ClosedXML with the Dependabot rule for SixLabors.Fonts ≥ 2; EXP-01, EXP-02, the XLSX part of EXP-03 and of CAT-16 | S4-20b |
 | P4 | The short-description column stays empty | S4-24 (O-S4-6) |
