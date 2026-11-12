@@ -1,7 +1,7 @@
 # S4-24 — Short description in the catalog model
 
 > **Sprint:** 04, P2 stretch task S4-24 (2 points). **Issues:** #237 (`TECH_DEBT_v3.md` TD-30). **Requirements / invariants:** Kriterienkatalog §6.1, SPEC §8.3 (export column „Kurzbeschreibung“), ARCHITECTURE §5.1; CAT-23 (validation of the new field) and CAT-07 (a changed short description is a new revision) — both already `active`, no invariant changes status.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #298 open.
 > **Scope:** the optional field `CriterionRevision.ShortDescriptionDe` with its catalog migration, the release folder property `shortDescriptionDe` (reader, validator, import, revision comparison), the release snapshot and `ICatalogSelectionResolver`, and the export column „Kurzbeschreibung“ that now reads it; ADR-016 in ARCHITECTURE_v43 (C129), SPEC v2.15, UX copy v26 (note only), Handoff 1.24, gap list v3. Not here: the criteria answer (SPEC §8.2) and the S11 card (O-S4-78 (a)), the S11 search over it, the texts themselves (project team, K-1).
 > **Owner decisions (2026-11-12, all (a)):** **O-S4-6** — the short description is a field of the revision and of the release format, with an ADR; the column was written empty until now (S4-20a). **O-S4-78** — scope: catalog model, release format, import and the export column only; the S11 card and the criteria answer follow as their own task. **O-S4-79** — format: an optional plain string `shortDescriptionDe`, no Markdown, no length limit, checked like `plainLanguageDe`. **O-S4-80** — the gap list gets a v3 that names the field and lists it as missing for every criterion in one general line, no column per criterion. Defaults stated before the task and not objected to: name `ShortDescriptionDe`; `PlainLanguageDe` stays the plain-language title (no rename, its comment and Handoff §5.5 corrected); the test release `T.1`/`T.2` and the MiniCatalog give `99.1` a short description; 2026.1 stays without one; UX copy v26 changes only the note of `exportFile.column.shortDescription`.
 
@@ -76,7 +76,7 @@ Checked without finding: no new query (the snapshot already loads the revision; 
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request opened; not merged | Owner |
+| P1 | Pull request #298 opened; not merged | Owner |
 | P2 | The criteria answer (SPEC §8.2) and the S11 card (Handoff §5.5, Kriterienkatalog §6.1: under the source title) do not show the short description; the S11 search (O-S4-26) does not look at it | Proposed issue: „S11: show the short description on the criterion card“ — `shortDescription` in the criteria answer (SPEC §8.2, contract test), the card line, and an owner decision on the search |
 | P3 | The project team writes the texts (K-1); release 2026.1 has none | Gap list v3; with the priorities (O-1) in a later 2026.x folder |
 | P4 | A kept dev database stores `T.1` without the short description of `99.1` (a stored release never changes) | `docker compose down -v` before using the dev stack with this branch; CI and the E2E stack start empty |
