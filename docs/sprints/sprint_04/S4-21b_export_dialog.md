@@ -1,7 +1,7 @@
 # S4-21b — Export dialog S13
 
 > **Sprint:** 04, P0 task S4-21b (client part of S4-21, M2.7; split by O-S4-73). **Issues:** none. **Requirements / invariants:** R-LST-11 (export dialog S13), R-LST-12 (the download); SPEC §7.3 (429 on the client); A11Y-01, A11Y-08, A11Y-09 stay green; no invariant changes.
-> **Status:** done — pull request open, not merged.
+> **Status:** done — pull request #294 open.
 > **Scope:** `ExportDialog` (S13, S13-E, S13-M) in place of the placeholder of S4-18a, the export request and the download, the request marker `CALLER_SHOWS_FAILURES`, Problem Details read from a `Blob` error body, UX copy v25 U110 (`errors.rateLimit.one`), the panel class `pa-dialog`; ARCHITECTURE_v41 (C127). Not here: the reload flow after `release-mismatch` (follow-up, O-S4-72), J1 to the export (S4-22).
 > **Owner decisions (2026-11-12, all (a)):** **O-S4-71** — UX copy v25 U110 `errors.rateLimit.one` („… Bitte warten Sie 1 Minute …“, wording confirmed). **O-S4-72** — `criteria.export.outdated` with „Schließen“ only; the reload flow is a follow-up. **O-S4-73** — S4-21 split; this is the client part, after S4-21a (#293, merged). **O-S4-74** — the interceptor reads Problem Details from a `Blob` body, and a new marker turns off snackbar and server page for a request whose caller shows every failure (the offline notice stays).
 
@@ -71,7 +71,7 @@ Pass with the checklist (security, correctness, edge cases, a11y) over the diff 
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request opened; not merged | Owner |
+| P1 | Pull request #294 opened; not merged | Owner |
 | P2 | Reload flow after `release-mismatch`: unpin the release, reload S11 for the same selection, drop the per-criterion changes as the text says, S10 if the selection is excluded now; needs a UX copy key for the action | Proposed issue (O-S4-72) |
 | P3 | Figma differences D1–D5 | Owner / designer: adjust Figma or ask for a change |
 | P4 | J1 to the export with the downloaded file | S4-22 |
