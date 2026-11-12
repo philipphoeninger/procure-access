@@ -1,7 +1,7 @@
 # S4-21a — Rate limits, client IP and /health/ready
 
 > **Sprint:** 04, P0 task S4-21a (API part of S4-21, M2.7; split by O-S4-73). **Issues:** #112. **Requirements / invariants:** SPEC §7.3 (rate limits), R-MET-01 (`ExportCreated`), R-ADM-04 (health endpoints); API-05 → `active` for the anonymous export and `CriteriaListShown`.
-> **Status:** done — pull request open, not merged.
+> **Status:** done — pull request #293 open.
 > **Scope:** the client IP behind the reverse proxies, the rate limiter of Platform with the policies `AnonymousExport` and `CriteriaListShown`, the limit and the configurable timeout of `/health/ready`, the `ExportCreated` caller, `Content-Disposition` exposed by CORS, the relaxed E2E limits; SPEC v2.12, ARCHITECTURE_v40, TESTING_v51. Not here: the export dialog S13, the download, the client handling of 429 and Problem Details from a blob body, `errors.rateLimit.one` — all S4-21b.
 > **Owner decisions (2026-11-12, all (a)):** **O-S4-69** — the API takes the client IP from `X-Forwarded-For`, trusted only from proxies in private and loopback networks, for at most 🔧 2 proxies. **O-S4-70** — `/health/ready`: at most 2 checks at a time over all callers, no queue, 429; the timeout 🔧. **O-S4-71** — UX copy v25 U110 `errors.rateLimit.one` (S4-21b; wording confirmed). **O-S4-72** — `criteria.export.outdated` with „Schließen“ only, the reload flow a follow-up (S4-21b). **O-S4-73** — S4-21 split into S4-21a (API) and S4-21b (client). **O-S4-74** — the client reads Problem Details from a blob error body and gets a request marker for a caller that shows every failure itself (S4-21b).
 
@@ -71,7 +71,7 @@ Checked without finding: the 429 is written before the body is read (export) and
 
 | # | Point | Next step |
 |---|---|---|
-| P1 | Pull request opened; not merged | Owner |
+| P1 | Pull request #293 opened; not merged | Owner |
 | P2 | The client IP is only as trustworthy as the deployment: no published API port on staging/production, and no direct Traefik route to the API that appends a forged `X-Forwarded-For` (R1) | Owner: confirm in Dokploy; proposed issue |
 | P3 | S13, the download, 429 and blob Problem Details on the client, `errors.rateLimit.one` (U110), `criteria.export.outdated` with „Schließen“ | S4-21b |
 | P4 | Reload flow after `release-mismatch` (unpin the release, reload S11, drop per-criterion changes, S10 if the selection is now excluded; needs a UX copy key) | Follow-up issue (O-S4-72) |
