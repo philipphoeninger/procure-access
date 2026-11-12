@@ -6,13 +6,11 @@ namespace API.ProcureAccess.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CriteriaController : BaseCrudController<Criterion, CriterionDto, CriteriaController>
+public class CriteriaController : BaseCrudController<Criterion, CriterionDto>
 {
     private readonly ICriterionService _criterionService;
 
-    public CriteriaController(
-        IAppLogging<CriteriaController> logger,
-        ICriterionService service) : base(logger, service)
+    public CriteriaController(ICriterionService service) : base(service)
     {
         _criterionService = service;
     }

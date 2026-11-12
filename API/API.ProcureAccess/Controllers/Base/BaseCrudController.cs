@@ -13,20 +13,15 @@ namespace API.ProcureAccess.Controllers.Base;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class BaseCrudController<TEntity, TDto, TController> : ControllerBase
+public class BaseCrudController<TEntity, TDto> : ControllerBase
     where TEntity : BaseEntity, new()
     where TDto : BaseDto, new()
-    where TController : class
 {
     protected readonly IBaseService<TEntity, TDto> MainService;
-    protected readonly IAppLogging<TController> Logger;
 
-    protected BaseCrudController(
-        IAppLogging<TController> logger,
-        IBaseService<TEntity, TDto> service)
+    protected BaseCrudController(IBaseService<TEntity, TDto> service)
     {
         MainService = service;
-        Logger = logger;
     }
 
     /// <summary>

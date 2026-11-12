@@ -7,13 +7,11 @@ namespace API.ProcureAccess.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProposalsController : BaseCrudController<Proposal, ProposalDto, ProposalsController>
+public class ProposalsController : BaseCrudController<Proposal, ProposalDto>
 {
     private readonly IProposalService _proposalService;
 
-    public ProposalsController(
-        IAppLogging<ProposalsController> logger,
-        IProposalService service) : base(logger, service)
+    public ProposalsController(IProposalService service) : base(service)
     {
         _proposalService = service;
     }
