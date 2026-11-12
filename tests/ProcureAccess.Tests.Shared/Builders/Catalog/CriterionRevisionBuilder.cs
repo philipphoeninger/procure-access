@@ -25,6 +25,7 @@ internal sealed class CriterionRevisionBuilder : Builder<CriterionRevision>
     private int _revisionNumber = 1;
     private string? _titleDe;
     private string? _plainLanguageDe;
+    private string? _shortDescriptionDe;
     private string? _rationaleDe;
     private int _sortOrder;
 
@@ -57,6 +58,12 @@ internal sealed class CriterionRevisionBuilder : Builder<CriterionRevision>
     public CriterionRevisionBuilder WithPlainLanguage(string plainLanguageDe)
     {
         _plainLanguageDe = plainLanguageDe;
+        return this;
+    }
+
+    public CriterionRevisionBuilder WithShortDescription(string shortDescriptionDe)
+    {
+        _shortDescriptionDe = shortDescriptionDe;
         return this;
     }
 
@@ -132,7 +139,8 @@ internal sealed class CriterionRevisionBuilder : Builder<CriterionRevision>
             _titleDe ?? $"Titel {criterion.Key}",
             _plainLanguageDe,
             _rationaleDe,
-            _sortOrder);
+            _sortOrder,
+            _shortDescriptionDe);
         foreach (var rule in _rules)
         {
             rule(revision);

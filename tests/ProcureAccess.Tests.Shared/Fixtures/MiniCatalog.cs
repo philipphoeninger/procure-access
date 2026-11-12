@@ -18,6 +18,8 @@ namespace ProcureAccess.Tests.Shared.Fixtures;
 /// <list type="bullet">
 /// <item>Priority resolution (CAT-01, CAT-02): <see cref="Keys.PriorityAllLevels"/> has a rule on
 /// each of the four levels, plus a level-3 rule for the inactive use case (CAT-18).</item>
+/// <item>Short description (Kurzbeschreibung, ADR-016): only <see cref="Keys.PriorityAllLevels"/>
+/// has one, so the export shows a filled and an empty cell.</item>
 /// <item>Several app types (CAT-14): <see cref="Keys.PriorityAppTypes"/> decides by level, by
 /// weight and, at equal level and weight, by <c>AppType.SortOrder</c>.</item>
 /// <item>Product parts: <see cref="Keys.DefaultOnly"/> applies with Basisfunktionalität,
@@ -85,6 +87,7 @@ internal sealed class MiniCatalog
         // Requirement criteria whose revision both releases share.
         var priorityAllLevels = ARevision().WithKey(Keys.PriorityAllLevels).WithSortOrder(10)
             .WithTitle("Testkriterium mit Regeln auf allen vier Ebenen")
+            .WithShortDescription("Testkurzbeschreibung: Das Kriterium hat Regeln auf allen vier Ebenen.")
             .AppliesTo(v.Web).AppliesTo(v.SoftwareOpen).AppliesTo(v.MobileOpen)
             .WithPriority(v.Web, v.Hr, PriorityLevel.A)
             .WithPriority(v.SoftwareOpen, null, PriorityLevel.Info)

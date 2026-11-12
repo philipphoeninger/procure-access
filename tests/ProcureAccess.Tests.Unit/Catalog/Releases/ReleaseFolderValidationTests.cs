@@ -449,6 +449,30 @@ public class ReleaseFolderValidationTests
         result.Errors.Select(e => e.Path).ShouldBe(["$.category", "$.titleDe"], ignoreOrder: true);
     }
 
+    [Theory(DisplayName = "INV:CAT-23 " + nameof(ShortDescription_EmptyOrWithSurroundingWhiteSpace_IsRefused))]
+    [Trait("Invariant", "CAT-23")]
+    [InlineData("", "The text is empty; leave the property out instead.")]
+    [InlineData("   ", "The text is empty; leave the property out instead.")]
+    [InlineData(" Kurz.", "The text starts or ends with white space.")]
+    public void ShortDescription_EmptyOrWithSurroundingWhiteSpace_IsRefused(string value, string message)
+    {
+        var result = Validate(T1, files => Edit(files, "criteria/99.7.json", json => json["shortDescriptionDe"] = value));
+
+        ShouldFailWith(result, "criteria/99.7.json", "$.shortDescriptionDe", message);
+    }
+
+    [Fact(DisplayName = "INV:CAT-23 " + nameof(ShortDescription_Given_IsReadAsWritten))]
+    [Trait("Invariant", "CAT-23")]
+    public void ShortDescription_Given_IsReadAsWritten()
+    {
+        var result = Validate(T1, files => Edit(
+            files, "criteria/99.7.json", json => json["shortDescriptionDe"] = "Ein Satz. Noch ein Satz."));
+
+        result.Errors.ShouldBeEmpty();
+        var criterion = result.Release!.Criteria.Single(c => c.Key == "99.7");
+        criterion.ShortDescriptionDe.ShouldBe("Ein Satz. Noch ein Satz.");
+    }
+
     [Fact]
     public void StandardReference_UnknownStandard_IsRefused()
     {

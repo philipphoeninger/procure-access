@@ -32,7 +32,11 @@ const EXPECTED_KEYS = ['99.1', '99.2', '99.3', '99.4', '99.6', '99.7', '99.8', '
 
 /** The criteria J1 changes on S11, by their catalog title in T.1. */
 const CHANGED = {
-  priority: { key: '99.1', title: 'Testkriterium mit Regeln auf allen vier Ebenen' },
+  priority: {
+    key: '99.1',
+    title: 'Testkriterium mit Regeln auf allen vier Ebenen',
+    shortDescription: 'Testkurzbeschreibung: Das Kriterium hat Regeln auf allen vier Ebenen.',
+  },
   note: { key: '99.2', title: 'Testkriterium für mehrere Anwendungstypen' },
   excluded: { key: '99.7', title: 'Testkriterium 99.7' },
 } as const;
@@ -350,6 +354,8 @@ test.describe('J1 configurator without account', () => {
       const column = (name: string) => XLSX_HEADERS.indexOf(name);
       expect(criteria.map((row) => row[column('Kriterium')])).toEqual(EXPECTED_KEYS.filter((key) => key !== CHANGED.excluded.key));
       const row = (key: string) => criteria.find((cells) => cells[column('Kriterium')] === key)!;
+      expect(row(CHANGED.priority.key)[column('Kurzbeschreibung')]).toBe(CHANGED.priority.shortDescription);
+      expect(row(CHANGED.note.key)[column('Kurzbeschreibung')]).toBe('');
       expect(row(CHANGED.priority.key)[column('Priorität (empfohlen)')]).toBe('A – Mindestanforderung');
       expect(row(CHANGED.priority.key)[column('Priorität (Ihre Wahl)')]).toBe('Hinweis');
       expect(row(CHANGED.priority.key)[column('Begründung der Empfehlung')]).toBe('Testbegründung A für web und hr.');

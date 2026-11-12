@@ -340,6 +340,7 @@ internal sealed partial class ReleaseFolderValidator
         var supersedes = ValidateSupersedes(file, key, json.Supersedes, releaseKeys, successors);
         var title = RequiredText(file, "$.titleDe", json.TitleDe, maxLength: null);
         var plainLanguage = OptionalText(file, "$.plainLanguageDe", json.PlainLanguageDe, maxLength: null);
+        var shortDescription = OptionalText(file, "$.shortDescriptionDe", json.ShortDescriptionDe, maxLength: null);
         var rationale = Lines(file, "$.rationaleDe", json.RationaleDe);
         if (json.SortOrder is null)
         {
@@ -362,8 +363,8 @@ internal sealed partial class ReleaseFolderValidator
         }
 
         return new CriterionDefinition(
-            key, kind.Value, testType, category, supersedes, title, plainLanguage, rationale, json.SortOrder!.Value,
-            references, applicability, priorities, texts);
+            key, kind.Value, testType, category, supersedes, title, plainLanguage, shortDescription, rationale,
+            json.SortOrder!.Value, references, applicability, priorities, texts);
     }
 
     private CriterionKind? Kind(string file, CriterionJson json)

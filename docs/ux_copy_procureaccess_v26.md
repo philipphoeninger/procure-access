@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v24 (12. November 2026) – v24 ergänzt die Texte der Exportdatei: Namen der Tabellenblätter, Spaltenköpfe und die Zeilen des Blatts „Info“ (`exportFile.*`, §5.6; Sprint 04, S4-20a, U109).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v24):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.11), `ARCHITECTURE_v39.md`, `TESTING_v50.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v26 (12. November 2026) – v26 ändert nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v26):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.15), `ARCHITECTURE_v43.md`, `TESTING_v53.md`, `design_handoff_procureaccess_v1.md` (1.24), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,22 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v25
+
+Quelle: Aufgabe S4-24 (Kurzbeschreibung im Katalogmodell), Owner-Entscheidungen O-S4-6 (a) und O-S4-78 (a) vom 12. November 2026 (`ARCHITECTURE_v43.md` ADR-016). Kein Wortlaut ändert sich, daher keine Bestätigung nötig.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U111 | **Anmerkung zu `exportFile.column.shortDescription`** (§6): „Kurzbeschreibung des Kriteriums (Katalogfeld `shortDescriptionDe`); leer, solange das Projektteam sie nicht geschrieben hat“ statt „Leer, bis der Katalog das Feld hat“ | Der Katalog hat das Feld jetzt; die Texte schreibt das Projektteam (K-1) | S4-24, O-S4-6 |
+
+### Änderungen gegenüber v24
+
+Quelle: Planung von S4-21 (Exportdialog S13 und Ratenbegrenzung), Owner-Entscheidung O-S4-71 (a) vom 12. November 2026; den Wortlaut hat der Product Owner am 12. November 2026 bestätigt. Die Wartezeit einer 429-Antwort (`retryAfterMinutes`) kann 1 sein; SPEC SD25 verlangt dann die Einzahl.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U110 | **Einzahl `errors.rateLimit.one`** (§6): „Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie 1 Minute und versuchen Sie es dann erneut.“ | Ohne Einzahl stünde „1 Minuten“ da (SD25, `translatePlural`) | S4-21b, O-S4-71 |
 
 ### Änderungen gegenüber v23
 
@@ -797,7 +813,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `exportFile.column.number` | Spaltenkopf | Nummer | Nummer nach EN 301 549; leer bei „Geprüft nach …“ |
 | `exportFile.column.title` | Spaltenkopf | Titel | Verständlicher Titel, solange er fehlt der Titel aus dem Katalog (O-S4-32) |
 | `exportFile.column.originalTitle` | Spaltenkopf | Originaltitel | Titel des Prüfschritts bei BIT inklusiv; leer bei „Geprüft nach …“ |
-| `exportFile.column.shortDescription` | Spaltenkopf | Kurzbeschreibung | Leer, bis der Katalog das Feld hat (O-S4-6, S4-24) |
+| `exportFile.column.shortDescription` | Spaltenkopf | Kurzbeschreibung | Kurzbeschreibung des Kriteriums (Katalogfeld `shortDescriptionDe`); leer, solange das Projektteam sie nicht geschrieben hat (O-S4-6, U111) |
 | `exportFile.column.productPart` | Spaltenkopf | Funktionsbereich | |
 | `exportFile.column.recommended` | Spaltenkopf | Priorität (empfohlen) | Werte `criteria.priority.A` / `.B` / `.Info` |
 | `exportFile.column.chosen` | Spaltenkopf | Priorität (Ihre Wahl) | Die Stufe, die gilt: die eigene Wahl, sonst die Empfehlung (O-S4-65) |
@@ -1529,6 +1545,7 @@ Fehler werden erst beim Absenden geprüft, nicht beim Tippen. Feldfehler stehen 
 | `errors.server.body` | Text | Das ist ein Fehler bei uns. Ihre Eingaben wurden nicht gespeichert. Bitte versuchen Sie es in einigen Minuten erneut. | |
 | `errors.offline` | Hinweis | Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung. | |
 | `errors.rateLimit` | Hinweis | Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie {{minutes}} Minuten und versuchen Sie es dann erneut. | 429, API-05 |
+| `errors.rateLimit.one` | Hinweis (Einzahl) | Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie 1 Minute und versuchen Sie es dann erneut. | U110 |
 | `errors.antiforgery` | Hinweis (`pa-notice` Fehler, Problemtyp `antiforgery`) | Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut. | U92; Button `common.actions.retry`; Ihre Eingaben bleiben erhalten |
 | `errors.home` | Button | Zur Startseite | |
 | `errors.email.sendFailed` | Hinweis (`pa-notice` Fehler) | Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut. | U72; die Aktion selbst bleibt gespeichert |

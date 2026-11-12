@@ -44,8 +44,14 @@ internal sealed class CriterionRevision : CatalogEntity
 
     public string TitleDe { get; private set; } = null!;
 
-    /// <summary>Plain-language title or summary (K-1); empty until the project team writes it (O-1).</summary>
+    /// <summary>Plain-language title (K-1); empty until the project team writes it (O-1).</summary>
     public string? PlainLanguageDe { get; private set; }
+
+    /// <summary>
+    /// Short description (Kurzbeschreibung, Kriterienkatalog §6.1): one or two plain sentences of the
+    /// project team, no Markdown; empty until the project team writes it (K-1, ADR-016).
+    /// </summary>
+    public string? ShortDescriptionDe { get; private set; }
 
     public string? RationaleDe { get; private set; }
 
@@ -68,7 +74,8 @@ internal sealed class CriterionRevision : CatalogEntity
         string titleDe,
         string? plainLanguageDe = null,
         string? rationaleDe = null,
-        int sortOrder = 0)
+        int sortOrder = 0,
+        string? shortDescriptionDe = null)
     {
         ArgumentNullException.ThrowIfNull(criterion);
         ArgumentOutOfRangeException.ThrowIfLessThan(revisionNumber, 1);
@@ -79,6 +86,7 @@ internal sealed class CriterionRevision : CatalogEntity
             RevisionNumber = revisionNumber,
             TitleDe = titleDe,
             PlainLanguageDe = plainLanguageDe,
+            ShortDescriptionDe = shortDescriptionDe,
             RationaleDe = rationaleDe,
             SortOrder = sortOrder,
             _isDraft = true,

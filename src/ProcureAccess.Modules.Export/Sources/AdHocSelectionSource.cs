@@ -238,6 +238,7 @@ internal sealed class AdHocSelectionSource(ICatalogSelectionResolver catalog, Pr
             criterion.Number,
             criterion.Title,
             criterion.PlainLanguageTitle,
+            criterion.ShortDescription,
             criterion.OriginalTitle,
             criterion.ProductPart,
             recommended.Level,

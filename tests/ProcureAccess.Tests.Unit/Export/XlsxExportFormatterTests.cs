@@ -32,16 +32,16 @@ public class XlsxExportFormatterTests
 
     private static readonly ExportRow RequirementA = new(
         "11.1.3.1c", CriterionKind.Requirement, "11.1.3.1c", "Info und Beziehungen", "Beziehungen verständlich",
-        "Überschriften", "Bildschirmanzeige", PriorityLevel.A, PriorityLevel.B, 7,
+        "Überschriften und Listen sind als solche erkennbar.", "Überschriften", "Bildschirmanzeige", PriorityLevel.A, PriorityLevel.B, 7,
         "Wichtig für Screenreader.", "Mit Anbieter klären", "https://example.org/11.1.3.1c");
 
     private static readonly ExportRow RequirementInfo = new(
-        "11.2.1", CriterionKind.Requirement, "11.2.1", "Kontrast", null, "Kontrast", null, PriorityLevel.Info, null, null,
+        "11.2.1", CriterionKind.Requirement, "11.2.1", "Kontrast", null, null, "Kontrast", null, PriorityLevel.Info, null, null,
         "Hilft bei Sehbehinderung.", null, null);
 
     private static readonly ExportRow TestedBy = new(
         "PROC-softwareTest", CriterionKind.TestProcedure, null, "Geprüft nach BIT inklusiv Software-Test", null,
-        null, null, PriorityLevel.B, null, 5, "Ein Prüfbericht zeigt den Stand.", null, "https://example.org/software");
+        null, null, null, PriorityLevel.B, null, 5, "Ein Prüfbericht zeigt den Stand.", null, "https://example.org/software");
 
     private readonly XlsxExportFormatter _formatter = new(ExportTexts.LoadGerman(), new ExportToolUrl(new Uri("https://procureaccess.de")));
 
@@ -58,7 +58,7 @@ public class XlsxExportFormatterTests
         Cell(rows[0], "Nummer").GetString().ShouldBe("11.1.3.1c");
         Cell(rows[0], "Titel").GetString().ShouldBe("Beziehungen verständlich");
         Cell(rows[0], "Originaltitel").GetString().ShouldBe("Überschriften");
-        Cell(rows[0], "Kurzbeschreibung").IsEmpty().ShouldBeTrue();
+        Cell(rows[0], "Kurzbeschreibung").GetString().ShouldBe("Überschriften und Listen sind als solche erkennbar.");
         Cell(rows[0], "Funktionsbereich").GetString().ShouldBe("Bildschirmanzeige");
         Cell(rows[0], "Priorität (empfohlen)").GetString().ShouldBe("A – Mindestanforderung");
         Cell(rows[0], "Priorität (Ihre Wahl)").GetString().ShouldBe("B – Bewertungskriterium");
@@ -69,8 +69,9 @@ public class XlsxExportFormatterTests
         Cell(rows[0], "Link zum Prüfschritt").GetString().ShouldBe("https://example.org/11.1.3.1c");
         Cell(rows[0], "Link zum Prüfschritt").GetHyperlink().ExternalAddress.ShouldBe(new Uri("https://example.org/11.1.3.1c"));
 
-        // No plain-language title, no override, no weight, no note.
+        // No plain-language title, no short description, no override, no weight, no note.
         Cell(rows[1], "Titel").GetString().ShouldBe("Kontrast");
+        Cell(rows[1], "Kurzbeschreibung").IsEmpty().ShouldBeTrue();
         Cell(rows[1], "Priorität (Ihre Wahl)").GetString().ShouldBe("Hinweis");
         Cell(rows[1], "Gewichtung").IsEmpty().ShouldBeTrue();
         Cell(rows[1], "Ihre Notiz").IsEmpty().ShouldBeTrue();

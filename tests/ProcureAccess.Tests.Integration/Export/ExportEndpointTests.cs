@@ -94,6 +94,26 @@ public sealed class ExportEndpointTests(ApiFixture api) : IntegrationTest(api), 
         Cell(changedRow, "Ihre Notiz").ShouldBe("Mit Anbieter klären; \"bald\"");
     }
 
+    [Fact]
+    public async Task Export_Csv_ShortDescription_IsTheImportedTextOrEmpty()
+    {
+        await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
+        using var client = CreateClient();
+        var criteria = await CriteriaAsync(client, MiniCatalog.T1Version, WebSelection, Cancellation);
+
+        using var response = await PostAsync(client, Body("csv", MiniCatalog.T1Version, WebSelection, criteria));
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
+        var records = CsvReader.Read(await response.Content.ReadAsByteArrayAsync(Cancellation));
+        var header = records[0].ToList();
+        var shortDescriptions = records.Skip(1).ToDictionary(
+            row => row[header.IndexOf("Kriterium")], row => row[header.IndexOf("Kurzbeschreibung")]);
+        var expected = MiniCatalog.RevisionOf(MiniCatalog.Build(MiniCatalogValues.InMemory()).T1, Keys.PriorityAllLevels).ShortDescriptionDe;
+        shortDescriptions[Keys.PriorityAllLevels].ShouldBe(expected);
+        expected.ShouldNotBeNullOrEmpty();
+        shortDescriptions.Where(pair => pair.Key != Keys.PriorityAllLevels).ShouldAllBe(pair => pair.Value == string.Empty);
+    }
+
     [Fact(DisplayName = "INV:EXP-01 " + nameof(Export_Xlsx_ReopenedWithClosedXml_MatchesTheSelectionAndTheUsersDecisions))]
     [Trait("Invariant", "EXP-01")]
     public async Task Export_Xlsx_ReopenedWithClosedXml_MatchesTheSelectionAndTheUsersDecisions()

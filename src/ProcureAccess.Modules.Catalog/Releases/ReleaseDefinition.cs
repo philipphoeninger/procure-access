@@ -31,6 +31,7 @@ internal sealed record CriterionDefinition(
     IReadOnlyList<string> Supersedes,
     string TitleDe,
     string? PlainLanguageDe,
+    string? ShortDescriptionDe,
     string? RationaleDe,
     int SortOrder,
     IReadOnlyList<StandardReferenceDefinition> StandardReferences,

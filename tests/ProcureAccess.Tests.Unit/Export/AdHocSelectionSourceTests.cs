@@ -30,7 +30,7 @@ public class AdHocSelectionSourceTests
     private static readonly ResolvedCatalogCriterion RequirementB = Criterion(12, "99.2", PriorityLevel.B, 4);
     private static readonly ResolvedCatalogCriterion RequirementInfo = Criterion(13, "99.3", PriorityLevel.Info, null);
     private static readonly ResolvedCatalogCriterion TestedBy = new(
-        14, "PROC-softwareTest", CriterionKind.TestProcedure, null, "Software-Test", null, null, null,
+        14, "PROC-softwareTest", CriterionKind.TestProcedure, null, "Software-Test", null, null, null, null,
         new CatalogPriority(PriorityLevel.Info, null, "Begründung PROC"), "https://example.org/software");
 
     private static readonly ResolvedCatalogCriterion[] All = [RequirementA, RequirementB, RequirementInfo, TestedBy];
@@ -56,7 +56,8 @@ public class AdHocSelectionSourceTests
         rows[0].ShouldSatisfyAllConditions(
             r => r.ChosenLevel.ShouldBe(PriorityLevel.B),
             r => r.Weight.ShouldBe(7),
-            r => r.Rationale.ShouldBe("Begründung 99.1"));
+            r => r.Rationale.ShouldBe("Begründung 99.1"),
+            r => r.ShortDescription.ShouldBe("Kurzbeschreibung 99.1"));
         rows[1].ShouldSatisfyAllConditions(r => r.ChosenLevel.ShouldBeNull(), r => r.Weight.ShouldBe(4));
         rows[2].ShouldSatisfyAllConditions(r => r.ChosenLevel.ShouldBeNull(), r => r.Note.ShouldBe("Eine Notiz"));
         rows[3].ShouldSatisfyAllConditions(r => r.Number.ShouldBeNull(), r => r.TestStepUrl.ShouldBe("https://example.org/software"));
@@ -296,7 +297,8 @@ public class AdHocSelectionSourceTests
     }
 
     private static ResolvedCatalogCriterion Criterion(int revisionId, string key, PriorityLevel level, int? weight) =>
-        new(revisionId, key, CriterionKind.Requirement, key, $"Titel {key}", null, $"Originaltitel {key}", "Basisfunktionalität",
+        new(revisionId, key, CriterionKind.Requirement, key, $"Titel {key}", null, $"Kurzbeschreibung {key}",
+            $"Originaltitel {key}", "Basisfunktionalität",
             new CatalogPriority(level, weight, $"Begründung {key}"), $"https://example.org/{key}");
 
     private static CatalogSelectionResult Resolved(ResolvedCatalogCriterion[] criteria, bool active = true, int criterionCount = 15) =>

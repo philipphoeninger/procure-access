@@ -222,7 +222,13 @@ internal sealed class CatalogReleaseImporter(CatalogDbContext db, TimeProvider t
 
             var lastNumber = criterion.Id == 0 ? 0 : stored.LastRevisionNumbers.GetValueOrDefault(criterion.Id);
             var revision = CriterionRevision.Create(
-                criterion, lastNumber + 1, definition.TitleDe, definition.PlainLanguageDe, definition.RationaleDe, definition.SortOrder);
+                criterion,
+                lastNumber + 1,
+                definition.TitleDe,
+                definition.PlainLanguageDe,
+                definition.RationaleDe,
+                definition.SortOrder,
+                definition.ShortDescriptionDe);
             foreach (var reference in definition.StandardReferences)
             {
                 revision.AddStandardReference(ReferenceOf(reference));

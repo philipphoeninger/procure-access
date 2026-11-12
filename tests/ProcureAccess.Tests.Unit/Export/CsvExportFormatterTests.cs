@@ -33,12 +33,12 @@ public class CsvExportFormatterTests
 
     private static readonly ExportRow Requirement = new(
         "11.1.3.1c", CriterionKind.Requirement, "11.1.3.1c", "Info und Beziehungen", "Beziehungen verständlich",
-        "Überschriften", "Bildschirmanzeige", PriorityLevel.A, PriorityLevel.B, 7,
+        "Überschriften und Listen sind als solche erkennbar.", "Überschriften", "Bildschirmanzeige", PriorityLevel.A, PriorityLevel.B, 7,
         "Wichtig für Screenreader.", "Mit Anbieter klären", "https://example.org/11.1.3.1c");
 
     private static readonly ExportRow TestedBy = new(
         "PROC-softwareTest", CriterionKind.TestProcedure, null, "Geprüft nach BIT inklusiv Software-Test", null,
-        null, null, PriorityLevel.B, null, 5, "Ein Prüfbericht zeigt den Stand.", null, "https://example.org/software");
+        null, null, null, PriorityLevel.B, null, 5, "Ein Prüfbericht zeigt den Stand.", null, "https://example.org/software");
 
     private readonly CsvExportFormatter _formatter = new(ExportTexts.LoadGerman());
 
@@ -84,8 +84,8 @@ public class CsvExportFormatterTests
 
         record.ShouldBe(
         [
-            Release, "1", "11.1.3.1c", "11.1.3.1c", "Beziehungen verständlich", "Überschriften", "",
-            "Bildschirmanzeige", "A – Mindestanforderung", "B – Bewertungskriterium", "7",
+            Release, "1", "11.1.3.1c", "11.1.3.1c", "Beziehungen verständlich", "Überschriften",
+            "Überschriften und Listen sind als solche erkennbar.", "Bildschirmanzeige", "A – Mindestanforderung", "B – Bewertungskriterium", "7",
             "Wichtig für Screenreader.", "Mit Anbieter klären", "https://example.org/11.1.3.1c",
         ]);
     }
@@ -93,11 +93,19 @@ public class CsvExportFormatterTests
     [Fact]
     public void Render_NoPlainLanguageTitleAndNoOverride_WritesTheCatalogTitleAndTheRecommendation()
     {
-        var row = Requirement with { PlainLanguageTitle = null, ChosenLevel = null, Weight = null, Note = null };
+        var row = Requirement with
+        {
+            PlainLanguageTitle = null,
+            ShortDescription = null,
+            ChosenLevel = null,
+            Weight = null,
+            Note = null,
+        };
 
         var record = CsvReader.Read(_formatter.Render(Document(row)))[1];
 
         record[Column("Titel")].ShouldBe("Info und Beziehungen");
+        record[Column("Kurzbeschreibung")].ShouldBe(string.Empty);
         record[Column("Priorität (Ihre Wahl)")].ShouldBe("A – Mindestanforderung");
         record[Column("Gewichtung")].ShouldBe(string.Empty);
         record[Column("Ihre Notiz")].ShouldBe(string.Empty);

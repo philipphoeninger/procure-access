@@ -1,6 +1,7 @@
 {
   "kind": "requirement",
   "titleDe": "Testkriterium mit Regeln auf allen vier Ebenen",
+  "shortDescriptionDe": "Testkurzbeschreibung: Das Kriterium hat Regeln auf allen vier Ebenen.",
   "sortOrder": 10,
   "applicability": [
     {

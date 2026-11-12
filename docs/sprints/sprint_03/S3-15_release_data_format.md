@@ -149,6 +149,7 @@ Nothing else may be in the folder. All files are JSON in UTF-8, without comments
 | `supersedes` | no | keys of earlier criteria this one replaces (rename: one key; merge: several). An old key has one successor; it must not be a key of this release |
 | `titleDe` | yes | title (until K-1: the BIT inklusiv title) |
 | `plainLanguageDe` | no | plain-language title (K-1, O-1) |
+| `shortDescriptionDe` | no | short description (Kurzbeschreibung, K-1): one or two sentences as plain text, no Markdown; an empty value is refused — leave the property out. *Added in sprint 04, task S4-24 (ARCHITECTURE_v43 ADR-016)* |
 | `rationaleDe` | no | lines; the project team's explanation |
 | `sortOrder` | yes | order in lists (a whole number) |
 | `standardReferences` | no | `standard` = `en301549`, `wcag`, `bitInklusiv` or `iso9241`; `clause` (≤ 64); optional `url` — the same clause must have the same URL in every file |

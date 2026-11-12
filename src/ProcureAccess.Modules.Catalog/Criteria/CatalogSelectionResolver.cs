@@ -66,6 +66,7 @@ internal sealed class CatalogSelectionResolver(CatalogReader reader) : ICatalogS
                 r.Number,
                 r.Criterion.TitleDe,
                 r.Criterion.PlainLanguageDe,
+                r.Criterion.ShortDescriptionDe,
                 r.Texts.Count > 0 ? r.Texts[0].OriginalTitleDe : null,
                 r.ProductPart is null ? null : productParts[r.ProductPart],
                 new CatalogPriority(r.Priority.Level, r.Priority.Weight, r.Priority.RationaleDe),

@@ -1,6 +1,6 @@
 # Release 2026.1 – fehlende Inhalte je Kriterium
 
-> **Version:** v1 (9. November 2026) – erstellt mit Aufgabe S3-27 (Sprint 03) aus dem Ordner `catalog/releases/2026.1/`. Für das Projektteam (SPEC_v2 §13 O-1, Kriterienkatalog K-1 und K-6). Quellen: `kriterienkatalog_bit_inklusiv_v1_teil_a.md`, `kriterienkatalog_bit_inklusiv_v1_teil_b.md`.
+> **Version:** v3 (12. November 2026) – v3 nennt das neue Feld für die Kurzbeschreibung (Aufgabe S4-24, Owner-Entscheidungen O-S4-6 (a) und O-S4-80 (a)). v2 (11. November 2026) – v2 ergänzt Z-7, eine Arbeitsmarkierung im Text von 11.1.3.2 (Aufgabe S4-15b, Owner-Entscheidung O-S4-39 (a)). v1 (9. November 2026) – erstellt mit Aufgabe S3-27 (Sprint 03) aus dem Ordner `catalog/releases/2026.1/`. Für das Projektteam (SPEC_v2 §13 O-1, Kriterienkatalog K-1 und K-6). Quellen: `kriterienkatalog_bit_inklusiv_v1_teil_a.md`, `kriterienkatalog_bit_inklusiv_v1_teil_b.md`.
 
 ## 1. Worum es geht
 
@@ -10,7 +10,7 @@ Es fehlt bei **jedem Kriterium**:
 
 - **Verständlicher Titel** (K-1, Feld `plainLanguageDe`). Bis dahin gilt der Titel von BIT inklusiv.
 - **Empfohlene Priorität** (K-6, O-1): eine Stufe für alle Anwendungstypen und Verwendungszwecke (A, B oder Info) mit Begründung, Feld `priorities`. Abweichungen für einzelne Anwendungstypen oder Verwendungszwecke sind möglich, jeweils mit eigener Begründung und optional mit Gewichtung.
-- **Kurzbeschreibung** (K-1, Kriterienkatalog §6.1): Dafür gibt es im Datenformat noch kein Feld (offener Punkt der Aufgabe S3-27).
+- **Kurzbeschreibung** (K-1, Kriterienkatalog §6.1, Feld `shortDescriptionDe`): ein bis zwei Sätze, abgeleitet aus „Anforderung“, als reiner Text ohne Formatierung. Sie steht in der Spalte „Kurzbeschreibung“ der exportierten Liste; bis sie eingetragen ist, bleibt die Spalte leer.
 - Optional: eine **Erläuterung des Projektteams** zum Kriterium (Feld `rationaleDe`).
 
 Bei den Kriterien „Geprüft nach …“ ist die Stufe **B – Bewertungskriterium** schon entschieden (Kriterienkatalog §2.4, 12. Oktober 2026); es fehlt nur die Begründung.
@@ -27,6 +27,7 @@ Die Spalte **Zu bestätigen** nennt, was der Ordner aus einem Vorschlag des Krit
 | Z-4 | 10.2.5.1, 10.2.5.4 und 10.4.1.3 sind im PDF-Test „nicht anwendbar“ und nennen keine Bewertungsstufen | als Kriterium für Dokumente enthalten, einzige Stufe „Nicht anwendbar“ (Entscheidung S3-27, Nicht-anwendbare Prüfschritte). Brauchen sie überhaupt eine Priorität, oder sollen sie im nächsten Stand fehlen? |
 | Z-5 | Hardware sowie Vermittlungs- oder Notrufdienst haben keine Kriterien (K-2) | unverändert: keine Kriterien für diese beiden Anwendungstypen |
 | Z-6 | Die Reihenfolge folgt den Dokumenten: Teil A, dann Teil B, dann „Geprüft nach …“ | Feld `sortOrder` in Zehnerschritten |
+| Z-7 | 11.1.3.2, Software-Test, „Anforderung“: der dritte Absatz beginnt mit der Markierung „#todo#“ („#todo#Bei einem Seitenaufruf soll bei der Tastaturnavigation …“); der App-Test hat denselben Absatz ohne sie | unverändert übernommen; die Kriterienliste zeigt den Text wörtlich, also mit „#todo#“ (Entscheidung S4-15b, O-S4-39). Bitte klären, ob der Absatz so gilt; die Korrektur kommt mit dem nächsten Release, weil ein gespeichertes Release sich nicht ändert |
 
 ## 3. Kriterien
 
@@ -99,7 +100,7 @@ Die Spalte **Zu bestätigen** nennt, was der Ordner aus einem Vorschlag des Krit
 | 11.1.3.1c | Strukturelemente für weitere Objekte | Basisfunktionalität |  |  |  |  |
 | 11.1.3.1d | Keine Strukturelemente für Layouttabellen | Basisfunktionalität | Funktionsbereich vom übergeordneten Prüfschritt übernommen |  |  |  |
 | 11.1.3.1e | Strukturelemente für weitere Objekte | Basisfunktionalität | Funktionsbereich vom übergeordneten Prüfschritt übernommen |  |  |  |
-| 11.1.3.2 | Sinnvolle Reihenfolge | Basisfunktionalität |  |  |  |  |
+| 11.1.3.2 | Sinnvolle Reihenfolge | Basisfunktionalität | Z-7 |  |  |  |
 | 11.1.3.3 | Sensorische Eigenschaften | Basisfunktionalität |  |  |  |  |
 | 11.1.3.4 | Keine Beschränkung der Bildschirmausrichtung | Basisfunktionalität |  |  |  |  |
 | 11.1.3.5 | Eingabezweck bestimmen | Basisfunktionalität |  |  |  |  |
@@ -295,3 +296,5 @@ Die Spalte **Zu bestätigen** nennt, was der Ordner aus einem Vorschlag des Krit
 | Version | Datum | Änderung |
 | --- | --- | --- |
 | v1 | 9. November 2026 | Erste Fassung mit S3-27 |
+| v2 | 11. November 2026 | Z-7 (Arbeitsmarkierung in 11.1.3.2) mit S4-15b |
+| v3 | 12. November 2026 | Feld `shortDescriptionDe` für die Kurzbeschreibung mit S4-24 |
