@@ -33,6 +33,32 @@
 html, body { height: 100%; }
 body { margin: 0; }
 
+/* Dialogs of the Handoff (§2.3, S13-M; panel class `pa-dialog`, opened with `maxWidth: '100vw'`):
+   below 600 px full screen — title on top, the content scrolls, the actions stay at the bottom —,
+   from 600 px a centred dialog 600 px wide with rounded corners. */
+.pa-dialog {
+  width: 100vw;
+  height: 100%;
+  --mat-dialog-container-shape: 0;
+  --mat-dialog-container-max-width: 100vw;
+
+  .mat-mdc-dialog-content {
+    max-height: none;
+    flex: 1 1 auto;
+  }
+
+  @media (min-width: 37.5em) {
+    width: 37.5rem;
+    height: auto;
+    max-height: 100%;
+    --mat-dialog-container-shape: var(--mat-sys-corner-extra-large);
+
+    .mat-mdc-dialog-content {
+      max-height: 65vh;
+    }
+  }
+}
+
 .list-item-container {
     .mat-mdc-slide-toggle {
         width: 100%;

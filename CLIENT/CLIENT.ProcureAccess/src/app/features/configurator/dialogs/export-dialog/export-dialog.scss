@@ -1,0 +1,63 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S13 (Handoff §5.1): the size of the dialog is set by the panel class `pa-dialog` in
+// styles/main.scss; here only its content.
+
+.pa-export {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-export__format {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.pa-export__legend {
+  padding: 0;
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.pa-export__options {
+  display: flex;
+  flex-direction: column;
+}
+
+.pa-export__scope {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-export p {
+  margin-block: 0;
+}
+
+.pa-export pa-notice p + p {
+  margin-block-start: var(--pa-space-xs);
+}
+
+// Button spinner (Handoff §6.2): 20 px before the label, in the label colour.
+.pa-export__spinner {
+  margin-inline-end: var(--pa-space-xs);
+  --mat-progress-spinner-active-indicator-color: currentColor;
+}
+
+// Below 600 px the actions are stacked at full width in DOM order (Handoff §2.3, S13-M): the
+// primary action last, next to the thumb.
+.pa-export__actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--pa-space-sm);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}

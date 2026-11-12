@@ -17,6 +17,7 @@ import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
+import { ExportApiService } from '../../services/api/export-api.service';
 import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from '../../state/with-configurator';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
@@ -55,6 +56,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
         { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
+        { provide: ExportApiService, useValue: { exportList: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         // jsdom never ends a CSS transition, so the K5 menu would never finish closing.
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
@@ -416,18 +418,15 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
       expect(screen.getByRole('link', { name: /^Fehlt ein Kriterium/ })).toBeTruthy();
     });
 
-    it('opens the export placeholder with its title and „Schließen“ until S4-21', async () => {
+    it('opens the export dialog S13 with the format choice; „Abbrechen“ closes it', async () => {
       const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
 
       screen.getByRole('button', { name: 'Liste exportieren' }).click();
       await fixture.whenStable();
 
       const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
-      await expectNoAxeViolations();
-      const close = within(dialog).getByRole('button', { name: 'Schließen' });
-      // The marker keeps the initial focus on „Schließen“ also on iOS (E2E mobile-safari).
-      expect(close.hasAttribute('cdkFocusInitial')).toBe(true);
-      close.click();
+      expect(within(dialog).getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' })).toBeTruthy();
+      within(dialog).getByRole('button', { name: 'Abbrechen' }).click();
       await fixture.whenStable();
 
       expect(screen.queryByRole('dialog')).toBeNull();

@@ -9,7 +9,8 @@ import { chooseFirstOption } from '../support/combobox';
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
  * 1280 × 1024 window at 400 % zoom, no page scrolls sideways and every link and button lies
  * inside the viewport. Covers the pages of the new shell and the rebuilt screens: S10 since S4-13,
- * S11 with its summary, notices, detail panel and action bar since S4-18a. The legacy screens are
+ * S11 with its summary, notices, detail panel and action bar since S4-18a, the export dialog S13
+ * (full screen below 600 px, S13-M) since S4-21b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -148,5 +149,20 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(page.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
     await expectReflow(page);
+  });
+
+  test('S13 fills the screen with its actions at the bottom and needs no horizontal scrolling', async ({ page }) => {
+    await toStep4(page);
+    await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+    await page.getByRole('button', { name: 'Liste exportieren' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+    await expect(dialog).toBeVisible();
+    await expectReflow(page);
+
+    // Full screen (S13-M): the dialog covers the viewport, and „Datei herunterladen“ is inside it.
+    const box = await dialog.boundingBox();
+    expect(box).toMatchObject({ x: 0, y: 0, width: ZOOM_400.width, height: ZOOM_400.height });
+    await expect(dialog.getByRole('button', { name: 'Datei herunterladen' })).toBeInViewport();
   });
 });

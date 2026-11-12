@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpClient, HttpContext, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpErrorResponse, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -11,7 +11,13 @@ import { firstValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
+import {
+  BACKGROUND_REQUEST,
+  CALLER_HANDLES_PROBLEMS,
+  CALLER_SHOWS_FAILURES,
+  FORM_SHOWS_FIELD_ERRORS,
+  problemTypeName,
+} from '../errors/problem-details';
 import { ConnectionStatus } from '../errors/system-errors';
 import { SnackbarService } from '../services/snackbar.service';
 import { errorInterceptor } from './error.interceptor';
@@ -203,6 +209,66 @@ describe('errorInterceptor', () => {
       await failInBackground(500);
 
       expect(offline()).toBe(false);
+    });
+  });
+
+  describe('a request for a file (responseType blob, S4-21b)', () => {
+    async function failWithBlob(body: Blob, context?: HttpContext): Promise<HttpErrorResponse> {
+      const request = firstValueFrom(http.post('/api/file', {}, { responseType: 'blob', context }));
+      backend.expectOne('/api/file').flush(body, { status: 429, statusText: 'Too Many Requests' });
+      return (await request.then(
+        () => Promise.reject(new Error('expected a failure')),
+        (error: unknown) => error,
+      )) as HttpErrorResponse;
+    }
+
+    it('reads Problem Details from the Blob, so the problem type counts', async () => {
+      const problem = { type: `${base}rate-limit`, status: 429, retryAfterMinutes: 10 };
+      const error = await failWithBlob(
+        new Blob([JSON.stringify(problem)], { type: 'application/problem+json' }),
+        new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['rate-limit']),
+      );
+
+      expect(problemTypeName(error)).toBe('rate-limit');
+      expect(error.error).toEqual(problem);
+      expect(error.status).toBe(429);
+      expect(snackbar.showError).not.toHaveBeenCalled();
+    });
+
+    it('keeps a body that is not JSON as it is', async () => {
+      const body = new Blob(['oops'], { type: 'text/plain' });
+
+      const error = await failWithBlob(body);
+
+      expect(error.error).toBe(body);
+      expect(snackbar.showError).toHaveBeenCalled();
+    });
+  });
+
+  describe('a request whose caller shows every failure (CALLER_SHOWS_FAILURES, S4-21b)', () => {
+    const shown = () => new HttpContext().set(CALLER_SHOWS_FAILURES, true);
+    const offline = () => TestBed.inject(ConnectionStatus).offline();
+
+    it.each([
+      ['a server error', 500],
+      ['a problem', 400],
+      ['a rate limit', 429],
+    ])('shows neither snackbar nor server page for %s', async (_case, status) => {
+      const request = firstValueFrom(http.post('/api/x', null, { context: shown() }));
+      backend.expectOne('/api/x').flush({ type: `${base}validation` }, { status, statusText: 'Error' });
+      await expect(request).rejects.toBeDefined();
+
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(snackbar.showError).not.toHaveBeenCalled();
+    });
+
+    it('still turns the offline notice on when there is no answer', async () => {
+      const request = firstValueFrom(http.post('/api/x', null, { context: shown() }));
+      backend.expectOne('/api/x').error(new ProgressEvent('error'), { status: 0, statusText: '' });
+      await expect(request).rejects.toBeDefined();
+
+      expect(offline()).toBe(true);
+      expect(snackbar.showError).not.toHaveBeenCalled();
     });
   });
 });

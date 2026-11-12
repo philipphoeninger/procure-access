@@ -1,0 +1,68 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'criteria.export.title' | translate }}</h2>
+
+<mat-dialog-content class="pa-export">
+  <fieldset class="pa-export__format">
+    <legend class="pa-export__legend">{{ 'criteria.export.format' | translate }}</legend>
+    <mat-radio-group class="pa-export__options" [value]="format()" (change)="chooseFormat($event.value)">
+      <mat-radio-button value="xlsx">{{ 'criteria.export.xlsx' | translate }}</mat-radio-button>
+      <mat-radio-button value="csv">{{ 'criteria.export.csv' | translate }}</mat-radio-button>
+    </mat-radio-group>
+  </fieldset>
+
+  <p class="pa-export__scope">{{ 'criteria.export.scope' | translatePlural: included() }}</p>
+
+  <pa-notice kind="info">
+    <p>{{ 'criteria.export.releaseNote' | translate: { release: release() } }}</p>
+    @if (!signedIn()) {
+      <p>{{ 'criteria.export.anonymousNote' | translate }}</p>
+    }
+  </pa-notice>
+
+  <pa-notice kind="attention">
+    <p>{{ 'criteria.export.legalNote' | translate }}</p>
+  </pa-notice>
+
+  @switch (status().kind) {
+    @case ('failed') {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.export.error.title' | translate">
+        <p>{{ 'criteria.export.error' | translate }}</p>
+      </pa-notice>
+    }
+    @case ('rateLimited') {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.export.error.title' | translate">
+        <p>{{ 'errors.rateLimit' | translatePlural: retryAfterMinutes() : { minutes: retryAfterMinutes() } }}</p>
+      </pa-notice>
+    }
+    @case ('outdated') {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.export.error.title' | translate">
+        <p>{{ 'criteria.export.outdated' | translate }}</p>
+      </pa-notice>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="pa-export__actions">
+  @if (status().kind === 'outdated') {
+    <button #closeButton matButton="filled" type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+  } @else {
+    <button matButton type="button" mat-dialog-close>{{ 'common.actions.cancel' | translate }}</button>
+    <!-- While the file is requested: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->
+    <button
+      matButton="filled"
+      type="button"
+      [attr.aria-disabled]="busy() ? 'true' : null"
+      (click)="download()"
+    >
+      @if (busy()) {
+        <mat-progress-spinner class="pa-export__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+      }
+      {{ primaryLabelKey() | translate }}
+    </button>
+  }
+</mat-dialog-actions>

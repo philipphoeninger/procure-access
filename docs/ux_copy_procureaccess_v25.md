@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v23 (12. November 2026) – v23 ergänzt den Namen des Buttons, der die Eingabe in einem Suchfeld mit Auswahlliste löscht (`common.actions.clearInput`, zuerst S10 Schritt 1; Sprint 04, S4-30, Issue #280, U108).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v23):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.10), `ARCHITECTURE_v37.md`, `TESTING_v48.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v25 (12. November 2026) – v25 ergänzt die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v25):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.12), `ARCHITECTURE_v40.md`, `TESTING_v51.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,22 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v24
+
+Quelle: Planung von S4-21 (Exportdialog S13 und Ratenbegrenzung), Owner-Entscheidung O-S4-71 (a) vom 12. November 2026; den Wortlaut hat der Product Owner am 12. November 2026 bestätigt. Die Wartezeit einer 429-Antwort (`retryAfterMinutes`) kann 1 sein; SPEC SD25 verlangt dann die Einzahl.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U110 | **Einzahl `errors.rateLimit.one`** (§6): „Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie 1 Minute und versuchen Sie es dann erneut.“ | Ohne Einzahl stünde „1 Minuten“ da (SD25, `translatePlural`) | S4-21b, O-S4-71 |
+
+### Änderungen gegenüber v23
+
+Quelle: Planung von S4-20 (XLSX- und CSV-Export), Owner-Entscheidungen O-S4-62 – O-S4-65 (a) vom 12. November 2026. SPEC §8.3 nennt die Spalten der Exportdatei, die UX-Copy hatte aber keine Schlüssel für die Dateitexte. Die Spaltenköpfe sind die deutschen Teile der Spaltenliste von SPEC §8.3; die übrigen Texte sind Vorschläge von Claude. Der Product Owner hat den Wortlaut am 12. November 2026 im Pull Request von S4-20a (#286) unverändert bestätigt.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U109 | **Texte der Exportdatei:** neu `exportFile.*` (§5.6, Tabelle „Exportdatei“): die Namen der Tabellenblätter „Kriterien“ und „Info“, die 13 Spaltenköpfe aus SPEC §8.3 und „Katalogversion“ als erste Spalte der CSV-Datei, die Zeilenbeschriftungen des Blatts „Info“ und eine Quellenzeile für die Texte von BIT inklusiv. Für Werkzeugname, Auswahl, Prioritäten und Hinweise nutzt die Datei die bestehenden Schlüssel `shell.appName`, `criteria.list.summary.useCase` / `.appTypes` / `.parts` / `.testTypes`, `criteria.select.step1.none`, `criteria.priority.A` / `.B` / `.Info`, `criteria.list.priorityNote` und `criteria.export.legalNote` ⚖️ | Die Datei geht in Vergabeunterlagen und an andere Personen; ihre Texte gehören deshalb wie die Oberfläche in die UX-Copy. Eigener Wurzelschlüssel `exportFile`, weil die Texte im Server liegen (`src/ProcureAccess.Modules.Export/Texts/de.json`, O-S4-63) und nicht in der `de.json` des Clients, die den Bereich `criteria.export` vollständig trägt. Dieselben Wörter wie auf S11, damit Liste und Datei übereinstimmen. Die Quellenzeile vor der Freigabe mit der Erlaubnis von BIT inklusiv abgleichen | S4-20a, O-S4-62, O-S4-63 |
 
 ### Änderungen gegenüber v22
 
@@ -728,7 +744,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.list.copy.notCarried` | Teil des Hinweises (nur wenn zutreffend) | Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U66 |
 | `criteria.list.copy.notCarried.one` | Teil des Hinweises (Einzahl) | Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U86 |
 
-### 5.6 S12–S16 Speichern, Exportieren, Teilen (`criteria.save.`, `criteria.export.`, `criteria.share.`)
+### 5.6 S12–S16 Speichern, Exportieren, Teilen (`criteria.save.`, `criteria.export.`, `criteria.share.`, `exportFile.`)
 
 | Schlüssel | Element | Text | Hinweis |
 |---|---|---|---|
@@ -776,6 +792,34 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.saved.delete.body` | Text | Die Liste „{{name}}“ wird gelöscht. Freigabelinks zu dieser Liste funktionieren danach nicht mehr. Beschaffungsprojekte, die eine Kopie der Liste nutzen, sind nicht betroffen. | D1 |
 | `criteria.saved.delete.confirm` | Button | Liste löschen | |
 | `criteria.saved.deleted` | Ansage | Die Liste „{{name}}“ wurde gelöscht. | |
+
+**Exportdatei** (`exportFile.`; XLSX und CSV, SPEC §8.3; Texte im Server, U109)
+
+| Schlüssel | Element | Text | Hinweis |
+|---|---|---|---|
+| `exportFile.sheet.criteria` | Name des Tabellenblatts (XLSX) | Kriterien | Zugleich Name der Tabelle mit den Kriterien (O-S4-66) |
+| `exportFile.sheet.info` | Name des Tabellenblatts (XLSX) | Info | |
+| `exportFile.column.release` | Spaltenkopf (nur CSV, erste Spalte) | Katalogversion | EXP-03; die CSV hat kein Blatt „Info“ |
+| `exportFile.column.index` | Spaltenkopf | Nr. | Laufende Nummer ab 1 |
+| `exportFile.column.key` | Spaltenkopf | Kriterium | Schlüssel des Kriteriums, z. B. „11.1.3.1c“ oder „PROC-softwareTest“ |
+| `exportFile.column.number` | Spaltenkopf | Nummer | Nummer nach EN 301 549; leer bei „Geprüft nach …“ |
+| `exportFile.column.title` | Spaltenkopf | Titel | Verständlicher Titel, solange er fehlt der Titel aus dem Katalog (O-S4-32) |
+| `exportFile.column.originalTitle` | Spaltenkopf | Originaltitel | Titel des Prüfschritts bei BIT inklusiv; leer bei „Geprüft nach …“ |
+| `exportFile.column.shortDescription` | Spaltenkopf | Kurzbeschreibung | Leer, bis der Katalog das Feld hat (O-S4-6, S4-24) |
+| `exportFile.column.productPart` | Spaltenkopf | Funktionsbereich | |
+| `exportFile.column.recommended` | Spaltenkopf | Priorität (empfohlen) | Werte `criteria.priority.A` / `.B` / `.Info` |
+| `exportFile.column.chosen` | Spaltenkopf | Priorität (Ihre Wahl) | Die Stufe, die gilt: die eigene Wahl, sonst die Empfehlung (O-S4-65) |
+| `exportFile.column.weight` | Spaltenkopf | Gewichtung | Nur bei B |
+| `exportFile.column.rationale` | Spaltenkopf | Begründung der Empfehlung | |
+| `exportFile.column.note` | Spaltenkopf | Ihre Notiz | |
+| `exportFile.column.testStep` | Spaltenkopf | Link zum Prüfschritt | |
+| `exportFile.info.tool` | Zeilenbeschriftung (Blatt „Info“) | Werkzeug | Wert `shell.appName` |
+| `exportFile.info.url` | Zeilenbeschriftung (Blatt „Info“) | Adresse | Wert 🔧 `Export:ToolUrl` (O-S4-64) |
+| `exportFile.info.generated` | Zeilenbeschriftung (Blatt „Info“) | Erstellt am | Datum der Erstellung |
+| `exportFile.info.release` | Zeilenbeschriftung (Blatt „Info“) | Katalogversion | EXP-03 |
+| `exportFile.info.counts` | Zeilenbeschriftung (Blatt „Info“) | Kriterien je Priorität | Darunter je Stufe `criteria.priority.*` mit der Anzahl; „Geprüft nach …“ zählt nicht mit (wie U106). Die Auswahl darüber mit `criteria.list.summary.*` |
+| `exportFile.info.notes` | Zeilenbeschriftung (Blatt „Info“) | Hinweise | Darunter `criteria.list.priorityNote` und `criteria.export.legalNote` ⚖️ |
+| `exportFile.info.source` | Quellenzeile (Blatt „Info“) | Die Originaltitel, Prüfschritte und Links stammen aus den Prüfverfahren von BIT inklusiv. Verwendet mit Erlaubnis. | Vor der Freigabe mit der Erlaubnis von BIT inklusiv abgleichen |
 
 ### 5.7 S20–S21 Organisation (`org.`)
 
@@ -1493,6 +1537,7 @@ Fehler werden erst beim Absenden geprüft, nicht beim Tippen. Feldfehler stehen 
 | `errors.server.body` | Text | Das ist ein Fehler bei uns. Ihre Eingaben wurden nicht gespeichert. Bitte versuchen Sie es in einigen Minuten erneut. | |
 | `errors.offline` | Hinweis | Keine Verbindung zum Server. Bitte prüfen Sie Ihre Internetverbindung. | |
 | `errors.rateLimit` | Hinweis | Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie {{minutes}} Minuten und versuchen Sie es dann erneut. | 429, API-05 |
+| `errors.rateLimit.one` | Hinweis (Einzahl) | Sie haben diese Aktion in kurzer Zeit sehr oft ausgeführt. Bitte warten Sie 1 Minute und versuchen Sie es dann erneut. | U110 |
 | `errors.antiforgery` | Hinweis (`pa-notice` Fehler, Problemtyp `antiforgery`) | Ihre Aktion wurde aus Sicherheitsgründen nicht ausgeführt. Das kann passieren, wenn Sie sich in einem anderen Tab an- oder abgemeldet haben. Bitte versuchen Sie es erneut. | U92; Button `common.actions.retry`; Ihre Eingaben bleiben erhalten |
 | `errors.home` | Button | Zur Startseite | |
 | `errors.email.sendFailed` | Hinweis (`pa-notice` Fehler) | Die E-Mail konnte gerade nicht versendet werden. Bitte versuchen Sie es in einigen Minuten erneut. | U72; die Aktion selbst bleibt gespeichert |
