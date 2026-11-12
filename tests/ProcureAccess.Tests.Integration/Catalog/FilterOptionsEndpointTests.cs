@@ -23,7 +23,7 @@ namespace ProcureAccess.Tests.Integration.Catalog;
 /// <c>GET /api/v1/catalog/filter-options</c> through the real pipeline (SPEC §8.1, S3-19): the JSON
 /// shape (CAT-12, contract), inactive use cases (CAT-18), the rules of the named or the active
 /// release (CAT-19), the next request after <c>catalog activate</c> (CAT-09, HTTP part), Problem
-/// Details and the caching headers of ARCHITECTURE §9.6. The releases are the test folders
+/// Details, the caching headers of ARCHITECTURE §9.6 and the language of the answer (API-06). The releases are the test folders
 /// <c>T.1</c> and <c>T.2</c> on the seeded filter values; <c>T.2</c> replaces HR → Video by HR → Audio.
 /// </summary>
 /// <remarks>Each test starts on an empty catalog; see <see cref="CatalogActivationTests"/> for the cache.</remarks>
@@ -193,6 +193,20 @@ public sealed class FilterOptionsEndpointTests(ApiFixture api) : IntegrationTest
         var cacheControl = response.Headers.CacheControl.ShouldNotBeNull();
         (cacheControl.Public, cacheControl.NoCache, cacheControl.MaxAge).ShouldBe((true, true, (TimeSpan?)null));
         response.Headers.ETag.ShouldNotBeNull();
+    }
+
+    [Theory(DisplayName = "INV:API-06 " + nameof(FilterOptions_AnyAcceptLanguage_AnswersGermanAndNamesIt))]
+    [Trait("Invariant", "API-06")]
+    [Trait("Kind", "Contract")]
+    [MemberData(nameof(CatalogLanguageContract.AcceptLanguages), MemberType = typeof(CatalogLanguageContract))]
+    public async Task FilterOptions_AnyAcceptLanguage_AnswersGermanAndNamesIt(string? acceptLanguage)
+    {
+        // T.1 has German texts only, so en, an unknown language and no header get the German answer.
+        await ImportAndActivateAsync(MiniCatalog.T1Version);
+        using var client = CreateClient();
+
+        await CatalogLanguageContract.ShouldAnswerGermanAsync(client, $"{Path}?release=T.1&useCase=hr", acceptLanguage, Cancellation);
+        await CatalogLanguageContract.ShouldAnswerGermanAsync(client, $"{Path}?useCase=hr", acceptLanguage, Cancellation);
     }
 
     [Theory]

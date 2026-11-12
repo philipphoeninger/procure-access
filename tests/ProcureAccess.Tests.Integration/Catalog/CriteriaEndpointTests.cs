@@ -26,8 +26,9 @@ namespace ProcureAccess.Tests.Integration.Catalog;
 /// with explained priorities and procedure texts (CAT-02, CAT-16, contract), the two kinds of 400
 /// (CAT-11, CAT-12, CAT-19), inactive use cases (CAT-18), the revisions of a named release after a
 /// newer one is active (CAT-06), the release-pinned procedure mapping (CAT-21), app types without
-/// criteria (CAT-20), 404 for an incomplete release and the caching headers. The releases are the
-/// test folders <c>T.1</c> and <c>T.2</c> on the seeded filter values.
+/// criteria (CAT-20), 404 for an incomplete release, the caching headers and the language of the
+/// answer (API-06). The releases are the test folders <c>T.1</c> and <c>T.2</c> on the seeded filter
+/// values.
 /// </summary>
 public sealed class CriteriaEndpointTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -273,6 +274,21 @@ public sealed class CriteriaEndpointTests(ApiFixture api) : IntegrationTest(api)
 
         var problem = await ProblemResponse.ReadAsync(response, Cancellation);
         problem.Deviations(HttpStatusCode.NotFound, TypeUri(ProblemTypes.NotFound), requireErrors: false).ShouldBeEmpty();
+    }
+
+    [Theory(DisplayName = "INV:API-06 " + nameof(Criteria_AnyAcceptLanguage_AnswersGermanAndNamesIt))]
+    [Trait("Invariant", "API-06")]
+    [Trait("Kind", "Contract")]
+    [MemberData(nameof(CatalogLanguageContract.AcceptLanguages), MemberType = typeof(CatalogLanguageContract))]
+    public async Task Criteria_AnyAcceptLanguage_AnswersGermanAndNamesIt(string? acceptLanguage)
+    {
+        // T.1 has German texts only, so en, an unknown language and no header get the German answer.
+        await ImportAndActivateAsync(MiniCatalog.T1Version);
+        using var client = CreateClient();
+        const string Selection = "useCase=hr&appTypeIds[]=web&productPartIds[]=base&testTypeIds[]=softwareTest";
+
+        await CatalogLanguageContract.ShouldAnswerGermanAsync(client, $"{Path}?release=T.1&{Selection}", acceptLanguage, Cancellation);
+        await CatalogLanguageContract.ShouldAnswerGermanAsync(client, $"{Path}?{Selection}", acceptLanguage, Cancellation);
     }
 
     [Fact]
