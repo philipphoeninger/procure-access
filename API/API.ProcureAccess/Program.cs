@@ -45,7 +45,7 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
 // code in API, DAL, MODELS and SERVICES moves into them with the migration step that replaces it
 // (S2-06, owner decision O-S2-1).
 builder.Services.AddPlatformModule(builder.Configuration)
-                .AddIdentityAccessModule(builder.Configuration)
+                .AddIdentityAccessModule(builder.Configuration, builder.Environment)
                 .AddCatalogModule(builder.Configuration)
                 .AddConfiguratorModule()
                 .AddExportModule(builder.Configuration)
