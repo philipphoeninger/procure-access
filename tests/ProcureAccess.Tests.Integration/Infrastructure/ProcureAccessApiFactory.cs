@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Time.Testing;
+using ProcureAccess.Modules.IdentityAccess.DataProtection;
 using ProcureAccess.Tests.Shared.Auth;
+using ProcureAccess.Tests.Shared.DataProtection;
 
 namespace ProcureAccess.Tests.Integration.Infrastructure;
 
@@ -38,6 +40,9 @@ public sealed class ProcureAccessApiFactory(
 
     private const string RelaxedPermitLimit = "1000000";
 
+    /// <summary>One key-ring certificate per test run, so hosts on the same database read each other's keys.</summary>
+    private static readonly Lazy<string> TestRunCertificate = new(() => TestCertificates.NewRsaPfxBase64());
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(environmentName);
@@ -53,6 +58,10 @@ public sealed class ProcureAccessApiFactory(
 
         // Secrets never live in the repository (CLAUDE.md §10): a fresh random key per test run.
         builder.UseSetting("JWTSettings:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));
+
+        // The key ring is encrypted outside Development and E2E (S4-26), so every host gets the
+        // throwaway certificate of this test run; tests of the certificate settings override it.
+        builder.UseSetting(KeyRingCertificates.CertificateSettingName, TestRunCertificate.Value);
 
         // Every request of the test server comes from no address, so all tests share one counter
         // per rate-limit policy: limits far above what a test run sends. Tests of the limits pass

@@ -16,7 +16,7 @@ internal static class RoleCommandHost
     {
         var builder = WebApplication.CreateBuilder();
         builder.Services.AddPlatformModule(builder.Configuration)
-                        .AddIdentityAccessModule(builder.Configuration)
+                        .AddIdentityAccessModule(builder.Configuration, builder.Environment)
                         .AddPostgreSQLConnection(builder.Configuration)
                         .AddIdentityHandlersAndStores()
                         .ConfigureIdentityOptions();
