@@ -11,6 +11,7 @@ import { catchError, switchMap, tap, throwError } from 'rxjs';
 import { SnackbarService } from '../services/snackbar.service';
 import { ERROR_TRANSLATIONS } from '../models/error-translation.map';
 import {
+  BACKGROUND_REQUEST,
   CALLER_HANDLES_PROBLEMS,
   FORM_SHOWS_FIELD_ERRORS,
   PROBLEM_TYPE_KEYS,
@@ -47,6 +48,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (event instanceof HttpResponse) answered();
     }),
     catchError((error: HttpErrorResponse) => {
+      // The user did not ask for it, so its failure changes nothing on screen (S4-18b).
+      if (req.context.get(BACKGROUND_REQUEST)) {
+        if (error.status !== 0) answered();
+        return throwError(() => error);
+      }
       if (error.status === 0) {
         connection.noAnswer();
         return throwError(() => error);

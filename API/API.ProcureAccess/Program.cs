@@ -105,7 +105,8 @@ try
     app.NewVersionedApi()
        .MapGroup("/api/v{version:apiVersion}")
        .HasApiVersion(1, 0)
-       .MapCatalogEndpoints();
+       .MapCatalogEndpoints()
+       .MapConfiguratorEndpoints();
 
     app.ConfigureSwaggerExplorer();
 

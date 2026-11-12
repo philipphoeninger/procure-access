@@ -40,6 +40,13 @@ export const FORM_SHOWS_FIELD_ERRORS = new HttpContextToken<boolean>(() => false
 export const CALLER_HANDLES_PROBLEMS = new HttpContextToken<readonly string[]>(() => []);
 
 /**
+ * Set on a request the user did not ask for and never sees, such as the usage event of S11
+ * (`CriteriaListShown`, SPEC §8.7): the error interceptor shows nothing for its failure — no
+ * snackbar, no offline notice, no server page. An answer still counts as the API being reachable.
+ */
+export const BACKGROUND_REQUEST = new HttpContextToken<boolean>(() => false);
+
+/**
  * The name of the problem type: `type` is `<base>/problems/<name>` (SPEC §8.6). The base URI is
  * configurable on the server, so only the path counts.
  */

@@ -11,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { CALLER_HANDLES_PROBLEMS, FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, FORM_SHOWS_FIELD_ERRORS } from '../errors/problem-details';
 import { ConnectionStatus } from '../errors/system-errors';
 import { SnackbarService } from '../services/snackbar.service';
 import { errorInterceptor } from './error.interceptor';
@@ -164,6 +164,45 @@ describe('errorInterceptor', () => {
       await request;
 
       expect(offline()).toBe(true);
+    });
+  });
+
+  describe('a request the user did not ask for (BACKGROUND_REQUEST, S4-18b)', () => {
+    const background = () => new HttpContext().set(BACKGROUND_REQUEST, true);
+    const offline = () => TestBed.inject(ConnectionStatus).offline();
+
+    async function failInBackground(status: number, body: object | null = { status }) {
+      const request = firstValueFrom(http.post('/api/x', null, { context: background() }));
+      if (status === 0) {
+        backend.expectOne('/api/x').error(new ProgressEvent('error'), { status: 0, statusText: '' });
+      } else {
+        backend.expectOne('/api/x').flush(body, { status, statusText: 'Error' });
+      }
+      await expect(request).rejects.toBeDefined();
+    }
+
+    it.each([
+      ['no answer', 0],
+      ['a server error', 500],
+      ['a problem', 400],
+      ['a rate limit', 429],
+    ])('shows nothing for %s', async (_case, status) => {
+      await failInBackground(status, { type: `${base}validation` });
+
+      expect(offline()).toBe(false);
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(snackbar.showError).not.toHaveBeenCalled();
+    });
+
+    it('still hides the offline notice when it gets an answer', async () => {
+      const request = firstValueFrom(http.get('/api/y'));
+      backend.expectOne('/api/y').error(new ProgressEvent('error'), { status: 0, statusText: '' });
+      await expect(request).rejects.toBeDefined();
+      expect(offline()).toBe(true);
+
+      await failInBackground(500);
+
+      expect(offline()).toBe(false);
     });
   });
 });

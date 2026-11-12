@@ -16,6 +16,7 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
+import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from '../../state/with-configurator';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
@@ -53,6 +54,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
         ]),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
+        { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         // jsdom never ends a CSS transition, so the K5 menu would never finish closing.
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },

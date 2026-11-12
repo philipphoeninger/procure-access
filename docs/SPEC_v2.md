@@ -1,6 +1,6 @@
 # ProcureAccess — Feature Specification
 
-> **Status:** v2.9 (2026-11-11; v2.8 of 2026-11-10, v2.7 of 2026-11-10, v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-07, issue #243): R-SHL-10, R-SET-03 and §11 name the invariants that check them, and the header names the current versions, recorded in the same way. **v2.8** (2026-11-10, sprint 04 task S4-02, issue #181): §8.6 names the UX key of each problem type (UX copy v17 §6.3), recorded in the same way; the owner approved the keys with UX copy v17 on 2026-11-11 (O-S4-4). **v2.9** (2026-11-11, sprint 04 task S4-15b, owner decision O-S4-29 (a)): §8.2 adds `appliesTo[]` to each criterion of the criteria answer, recorded in the same way.
+> **Status:** v2.10 (2026-11-11; v2.9 of 2026-11-11, v2.8 of 2026-11-10, v2.7 of 2026-11-10, v2.6 of 2026-11-09, v2.5 of 2026-11-09, v2.4 of 2026-11-09, v2.3 of 2026-11-05, v2.2 of 2026-11-02, v2.1 of 2026-10-29, v2 of 2026-10-19) — output of Phase 3, step 8 ("Write the feature spec") of `ai_development_process.md`. Supersedes v1 (2026-10-15). v2 records the owner's confirmation of the proposals O-S1–O-S4 and O-S6 (decisions SD19–SD23); behaviour and acceptance criteria are otherwise unchanged. The detailed P1 specification therefore moves to SPEC_v3. **v2.1** (2026-10-29, owner): change row in this file instead of a new version (see "Versioning of this document"), so that SPEC_v3 stays the P1 version. **v2.2** (2026-11-02, owner decision O-S2-3, sprint 02 task S2-12): UX-O9 closed in the same way (SD25). **v2.3** (2026-11-05, sprint 03 task S3-05, issue #180): `email-unconfirmed` in §8.6 and the open footer targets in §13, recorded in the same way. **v2.4** (2026-11-09, owner decisions before sprint 03 task S3-20): the details of §8.2 and the use of `selection-excluded` in §8.6, recorded in the same way. **v2.5** (2026-11-09, owner decisions before sprint 03 task S3-21): where the suggestion channel is configured and what fails on its placeholder (R-SUG-01), recorded in the same way. **v2.6** (2026-11-09, sprint 03 task S3-27): §13 O-1 names the gap list of release 2026.1, recorded in the same way. **v2.7** (2026-11-10, sprint 04 task S4-07, issue #243): R-SHL-10, R-SET-03 and §11 name the invariants that check them, and the header names the current versions, recorded in the same way. **v2.8** (2026-11-10, sprint 04 task S4-02, issue #181): §8.6 names the UX key of each problem type (UX copy v17 §6.3), recorded in the same way; the owner approved the keys with UX copy v17 on 2026-11-11 (O-S4-4). **v2.9** (2026-11-11, sprint 04 task S4-15b, owner decision O-S4-29 (a)): §8.2 adds `appliesTo[]` to each criterion of the criteria answer, recorded in the same way. **v2.10** (2026-11-11, sprint 04 task S4-18b, owner decisions O-S4-48, O-S4-55, O-S4-56): §8.7 adds the contract of the usage event `CriteriaListShown` and §7.3 its rate limit, recorded in the same way.
 > **Combines:**
 > - `prd_procureaccess_werteit_v5.md` — product scope, personas, P0/P1/P2 (authoritative for *what* and *why*)
 > - `ARCHITECTURE_v10.md` — modules, flows A–E, domain model, API (authoritative for *how it is built*)
@@ -124,6 +124,15 @@ Recorded in this file like v2.1 – v2.8; SPEC_v3 stays the P1 version. Source: 
 | # | Change | Source |
 |---|---|---|
 | v2.9-1 | §8.2: each criterion carries `appliesTo[]`, the selected app types it applies to as `{ id, name }` in app-type order (empty for a procedure criterion), for „Gilt für“ in the detail panel of S11 (Handoff §5.5) | S4-15b, O-S4-29 |
+
+#### Changes in v2.10 (2026-11-11)
+
+Recorded in this file like v2.1 – v2.9; SPEC_v3 stays the P1 version. Source: sprint 04 task S4-18b (`docs/sprints/sprint_04/S4-18b_criteria_list_shown.md`, owner decisions O-S4-48, O-S4-55, O-S4-56 of 2026-11-11). Acceptance criteria are unchanged; §9.1 named no trigger for `CriteriaListShown`.
+
+| # | Change | Source |
+|---|---|---|
+| v2.10-1 | §8.7 (new): `POST /api/v1/configurator/criteria-list-shown` writes `CriteriaListShown`; the client calls it once per new selection shown on S11, and a failure shows nothing | S4-18b, O-S4-48, O-S4-55 |
+| v2.10-2 | §7.3: rate limit of that endpoint (client IP, memory only, 30 per 10 minutes 🔧), built with the limiter of the anonymous export (S4-21); the client ignores the 429 | S4-18b, O-S4-56 |
 
 ---
 
@@ -610,6 +619,7 @@ The handoff and the UX copy contain no administration screens. Platform roles ex
 | Policy | Partition | Default |
 |---|---|---|
 | Anonymous export | client IP (memory only) | 30 per 10 minutes |
+| Usage event `CriteriaListShown` (§8.7, v2.10) | client IP (memory only) | 30 per 10 minutes |
 | Saved export | user | 60 per 10 minutes |
 | Registration | IP | 5 per hour |
 | Password reset request | IP and e-mail address | 5 per hour per IP, 3 per hour per address |
@@ -768,6 +778,15 @@ Endpoints not listed here are as in `ARCH §7.2`. JSON uses camelCase; enums are
 | `release-mismatch` | `criteria.export.outdated` |
 | `email-unconfirmed` | `auth.confirm.required` |
 | `not-found` | error page `errors.notFound.*` |
+
+
+### 8.7 Usage event `CriteriaListShown` (v2.10)
+
+`POST /api/v1/configurator/criteria-list-shown` (Configurator module), no body, answer **204** without body. Open to everyone; dimension 1 of §9.1 is `signedIn` when the request is signed in, else `anonymous`. The server writes one event per call, fire-and-forget (R-MET-01); it stores nothing about the selection.
+
+- **When the client calls it (O-S4-55 (a)):** after S11 has loaded the criteria list of a complete selection (also one without criteria), when that selection differs from the last one counted in this session — A → B → A counts three times, a return to S10 and back without a change counts none. The selection lives in memory only (R-CON-09), so a reload starts again. Not for a failed load or the switch to the legacy filter (404).
+- **Failure:** the client sends it once and never repeats it; no snackbar, no offline notice, no server page, no loading bar (a lost event is lost, as on the server).
+- **Rate limit:** §7.3 (built with the anonymous export's limiter, S4-21); the 429 is ignored like any other failure.
 
 ---
 
