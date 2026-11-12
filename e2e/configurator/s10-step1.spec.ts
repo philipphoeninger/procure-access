@@ -78,6 +78,9 @@ test.describe('S10 Kriterien zusammenstellen, step 1', () => {
     await expect(options(page)).toHaveCount(2);
     await chooseFirstOption(page, combobox(page), 'HR-Anwendung');
 
+    // „Eingabe löschen“ is the next tab stop while the field holds text (#280)
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Eingabe löschen' })).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(page.getByRole('button', { name: 'Weiter' })).toBeFocused();
     await page.keyboard.press('Enter');
@@ -87,6 +90,32 @@ test.describe('S10 Kriterien zusammenstellen, step 1', () => {
     await expect(steps.nth(1)).toHaveAttribute('aria-current', 'step');
     await expect(steps.first()).toContainText('erledigt');
     await expectNoAxeViolations(page, testInfo, 's10 step 2 frame');
+  });
+
+  test('INV:A11Y-01 INV:A11Y-08 „Eingabe löschen“ by keyboard empties the field and keeps the answer (#280)', async ({ page }, testInfo) => {
+    await openPage(page, WIDE);
+    await expect(page.getByRole('button', { name: 'Eingabe löschen' })).toHaveCount(0);
+
+    await openList(page);
+    await page.keyboard.type('HR');
+    await expect(options(page)).toHaveCount(2);
+    await chooseFirstOption(page, combobox(page), 'HR-Anwendung');
+    await expectNoAxeViolations(page, testInfo, 's10 step 1, answer with clear button');
+
+    await page.keyboard.press('Tab');
+    const clear = page.getByRole('button', { name: 'Eingabe löschen' });
+    await expect(clear).toBeFocused();
+    await page.keyboard.press('Enter');
+
+    await expect(combobox(page)).toBeFocused();
+    await expect(combobox(page)).toHaveValue('');
+    await expect(combobox(page)).toHaveAttribute('aria-expanded', 'true');
+    await expect(options(page)).toHaveCount(7);
+    await expect(clear).toHaveCount(0);
+
+    // Leaving without a new choice shows the answer again
+    await page.keyboard.press('Escape');
+    await expect(combobox(page)).toHaveValue('HR-Anwendung');
   });
 
   test('INV:A11Y-01 INV:A11Y-08 shows the step as a text line at 360 px (S10-M)', async ({ page }, testInfo) => {

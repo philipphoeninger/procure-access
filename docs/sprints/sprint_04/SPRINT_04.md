@@ -64,6 +64,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | S4-06 | Review the open Dependabot PRs #226 (`@playwright/test` 1.65), #227 (Angular group), #228 (Vitest group), #229 (other group), #230 (**jsdom 31, a major**), #231 (xunit.v3 4.0.3): licences, changelogs, CI | 0.5 | Each PR merged or closed by the owner with the reason in the protocol |
 | S4-07 | Documentation session (#243, TD-37): the sprint-03 findings in ARCHITECTURE, TESTING, SPEC, Handoff and the Figma mapping, and their headers naming current versions. ROADMAP v4 and the SPRINT_03 close-out are already done in the control chat; PRD, Kriterienkatalog and UX copy are the owner's | 1 | #243 closed for Claude's part; owner documents listed in the protocol |
 | S4-29 | *(added 2026-11-11, after S10, before S11)* Figma light colours: the light values of Handoff §1.2 (the Figma variables) pinned with `mat.theme-overrides` instead of the generated palette (SPEC §7.5; TD-34, owner decision **O-S4-22**); the dark appearance stays generated until O-S5. A Figma value that breaks a contrast rule is reported, not changed | 1 | Every `--mat-sys-*` role of Handoff §1.2 has its Figma value in the light appearance (test or protocol table); A11Y-01 and A11Y-08 green; #240 keeps only its dark part |
+| S4-30 | *(added 2026-11-12, from the Figma review, #280)* S10 step 1: the trailing icons of the Figma frames — the `error` icon while the field shows its error (Handoff §1.8, S10-E) and the clear button „Eingabe löschen“ (`common.actions.clearInput`, UX copy v23 U108) while the field holds text (owner decision **O-S4-61**); clearing empties the text and keeps the answer (protocol S4-30 §2) | 0.5 | Both icons as in Figma `2019:407` / `2139:3332`; clear by keyboard in E2E with axe in both appearances; UX copy v23, Handoff 1.23 |
 
 #### M2.5 Configurator S10 — 13 points (+ 4 points M2.5d)
 
@@ -143,6 +144,7 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | S4-11, S4-12 | S4-10 | internal |
 | S4-13 | S4-12; **O-S4-5** | internal / Philipp |
 | S4-29 | S4-13 merged; **O-S4-22** | internal / Philipp (decided) |
+| S4-30 | S4-10 merged; **O-S4-61** | internal / Philipp (decided) |
 | S4-14 – S4-18 | S4-29 merged (S11 is built and axe-checked in the final light colours); S4-12 merged (S10 hands the selection over); **O-S4-4** (approved UX copy v17) for the texts | internal / Philipp |
 | S4-16, S4-17 | S4-15a | internal |
 | S4-18a | S4-14 – S4-17 | internal |
@@ -218,6 +220,7 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 | O-S4-58 | S4-19: the weight range 1–10 (🔧 SD23) existed only as the client setting `priorityWeight`, but the server is authoritative for limits: (a) a server setting `Configurator:PriorityWeight` (Min 1, Max 10) in `appsettings.json`, kept in step with the client by hand; a weight only while B applies; (b) only a positive whole number until step 3 | S4-19 | (a); **decided (a)**, owner 2026-11-12 |
 | O-S4-59 | S4-19: how EXP-05 proves that no note reaches a log (TESTING named `Serilog.Sinks.InMemory`, not a dependency): (a) a hand-written test logger provider at every level; (b) the package as a test dependency | S4-19 | (a); **decided (a)**, owner 2026-11-12 |
 | O-S4-60 | S4-19: SPEC §8.6 maps `release-mismatch` to `criteria.export.outdated` („inzwischen gilt eine neue Katalogversion“), against exporting any stored release: (a) only the active release; a stored, inactive one is 400 `release-mismatch`, an unknown one 404; (b) any stored, complete release | S4-19 | (a); **decided (a)**, owner 2026-11-12 |
+| O-S4-61 | #280 (Figma review 2026-11-12): the clear button of the S10 combobox in Figma `2019:407` / S10-M1 had no UX copy key: (a) build it, wording proposed by Claude; (b) remove it from Figma | S4-30 | (a); **decided (a)**, owner 2026-11-12 („come up with the text yourself“); wording „Eingabe löschen“ (U108) |
 | — | S4-19: TEN-04 asked for `max-age=3600` on every catalog answer, ARCHITECTURE §9.6 (S3-19) for `no-cache` on the active release: reword TEN-04 to §9.6 | S4-19 | Reword; **decided**, owner 2026-11-12 (TESTING_v48 V145) |
 | — | Dependabot: majors in #230 (jsdom 31) and #231 (xunit.v3 4) | S4-06 | Decide per the review |
 | — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-P | — |

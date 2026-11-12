@@ -18,11 +18,13 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -166,6 +168,7 @@ function normalize(text: string): string {
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
@@ -238,6 +241,17 @@ export class CriteriaSelect {
 
   /** The text typed into the combobox; empty while it shows a chosen entry. */
   private readonly typed = signal('');
+
+  /** What the field holds: typed text or the entry it shows. */
+  private readonly fieldValue = toSignal(this.useCaseField.valueChanges, { initialValue: this.useCaseField.value });
+
+  /** The clear button shows while the field holds text (Figma `2019:407`, UX copy U108). */
+  protected readonly useCaseFieldHasText = computed(() => this.displayEntry(this.fieldValue()) !== '');
+
+  /** The error icon follows the field error (Handoff §1.8, S10-E `2139:3332`); same rule as the validator. */
+  protected readonly useCaseErrorIconShown = computed(
+    () => (this.useCaseChecked() && !this.useCaseAnswered()) || this.serverError()?.layer === 'useCase',
+  );
 
   /** The use case chosen last, shown also when a later answer no longer lists it (S4-10 R1). */
   private readonly chosenUseCase = signal<UseCaseOption | null>(null);
@@ -365,6 +379,18 @@ export class CriteriaSelect {
     this.store.chooseUseCase(isNone(entry) ? { kind: 'none' } : { kind: 'useCase', id: entry.id });
     this.typed.set('');
     this.useCaseField.updateValueAndValidity();
+  }
+
+  /**
+   * „Eingabe löschen“ (#280): empties the text and shows every option, with the focus back in the field
+   * and the list open. The answer stays until another option is chosen, so leaving the field shows it
+   * again (`onPanelClosed`); clearing never resets the lower steps.
+   */
+  protected clearUseCase(): void {
+    this.useCaseField.setValue('');
+    this.onUseCaseInput('');
+    this.useCaseInput()?.nativeElement.focus();
+    this.useCaseTrigger()?.openPanel();
   }
 
   /** Text that chose nothing does not stay: the field shows the current answer again. */
