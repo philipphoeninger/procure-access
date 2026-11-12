@@ -37,6 +37,20 @@ SPDX-License-Identifier: MIT
           (input)="onUseCaseInput(useCaseInput.value)"
           (focus)="onUseCaseFocus()"
         />
+        @if (useCaseErrorIconShown()) {
+          <mat-icon matSuffix aria-hidden="true">error</mat-icon>
+        }
+        @if (useCaseFieldHasText()) {
+          <button
+            matIconButton
+            matSuffix
+            type="button"
+            [attr.aria-label]="'common.actions.clearInput' | translate"
+            (click)="clearUseCase()"
+          >
+            <mat-icon aria-hidden="true">cancel</mat-icon>
+          </button>
+        }
         <mat-hint>{{ 'criteria.select.step1.field.hint' | translate }}</mat-hint>
         <mat-error>
           @if (serverError(); as error) {

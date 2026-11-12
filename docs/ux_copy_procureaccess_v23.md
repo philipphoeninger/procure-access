@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v21 (11. November 2026) – v21 teilt den Leerzustand des Filters in S11 in den Satz und die Beschriftung des Buttons „Filter zurücksetzen“ auf, der bisher im selben Text stand (Sprint 04, S4-17, U105); Wortlaut unverändert. Der Product Owner hat U105 am 11. November 2026 unverändert bestätigt. v20 (11. November 2026) – v20 ergänzt für die Kriterienkarte in S11 die Beschriftung der Gewichtung, den Hinweis auf eine nur in der Gewichtung geänderte Empfehlung und die beiden Beschriftungen des Buttons zur Notiz (Sprint 04, S4-16, U102–U104). Der Product Owner hat U102–U104 am 11. November 2026 unverändert bestätigt. v19 (11. November 2026) – v19 teilt den Schlüssel der Tabs in der Detailansicht der Kriterienkarte (S11), dessen Text „Software-Test / App-Test / PDF-Test“ eine Beschreibung und keine Beschriftung war, in drei Beschriftungen auf (Sprint 04, S4-15b, U101); Wortlaut aus dem bisherigen Schlüssel. Der Product Owner hat U101 am 11. November 2026 unverändert bestätigt. v18 (11. November 2026) – v18 ergänzt für die Metazeile der Kriterienkarte in S11 zwei Teilschlüssel für Karten, denen der Funktionsbereich oder die Nummer in EN 301 549 fehlt (Sprint 04, S4-15a, U100); Wortlaut aus `criteria.item.meta`, nur aufgeteilt. Der Product Owner hat U100 am 11. November 2026 unverändert bestätigt. v17 (10. November 2026) – v17 schließt die Lücken aus Issue #181 (Sprint 04, S4-02): Einzahl- und Nullformen, Seitentitel-Varianten, Texte zu den Problemtypen, Grund am nicht verfügbaren Button „Konto endgültig löschen“, weiche Trennzeichen in zwei rechtlichen Titeln, Name des Konto-Buttons, Text der Vorschlags-E-Mail ohne kodierte Zeilenumbrüche. Dazu zwei Texte für S10 aus der Planung von S4-11: Grund für einen Ausschluss durch einen Funktionsbereich und der zweite Satz des Hinweises in Schritt 2 als eigener Schlüssel. Der Product Owner hat alle neuen und geänderten Texte (U86–U89, U91–U96, U98, U99) am 11. November 2026 unverändert bestätigt (O-S4-4). v16 (9. November 2026) – v16 gibt dem Zusatz „(öffnet eine externe Seite)“ des Links „Kriterium vorschlagen“ einen eigenen Schlüssel (Sprint 03, S3-21). v15 (2. November 2026) – v15 schreibt die Seitentitel der Fehlerseiten aus und gibt der Startseite einen eigenen Titelschlüssel (Sprint 02, S2-16). v14 – Ergebnis von Phase 2, Schritt 7b („UX copy for key flows“) aus `ai_development_process.md`, angepasst an `ARCHITECTURE_v11.md` und ergänzt um die Texte aus dem Design-Review (7e, `design_critique_procureaccess_v1.md`) und der Barrierefreiheitsprüfung (7f, `accessibility_review_procureaccess_v1.md`), ergänzt um die nachgereichten Screens S40, S35 (Schritt 2), S42, S53 und S37 sowie um die Review-Punkte 1–6 vom 6. Oktober 2026 (Anwendungstypen, Funktionsbereiche, Verwendungszweck, Prüfverfahren, Ausschlussregeln, Kriterien aus BIT inklusiv) und die Nachträge desselben Tages (Überblick eines Produkts im Projekt, Erklärung der Bewertungsstufen, Filterreihenfolge in S40) sowie um die Texte aus Design-Review 2 (`design_critique_procureaccess_v2.md`), Barrierefreiheitsprüfung 2 (`accessibility_review_procureaccess_v2.md`) und den Mobile-first-Screens (12. Oktober 2026) sowie um die Korrekturen aus der Konsistenzprüfung vor SPEC_v1 und aus dem Architektur-Review (12. Oktober 2026) sowie um die Entscheidungen vom 13. Oktober 2026 (Anmeldemodell, Kriterienliste anpassen, Sitzungsdauer) und um die Projektübersicht S32 sowie um die Entscheidungen D1–D7 und die Befunde aus der Prüfung der Hauptdokumente (`pruefung_hauptdokumente_v1.md`, 13. Oktober 2026) sowie um die Texte aus der Feature-Spezifikation (`SPEC_v1.md` §14, 15. Oktober 2026); v14 übernimmt die Bestätigung der Vorschläge vom 19. Oktober 2026 (`SPEC_v2.md` SD19–SD23). Ersetzt v13. Enthält als Grundlage zusätzlich das Screen- und Komponenteninventar (Ersatz für den verschlankten Schritt 7a).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v21):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.9), `ARCHITECTURE_v35.md`, `TESTING_v47.md`, `design_handoff_procureaccess_v1.md` (1.21), `figma_code_mapping_procureaccess_v1.md` (1.20), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v23 (12. November 2026) – v23 ergänzt den Namen des Buttons, der die Eingabe in einem Suchfeld mit Auswahlliste löscht (`common.actions.clearInput`, zuerst S10 Schritt 1; Sprint 04, S4-30, Issue #280, U108).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v23):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.10), `ARCHITECTURE_v37.md`, `TESTING_v48.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,23 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v22
+
+Quelle: Issue #280 (Figma-Abgleich vom 12. November 2026). Der Product Owner hat am 12. November 2026 entschieden, den Löschen-Button der Figma-Frames S10 Schritt 1 (`2019:407`) und S10-M1 (`2134:3174`) zu bauen, und den Wortlaut Claude überlassen.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U108 | **Eingabe löschen:** neu `common.actions.clearInput` „Eingabe löschen“ (§5.0), der Name des Symbol-Buttons am Ende eines Suchfelds mit Auswahlliste, solange das Feld Text enthält; zuerst S10 Schritt 1, später auch S40 „Verwendungszweck“ | Ein Symbol-Button braucht einen hörbaren Namen. „Eingabe löschen“ sagt, was passiert, und passt zu jedem Feld; „Verwendungszweck löschen“ klänge so, als ginge die Auswahl verloren, die bleibt aber, bis eine neue gewählt ist. Gemeinsamer Schlüssel, weil S40 dasselbe Feldmuster nutzt (Design-Handoff §2.2) | S4-30, #280 |
+
+### Änderungen gegenüber v21
+
+Quelle: Planung von S4-18, Owner-Entscheidungen O-S4-50 (a) und O-S4-53 (a) vom 11. November 2026. Der Wortlaut von U106 ist ein Vorschlag von Claude; der Product Owner hat ihn am 11. November 2026 vor der Umsetzung unverändert bestätigt.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U106 | **Anzahlen je Priorität mit Einzahl:** `criteria.list.counts` ist nur noch der Rahmen „{{a}}, {{b}}, {{info}}“; neu `criteria.list.counts.a` „{{count}} Mindestanforderungen“ / `.a.one` „1 Mindestanforderung“, `criteria.list.counts.b` „{{count}} Bewertungskriterien“ / `.b.one` „1 Bewertungskriterium“, `criteria.list.counts.info` „{{count}} Hinweise“ / `.info.one` „1 Hinweis“ (§5.5). Gezählt werden die Anforderungskriterien der Liste nach der Stufe, die gerade gilt; „Geprüft nach …“ zählt nicht mit | Ein Schlüssel mit drei Zahlen hat keine Einzahl (SD25: `translatePlural` wählt nach einer Zahl). Je Stufe ein Schlüssel mit `.one`; die Kommas stehen im Rahmen, nicht im Code | S4-18, O-S4-50, O-S4-51 |
+| U107 | **Ort des Hinweises ohne Anmeldung:** `criteria.list.draftNote` steht oberhalb der Liste unter `criteria.list.priorityNote` (bisher: „oberhalb der Aktionen“); Wortlaut unverändert | Design-Handoff §5.1 und der Figma-Frame S11 (`2020:70`) zeigen beide Hinweise über der Liste; für den Ort gilt der Handoff vor der UX-Copy. Wer die Liste bearbeitet, liest die Warnung vorher | S4-18, O-S4-53 |
 
 ### Änderungen gegenüber v20
 
@@ -429,6 +446,7 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `common.actions.showMore` | Button | Mehr anzeigen | |
 | `common.actions.showLess` | Button | Weniger anzeigen | |
 | `common.actions.retry` | Button | Erneut versuchen | |
+| `common.actions.clearInput` | Name des Symbol-Buttons im Suchfeld (Symbol `cancel`) | Eingabe löschen | U108; nur sichtbar, solange das Feld Text enthält; löscht den Text, nicht die gewählte Antwort |
 | `common.optional` | Feldzusatz | (optional) | Pflichtfelder werden nicht markiert, optionale schon – weniger Sternchen, besser hörbar |
 | `common.loading` | Ladeanzeige (Ansage) | Wird geladen … | per Live-Region, höchstens einmal |
 | `common.loaded` | Ansage | {{count}} Ergebnisse geladen. | |
@@ -627,7 +645,13 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.list.changeSelection` | Button | Auswahl ändern | → S10 mit Vorbelegung; nicht bei der Kriterienliste eines Projekts (Auswahl fest, D1) |
 | `criteria.list.projectCopy` | Hinweis (`pa-notice` Info, nur bei der Kriterienliste eines Projekts) | Diese Liste gehört zum Beschaffungsprojekt „{{project}}“. Verwendungszweck, Anwendungstyp, Funktionsbereiche und Prüfverfahren sind fest. Sie können Kriterien aufnehmen oder entfernen und Prioritäten und Notizen ändern. | U63; D1, WSP-03 |
 | `criteria.list.priorityNote` | Hinweisbox (oberhalb der Liste, nicht wegklickbar) | Die Prioritäten sind eine Empfehlung des Projektteams auf Grundlage fachlicher Erfahrung. Sie sind keine Vorgabe aus einer Norm. Prüfen Sie, ob sie zu Ihrer Beschaffung passen, und ändern Sie sie bei Bedarf. | PRD §7, G8 |
-| `criteria.list.counts` | Text | {{a}} Mindestanforderungen, {{b}} Bewertungskriterien, {{info}} Hinweise | |
+| `criteria.list.counts` | Text über der Liste (vor der Filterzeile) | {{a}}, {{b}}, {{info}} | U106; die Teile aus den drei Schlüsseln darunter |
+| `criteria.list.counts.a` | Teil von `criteria.list.counts` | {{count}} Mindestanforderungen | U106; Anforderungskriterien mit Stufe A, wie sie gerade gilt |
+| `criteria.list.counts.a.one` | Teil (Einzahl) | 1 Mindestanforderung | U106 |
+| `criteria.list.counts.b` | Teil von `criteria.list.counts` | {{count}} Bewertungskriterien | U106 |
+| `criteria.list.counts.b.one` | Teil (Einzahl) | 1 Bewertungskriterium | U106 |
+| `criteria.list.counts.info` | Teil von `criteria.list.counts` | {{count}} Hinweise | U106 |
+| `criteria.list.counts.info.one` | Teil (Einzahl) | 1 Hinweis | U106 |
 | `criteria.list.filter.label` | `aria-label` Filtergruppe | Liste filtern | |
 | `criteria.list.filter.priority` | Label | Priorität | |
 | `criteria.list.filter.included` | Label | Nur aufgenommene Kriterien anzeigen | |
@@ -687,7 +711,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | **Aktionen** | | | |
 | `criteria.list.save` | Button | Liste speichern | ohne Anmeldung → S01 mit `auth.login.reasonSave` |
 | `criteria.list.export` | Button | Liste exportieren | auch ohne Anmeldung (E7) → S13 |
-| `criteria.list.draftNote` | Hinweis (nur ohne Anmeldung, oberhalb der Aktionen, nicht wegklickbar) | Ihre Auswahl wird nicht gespeichert, solange Sie nicht angemeldet sind. Wenn Sie die Seite neu laden oder schließen, geht sie verloren. Laden Sie die Liste herunter oder melden Sie sich an, um sie zu speichern. | E7; kein Warndialog beim Verlassen nötig, der Hinweis genügt |
+| `criteria.list.draftNote` | Hinweis (nur ohne Anmeldung, oberhalb der Liste unter `criteria.list.priorityNote`, nicht wegklickbar; U107) | Ihre Auswahl wird nicht gespeichert, solange Sie nicht angemeldet sind. Wenn Sie die Seite neu laden oder schließen, geht sie verloren. Laden Sie die Liste herunter oder melden Sie sich an, um sie zu speichern. | E7; kein Warndialog beim Verlassen nötig, der Hinweis genügt |
 | `criteria.list.unsaved` | Status in der Aktionsleiste (Auswahl noch nicht gespeichert) | Noch nicht gespeichert | in der Aktionsleiste unter `criteria.list.status.count` (7e); ohne Anmeldung zusätzlich `criteria.list.draftNote`. Wechsel zu „Liste gespeichert.“ per Ansage |
 | `criteria.list.status.count` | Status in der Aktionsleiste | {{included}} von {{total}} Kriterien in Ihrer Liste | Live-Region, polite, höchstens eine Ansage pro Sekunde |
 | `criteria.list.share` | Button | Freigabelink erstellen | nur gespeicherte Listen der Organisation, nicht die Kriterienliste eines Projekts (D1, D7) |

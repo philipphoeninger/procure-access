@@ -222,7 +222,8 @@
       "edit": "Bearbeiten",
       "showMore": "Mehr anzeigen",
       "showLess": "Weniger anzeigen",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "clearInput": "Eingabe löschen"
     },
     "optional": "(optional)",
     "loading": "Wird geladen …",

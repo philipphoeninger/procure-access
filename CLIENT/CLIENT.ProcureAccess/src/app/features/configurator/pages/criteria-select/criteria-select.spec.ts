@@ -236,6 +236,59 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
     });
   });
 
+  describe('step 1: „Eingabe löschen“ (#280, UX copy U108)', () => {
+    const clearButton = () => screen.queryByRole('button', { name: 'Eingabe löschen' });
+
+    it('shows no clear button while the field is empty', async () => {
+      await setUp();
+
+      expect(clearButton()).toBeNull();
+    });
+
+    it('shows the clear button while the field holds typed text or a chosen answer', async () => {
+      await setUp();
+      await open();
+      await type('HR');
+      expect(clearButton()).not.toBeNull();
+
+      await choose('HR-Anwendung');
+      expect(clearButton()).not.toBeNull();
+      await expectNoAxeViolations();
+    });
+
+    it('empties the field, keeps the focus in it with every option listed and announces the count', async () => {
+      await setUp();
+      await open();
+      await type('Repo');
+
+      clearButton()!.click();
+      await fixture.whenStable();
+
+      expect((combobox() as HTMLInputElement).value).toBe('');
+      expect(document.activeElement).toBe(combobox());
+      expect(combobox().getAttribute('aria-expanded')).toBe('true');
+      expect(optionNames()).toEqual(['HR-Anwendung', 'Reporting-Anwendung', 'Gehaltsabrechnungen', NONE_OPTION]);
+      expect(announce).toHaveBeenLastCalledWith('criteria.select.step1.matches', { count: 3 }, { throttleMs: 1000 });
+      expect(clearButton()).toBeNull();
+    });
+
+    it('keeps the answer: leaving the cleared field shows it again and resets no lower step', async () => {
+      await setUp();
+      await choose('HR-Anwendung');
+
+      clearButton()!.click();
+      await fixture.whenStable();
+      expect(store.configurator.draft().useCase).toEqual({ kind: 'useCase', id: 'hr' });
+
+      fireEvent.keyDown(combobox(), { key: 'Escape', keyCode: 27 });
+      await fixture.whenStable();
+
+      expect((combobox() as HTMLInputElement).value).toBe('HR-Anwendung');
+      expect(store.configurator.draft().useCase).toEqual({ kind: 'useCase', id: 'hr' });
+      expect(store.configurator.reset()).toBeNull();
+    });
+  });
+
   describe('„Weiter“', () => {
     it('without an answer shows the field error, marks the field invalid and focuses it (S10-E)', async () => {
       await setUp();
@@ -250,6 +303,20 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
       expect(field.getAttribute('aria-expanded')).toBe('false');
       expect(stepItems()[0].getAttribute('aria-current')).toBe('step');
       await expectNoAxeViolations();
+    });
+
+    it('shows the error icon with the field error and drops it with the error (Handoff §1.8, S10-E)', async () => {
+      await setUp();
+      const errorIcon = () =>
+        [...document.querySelectorAll('.mat-mdc-form-field-icon-suffix mat-icon')].find((i) => text(i) === 'error');
+      expect(errorIcon()).toBeUndefined();
+
+      button('Weiter').click();
+      await fixture.whenStable();
+      expect(errorIcon()?.getAttribute('aria-hidden')).toBe('true');
+
+      await choose('HR-Anwendung');
+      expect(errorIcon()).toBeUndefined();
     });
 
     it('drops the field error once an answer is chosen', async () => {

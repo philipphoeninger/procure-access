@@ -8,6 +8,7 @@
     "arrow_downward",
     "arrow_drop_down",
     "box",
+    "cancel",
     "check",
     "checklist",
     "contrast",
@@ -39,5 +40,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "3fa0cfff5209eb751ef60a49f908f606659e6e2d08d5275faf1d24973ec6ff43"
+  "sha256": "8afe4128909384e24e90cdc4d2d7a6e1b32da0a6933f9aa0f809310289ad6f05"
 }
