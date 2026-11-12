@@ -45,7 +45,7 @@ Checked with `/engineering:code-review` on the diff.
 | # | Finding | Sorting |
 |---|---|---|
 | R1 | `API/API.ProcureAccess/Controllers/FavoritesController.cs` is commented out as a whole and still names the old base signature (`BaseCrudController<Favorite, FavoritesController>`, `base(logger, repo)`) | Follow-up: P1 (not in the row) |
-| R2 | The `immutable` location `-[A-Z0-9]{8}\.(js\|css)$` of `nginx.conf` matches only `main-*.js` and `styles-*.css`: 44 of the 45 lazy chunks carry lowercase letters, `_` or `-` in their hash (`chunk-6xwBF1Or.js`, `chunk--54nLi_Y.js`), fall into `location /` and are revalidated on every load instead of cached for a year | Follow-up: P2 (not in the row; no wrong file is ever served) |
+| R2 | The `immutable` location `-[A-Z0-9]{8}\.(js\|css)$` of `nginx.conf` matches only `main-*.js` and `styles-*.css`: 44 of the 45 lazy chunks carry lowercase letters, `_` or `-` in their hash (`chunk-6xwBF1Or.js`, `chunk--54nLi_Y.js`), fall into `location /` and are revalidated on every load instead of cached for a year | Follow-up: P2, #308 (not in the row; no wrong file is ever served) |
 
 No correctness or security bug left that affects current behaviour; no further review round needed.
 
@@ -68,4 +68,4 @@ No correctness or security bug left that affects current behaviour; no further r
 | # | Point | Proposal |
 |---|---|---|
 | P1 | `FavoritesController.cs` is commented out as a whole (R1), like the dialog service was | Delete it with the favorites rework of step 5 (`withFavorites()` is legacy), or as a touch item in the next TECH_DEBT version |
-| P2 | The hash pattern of the `immutable` nginx location misses the lazy chunks (R2); since S4-22 the lazy routes make them most of the bundle | Proposed issue: widen the pattern to the build's hash alphabet (e.g. `-[A-Za-z0-9_-]{8}\.(js\|css)$`) and check the headers of `main`, `styles` and a chunk on the client image |
+| P2 | The hash pattern of the `immutable` nginx location misses the lazy chunks (R2); since S4-22 the lazy routes make them most of the bundle | #308 (opened 2026-11-13, owner): widen the pattern to the build's hash alphabet (e.g. `-[A-Za-z0-9_-]{8}\.(js\|css)$`) and check the headers of `main`, `styles` and a chunk on the client image |
