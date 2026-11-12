@@ -2,7 +2,7 @@
 
 > **Sprint:** 04, added 2026-11-12 from the Figma review of sprints 1–4. **Issues:** #280. **Requirements / invariants:** R-CON-02; CFG-03 unchanged; A11Y-01, A11Y-08 (E2E); no TESTING version.
 > **Owner decision:** O-S4-61 (a), 2026-11-12: build the clear button; the wording is Claude's proposal.
-> **Status:** done — pull request open.
+> **Status:** done — pull request #285 open.
 > **Scope:** the trailing icons of the S10 use-case combobox; UX copy v23, Handoff 1.23.
 
 ## 1. Starting point
