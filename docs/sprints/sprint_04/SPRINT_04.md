@@ -303,11 +303,11 @@ Frontend (S4-09 – S4-18, S4-21 UI part) and backend (S4-03, S4-05, S4-08, S4-1
 
 | Item | Value |
 |---|---|
-| Points done (P0 / stretch) | |
-| Development days used | |
-| Velocity for forecasting | |
-| Carried over to sprint 05 (with reason) | |
-| Issues created / closed | |
-| Changes needed in roadmap or documents | |
+| Points done (P0 / stretch) | **50 / 6.5** — every task incl. stretch and S4-29; S4-15, S4-18, S4-20 and S4-21 were split into a/b, S4-01b, S4-14b and S4-30 were added during the sprint; 36 protocols in this folder |
+| Development days used | **about 3** (owner, 2026-11-13); calendar 2026-11-10 – 2026-11-13 |
+| Velocity for forecasting | ≈ **19 points per development day** (sprint 03 ≈ 16, sprint 02 ≈ 8). Sprint 05 is planned with ~90 points for 8 days (≈ 11 per day, discounted because it replaces the authentication; `ROADMAP_v5.md` §6) |
+| Carried over to sprint 05 (with reason) | No task. M2.3 priorities stay blocked on O-1/K-1; the manual checks X2/X3 of the M2 exit wait for the accessibility tester (#311); the staging deployment (#236) is the owner's |
+| Issues created / closed | Closed among others: #203, #181, #205, #233, #242, #239, #243, #241, #237, #235, #187, #112, #91, #92, #42 (`TECH_DEBT_v4.md` §4). Created: follow-ups of the protocols, e.g. #264, #278, #279, #281, #282, #296, #299, #301, #302, #306, #308, and #309 – #313 at the register review |
+| Changes needed in roadmap or documents | `ROADMAP_v5.md` (M2 done except the priorities, M3 re-estimated, velocity, forecast). Written during the sprint: ARCHITECTURE up to v46 (ADR-016), TESTING up to v55, UX copy up to v26, gap list v3, CLAUDE.md (Figma files). Still open: the documentation drift of #313 (task S5-05) |
 
 **Next sprint (preview):** M3 — cookie session replacing the JWT (M3.1), registration and e-mail confirmation (M3.2), organisations (M3.3), saved lists (M3.5); release 2026.1 activated and the legacy filter removed as soon as O-1/K-1 arrive.
