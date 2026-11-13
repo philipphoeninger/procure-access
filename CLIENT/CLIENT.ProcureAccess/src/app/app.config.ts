@@ -24,6 +24,7 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideAppearance } from './core/a11y/appearance';
 import { provideDocumentLanguage } from './core/a11y/document-language';
 import { PageTitleStrategy } from './core/a11y/page-title.strategy';
+import { provideSessionProbe } from './core/session/session-probe.service';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
@@ -53,6 +54,9 @@ export const appConfig: ApplicationConfig = {
         errorInterceptor]),
     ),
     provideMarkdown(),
+    // Session probe at start: issues the antiforgery cookie XSRF-TOKEN, which Angular's XSRF
+    // interceptor sends back as X-XSRF-TOKEN (ARCHITECTURE §8.3, SPEC §8.8; S5-07)
+    provideSessionProbe(),
     { provide: APP_NAME, useValue: 'ProcureAccess'},
     { provide: API_URL, useValue: environment.apiUrl },
     { provide: JWT_NAME,

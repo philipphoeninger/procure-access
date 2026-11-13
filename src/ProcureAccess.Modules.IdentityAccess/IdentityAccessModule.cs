@@ -2,12 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.IdentityAccess.Session;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 
 namespace ProcureAccess.Modules.IdentityAccess;
@@ -72,6 +76,48 @@ public static class IdentityAccessModule
             dataProtection.UnprotectKeysWithAnyCertificate(certificates.Previous);
         }
 
+        // Cookie session and antiforgery (S5-07, ARCHITECTURE §9.1): the Identity cookie schemes,
+        // the session lifetimes of 🔧 Session:* and the antiforgery token pair; Secure cookies only on
+        // HTTPS requests in Development and E2E (SessionCookiePolicy).
+        services.AddSession(configuration, environment);
+
         return services;
+    }
+
+    /// <summary>
+    /// Validates the antiforgery token of every state-changing request
+    /// (<see cref="AntiforgeryValidationMiddleware"/>; SEC-02). Add it after authorization and the
+    /// rate limiter, before the endpoints run.
+    /// </summary>
+    public static IApplicationBuilder UseIdentityAccessAntiforgery(this IApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+        return app.UseMiddleware<AntiforgeryValidationMiddleware>();
+    }
+
+    /// <summary>
+    /// Maps the module's endpoints as minimal APIs below <c>/auth</c> of <paramref name="routes"/>,
+    /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
+    /// before the Swagger set-up (#176). Today only the session probe; sign-in and sign-out live in
+    /// the host until the users move into this module (M3.1).
+    /// </summary>
+    public static IEndpointRouteBuilder MapIdentityAccessEndpoints(this IEndpointRouteBuilder routes)
+    {
+        ArgumentNullException.ThrowIfNull(routes);
+        var auth = routes.MapGroup("/auth").WithTags("Auth");
+        SessionProbeEndpoint.Map(auth);
+        return routes;
+    }
+
+    /// <summary>
+    /// Issues the antiforgery token cookie for the user of <paramref name="context"/>
+    /// (<c>HttpContext.User</c>), as the session probe does (SEC-09). For the host's sign-in and
+    /// sign-out endpoints, which rotate the token because it is bound to the user; it moves into the
+    /// module with them (M3.1). Set <c>HttpContext.User</c> to the new principal first.
+    /// </summary>
+    public static void IssueAntiforgeryToken(HttpContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        AntiforgeryTokenCookie.Issue(context);
     }
 }

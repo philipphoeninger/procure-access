@@ -27,13 +27,18 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// <paramref name="environmentName"/> or extra host <paramref name="settings"/>
 /// (e.g. SEC-06) and dispose it themselves. <paramref name="configureServices"/> adds test-only
 /// services to such an instance, e.g. a controller of the test assembly.
+/// With <paramref name="realAuthentication"/> the host keeps the API's own authentication — the
+/// Identity cookie and the legacy JWT — instead of the test scheme, for the tests of the real
+/// sign-in flow (SEC-01, SEC-03, SEC-09, OPS-04; #88). Such a host runs on a database of its own,
+/// because the test scheme is a host-wide switch and the shared host keeps it.
 /// </remarks>
 public sealed class ProcureAccessApiFactory(
     string connectionString,
     FakeTimeProvider clock,
     string environmentName = ProcureAccessApiFactory.EnvironmentName,
     IReadOnlyDictionary<string, string?>? settings = null,
-    Action<IServiceCollection>? configureServices = null)
+    Action<IServiceCollection>? configureServices = null,
+    bool realAuthentication = false)
     : WebApplicationFactory<Program>
 {
     public const string EnvironmentName = "Testing";
@@ -79,22 +84,25 @@ public sealed class ProcureAccessApiFactory(
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(clock);
 
-            // The test scheme replaces JwtBearer as the default, also in the default policy,
-            // which the API ties to the JwtBearer scheme.
-            services.AddAuthentication()
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
-            services.PostConfigure<AuthenticationOptions>(options =>
+            if (!realAuthentication)
             {
-                options.DefaultScheme = TestAuthHandler.SchemeName;
-                options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
-                options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
-            });
-            services.PostConfigure<AuthorizationOptions>(options =>
-            {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName)
-                    .RequireAuthenticatedUser()
-                    .Build();
-            });
+                // The test scheme replaces the API's default scheme (cookie or legacy JWT), also
+                // in the default policy. The cookie and JWT schemes stay registered but unused.
+                services.AddAuthentication()
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+                services.PostConfigure<AuthenticationOptions>(options =>
+                {
+                    options.DefaultScheme = TestAuthHandler.SchemeName;
+                    options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                    options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+                });
+                services.PostConfigure<AuthorizationOptions>(options =>
+                {
+                    options.DefaultPolicy = new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName)
+                        .RequireAuthenticatedUser()
+                        .Build();
+                });
+            }
 
             configureServices?.Invoke(services);
         });

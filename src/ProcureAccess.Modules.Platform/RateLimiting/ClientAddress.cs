@@ -13,11 +13,13 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ProcureAccess.Modules.Platform.RateLimiting;
 
 /// <summary>
-/// The client IP behind the reverse proxies (ARCHITECTURE §9.2, owner decision O-S4-69 (a)). The
-/// browser reaches the API through Traefik and the client's nginx, so the connection always comes
-/// from nginx; the client's own address is in <c>X-Forwarded-For</c>. ASP.NET's forwarded-headers
-/// middleware takes it from there, but only from a proxy in a private or loopback network and for
-/// at most <see cref="ForwardLimitKey"/> proxies (🔧, default 2: Traefik → nginx → API).
+/// The client IP and the scheme behind the reverse proxies (ARCHITECTURE §9.2, owner decision
+/// O-S4-69 (a); scheme since S5-07). The browser reaches the API through Traefik and the client's
+/// nginx, so the connection always comes from nginx; the client's own address is in
+/// <c>X-Forwarded-For</c> and the scheme the client used in <c>X-Forwarded-Proto</c>. ASP.NET's
+/// forwarded-headers middleware takes them from there, but only from a proxy in a private or
+/// loopback network and for at most <see cref="ForwardLimitKey"/> proxies (🔧, default 2:
+/// Traefik → nginx → API).
 /// </summary>
 /// <remarks>
 /// The address is used only to choose the counter of a rate limit; it is never stored or logged
@@ -59,8 +61,14 @@ internal static class ClientAddress
 
         services.Configure<ForwardedHeadersOptions>(options =>
         {
-            // Only the address: scheme and host stay those of the connection.
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            // The address and, since S5-07 (owner decision 1a), the scheme: Traefik terminates TLS,
+            // so the API sees plain HTTP and would refuse to issue or check its Secure cookies and
+            // antiforgery tokens (SecurePolicy Always → InvalidOperationException on a non-HTTPS
+            // request). X-Forwarded-Proto from the same trusted proxies restores Request.IsHttps;
+            // nginx passes Traefik's value through (nginx.conf). The host stays that of the connection.
+            // RequireHeaderSymmetry stays off (the default), so a For header without a Proto
+            // header, as the rate-limit tests send it, still sets the address.
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             options.ForwardLimit = forwardLimit;
             options.KnownProxies.Clear();
             options.KnownIPNetworks.Clear();
