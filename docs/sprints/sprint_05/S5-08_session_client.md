@@ -48,7 +48,7 @@
 | `features/identity/dialogs/login-overlay/` | `pa-login-overlay`: `shell.session.expired.title|body`, e-mail and password fields with `errors.field.required`, error notice (`auth.login.error.invalid` or `errors.antiforgery`, `role="alert"`, focus), „Schließen“, „Anmelden“ with spinner; announces `shell.session.restored`, closes with `true`; panel class `pa-dialog` |
 | `core/interceptors/error.interceptor.ts` | A 401 gets neither snackbar nor server page |
 | `app.config.ts` | `withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' })`; `headersInterceptor`, `provideSessionProbe()`, `JWT_NAME`, `REFRESH_TOKEN_NAME` removed |
-| `core/state/app.store.ts`, `core/models/appState.interface.ts` | `init()` waits for `sessionReady()`; the identity slice starts from `initialIdentityState` |
+| `core/state/app.store.ts`, `core/models/appState.interface.ts` | `init()` applies the anonymous settings and the UI language from the browser first, then waits for `sessionReady()` and replaces them with a signed-in user's saved settings; the identity slice starts from `initialIdentityState`. The first push waited for the probe before the language: CI's E2E jobs failed in every browser, because the two reduced-motion tests of `shell/appearance.spec.ts` hold every API request and the loading bar then had the raw key `common.loading` as its name instead of „Wird geladen …“ (fixed 2026-11-14, see §4) |
 | `layout/main-nav/main-nav.ts` | `signedIn` is the store's signal; „Abmelden“ → `signOut()`, legacy proposals and settings reset, start page |
 | `features/identity/login/login.ts`, `.html` | Signs in through `store.signIn()`, sets the legacy UI settings from the returned user, shows `auth.login.error.invalid` (`role="alert"`) on a refusal; `inject()`, no floating promises |
 | `core/guards/auth.guard.ts`, `features/identity/guards/permission.guard.ts` | Functional guards (`authGuard`, `permissionGuard`, route data key `PERMISSION_KEY`) that await `sessionReady()`; `app.routes.ts` uses them |
@@ -71,6 +71,7 @@
 | `POST /api/signIn`, `POST /api/refresh` | 200 with tokens | 404 (gone) |
 | Cross-origin browser request | allowed for `Cors:AllowedOrigins` | no CORS headers (every client is on the API's origin) |
 | Swagger UI | Bearer „Authorize“ button | none; sign in through `POST /api/v1/auth/login` in the UI |
+| UI texts at start | loaded at once for an anonymous visitor (local settings), after `/api/me` for a signed-in one | loaded at once for everyone; a signed-in user's saved language and appearance replace them when the probe and `/api/me` answered |
 
 ### 2.4 Tests
 
@@ -114,7 +115,7 @@
 | `node scripts/check-figma-links.mjs`, `check-icons.mjs` | 0 errors |
 | `reuse lint` (Docker) | compliant |
 | `ng serve --port 4299` with the proxy | `/` 200 from the dev server, `/health/live` 200 from the API on 5000 through the proxy, `/api/v1/auth/session` answered by the API (404 from the 27-hour-old dev image that predates S5-07, same answer direct and through the proxy) |
-| E2E | not run locally (another session owns the stack); CI |
+| E2E | not run locally for the first push (another session owns the stack). CI run 43493788973: stages 1–5, 7, 8 and CodeQL green; all five E2E jobs red on the two reduced-motion tests of `shell/appearance.spec.ts` (`init()` order, see §2.2). After the fix, locally in Chromium against `ng serve --port 4300` (the tests hold every API request, so only the client matters): the two tests fail without the fix and pass with it; `shell/` and `smoke/stack.spec.ts` 38 passed. Lint and the 529 specs unchanged. The full matrix runs in CI on the new push |
 
 ## 5. Open points
 
