@@ -27,13 +27,11 @@ builder.Services.AddControllers()
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddPostgreSQLConnection(builder.Configuration)
-                .AddAppConfig(builder.Configuration)
                 .AddEmailConfig(builder.Configuration)
-                .AddFrontendCors(builder.Configuration)
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
-                .AddIdentityAuth(builder.Configuration)
+                .AddIdentityAuth()
                 .AddAuthorizationPolicies()
                 .AddRepositories()
                 .AddDataServices()
@@ -123,10 +121,9 @@ try
     //app.UseHttpsRedirection();
     app.UseRequestLocalization();
 
-    app.ConfigureCORS()
-       .AddIdentityAuthMiddlewares();
+    app.AddIdentityAuthMiddlewares();
 
-    // Rate limits of SPEC §7.3 (S4-21a): after CORS, so a 429 reaches a browser on another origin
+    // Rate limits of SPEC §7.3 (S4-21a): after authentication, so a 429 knows the caller
     app.UsePlatformRateLimiting();
 
     // Antiforgery on every state-changing request (S5-07, SEC-02): last, so a forged request still

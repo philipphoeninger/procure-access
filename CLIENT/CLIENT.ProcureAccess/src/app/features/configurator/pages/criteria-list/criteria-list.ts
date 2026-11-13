@@ -138,14 +138,8 @@ export class CriteriaListPage {
   protected readonly included = computed(() =>
     includedCount(this.answer()?.criteria ?? [], this.store.configurator.list.decisions()),
   );
-  /**
-   * The legacy token sits in `localStorage` (until step 3), which no signal tracks; `user` changes
-   * with every sign-in and sign-out, so the draft note follows them.
-   */
-  protected readonly signedIn = computed(() => {
-    this.store.user();
-    return this.store.isAuthenticated();
-  });
+  /** From the session (S5-08): the draft note follows every sign-in and sign-out. */
+  protected readonly signedIn = this.store.signedIn;
   protected readonly suggest = injectSuggestionLink();
   /** The names of the selected app types without criteria, joined; null when there are none. */
   protected readonly appTypesWithoutCriteria = computed(() => {

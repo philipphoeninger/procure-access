@@ -4,7 +4,10 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api',
+  // Relative in every environment (S5-08, #317): the dev server proxies /api to the API
+  // (proxy.conf.json), the release build reaches it through nginx. The session cookie is
+  // SameSite=Strict and Angular sends the antiforgery header only to a relative URL.
+  apiUrl: '/api',
   // Channel of „Kriterium vorschlagen“ (R-SUG-01, SPEC `Contact:CriteriaSuggestion`): `mailto:<address>`
   // or an https URL. 🔧 Placeholder until O-6 is decided: an address on the reserved domain
   // `.invalid`, which scripts/check-release-config.mjs refuses for a production release.

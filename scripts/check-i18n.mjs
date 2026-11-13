@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 // UX copy areas that de.json carries in full: a key root (`shell`) or a deeper prefix
 // (`criteria.select`), when only part of a root has its screen yet. Add an area with the step that
 // builds its screens.
-export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle'];
+export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'auth.login', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle'];
 
 // UX copy keys of the export files (XLSX, CSV; UX copy §5.6 „Exportdatei“), in the Export module.
 // Areas can be whole keys: the files reuse single texts of the screens. A whole key also takes its

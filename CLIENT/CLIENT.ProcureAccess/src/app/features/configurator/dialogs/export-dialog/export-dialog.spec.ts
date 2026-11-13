@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { provideRouter } from '@angular/router';
-import { signalStore, withMethods, withState } from '@ngrx/signals';
+import { signalStore, withMethods } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -27,8 +27,7 @@ import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
   withConfigurator(),
-  withState<{ user: { id: string } | null }>({ user: null }),
-  withMethods(() => ({ isAuthenticated: () => signedIn })),
+  withMethods(() => ({ signedIn: () => signedIn })),
 );
 
 @Component({ template: '' })

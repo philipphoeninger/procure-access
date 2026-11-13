@@ -71,17 +71,17 @@ public sealed class AntiforgeryHandlerTests
         var server = new StubServer(request => request.RequestUri!.AbsolutePath switch
         {
             SessionProbe => WithTokenCookie(HttpStatusCode.OK, "token-1"),
-            "/api/signIn" => WithTokenCookie(HttpStatusCode.OK, "token-2"),
+            "/api/v1/auth/login" => WithTokenCookie(HttpStatusCode.NoContent, "token-2"),
             _ => new HttpResponseMessage(HttpStatusCode.OK),
         });
         using var client = server.CreateClient();
 
-        await client.PostAsync("/api/signIn", content: null, TestContext.Current.CancellationToken);
+        await client.PostAsync("/api/v1/auth/login", content: null, TestContext.Current.CancellationToken);
         await client.PostAsync("/api/something", content: null, TestContext.Current.CancellationToken);
 
         server.Requests.Select(r => (r.Path, r.TokenHeader)).ShouldBe([
             (SessionProbe, null),
-            ("/api/signIn", "token-1"),
+            ("/api/v1/auth/login", "token-1"),
             ("/api/something", "token-2"),
         ]);
     }
@@ -161,17 +161,17 @@ public sealed class AntiforgeryHandlerTests
 public sealed class AntiforgeryHookApiTests(ApiFixture api) : IntegrationTest(api)
 {
     [Fact]
-    public async Task LegacySignIn_ThroughTheHook_ReachesEndpoint()
+    public async Task Login_ThroughTheHook_ReachesEndpoint()
     {
         using var client = CreateClient();
 
         using var response = await client.PostAsJsonAsync(
-            "/api/signIn",
+            "/api/v1/auth/login",
             new { email = "nobody@example.test", password = "Wrong-password-1" },
             TestContext.Current.CancellationToken);
 
-        // 400 "InvalidLogin" comes from the endpoint itself, so the request got through.
+        // 400 validation for "$" comes from the endpoint itself (not 400 antiforgery), so the request got through.
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("InvalidLogin");
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("/problems/validation");
     }
 }

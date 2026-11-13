@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
@@ -26,8 +25,8 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// The real cookie session (S5-07; ARCHITECTURE §9.1, C60; SPEC R-AUTH-05): sign-in and sign-out
 /// through <c>POST /api/v1/auth/login</c> and <c>/logout</c>, the cookie flags (SEC-01), 401
 /// without a redirect (SEC-03), the antiforgery token rotation (SEC-09), a cookie accepted by a
-/// second host on the same database (OPS-04), the idle and absolute limits on the API's clock, and
-/// the legacy JWT next to the cookie until S5-08. Runs on hosts with the API's own authentication
+/// second host on the same database (OPS-04), and the idle and absolute limits on the API's clock.
+/// Runs on hosts with the API's own authentication
 /// (<c>realAuthentication</c>, #88) on a database of this class, with a clock of its own.
 /// </summary>
 public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
@@ -162,6 +161,8 @@ public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
         var user = body.RootElement.GetProperty("user");
         user.GetProperty("email").GetString().ShouldBe(Email);
         user.GetProperty("roles").EnumerateArray().Select(r => r.GetString()).ShouldBe(["Moderator"]);
+        // The permissions the roles grant, from the role claims in the cookie principal (S5-08, #320).
+        user.GetProperty("permissions").EnumerateArray().Select(r => r.GetString()).ShouldBe(["moderation:review"]);
         body.RootElement.GetProperty("expiresAt").GetDateTimeOffset().ShouldBe(signedInAt + TimeSpan.FromMinutes(30));
         body.RootElement.GetProperty("absoluteExpiresAt").GetDateTimeOffset().ShouldBe(signedInAt + TimeSpan.FromHours(8));
     }
@@ -245,30 +246,6 @@ public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
 
         // 8 hours after sign-in the session ends although the idle limit was never reached.
         (await SessionUserAsync(client)).ShouldBeNull();
-    }
-
-    [Fact]
-    public async Task LegacyJwt_UntilS508_StillSignsInAndSkipsAntiforgery()
-    {
-        var cancellationToken = TestContext.Current.CancellationToken;
-        string token;
-        using (var legacyClient = CreateClient(Host))
-        {
-            using var signIn = await legacyClient.PostAsJsonAsync("/api/signIn", new { email = Email, password = Password }, cancellationToken);
-            signIn.StatusCode.ShouldBe(HttpStatusCode.OK);
-            using var body = JsonDocument.Parse(await signIn.Content.ReadAsStringAsync(cancellationToken));
-            token = body.RootElement.GetProperty("accessToken").GetString()!;
-        }
-
-        // No cookies, no antiforgery token: only the Bearer header.
-        using var client = Host.CreateDefaultClient(IntegrationTest.BaseAddress);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        using var me = await client.GetAsync("/api/me", cancellationToken);
-        me.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        using var write = await client.PostAsync("/api/Users/revoke-sessions", content: null, cancellationToken);
-        write.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     private ProcureAccessApiFactory NewHost()

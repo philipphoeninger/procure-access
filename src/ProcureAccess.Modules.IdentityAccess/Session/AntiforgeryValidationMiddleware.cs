@@ -5,7 +5,6 @@
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 
 namespace ProcureAccess.Modules.IdentityAccess.Session;
@@ -21,16 +20,14 @@ namespace ProcureAccess.Modules.IdentityAccess.Session;
 /// with <c>DisableAntiforgery()</c> (<see cref="IAntiforgeryMetadata.RequiresValidation"/> false),
 /// which the anonymous export carries, the only exemption the architecture names. The test
 /// <c>INV:SEC-02</c> lists every exempt endpoint, so the list can only shrink knowingly.</para>
-/// <para>Legacy until S5-08 removes the JWT: a request that authenticates with a Bearer token is
-/// not validated. A bearer token is no ambient credential — the browser never attaches it on its
-/// own, so a cross-site request cannot ride on it — and the legacy client has no token cookie
-/// yet. Also until S5-10: the anonymous legacy identity endpoints are exempt by metadata.</para>
+/// <para>Until S5-10 the anonymous legacy identity endpoints (<c>signUp</c>, <c>forgot-password</c>,
+/// <c>reset-password</c>) are exempt by metadata. The skip for a Bearer header went with the JWT
+/// (S5-08): every request is validated by its endpoint alone.</para>
 /// <para>Runs after authorization and the rate limiter, so a forged request still counts against
 /// its limit and an anonymous request to a protected endpoint stays a 401.</para>
 /// </remarks>
 internal sealed class AntiforgeryValidationMiddleware(RequestDelegate next, IAntiforgery antiforgery)
 {
-    private const string BearerPrefix = "Bearer ";
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -71,18 +68,9 @@ internal sealed class AntiforgeryValidationMiddleware(RequestDelegate next, IAnt
             return false;
         }
 
-        if (endpoint.Metadata.GetMetadata<IAntiforgeryMetadata>() is { RequiresValidation: false })
-        {
-            return false;
-        }
-
-        return !HasBearerToken(context);
+        return endpoint.Metadata.GetMetadata<IAntiforgeryMetadata>() is not { RequiresValidation: false };
     }
 
     private static bool IsSafeMethod(string method) =>
         HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method) || HttpMethods.IsTrace(method);
-
-    /// <summary>Legacy JWT (removed with S5-08): see the remarks of the class.</summary>
-    private static bool HasBearerToken(HttpContext context) =>
-        context.Request.Headers[HeaderNames.Authorization].ToString().StartsWith(BearerPrefix, StringComparison.OrdinalIgnoreCase);
 }

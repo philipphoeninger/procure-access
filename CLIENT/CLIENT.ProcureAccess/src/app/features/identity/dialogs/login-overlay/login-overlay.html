@@ -1,0 +1,50 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'shell.session.expired.title' | translate }}</h2>
+
+<mat-dialog-content class="pa-login-overlay">
+  <p>{{ 'shell.session.expired.body' | translate }}</p>
+
+  @if (errorKey(); as key) {
+    <pa-notice kind="error" live="assertive" [focusOnShow]="true">
+      <p>{{ key | translate }}</p>
+    </pa-notice>
+  }
+
+  <form id="pa-login-overlay-form" class="pa-login-overlay__form" novalidate (submit)="submit($event)">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auth.login.email' | translate }}</mat-label>
+      <input matInput type="email" name="email" autocomplete="email" required [formControl]="email" />
+      @if (email.touched && email.invalid) {
+        <mat-error>{{ 'errors.field.required' | translate: { field: ('auth.login.email' | translate) } }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auth.login.password' | translate }}</mat-label>
+      <input matInput type="password" name="password" autocomplete="current-password" required [formControl]="password" />
+      @if (password.touched && password.invalid) {
+        <mat-error>{{ 'errors.field.required' | translate: { field: ('auth.login.password' | translate) } }}</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="pa-login-overlay__actions">
+  <button mat-button type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+  <button
+    mat-flat-button
+    type="submit"
+    form="pa-login-overlay-form"
+    class="pa-login-overlay__submit"
+    [attr.aria-disabled]="busy() || null"
+  >
+    @if (busy()) {
+      <mat-progress-spinner class="pa-login-overlay__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+    }
+    {{ 'auth.login.submit' | translate }}
+  </button>
+</mat-dialog-actions>

@@ -30,16 +30,17 @@ export const ProcureAccessStore = signalStore(
         return {
             async init() {
                 // load necessary data:
-                // set identity
-                const user = await state.loadIdentity();
+                // the UI texts and the anonymous settings first (nobody is signed in before the probe):
+                // they come from the browser, so no text waits for an API answer
+                await state.reloadUICustomization();
 
-                // settings
+                // the session probe (ARCHITECTURE §8.3): who is signed in, and the antiforgery cookie;
+                // a signed-in user's saved settings replace the anonymous ones
+                const user = await state.sessionReady().then(() => state.user());
                 if (user != null) {
                     state.setUICustomization(user.uiCustomization);
                     state.setLanguage(user.uiCustomization.language);
                     state.removeSettingsFromLocalStorage();
-                } else {
-                    await state.reloadUICustomization();
                 }
                 state.activateMediaEventListeners();
 

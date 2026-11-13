@@ -9,8 +9,7 @@ public static class SwaggerConfiguration
     public static void AddAndConfigureSwagger(
         this IServiceCollection services,
         IConfiguration config,
-        string xmlPathAndFile,
-        bool addBasicSecurity)
+        string xmlPathAndFile)
     {
         services.Configure<SwaggerApplicationSettings>(config.GetSection(nameof(SwaggerApplicationSettings)));
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
@@ -20,23 +19,8 @@ public static class SwaggerConfiguration
             options.EnableAnnotations();
             options.OperationFilter<SwaggerDefaultValues>();
             options.IncludeXmlComments(xmlPathAndFile);
-            if (!addBasicSecurity)
-            {
-                return;
-            }
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme."
-            });
-            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-            {
-                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-            });
+            // No security scheme: the session is the Identity cookie (S5-08), which the browser
+            // sends on its own; Swagger UI signs in through POST /api/v1/auth/login.
         });
     }
 }

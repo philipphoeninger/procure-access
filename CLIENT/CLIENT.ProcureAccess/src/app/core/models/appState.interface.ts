@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Criterion } from "@app/features/criteria/models/criterion.model";
-import { IdentityState } from "@app/features/identity/state/with-identity";
+import { IdentityState, initialIdentityState } from "@app/features/identity/state/with-identity";
 import { ProductSave } from "@app/features/favorites/models/productSave.model";
 import { FilterSet } from "@app/features/favorites/models/filterSet.model";
 import { Product } from "@app/features/products/models/product.model";
@@ -26,9 +26,7 @@ export interface AppState {
 export const initialAppState: AppState = {
     loadingCount: 0,
     settings: initialSettingsState,
-    identity: {
-        user: null
-    },
+    identity: initialIdentityState,
     filters: {
         filterTypes: [],
         criteriaFilters: [],

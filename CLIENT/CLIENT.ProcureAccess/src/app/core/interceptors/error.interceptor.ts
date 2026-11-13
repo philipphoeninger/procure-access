@@ -68,6 +68,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
       answered();
+      // The session ended: the authInterceptor opens the login overlay and retries (SEC-03, S5-08).
+      if (error.status === 401) {
+        return throwError(() => error);
+      }
       // The caller shows every failure in place, e.g. the export dialog S13 (O-S4-74).
       if (req.context.get(CALLER_SHOWS_FAILURES)) {
         return throwError(() => error);

@@ -14,8 +14,7 @@ public static class SwaggerExtensions
             config,
             Path.Combine(
                 AppContext.BaseDirectory,
-                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"),
-            true);
+                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
         return services;
     }
 

@@ -9,7 +9,6 @@ import { render, screen } from '@testing-library/angular';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ProposalDto } from '@app/features/proposal/models/proposal.dto';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { AuthService } from '../services/auth.service';
 import { Profile } from './profile';
 
 // #137: the icon of a product proposal is decoration (Handoff §1.8); screen readers must not read
@@ -26,11 +25,11 @@ async function renderProfile() {
     providers: [
       provideTestTranslations(),
       provideRouter([]),
-      { provide: AuthService, useValue: { hasNotPermission: () => true } },
       {
         provide: ProcureAccessStore,
         useValue: {
           user: signal(null),
+          hasPermission: () => false,
           openProposals: signal(open),
           openProposalsCount: signal(open.length),
           closedProposals: signal(closed),

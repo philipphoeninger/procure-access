@@ -40,28 +40,6 @@ const LEGACY_EXCEPTIONS = {
     '@typescript-eslint/no-unsafe-enum-comparison',
   ],
   // M3 — cookie authentication, identity screens, settings S60
-  'src/app/core/guards/auth.guard.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-  ],
-  'src/app/features/identity/directives/has-not-permission.directive.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-explicit-any',
-  ],
-  'src/app/features/identity/directives/has-permission.directive.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-explicit-any',
-  ],
-  'src/app/features/identity/guards/permission.guard.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-unsafe-argument',
-    '@typescript-eslint/no-unsafe-assignment',
-  ],
-  'src/app/features/identity/login/login.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-  ],
   'src/app/features/identity/pages/email-confirmed/email-confirmation.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-explicit-any',
@@ -85,16 +63,7 @@ const LEGACY_EXCEPTIONS = {
     '@typescript-eslint/no-floating-promises',
     '@typescript-eslint/no-unsafe-assignment',
   ],
-  'src/app/features/identity/services/auth.service.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-explicit-any',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-unsafe-assignment',
-    '@typescript-eslint/no-unsafe-member-access',
-    '@typescript-eslint/no-unsafe-return',
-    '@typescript-eslint/only-throw-error',
-  ],
-  'src/app/features/identity/services/identity-api.service.ts': [
+    'src/app/features/identity/services/identity-api.service.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-explicit-any',
   ],

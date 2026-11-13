@@ -39,7 +39,6 @@ global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Identity;
 global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.Entities.Requests;
-global using MODELS.ProcureAccess.Settings;
 
 global using SERVICES.ProcureAccess.DataServices;
 global using SERVICES.ProcureAccess.DataServices.Configuration;
@@ -58,12 +57,10 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.OpenApi;
 global using System.Text.Json.Nodes;
 global using Microsoft.AspNetCore.Authentication;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc.Authorization;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.Data;
-global using Microsoft.IdentityModel.Tokens;
 
 global using Swashbuckle.AspNetCore.Annotations;
 global using Swashbuckle.AspNetCore.SwaggerGen;

@@ -81,37 +81,30 @@ describe('MainNav', () => {
     expect(screen.queryByRole('button', { name: 'Anmelden' })).toBeNull();
   });
 
-  // Account deletion and a failed token refresh remove the token without resetting the user;
-  // both navigate to /home.
-  it('shows „Anmelden“ again after a navigation once the token is gone', async () => {
-    let signedIn = true;
-    const doubles = createShellDoubles(true);
-    doubles.store.isAuthenticated = () => signedIn;
-    const { fixture } = await render(MainNav, {
-      inputs: { layout: 'bar' },
-      routes: SHELL_TEST_ROUTES,
-      providers: [provideTestTranslations(), ...doubles.providers],
-    });
+  // The session state is a signal (withIdentity(), S5-08): the nav follows it without a navigation,
+  // also after an account deletion or a session that ended.
+  it('shows „Anmelden“ again as soon as the session is gone', async () => {
+    const { fixture, store } = await renderNav('bar', true);
     expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
 
-    signedIn = false;
-    await TestBed.inject(Router).navigateByUrl('/impressum');
+    store.signedIn.set(false);
     await fixture.whenStable();
 
     expect(screen.getByRole('button', { name: 'Anmelden' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Abmelden' })).toBeNull();
   });
 
-  it('signs out through the legacy services when „Abmelden“ is pressed', async () => {
-    const { fixture, authService, store } = await renderNav('bar', true);
+  it('ends the session and returns to the start page when „Abmelden“ is pressed', async () => {
+    const { fixture, store } = await renderNav('bar', true);
+    await TestBed.inject(Router).navigateByUrl('/products');
 
     screen.getByRole('button', { name: 'Abmelden' }).click();
     await fixture.whenStable();
 
-    expect(authService.logout).toHaveBeenCalledOnce();
-    expect(store.setUser).toHaveBeenCalledWith(null);
+    expect(store.signOut).toHaveBeenCalledOnce();
     expect(store.setProposals).toHaveBeenCalledWith([]);
     expect(store.reloadUICustomization).toHaveBeenCalledOnce();
+    expect(TestBed.inject(Router).url).toBe('/');
   });
 
   it('marks the first item as the initial focus of the compact menu, and only there', async () => {

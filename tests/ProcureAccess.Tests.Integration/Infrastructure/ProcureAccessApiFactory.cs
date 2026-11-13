@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Security.Cryptography;
 using API.ProcureAccess.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +27,7 @@ namespace ProcureAccess.Tests.Integration.Infrastructure;
 /// (e.g. SEC-06) and dispose it themselves. <paramref name="configureServices"/> adds test-only
 /// services to such an instance, e.g. a controller of the test assembly.
 /// With <paramref name="realAuthentication"/> the host keeps the API's own authentication — the
-/// Identity cookie and the legacy JWT — instead of the test scheme, for the tests of the real
+/// Identity cookie — instead of the test scheme, for the tests of the real
 /// sign-in flow (SEC-01, SEC-03, SEC-09, OPS-04; #88). Such a host runs on a database of its own,
 /// because the test scheme is a host-wide switch and the shared host keeps it.
 /// </remarks>
@@ -61,9 +60,6 @@ public sealed class ProcureAccessApiFactory(
         // Development would seed it. Tests of the seeder set the path themselves.
         builder.UseSetting(TestCatalogSeedExtensions.PathKey, "");
 
-        // Secrets never live in the repository (CLAUDE.md §10): a fresh random key per test run.
-        builder.UseSetting("JWTSettings:Key", Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)));
-
         // The key ring is encrypted outside Development and E2E (S4-26), so every host gets the
         // throwaway certificate of this test run; tests of the certificate settings override it.
         builder.UseSetting(KeyRingCertificates.CertificateSettingName, TestRunCertificate.Value);
@@ -86,8 +82,8 @@ public sealed class ProcureAccessApiFactory(
 
             if (!realAuthentication)
             {
-                // The test scheme replaces the API's default scheme (cookie or legacy JWT), also
-                // in the default policy. The cookie and JWT schemes stay registered but unused.
+                // The test scheme replaces the API's default scheme (the Identity cookie), also
+                // in the default policy. The cookie schemes stay registered but unused.
                 services.AddAuthentication()
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
                 services.PostConfigure<AuthenticationOptions>(options =>

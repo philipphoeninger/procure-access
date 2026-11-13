@@ -11,9 +11,9 @@ import {
   provideHttpClient,
   withFetch,
   withInterceptors,
+  withXsrfConfiguration,
 } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { headersInterceptor } from './core/interceptors/headers.interceptor';
 import { environment } from '../environments/environment';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -23,12 +23,9 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideAppearance } from './core/a11y/appearance';
 import { provideDocumentLanguage } from './core/a11y/document-language';
 import { PageTitleStrategy } from './core/a11y/page-title.strategy';
-import { provideSessionProbe } from './core/session/session-probe.service';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
-export const JWT_NAME = new InjectionToken<string>('JWT_NAME');
-export const REFRESH_TOKEN_NAME = new InjectionToken<string>('REFRESH_TOKEN_NAME');
 export const DEFAULT_LANGUAGE = EnLanguage.de;
 
 export const appConfig: ApplicationConfig = {
@@ -46,29 +43,15 @@ export const appConfig: ApplicationConfig = {
     }),
     provideHttpClient(
       withFetch(),
-      withInterceptors([
-        authInterceptor, 
-        headersInterceptor, 
-        languageInterceptor,
-        errorInterceptor]),
+      // Antiforgery (SEC-02, SEC-09; ARCHITECTURE §8.3): the cookie XSRF-TOKEN of the session probe
+      // goes back as X-XSRF-TOKEN with every state-changing request to a relative URL. `apiUrl` is
+      // relative in every environment (the dev server proxies /api, #317), so this is the only
+      // place that handles the token; nothing in JavaScript holds a credential (SEC-01).
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
+      withInterceptors([authInterceptor, languageInterceptor, errorInterceptor]),
     ),
-    // Session probe at start: issues the antiforgery cookie XSRF-TOKEN, which Angular's XSRF
-    // interceptor sends back as X-XSRF-TOKEN (ARCHITECTURE §8.3, SPEC §8.8; S5-07)
-    provideSessionProbe(),
     { provide: APP_NAME, useValue: 'ProcureAccess'},
     { provide: API_URL, useValue: environment.apiUrl },
-    { provide: JWT_NAME,
-      useFactory: () => {
-        const appName = inject(APP_NAME);
-        return appName.toLowerCase() + '-token';
-      }
-    },
-    { provide: REFRESH_TOKEN_NAME,
-      useFactory: () => {
-        const appName = inject(APP_NAME);
-        return appName.toLowerCase() + '-refresh-token';
-      }
-    },
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: './i18n/',

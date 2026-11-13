@@ -24,7 +24,7 @@ SPDX-License-Identifier: MIT
 
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
-        @if (store.isAuthenticated()) {
+        @if (store.signedIn()) {
           <button
             matButton="filled"
             [routerLink]="'/criterion-proposal/0'"
@@ -50,7 +50,7 @@ SPDX-License-Identifier: MIT
             <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
         </div>
         <div class="action-sharing">
-            @if (store.isAuthenticated()) {
+            @if (store.signedIn()) {
               <button
                   mat-icon-button
                   class="products-link-btn"
@@ -70,7 +70,7 @@ SPDX-License-Identifier: MIT
                 (click)="exportProductsFile()">
                 <mat-icon>arrow_downward</mat-icon>
             </button>
-            @if (store.isAuthenticated()) {
+            @if (store.signedIn()) {
                 <button
                     mat-icon-button
                     class="products-save-btn"
@@ -83,7 +83,7 @@ SPDX-License-Identifier: MIT
             }
         </div>
         <div>
-            @if (store.isAuthenticated()) {
+            @if (store.signedIn()) {
                 <button
                   matButton="elevated"
                   [routerLink]="'/criterion-proposal/0'"

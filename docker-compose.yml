@@ -41,7 +41,6 @@ services:
       # the variable never reseeds. Sample data (RebuildDatabase) runs only in Development (SEC-06).
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       ConnectionStrings__ProcureAccess: "Host=${DB_HOST:-db};Port=${DB_PORT_INNER:-5432};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"
-      JWTSettings__Key: ${JWT_KEY:?set JWT_KEY in .env}
       # Encrypts the Data Protection key ring at rest (S4-26); required outside Development and E2E,
       # the API refuses to start without it. Base64 PFX, see .env.example.
       DataProtection__Certificate: ${DATA_PROTECTION_CERTIFICATE:-}

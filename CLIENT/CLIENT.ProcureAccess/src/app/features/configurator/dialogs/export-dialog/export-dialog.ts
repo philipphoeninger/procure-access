@@ -104,11 +104,8 @@ export class ExportDialog {
   protected readonly included = computed(() =>
     includedCount(this.store.configurator.list.answer()?.criteria ?? [], this.store.configurator.list.decisions()),
   );
-  /** As on S11: the legacy token lives in `localStorage`, `user` changes with every sign-in. */
-  protected readonly signedIn = computed(() => {
-    this.store.user();
-    return this.store.isAuthenticated();
-  });
+  /** As on S11: from the session (S5-08). */
+  protected readonly signedIn = this.store.signedIn;
   protected readonly busy = computed(() => this.status().kind === 'busy');
   /** Minutes of a 429 (`errors.rateLimit`); 0 in every other state. */
   protected readonly retryAfterMinutes = computed(() => {

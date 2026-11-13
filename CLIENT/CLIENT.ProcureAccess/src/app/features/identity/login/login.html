@@ -36,8 +36,8 @@ SPDX-License-Identifier: MIT
         {{ 'AUTH.KEEP_SIGNED_IN' | translate }}
       </mat-checkbox>
     </div>
-    @if (loginErrorMessage) {
-      <span class="error-message ng-touched ng-invalid">{{ loginErrorMessage }}</span>
+    @if (loginErrorMessage(); as message) {
+      <span class="error-message ng-touched ng-invalid" role="alert">{{ message }}</span>
     }
     <div class="buttons">
       <button mat-button color="primary" (click)="openForgotPwDialog()" type="button">

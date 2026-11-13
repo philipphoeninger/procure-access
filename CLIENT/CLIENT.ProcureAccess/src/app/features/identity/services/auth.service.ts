@@ -2,122 +2,100 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { API_URL, JWT_NAME, REFRESH_TOKEN_NAME } from "@app/app.config";
-import { BehaviorSubject, catchError, filter, lastValueFrom, map, Observable, take } from 'rxjs';
-import { LoginModel } from '../models/login.model';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import { HttpClient, HttpContext, HttpResponse } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { lastValueFrom, Observable } from 'rxjs';
+
+import { API_URL } from '@app/app.config';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
+import { LoginModel } from '../models/login.model';
 import { ResetPasswordModel } from '../models/reset-password.model';
-import { AuthResponse } from '../models/auth-response.model';
-import { jwtDecode } from 'jwt-decode';
-import { EnCustomClaimTypes } from '../models/custom-claim-types.enum';
+import { SessionResponse } from '../models/session';
 import { User } from '../models/user.model';
 
+/** Problem types of `POST /api/v1/auth/login` that the sign-in form shows itself (SPEC §8.8). */
+export const LOGIN_PROBLEMS: readonly string[] = ['validation', 'antiforgery'];
+
+/**
+ * HTTP calls of the session and the legacy account flows (ARCHITECTURE §8.3, §9.1; S5-08).
+ *
+ * The session is the Identity cookie: the browser sends it on its own, the client never holds a
+ * token (SEC-01). The three session calls are `GET /api/v1/auth/session` (the probe, also the
+ * source of the antiforgery cookie), `POST /api/v1/auth/login` and `POST /api/v1/auth/logout`
+ * (SPEC §8.8). The state lives in `withIdentity()`, which is the only caller of them.
+ *
+ * `register`, `forgotPassword`, `resetPassword` and `confirmEmail` still call the legacy identity
+ * endpoints until S5-12 and S5-13 replace their screens.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private permissions: string[] = [];
-  private isRefreshing = false;
-  private refreshSubject = new BehaviorSubject<AuthResponse | null>(null);
+  private readonly apiUrl = inject(API_URL);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
-  constructor(
-    @Inject(API_URL) private apiUrl: string,
-    @Inject(JWT_NAME) private jwtName: string,
-    @Inject(REFRESH_TOKEN_NAME) private refreshTokenName: string,
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  /**
+   * The session probe. Marked {@link BACKGROUND_REQUEST}: the user did not ask for it, so a failure
+   * shows nothing; the caller decides what a failed probe means (nobody signed in).
+   */
+  session(): Promise<SessionResponse> {
+    return lastValueFrom(
+      this.http.get<SessionResponse>(`${this.apiUrl}/v1/auth/session`, {
+        context: new HttpContext().set(BACKGROUND_REQUEST, true),
+      }),
+    );
+  }
 
+  /**
+   * Signs in; the answer is 204 with the session cookie, or 400 `validation` with one error for
+   * the body as a whole (wrong address or password, locked or deleted account; SPEC §8.8). The
+   * sign-in form shows that and a missing antiforgery token in place ({@link LOGIN_PROBLEMS});
+   * every other failure keeps the system states of the error interceptor.
+   */
+  login(email: string, password: string): Promise<void> {
+    return lastValueFrom(
+      this.http.post<void>(
+        `${this.apiUrl}/v1/auth/login`,
+        { email, password },
+        { context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, LOGIN_PROBLEMS) },
+      ),
+    );
+  }
+
+  /** Ends the session: the cookie is deleted and a new antiforgery token issued, also without a session. */
+  logout(): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.apiUrl}/v1/auth/logout`, null));
+  }
+
+  /** The legacy user with the UI settings (`GET /api/me`), read while the legacy screens need it. */
   me(): Promise<User | null> {
     return lastValueFrom(this.http.get<User | null>(`${this.apiUrl}/me`));
   }
 
-  login(command: LoginModel): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/signIn`, command);
+  register(command: LoginModel): Observable<{ succeeded: boolean; errors: unknown[] }> {
+    return this.http.post<{ succeeded: boolean; errors: unknown[] }>(`${this.apiUrl}/signUp`, command);
   }
 
-  register(command: LoginModel): Observable<{ succeeded: boolean, errors: [] }> {
-    return this.http.post<any>(`${this.apiUrl}/signUp`, command);
+  showLogin(): void {
+    void this.router.navigate(['', { outlets: { login: ['auth'] } }]);
   }
 
-  public showLogin() {
-    this.router.navigate(['', { outlets: { login: ['auth'] } }]);
+  showRegister(): void {
+    void this.router.navigate(['', { outlets: { login: ['register'] } }]);
   }
 
-  public showRegister() {
-    this.router.navigate(['', { outlets: { login: ['register'] } }]);
+  forgotPassword(email: string): Observable<HttpResponse<unknown>> {
+    return this.http.post<unknown>(`${this.apiUrl}/forgot-password`, { email }, { observe: 'response' });
   }
 
-  public logout() {
-    this.permissions = [];
-    localStorage.removeItem(this.jwtName);
-    localStorage.removeItem(this.refreshTokenName);
-    this.router.navigateByUrl('/home'); // /(login:auth)
-  }
-
-  public isAuthenticated(): boolean {
-    const token = localStorage.getItem(this.jwtName);
-    const helper = new JwtHelperService();
-    const isExpired = helper.isTokenExpired(token);
-    return !isExpired;
-  }
-
-  public forgotPassword(email: string) {
-    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email }, { observe: 'response' });
-  }
-
-  public resetPassword(command: ResetPasswordModel) {
+  resetPassword(command: ResetPasswordModel): Observable<{ succeeded: boolean }> {
     return this.http.post<{ succeeded: boolean }>(`${this.apiUrl}/reset-password`, command);
   }
 
-  public confirmEmail(userId: string, token: string) {
-    return this.http.get<any>(`${this.apiUrl}/confirm-email`, {
-        params: {
-          userId,
-          token
-        },
-        observe: 'response' 
-      });
-  }
-
-  loadUserFromToken(token: string) {
-    const decoded: any = jwtDecode(token);
-    this.permissions = decoded[EnCustomClaimTypes.Permission] || [];
-  }
-
-  hasPermission(permission: string): boolean {
-    return this.permissions.includes(permission);
-  }
-
-  hasNotPermission(permission: string): boolean {
-    return !this.permissions.includes(permission);
-  }
-
-  refreshToken(refreshToken: string): Observable<AuthResponse> {
-    if (this.isRefreshing) {
-      return this.refreshSubject.pipe(
-        filter(v => v !== null),
-        take(1)
-      );
-    }
-
-    this.isRefreshing = true;
-    this.refreshSubject.next(null);
-
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, {
-      params: { refreshToken }
-    }).pipe(
-      map((response: AuthResponse) => {
-        this.isRefreshing = false;
-        this.refreshSubject.next(response);
-        return response;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        this.isRefreshing = false;
-        this.refreshSubject.next(null);
-        throw error;
-      })
-    );
+  confirmEmail(userId: string, token: string): Observable<HttpResponse<unknown>> {
+    return this.http.get<unknown>(`${this.apiUrl}/confirm-email`, {
+      params: { userId, token },
+      observe: 'response',
+    });
   }
 }
