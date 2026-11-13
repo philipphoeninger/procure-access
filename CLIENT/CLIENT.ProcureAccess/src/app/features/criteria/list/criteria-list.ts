@@ -12,7 +12,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { CriteriaApiService } from '../services/api/criteria-api.service';
-import { MarkdownComponent } from 'ngx-markdown';
+import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -20,8 +20,11 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'pa-criteria-list',
   templateUrl: 'criteria-list.html',
   styleUrl: 'criteria-list.scss',
+  // `provideMarkdown()` here and not in app.config.ts: this legacy list is the only user of
+  // ngx-markdown, so `marked` and `ngx-markdown` load with the route /filters, not with the shell (#264)
   providers: [
-    provideNativeDateAdapter()
+    provideNativeDateAdapter(),
+    provideMarkdown(),
   ],
   imports: [
     MatExpansionModule,

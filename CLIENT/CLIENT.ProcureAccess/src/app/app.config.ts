@@ -14,7 +14,6 @@ import {
 } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { headersInterceptor } from './core/interceptors/headers.interceptor';
-import { provideMarkdown } from 'ngx-markdown';
 import { environment } from '../environments/environment';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -53,7 +52,6 @@ export const appConfig: ApplicationConfig = {
         languageInterceptor,
         errorInterceptor]),
     ),
-    provideMarkdown(),
     // Session probe at start: issues the antiforgery cookie XSRF-TOKEN, which Angular's XSRF
     // interceptor sends back as X-XSRF-TOKEN (ARCHITECTURE §8.3, SPEC §8.8; S5-07)
     provideSessionProbe(),
