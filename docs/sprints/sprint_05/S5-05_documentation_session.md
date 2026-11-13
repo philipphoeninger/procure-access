@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-05 (debt, 1 point) · **Issues:** #313 (`TECH_DEBT_v4.md` TD-50)
 > **Requirements / invariants:** none (documents only); no invariant changes status. New versions `ARCHITECTURE_v49.md` (C135; v47 deleted), `TESTING_v57.md` (V178 – V180; v55 deleted), SPEC v2.17 in `SPEC_v2.md`, Handoff 1.25, Figma mapping 1.24
-> **Status:** pull request open (2026-11-13)
+> **Status:** pull request #329 open (2026-11-13)
 > **Scope:** the TD-50 points of #313 for SPEC (current-versions line), ARCHITECTURE (status line, input list), TESTING (§4.2a, §6.2), the Design handoff (`pa-stepper` for S10, S35, S55, the other sprint-04 changes of a screen, the body references) and the Figma mapping, with every header naming the current versions of the others; the `@spec` tag of `criteria-list-summary.ts`. ROADMAP_v5 and the SPRINT_04 close-out are not touched. PRD, Kriterienkatalog and UX copy are the owner's documents: their points are in §5. No rule or requirement changes beyond the listed points.
 > **Owner decisions (2026-11-13, before the start):** **D1 (a)** — references without version: only a document's header names the versions of the others; text about the current state cites them by section, change or invariant number; applied where #313 points and where this task touches such text, no sweep of whole documents; change rows keep their versions; the rule goes into CLAUDE §2. **D2 (a)** — the rows O-S4-78 – O-S4-80 go into the decisions table of `SPRINT_04.md` (not the close-out). **D3 (a)** — S5-03 P2 (TESTING §8.2 stage 1 lacks „Check the SDK pin“) is included, because TESTING gets a version anyway. Plan stated before the change; one session, no EF migration, no screen built (so no Figma comparison).
 
