@@ -141,7 +141,7 @@ Items re-scored against v3 are marked ↑ or ↓.
 | ID | Item | Category | I | R | E | Prio | When |
 |---|---|---|---:|---:|---:|---:|---|
 | TD-51 | PRs that change the same lock file were merged without a rebase in between (#227 – #231), so a broken combination would show only on `main`. The ruleset does not require branches to be up to date (S4-06 P1). | CI/Ops | 1 | 2 | 1 | 15 | owner: merge one at a time, or turn on "Require branches to be up to date" |
-| TD-52 | GitHub runner failures outside the workflow (`abandoned` jobs, or jobs `queued` for hours) turn the required check red although no test failed. Run 43098373045, the merge of #275, has been `queued` since 2026-11-11. Re-running is the only fix (S4-01 P1). GitHub refuses to cancel the stuck run (§7). | CI/Ops | 1 | 1 | 1 | 10 | owner: delete the stuck run; watch |
+| TD-52 | GitHub runner failures outside the workflow (`abandoned` jobs, or jobs `queued` for hours) turn the required check red although no test failed. Run 43098373045, the merge of #275, has been `queued` since 2026-11-11. Re-running is the only fix (S4-01 P1). GitHub refuses to cancel or delete the stuck run (§7). | CI/Ops | 1 | 1 | 1 | 10 | watch; GitHub Support only if the run starts to bother |
 
 ### 3.6 Documentation and licences
 
@@ -253,7 +253,7 @@ CLAUDE §6.6: Claude Code must not decide these. Decided in sprint 04: O-S4-1 �
 - **Milestones set on 2026-11-13** (owner's request): #264 and #308 → M3 (sprint 05 quick wins); #278, #279, #281, #282 → M2 (S11 follow-ups, with #299). No open issue is left without a milestone.
 - **M1** has no open issue and can be closed. **M2** has #52 (legacy removal), #236, #259 and #299 open.
 - **#52** stays in M2 but closes only with the legacy removal, which needs O-1. **#240** keeps only its dark part; a comment that the light part is done is still missing (S4-29 P4).
-- **CI:** run 43098373045 (merge of #275) has been `queued` since 2026-11-11 and has no jobs. GitHub refuses to cancel it: `cancel` answers "completed", `force-cancel` answers "not been queued yet" (409). Deleting the run (`gh run delete`) is the only way to remove it; owner's call (TD-52).
+- **CI:** run 43098373045 (merge of #275) has been `queued` since 2026-11-11 and has no jobs. GitHub refuses to cancel it: `cancel` answers "completed", `force-cancel` answers "not been queued yet" (409). `gh run delete` answers 403 although the token has `repo` and `workflow`. It blocks nothing (the later runs on `main` are green); only GitHub Support can remove it (TD-52).
 - **Open Dependabot PRs** for the weekly review: #288, #289, #291, #292 (TD-42).
 - **Alerts:** CodeQL has no open alert. Dependabot has only 12 and 13 (TD-17). Every issue closed for an alert in sprint 04 (#233) really closed it.
 - **Labels:** all open debt issues carry `tech-debt`, except #4 and #259 (`documentation`), #52 (`bug`, `a11y`), #301 and #302 (`bug`), #102 (`question`, `a11y`). This is correct.
