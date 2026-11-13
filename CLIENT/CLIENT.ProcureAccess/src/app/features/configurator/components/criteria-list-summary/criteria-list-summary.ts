@@ -18,7 +18,7 @@ import { SelectionNames } from '../../state/selection-names';
  *
  * Shows only what it gets. Part of the S11 frames, not a Figma component.
  *
- * @spec docs/ux_copy_procureaccess_v22.md §5.5 (`criteria.list.summary.*`); docs/design_handoff_procureaccess_v1.md §5.1 (S11)
+ * @spec UX copy (highest docs/ux_copy_procureaccess_v*.md) §5.5 (`criteria.list.summary.*`); docs/design_handoff_procureaccess_v1.md §5.1 (S11)
  */
 @Component({
   selector: 'pa-criteria-list-summary',
