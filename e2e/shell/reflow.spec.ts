@@ -151,6 +151,54 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
   });
 
+  test('S11 with a card of two procedures (tabs) needs no horizontal scrolling and keeps both tabs reachable', async ({ page }) => {
+    // T.1: „Mobile Anwendung (offen)“ is mapped to the Software-Test and the App-Test, so 99.1 (texts for both) gets two tabs.
+    await page.goto('/kriterien');
+    await chooseUseCase(page, 'HR', 'HR-Anwendung');
+    await next(page, 'Was möchten Sie beschaffen?');
+    await page.getByRole('checkbox', { name: 'Mobile Anwendung (offen)', exact: true }).press('Space');
+    await next(page, 'Welche Funktionen hat das Produkt?');
+    await next(page, /Soll das Produkt nach einem bestimmten Verfahren geprüft sein/);
+    await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+
+    const card = page.getByRole('listitem').filter({
+      has: page.getByRole('heading', { level: 2, name: 'Testkriterium mit Regeln auf allen vier Ebenen' }),
+    });
+    await card.getByRole('button', { name: 'Details anzeigen' }).click();
+    await expect(card.getByRole('tab')).toHaveCount(2);
+    await expectReflow(page);
+    // The first label is selected, and both labels fit the header without Material's pagination buttons (#312, TD-54).
+    await expect(card.getByRole('tab', { name: 'Software-Test' })).toHaveAttribute('aria-selected', 'true');
+    await expect(card.locator('.mat-mdc-tab-header')).not.toHaveClass(/mat-mdc-tab-header-pagination-controls-enabled/);
+
+    // Both labels are reachable by keyboard (also where a wider font would bring the pagination back), and the header follows the selected tab into the viewport.
+    for (const name of ['Software-Test', 'App-Test', 'Software-Test']) {
+      const tab = card.getByRole('tab', { name });
+      await card.getByRole('tab').first().focus();
+      await page.keyboard.press('Home');
+      if (name === 'App-Test') {
+        await page.keyboard.press('ArrowRight');
+      }
+      // Arrow keys only move the focus between the tabs; Enter selects.
+      await page.keyboard.press('Enter');
+      await expect(tab).toHaveAttribute('aria-selected', 'true');
+      // The header scrolls to the selected tab (animated, sub-pixel rounding at the edge), so allow 1 %.
+      await expect(tab).toBeInViewport({ ratio: 0.99 });
+      // And it lies inside the visible part of the tab header, not behind its edge or a pagination button.
+      await expect
+        .poll(() =>
+          tab.evaluate((element) => {
+            const label = element.getBoundingClientRect();
+            const header = element.closest('.mat-mdc-tab-header')!.getBoundingClientRect();
+            return label.left >= header.left - 1 && label.right <= header.right + 1;
+          }),
+        )
+        .toBe(true);
+      await expectReflow(page);
+    }
+  });
+
   test('S13 fills the screen with its actions at the bottom and needs no horizontal scrolling', async ({ page }) => {
     await toStep4(page);
     await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();

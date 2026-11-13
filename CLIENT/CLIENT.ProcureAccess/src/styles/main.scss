@@ -30,6 +30,17 @@
   outline-offset: 2px;
 }
 
+/* Tabs of the criterion card's detail panel (S5-06, #312, Handoff §2.2: below 600 px a tab bar must not need pagination if
+   its labels can fit): Material's 24 px label padding leaves no room for two labels at 320 px (400 % zoom), so the
+   second label was cut behind the pagination buttons; from 600 px the default applies. */
+.pa-criterion-card__tabs .mat-mdc-tab.mdc-tab {
+  padding-inline: var(--pa-space-md);
+
+  @media (min-width: 37.5em) {
+    padding-inline: 1.5rem;
+  }
+}
+
 html, body { height: 100%; }
 body { margin: 0; }
 
