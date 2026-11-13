@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# Git-ignored files copied into every Claude Code worktree (.claude/worktrees/)
+.env
