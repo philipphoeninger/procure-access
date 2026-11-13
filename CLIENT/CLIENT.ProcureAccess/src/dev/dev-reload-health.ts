@@ -5,11 +5,13 @@
 import { environment } from '../environments/environment';
 
 /**
- * Liveness URL of the API that the build calls. The health endpoints sit at the API root,
- * not under `/api`, so `http://localhost:5000/api` becomes `http://localhost:5000/health/live`.
+ * Liveness URL of the API that the build calls. The health endpoints sit at the API root, not
+ * under `/api`: `apiUrl` is `/api` on the page's origin since S5-08 (#317), and the dev server
+ * proxies `/health` next to `/api` to the local API (proxy.conf.json), so the watcher polls
+ * `<origin>/health/live`.
  */
 function apiHealthUrl(apiUrl: string): string {
-  return new URL('/health/live', apiUrl).href;
+  return new URL('/health/live', new URL(apiUrl, window.location.origin)).href;
 }
 
 // call this from main.ts only in development

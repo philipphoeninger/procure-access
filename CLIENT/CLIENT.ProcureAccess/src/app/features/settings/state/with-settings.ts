@@ -77,7 +77,7 @@ export const withSettings = () => signalStoreFeature(
           window
             .matchMedia('(prefers-color-scheme: dark)')
             .addEventListener('change', event => {
-              if (state.isAuthenticated()) {
+              if (state.signedIn()) {
                 const uiCustomization = state.uiCustomization();
                 uiCustomization.darkModeOn = event.matches;
                 this.setUICustomization(uiCustomization);
@@ -95,7 +95,7 @@ export const withSettings = () => signalStoreFeature(
           window
             .matchMedia('(prefers-contrast: more)')
             .addEventListener('change', event => {
-              if (state.isAuthenticated()) {
+              if (state.signedIn()) {
                 const uiCustomization = state.uiCustomization();
                 uiCustomization.highContrastOn = event.matches;
                 this.setUICustomization(uiCustomization);
@@ -114,7 +114,7 @@ export const withSettings = () => signalStoreFeature(
             });
         },
         async reloadUICustomization() {
-          if (!state.isAuthenticated()) {
+          if (!state.signedIn()) {
             if (state.loadFromLocalStorage(LocalStorageKeys.uiCustomization)) {
               followSystemAppearance();
 
@@ -159,7 +159,7 @@ export const withSettings = () => signalStoreFeature(
           });
 
           // A signed-in user's saved setting overrides the system appearance (R-SET-02)
-          if (state.isAuthenticated())
+          if (state.signedIn())
             appearance.setExplicit(state.uiCustomization().darkModeOn ? 'dark' : 'light');
 
           if (state.uiCustomization().highContrastOn)
@@ -167,7 +167,7 @@ export const withSettings = () => signalStoreFeature(
           else renderer.removeClass(document.documentElement, 'contrast-more');
         },
         async updateUICustomization(uiCustomization: UICustomization) {
-          if (!state.isAuthenticated()) {
+          if (!state.signedIn()) {
             this.setUICustomization(uiCustomization);
             state.saveToLocalStorage(LocalStorageKeys.uiCustomization);
             translateService

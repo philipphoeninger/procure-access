@@ -77,7 +77,8 @@
               "buildTarget": "procure-access:build:production"
             },
             "development": {
-              "buildTarget": "procure-access:build:development"
+              "buildTarget": "procure-access:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

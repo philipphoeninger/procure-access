@@ -4,8 +4,8 @@
 
 import { Routes } from '@angular/router';
 import { Home } from '@pages/home/home';
-import { AuthGuard } from '@core/guards/auth.guard';
-import { PermissionGuard } from './features/identity/guards/permission.guard';
+import { authGuard } from '@core/guards/auth.guard';
+import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
@@ -42,13 +42,13 @@ export const routes: Routes = [
   {
     path: 'proposals',
     loadComponent: () => import('./features/proposal/list/proposal-list').then((m) => m.ProposalList),
-    canActivate: [PermissionGuard],
-    data: { permission: 'moderation:review' }
+    canActivate: [permissionGuard],
+    data: { [PERMISSION_KEY]: 'moderation:review' }
   },
   {
     path: 'profile',
     loadComponent: () => import('@features/identity/profile/profile').then((m) => m.Profile),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { [PAGE_TITLE_KEY]: 'pageTitle.account' },
   },
   {
@@ -78,7 +78,7 @@ export const routes: Routes = [
   {
     path: 'favorites',
     loadComponent: () => import('@app/features/favorites/list/favorites').then((m) => m.Favorites),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
   },
   {
     path: 'products',
@@ -91,12 +91,12 @@ export const routes: Routes = [
    {
     path: 'product-proposal/:id',
     loadComponent: () => import('@app/features/products/proposal/product-proposal').then((m) => m.ProductProposal),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
    },
    {
     path: 'criterion-proposal/:id',
     loadComponent: () => import('@app/features/criteria/proposal/criterion-proposal').then((m) => m.CriterionProposal),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
    },
   { 
     path: 'reset-password', 

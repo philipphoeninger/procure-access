@@ -73,6 +73,16 @@ describe('errorInterceptor', () => {
     );
   });
 
+  // SEC-03: the session interceptor opens the login overlay and retries; nothing else shows.
+  it('shows neither snackbar nor server page for a 401', async () => {
+    const request = firstValueFrom(http.post('/api/configurations', {}));
+    backend.expectOne('/api/configurations').flush({ status: 401 }, { status: 401, statusText: 'Unauthorized' });
+    await expect(request).rejects.toMatchObject({ status: 401 });
+
+    expect(snackbar.showError).not.toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
   it('shows no snackbar for a problem type the caller handles itself', async () => {
     const request = firstValueFrom(
       http.get('/api/x', { context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['not-found']) }),

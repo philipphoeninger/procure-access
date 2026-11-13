@@ -2,26 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '@features/identity/services/auth.service';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthGuard {
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+import { ProcureAccessStore } from '@app/core/state/app.store';
 
-  canActivate(): boolean {
-    if (this.authService.isAuthenticated()) {
-      return true;
-    } else {
-      this.router.navigate(['', { outlets: { login: ['auth'] } }]);
-      return false;
-    }
+/**
+ * Lets only a signed-in user through (legacy account pages until S5-28); the session is the
+ * probe's answer, so the guard waits for it on a deep link. Everyone else is sent to the sign-in
+ * form in the `login` outlet.
+ */
+export const authGuard: CanActivateFn = async () => {
+  const store = inject(ProcureAccessStore);
+  const router = inject(Router);
+  await store.sessionReady();
+  if (store.signedIn()) {
+    return true;
   }
-}
-
+  return router.createUrlTree(['', { outlets: { login: ['auth'] } }]);
+};

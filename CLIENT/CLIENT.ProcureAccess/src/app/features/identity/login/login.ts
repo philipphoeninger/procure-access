@@ -2,26 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, Inject, inject, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, map } from 'rxjs/operators';
-import { AuthService } from '@features/identity/services/auth.service';
-import { LoginModel } from '@features/identity/models/login.model';
-import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
-import { ProcureAccessStore } from '@app/core/state/app.store';
-import { SnackbarService } from '@app/core/services/snackbar.service';
-import { JWT_NAME, REFRESH_TOKEN_NAME } from '@app/app.config';
-import { UserDto } from '../models/user.dto';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs/operators';
 
+import { SnackbarService } from '@app/core/services/snackbar.service';
+import { ProcureAccessStore } from '@app/core/state/app.store';
+import { ForgotPasswordDialog } from '@features/identity/dialogs/forgot-password-dialog/forgot-password-dialog';
+import { AuthService } from '@features/identity/services/auth.service';
+
+/**
+ * Legacy sign-in page in the `login` outlet (replaced by S01 in S5-09). Since S5-08 it signs in
+ * through the cookie session (`withIdentity().signIn()`): no token is stored, and the UI settings
+ * come from the legacy user the store loads after the sign-in.
+ */
 @Component({
   selector: 'pa-login',
   imports: [
@@ -40,34 +43,30 @@ import { TranslatePipe } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Login {
-  protected store = inject(ProcureAccessStore);
+  protected readonly store = inject(ProcureAccessStore);
+  protected readonly authService = inject(AuthService);
+  protected readonly snackbarService = inject(SnackbarService);
+  private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
+  readonly dialog = inject(MatDialog);
 
-  public loginErrorMessage?: string;
+  /** `auth.login.error.invalid` after a refused sign-in; the template shows it above the buttons. */
+  protected readonly loginErrorMessage = signal<string | null>(null);
   public showLanguageSelection = true;
 
   protected logoPath = '/werte_it_logo.jpg';
 
-  protected email? = model('');
-  protected password? = model('');
+  protected email = model('');
+  protected password = model('');
   public keepSignedIn = model(false);
-
-  readonly dialog = inject(MatDialog);
-
-  constructor(
-    @Inject(JWT_NAME) private jwtName: string,
-    @Inject(REFRESH_TOKEN_NAME) private refreshTokenName: string,
-    protected authService: AuthService,
-    private router: Router,
-    protected snackbarService: SnackbarService
-  ) {}
 
   openForgotPwDialog(): void {
     const dialogRef = this.dialog.open(ForgotPasswordDialog, {
-      data: { email: this.email!() },
+      data: { email: this.email() },
       width: '420px'
     });
 
-    dialogRef.afterClosed().subscribe((email: string) => {
+    dialogRef.afterClosed().subscribe((email: string | undefined) => {
       if (email !== undefined) {
         this.store.incrementLoadingCount();
         this.authService
@@ -78,30 +77,28 @@ export class Login {
     });
   }
 
-  onSubmit(form: NgForm, event: Event) {
+  async onSubmit(form: NgForm, event: Event): Promise<void> {
     event.preventDefault();
-    const loginCommand = new LoginModel(this.email!(), this.password!());
-
+    if (form.invalid) {
+      return;
+    }
+    this.loginErrorMessage.set(null);
     this.store.incrementLoadingCount();
-    this.authService
-      .login(loginCommand)
-      .pipe(
-        map((response) => {
-          if (!response.accessToken) return; //gate
-          this.authService.loadUserFromToken(response.accessToken);
-          localStorage.setItem(this.jwtName, response.accessToken);
-          localStorage.setItem(this.refreshTokenName, response.refreshToken);
-          const user: UserDto = new UserDto(response.user.id, response.user.email);
-          this.store.setUser(user);
-          // set settings
-          this.store.setUICustomization(response.user.uiCustomization);
-          this.store.setLanguage(response.user.uiCustomization.language);
-          this.store.removeSettingsFromLocalStorage();
-          this.store.loadProposals();
-          this.router.navigateByUrl('/home');
-        }),
-        finalize(() => this.store.decrementLoadingCount())
-      )
-      .subscribe();
+    try {
+      const user = await this.store.signIn(this.email(), this.password());
+      if (user) {
+        // The legacy settings of the user (S60 replaces them in S5-25).
+        this.store.setUICustomization(user.uiCustomization);
+        this.store.setLanguage(user.uiCustomization.language);
+        this.store.removeSettingsFromLocalStorage();
+      }
+      void this.store.loadProposals();
+      await this.router.navigateByUrl('/');
+    } catch {
+      // 400 validation for the body as a whole: wrong address or password, locked or deleted (SPEC §8.8).
+      this.loginErrorMessage.set(this.translate.instant('auth.login.error.invalid') as string);
+    } finally {
+      this.store.decrementLoadingCount();
+    }
   }
 }

@@ -30,8 +30,8 @@ export const ProcureAccessStore = signalStore(
         return {
             async init() {
                 // load necessary data:
-                // set identity
-                const user = await state.loadIdentity();
+                // the session probe (ARCHITECTURE §8.3): who is signed in, and the antiforgery cookie
+                const user = await state.sessionReady().then(() => state.user());
 
                 // settings
                 if (user != null) {

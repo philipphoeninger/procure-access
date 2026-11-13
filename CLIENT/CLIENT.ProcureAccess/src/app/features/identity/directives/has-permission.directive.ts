@@ -2,25 +2,29 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Directive, Input, TemplateRef, ViewContainerRef } from "@angular/core";
-import { AuthService } from "../services/auth.service";
+import { Directive, effect, inject, input, TemplateRef, ViewContainerRef } from '@angular/core';
 
-@Directive({
-  selector: '[appHasPermission]'
-})
+import { ProcureAccessStore } from '@app/core/state/app.store';
+
+/**
+ * Renders its template while the session carries the permission (legacy proposal pages until
+ * step 5). The permissions come from the probe (`withIdentity().permissions`), so the view follows
+ * every sign-in and sign-out; the server still checks every request itself.
+ */
+@Directive({ selector: '[appHasPermission]' })
 export class HasPermissionDirective {
+  readonly appHasPermission = input.required<string>();
 
-  @Input() set appHasPermission(permission: string) {
-    if (this.auth.hasPermission(permission)) {
-      this.view.createEmbeddedView(this.template);
-    } else {
+  private readonly store = inject(ProcureAccessStore);
+  private readonly template = inject<TemplateRef<unknown>>(TemplateRef);
+  private readonly view = inject(ViewContainerRef);
+
+  constructor() {
+    effect(() => {
       this.view.clear();
-    }
+      if (this.store.hasPermission(this.appHasPermission())) {
+        this.view.createEmbeddedView(this.template);
+      }
+    });
   }
-
-  constructor(
-    private auth: AuthService,
-    private template: TemplateRef<any>,
-    private view: ViewContainerRef
-  ) {}
 }

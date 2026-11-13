@@ -41,7 +41,7 @@ SPDX-License-Identifier: MIT
         >
           <mat-icon>visibility</mat-icon>
         </button>
-        @if (store.isAuthenticated()) {
+        @if (store.signedIn()) {
           <button
             mat-icon-button
             class="product-save-btn"
@@ -91,7 +91,7 @@ SPDX-License-Identifier: MIT
 </div>
 
 <div class="product-list-actions">
-  @if (store.isAuthenticated()) {
+  @if (store.signedIn()) {
     <button 
       matButton="filled"
       aria-label="Product proposal button" 

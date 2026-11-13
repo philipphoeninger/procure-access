@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import { TestBed } from '@angular/core/testing';
-import { signalStore } from '@ngrx/signals';
+import { provideRouter } from '@angular/router';
+import { patchState, signalStore } from '@ngrx/signals';
 
 import { APP_NAME } from '@app/app.config';
 import { AppearanceService } from '@app/core/a11y/appearance';
@@ -18,7 +19,8 @@ import { initialSettingsState, withSettings } from './with-settings';
 
 // #168: a failed request of a signed-in user must not leave the loading bar on
 // (pa-loading-bar, R-SHL-09). Signed-out users never call the API here.
-const SettingsTestStore = signalStore(withSettings());
+// Unprotected, so setUp can put the session state in place (patchState from outside the store).
+const SettingsTestStore = signalStore({ protectedState: false }, withSettings());
 let media: FakeMediaMatcher;
 let showInfo: ReturnType<typeof vi.fn>;
 
@@ -35,13 +37,20 @@ function setUp(
       SettingsTestStore,
       { provide: APP_NAME, useValue: 'ProcureAccess' },
       { provide: SettingsApiService, useValue: apiService },
-      { provide: AuthService, useValue: { isAuthenticated: () => signedIn } },
+      provideRouter([]),
+      { provide: AuthService, useValue: {} },
       { provide: IdentityApiService, useValue: {} },
       { provide: LanguageService, useValue: { init: vi.fn(), get: () => 'de' } },
       { provide: SnackbarService, useValue: { showInfo } },
     ],
   });
-  return TestBed.inject(SettingsTestStore);
+  const store = TestBed.inject(SettingsTestStore);
+  // The session as the probe would report it (withIdentity(), S5-08), without a request.
+  patchState(store, {
+    session: signedIn ? { id: 'u1', email: 'user@example.test', roles: [], permissions: [] } : null,
+    sessionStatus: 'ready',
+  });
+  return store;
 }
 
 // The store does not look at the reason; HttpClient would reject with an HttpErrorResponse.

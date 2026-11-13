@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { fireEvent } from '@testing-library/dom';
 import { provideRouter, Router } from '@angular/router';
-import { signalStore, withMethods, withState } from '@ngrx/signals';
+import { signalStore, withMethods } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -24,12 +24,11 @@ import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CriteriaListPage } from './criteria-list';
 
 // The real configurator slice stands in for the root store, so the page runs the S4-14 rules; the
-// legacy sign-in is a flag (`isAuthenticated` reads the token in localStorage in the root store).
+// sign-in state (`signedIn` of withIdentity(), from the session probe) is a flag here.
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
   withConfigurator(),
-  withState<{ user: { id: string } | null }>({ user: null }),
-  withMethods(() => ({ isAuthenticated: () => signedIn })),
+  withMethods(() => ({ signedIn: () => signedIn })),
 );
 
 @Component({ template: '' })

@@ -255,6 +255,21 @@
   "auth": {
     "confirm": {
       "required": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Danach können Sie Listen speichern, Organisationen anlegen, Einladungen annehmen und Beiträge veröffentlichen."
+    },
+    "login": {
+      "title": "Anmelden",
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "showPassword": "Passwort anzeigen",
+      "submit": "Anmelden",
+      "forgot": "Passwort vergessen?",
+      "noAccount": "Noch kein Konto? Jetzt registrieren",
+      "error": {
+        "invalid": "Anmeldung nicht möglich. E-Mail-Adresse oder Passwort stimmen nicht. Bitte prüfen Sie Ihre Eingaben."
+      },
+      "reasonSave": "Melden Sie sich an, um Ihre Kriterienliste zu speichern. Ihre Auswahl bleibt dabei erhalten.",
+      "draftKept": "Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden.",
+      "locked": "Zu viele Anmeldeversuche. Aus Sicherheitsgründen können Sie sich erst in {{minutes}} Minuten erneut anmelden."
     }
   },
   "errors": {

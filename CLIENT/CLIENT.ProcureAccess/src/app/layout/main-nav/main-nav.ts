@@ -54,25 +54,21 @@ export class MainNav {
     return [CONFIGURATOR_PATH, LEGACY_FILTER_PATH].some((base) => path === base || path.startsWith(`${base}/`));
   });
 
-  // The token lives in localStorage (legacy until step 3), which no signal tracks. It is read
-  // again when the user changes (login, „Abmelden“) and after every navigation: the other legacy
-  // paths that remove it (account deletion, failed token refresh) navigate to /home.
-  protected readonly signedIn = computed(() => {
-    this.store.user();
-    this.navigationEnd();
-    return this.store.isAuthenticated();
-  });
+  /** From the session of `withIdentity()` (S5-08): follows sign-in, sign-out and account deletion. */
+  protected readonly signedIn = this.store.signedIn;
 
   protected login(): void {
     this.navigated.emit();
     this.authService.showLogin();
   }
 
+  /** Ends the session (R-AUTH-08 base; the focus to the H1 of the start page follows in S5-09). */
   protected logout(): void {
     this.navigated.emit();
-    this.authService.logout();
-    this.store.setUser(null);
-    this.store.setProposals([]);
-    void this.store.reloadUICustomization();
+    void this.store.signOut().then(() => {
+      this.store.setProposals([]);
+      void this.store.reloadUICustomization();
+      return this.router.navigateByUrl('/');
+    });
   }
 }

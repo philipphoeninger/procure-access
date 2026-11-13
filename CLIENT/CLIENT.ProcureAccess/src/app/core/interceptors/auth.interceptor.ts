@@ -2,57 +2,55 @@
 //
 // SPDX-License-Identifier: MIT
 
-import type { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { JWT_NAME, REFRESH_TOKEN_NAME } from '@app/app.config';
-import { AuthService } from '@app/features/identity/services/auth.service';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, from, switchMap, throwError } from 'rxjs';
 
-const appendJwt = (req: HttpRequest<unknown>) => {
-  const jwtName = inject(JWT_NAME);
-  const jwt = localStorage.getItem(jwtName);
-  if (jwt != null) {
-    req = req.clone({
-      headers: req.headers.set('Authorization', 'bearer ' + jwt),
-    });
-  }
-  return req;
-}
+import { API_URL } from '@app/app.config';
+import { BACKGROUND_REQUEST } from '@app/core/errors/problem-details';
+import { LoginOverlayService } from '@app/core/session/login-overlay.service';
 
+/** Set on a request that was already retried after a sign-in: a second 401 is not retried (no loop). */
+export const RETRIED_AFTER_SIGN_IN = new HttpContextToken<boolean>(() => false);
+
+/**
+ * The session interceptor (ARCHITECTURE §8.3, C60; SEC-03): a 401 from any endpoint opens the
+ * login overlay without navigation, holds the failed request and sends it again once after a
+ * successful sign-in; the user's page, input and draft stay. The failure is passed on when the
+ * overlay is closed instead, and when the retry fails too.
+ *
+ * Not retried: the session probe (it answers 200 for everyone, a 401 from it is unexpected and
+ * ignored by the caller) and a request the user did not ask for (`BACKGROUND_REQUEST`), which
+ * must not open a dialog.
+ *
+ * The antiforgery header is Angular's own XSRF interceptor (`withXsrfConfiguration` in
+ * `app.config.ts`): it copies the cookie `XSRF-TOKEN` of the probe into `X-XSRF-TOKEN` on every
+ * state-changing request to a relative URL. There is no token in JavaScript (SEC-01).
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const refreshTokenName = inject(REFRESH_TOKEN_NAME);
-  const auth = inject(AuthService);
-  
-  req = appendJwt(req);
-
-  // skip for refresh endpoint
-  if (req.url.includes('/refresh')) return next(req);
-  // try refresh on 401
-  const refreshToken = localStorage.getItem(refreshTokenName);
+  const overlay = inject(LoginOverlayService);
+  const apiUrl = inject(API_URL);
+  const isProbe = req.url === `${apiUrl}/v1/auth/session`;
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // only handle 401
-      if (error.status !== 401 || refreshToken == null) {
+      if (
+        error.status !== 401 ||
+        isProbe ||
+        req.context.get(BACKGROUND_REQUEST) ||
+        req.context.get(RETRIED_AFTER_SIGN_IN)
+      ) {
         return throwError(() => error);
       }
-      // try refresh
-      return auth.refreshToken(refreshToken).pipe(
-        switchMap(response => {
-          if (!response.accessToken) {
-            auth.logout(); // ❌ refresh failed
+      return from(overlay.requestSignIn()).pipe(
+        switchMap((signedIn) => {
+          if (!signedIn) {
             return throwError(() => error);
           }
-          // use new tokens
-          const jwtName = inject(JWT_NAME);
-          localStorage.setItem(jwtName, response.accessToken);
-          localStorage.setItem(refreshTokenName, response.refreshToken);
-          req = appendJwt(req);
-
-          // retry original request
+          req.context.set(RETRIED_AFTER_SIGN_IN, true);
           return next(req);
-        })
+        }),
       );
-    })
+    }),
   );
 };
