@@ -112,7 +112,7 @@ test.describe('S10 Kriterien zusammenstellen, steps 2–4', () => {
   test('INV:A11Y-01 INV:A11Y-08 step 2 at 360 px', async ({ page }, testInfo) => {
     await toStep2(page, COMPACT);
 
-    await expect(page.getByText('Schritt 2 von 4: Anwendungstyp')).toBeVisible();
+    await expect(page.locator('#main').getByText('Schritt 2 von 4: Anwendungstyp')).toBeVisible();
     await expect(checkbox(page, 'Hardware')).toHaveAttribute('aria-disabled', 'true');
     await expectNoAxeViolations(page, testInfo, 's10 step 2, 360 px');
   });
