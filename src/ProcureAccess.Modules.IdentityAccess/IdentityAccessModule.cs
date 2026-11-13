@@ -77,8 +77,9 @@ public static class IdentityAccessModule
         }
 
         // Cookie session and antiforgery (S5-07, ARCHITECTURE §9.1): the Identity cookie schemes,
-        // the session lifetimes of 🔧 Session:* and the antiforgery token pair.
-        services.AddSession(configuration);
+        // the session lifetimes of 🔧 Session:* and the antiforgery token pair; Secure cookies only on
+        // HTTPS requests in Development and E2E (SessionCookiePolicy).
+        services.AddSession(configuration, environment);
 
         return services;
     }

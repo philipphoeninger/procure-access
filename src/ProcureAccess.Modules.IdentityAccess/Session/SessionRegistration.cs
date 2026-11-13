@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace ProcureAccess.Modules.IdentityAccess.Session;
 
@@ -23,11 +24,16 @@ internal static class SessionRegistration
     /// <summary>Name of the HttpOnly half of the antiforgery token pair.</summary>
     public const string AntiforgeryCookieName = ".ProcureAccess.Antiforgery";
 
-    public static IServiceCollection AddSession(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddSession(
+        this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         // Read now, so a bad value stops the start before the host is built (like the rate limits).
         var settings = SessionSettings.From(configuration);
         services.AddSingleton(settings);
+
+        // Secure everywhere; Secure only on HTTPS requests in Development and E2E (plain-HTTP stacks).
+        var cookiePolicy = SessionCookiePolicy.For(environment);
+        services.AddSingleton(cookiePolicy);
         services.AddScoped<SessionCookieEvents>();
 
         // The three Identity cookie schemes (application, external, two-factor). SignInManager
@@ -39,7 +45,7 @@ internal static class SessionRegistration
         {
             options.Cookie.Name = SessionCookieName;
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookiePolicy.SecurePolicy;
             options.Cookie.SameSite = SameSiteMode.Strict;
             options.Cookie.IsEssential = true;
             options.ExpireTimeSpan = settings.IdleTimeout;
@@ -59,7 +65,7 @@ internal static class SessionRegistration
             options.HeaderName = AntiforgeryTokenCookie.HeaderName;
             options.Cookie.Name = AntiforgeryCookieName;
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookiePolicy.SecurePolicy;
             options.Cookie.SameSite = SameSiteMode.Strict;
             options.Cookie.IsEssential = true;
             // The header is the only way the token arrives: the API has no forms.

@@ -2,9 +2,9 @@
 
 > **Sprint:** 05 · **Task:** S5-07 · **Issues:** #87, #88, #89
 > **Requirements / invariants:** R-AUTH-03 (server part), R-AUTH-05, R-AUTH-08; SEC-01 (server part), SEC-02, SEC-03 (API part), SEC-09, OPS-04 → `active` (TESTING_v56 V175); API-01 stays green; SEC-07/SEC-08 stay `planned` (S5-29)
-> **Status:** pull request #316 open (2026-11-13); E2E red on the plain-HTTP stack until the owner decides §5 point 1
+> **Status:** pull request #316 open (2026-11-13)
 > **Scope:** ASP.NET Core Identity cookie session (`HttpOnly; Secure; SameSite=Strict`, 🔧 30 min idle / 8 h absolute from configuration) with the Data Protection keys of S4-26; antiforgery (`X-XSRF-TOKEN`, cookie `XSRF-TOKEN`) on every state-changing endpoint except the anonymous export; `GET /api/v1/auth/session`, `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`; 401 never 302; the integration-host options of #87 – #89. The legacy JWT keeps working next to the cookie for this one PR (S5-08 switches the client and removes it). No EF migration.
-> **Owner decisions (control chat, 2026-11-13):** Q1 (A) server switch now, legacy client untouched, two asserted legacy exemptions · Q2 (a) sign-in failures answer 400 `validation` with `errors["$"]`, never 401 · Q3 (a) the stored sign-in time and the absolute limit are built now and tested without an invariant tag · after the first CI run: 1a trust `X-Forwarded-Proto` from the proxies and have nginx send it · 2a the client calls the probe once at start
+> **Owner decisions (control chat, 2026-11-13):** Q1 (A) server switch now, legacy client untouched, two asserted legacy exemptions · Q2 (a) sign-in failures answer 400 `validation` with `errors["$"]`, never 401 · Q3 (a) the stored sign-in time and the absolute limit are built now and tested without an invariant tag · after the first CI run: 1a trust `X-Forwarded-Proto` from the proxies and have nginx send it · 2a the client calls the probe once at start · 3a Secure cookies only on HTTPS requests in `Development` and `E2E`
 
 ## 1. Starting point
 
@@ -38,6 +38,7 @@
 - `appsettings.json` — section `Session`.
 - `src/ProcureAccess.Modules.Export/Http/ExportEndpoint.cs` — `DisableAntiforgery()` (the exemption the architecture names).
 - `src/ProcureAccess.Modules.Platform/RateLimiting/ClientAddress.cs` (1a) — the forwarded-headers middleware also takes `X-Forwarded-Proto` from the trusted proxies; `RequireHeaderSymmetry` stays off, so a `For` header without a `Proto` header still sets the address. `CLIENT/CLIENT.ProcureAccess/nginx.conf` sends `X-Forwarded-Proto` (Traefik's value when present, else its own scheme).
+- `Session/SessionCookiePolicy.cs` (3a) — `CookieSecurePolicy.SameAsRequest` for the session cookie, the antiforgery cookie and `XSRF-TOKEN` in `Development` and `E2E` (guarded on `IHostEnvironment`, the same two environments that may run without a key-ring certificate), `Always` everywhere else; `AddIdentityAccessModule` passes the environment on.
 - `CLIENT/CLIENT.ProcureAccess/src/app/core/session/session-probe.service.ts` (2a) — `SessionProbeService.probe()` (GET probe, `BACKGROUND_REQUEST`, never rejects) and `provideSessionProbe()`, registered in `app.config.ts`: fire-and-forget at application start. Angular's default XSRF interceptor (cookie `XSRF-TOKEN` → header `X-XSRF-TOKEN`, relative URLs only) then covers every state-changing request of the release build and the E2E stack; `npm start` (absolute `apiUrl`) sends no header (§5).
 
 ### 2.3 Endpoints whose behaviour changes
@@ -62,6 +63,7 @@
 - `…/Api/ProblemDetailsHostTests.cs` — its client got the antiforgery hook (its POST now needs the token).
 - `tests/ProcureAccess.Tests.Unit/IdentityAccess/SessionSettingsTests.cs` — defaults and every refused value.
 - `tests/ProcureAccess.Tests.Integration/Api/ForwardedProtoTests.cs` (1a) — probe over HTTP from a trusted proxy forwarding `https` → 200 with the Secure token; without the header → 500; from an untrusted address → ignored (500).
+- `tests/ProcureAccess.Tests.Unit/IdentityAccess/SessionCookiePolicyTests.cs` and `ForwardedProtoTests.Probe_OverHttpInDevelopment_IssuesTheTokenWithoutSecure` (3a).
 - `CLIENT/…/core/session/session-probe.service.spec.ts` (2a) — GET with the background marker, resolves on failure, called once by the initializer.
 
 ### 2.5 Documents
@@ -92,11 +94,11 @@ TESTING_v56 (V175–V177; v54 deleted), ARCHITECTURE_v47 (C133, §7.1, §9.1 "as
 | `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs` | passed, nothing touched |
 | `reuse lint` (container) | only the owner's untracked `.worktreeinclude` reported, not part of this PR |
 | Client: `npm run lint`, `ng test` (56 files, 507 tests) | passed |
-| E2E | first CI run red on all five browsers (see §3); after 1a/2a the plain-HTTP E2E stack still cannot issue the Secure cookies — §5 point 1 |
+| E2E | first CI run red on all five browsers (see §3); fixed by 1a, 2a and 3a, confirmed by the second CI run (see the PR) |
 
 ## 5. Open points
 
-1. **Secure cookies on the plain-HTTP dev and E2E stacks — decision needed to turn CI green.** Behind Traefik the scheme is now forwarded (1a), so staging and production work. The dev stack (`http://localhost:4200` → API) and the E2E stack have no TLS anywhere, so nginx forwards `http`, and ASP.NET's antiforgery refuses to issue or check tokens with `SecurePolicy = Always` on a non-HTTPS request (500 on the probe and on every state-changing request; `ForwardedProtoTests.Probe_OverHttpWithoutAForwardedScheme_Fails` documents it). Options: (a) `SecurePolicy = SameAsRequest` for the session cookie, the antiforgery cookie and `XSRF-TOKEN` only in `Development` and `E2E`, guarded on `IHostEnvironment` like the key-ring certificate rule of S4-26 (recommended: a few lines, production unchanged, every browser accepts the cookies over `http://localhost`); (b) TLS in the stacks (self-signed certificate for nginx, `ignoreHTTPSErrors` and new URLs in Playwright, healthchecks). Not decided here; the E2E jobs stay red until one is.
+1. **Secure cookies on the plain-HTTP dev and E2E stacks — decided (3a).** `SessionCookiePolicy` relaxes the three cookies to `SameAsRequest` in `Development` and `E2E` only; production and staging keep `Always`, and behind Traefik the scheme comes from `X-Forwarded-Proto` (1a). TLS in the stacks (the alternative) was not chosen.
 2. **`npm start` origin (S5-08).** The dev client on `localhost:4200` calls `http://localhost:5000/api` cross-origin; cookies would need `AllowCredentials` in the CORS policy and `withCredentials` in the client, and `SameSite=Strict` still blocks a cross-site cookie. The release build and the E2E stack call `/api` on their own origin and are unaffected. Recommendation for S5-08: a dev-server proxy to the API (`proxy.conf.json`), so `apiUrl` is `/api` everywhere and CORS can shrink.
 3. **Legacy client until S5-08.** With 2a the release build and the E2E stack send the token for `criteria-list-shown`; `npm start` (absolute `apiUrl`, no XSRF header) answers 400 silently until point 2 is settled.
 4. **Sign-in rate limit.** SPEC §7.3 lists limits per endpoint; the new `/auth/login` has none yet (lockout after 5 attempts applies). Proposed issue for S5-08 or S5-12.

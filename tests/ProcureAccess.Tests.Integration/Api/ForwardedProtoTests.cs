@@ -81,6 +81,23 @@ public sealed class ForwardedProtoTests(ApiFixture api) : IntegrationTest(api), 
     }
 
     [Fact]
+    public async Task Probe_OverHttpInDevelopment_IssuesTheTokenWithoutSecure()
+    {
+        // The dev and E2E stacks run plain HTTP end to end (owner decision 3a): there the cookies
+        // are Secure only on an HTTPS request, so the probe answers and the browser keeps the token.
+        await using var development = new ProcureAccessApiFactory(
+            Api.ConnectionString, Clock, Microsoft.Extensions.Hosting.Environments.Development);
+        using var client = development.CreateDefaultClient(PlainHttp);
+
+        using var response = await client.GetAsync(Probe, TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Headers.GetValues("Set-Cookie")
+            .ShouldContain(c => c.StartsWith(AntiforgeryHandler.TokenCookieName + "=", StringComparison.Ordinal)
+                                && !c.Contains("secure", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public async Task Probe_OverHttpWithAForwardedSchemeFromAnUntrustedAddress_IgnoresIt()
     {
         // A caller outside the proxy networks cannot make the API believe it runs behind TLS.

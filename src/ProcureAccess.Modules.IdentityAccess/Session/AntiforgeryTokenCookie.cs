@@ -25,12 +25,13 @@ internal static class AntiforgeryTokenCookie
     public static void Issue(HttpContext context)
     {
         var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+        var policy = context.RequestServices.GetRequiredService<SessionCookiePolicy>();
         var tokens = antiforgery.GetAndStoreTokens(context);
         context.Response.Cookies.Append(CookieName, tokens.RequestToken!, new CookieOptions
         {
             // Readable by the client script, otherwise it could not copy it into the header.
             HttpOnly = false,
-            Secure = true,
+            Secure = policy.SecureFor(context),
             SameSite = SameSiteMode.Strict,
             Path = "/",
             IsEssential = true,
