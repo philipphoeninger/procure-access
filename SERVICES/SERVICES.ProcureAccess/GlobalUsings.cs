@@ -61,6 +61,7 @@ global using SERVICES.ProcureAccess.Logging.Interfaces;
 global using SERVICES.ProcureAccess.Logging.Configuration;
 global using SERVICES.ProcureAccess.Utilities;
 
+global using MailKit;
 global using MailKit.Net.Smtp;
 global using MailKit.Security;
 global using MimeKit;

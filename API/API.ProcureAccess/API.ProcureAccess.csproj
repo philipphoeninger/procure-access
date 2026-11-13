@@ -48,16 +48,16 @@ SPDX-License-Identifier: MIT
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <!--
-      Swashbuckle brings Microsoft.OpenApi at the version it requires (2.7.5 for 10.3.1); there is no
-      direct reference on purpose (owner, 2026-11-04, #74). 2.7.5 is the first version patched for
-      CVE-2026-49451 (GHSA-v5pm-xwqc-g5wc, parsing of circular schema references); the API only writes
-      documents. Until #74 the unused Microsoft.AspNetCore.OpenApi raised it to 2.12.2.
+      Swashbuckle brings Microsoft.OpenApi at the version it requires (3.11.0 for 11.0.1); there is no
+      direct reference on purpose (owner, 2026-11-04, #74). CVE-2026-49451 (GHSA-v5pm-xwqc-g5wc,
+      parsing of circular schema references) is fixed in 2.7.5 and 3.5.4; the API only writes
+      documents. Swashbuckle 11 still writes OpenAPI 3.0 documents (S5-04).
     -->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="11.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="11.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="11.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="11.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="11.0.1" />
   </ItemGroup>
 
   <ItemGroup>

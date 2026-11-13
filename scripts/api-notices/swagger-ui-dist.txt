@@ -1,7 +1,7 @@
-swagger-ui-dist 5.33.3 (https://github.com/swagger-api/swagger-ui), licensed under the Apache License 2.0.
+swagger-ui-dist 5.34.1 (https://github.com/swagger-api/swagger-ui), licensed under the Apache License 2.0.
 Swashbuckle.AspNetCore.SwaggerUI embeds its files; its NOTICE and the licence comments of the
 packages bundled into swagger-ui-bundle.js and swagger-ui-standalone-preset.js follow (from
-swagger-ui-bundle.js.LICENSE.txt of swagger-ui-dist 5.33.3; the preset's comments are a subset).
+swagger-ui-bundle.js.LICENSE.txt of swagger-ui-dist 5.34.1; the preset's comments are a subset).
 
 NOTICE of swagger-ui:
 
@@ -69,7 +69,7 @@ Licence comments of the bundled packages:
  * Licensed under the MIT License.
  */
 
-/*! @license DOMPurify 3.4.16 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.16/LICENSE */
+/*! @license DOMPurify 3.4.17 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.17/LICENSE */
 
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 

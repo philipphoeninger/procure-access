@@ -55,8 +55,8 @@ export const PACKAGE_TEXTS = {
 /** Third-party code a package embeds without its notices, reviewed for one package version. */
 export const EMBEDDED = {
   'Swashbuckle.AspNetCore.SwaggerUI': {
-    version: '10.3.1',
-    name: 'swagger-ui-dist 5.33.3',
+    version: '11.0.1',
+    name: 'swagger-ui-dist 5.34.1',
     licence: 'Apache-2.0',
     file: `${TEXTS}/swagger-ui-dist.txt`,
   },
