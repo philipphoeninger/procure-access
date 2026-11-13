@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-02 · **Issues:** #264
 > **Requirements / invariants:** none (developer tooling; no invariant changes)
-> **Status:** pull request open (2026-11-13)
+> **Status:** pull request #324 open (2026-11-13)
 > **Scope:** make `npm start` (`ng serve`) render the app again; `provideMarkdown()` only where the legacy Markdown is rendered, which also takes `marked` and `ngx-markdown` out of the first download (S4-22 P4)
 > **Owner decisions:** none for this task. Plan not approved in advance: the task ran unattended, so the plan below was followed without a stop (coordinator's instruction)
 
