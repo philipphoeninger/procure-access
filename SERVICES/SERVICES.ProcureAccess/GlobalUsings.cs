@@ -16,7 +16,6 @@ global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Identity;
 global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.Entities.Requests;
-global using MODELS.ProcureAccess.Settings;
 
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Hosting;
@@ -25,14 +24,12 @@ global using Microsoft.Extensions.Options;
 // global using Microsoft.OpenApi.Any;
 // global using Microsoft.OpenApi.Models;
 global using Microsoft.AspNetCore.Authentication;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.Data;
 global using Microsoft.AspNetCore.Identity.UI.Services;
 global using Microsoft.AspNetCore.Mvc.Authorization;
-global using Microsoft.IdentityModel.Tokens;
 
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
@@ -43,7 +40,6 @@ global using Serilog;
 global using Serilog.Context;
 
 global using System.Data;
-global using System.IdentityModel.Tokens.Jwt;
 global using System.Runtime.CompilerServices;
 global using System.Net.Http.Headers;
 global using System.Net.Http.Json;

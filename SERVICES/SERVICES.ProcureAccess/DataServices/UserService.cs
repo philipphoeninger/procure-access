@@ -4,15 +4,11 @@
 
 namespace SERVICES.ProcureAccess.DataServices;
 
-using Claim = System.Security.Claims.Claim;
-using ClaimsIdentity = System.Security.Claims.ClaimsIdentity;
-
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly ApplicationDBContext _db;
-    private readonly JWTSettings _jwt;
     private readonly IEmailService _emailService;
     private readonly IEmailTemplateService _templateService;
     private readonly IConfiguration _config;
@@ -23,7 +19,6 @@ public class UserService : IUserService
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ApplicationDBContext db,
-        IOptions<JWTSettings> jwt,
         IEmailService emailService,
         IEmailTemplateService templateService,
         IConfiguration config,
@@ -32,7 +27,6 @@ public class UserService : IUserService
         _userManager = userManager;
         _signInManager = signInManager;
         _db = db;
-        _jwt = jwt.Value;
         _emailService = emailService;
         _templateService = templateService;
         _config = config;
@@ -50,28 +44,6 @@ public class UserService : IUserService
         if (user == null || user.IsDeleted)
             return null; //gate
         return user.ToDto();
-    }
-
-    // SIGN IN (with lockout support)
-    public async Task<AuthResponseDto?> SignInAsync(LoginRequest request)
-    {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-
-        if (user == null || user.IsDeleted)
-            return null; //gate
-
-        var result = await _signInManager.CheckPasswordSignInAsync(
-            user,
-            request.Password,
-            lockoutOnFailure: true);
-
-        if (!result.Succeeded)
-            return null; //gate
-
-        // if (!user.EmailConfirmed)
-        //     throw new Exception("Email not confirmed");
-
-        return await GenerateAuthResponseAsync(user);
     }
 
     // SIGN UP
@@ -136,79 +108,6 @@ public class UserService : IUserService
             user,
             decodedToken,
             dto.NewPassword);
-    }
-
-    // REFRESH TOKEN
-    public async Task<AuthResponseDto?> RefreshTokenAsync(string refreshToken)
-    {
-        var token = await _db.RefreshTokens
-            .Include(rt => rt.User)
-            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
-
-        if (token == null || token.IsRevoked || token.ExpiresAt < DateTime.UtcNow)
-            return null; //gate
-
-        // revoke old token (rotation)
-        token.IsRevoked = true;
-
-        await _db.SaveChangesAsync();
-
-        return await GenerateAuthResponseAsync(token.User);
-    }
-
-    // PRIVATE: Generate Tokens
-    private async Task<AuthResponseDto> GenerateAuthResponseAsync(User user)
-    {
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var permissions = await (
-            from role in _db.Roles
-            join claim in _db.RoleClaims on role.Id equals claim.RoleId
-            where roles.Contains(role.Name!) &&
-                  claim.ClaimType == CustomClaimTypes.Permission
-            select claim.ClaimValue
-        ).Distinct().ToArrayAsync();
-
-        List<Claim> claims =
-        [
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Email, user.Email!),
-            ..roles.Select(r => new Claim(ClaimTypes.Role, r)),
-            ..permissions.Select(p => new Claim(CustomClaimTypes.Permission, p))
-        ];
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(30),
-            SigningCredentials = new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-        var accessToken = handler.WriteToken(handler.CreateToken(tokenDescriptor));
-
-        // create refresh token
-        var refreshToken = new RefreshToken
-        {
-            Token = Guid.NewGuid().ToString(),
-            UserId = user.Id,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(7)
-        };
-
-        _db.RefreshTokens.Add(refreshToken);
-        await _db.SaveChangesAsync();
-
-        return new AuthResponseDto
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken.Token,
-            User = user.ToDto()
-        };
     }
 
     public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token)

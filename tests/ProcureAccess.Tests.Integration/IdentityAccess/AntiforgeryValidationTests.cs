@@ -21,7 +21,7 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// request needs the token of the probe as <c>X-XSRF-TOKEN</c>, else 400 Problem Details of type
 /// <c>antiforgery</c>; the anonymous export is exempt, asserted explicitly. The exemption list is
 /// checked whole, so it can only shrink knowingly: the export, and until S5-10 the anonymous legacy
-/// identity endpoints; until S5-08 a request with a Bearer header (owner decision Q1 (A)).
+/// identity endpoints. A Bearer header is no exemption any more since the JWT went (S5-08).
 /// </summary>
 public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest(api)
 {
@@ -93,11 +93,9 @@ public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest
 
         exempt.ShouldBe(
         [
-            // Legacy JWT client until S5-10: no token cookie, and no session to forge a request into.
+            // Legacy anonymous identity POSTs until S5-10 (S5-12, S5-13): no session to forge a request into.
             "/api/forgot-password",
-            "/api/refresh",
             "/api/reset-password",
-            "/api/signIn",
             "/api/signUp",
             // The anonymous export changes no server state (SEC-02, EXP-05).
             "/api/v{version:apiVersion}/exports",
@@ -114,18 +112,18 @@ public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
-    [Fact(DisplayName = "INV:SEC-02 " + nameof(StateChangingRequest_WithBearerHeader_IsNotValidatedUntilS508))]
+    [Fact(DisplayName = "INV:SEC-02 " + nameof(StateChangingRequest_WithBearerHeader_IsValidatedLikeAnyOther))]
     [Trait("Invariant", "SEC-02")]
-    public async Task StateChangingRequest_WithBearerHeader_IsNotValidatedUntilS508()
+    public async Task StateChangingRequest_WithBearerHeader_IsValidatedLikeAnyOther()
     {
-        // A JWT is no ambient credential: the browser never attaches it on its own. The test scheme
-        // ignores the header; the real JWT is in CookieSessionTests.
+        // The legacy JWT skipped validation until S5-08; a Bearer header exempts nothing any more.
         using var client = Api.Factory.CreateDefaultClient(BaseAddress);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "legacy-token");
 
         using var response = await client.PostAsync(CriteriaListShown, content: null, TestContext.Current.CancellationToken);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await ProblemTypeOf(response)).ShouldEndWith("/problems/" + ProblemTypes.Antiforgery);
     }
 
     private static async Task<string> ProblemTypeOf(HttpResponseMessage response)

@@ -12,7 +12,7 @@ namespace API.ProcureAccess.Commands;
 /// <remarks>
 /// It works on the legacy Identity tables through <see cref="UserManager{TUser}"/>, so it lives in
 /// the host until the users move into the IdentityAccess module (roadmap M3.1). A change reaches a
-/// signed-in user with the next JWT, at the latest after 30 minutes. Every grant and revoke is logged
+/// signed-in user with the next sign-in (the cookie principal is built at sign-in). Every grant and revoke is logged
 /// with the user id and the role, never with the e-mail address.
 /// </remarks>
 public static class RoleCommandLine

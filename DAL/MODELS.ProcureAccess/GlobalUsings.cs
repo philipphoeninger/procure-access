@@ -11,7 +11,6 @@ global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Interfaces;
 global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.SeedData;
-global using MODELS.ProcureAccess.Settings;
 
 global using MODELS.ProcureAccess.ViewModels.Interfaces;
 //global using MODELS.ProcureAccess.ViewModels.Configuration;

@@ -5,9 +5,10 @@
 namespace API.ProcureAccess.Controllers.Identity;
 
 /// <summary>
-/// Legacy identity endpoints of the JWT client (removed with S5-10). The anonymous POSTs carry
-/// <c>DisableAntiforgery()</c>: the legacy client has no token cookie, and a request without a
-/// session cannot be forged into one (S5-07, owner decision Q1 (A)); the SEC-02 test lists them.
+/// Legacy identity endpoints (removed with S5-10, replaced by S5-12 and S5-13). <c>/signIn</c> and
+/// <c>/refresh</c> went with the JWT in S5-08; sign-in is <c>POST /api/v1/auth/login</c>. The
+/// remaining anonymous POSTs carry <c>DisableAntiforgery()</c>: a request without a session cannot
+/// be forged into one (S5-07, owner decision Q1 (A)); the SEC-02 test lists them.
 /// </summary>
 public static class IdentityUserEndpoints
 {
@@ -18,20 +19,6 @@ public static class IdentityUserEndpoints
         {
             return await service.GetCurrentUserAsync();
         });
-
-        app.MapPost("/signIn", async (
-            IUserService service,
-            LoginRequest request) =>
-        {
-            var result = await service.SignInAsync(request);
-
-            return result == null
-                ? Results.BadRequest(new
-                {
-                    code = "InvalidLogin"
-                })
-                : Results.Ok(result);
-        }).DisableAntiforgery();
 
         app.MapPost("/signUp", async (
             IUserService service,
@@ -65,20 +52,6 @@ public static class IdentityUserEndpoints
             return result.Succeeded
                 ? Results.Ok(result)
                 : Results.BadRequest(result.Errors);
-        }).DisableAntiforgery();
-
-        app.MapPost("/refresh", async (
-            IUserService service,
-            string refreshToken) =>
-        {
-            var result = await service.RefreshTokenAsync(refreshToken);
-
-            return result == null
-                ? Results.BadRequest(new
-                {
-                    code = "InvalidRefreshToken"
-                })
-                : Results.Ok(result);
         }).DisableAntiforgery();
 
         app.MapGet("/confirm-email", async (
