@@ -49,6 +49,9 @@ internal static class ExportEndpoint
     public static RouteHandlerBuilder Map(IEndpointRouteBuilder routes) =>
         routes.MapPost(Path, HandleAsync)
             .AllowAnonymous()
+            // The one exemption from antiforgery the architecture names (SEC-02, §9.1): the export
+            // changes no server state (EXP-05), and the anonymous client may have no token yet.
+            .DisableAntiforgery()
             .RequireRateLimiting(RateLimitPolicies.AnonymousExport)
             .WithMetadata(new RequestSizeLimitAttribute(MaxRequestBodySize))
             .WithName("PostExport")

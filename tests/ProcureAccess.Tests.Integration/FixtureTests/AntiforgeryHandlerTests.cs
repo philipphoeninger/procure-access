@@ -12,9 +12,9 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.FixtureTests;
 
 /// <summary>
-/// The antiforgery hook of the test client against a stub server. The real session probe and
-/// antiforgery validation only arrive in migration step 3; these tests keep the hook from
-/// breaking unnoticed until then.
+/// The antiforgery hook of the test client against a stub server: what it sends and when, apart
+/// from the real API (which <c>IdentityAccess/AntiforgeryValidationTests</c> and
+/// <c>CookieSessionTests</c> cover since S5-07).
 /// </summary>
 public sealed class AntiforgeryHandlerTests
 {
@@ -87,6 +87,24 @@ public sealed class AntiforgeryHandlerTests
     }
 
     [Fact]
+    public async Task StateChangingRequest_CallerHeaders_ProbeCarriesSameHeaders()
+    {
+        // The token is bound to the user: the probe must run as the caller (#89), with the
+        // caller's language, so the fixture user and the test scheme header reach the probe.
+        var server = new StubServer(_ => new HttpResponseMessage(HttpStatusCode.OK));
+        using var client = server.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-User", "member");
+        client.DefaultRequestHeaders.Add("Accept-Language", "de");
+
+        await client.PostAsync("/api/something", content: null, TestContext.Current.CancellationToken);
+
+        server.Requests.Select(r => (r.Path, r.Headers["X-Test-User"], r.Headers["Accept-Language"])).ShouldBe([
+            (SessionProbe, "member", "de"),
+            ("/api/something", "member", "de"),
+        ]);
+    }
+
+    [Fact]
     public async Task StateChangingRequest_SessionProbeFails_Throws()
     {
         var server = new StubServer(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError));
@@ -103,7 +121,7 @@ public sealed class AntiforgeryHandlerTests
         return response;
     }
 
-    private sealed record SentRequest(HttpMethod Method, string Path, string? TokenHeader);
+    private sealed record SentRequest(HttpMethod Method, string Path, string? TokenHeader, IReadOnlyDictionary<string, string> Headers);
 
     /// <summary>Answers every request with <paramref name="respond"/> and records what was sent.</summary>
     private sealed class StubServer(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
@@ -125,7 +143,8 @@ public sealed class AntiforgeryHandlerTests
             var token = request.Headers.TryGetValues(AntiforgeryHandler.TokenHeaderName, out var values)
                 ? values.Single()
                 : null;
-            Requests.Add(new SentRequest(request.Method, request.RequestUri!.AbsolutePath, token));
+            var headers = request.Headers.ToDictionary(h => h.Key, h => string.Join(",", h.Value), StringComparer.OrdinalIgnoreCase);
+            Requests.Add(new SentRequest(request.Method, request.RequestUri!.AbsolutePath, token, headers));
 
             // A real server sets RequestMessage; CookieContainerHandler reads its URI to store cookies.
             var response = respond(request);
@@ -136,13 +155,13 @@ public sealed class AntiforgeryHandlerTests
 }
 
 /// <summary>
-/// The hook against the real API: before migration step 3 the session probe answers 404, and a
-/// state-changing request still reaches its endpoint.
+/// The hook against the real API: the legacy sign-in is exempt from antiforgery until S5-10
+/// (SEC-02 lists it), and a state-changing request through the hook reaches its endpoint.
 /// </summary>
 public sealed class AntiforgeryHookApiTests(ApiFixture api) : IntegrationTest(api)
 {
     [Fact]
-    public async Task SignIn_BeforeSessionProbeExists_ReachesEndpoint()
+    public async Task LegacySignIn_ThroughTheHook_ReachesEndpoint()
     {
         using var client = CreateClient();
 

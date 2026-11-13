@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Shouldly;
 using Xunit;
 
@@ -103,7 +104,12 @@ public sealed class ProblemDetailsHostTests(ProblemDetailsHostTests.Host host) :
                 {
                     services.AddControllers().AddApplicationPart(typeof(ProblemProbeController).Assembly);
                 });
-            Client = _factory.CreateClient();
+            // With the antiforgery hook (S5-07): the POST of the validation probe needs the token.
+            var cookies = new CookieContainer();
+            Client = _factory.CreateDefaultClient(
+                IntegrationTest.BaseAddress,
+                new AntiforgeryHandler(cookies),
+                new CookieContainerHandler(cookies));
             return ValueTask.CompletedTask;
         }
 

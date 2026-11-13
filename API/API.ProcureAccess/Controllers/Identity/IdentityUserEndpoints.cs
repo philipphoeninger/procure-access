@@ -4,6 +4,11 @@
 
 namespace API.ProcureAccess.Controllers.Identity;
 
+/// <summary>
+/// Legacy identity endpoints of the JWT client (removed with S5-10). The anonymous POSTs carry
+/// <c>DisableAntiforgery()</c>: the legacy client has no token cookie, and a request without a
+/// session cannot be forged into one (S5-07, owner decision Q1 (A)); the SEC-02 test lists them.
+/// </summary>
 public static class IdentityUserEndpoints
 {
     public static IEndpointRouteBuilder MapIdentityUserEndpoints(this IEndpointRouteBuilder app)
@@ -26,7 +31,7 @@ public static class IdentityUserEndpoints
                     code = "InvalidLogin"
                 })
                 : Results.Ok(result);
-        });
+        }).DisableAntiforgery();
 
         app.MapPost("/signUp", async (
             IUserService service,
@@ -41,7 +46,7 @@ public static class IdentityUserEndpoints
                     code = "SignUpFailure",
                     message = result.Errors
                 });
-        });
+        }).DisableAntiforgery();
 
         app.MapPost("/forgot-password", async (
             IUserService service,
@@ -49,7 +54,7 @@ public static class IdentityUserEndpoints
         {
             await service.RequestPasswordResetAsync("ok@testing.lettermint.co"); //request.Email
             return Results.Ok();
-        });
+        }).DisableAntiforgery();
 
         app.MapPost("/reset-password", async (
             IUserService service,
@@ -60,7 +65,7 @@ public static class IdentityUserEndpoints
             return result.Succeeded
                 ? Results.Ok(result)
                 : Results.BadRequest(result.Errors);
-        });
+        }).DisableAntiforgery();
 
         app.MapPost("/refresh", async (
             IUserService service,
@@ -74,7 +79,7 @@ public static class IdentityUserEndpoints
                     code = "InvalidRefreshToken"
                 })
                 : Results.Ok(result);
-        });
+        }).DisableAntiforgery();
 
         app.MapGet("/confirm-email", async (
             IUserService service,

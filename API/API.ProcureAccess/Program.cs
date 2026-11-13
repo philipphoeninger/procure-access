@@ -114,7 +114,9 @@ try
        .HasApiVersion(1, 0)
        .MapCatalogEndpoints()
        .MapConfiguratorEndpoints()
-       .MapExportEndpoints();
+       .MapExportEndpoints()
+       .MapIdentityAccessEndpoints()
+       .MapAuthEndpoints();
 
     app.ConfigureSwaggerExplorer();
 
@@ -126,6 +128,10 @@ try
 
     // Rate limits of SPEC §7.3 (S4-21a): after CORS, so a 429 reaches a browser on another origin
     app.UsePlatformRateLimiting();
+
+    // Antiforgery on every state-changing request (S5-07, SEC-02): last, so a forged request still
+    // counts against its rate limit and an anonymous one to a protected endpoint stays a 401
+    app.UseIdentityAccessAntiforgery();
 }
 catch (Exception ex)
 {
