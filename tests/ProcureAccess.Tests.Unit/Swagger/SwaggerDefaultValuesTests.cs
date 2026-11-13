@@ -155,7 +155,7 @@ public sealed class SwaggerDefaultValuesTests
 
     private static OpenApiResponse Response(params string[] mediaTypes) => new()
     {
-        Content = mediaTypes.ToDictionary(mediaType => mediaType, _ => new OpenApiMediaType())
+        Content = mediaTypes.ToDictionary(mediaType => mediaType, IOpenApiMediaType (_) => new OpenApiMediaType())
     };
 
     private static ApiParameterDescription Parameter(string name, object defaultValue, bool isRequired) => new()
