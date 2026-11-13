@@ -2,9 +2,9 @@
 
 > **Sprint:** 05 · **Task:** S5-07 · **Issues:** #87, #88, #89
 > **Requirements / invariants:** R-AUTH-03 (server part), R-AUTH-05, R-AUTH-08; SEC-01 (server part), SEC-02, SEC-03 (API part), SEC-09, OPS-04 → `active` (TESTING_v56 V175); API-01 stays green; SEC-07/SEC-08 stay `planned` (S5-29)
-> **Status:** done, pull request open (2026-11-13)
+> **Status:** pull request #316 open (2026-11-13); E2E red on the plain-HTTP stack until the owner decides §5 point 1
 > **Scope:** ASP.NET Core Identity cookie session (`HttpOnly; Secure; SameSite=Strict`, 🔧 30 min idle / 8 h absolute from configuration) with the Data Protection keys of S4-26; antiforgery (`X-XSRF-TOKEN`, cookie `XSRF-TOKEN`) on every state-changing endpoint except the anonymous export; `GET /api/v1/auth/session`, `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`; 401 never 302; the integration-host options of #87 – #89. The legacy JWT keeps working next to the cookie for this one PR (S5-08 switches the client and removes it). No EF migration.
-> **Owner decisions (control chat, 2026-11-13):** Q1 (A) server switch now, legacy client untouched, two asserted legacy exemptions · Q2 (a) sign-in failures answer 400 `validation` with `errors["$"]`, never 401 · Q3 (a) the stored sign-in time and the absolute limit are built now and tested without an invariant tag
+> **Owner decisions (control chat, 2026-11-13):** Q1 (A) server switch now, legacy client untouched, two asserted legacy exemptions · Q2 (a) sign-in failures answer 400 `validation` with `errors["$"]`, never 401 · Q3 (a) the stored sign-in time and the absolute limit are built now and tested without an invariant tag · after the first CI run: 1a trust `X-Forwarded-Proto` from the proxies and have nginx send it · 2a the client calls the probe once at start
 
 ## 1. Starting point
 
@@ -37,6 +37,8 @@
 - `Controllers/Identity/IdentityUserEndpoints.cs` — `DisableAntiforgery()` on `/api/signIn`, `signUp`, `forgot-password`, `reset-password`, `refresh` (legacy until S5-10).
 - `appsettings.json` — section `Session`.
 - `src/ProcureAccess.Modules.Export/Http/ExportEndpoint.cs` — `DisableAntiforgery()` (the exemption the architecture names).
+- `src/ProcureAccess.Modules.Platform/RateLimiting/ClientAddress.cs` (1a) — the forwarded-headers middleware also takes `X-Forwarded-Proto` from the trusted proxies; `RequireHeaderSymmetry` stays off, so a `For` header without a `Proto` header still sets the address. `CLIENT/CLIENT.ProcureAccess/nginx.conf` sends `X-Forwarded-Proto` (Traefik's value when present, else its own scheme).
+- `CLIENT/CLIENT.ProcureAccess/src/app/core/session/session-probe.service.ts` (2a) — `SessionProbeService.probe()` (GET probe, `BACKGROUND_REQUEST`, never rejects) and `provideSessionProbe()`, registered in `app.config.ts`: fire-and-forget at application start. Angular's default XSRF interceptor (cookie `XSRF-TOKEN` → header `X-XSRF-TOKEN`, relative URLs only) then covers every state-changing request of the release build and the E2E stack; `npm start` (absolute `apiUrl`) sends no header (§5).
 
 ### 2.3 Endpoints whose behaviour changes
 
@@ -59,6 +61,8 @@
 - `…/FixtureTests/AntiforgeryHandlerTests.cs` — #89 `StateChangingRequest_CallerHeaders_ProbeCarriesSameHeaders`; comments updated; `AntiforgeryHookApiTests` renamed to the legacy exemption.
 - `…/Api/ProblemDetailsHostTests.cs` — its client got the antiforgery hook (its POST now needs the token).
 - `tests/ProcureAccess.Tests.Unit/IdentityAccess/SessionSettingsTests.cs` — defaults and every refused value.
+- `tests/ProcureAccess.Tests.Integration/Api/ForwardedProtoTests.cs` (1a) — probe over HTTP from a trusted proxy forwarding `https` → 200 with the Secure token; without the header → 500; from an untrusted address → ignored (500).
+- `CLIENT/…/core/session/session-probe.service.spec.ts` (2a) — GET with the background marker, resolves on failure, called once by the initializer.
 
 ### 2.5 Documents
 
@@ -75,6 +79,7 @@ TESTING_v56 (V175–V177; v54 deleted), ARCHITECTURE_v47 (C133, §7.1, §9.1 "as
 | The user's own session survives their password change until the security-stamp interval (30 min) passes | follow-up | SEC-08, S5-29 |
 | Sliding renewal is the handler's default (after half the window), not on every request | won't fix here | ARCHITECTURE puts it in step 4 (S5-29); the probe never renews, as the row requires |
 | `.ProcureAccess.Session` is not persistent (gone when the browser closes) | no change | matches "no token survives in the browser"; a "remember me" is not in scope |
+| **CI, first run:** every E2E job red — `s11-list.spec.ts` asserts the 204 of `criteria-list-shown` (my plan said it only counted the request) and received 500: antiforgery with `SecurePolicy = Always` throws on a non-HTTPS request, and the API sees HTTP behind every proxy, also behind Traefik in staging and production | fix (1a, 2a) | `X-Forwarded-Proto` trusted and sent; the client calls the probe at start |
 
 ## 4. Checks
 
@@ -86,13 +91,14 @@ TESTING_v56 (V175–V177; v54 deleted), ARCHITECTURE_v47 (C133, §7.1, §9.1 "as
 | `node scripts/check-invariants.mjs` | passed (SEC-01/02/03/09, OPS-04 counted) |
 | `node scripts/check-figma-links.mjs`, `node scripts/check-i18n.mjs` | passed, nothing touched |
 | `reuse lint` (container) | only the owner's untracked `.worktreeinclude` reported, not part of this PR |
-| E2E | left to CI (no local run); expected impact: the anonymous `criteria-list-shown` answers 400 silently, the S11 test counts the request, not its status |
+| Client: `npm run lint`, `ng test` (56 files, 507 tests) | passed |
+| E2E | first CI run red on all five browsers (see §3); after 1a/2a the plain-HTTP E2E stack still cannot issue the Secure cookies — §5 point 1 |
 
 ## 5. Open points
 
-1. **Secure cookies need HTTPS (S5-08 decision).** Both cookies are `Secure` (ARCHITECTURE §9.1). The dev stack (`http://localhost:4200`, API `http://localhost:5000`) and the E2E stack run over plain HTTP, so a browser will not store them and the cookie sign-in cannot work there as it stands. Options for S5-08: (a) `SecurePolicy = SameAsRequest` and `XSRF-TOKEN` without `Secure` only in `Development` and `E2E` (recommended: one guarded line, like the key-ring certificate rule of S4-26); (b) TLS in the stacks (self-signed certificate for nginx and the Playwright image). Not decided here.
+1. **Secure cookies on the plain-HTTP dev and E2E stacks — decision needed to turn CI green.** Behind Traefik the scheme is now forwarded (1a), so staging and production work. The dev stack (`http://localhost:4200` → API) and the E2E stack have no TLS anywhere, so nginx forwards `http`, and ASP.NET's antiforgery refuses to issue or check tokens with `SecurePolicy = Always` on a non-HTTPS request (500 on the probe and on every state-changing request; `ForwardedProtoTests.Probe_OverHttpWithoutAForwardedScheme_Fails` documents it). Options: (a) `SecurePolicy = SameAsRequest` for the session cookie, the antiforgery cookie and `XSRF-TOKEN` only in `Development` and `E2E`, guarded on `IHostEnvironment` like the key-ring certificate rule of S4-26 (recommended: a few lines, production unchanged, every browser accepts the cookies over `http://localhost`); (b) TLS in the stacks (self-signed certificate for nginx, `ignoreHTTPSErrors` and new URLs in Playwright, healthchecks). Not decided here; the E2E jobs stay red until one is.
 2. **`npm start` origin (S5-08).** The dev client on `localhost:4200` calls `http://localhost:5000/api` cross-origin; cookies would need `AllowCredentials` in the CORS policy and `withCredentials` in the client, and `SameSite=Strict` still blocks a cross-site cookie. The release build and the E2E stack call `/api` on their own origin and are unaffected. Recommendation for S5-08: a dev-server proxy to the API (`proxy.conf.json`), so `apiUrl` is `/api` everywhere and CORS can shrink.
-3. **Legacy client until S5-08.** The anonymous `criteria-list-shown` event is not counted for the legacy client (400). Accepted by Q1 (A); S5-08 calls the probe at start, after which Angular's built-in XSRF interceptor adds the header for relative URLs.
+3. **Legacy client until S5-08.** With 2a the release build and the E2E stack send the token for `criteria-list-shown`; `npm start` (absolute `apiUrl`, no XSRF header) answers 400 silently until point 2 is settled.
 4. **Sign-in rate limit.** SPEC §7.3 lists limits per endpoint; the new `/auth/login` has none yet (lockout after 5 attempts applies). Proposed issue for S5-08 or S5-12.
 5. **Lockout message.** R-AUTH-03 wants a lockout hint next to `auth.login.error.invalid`; the server answers the same `$` error for both (Q2 (a)), so the client cannot tell them apart. If the hint is wanted, the server needs a second problem type or an extension member — owner decision for S5-08.
 6. **`SessionResponse` is `internal` and serialised by reflection;** when the client needs it typed (S5-08), a contract record in `IdentityAccess.Contracts` can replace it.
