@@ -11,8 +11,8 @@
 // which builds Debug; publish alone would default to Release) and read the published deps.json,
 // so the file lists exactly the NuGet packages the image ships — not the design-time packages a
 // plain build lists. Debug and Release publish the same packages. Which packages ship depends on the .NET SDK (newer
-// SDKs prune packages the shared framework already has), so generate the file with the SDK that
-// CI and the image's sdk:10.0 use (the latest 10.0), or from the image's deps.json:
+// SDKs prune packages the shared framework already has), so generate the file with the SDK pinned in
+// global.json (CI and the image's sdk:<version> use the same one, S5-03), or from the image's deps.json:
 //   docker run --rm --entrypoint cat <api image> /app/API.ProcureAccess.deps.json > deps.json
 // Per package it reads the .nuspec and the licence and notice files in the NuGet package folder
 // (NUGET_PACKAGES or ~/.nuget/packages).
@@ -37,7 +37,7 @@ const API_PROJECT = 'API/API.ProcureAccess/API.ProcureAccess.csproj';
 const DEPS_FILE = 'API.ProcureAccess.deps.json';
 const TEXTS = 'scripts/api-notices';
 const REGENERATE =
-  'run `dotnet build ProcureAccess.sln`, then `node scripts/check-api-notices.mjs --write` with the SDK of CI (or --deps with the deps.json of the image)';
+  'run `dotnet build ProcureAccess.sln`, then `node scripts/check-api-notices.mjs --write` with the SDK of global.json (or --deps with the deps.json of the image)';
 
 /** Licences any package may carry, with their standard text (MIT's copyright placeholder is removed). */
 export const STANDARD_TEXTS = {

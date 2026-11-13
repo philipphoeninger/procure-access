@@ -105,6 +105,8 @@ updates:
       # The Node version lives in the client Dockerfile and both .nvmrc files and is
       # updated by hand in one commit (CLAUDE §3).
       - dependency-name: node
-      # .NET stays on the LTS line; the 10.0 tags already pull the latest patch.
+      # .NET stays on the LTS line (ADR-013). The SDK tag of the API image is pinned to the
+      # sdk.version of global.json (S5-03): a pull request that changes it fails CI stage 1 until
+      # global.json names the same version, so push that change onto the pull request.
       - dependency-name: "dotnet/*"
         update-types: [version-update:semver-major]
