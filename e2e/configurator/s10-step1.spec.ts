@@ -121,7 +121,7 @@ test.describe('S10 Kriterien zusammenstellen, step 1', () => {
   test('INV:A11Y-01 INV:A11Y-08 shows the step as a text line at 360 px (S10-M)', async ({ page }, testInfo) => {
     await openPage(page, COMPACT);
 
-    await expect(page.getByText('Schritt 1 von 4: Verwendungszweck')).toBeVisible();
+    await expect(page.locator('#main').getByText('Schritt 1 von 4: Verwendungszweck')).toBeVisible();
     await expect(page.getByRole('main').getByRole('listitem')).toHaveCount(0);
     await expectNoAxeViolations(page, testInfo, 's10 step 1, 360 px');
 
