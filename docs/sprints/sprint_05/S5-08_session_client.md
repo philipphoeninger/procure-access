@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-08 (3 points) · **Issues:** #317, #320 (closed by this task); none assigned by the row
 > **Requirements / invariants:** R-AUTH-05, R-AUTH-07 (overlay and retry; the S01 form card follows in S5-09), R-AUTH-08 (base); SEC-01 (FE part) and SEC-03 (interceptor part) → complete (`TESTING_v58.md` V181); SEC-02 with a shorter exemption list (V182); the E2E storage part of SEC-01 deferred to S5-14 (owner decision)
-> **Status:** done — pull request open (2026-11-13)
+> **Status:** done — pull request #330 open (2026-11-13)
 > **Scope:** `withIdentity()` holds the session from `GET /api/v1/auth/session`; the interceptor turns a 401 into the login overlay and retries the request once; a minimal overlay dialog; the legacy screens sign in and out through the cookie session; JWT, `jwt-decode`, `@auth0/angular-jwt` and every token in browser storage gone on the client; the JWT handler, `/api/signIn`, `/api/refresh`, the Bearer antiforgery exemption and the CORS policy gone on the server; the probe's answer as a contract record with `permissions`; the dev server behind a proxy. No EF migration (the `RefreshToken` table stays until S5-10).
 > **Owner decisions (control chat, 2026-11-13):** 1 (a) S5-08 also removes the server-side JWT (handler, selector, Bearer exemption, `JWTSettings`, `signIn`, `refresh`) · 2 (a) the legacy login page switches to `POST /api/v1/auth/login`, S5-09 stays separate · 3 (a) the probe's `user` carries `permissions`, with the contract record of #320 · 4 (a) `proxy.conf.json`, `apiUrl` `/api` everywhere, CORS removed · 5 (a) stale tokens in existing browsers are left alone · the E2E storage inspection of SEC-01 follows with the E2E users of S5-14
 
