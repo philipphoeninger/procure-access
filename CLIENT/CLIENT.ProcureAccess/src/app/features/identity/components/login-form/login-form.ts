@@ -6,19 +6,18 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { AbstractControl, FormControl, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { finalize } from 'rxjs';
 
-import { ErrorSummaryItem } from '@app/core/errors/error-summary-item';
+import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
 import { applyServerErrors, problemFieldErrors, problemTypeName, ServerErrorField } from '@app/core/errors/problem-details';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
-import { ForgotPasswordDialog } from '../../dialogs/forgot-password-dialog/forgot-password-dialog';
-import { AuthService } from '../../services/auth.service';
+import { LOCKOUT_RULE } from '../../models/lockout-rule';
+import { RESET_PASSWORD_PATH } from '../../models/login-navigation';
 
 /** `Validators.required` as a plain function (the lint rule `unbound-method` refuses the static method). */
 function required(control: AbstractControl<string>): ValidationErrors | null {
@@ -38,12 +37,15 @@ const BODY_PATH = '$';
  * Fields are checked on submit only. A failed submit shows the error summary at the top of the
  * form, which takes the focus: one linked line per empty field, or `auth.login.error.invalid`
  * without a field for the server's answer on the body as a whole — a wrong address or password,
- * a locked or a deleted account, so it never names a field (SPEC §8.8) — or `errors.antiforgery`.
+ * a locked or a deleted account, so it never names a field (SPEC §8.8) — followed by the fixed
+ * lockout note `auth.login.error.lockout` with the 🔧 numbers (owner decisions S5-13 1 (a),
+ * S5-13b 2 (a): the server never says whether an account is locked) — or `errors.antiforgery`.
  * Other failures keep the system states of the error interceptor. A successful sign-in emits
  * `signedIn`; the host decides what follows.
  *
- * „Passwort vergessen?“ opens the legacy reset dialog until S03 replaces it (S5-13, owner decision
- * S5-09 (a)), so it is a button, not a link.
+ * „Passwort vergessen?“ is a link to S03 (S5-13b): on S01 in place of the page, closing the `login`
+ * outlet; in the login overlay (`forgotInNewTab`) in a new tab, so the page under the overlay keeps
+ * its input (owner decision S5-13b 1 (a)).
  *
  * @spec docs/SPEC_v2.md R-AUTH-03, R-AUTH-07; docs/design_handoff_procureaccess_v1.md §5.3, §6.4
  * @invariants SEC-03, API-02
@@ -57,6 +59,7 @@ const BODY_PATH = '$';
     MatInputModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    RouterLink,
     TranslatePipe,
   ],
   templateUrl: './login-form.html',
@@ -68,21 +71,25 @@ export class LoginForm {
   readonly idPrefix = input.required<string>();
   /** `card`: the fields in an outlined card, actions below it (S01); `dialog`: no card (overlay). */
   readonly formLayout = input<'card' | 'dialog'>('card');
+  /** „Passwort vergessen?“ opens S03 in a new tab (the login overlay) instead of in place (S01). */
+  readonly forgotInNewTab = input(false);
   /** The user is signed in. */
   readonly signedIn = output();
   /** True while the error summary shows lines, for the page title prefix „Fehler:“ (UX copy §6.1). */
   readonly errorsShown = output<boolean>();
 
   private readonly store = inject(ProcureAccessStore);
-  private readonly authService = inject(AuthService);
-  private readonly dialog = inject(MatDialog);
   private readonly translate = inject(TranslateService);
+  private readonly lockout = inject(LOCKOUT_RULE);
 
   protected readonly email = new FormControl('', { nonNullable: true, validators: [required] });
   protected readonly password = new FormControl('', { nonNullable: true, validators: [required] });
   protected readonly busy = signal(false);
   protected readonly passwordShown = signal(false);
   protected readonly summary = signal<ErrorSummaryItem[]>([]);
+  /** The lockout note under `auth.login.error.invalid`; null for every other summary. */
+  protected readonly summaryNote = signal<TextKey | null>(null);
+  protected readonly resetPath = RESET_PASSWORD_PATH;
   protected readonly formId = computed(() => `${this.idPrefix()}-form`);
   protected readonly emailId = computed(() => `${this.idPrefix()}-email`);
   protected readonly passwordId = computed(() => `${this.idPrefix()}-password`);
@@ -95,24 +102,6 @@ export class LoginForm {
 
   protected togglePassword(): void {
     this.passwordShown.update((shown) => !shown);
-  }
-
-  /** The legacy dialog asks for the address and requests the reset link (until S03, S5-13). */
-  protected openForgotPassword(): void {
-    const dialogRef = this.dialog.open<ForgotPasswordDialog, { email: string }, string | undefined>(ForgotPasswordDialog, {
-      data: { email: this.email.value },
-      width: '420px',
-      maxWidth: '100vw',
-    });
-    dialogRef.afterClosed().subscribe((email) => {
-      if (email !== undefined) {
-        this.store.incrementLoadingCount();
-        this.authService
-          .forgotPassword(email)
-          .pipe(finalize(() => this.store.decrementLoadingCount()))
-          .subscribe();
-      }
-    });
   }
 
   protected async submit(event: Event): Promise<void> {
@@ -130,7 +119,8 @@ export class LoginForm {
     try {
       await this.store.startSession(this.email.value, this.password.value);
     } catch (error: unknown) {
-      this.showErrors(this.serverErrors(error));
+      const lines = this.serverErrors(error);
+      this.showErrors(lines, this.refusedAsAWhole(error) ? this.lockoutNote() : null);
       return;
     } finally {
       this.busy.set(false);
@@ -139,7 +129,8 @@ export class LoginForm {
     this.signedIn.emit();
   }
 
-  private showErrors(lines: ErrorSummaryItem[]): void {
+  private showErrors(lines: ErrorSummaryItem[], note: TextKey | null = null): void {
+    this.summaryNote.set(note);
     this.summary.set(lines);
     this.errorsShown.emit(lines.length > 0);
   }
@@ -162,12 +153,21 @@ export class LoginForm {
       case 'antiforgery':
         return [{ message: { key: 'errors.antiforgery' } }];
       case 'validation':
-        return BODY_PATH in problemFieldErrors(error)
+        return this.refusedAsAWhole(error)
           ? [{ message: { key: 'auth.login.error.invalid' } }]
           : applyServerErrors(error, (path) => this.fields().find((field) => field.path === path));
       default:
         return [];
     }
+  }
+
+  /** The server refused the sign-in itself (an error at `$`), not a field. */
+  private refusedAsAWhole(error: unknown): boolean {
+    return problemTypeName(error) === 'validation' && BODY_PATH in problemFieldErrors(error);
+  }
+
+  private lockoutNote(): TextKey {
+    return { key: 'auth.login.error.lockout', params: { attempts: this.lockout.maxFailedAttempts, minutes: this.lockout.minutes } };
   }
 
   private fields(): (ServerErrorField & { path: string })[] {

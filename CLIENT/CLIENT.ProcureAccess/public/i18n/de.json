@@ -271,11 +271,11 @@
       "forgot": "Passwort vergessen?",
       "noAccount": "Noch kein Konto? Jetzt registrieren",
       "error": {
-        "invalid": "Anmeldung nicht möglich. E-Mail-Adresse oder Passwort stimmen nicht. Bitte prüfen Sie Ihre Eingaben."
+        "invalid": "Anmeldung nicht möglich. E-Mail-Adresse oder Passwort stimmen nicht. Bitte prüfen Sie Ihre Eingaben.",
+        "lockout": "Nach {{attempts}} Fehlversuchen ist die Anmeldung aus Sicherheitsgründen für {{minutes}} Minuten gesperrt."
       },
       "reasonSave": "Melden Sie sich an, um Ihre Kriterienliste zu speichern. Ihre Auswahl bleibt dabei erhalten.",
-      "draftKept": "Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden.",
-      "locked": "Zu viele Anmeldeversuche. Aus Sicherheitsgründen können Sie sich erst in {{minutes}} Minuten erneut anmelden."
+      "draftKept": "Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden."
     },
     "register": {
       "title": "Konto erstellen",
@@ -289,6 +289,20 @@
       "submit": "Konto erstellen",
       "success.title": "E-Mail-Adresse bestätigen",
       "success": "Fast geschafft. Wir haben Ihnen eine E-Mail an {{email}} geschickt. Bitte bestätigen Sie darin Ihre Adresse."
+    },
+    "reset": {
+      "title": "Passwort zurücksetzen",
+      "intro": "Geben Sie Ihre E-Mail-Adresse ein. Wenn ein Konto dazu existiert, erhalten Sie einen Link zum Zurücksetzen.",
+      "submit": "Link anfordern",
+      "sent": "Falls ein Konto zu {{email}} existiert, ist der Link unterwegs. Er ist {{hours}} Stunden gültig.",
+      "newPassword": "Neues Passwort",
+      "newPassword.submit": "Passwort speichern",
+      "done.title": "Passwort geändert",
+      "done": "Ihr Passwort wurde geändert. Sie können sich jetzt anmelden.",
+      "done.login": "Zur Anmeldung",
+      "invalid.title": "Link nicht mehr gültig",
+      "invalid": "Dieser Link zum Zurücksetzen ist nicht mehr gültig. Bitte fordern Sie einen neuen an.",
+      "invalid.requestNew": "Neuen Link anfordern"
     }
   },
   "errors": {
@@ -381,7 +395,9 @@
     "confirm": {
       "done": "E-Mail-Adresse bestätigt",
       "invalid": "Link nicht mehr gültig"
-    }
+    },
+    "reset": "Passwort zurücksetzen",
+    "reset.invalid": "Link nicht mehr gültig"
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",

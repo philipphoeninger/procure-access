@@ -11,7 +11,6 @@ import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { AuthService } from '../../services/auth.service';
 import { LoginOverlay } from './login-overlay';
 
 const base = 'https://procureaccess.de/problems/';
@@ -27,10 +26,10 @@ describe('LoginOverlay (login overlay after 401, R-AUTH-07)', () => {
     announce = vi.fn().mockResolvedValue(undefined);
     close = vi.fn();
     const rendered = await render(LoginOverlay, {
+      routes: [],
       providers: [
         provideTestTranslations(),
         { provide: ProcureAccessStore, useValue: { startSession } },
-        { provide: AuthService, useValue: { forgotPassword: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: MatDialogRef, useValue: { close } },
       ],
@@ -53,7 +52,7 @@ describe('LoginOverlay (login overlay after 401, R-AUTH-07)', () => {
     expect(screen.getByText(/Ihre Sitzung ist aus Sicherheitsgründen abgelaufen/)).toBeTruthy();
     expect(screen.getByLabelText('E-Mail-Adresse').id).toBe('pa-login-overlay-email');
     expect(screen.getByRole('button', { name: 'Passwort anzeigen' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Passwort vergessen?' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Passwort vergessen? (öffnet in neuem Tab)' }).getAttribute('target')).toBe('_blank');
     const buttons = screen.getAllByRole('button').map((button) => button.textContent?.trim());
     expect(buttons.indexOf('Schließen')).toBeLessThan(buttons.indexOf('Anmelden'));
     await expectNoAxeViolations();

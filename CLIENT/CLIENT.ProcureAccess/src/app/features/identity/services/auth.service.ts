@@ -2,15 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpClient, HttpContext, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
 import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { LOGIN_PATH, LoginNavigationState, LoginReason, REGISTER_PATH } from '../models/login-navigation';
-import { ResetPasswordModel } from '../models/reset-password.model';
 import { SessionResponse } from '../models/session';
 import { User } from '../models/user.model';
 
@@ -22,6 +21,17 @@ export const REGISTER_PROBLEMS: readonly string[] = ['validation', 'antiforgery'
 
 /** Problem types of `POST /api/v1/auth/confirm-email/resend` that the notice shows itself (SPEC §8.8). */
 export const RESEND_PROBLEMS: readonly string[] = ['email-delivery', 'rate-limit'];
+
+/** Problem types of `POST /api/v1/auth/password-reset` that S03 shows in its error summary (SPEC §8.8). */
+export const RESET_REQUEST_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'rate-limit'];
+
+/** Problem types of `POST /api/v1/auth/password-reset/complete` that S03 shows itself (SPEC §8.8). */
+export const RESET_COMPLETE_PROBLEMS: readonly string[] = ['validation', 'antiforgery'];
+
+/** The answer of `POST /api/v1/auth/password-reset`, the same for every address (SPEC §8.8). */
+export interface PasswordResetRequested {
+  validHours: number;
+}
 
 /** The body of `POST /api/v1/auth/register` (SPEC §8.8). */
 export interface RegistrationRequest {
@@ -39,8 +49,7 @@ export interface RegistrationRequest {
  * (SPEC §8.8). The state lives in `withIdentity()`, which is the only caller of them.
  *
  * Registration and address confirmation (S5-12b, SPEC §8.8): `register`, `confirmEmail` and
- * `resendConfirmation`. `forgotPassword` and `resetPassword` still call the legacy identity
- * endpoints until S5-13 replaces their screens.
+ * `resendConfirmation`. Password reset (S5-13b): `requestPasswordReset` and `completePasswordReset`.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -139,11 +148,33 @@ export class AuthService {
     void this.router.navigate([{ outlets: { primary: [REGISTER_PATH], login: null } }]);
   }
 
-  forgotPassword(email: string): Observable<HttpResponse<unknown>> {
-    return this.http.post<unknown>(`${this.apiUrl}/forgot-password`, { email }, { observe: 'response' });
+  /**
+   * Asks for a reset link (R-AUTH-04): 200 with the link's lifetime for a known and an unknown
+   * address alike; the server sends the e-mail in the background. S03 shows field errors, a missing
+   * antiforgery token and the rate limit itself ({@link RESET_REQUEST_PROBLEMS}).
+   */
+  requestPasswordReset(email: string): Promise<PasswordResetRequested> {
+    return lastValueFrom(
+      this.http.post<PasswordResetRequested>(
+        `${this.apiUrl}/v1/auth/password-reset`,
+        { email },
+        { context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, RESET_REQUEST_PROBLEMS) },
+      ),
+    );
   }
 
-  resetPassword(command: ResetPasswordModel): Observable<{ succeeded: boolean }> {
-    return this.http.post<{ succeeded: boolean }>(`${this.apiUrl}/reset-password`, command);
+  /**
+   * Sets the new password with the token of the reset link (R-AUTH-04): 204, or 400 `validation`
+   * at `newPassword` (the link stays valid) or at `token` (the link is no longer valid). S03 shows
+   * both and a missing antiforgery token ({@link RESET_COMPLETE_PROBLEMS}).
+   */
+  completePasswordReset(token: string, newPassword: string): Promise<void> {
+    return lastValueFrom(
+      this.http.post<void>(
+        `${this.apiUrl}/v1/auth/password-reset/complete`,
+        { token, newPassword },
+        { context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, RESET_COMPLETE_PROBLEMS) },
+      ),
+    );
   }
 }

@@ -47,11 +47,6 @@ const LEGACY_EXCEPTIONS = {
     '@typescript-eslint/no-unsafe-assignment',
     '@typescript-eslint/no-unsafe-member-access',
   ],
-  'src/app/features/identity/reset-password/reset-password.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-unsafe-assignment',
-  ],
     'src/app/features/identity/services/identity-api.service.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-explicit-any',

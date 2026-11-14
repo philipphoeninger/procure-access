@@ -24,7 +24,7 @@ namespace ProcureAccess.Tests.Integration.Api;
 /// The legacy account actions of <c>UsersController</c> need a signed-in user (S4-03, #205): before,
 /// an anonymous request reached the action and answered 400. The token-less
 /// <c>POST /api/Users/reset-password</c> is gone (owner decision O-S4-7 (a)); the password reset
-/// goes through the token-based <c>POST /api/reset-password</c>.
+/// goes through <c>POST /api/v1/auth/password-reset</c> (S5-13).
 /// </summary>
 public sealed class UsersControllerAuthorizationTests(ApiFixture api) : IntegrationTest(api)
 {

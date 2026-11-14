@@ -148,6 +148,26 @@ export class PageTitleStrategy extends TitleStrategy {
   }
 
   /**
+   * A page that shows another page at the same address — S03's „Link nicht mehr gültig“ after the
+   * server refused the token (S5-13b) — gets what a route change gives: the title of
+   * `pageKey` without the page's title state, the focus on its H1 after the next render and the
+   * announcement of the title. The router does not see the change, and its resolvers name the same
+   * key on the next navigation.
+   */
+  changePageInPlace(pageKey: string): void {
+    this.pageKey = pageKey;
+    this.pageState = {};
+    void this.applyTitle();
+    afterNextRender(
+      () => {
+        this.focusMainHeading();
+        void this.settledTitle().then((text) => (text ? this.announcer.announcePageTitle(text) : undefined));
+      },
+      { injector: this.injector },
+    );
+  }
+
+  /**
    * Moves the focus to the H1 of the page after its next render, for a page change the router does
    * not see as one (sign-out on the start page, R-AUTH-08).
    */

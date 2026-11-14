@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 <mat-dialog-content class="pa-login-overlay">
   <p class="pa-login-overlay__body">{{ 'shell.session.expired.body' | translate }}</p>
 
-  <pa-login-form idPrefix="pa-login-overlay" formLayout="dialog" (signedIn)="signedIn()">
+  <pa-login-form idPrefix="pa-login-overlay" formLayout="dialog" [forgotInNewTab]="true" (signedIn)="signedIn()">
     <button paLoginSecondaryAction matButton type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
   </pa-login-form>
 </mat-dialog-content>

@@ -31,7 +31,6 @@
     "info",
     "light_mode",
     "link",
-    "lock",
     "remove",
     "rule",
     "title",
@@ -39,5 +38,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "c9e3b32b6e6cab1d6b9c8cc0219851ca0b5f1d77909bc27db25012d4d17ab420"
+  "sha256": "bc1fe58eba54fe7aee4a14d794e2311245f48def8b5d9c98af8b80775cb20490"
 }

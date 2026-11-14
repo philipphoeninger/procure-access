@@ -5,12 +5,12 @@
 namespace API.ProcureAccess.Controllers.Identity;
 
 /// <summary>
-/// Legacy identity endpoints (removed with S5-10, replaced by S5-13). <c>/signIn</c> and
-/// <c>/refresh</c> went with the JWT in S5-08; sign-in is <c>POST /api/v1/auth/login</c>.
-/// <c>/signUp</c> and <c>/confirm-email</c> went with S5-12b (owner decision 3 (a)): registration is
-/// <c>POST /api/v1/auth/register</c> and <c>/confirm-email</c>. The remaining anonymous POSTs carry
-/// <c>DisableAntiforgery()</c>: a request without a session cannot be forged into one (S5-07, owner
-/// decision Q1 (A)); the SEC-02 test lists them.
+/// Legacy identity endpoints: only <c>GET /api/me</c> is left (until the users move, M3.1).
+/// <c>/signIn</c> and <c>/refresh</c> went with the JWT in S5-08 (sign-in is
+/// <c>POST /api/v1/auth/login</c>), <c>/signUp</c> and <c>/confirm-email</c> with S5-12b (registration
+/// is <c>POST /api/v1/auth/register</c> and <c>/confirm-email</c>), <c>/forgot-password</c> and
+/// <c>/reset-password</c> with S5-13b (owner decision S5-13 4 (a); the reset is
+/// <c>POST /api/v1/auth/password-reset</c> and <c>/password-reset/complete</c>).
 /// </summary>
 public static class IdentityUserEndpoints
 {
@@ -21,25 +21,6 @@ public static class IdentityUserEndpoints
         {
             return await service.GetCurrentUserAsync();
         });
-
-        app.MapPost("/forgot-password", async (
-            IUserService service,
-            ForgotPWRequest request) =>
-        {
-            await service.RequestPasswordResetAsync(request.Email);
-            return Results.Ok();
-        }).DisableAntiforgery();
-
-        app.MapPost("/reset-password", async (
-            IUserService service,
-            ResetPasswordDto dto) =>
-        {
-            var result = await service.ResetPasswordAsync(dto);
-
-            return result.Succeeded
-                ? Results.Ok(result)
-                : Results.BadRequest(result.Errors);
-        }).DisableAntiforgery();
 
         return app;
     }

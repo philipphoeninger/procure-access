@@ -15,5 +15,8 @@ export const environment = {
   priorityWeight: { min: 1, max: 10 },
   // Shortest password of the registration (R-AUTH-01). 🔧 Confirmed default (SPEC SD23); keep it in
   // step with the server's Account:Password:MinLength, which decides.
-  passwordMinLength: 12
+  passwordMinLength: 12,
+  // Sign-in lockout (R-AUTH-03), for the fixed note under a refused sign-in. 🔧 Confirmed defaults
+  // (SPEC SD23); keep them in step with the server's Account:Lockout:MaxFailedAttempts and :Duration.
+  lockout: { maxFailedAttempts: 5, minutes: 15 }
 };

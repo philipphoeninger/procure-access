@@ -79,9 +79,9 @@ public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest
         (await ProblemTypeOf(response)).ShouldEndWith("/problems/" + ProblemTypes.Validation);
     }
 
-    [Fact(DisplayName = "INV:SEC-02 " + nameof(ExemptEndpoints_AreExactlyTheExportAndTheLegacyIdentityPosts))]
+    [Fact(DisplayName = "INV:SEC-02 " + nameof(ExemptEndpoints_AreExactlyTheAnonymousExport))]
     [Trait("Invariant", "SEC-02")]
-    public void ExemptEndpoints_AreExactlyTheExportAndTheLegacyIdentityPosts()
+    public void ExemptEndpoints_AreExactlyTheAnonymousExport()
     {
         var exempt = Api.Factory.Services.GetServices<EndpointDataSource>()
             .SelectMany(source => source.Endpoints)
@@ -93,10 +93,8 @@ public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest
 
         exempt.ShouldBe(
         [
-            // Legacy anonymous identity POSTs until S5-10 (S5-13): no session to forge a request into;
-            // /api/signUp went with S5-12b.
-            "/api/forgot-password",
-            "/api/reset-password",
+            // The legacy anonymous identity POSTs are gone: /api/signUp with S5-12b,
+            // /api/forgot-password and /api/reset-password with S5-13b.
             // The anonymous export changes no server state (SEC-02, EXP-05).
             "/api/v{version:apiVersion}/exports",
         ]);

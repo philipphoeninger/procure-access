@@ -15,7 +15,6 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { LOGIN_PATH } from '../../models/login-navigation';
-import { AuthService } from '../../services/auth.service';
 import { LoginPage } from './login-page';
 
 @Component({
@@ -58,7 +57,6 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
             configurator: { list: { answer: () => (options.listLoaded ? { criteria: [] } : null) } },
           },
         },
-        { provide: AuthService, useValue: { forgotPassword: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce, announcePageTitle: vi.fn().mockResolvedValue(undefined) } },
       ],
     });

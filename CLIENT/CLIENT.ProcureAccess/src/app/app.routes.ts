@@ -5,7 +5,7 @@
 import { Routes } from '@angular/router';
 import { Home } from '@pages/home/home';
 import { authGuard } from '@core/guards/auth.guard';
-import { CONFIRM_EMAIL_PATH, LOGIN_PATH, REGISTER_PATH } from '@features/identity/models/login-navigation';
+import { CONFIRM_EMAIL_PATH, LOGIN_PATH, NEW_PASSWORD_PATH, REGISTER_PATH, RESET_PASSWORD_PATH } from '@features/identity/models/login-navigation';
 import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
@@ -59,6 +59,24 @@ export const routes: Routes = [
   {
     path: CONFIRM_EMAIL_PATH,
     loadChildren: () => import('@features/identity/pages/confirm-email/confirm-email.routing').then((m) => m.CONFIRM_EMAIL_ROUTES),
+  },
+  // S03 „Passwort zurücksetzen“ (R-AUTH-04) in place of the page: the request step, and the
+  // new-password step of the e-mail link, whose guard takes the token out of the URL (lazy child
+  // routes like the confirmation page); `reset-password` is the legacy path of older e-mails
+  {
+    path: RESET_PASSWORD_PATH,
+    pathMatch: 'full',
+    loadComponent: () => import('@features/identity/pages/reset-password/reset-request-page').then((m) => m.ResetRequestPage),
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.reset' },
+  },
+  {
+    path: NEW_PASSWORD_PATH,
+    loadChildren: () => import('@features/identity/pages/new-password/new-password.routing').then((m) => m.NEW_PASSWORD_ROUTES),
+  },
+  {
+    path: 'reset-password',
+    pathMatch: 'full',
+    redirectTo: RESET_PASSWORD_PATH,
   },
   {
     path: 'proposals',
@@ -119,10 +137,6 @@ export const routes: Routes = [
     loadComponent: () => import('@app/features/criteria/proposal/criterion-proposal').then((m) => m.CriterionProposal),
     canActivate: [authGuard]
    },
-  { 
-    path: 'reset-password', 
-    loadComponent: () => import('./features/identity/reset-password/reset-password').then((m) => m.ResetPassword)
-  },
   // S80 error pages (R-SHL-08); the page title is the H1
   {
     path: 'unauthorized',

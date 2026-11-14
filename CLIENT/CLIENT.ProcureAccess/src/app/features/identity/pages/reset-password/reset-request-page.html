@@ -1,0 +1,40 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1 class="pa-reset-page__title">{{ 'auth.reset.title' | translate }}</h1>
+
+@if (sentTo(); as sent) {
+  <!-- Replaces the form after the submit and takes the focus; the same for every address -->
+  <p #sentText class="pa-reset-page__result" tabindex="-1">{{ 'auth.reset.sent' | translate: sent }}</p>
+} @else {
+  <p class="pa-reset-page__intro">{{ 'auth.reset.intro' | translate }}</p>
+
+  <form class="pa-reset-page__form" id="pa-reset-form" novalidate (submit)="submit($event)">
+    <pa-error-summary [items]="summary()" />
+
+    <div class="pa-reset-page__card">
+      <p class="pa-reset-page__required">{{ 'common.requiredNote' | translate }}</p>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'auth.login.email' | translate }}</mat-label>
+        <input matInput [id]="emailId" type="email" name="email" autocomplete="email" required
+          [formControl]="email" [errorStateMatcher]="errorState" />
+        @if (emailMessage(); as message) {
+          <mat-error>{{ message.key | translate: message.params }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="pa-reset-page__actions">
+      <button matButton="filled" type="submit" class="pa-reset-page__submit" [attr.aria-disabled]="busy() || null">
+        @if (busy()) {
+          <mat-progress-spinner mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'auth.reset.submit' | translate }}
+      </button>
+    </div>
+  </form>
+}

@@ -3,16 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatDialog } from '@angular/material/dialog';
 import { render, screen } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
-import { of } from 'rxjs';
 import type { Mock } from 'vitest';
 
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { AuthService } from '../../services/auth.service';
+import { LOCKOUT_RULE } from '../../models/lockout-rule';
 import { LoginForm } from './login-form';
 
 const base = 'https://procureaccess.de/problems/';
@@ -21,18 +19,17 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
   let startSession: ReturnType<typeof vi.fn>;
   let signedIn: Mock<() => void>;
   let errorsShown: Mock<(shown: boolean) => void>;
-  let forgotPassword: ReturnType<typeof vi.fn>;
 
-  async function renderForm(signIn: { rejectWith?: unknown; pending?: Promise<void> } = {}) {
+  async function renderForm(signIn: { rejectWith?: unknown; pending?: Promise<void> } = {}, forgotInNewTab = false) {
     startSession =
       signIn.rejectWith === undefined
         ? vi.fn().mockReturnValue(signIn.pending ?? Promise.resolve())
         : vi.fn().mockRejectedValue(signIn.rejectWith);
     signedIn = vi.fn<() => void>();
     errorsShown = vi.fn<(shown: boolean) => void>();
-    forgotPassword = vi.fn().mockReturnValue(of(null));
     const rendered = await render(LoginForm, {
-      inputs: { idPrefix: 'test-login' },
+      inputs: { idPrefix: 'test-login', forgotInNewTab },
+      routes: [],
       on: { signedIn, errorsShown },
       providers: [
         provideTestTranslations(),
@@ -40,7 +37,7 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
           provide: ProcureAccessStore,
           useValue: { startSession, incrementLoadingCount: vi.fn(), decrementLoadingCount: vi.fn() },
         },
-        { provide: AuthService, useValue: { forgotPassword } },
+        { provide: LOCKOUT_RULE, useValue: { maxFailedAttempts: 5, minutes: 15 } },
       ],
     });
     await rendered.fixture.whenStable();
@@ -68,7 +65,7 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
     expect(screen.getByLabelText('E-Mail-Adresse').getAttribute('autocomplete')).toBe('email');
     expect(screen.getByLabelText('Passwort').getAttribute('autocomplete')).toBe('current-password');
     expect(screen.getByRole('button', { name: 'Passwort anzeigen' }).getAttribute('aria-pressed')).toBe('false');
-    expect(screen.getByRole('button', { name: 'Passwort vergessen?' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Passwort vergessen?' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Anmelden' })).toBeTruthy();
     await expectNoAxeViolations();
   });
@@ -112,14 +109,16 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
     expect(errorsShown).toHaveBeenLastCalledWith(false);
   });
 
-  it('shows „Anmeldung nicht möglich“ without naming a field for a refused sign-in (R-AUTH-03)', async () => {
+  it('shows „Anmeldung nicht möglich“ without naming a field, and the lockout note, for a refused sign-in (R-AUTH-03)', async () => {
     const { fixture } = await renderForm({ rejectWith: refusal('validation', { $: ['Invalid sign-in.'] }) });
 
     await fillAndSubmit(fixture);
 
     expect(signedIn).not.toHaveBeenCalled();
+    // The note is not an error: the count stays 1 (owner decision S5-13b 2 (a))
     const summary = screen.getByRole('heading', { level: 2, name: /1 Angabe muss noch korrigiert werden/ }).closest('pa-notice')!;
     expect(summary.textContent).toContain('Anmeldung nicht möglich. E-Mail-Adresse oder Passwort stimmen nicht.');
+    expect(summary.textContent).toContain('Nach 5 Fehlversuchen ist die Anmeldung aus Sicherheitsgründen für 15 Minuten gesperrt.');
     expect(summary.querySelector('a')).toBeNull();
     expect(screen.getByLabelText('E-Mail-Adresse').getAttribute('aria-invalid')).toBe('false');
     expect(screen.getByLabelText('Passwort').getAttribute('aria-invalid')).toBe('false');
@@ -134,6 +133,7 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
 
     expect(screen.getByRole('link', { name: 'E-Mail-Adresse: Too long.' })).toBeTruthy();
     expect(screen.getByLabelText('E-Mail-Adresse').getAttribute('aria-invalid')).toBe('true');
+    expect(screen.queryByText(/Fehlversuchen/)).toBeNull();
   });
 
   it('shows the antiforgery text when the token was missing', async () => {
@@ -181,16 +181,22 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
     expect(toggle.getAttribute('aria-controls')).toBe('test-login-password');
   });
 
-  it('opens the legacy reset dialog with the typed address and requests the link (until S03)', async () => {
-    const { fixture } = await renderForm();
-    const afterClosed = of('mod@example.test');
-    const open = vi.spyOn(fixture.debugElement.injector.get(MatDialog), 'open').mockReturnValue({ afterClosed: () => afterClosed } as never);
-    fireEvent.input(screen.getByLabelText('E-Mail-Adresse'), { target: { value: 'mod@example.test' } });
+  it('links „Passwort vergessen?“ to S03 in place of the page, closing the login outlet (S01)', async () => {
+    await renderForm();
 
-    screen.getByRole('button', { name: 'Passwort vergessen?' }).click();
-    await fixture.whenStable();
+    const link = screen.getByRole('link', { name: 'Passwort vergessen?' });
 
-    expect(open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ data: { email: 'mod@example.test' } }));
-    expect(forgotPassword).toHaveBeenCalledWith('mod@example.test');
+    expect(link.getAttribute('href')).toBe('/passwort');
+    expect(link.getAttribute('target')).toBeNull();
+  });
+
+  it('opens S03 in a new tab from the login overlay, so the page under it keeps its input (S5-13b 1 (a))', async () => {
+    await renderForm({}, true);
+
+    const link = screen.getByRole('link', { name: 'Passwort vergessen? (öffnet in neuem Tab)' });
+
+    expect(link.getAttribute('href')).toBe('/passwort');
+    expect(link.getAttribute('target')).toBe('_blank');
+    await expectNoAxeViolations();
   });
 });
