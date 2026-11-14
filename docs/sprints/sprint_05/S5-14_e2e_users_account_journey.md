@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-14 (1 point) · **Issues:** none
 > **Requirements / invariants:** SPEC R-AUTH-01, R-AUTH-02, R-AUTH-03, R-AUTH-08 (covered end to end, unchanged); TESTING §6.3 (user part of the E2E seeder, V203), §5.4 (new journey J8, V204); **SEC-01 complete** with its E2E part (V205, deferred by S5-08); PRV-11 (E2E part moved into J8), A11Y-01, A11Y-08 stay green; prepares the J1 second part (S5-20); no invariant changes its status
-> **Status:** done — pull request open (2026-11-15)
+> **Status:** done — pull request #338 open (2026-11-15)
 > **Scope:** the E2E users in the seeder; journey J8 register → mail in Mailpit → confirm → sign in → sign out with axe in both appearances; SEC-01's browser storage inspection after a real sign-in; the S01 tests on real sessions instead of the faked one.
 > **Owner decisions (2026-11-14, before the task):** S5-14 1 (a) — the seeder runs only in `Development` or `E2E` and only when a setting is set that only `docker-compose.e2e.yml` sets; no `E2E` environment yet · 2 (a) — one confirmed and one unconfirmed user; organisation users with S5-15/S5-16 · 3 (a) — fixed test credentials in the repository (`example.invalid`, fixed password in the compose override and `e2e/support/users.ts`) · 4 (a) — SEC-01's E2E storage inspection is part of this task · defaults accepted: the journey in its own file under `journeys/`, `login.spec.ts` on the seeded user, the seeder in the host, no EF migration · **2026-11-15:** the journey is J8
 
