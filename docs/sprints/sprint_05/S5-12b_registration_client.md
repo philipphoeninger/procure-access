@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-12b (second half of S5-12, 3.5 points together with S5-12a) · **Issues:** — (#301 closed by S5-12a)
 > **Requirements / invariants:** SPEC R-AUTH-01, R-AUTH-02, §8.8 (v2.22); ARCHITECTURE C72, §8.3 (C140); **SEC-10** client part (TESTING_v61 V192), E2E part moved to S5-16; **PRV-11** E2E part → `active` (V193); SEC-02 list shorter (V194); **A11Y-09** stays green with S02 and both confirmation results (V195)
-> **Status:** done — pull request open (2026-11-14)
+> **Status:** done — pull request #334 open (2026-11-14)
 > **Scope:** S02 at `/registrieren`; the confirmation page at `/registrieren/bestaetigen` (token out of the URL first, S5-12a R4); the reusable notice `auth.confirm.required` with „Bestätigungs-E-Mail erneut senden“; S01's „Jetzt registrieren“ to S02; the legacy sign-up and confirmation removed; S02 and the confirmation page in `reflow.spec.ts`; the E2E registration with the mail from Mailpit.
 > **Owner decisions (2026-11-14):** 1 (a) — the notice is built now as a reusable piece with component tests; S5-16 places it and brings SEC-10's E2E part · 2 (a) — S5-12b tests the real registration with the mail from Mailpit (PRV-11 E2E part), error cases with faked answers; S5-14 adds the seeded users and sign-in/sign-out · 3 (a) — the legacy `POST /api/signUp`, `GET /api/confirm-email` and the legacy register and confirm pages go now · defaults accepted without a question: S02 in place of the page, the privacy link in a new tab, the minimum from the environment like `priorityWeight`, the confirmation sent on load without a button, `/register` → `/registrieren`.
 
