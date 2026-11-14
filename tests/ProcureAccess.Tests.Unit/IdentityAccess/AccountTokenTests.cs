@@ -77,11 +77,12 @@ public sealed class AccountTokenTests
         new IssuedAccountToken("secret-value", Now, TimeSpan.FromHours(1)).ToString().ShouldNotContain("secret-value");
 
     [Fact]
-    public void Settings_ConfiguredLifetime_IsRead()
+    public void Settings_ConfiguredLifetimes_AreReadPerPurpose()
     {
-        var settings = AccountTokenSettings.From(Configuration("1.00:00:00"));
+        var settings = AccountTokenSettings.From(Configuration(confirmation: "1.00:00:00", reset: "02:00:00"));
 
         settings.LifetimeOf(AccountTokenPurpose.EmailConfirmation).ShouldBe(TimeSpan.FromHours(24));
+        settings.LifetimeOf(AccountTokenPurpose.PasswordReset).ShouldBe(TimeSpan.FromHours(2));
     }
 
     [Theory]
@@ -90,22 +91,36 @@ public sealed class AccountTokenTests
     [InlineData("00:00:00")]
     [InlineData("-01:00:00")]
     [InlineData("a day")]
-    public void Settings_MissingOrUnusableLifetime_StopsTheStart(string? value) =>
-        Should.Throw<InvalidOperationException>(() => AccountTokenSettings.From(Configuration(value)))
+    public void Settings_MissingOrUnusableConfirmationLifetime_StopsTheStart(string? value) =>
+        Should.Throw<InvalidOperationException>(() => AccountTokenSettings.From(Configuration(confirmation: value)))
               .Message.ShouldContain("Account:Tokens:EmailConfirmationLifetime");
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("00:00:00")]
+    [InlineData("two hours")]
+    public void Settings_MissingOrUnusableResetLifetime_StopsTheStart(string? value) =>
+        Should.Throw<InvalidOperationException>(() => AccountTokenSettings.From(Configuration(reset: value)))
+              .Message.ShouldContain("Account:Tokens:PasswordResetLifetime");
+
     [Fact]
-    public void Settings_DefaultOfAppsettings_Is24Hours()
+    public void Settings_DefaultsOfAppsettings_Are24And2Hours()
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false)
             .Build();
 
-        AccountTokenSettings.From(configuration).EmailConfirmationLifetime.ShouldBe(TimeSpan.FromHours(24));
+        var settings = AccountTokenSettings.From(configuration);
+        settings.EmailConfirmationLifetime.ShouldBe(TimeSpan.FromHours(24));
+        settings.PasswordResetLifetime.ShouldBe(TimeSpan.FromHours(2));
     }
 
-    private static IConfiguration Configuration(string? lifetime) =>
+    private static IConfiguration Configuration(string? confirmation = "1.00:00:00", string? reset = "02:00:00") =>
         new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["Account:Tokens:EmailConfirmationLifetime"] = lifetime })
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Account:Tokens:EmailConfirmationLifetime"] = confirmation,
+                ["Account:Tokens:PasswordResetLifetime"] = reset,
+            })
             .Build();
 }

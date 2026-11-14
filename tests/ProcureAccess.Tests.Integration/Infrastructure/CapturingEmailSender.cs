@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using ProcureAccess.Modules.Platform.Contracts.Email;
 
 namespace ProcureAccess.Tests.Integration.Infrastructure;
@@ -32,6 +33,32 @@ public sealed class CapturingEmailSender : IEmailSender
 
         _sent.Enqueue(message);
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Waits until a message of type <typeparamref name="T"/> (matching <paramref name="match"/>)
+    /// was sent, for the e-mails a background service sends (the password reset, S5-13a); fails
+    /// after <paramref name="timeout"/> (10 s).
+    /// </summary>
+    public async Task<T> WaitForAsync<T>(Func<T, bool>? match = null, TimeSpan? timeout = null)
+        where T : EmailMessage
+    {
+        var limit = timeout ?? TimeSpan.FromSeconds(10);
+        var waited = Stopwatch.StartNew();
+        while (true)
+        {
+            if (_sent.OfType<T>().FirstOrDefault(m => match?.Invoke(m) ?? true) is { } found)
+            {
+                return found;
+            }
+
+            if (waited.Elapsed > limit)
+            {
+                throw new TimeoutException($"No {typeof(T).Name} was sent within {limit}.");
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(20));
+        }
     }
 
     /// <summary>Forgets the messages sent so far and sends again.</summary>

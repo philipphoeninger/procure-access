@@ -290,7 +290,7 @@ public static class RegistrationEndpoints
     }
 
     /// <summary>One plain address (<c>name@domain</c>), no display name and no list.</summary>
-    private static bool IsEmailAddress(string value) =>
+    internal static bool IsEmailAddress(string value) =>
         MailAddress.TryCreate(value, out var parsed)
         && string.Equals(parsed.Address, value, StringComparison.Ordinal)
         && parsed.Host.Length > 0;

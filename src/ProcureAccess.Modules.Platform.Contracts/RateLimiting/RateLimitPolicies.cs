@@ -26,4 +26,14 @@ public static class RateLimitPolicies
     /// first policy partitioned by user, not by client IP.
     /// </summary>
     public const string ConfirmationResend = "ConfirmationResend";
+
+    /// <summary><c>POST /api/v1/auth/password-reset</c>: per client IP, 5 per hour 🔧 (S5-13a).</summary>
+    public const string PasswordReset = "PasswordReset";
+
+    /// <summary>
+    /// <c>POST /api/v1/auth/password-reset</c>: per e-mail address, 3 per hour 🔧 (S5-13a). The address
+    /// is in the body, which the rate-limit middleware cannot read, so the endpoint asks
+    /// <see cref="IKeyedRateLimiter"/> with it after binding.
+    /// </summary>
+    public const string PasswordResetAddress = "PasswordResetAddress";
 }

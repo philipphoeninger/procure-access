@@ -8,7 +8,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 /// The single-use tokens of the account e-mails (ARCHITECTURE §9.1, C72; SPEC §7.8, R-AUTH-02):
 /// a random value that only the e-mail holds, stored as its hash, valid for a 🔧 lifetime and
 /// redeemed at most once. Implemented by the IdentityAccess module; the host's registration
-/// endpoints use it while the users are still legacy (S5-12a), the password reset reuses it (S5-13).
+/// endpoints use it while the users are still legacy (S5-12a), the password reset reuses it (S5-13a).
 /// </summary>
 public interface IAccountTokens
 {
@@ -23,6 +23,15 @@ public interface IAccountTokens
     /// known, unused and not expired. Two concurrent calls with the same token never both succeed.
     /// </summary>
     Task<AccountTokenRedemption> RedeemAsync(string token, AccountTokenPurpose purpose, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Ends every unused token of <paramref name="purpose"/> for <paramref name="userId"/>, e.g. the
+    /// other reset links once one of them set a new password (S5-13a).
+    /// </summary>
+    Task RevokeAsync(string userId, AccountTokenPurpose purpose, CancellationToken cancellationToken = default);
+
+    /// <summary>The 🔧 lifetime of <paramref name="purpose"/>, for an answer that names it before any token exists.</summary>
+    TimeSpan LifetimeOf(AccountTokenPurpose purpose);
 }
 
 /// <summary>What an account token is for; each purpose has its own 🔧 lifetime.</summary>
@@ -30,6 +39,9 @@ public enum AccountTokenPurpose
 {
     /// <summary>The link of the address confirmation (24 h 🔧, R-AUTH-02).</summary>
     EmailConfirmation = 1,
+
+    /// <summary>The link of the password reset (2 h 🔧, R-AUTH-04; S5-13a).</summary>
+    PasswordReset = 2,
 }
 
 /// <summary>A new token: the value for the link (never stored) and its lifetime.</summary>
@@ -39,7 +51,10 @@ public enum AccountTokenPurpose
 public sealed record IssuedAccountToken(string Token, DateTimeOffset ExpiresAt, TimeSpan Lifetime)
 {
     /// <summary>The lifetime in whole hours, rounded up, as the e-mails write it (<c>{{hours}}</c>).</summary>
-    public int ValidHours => Math.Max(1, (int)Math.Ceiling(Lifetime.TotalHours));
+    public int ValidHours => HoursOf(Lifetime);
+
+    /// <summary>A lifetime in whole hours, rounded up, at least 1 (<c>{{hours}}</c> of the texts).</summary>
+    public static int HoursOf(TimeSpan lifetime) => Math.Max(1, (int)Math.Ceiling(lifetime.TotalHours));
 
     /// <summary>Only the type: the value must never reach a log.</summary>
     public override string ToString() => nameof(IssuedAccountToken);

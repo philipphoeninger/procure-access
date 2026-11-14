@@ -36,6 +36,11 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddDataServices()
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
+// Password-reset e-mails go out in the background, so a known address answers as fast as an
+// unknown one (S5-13a, ARCHITECTURE C141).
+builder.Services.AddSingleton<PasswordResetMailQueue>()
+                .AddHostedService<PasswordResetMailer>();
+
 // Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,
 // the health checks (S2-07) and Problem Details (S2-10); IdentityAccess the Data Protection key
 // store (S3-24); Catalog its database context (S3-12). E-mail (S5-11) is registered only here, not in
@@ -116,7 +121,8 @@ try
        .MapExportEndpoints()
        .MapIdentityAccessEndpoints()
        .MapAuthEndpoints()
-       .MapRegistrationEndpoints();
+       .MapRegistrationEndpoints()
+       .MapPasswordResetEndpoints();
 
     app.ConfigureSwaggerExplorer();
 

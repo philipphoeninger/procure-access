@@ -19,7 +19,8 @@ namespace ProcureAccess.Modules.Platform.RateLimiting;
 /// <summary>
 /// The rate limits of SPEC §7.3 (ARCHITECTURE §9.2) on ASP.NET Core's rate limiter: one policy
 /// per name of <see cref="RateLimitPolicies"/>, a fixed window per client IP
-/// (<see cref="ClientAddress"/>) or, for the policies of signed-in actions, per user (S5-12a), held
+/// (<see cref="ClientAddress"/>), for the policies of signed-in actions per user (S5-12a), or, for
+/// the keyed policies, per key the endpoint passes to <see cref="KeyedRateLimiter"/> (S5-13a), held
 /// in memory only. A rejected request gets 429 as Problem
 /// Details of type <c>rate-limit</c> with <c>retryAfterMinutes</c> and a <c>Retry-After</c> header
 /// (API-05); other modules and Platform itself add policies of their own kind (the ready check,
@@ -43,6 +44,7 @@ internal static class RateLimitingRegistration
         RateLimitPolicies.AnonymousExport,
         RateLimitPolicies.CriteriaListShown,
         RateLimitPolicies.Registration,
+        RateLimitPolicies.PasswordReset,
     ];
 
     /// <summary>
@@ -55,15 +57,31 @@ internal static class RateLimitingRegistration
         RateLimitPolicies.ConfirmationResend,
     ];
 
+    /// <summary>
+    /// The fixed-window policies partitioned by a key from the request body, which only the
+    /// endpoint can read (<see cref="IKeyedRateLimiter"/>, S5-13a).
+    /// </summary>
+    private static readonly string[] KeyedPolicies =
+    [
+        RateLimitPolicies.PasswordResetAddress,
+    ];
+
     public static IServiceCollection AddPlatformRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
         var limits = ClientIpPolicies.Concat(UserPolicies)
                                      .ToDictionary(name => name, name => FixedWindowLimit.From(configuration, name));
 
+        var keyedLimits = KeyedPolicies.ToDictionary(name => name, name => FixedWindowLimit.From(configuration, name));
+        // A factory, not an instance: the container disposes only what it creates (the limiters keep timers).
+        services.AddSingleton<IKeyedRateLimiter>(_ => new KeyedRateLimiter(keyedLimits));
+        services.AddExceptionHandler<RateLimitExceededExceptionHandler>();
+
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            options.OnRejected = (context, _) => WriteRejectionAsync(context.HttpContext, context.Lease);
+            options.OnRejected = (context, _) => WriteRejectionAsync(
+                context.HttpContext,
+                context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter) ? retryAfter : null);
 
             foreach (var (name, limit) in limits)
             {
@@ -102,8 +120,13 @@ internal static class RateLimitingRegistration
     public static int RetryAfterMinutes(TimeSpan retryAfter) =>
         Math.Max(1, (int)Math.Ceiling(retryAfter.TotalMinutes));
 
-    private static async ValueTask WriteRejectionAsync(HttpContext context, RateLimitLease lease)
+    /// <summary>
+    /// Writes the 429 of every policy: Problem Details <c>rate-limit</c> with
+    /// <c>retryAfterMinutes</c> and a <c>Retry-After</c> header when the wait is known.
+    /// </summary>
+    internal static async ValueTask WriteRejectionAsync(HttpContext context, TimeSpan? retryAfter)
     {
+        context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         var problem = new ProblemDetails
         {
             Status = StatusCodes.Status429TooManyRequests,
@@ -112,11 +135,11 @@ internal static class RateLimitingRegistration
             Detail = "This action was carried out too often in a short time. Try again later.",
         };
 
-        if (lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        if (retryAfter is { } wait)
         {
-            problem.Extensions[RetryAfterMinutesExtension] = RetryAfterMinutes(retryAfter);
+            problem.Extensions[RetryAfterMinutesExtension] = RetryAfterMinutes(wait);
             context.Response.Headers.RetryAfter =
-                ((long)Math.Ceiling(retryAfter.TotalSeconds)).ToString(CultureInfo.InvariantCulture);
+                ((long)Math.Ceiling(wait.TotalSeconds)).ToString(CultureInfo.InvariantCulture);
         }
 
         var problemDetails = context.RequestServices.GetRequiredService<IProblemDetailsService>();
