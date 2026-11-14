@@ -131,7 +131,7 @@ public sealed partial class EmailDeliveryTests(MailpitContainer mailpit) : IClas
 
     private static EmailMessage Message(string messageType, string recipient) => messageType switch
     {
-        nameof(AddressConfirmationEmail) => new AddressConfirmationEmail(recipient, Link),
+        nameof(AddressConfirmationEmail) => new AddressConfirmationEmail(recipient, Link, 24),
         nameof(PasswordResetEmail) => new PasswordResetEmail(recipient, Link, 2),
         nameof(AlreadyRegisteredEmail) => new AlreadyRegisteredEmail(recipient, Link),
         nameof(OrganisationInvitationEmail) => new OrganisationInvitationEmail(recipient, "Stadt Musterhausen", InvitationRole.Editor, Link, 14),

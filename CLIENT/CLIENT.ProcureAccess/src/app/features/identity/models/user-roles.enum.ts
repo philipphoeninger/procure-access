@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-/** Role names of the legacy JWT; the platform roles of ARCHITECTURE §9.1 since S4-25. */
+/** The platform roles of ARCHITECTURE §9.1 (S4-25); the global `Member` role is gone since S5-12a (O-S5-3). */
 export enum EnUserRole {
-    member = 'Member',
     moderator = 'Moderator',
     catalogEditor = 'CatalogEditor',
     platformAdmin = 'PlatformAdmin'

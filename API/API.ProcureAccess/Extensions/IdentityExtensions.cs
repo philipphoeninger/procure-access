@@ -18,21 +18,29 @@ public static class IdentityExtensions
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddSignInManager()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddPasswordValidator<MaximumLengthPasswordValidator>();
         return services;
     }
 
-    public static IServiceCollection ConfigureIdentityOptions(this IServiceCollection services)
+    /// <summary>
+    /// Unique e-mail addresses and the password rule of <see cref="PasswordPolicy"/> (S5-12a): a
+    /// 🔧 minimum length, no composition rules. The user name is the e-mail address, so it may hold
+    /// every character an address may (the default allows only letters, digits and <c>-._@+</c>).
+    /// </summary>
+    public static IServiceCollection ConfigureIdentityOptions(this IServiceCollection services, IConfiguration configuration)
     {
+        var minLength = PasswordPolicy.MinLengthFrom(configuration);
         services.Configure<IdentityOptions>(options =>
         {
             options.User.RequireUniqueEmail = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireDigit = true;
-            options.Password.RequiredLength = 6;
-            options.Password.RequiredUniqueChars = 2;
+            options.User.AllowedUserNameCharacters = "";
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = minLength;
+            options.Password.RequiredUniqueChars = 1;
         });
         return services;
     }

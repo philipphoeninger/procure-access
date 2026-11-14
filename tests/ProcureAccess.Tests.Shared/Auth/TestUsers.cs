@@ -31,12 +31,15 @@ public sealed record TestUser(
 /// </summary>
 public static class TestUsers
 {
-    /// <summary>A signed-in user with the <c>Member</c> role and no permissions.</summary>
+    /// <summary>
+    /// A signed-in user without roles or permissions. The name stays from the legacy global
+    /// <c>Member</c> role, which is gone since S5-12a (O-S5-3 (a)).
+    /// </summary>
     public static readonly TestUser Member = new(
         Name: "member",
         Id: "00000000-0000-0000-0000-00000000a001",
         Email: "member@example.test",
-        Roles: [Roles.Member],
+        Roles: [],
         Permissions: []);
 
     /// <summary>
@@ -47,7 +50,7 @@ public static class TestUsers
         Name: "moderator",
         Id: "00000000-0000-0000-0000-00000000a002",
         Email: "moderator@example.test",
-        Roles: [Roles.Member, Roles.Moderator],
+        Roles: [Roles.Moderator],
         Permissions: [MODELS.ProcureAccess.Entities.Authorization.Permissions.ModerationReview]);
 
     /// <summary>All fixture users, looked up by <see cref="TestUser.Name"/>.</summary>
