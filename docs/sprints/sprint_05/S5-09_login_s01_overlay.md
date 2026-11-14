@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-09 (2 points) · **Issues:** #170 (L1, the login outlet; L2 and L3 stay open for steps 6), #319 (deferred to S5-13 by decision 1 (a))
 > **Requirements / invariants:** R-AUTH-03 (without the lockout hint, #319), R-AUTH-07 (base: overlay with the S01 form), R-AUTH-08; A11Y-01, A11Y-03, A11Y-08, A11Y-09 stay green and now cover S01 and the overlay; SEC-03 keeps its overlay tests on the shared form. No invariant changes its status, so no new TESTING version
-> **Status:** done — pull request open (2026-11-14)
+> **Status:** done — pull request #331 open (2026-11-14)
 > **Scope:** S01 in the named `login` outlet as the form card of Handoff §5.3, inside the shell over the page it opened on; one sign-in form for S01 and the login overlay; the page title of the outlet; sign-out clearing the in-memory state with the focus on the start page's H1; S01 and the overlay in the reflow check. Client only, no EF migration, no new dependency.
 > **Owner decisions (control chat, 2026-11-14):** 1 (a) the lockout hint (#319) is decided with the lockout in S5-13; S01 shows `auth.login.error.invalid` for every refused sign-in · 2 (a) S01 shows inside the shell, in `main` in place of the page · 3 `pageTitle.login` „Anmelden“ confirmed (UX copy v27 U112) · defaults confirmed: route `/(login:anmelden)` with a redirect from `auth`, „Jetzt registrieren“ to the legacy registration, `reasonSave`/`draftKept` built now and wired to „Liste speichern“ in S5-20, after the sign-in S01 closes over the page, sign-out clears the configurator too, one form for S01 and the overlay · „Passwort vergessen?“ (a): a button that opens the legacy reset dialog until S03 (S5-13)
 
