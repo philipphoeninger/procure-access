@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-13b (second half of S5-13, 2.5 points together with S5-13a) · **Issues:** #319 (closed by this task)
 > **Requirements / invariants:** SPEC R-AUTH-03, R-AUTH-04, §8.8 (v2.24); ARCHITECTURE C72, §8.3 (C142); SEC-02 (exemption list now only the export, TESTING_v63 V200), A11Y-09 (S03 joins the reflow check, V201), A11Y-01, A11Y-03, A11Y-08 on the new screens (V202); no invariant changes its status
-> **Status:** done — pull request open (2026-11-14), stacked on #335 (S5-13a)
+> **Status:** done — pull request #336 open (2026-11-14), stacked on #335 (S5-13a)
 > **Scope:** S03 at `/passwort` (request) and `/passwort/neu` (new password from the mail's link); „Passwort vergessen?“ as a link; the fixed lockout note in S01's error summary; UX copy v29; the legacy reset removed on server and client; S03 in `reflow.spec.ts`; an E2E reset through Mailpit.
 > **Owner decisions (2026-11-14):** S5-13 1 (a) — one server answer for a wrong password and a locked account, a fixed lockout note on S01 · 4 (a) — the legacy reset goes with S5-13 · wording of the S03 keys and the lockout note confirmed (UX copy v29, U120–U124) · S5-13b 1 (a) — „Passwort vergessen?“ opens S03 in a new tab from the login overlay, in place on S01 · S5-13b 2 (a) — the lockout note is an optional note of the error summary, after its list, not counted
 
