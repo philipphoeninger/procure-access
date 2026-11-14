@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 -->
 
 <form class="pa-login-form" [id]="formId()" novalidate (submit)="submit($event)">
-  <pa-error-summary [items]="summary()" />
+  <pa-error-summary [items]="summary()" [note]="summaryNote()" />
 
   <div class="pa-login-form__fields" [class.pa-login-form__fields--card]="formLayout() === 'card'">
     <p class="pa-login-form__required">{{ 'common.requiredNote' | translate }}</p>
@@ -35,7 +35,11 @@ SPDX-License-Identifier: MIT
     <div class="pa-login-form__password-actions">
       <button matButton type="button" [attr.aria-pressed]="passwordShown()" [attr.aria-controls]="passwordId()"
         (click)="togglePassword()">{{ 'auth.login.showPassword' | translate }}</button>
-      <button matButton type="button" (click)="openForgotPassword()">{{ 'auth.login.forgot' | translate }}</button>
+      @if (forgotInNewTab()) {
+        <a matButton [routerLink]="['/', resetPath]" target="_blank">{{ 'auth.login.forgot' | translate }}&ngsp;<span class="cdk-visually-hidden">{{ 'common.newTab' | translate }}</span></a>
+      } @else {
+        <a matButton [routerLink]="['/', { outlets: { primary: [resetPath], login: null } }]">{{ 'auth.login.forgot' | translate }}</a>
+      }
     </div>
   </div>
 

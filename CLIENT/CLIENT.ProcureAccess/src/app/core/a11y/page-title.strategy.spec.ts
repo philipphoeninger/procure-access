@@ -252,6 +252,20 @@ describe('PageTitleStrategy', () => {
     expect(announced).toEqual([]);
   });
 
+  it('ChangePageInPlace_SetsTheNewTitleFocusesTheH1AndAnnouncesIt', async () => {
+    const fixture = await startOn('/impressum');
+    await settle(fixture);
+    TestBed.inject(PageTitleStrategy).setPageTitleState({ error: true });
+
+    TestBed.inject(PageTitleStrategy).changePageInPlace('pageTitle.reset.invalid');
+    await settle(fixture);
+
+    // The page's title state („Fehler:“) belongs to the page it replaced
+    expect(document.title).toBe('Link nicht mehr gültig – ProcureAccess');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Impressum' }));
+    expect(announced).toEqual(['Link nicht mehr gültig – ProcureAccess']);
+  });
+
   it('DialogOpened_TitleUnchanged', async () => {
     const fixture = await startOn('/settings');
     await settle(fixture);

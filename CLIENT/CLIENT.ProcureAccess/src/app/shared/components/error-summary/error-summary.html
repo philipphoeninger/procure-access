@@ -19,5 +19,8 @@ SPDX-License-Identifier: MIT
         </li>
       }
     </ul>
+    @if (note(); as note) {
+      <p class="pa-error-summary__note">{{ note.key | translate: note.params }}</p>
+    }
   </pa-notice>
 }

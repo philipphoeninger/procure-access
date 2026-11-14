@@ -40,8 +40,8 @@ async function mailsTo(request: APIRequestContext, address: string): Promise<Sea
 }
 
 /**
- * Waits until `count` mails to the address arrived (the API sends synchronously, so it is there
- * within a few seconds) and returns the newest.
+ * Waits until `count` mails to the address arrived (within a few seconds: the API sends most mails
+ * synchronously, the password reset from a background service) and returns the newest.
  */
 export async function waitForMail(request: APIRequestContext, address: string, count = 1): Promise<Mail> {
   let messages: SearchAnswer['messages'] = [];

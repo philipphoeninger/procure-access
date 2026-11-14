@@ -6,7 +6,5 @@ namespace SERVICES.ProcureAccess.DataServices.Interfaces;
 
 public interface IUserService
 {
-    Task RequestPasswordResetAsync(string email);
-    Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto);
     Task<UserDto?> GetCurrentUserAsync();
 }

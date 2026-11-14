@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v27 (14. November 2026) – v27 ergänzt den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v27):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.19), `ARCHITECTURE_v51.md`, `TESTING_v58.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v29):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.24), `ARCHITECTURE_v56.md`, `TESTING_v62.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,32 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v28
+
+Quelle: Aufgabe S5-13 (Passwort zurücksetzen S03 und Sperre nach Fehlversuchen; Serverteil S5-13a, Bildschirme S5-13b), Wortlaut vom Product Owner bestätigt am 14. November 2026.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U120 | **Seitentitel von S03:** neu `pageTitle.reset` „Passwort zurücksetzen“ für beide Schritte (§5.16) | Wortlaut der H1 `auth.reset.title`, wie U112 und U114 | S5-13b |
+| U121 | **Zweiter Schritt:** neu `auth.reset.newPassword.submit` „Passwort speichern“ (§5.2); der Hinweis unter „Neues Passwort“ ist `auth.register.password.hint` | Der Button des ersten Schritts („Link anfordern“) passt nicht zum Speichern des neuen Passworts; die Regel ist dieselbe wie bei der Registrierung | S5-13b |
+| U122 | **Nach dem Ändern:** neu `auth.reset.done.title` „Passwort geändert“ als Überschrift über `auth.reset.done` (ersetzt das Formular, Fokus darauf) und der Link `auth.reset.done.login` „Zur Anmeldung“ (§5.2) | Wie die Erfolgsmeldung von S02 (U115); der Link führt zu S01 | S5-13b |
+| U123 | **Link nicht mehr gültig:** neu `auth.reset.invalid.title` „Link nicht mehr gültig“ als H1 über `auth.reset.invalid` (Seite wie S80), Seitentitel `pageTitle.reset.invalid` mit demselben Wortlaut, Link `auth.reset.invalid.requestNew` „Neuen Link anfordern“ zu `/passwort` (§5.2, §5.16); Route `/passwort/neu` (§3) | Wie die Bestätigungsseiten (U118); statt „Zur Startseite“ führt der Link dorthin, wo ein neuer angefordert wird | S5-13b |
+| U124 | **Sperre nach Fehlversuchen:** neu `auth.login.error.lockout` „Nach {{attempts}} Fehlversuchen ist die Anmeldung aus Sicherheitsgründen für {{minutes}} Minuten gesperrt.“ als fester Hinweis unter `auth.login.error.invalid` bei jeder abgelehnten Anmeldung; `auth.login.locked` entfällt (§5.2) | Der Server antwortet auf ein gesperrtes Konto wie auf ein falsches Passwort, damit keine Antwort verrät, dass es zu einer Adresse ein Konto gibt (SPEC R-AUTH-03, §13 #319; Entscheidung S5-13 1 (a)); beide Zahlen sind 🔧-Einstellungen | S5-13a, S5-13b |
+
+### Änderungen gegenüber v27
+
+Quelle: Aufgabe S5-12a (Registrierung und Bestätigung der E-Mail-Adresse, Serverteil), Wortlaut vom Product Owner bestätigt am 14. November 2026. Die Bildschirme baut S5-12b.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U113 | **Gültigkeit des Bestätigungslinks als Platzhalter:** `email.confirm.body` „Der Link ist {{hours}} Stunden gültig.“ statt „24 Stunden“ (§5.17) | Die Gültigkeit ist eine 🔧-Einstellung (SPEC R-AUTH-02); wie bei `email.reset.body` nennt die E-Mail den eingestellten Wert | S5-11 P5 |
+| U114 | **Seitentitel der Registrierung:** neu `pageTitle.register` „Konto erstellen“ (§5.16) | Wortlaut der H1 `auth.register.title`, wie U112 für S01 | S5-12a |
+| U115 | **Überschrift nach dem Absenden:** neu `auth.register.success.title` „E-Mail-Adresse bestätigen“ über `auth.register.success` (§5.2) | Die Erfolgsmeldung ersetzt das Formular und bekommt eine Überschrift, auf die der Fokus geht | S5-12a |
+| U116 | **Fehler der Datenschutz-Bestätigung:** neu `auth.register.consent.required` „Bitte bestätigen Sie, dass Sie die Datenschutzhinweise gelesen haben.“ (§5.2) | `errors.field.required` („Bitte geben Sie … an“) passt nicht zu einem Kontrollkästchen | S5-12a |
+| U117 | **Mindestlänge:** neu `errors.field.minLength` „Bitte geben Sie mindestens {{min}} Zeichen ein. Derzeit sind es {{current}}.“ (§6) | Gegenstück zu `errors.field.maxLength`; zuerst für das Passwort (mindestens 12 Zeichen 🔧) | S5-12a |
+| U118 | **Bestätigungsseiten wie S80:** neu `auth.confirm.done.title` „E-Mail-Adresse bestätigt“ und `auth.confirm.invalid.title` „Link nicht mehr gültig“ als H1 über `auth.confirm.done` / `auth.confirm.invalid`, Seitentitel `pageTitle.confirm.done` / `pageTitle.confirm.invalid` mit demselben Wortlaut, Button `errors.home` (§5.2, §5.16); Route `/registrieren/bestaetigen` (§3, unter S02) | Handoff §5.3: Ergebnisseiten „wie S80“ (H1, Text, Button; Seitentitel = H1). Ein schon benutzter Link zeigt `done`, wenn die Adresse bestätigt ist (Entscheidung S5-12 4 (b)) | S5-12a |
+| U119 | **Problemtyp `email-delivery`:** neue Zeile in §6.3 mit dem bestehenden Text `errors.email.sendFailed` | Eine E-Mail, die nach einem zweiten Versuch nicht versendet werden konnte, meldet der Server als eigenen Problemtyp, die Aktion bleibt bestehen (SPEC §7.6, §8.6; Entscheidung S5-12 4 (a)); kein neuer Wortlaut | S5-12a |
 
 ### Änderungen gegenüber v26
 
@@ -388,8 +414,8 @@ Priorität: P0 = Teil des MVP, P1 = später. „Anmeldung“: ✗ = ohne Konto n
 |---|---|---|---|---|---|---|
 | S00 | App-Rahmen (Kopfbereich, Navigation, Fußzeile, Sprunglink, Ansagen, Sitzungswarnung) | – | alle | alle | – | P0 |
 | S01 | Anmelden | `/anmelden` (Outlet `login`) | – | alle | ✗ | P0 |
-| S02 | Registrieren | `/registrieren` | – | alle | ✗ | P0 |
-| S03 | Passwort vergessen / zurücksetzen | `/passwort` | – | alle | ✗ | P0 |
+| S02 | Registrieren; Bestätigungsseiten des E-Mail-Links (v28, U118) | `/registrieren`, `/registrieren/bestaetigen` | – | alle | ✗ | P0 |
+| S03 | Passwort vergessen / zurücksetzen; neues Passwort aus dem Link der E-Mail (v29, U123) | `/passwort`, `/passwort/neu` | – | alle | ✗ | P0 |
 | S04 | Startseite | `/` | Einstieg | alle | ✗ | P0 |
 | S10 | Kriterien zusammenstellen – Auswahl (4 Schritte) | `/kriterien` | A | Beschaffende | ✗ | P0 |
 | S11 | Kriterienliste – Ergebnis | `/kriterien/ergebnis` bzw. `/kriterienlisten/:id` | A | Beschaffende | ✗ lesen, anpassen und exportieren; ✓O speichern | P0 |
@@ -554,6 +580,7 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `auth.login.forgot` | Link | Passwort vergessen? | |
 | `auth.login.noAccount` | Text + Link | Noch kein Konto? Jetzt registrieren | |
 | `auth.login.error.invalid` | Fehler (über dem Formular) | Anmeldung nicht möglich. E-Mail-Adresse oder Passwort stimmen nicht. Bitte prüfen Sie Ihre Eingaben. | bewusst nicht verraten, welches Feld falsch ist |
+| `auth.login.error.lockout` | Hinweis unter `auth.login.error.invalid` (in der Fehlerübersicht, bei jeder abgelehnten Anmeldung) | Nach {{attempts}} Fehlversuchen ist die Anmeldung aus Sicherheitsgründen für {{minutes}} Minuten gesperrt. | v29, U124; ersetzt `auth.login.locked`; Zahlen 🔧 (5, 15) |
 | `auth.login.reasonSave` | Hinweis (wenn aus S11 „Liste speichern“ kommend) | Melden Sie sich an, um Ihre Kriterienliste zu speichern. Ihre Auswahl bleibt dabei erhalten. | E7; Anmeldung im `login`-Outlet, die Auswahl im Speicher bleibt bestehen |
 | `auth.login.draftKept` | Ansage und Hinweis nach der Anmeldung | Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden. | E7; nur wenn eine nicht gespeicherte Auswahl besteht |
 | `auth.register.title` | H1 | Konto erstellen | |
@@ -563,21 +590,29 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `auth.register.password.hint` | Hint | Mindestens {{min}} Zeichen. | Regeln an Backend-Policy anpassen |
 | `auth.register.privacyNote` | Text | Ihre E-Mail-Adresse wird nie öffentlich angezeigt. | wichtig für Beitragende (Pseudonymität) |
 | `auth.register.consent` | Checkbox | Ich habe die Datenschutzhinweise gelesen. | Link auf „Datenschutzhinweise“ |
+| `auth.register.consent.required` | Feldfehler | Bitte bestätigen Sie, dass Sie die Datenschutzhinweise gelesen haben. | v28, U116 |
 | `auth.register.submit` | Button | Konto erstellen | |
+| `auth.register.success.title` | Überschrift (statt des Formulars nach dem Absenden, Fokus darauf) | E-Mail-Adresse bestätigen | v28, U115 |
 | `auth.register.success` | Seite | Fast geschafft. Wir haben Ihnen eine E-Mail an {{email}} geschickt. Bitte bestätigen Sie darin Ihre Adresse. | falls E-Mail-Bestätigung umgesetzt wird |
 | `auth.reset.title` | H1 | Passwort zurücksetzen | |
 | `auth.reset.intro` | Text | Geben Sie Ihre E-Mail-Adresse ein. Wenn ein Konto dazu existiert, erhalten Sie einen Link zum Zurücksetzen. | keine Konto-Existenz verraten |
 | `auth.reset.submit` | Button | Link anfordern | |
 | `auth.reset.sent` | Bestätigung | Falls ein Konto zu {{email}} existiert, ist der Link unterwegs. Er ist {{hours}} Stunden gültig. | |
-| `auth.reset.newPassword` | Label | Neues Passwort | |
+| `auth.reset.newPassword` | Label | Neues Passwort | Hinweis darunter `auth.register.password.hint` |
+| `auth.reset.newPassword.submit` | Button (zweiter Schritt) | Passwort speichern | v29, U121 |
+| `auth.reset.done.title` | Überschrift (statt des Formulars nach dem Speichern, Fokus darauf) | Passwort geändert | v29, U122 |
 | `auth.reset.done` | Bestätigung | Ihr Passwort wurde geändert. Sie können sich jetzt anmelden. | |
-| `auth.login.locked` | Fehler (über dem Formular) | Zu viele Anmeldeversuche. Aus Sicherheitsgründen können Sie sich erst in {{minutes}} Minuten erneut anmelden. | U72; nach 5 Fehlversuchen für 15 Minuten |
+| `auth.reset.done.login` | Link (zu S01) | Zur Anmeldung | v29, U122 |
 | `auth.confirm.required` | Hinweis (`pa-notice` Achtung, bei gesperrter Aktion und auf S61) | Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Danach können Sie Listen speichern, Organisationen anlegen, Einladungen annehmen und Beiträge veröffentlichen. | U72; Antwort 403 `email-unconfirmed` |
 | `auth.confirm.resend` | Button | Bestätigungs-E-Mail erneut senden | |
 | `auth.confirm.sent` | Ansage und Bestätigung | Wir haben die E-Mail erneut an {{email}} geschickt. | |
+| `auth.confirm.done.title` | H1 (Seite wie S80, Button `errors.home`) | E-Mail-Adresse bestätigt | v28, U118 |
 | `auth.confirm.done` | Seite nach dem Bestätigungslink | Ihre E-Mail-Adresse ist bestätigt. Sie können jetzt alle Funktionen nutzen. | |
+| `auth.confirm.invalid.title` | H1 (Seite wie S80, Button `errors.home`) | Link nicht mehr gültig | v28, U118 |
 | `auth.confirm.invalid` | Seite (Link abgelaufen oder schon benutzt) | Dieser Bestätigungslink ist nicht mehr gültig. Melden Sie sich an und fordern Sie einen neuen Link an. | 24 Stunden gültig |
+| `auth.reset.invalid.title` | H1 (Seite wie S80) | Link nicht mehr gültig | v29, U123 |
 | `auth.reset.invalid` | Seite (Link abgelaufen oder schon benutzt) | Dieser Link zum Zurücksetzen ist nicht mehr gültig. Bitte fordern Sie einen neuen an. | 2 Stunden gültig |
+| `auth.reset.invalid.requestNew` | Link (zu `/passwort`) | Neuen Link anfordern | v29, U123 |
 
 ### 5.3 S04 Startseite (`home.`)
 
@@ -1446,6 +1481,10 @@ Wert für `{{page}}` in `shell.pageTitle`. Vom Speziellen zum Allgemeinen, damit
 |---|---|---|
 | `pageTitle.home` | S04 | Barrierefreie Software beschaffen |
 | `pageTitle.login` | S01 | Anmelden |
+| `pageTitle.register` | S02 | Konto erstellen |
+| `pageTitle.confirm.done` / `.invalid` | S02 (Bestätigungsseiten) | E-Mail-Adresse bestätigt / Link nicht mehr gültig |
+| `pageTitle.reset` | S03 (beide Schritte) | Passwort zurücksetzen |
+| `pageTitle.reset.invalid` | S03 (Link nicht mehr gültig) | Link nicht mehr gültig |
 | `pageTitle.criteria.step` | S10 | Kriterien zusammenstellen – Schritt {{n}} von 4 |
 | `pageTitle.criteria.list` | S11 | Ihre Kriterienliste |
 | `pageTitle.criteria.list.saved` | S11 (gespeicherte Liste) | {{name}} – Gespeicherte Kriterienlisten |
@@ -1477,7 +1516,7 @@ Nur Text, keine Bilder, kein Tracking (ARCHITECTURE_v11 C71). Jede E-Mail endet 
 |---|---|---|---|
 | `email.footer` | Fußzeile | Diese E-Mail wurde automatisch von ProcureAccess (Projekt WERTE.IT) versendet. Bitte antworten Sie nicht darauf. | |
 | `email.confirm.subject` | Betreff | Bitte bestätigen Sie Ihre E-Mail-Adresse | |
-| `email.confirm.body` | Text | Guten Tag,\n\nbitte bestätigen Sie Ihre E-Mail-Adresse für ProcureAccess mit diesem Link:\n{{link}}\n\nDer Link ist 24 Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren. | |
+| `email.confirm.body` | Text | Guten Tag,\n\nbitte bestätigen Sie Ihre E-Mail-Adresse für ProcureAccess mit diesem Link:\n{{link}}\n\nDer Link ist {{hours}} Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren. | |
 | `email.alreadyRegistered.subject` | Betreff | Anmeldung bei ProcureAccess | R-AUTH-01 |
 | `email.alreadyRegistered.body` | Text | Guten Tag,\n\njemand wollte mit dieser E-Mail-Adresse ein Konto bei ProcureAccess anlegen. Es gibt dafür bereits ein Konto. Sie können sich hier anmelden oder Ihr Passwort zurücksetzen:\n{{link}}\n\nWenn Sie das nicht waren, müssen Sie nichts tun. | |
 | `email.reset.subject` | Betreff | Passwort zurücksetzen | |
@@ -1537,6 +1576,7 @@ Fehler werden erst beim Absenden geprüft, nicht beim Tippen. Feldfehler stehen 
 | `errors.field.requiredChoice` | Feldfehler | Bitte wählen Sie eine Option. | |
 | `errors.field.email` | Feldfehler | Bitte geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@beispiel.de. | |
 | `errors.field.url` | Feldfehler | Bitte geben Sie eine vollständige Webadresse ein, die mit https:// beginnt. | |
+| `errors.field.minLength` | Feldfehler | Bitte geben Sie mindestens {{min}} Zeichen ein. Derzeit sind es {{current}}. | v28, U117 |
 | `errors.field.maxLength` | Feldfehler | Bitte kürzen Sie den Text auf höchstens {{max}} Zeichen. Derzeit sind es {{current}}. | |
 | `errors.field.date` | Feldfehler | Bitte geben Sie ein Datum im Format TT.MM.JJJJ ein. | |
 | `errors.field.dateFuture` | Feldfehler | Das Datum liegt in der Zukunft. Bitte prüfen Sie es. | Prüfdatum |
@@ -1577,6 +1617,7 @@ Jeder Problemtyp aus SPEC §8.6 hat einen Text (SPEC_v2 v2.8). Bis der Screen ei
 | `selection-excluded` | `criteria.select.error.excluded` am Feld | neu |
 | `release-mismatch` | `criteria.export.outdated` | bestehender Text (EXP-07) |
 | `email-unconfirmed` | `auth.confirm.required` | bestehender Text |
+| `email-delivery` | `errors.email.sendFailed` | bestehender Text (v28, U119; 503, z. B. „Bestätigungs-E-Mail erneut senden“) |
 | `not-found` | Seite `errors.notFound.*` | bestehende Texte |
 
 ---
