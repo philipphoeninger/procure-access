@@ -74,10 +74,12 @@ No correctness or security finding that affects current behaviour.
 - `check-invariants` (TESTING_v64), `check-figma-links`, `check-i18n` passed; e2e `typecheck` and `lint` clean; `reuse lint` compliant.
 - E2E locally against the branch (API `dotnet run --no-launch-profile` on 5100 with the E2E settings, throwaway PostgreSQL 17 and Mailpit, `ng serve` on 4300; the dev stack untouched): J8, `identity/` and `reflow.spec.ts` in Chromium, Firefox and mobile Chrome 120 of 120; the whole suite in Chromium 103 of 103. WebKit and mobile Safari only in CI.
 - Firefox, repeated: with two workers the content process crashed now and then at the axe run of S02's success state (J8 2 of 4 with `login.spec.ts` in parallel; 0 of 6 and 0 of 8 in other runs). The first test of `register.spec.ts` from `main` crashed the same way in the same set-up (2 of 8 in one run with J8, which passed 8 of 8 there); with one worker J8 and `login.spec.ts` passed 28 of 28. So it is the local Firefox problem of S5-13b under load on the dev build, not this change; CI (release build, one job per browser project) is the authority.
+- CI of #338: every stage green; J8 passed on all five browser projects (Firefox included) at the first run. Only `6. E2E + a11y (mobile-safari)` failed once, in `configurator/s10-step1.spec.ts` (untouched here): axe found a contrast of 3.89 (`#807c82` on `#fef7ff`, 12 px) in the state „s10 step 1, wide“, a colour between the field's text and the background — Material's form field measured while it fades in, as `register.spec.ts` notes for S02. The re-run of that job passed.
 
 ## 5. Open points
 
 1. If CI shows the Firefox crash in J8, split the journey at the confirmation (registration and confirmation / sign-in and sign-out) — fewer axe runs per page.
 2. S5-15/S5-16: organisation users in the seeder (Owner, Editor, Reader) with the steps that need them; S5-16 uses `e2e-unconfirmed` for SEC-10's E2E part.
 3. S5-20: the J1 second part signs in as `e2e-confirmed` (or registers, as TESTING §5.4 J1 describes — decide there).
-4. When the stack gets its own `E2E` environment (TESTING §3.3), the seeder's check stays as it is; `RebuildDatabase` then no longer runs, and the idempotent path is used.
+4. Proposed issue: `s10-step1.spec.ts` runs axe on „s10 step 1, wide“ right after the H1 is visible, before the form field's fade-in ends (mobile Safari flake in #338, §4); wait as `register.spec.ts` does (`mat-form-field-animations-enabled` and `settled`) before that axe run.
+5. When the stack gets its own `E2E` environment (TESTING §3.3), the seeder's check stays as it is; `RebuildDatabase` then no longer runs, and the idempotent path is used.
