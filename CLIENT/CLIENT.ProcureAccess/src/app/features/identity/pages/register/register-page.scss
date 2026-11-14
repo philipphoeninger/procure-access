@@ -71,6 +71,10 @@
   gap: var(--pa-space-xs);
 }
 
+.pa-register-page__consent a {
+  color: var(--mat-sys-primary);
+}
+
 .pa-register-page__consent-error {
   margin: 0 0 0 var(--pa-space-xs);
   color: var(--mat-sys-error);

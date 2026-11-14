@@ -147,7 +147,8 @@ test.describe('S02 „Konto erstellen“ and the confirmation page', () => {
     const fieldErrors = main(page).locator('.mat-mdc-form-field-error-wrapper');
     await expect(fieldErrors).toHaveCount(2);
     for (const fieldError of await fieldErrors.all()) await expect(fieldError).toHaveCSS('opacity', '1');
-    await settled(main(page));
+    // WebKit still failed once after that (CI run 3): wait for every animation of the page, not only main
+    await settled(page.locator('body'));
     await expectNoAxeViolations(page, testInfo, 's02-errors');
   });
 
