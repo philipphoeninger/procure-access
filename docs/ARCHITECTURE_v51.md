@@ -1,0 +1,1893 @@
+# ProcureAccess — System Architecture
+
+> **Status:** v51 — output of Phase 2, step 4 ("System design") of `ai_development_process.md`, amended during step 5 ("Architecture diagrams"), step 7 ("UI & Frontend design") and step 8 ("Write the feature spec"). Supersedes v50. v51 (2026-11-14) records the sign-in screens as built (sprint 05, task S5-09, issues #170, #319; owner decisions S5-09 1 (a), 2 (a), 3 and „Passwort vergessen?“ (a); C137): S01 in the `login` outlet inside the shell over the page it hides, one sign-in form for S01 and the login overlay, the page title of the outlet, and sign-out clearing the in-memory state. v50 (2026-11-13) records the client switch to the cookie session as built (sprint 05, task S5-08, issues #317, #320, owner decisions S5-08 1–5, all (a); C136): the session state from the probe in `withIdentity()`, the session interceptor with the login overlay and the retry, the probe's contract record with `permissions`, the JWT and the CORS policy removed, and the dev server behind a proxy. v49 (2026-11-13) is document upkeep after sprint 04 (sprint 05, task S5-05, issue #313, `TECH_DEBT_v4.md` TD-50; C135): the status line names its own version, the input list names the files as they are called, and the header names the current versions of the other documents; no rule changes. v48 (2026-11-13) records the pinned .NET SDK (S5-03, C134: one SDK version in `global.json`, CI and the API image's build stage, #306). v47 (2026-11-13) records the cookie session and antiforgery as built in sprint 05 (S5-07, C133: the server part of C50/C52/C60 — Identity cookie, antiforgery on every state-changing endpoint, the session probe, sign-in and sign-out — next to the legacy JWT for one PR, the sign-in failure contract and the shape of the probe's `user`). v46 (2026-11-13) records the licence notices of the API image — a generated `THIRD-PARTY-NOTICES.txt` of the shipped NuGet packages, checked in CI against the packages and their licences — and adds the notice rule to D12 (sprint 04, task S4-27, issue #187, owner decisions O-S4-90 – O-S4-93, all (a), C132). v45 (2026-11-12) records the encryption of the Data Protection key ring at rest — a certificate from the environment, required outside Development and E2E, with a previous certificate for a rotation (sprint 04, task S4-26, issue #235, owner decisions O-S4-87 – O-S4-89, all (a), C131). v44 (2026-11-12) records the groundwork of roadmap M3.4 as built — the contributor-profile tables in the IdentityAccess module, the legacy roles renamed to the platform roles of §9.1 with a claim policy for the moderation permission, and the `roles` command of the API host (sprint 04, task S4-25, owner decisions O-S4-81 – O-S4-86, all (a), C130). v43 (2026-11-12) records **ADR-016**, the short description (Kurzbeschreibung) of a criterion as a field of its revision and of the release folder, which the export column „Kurzbeschreibung“ reads (sprint 04, task S4-24, issue #237, owner decisions O-S4-6 (a), O-S4-78 (a), O-S4-79 (a), C129). v42 (2026-11-12) records the language of the catalog answers as built — `Accept-Language` honoured with `de` and `en`, German as the fallback while every release has German texts only, `Content-Language` and `Vary: Accept-Language` on the answer and the language in its `ETag` (sprint 04, task S4-23, API-06, C128). v41 (2026-11-12) records the export dialog S13 on the client as built — the request marker for a caller that shows every failure itself, Problem Details read from the `Blob` error body of a file request, and the download (sprint 04, task S4-21b, owner decisions O-S4-72 (a), O-S4-74 (a), C127). v40 (2026-11-12) records the rate limiting as built — the client IP from the trusted proxies, the policies of the anonymous export and of `CriteriaListShown`, the limit and the configurable timeout of `/health/ready`, and the `ExportCreated` caller (sprint 04, task S4-21a, owner decisions O-S4-69 (a), O-S4-70 (a), C126). v39 (2026-11-12) records the XLSX renderer as built — the Excel table `Kriterien`, the sheet „Info“, document time from `TimeProvider` and the guard on the licence of ClosedXML's font package (sprint 04, task S4-20b, owner decisions O-S4-64, O-S4-66, C125). v38 (2026-11-12) records the texts of the export files in the Export module and the CSV renderer as built — `Texts/de.json` from the UX copy, checked by `check-i18n.mjs`, the shared column model and the formula guard of the CSV — and the decisions for the XLSX renderer of S4-20b (sprint 04, task S4-20a, owner decisions O-S4-6 and O-S4-62 – O-S4-68, all (a), C124). v37 (2026-11-12) records the export pipeline as built — `ICatalogSelectionResolver` in `Catalog.Contracts`, the ad-hoc source behind `POST /api/v1/exports` that re-resolves every priority, exports only the active release and stores nothing, and a placeholder renderer until S4-20 (sprint 04, task S4-19, owner decisions O-S4-57, O-S4-58, O-S4-60, all (a), C123). v36 (2026-11-11) records the first caller of the usage event `CriteriaListShown` — `POST /api/v1/configurator/criteria-list-shown` in the Configurator module, called by the client once per new selection without any system state on failure, and its rate limit (sprint 04, task S4-18b, owner decisions O-S4-48, O-S4-55 (a), O-S4-56 (b), C122). v35 (2026-11-11) records the search and filter of S11 as built — search and filter cleared when S11 shows the list of another selection, the result count announced through one throttle for its plural forms, and S10 opening at a later step from the router state (sprint 04, task S4-17, owner decisions O-S4-44 – O-S4-47, all (a), C121). v34 (2026-11-11) records „Gilt für“ in the criteria answer — `appliesTo[]`, the selected app types each criterion applies to (sprint 04, task S4-15b, owner decision O-S4-29 (a), C120). v33 (2026-11-11) records the S11 list state as built — the typed criteria answer, the user's decisions by criterion key that survive a change of the selection, the override next to the recommendation, the weight range as a client setting, and the search and priority filter as pure functions (sprint 04, task S4-14, owner decisions O-S4-24 – O-S4-27, all (a), C119). v32 (2026-11-11) records the hand-over from S10 to S11 and the switch between S10 and the legacy filter as built — a route guard of S10 that opens the legacy filter without an active release, the request marker for problem types a caller shows itself, the page-title state of a page, and the shared loading counter (sprint 04, task S4-12, owner decisions O-S4-17 – O-S4-20, C118). v31 (2026-11-11) records the stepper of S10 as built — `pa-stepper` on CDK `CdkStepper` with display-only step headers instead of `mat-stepper`, whose horizontal headers are clickable tabs (sprint 04, task S4-10, owner decision O-S4-12 (a), C117). v30 (2026-11-11) records the configurator state as built — the draft and the filter options of S10 in `withConfigurator()`, the release pinned by the draft, and `withCatalog()` deferred until the legacy filter goes (sprint 04, task S4-09, owner decision O-S4-8 (a), C116). v29 (2026-11-10) records the test catalog release of the development and E2E stacks — `T.1` seeded and activated at startup, only in `Development` and `E2E`, from a folder that only the compose overrides mount (sprint 04, task S4-08, issue #241, C115). v28 (2026-11-10) carries the sprint-03 findings into this document (sprint 04, task S4-07, issue #243, `TECH_DEBT_v3.md` TD-37): this status line and the header name the current versions (C113), and §5.1 says what `Criterion.Category` holds (C114); no rule changes. v27 (2026-11-09) records the Data Protection key store as built ahead of step 3 — the key ring in `identity."DataProtectionKeys"` of the first IdentityAccess context, unencrypted at rest (sprint 03, task S3-24, issue #186, C112). v26 (2026-11-09) records the usage-event writer as built fire-and-forget — a bounded queue on the request path and a background service that never repeats a sent insert (sprint 03, task S3-23, issue #115, C111). v25 (2026-11-09) records the criteria-suggestion channel as built — a client setting shown with a placeholder, and a release check instead of a failing production build (sprint 03, task S3-21, C110). v24 (2026-11-09) records the criteria endpoint as built — what the cached release holds, which criteria, texts and ratings a selection gets, and 404 for an incomplete release (sprint 03, task S3-20b, C109). v23 (2026-11-09) records the priority resolution and the selection check of the criteria endpoint as built — each applicable app type runs the whole chain, the strictest result wins, and excluded values get their own problem type (sprint 03, task S3-20a, C108). v22 (2026-11-06) records the first catalog endpoint as built — `GET /api/v1/catalog/filter-options` as a minimal API of the Catalog module, the URL segment as the only API-version reader and the HTTP caching of catalog answers for named and active releases (sprint 03, task S3-19, C107). v21 (2026-11-06) records the activation of a catalog release as built — completeness rules, one active release, and the catalog cache that reads the active release from the database (sprint 03, task S3-17, C106). v20 (2026-11-06) records the import of a catalog release as built — the command mode of the API host, what the import reuses, the set-once successor key and the guard against changes of stored rows (sprint 03, task S3-16, C105). v19 (2026-11-06) records the filter dimensions and rules of the Catalog module as built, with the seeded filter values and their keys, and removes the undefined field `AppType.IsInScope` (sprint 03, task S3-13, C104). v18 (2026-11-06) records the core entities of the Catalog module as built, with their own database context, and what „published“ means for a release (sprint 03, task S3-12, C101), and rewords migration step 2 after owner decision O-S3-5 on the design note of task S3-11: the existing criteria are not copied into the catalog (C102); it also names the two seed exclusions that step 2 drops by their entries (C103). v17 (2026-11-05) records **ADR-015**, the replacement of AutoMapper by hand-written maps (sprint 03, task S3-07, issues #31, #90, owner decision O-S3-4), and that the generic CRUD controllers are read-only since then (D11, C100). v16 (2026-11-05) carries the sprint-02 findings into this document (sprint 03, task S3-05, issue #180, `TECH_DEBT_v2.md` TD-14): the interim rule for O-22, Platform as built with Problem Details, `/api/Health` removed, the services of the hosting platform in the licence rule D12 (owner, sprint 03, task S3-03) and two open footer targets (O-23, O-24); no other rule changes. v15 (2026-10-30) records how sprint 02 built the module projects (tasks S2-06, S2-07): the module reference rules decided in S2-06, the Platform module as built and **ADR-014**, one `DbContext` and one migration history per module (owner decision O-S2-1, option A of S2-07); the owner accepted all rules of ADR-014 on the same day, with the review of PR #148. v14 (2026-10-29) records how sprint 01 built logging and the usage-event table ahead of step 1 (tasks S1-22, S1-23; `TECH_DEBT_v1.md` TD-11, issue #123). v13 (2026-10-27) records the owner's licence rule for dependencies (C89, D12): shipped dependencies must not use a strong copyleft or reciprocal licence; it follows the AutoMapper finding of sprint 01, task S1-03 (`docs/sprints/sprint_01/S1-03_backend_inventory.md` §4). v12 records the owner's confirmation of the SPEC proposals on 2026-10-19 (`SPEC_v2.md` SD19–SD23): catalog releases from data files without an editor UI, minimal administration of product identities (the owner holds `PlatformAdmin`), removal of candidates, supported browsers and all 🔧 default values; O-17–O-20 are closed. v11 incorporated the follow-ups of `SPEC_v1.md` §14 (2026-10-15): e-mail delivery through Lettermint (SMTP), e-mail confirmation and sign-in lockout, the dark theme in v1, the final shapes of the filter-options and criteria responses (O-8 closed), problem types, the personal data export, organisation and account rules, catalog import from data files, administration of product identities, removal of candidates and the final list of usage events (O-15 closed). v10 incorporated the review of the main documents before `SPEC_v1.md` (`pruefung_hauptdokumente_v1.md`, 2026-10-13): the owner's decisions D1–D7 (project copy of the criteria list, vendor entries without assessments, republication only by the original profile, content purge on consent withdrawal, context of experience reports, re-pinning, share links) and all findings of the consistency audit (A) and of the architecture and testing review (B), among them the session implementation, module projects, idempotency and the version reference in moderation. v9 recorded the session timeouts (O-12: 30 minutes idle, 8 hours absolute). v8 recorded the owner's decision on the session model (O-11: ASP.NET Core Identity cookie authentication with antiforgery) and clarifies what the locked criteria list allows. v7 incorporated the architecture review of 2026-10-12 (`architektur_review_v6.md`) and the owner's decisions on it: .NET 10, stable entries with immutable versions, stored assessment scope, module contracts, release-pinned procedure mapping, several test evidences per product, locked criteria lists, consent for every experience report. v6 incorporated the consistency audit before `SPEC_v1.md` (2026-10-12): the "tested according to" criterion type, the allowed-ratings union, app types and use cases on published entries (variant A), experience reports without counts, API contracts for multi-selection, and Angular 22. v5 added the catalog changes from the design review of 2026-10-06 (filter layers, exclusion rules, test types, BIT inklusiv rating scale, criterion texts per test procedure) and decision E13 (experience reports carry no test status). v4 recorded the owner's decisions on all three open questions of §16.1 and §16.3 and three further decisions that surfaced while writing the UX copy (step 7b).
+> **Input documents:**
+> - `prd_procureaccess_werteit_v5.md` (authoritative product scope)
+> - `1_2_brainstorm_validierung_procureaccess_werteit_v2.md` (decision history)
+> - `1_1_anforderungen_beschaffungstool_procureaccess_werteit_v2.md` (original requirements)
+> - `CLAUDE.md` (state of the existing codebase)
+> - `ux_copy_procureaccess_v1.md` (step 7b — screen inventory, domain components, UI terminology); current version `ux_copy_procureaccess_v27.md`
+> - `design_handoff_procureaccess_v1.md` (v1.25) and `figma_code_mapping_procureaccess_v1.md` (v1.24, step 7f/7h replacement)
+> - `kriterienkatalog_bit_inklusiv_v1.md` (1.5, + parts A and B) — criteria catalog based on BIT inklusiv, filter layers, exclusion rules, rating scale (German)
+>
+> **Diagrams:** FigJam board *ProcureAccess* — 01–09 architecture (component overview and module dependencies, Flows A–D, domain model per schema, migration path), 10–15 decision trees for §15 and §16, 16 persona flow map (PRD §8 user stories → flows and endpoints), 17 Flow E (direct Kanal-1 publication, new in v4). All boards were updated to v4 on 2026-10-02. On 2026-10-12, v7 versions of boards 01–09 and 17 were placed to the right of the originals (titles "NN (v7) …"); the originals stay as history and are marked "superseded". They cover four filter layers, procedure criteria and mapping, entry/version split, full assessment scope, test evidences, context, consent, module contracts, .NET 10 and Angular 22. Boards 10–16 (decision trees, persona flow map) remain at v4; their decisions are recorded in §16.
+>
+> **Language note:** Written in English per project convention. Domain terms are kept in German where they are the established project vocabulary (Kriterium, Workspace, Kanal 1/2, Vergabeunterlagen), with English identifiers at code level. User-facing terms are defined in the UX copy §2 (current version in the input list above) and differ deliberately from these (e.g. "Kanal 1" is never shown in the UI).
+>
+> - `architektur_review_v6.md` (architecture review of v6, German; findings R1–R6, Y1–Y8, G1–G4)
+> - `pruefung_hauptdokumente_v1.md` (review of the main documents before `SPEC_v1.md`, German; owner decisions D1–D7, findings A-F1–A-F25 and B-F1–B-F19)
+> - `SPEC_v2.md` (feature specification; v1 of 2026-10-15 with decisions SD1–SD18 and follow-ups §14; v2 of 2026-10-19 with decisions SD19–SD23 confirming the proposals O-S1–O-S4 and O-S6; change rows from v2.1 in the same file, current v2.19 of 2026-11-14)
+>
+> **Not covered here:** detailed UI/UX design (step 7), test strategy (step 6, `TESTING_v58.md`), feature-level acceptance criteria (step 8, `SPEC_v2.md`). Decisions marked **→ ADR** are candidates for formal decision records.
+
+### Changes from v50
+
+Sprint 05, task S5-09 (`docs/sprints/sprint_05/S5-09_login_s01_overlay.md`; issues #170 (L1), #319; owner decisions S5-09 1 (a), 2 (a), 3 and „Passwort vergessen?“ (a) of 2026-11-14).
+
+| # | Change | Reason |
+|---|---|---|
+| C137 | **Sign-in S01, the shared sign-in form and sign-out (S5-09; §8.3; completes the client part of C60 up to the warning of step 4).** (1) *S01 in the shell (decision 2 (a)):* the named `login` outlet moved from beside the shell into `main#main`. While it is open the primary page stays alive but `hidden` (its wrapper is `display: contents` otherwise, so the column layout of the pages is unchanged), so the page and its input — S10's choices, S11's decisions — are there again when the outlet closes. S01 is `/anmelden` in that outlet (UX copy §3); `auth` redirects there until S5-10 removes the legacy callers. `AuthService.showLogin(reason?)` opens it over the current page, and the router state `{ loginReason: 'save' }` (never the URL) makes S01 show `auth.login.reasonSave` (S11 „Liste speichern“ sets it in S5-20); after the sign-in the outlet closes and, with a loaded list, `auth.login.draftKept` is announced. The path and the state type live in `features/identity/models/login-navigation.ts` without imports, because `app.routes.ts` reads the path while `app.config.ts` is still loading. (2) *Page title (A11Y-03):* `PageTitleStrategy` treats the open `login` outlet as the page: its `pageTitle.*` key (`pageTitle.login`, UX copy U112), focus on the visible H1 (not one inside `[hidden]`) and the announcement when it opens or closes; a page that S01 hid gets its title state (S10's step number) back when S01 closes over it. `focusPageHeading()` focuses the H1 after a change the router does not see. (3) *One form:* `pa-login-form` (`features/identity/components/login-form/`) is the form card of Handoff §5.3 for S01 and the login overlay: fields checked on submit only, the error summary of Handoff §6.4 with the focus, `auth.login.error.invalid` without a field for the server's error on `$`, `errors.antiforgery`, other failures left to the error interceptor; „Passwort vergessen?“ opens the legacy reset dialog until S03 (decision (a), S5-13). The lockout hint of R-AUTH-03 waits for #319 (decision 1 (a), S5-13). (4) *Session start and end in the root store:* `startSession()` signs in and applies the signed-in user's legacy settings for S01 and the overlay alike; `endSession()` signs out and clears the configurator (`resetConfigurator()`, which also drops answers of running requests), the legacy proposals and favourites and reloads the anonymous settings, also when the logout request fails; „Abmelden“ then opens the start page and focuses its H1 (R-AUTH-08) | S5-09; #170 L1 fixed for the login outlet; R-AUTH-03, R-AUTH-07, R-AUTH-08 |
+
+### Changes from v48
+
+Sprint 05, task S5-05 (`docs/sprints/sprint_05/S5-05_documentation_session.md`; issue #313, `TECH_DEBT_v4.md` TD-50; owner decision D1 (a) of 2026-11-13).
+
+| # | Change | Reason |
+|---|---|---|
+| C136 | **Client on the cookie session, JWT removed (S5-08; completes C50, C60 up to the warning of step 4; §8.3, §9.1; #317, #320; owner decisions S5-08 1–5, all (a), 2026-11-13).** (1) *Session state:* `withIdentity()` holds `session` (`user` of the probe, or null), `sessionExpiresAt`, `sessionAbsoluteExpiresAt` and `sessionStatus`; `signedIn` and `permissions` are computed from it; `loadSession()` asks `GET /api/v1/auth/session` (a background request that never rejects — a failed probe counts as „nobody signed in“) and, for a signed-in user, loads the legacy user with the UI settings once from `/api/me`; `sessionReady()` lets the guards wait for the first probe on a deep link; `signIn()` posts `/auth/login` and reloads the session; `signOut()` posts `/auth/logout` and forgets the session also when the request fails. The root store runs the probe at start (`init()`), so `provideSessionProbe()` of C133 (8) is gone. No token in JavaScript, no `localStorage`/`sessionStorage` for the session (SEC-01, tested with `Storage` blocked). (2) *Interceptor (§8.3 job 3):* `authInterceptor` turns a 401 into the login overlay through `LoginOverlayService` (one dialog for any number of concurrent 401s, the component loaded on first use) and sends the held request once more with its original body after a sign-in (`RETRIED_AFTER_SIGN_IN` on the request context, so a second 401 is not retried); not for the probe and not for a `BACKGROUND_REQUEST`. The error interceptor shows neither snackbar nor server page for a 401. Job 1 is Angular's XSRF interceptor (`withXsrfConfiguration`, `XSRF-TOKEN` → `X-XSRF-TOKEN`); job 2 (expiry headers) follows with S5-29. (3) *Overlay:* a minimal `MatDialog` (`pa-login-overlay`, Handoff §5.3) with `shell.session.expired.title|body`, the two fields of S01 and „Anmelden“; a success announces `shell.session.restored` and closes with `true`, „Schließen“ and Esc leave the user signed out on the page; S5-09 completes it into the S01 form card. `POST /auth/login` is marked `CALLER_HANDLES_PROBLEMS` for `validation` and `antiforgery`, which the form shows in place. (4) *Probe contract (#320, decision 3 (a)):* `SessionResponse` and `SessionUser` are records of `IdentityAccess.Contracts` (the first types there); `user` carries `permissions`, the role claims of type `permission` (e.g. `moderation:review`) that Identity's claims factory puts into the cookie principal, so the client shows moderation controls by them (`appHasPermission`, `permissionGuard`) while the server's policies stay the authority; SPEC §8.8. (5) *JWT removed (decision 1 (a)):* the JWT handler, the policy scheme `CookieOrBearer` and `JWTSettings` in the host, `SignInAsync`/`RefreshTokenAsync` and the token generation of `UserService`, `/api/signIn` and `/api/refresh`, the Swagger Bearer scheme, both `Microsoft.AspNetCore.Authentication.JwtBearer` references (C132: the IdentityModel family left the notices), `JWT_KEY` in `.env.example`, compose and CI, and the Bearer skip of the antiforgery middleware — the default scheme is `Identity.Application`, and SEC-02's exemption list holds only the export and, until S5-10, `signUp`, `forgot-password`, `reset-password`. The `RefreshToken` table stays until S5-10 (no migration here). On the client `jwt-decode`, `@auth0/angular-jwt`, the token injection tokens, the Bearer header and the `headersInterceptor` (it set a request header that belongs to CORS answers) are gone; stale tokens in a browser's `localStorage` are left alone (decision 5 (a): a cleanup would itself be an auth read of browser storage, and pre-pilot data may be reset). (6) *One origin (decision 4 (a), #317):* `apiUrl` is `/api` in every environment; the dev server proxies `/api` and `/health` to `http://localhost:5000` (`proxy.conf.json`), so the `SameSite=Strict` cookie and the XSRF header (relative URLs only) work with `npm start` too, and the CORS policy of the host (`Cors:AllowedOrigins`) is removed. (7) *Legacy screens:* the legacy login page posts to `/auth/login` through the store and loads the UI settings from the legacy user; „Abmelden“ calls `signOut()` and opens the start page; `authGuard` and `permissionGuard` are functional guards that wait for the probe; the `appHasPermission` directives follow the session as signals. | S5-08; #317, #320 closed; SEC-01 FE part, SEC-03 interceptor part active |
+| C135 | **Document upkeep, no rule changes.** (1) The status line starts with this file's version (it still said „v33“ since v34). (2) The input list names the requirements and brainstorm documents by their file names `1_1_anforderungen_…_v2.md` and `1_2_brainstorm_validierung_…_v2.md` (S4-07 P3). (3) The header names Handoff 1.25, Figma mapping 1.24, SPEC v2.17 and `TESTING_v57.md`; the language note refers to the UX copy of the input list instead of naming a version, and §13 names the testing strategy without a version (it named `TESTING_v10.md`). (4) References without version (owner decision D1 (a), CLAUDE §2): only the header names versions of other documents; text that describes the current state cites them by section, change or invariant number (`TESTING §8.2`, `C117`, `SPEC R-CON-08`), because these numbers stay stable across versions while every new version made a versioned reference stale. Change rows are history and keep the versions they name | TD-50 (#313); S4-07 P3 |
+
+### Changes from v45
+
+Sprint 04, task S4-27 (`docs/sprints/sprint_04/S4-27_nuget_licence_notices.md`; issue #187, `TECH_DEBT_v3.md` TD-22; owner decisions O-S4-90 – O-S4-93 of 2026-11-13, all (a)).
+
+| # | Change | Reason |
+|---|---|---|
+| C134 | **The .NET SDK is pinned (S5-03; #306, S4-27 P2; owner decision O-S5-1 (a): 4xx band 10.0.404, runtime image floating, tag only).** (1) *Why:* the SDK decides which NuGet packages a publish ships (it prunes the ones the shared framework already has; 10.0.402 → 10.0.404 changed the set, C132), so the notices check (C132) is only deterministic when local builds, CI and the API image use one SDK; it also fixes compiler, analyzers and warnings-as-errors. (2) *Where the version lives:* `sdk.version` in `global.json` (`10.0.404`, `rollForward: latestPatch`, so a newer patch of the band still builds locally, while CI installs exactly the pinned one); CI's four `actions/setup-dotnet` steps read it with `global-json-file` (the `DOTNET_VERSION: 10.0.x` variable is gone); the build stage of `API/API.ProcureAccess/Dockerfile` is `FROM mcr.microsoft.com/dotnet/sdk:10.0.404` (tag only, no digest: the stage is not shipped). (3) *Check:* CI stage 1 step „Check the SDK pin“ fails when that tag differs from `global.json`, the same pattern as the Playwright image check (S4-01b). (4) *Not pinned:* the runtime image `aspnet:10.0` still floats, so every rebuild brings the .NET security patches; it does not change the shipped package set. (5) *Updating:* Dependabot's `docker` ecosystem proposes the new SDK tag and fails stage 1 until `global.json` names the same version, so one commit on that pull request changes both and, if `check-api-notices.mjs` turns red, regenerates `THIRD-PARTY-NOTICES.txt` (CLAUDE §5); the `dotnet-sdk` ecosystem could propose `global.json` alone, but a pull request per file would each fail the check, so it is not used. A jump to another feature band (10.0.5xx) is a deliberate change of all places. Local builds need the pinned band: distribution packages ship the 1xx band, so install it with Microsoft's `dotnet-install.sh`. | S5-03; #306 closed |
+| C133 | **Cookie session as built (S5-07; completes the server part of C50, C52, C60; owner decisions S5-07 Q1 (A), Q2 (a), Q3 (a)).** (1) *Placement:* the IdentityAccess module registers the three Identity cookie schemes (`AddIdentityCookies`), the application cookie `.ProcureAccess.Session` (`HttpOnly`, `Secure`, `SameSite=Strict`, not persistent, idle limit 🔧 `Session:IdleTimeout` as `ExpireTimeSpan`, sliding), its events (401/403 instead of redirects, sign-in time in `Items["pa:signedInUtc"]`, `OnValidatePrincipal` chains the security-stamp validator and rejects a ticket past 🔧 `Session:AbsoluteTimeout`, no renewal on the probe), the antiforgery pair (`HttpOnly` cookie `.ProcureAccess.Antiforgery` + readable `XSRF-TOKEN`, header `X-XSRF-TOKEN`), the validation middleware and `GET /api/v1/auth/session`; cookie handler and security-stamp validator take the API's `TimeProvider`. `POST /api/v1/auth/login` and `/logout` live in the host (`API/Auth/`), because they need `SignInManager<User>` of the legacy user; they move into the module with the users (M3.1). (2) *Coexistence for one PR:* the default scheme is the policy scheme `CookieOrBearer`, which forwards to the JWT handler when the request carries a Bearer header and to the Identity cookie otherwise; `[Authorize]` names no scheme, so both satisfy it. S5-08 switches the client and removes JWT and selector. (3) *Antiforgery exemptions:* opt-out by `DisableAntiforgery()` metadata, validated after authorization and the rate limiter; exempt are the anonymous export (the only exemption §9.1 names), until S5-10 the five anonymous legacy identity endpoints (`/api/signIn`, `signUp`, `forgot-password`, `reset-password`, `refresh`) and until S5-08 every request with a Bearer header (a JWT is no ambient credential). SEC-02 asserts the exact list. Failures: 400 Problem Details `antiforgery`. (4) *Sign-in failure contract:* wrong address, wrong password, locked or deleted account answer 400 `validation` with one error for `$` (the body as a whole), never 401 — the login overlay opens on 401 and must not open on its own form; success is 204 with the cookie and a new token. (5) *Probe:* `user` is `{ id, email, roles }` from the claims; `expiresAt` (ticket expiry) and `absoluteExpiresAt` (sign-in time + absolute limit) are left out for a sign-in without session limits (JWT, test scheme). (6) *Deferred to step 4 (S5-29):* renewal on every request (today the handler's default, after half of the idle window), the expiry headers, `POST /auth/session/extend`, the `WarningLead` setting and SEC-07/SEC-08. (7) *Scheme behind the proxies (owner decision 1a, after CI):* Traefik terminates TLS, so the API's connection is plain HTTP and antiforgery with `SecurePolicy = Always` throws on it (500). Platform's forwarded-headers middleware now also takes `X-Forwarded-Proto` from the trusted proxies (§9.2, C126), and nginx passes Traefik's value through or sends its own scheme. (8) *Client (owner decision 2a):* the client calls the probe once at application start (`provideSessionProbe()`, a background request that never rejects), so Angular's XSRF interceptor sends `X-XSRF-TOKEN` with every state-changing request to a relative URL — the first piece of §8.3 built; the rest of the interceptor follows in S5-08. (9) *Plain-HTTP stacks (owner decision 3a):* `SessionCookiePolicy` sets `CookieSecurePolicy.SameAsRequest` for the session cookie, the antiforgery cookie and `XSRF-TOKEN` only in `Development` and `E2E` (the environments that may also run without a key-ring certificate, C131), `Always` everywhere else — so the dev and E2E stacks sign in over `http://localhost`, and staging and production keep Secure cookies. | S5-07; SEC-01, SEC-02, SEC-03, SEC-09, OPS-04 active |
+| C132 | **Licence notices of the API image (D12, §10.3).** (1) *What ships:* the published API carries 49 NuGet packages (36 MIT, 11 Apache-2.0, 2 under Npgsql's PostgreSQL licence); EF Core Design and Roslyn are design-time only and not published. The set depends on the .NET SDK, which prunes packages the shared framework already provides (SDK 10.0.402 still published `Microsoft.Extensions.FileProviders.Embedded`, 10.0.404 — the pinned SDK since C134 — no longer does), so the file is generated with the SDK pinned in `global.json` (C134), or from the built image's `deps.json` (`--deps`). Each of these licences asks for its notice to travel with the binaries. The .NET runtime of the base image carries its own (`/usr/share/dotnet/LICENSE.txt`, `ThirdPartyNotices.txt`). (2) *The file (O-S4-90 (a), O-S4-93 (a)):* `API/API.ProcureAccess/THIRD-PARTY-NOTICES.txt`, generated by `scripts/check-api-notices.mjs --write` from the published `deps.json` and the packages' `.nuspec`, licence and notice files, and committed: per package its licence, copyright line (else its authors) and project; each distinct text once — the package's own licence file, else the standard text of its licence from `LICENSES/` with MIT's copyright placeholder removed, and every notice file the package carries (e.g. Microsoft's `THIRD-PARTY-NOTICES.TXT`). Npgsql's licence names its holder, so its text is kept in `scripts/api-notices/` as a reviewed entry. (3) *Embedded code (O-S4-92 (a)):* `Swashbuckle.AspNetCore.SwaggerUI` embeds swagger-ui-dist (Apache-2.0) but not its bundle's licence comments; a reviewed entry in `scripts/api-notices/swagger-ui-dist.txt` adds its NOTICE and those comments, pinned to the package version. (4) *Where (O-S4-91 (a)):* only in the image, `/app/THIRD-PARTY-NOTICES.txt` (API Dockerfile), and in the repository; no endpoint — the API's binaries reach only those who receive the image, and browser users get the client's `/3rdpartylicenses.txt`. (5) *Check (TESTING_v55 V173):* CI stage 2 fails on a licence outside the allowlist (MIT, Apache-2.0, reviewed entries), on a new version of a package with embedded code, and on a file that differs from the shipped packages, so a NuGet update stays red until the file is regenerated and its diff reviewed — the first general D12 check of NuGet packages (until now `ClosedXmlLicenceTests` guarded one package). A new licence needs the D12 check and its text in the script | Issue #187 (S2-03 P4, TD-22): whether the API image's notices reach the people who receive it was never checked; pilot images (G-P) are handed out |
+
+### Changes from v44
+
+Sprint 04, task S4-26 (`docs/sprints/sprint_04/S4-26_key_ring_encryption.md`; issue #235, `TECH_DEBT_v3.md` TD-27; owner decisions O-S4-87 – O-S4-89 of 2026-11-12, all (a)).
+
+| # | Change | Reason |
+|---|---|---|
+| C131 | **Data Protection key ring encrypted at rest (§4.3, §9.1, §10.4; replaces C112 (3)).** (1) *Mechanism (O-S4-87 (a)):* the built-in `ProtectKeysWithCertificate` with an X.509 certificate from the environment, never from the repository: `DataProtection:Certificate` (compose: `DATA_PROTECTION_CERTIFICATE`) holds a PFX with an RSA private key and without password, base64-encoded on one line; ASP.NET Core encrypts each new key with it (`EncryptedXml`, part of the shared framework, so no new package) and reads the keys it encrypted. The optional `DataProtection:PreviousCertificate` (`DATA_PROTECTION_PREVIOUS_CERTIFICATE`) only reads keys encrypted before a rotation (`UnprotectKeysWithAnyCertificate`). The certificate's validity dates are not checked: a self-signed certificate of 10 years is enough, and an expired one still works. (2) *Where it is required (O-S4-88 (a)):* `KeyRingCertificates` (`DataProtection/`, `internal`) reads both while `AddIdentityAccessModule(configuration, environment)` registers the services: only `Development` and `E2E` may run without a certificate (keys in plain text and the warning „No XML encryptor configured“, as before); every other environment — Staging, Production, the integration tests' `Testing`, any other name — stops at startup without one, and a value that is not base64, not a PFX without password or without an RSA private key, or a previous certificate without a current one, stops the start in every environment. The message names the setting, never its value. The `roles` command host passes its environment too. (3) *Keys stored before (O-S4-89 (a)):* Data Protection keeps reading a plain key once a certificate is configured, so the plain rows of an existing database stay until they are deleted once by hand after the first encrypted start (protocol S4-26 §6); no code deletes key rows. (4) *Effect:* a database read or a `pg_dump` alone no longer yields usable keys; the certificate becomes part of what a restore needs (§10.4). OPS-04 stays planned | S4-26, #235; `TECH_DEBT_v3.md` TD-27 |
+
+### Changes from v43
+
+| # | Change | Reason |
+|---|---|---|
+| C130 | **Groundwork of roadmap M3.4 as built (§4.3, §5.2, §9.1, §12 step 3; SPEC R-ADM-03; TEN-06).** (1) *Contributor profiles:* `ContributorProfile` (`Id` a random `Guid`, `DisplayName` ≤ 60, `Kind` Individual/Institution/Vendor/Auditor stored by name, `CreatedAt` from `TimeProvider` through its factory) and `UserContributorLink` (key `ContributorProfileId`, so a profile has at most one user and a user several profiles; deleted with its profile) are `internal` entities of `IdentityAccessDbContext` (migration `AddContributorProfiles`). The display name is unique regardless of case through a unique index with the non-deterministic ICU collation `identity_case_insensitive` (`und-u-ks-level2`: „Anna“ = „anna“, „Bär“ ≠ „Bar“). The collation lives in `public`, not in `identity`: EF names a column's collation without a schema (a qualified name is quoted as one identifier), and PostgreSQL finds an unqualified collation only on the search path. `UserContributorLink.UserId` has no foreign key, because the users are still in the legacy context (ADR-014: no key crosses two contexts); it gets one when the users move into the module. No endpoint, DTO or service reads either table yet (S50, step 6). (2) *Platform roles (O-S4-81, O-S4-82, O-S4-83):* the legacy migration `RenamePlatformRoles` renames the role rows `Approver` → `Moderator` and `Admin` → `PlatformAdmin` (same ids, so users keep their roles) and the permission `objects:approve` → `moderation:review`, creates `PlatformAdmin`, `CatalogEditor` and `Moderator` where missing — so every environment has them, not only a database the Development rebuild filled — and gives Moderator and PlatformAdmin `moderation:review`. PlatformAdmin keeps it until the legacy proposals go (step 5). `CatalogEditor` has no permission and no endpoint (SD20). `Member` stays a global legacy role until step 3; the rebuild creates it. `Proposal.ApproverId` keeps its name until the proposals go. The JWT code is unchanged: it reads role and permission names from the database, so a token carries the new names from the next sign-in or refresh (≤ 30 minutes). (3) *Policy (O-S4-85):* the claim policy `ModerationReview` (`API/Extensions/AuthorizationExtensions.cs`, requires `moderation:review`) replaces `AuthApproverAttribute` on `POST /api/Proposals/approve`: a signed-in user without the permission gets 403 Problem Details instead of the 500 of an unmapped exception. The legacy client checks `moderation:review` on the proposal pages, the proposal-list route and the profile page (O-S4-86). (4) *`roles` command (R-ADM-03):* `roles list [<email>]`, `roles grant <email> <role>`, `roles revoke <email> <role>` are a command mode of the API host like `catalog …` (`API/Commands/RoleCommandLine.cs`, `API/Extensions/RoleCommandHost.cs`): a host with Platform, IdentityAccess, the legacy context and ASP.NET Core Identity — no web server, no JWT, no migration; it refuses while legacy migrations are pending. It finds users by e-mail address, accepts only the three platform roles (case-insensitive), succeeds without change when nothing has to change, and logs every grant and revoke with user id and role (never the address); exit codes 0/1/2 as for `catalog`. It lives in the host because it works on the legacy Identity tables through `UserManager`; it moves into IdentityAccess with the users (M3.1) | Sprint 04, S4-25; owner decisions O-S4-81 – O-S4-86 |
+
+### Changes from v42
+
+| # | Change | Reason |
+|---|---|---|
+| C129 | **ADR-016: the short description is a field of the criterion revision (§5.1, §14; SPEC_v2 §8.3 v2.15; TECH_DEBT_v3 TD-30).** (1) *Decision (O-S4-6 (a)):* the Kurzbeschreibung of Kriterienkatalog §6.1 — one or two sentences of the project team, derived from „Anforderung“ — is its own text, not derived from an existing one: the BIT inklusiv texts are quoted verbatim and the plain-language title is a title. It is the nullable `CriterionRevision.ShortDescriptionDe` (catalog migration `AddShortDescription`, column `text`), next to `PlainLanguageDe`, which stays the plain-language title (no rename). (2) *Release folder (O-S4-79 (a)):* the optional property `shortDescriptionDe` of `criteria/<key>.json` is a plain string, no Markdown and no length limit, checked like `plainLanguageDe`: an empty text or one with surrounding white space is refused with file and JSON path (CAT-23). A changed short description is changed content, so the import gives the criterion a new revision (`RevisionContent.Matches`, CAT-07). Release 2026.1 has no value yet (K-1); the gap list names the field. (3) *Reading (O-S4-78 (a)):* `CatalogReleaseSnapshot` holds it and `ICatalogSelectionResolver` hands it to the export as `ResolvedCatalogCriterion.ShortDescription`; the column „Kurzbeschreibung“ of SPEC §8.3 writes it (empty without a value). (4) *Not yet:* the criteria answer (SPEC §8.2) and the S11 card (Handoff §5.5, Kriterienkatalog §6.1) do not show it; that follows as its own task (S4-24 open point), and so does the S11 search over it (O-S4-26). | S4-24, #237; owner decisions O-S4-6 (a), O-S4-78 (a), O-S4-79 (a), O-S4-80 (a), 2026-11-12 |
+| C128 | **Language of the catalog answers as built (§7.1, §9.6; API-06; SPEC_v2 §8 v2.14).** (1) *Choice:* `GET /api/v1/catalog/filter-options` and `GET /api/v1/catalog/criteria` honour `Accept-Language` with `de` and `en` (`Http/CatalogLanguage` in the Catalog module): the client's languages by weight, ties in header order, `en-US` counts as `en`, `*` as any language the header does not name. Every release has German texts only so far — the release folder format has no language, and English texts come with an ADR of their own —, so German is the answer for `en`, an unknown language, no header or a header that cannot be read; never 406. (2) *Only the header:* the module reads `Accept-Language` itself, not the culture of the host's request localization, which also reads a query parameter and a cookie; an answer that depended on a cookie could not be cached by `Vary`. The host's localization stays as it is for the legacy controllers. (3) *Headers and caching:* a 200 and a 304 carry `Content-Language` (the language served) and `Vary: Accept-Language`; the `ETag` hashes the language with the body (`Http/CatalogJsonAnswer`), so an answer in one language never revalidates one cached in another. Problem Details answers keep their English `title`/`detail` and get neither header. (4) *Client:* unchanged — its language interceptor already sends the UI language (`de`) with every request. (5) *Not yet:* the export files stay German (SPEC §8.3: export language = UI language); the other list endpoints (directory, workspace) honour the header with their steps. | S4-23 |
+
+### Changes from v40
+
+| # | Change | Reason |
+|---|---|---|
+| C127 | **Export dialog S13 on the client as built (§8.3, §8.6; R-LST-11; SPEC_v2 §7.3, §8.3).** (1) *Request marker (O-S4-74 (a)):* `CALLER_SHOWS_FAILURES` (`core/errors/problem-details.ts`) marks a request the user asked for whose caller shows every failure in place: the error interceptor shows no snackbar and no server page for it, while a request without an answer still turns the offline notice on (the state of the connection). It sits next to `FORM_SHOWS_FIELD_ERRORS`, `CALLER_HANDLES_PROBLEMS` (C118) and `BACKGROUND_REQUEST` (C122), which stays for requests the user did not ask for. (2) *Blob error bodies:* a request for a file (`responseType: 'blob'`) gets its error body as a `Blob`; the interceptor reads a JSON body first (`withProblemBody`), so the problem type and `retryAfterMinutes` count as for any request. (3) *Download:* `ExportApiService` posts the body of C123 built by `toExportRequest` (release of the answer, selection by key, every criterion once by revision; never a recommended level) and takes the file name from `Content-Disposition` (exposed by CORS, C126); `FileSaver` (`core/files/`) hands the `Blob` to the browser through a temporary object URL. Nothing is stored in the browser (EXP-05). (4) *Dialog:* `ExportDialog` (`features/configurator/dialogs/export-dialog/`) shows a failure above the actions as an alert with „Erneut versuchen“; a 429 shows `errors.rateLimit` with its minutes; `release-mismatch` shows `criteria.export.outdated` with „Schließen“ only (O-S4-72 (a); reloading the list for the new release is a follow-up). Dialogs of the Handoff use the panel class `pa-dialog` (`styles/main.scss`): full screen below 600 px, 600 px wide from there. | S4-21b; owner decisions O-S4-72 (a), O-S4-74 (a) |
+
+### Changes from v39
+
+| # | Change | Reason |
+|---|---|---|
+| C126 | **Rate limiting, client IP and the ready check as built (§7.2, §9.2, §9.5; API-05; SPEC_v2 §7.3 v2.12).** (1) *Client IP (O-S4-69 (a)):* Platform runs ASP.NET's forwarded-headers middleware first (`RateLimiting/ClientAddress`, in `UsePlatformMiddleware`): `X-Forwarded-For` only, trusted only from proxies in `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `127.0.0.0/8`, `::1`, `fc00::/7` (IPv4-mapped addresses included), for at most 🔧 `ForwardedHeaders:ForwardLimit` proxies (default 2: Traefik → nginx → API). A header from any other address is ignored; this holds only while the API port is not reachable from the internet. The rate-limit partition is the IPv4 address or the /64 network of an IPv6 address; it is held in memory and never stored or logged (§9.3). (2) *Limiter:* ASP.NET Core's rate limiter in Platform (`RateLimiting/RateLimitingRegistration`); the policy names are constants of `Platform.Contracts` (`RateLimitPolicies.AnonymousExport`, `.CriteriaListShown`), which the Export and Configurator modules attach with `RequireRateLimiting` — no module references Platform itself. Each is a fixed window per client IP with 🔧 `RateLimits:<policy>:PermitLimit` / `:Window` (30 per 10 minutes); a missing or impossible value stops the start. `UsePlatformRateLimiting()` runs after CORS and authentication, so a 429 carries the CORS headers. A rejection is 429 Problem Details `rate-limit` with `retryAfterMinutes` and `Retry-After`: the window lease reports the whole window, so the wait is an upper bound. The limiter keeps its own clock (not `TimeProvider`); tests check counts, not the passing of a window. The E2E stack relaxes both limits (all tests share one address). (3) *Ready check (#112, O-S4-70 (a)):* `/health/ready` has a concurrency policy of its own — at most 🔧 `Health:ReadyConcurrentChecks` (2) at a time over all callers, no queue, 429 without `retryAfterMinutes` —, and the database check's timeout is 🔧 `Health:ReadyTimeout` (5 s); `/health/live` is not limited. (4) *Usage event:* `POST /api/v1/exports` writes `ExportCreated` (format, signed in) after the file is created, never for a refused request (R-MET-01). (5) *CORS:* the client policy exposes `Content-Disposition`, so the export dialog reads the file name also from another origin (`npm start`). | S4-21a; owner decisions O-S4-69 (a), O-S4-70 (a); #112 |
+
+### Changes from v38
+
+| # | Change | Reason |
+|---|---|---|
+| C125 | **XLSX renderer as built (§4.4 Flow A1; D12; EXP-01 – EXP-03; SPEC §8.3).** (1) `XlsxExportFormatter` (Export module, ClosedXML 0.105.1) replaces the placeholder of S4-19; `StubExportFormatter` is gone. (2) *Sheet „Kriterien“:* the cells of `CriteriaColumns` (numbers as numbers, texts as texts — a text never becomes a formula, so XLSX needs no guard), an Excel table named `Kriterien` without style or stripes, bold header row frozen, fixed column widths with wrapped text, the test-step link also a hyperlink; a list without criteria gets one empty data row, because a table needs one (O-S4-66 (a)). (3) *Sheet „Info“:* label and value lines — tool, address (🔧 `Export:ToolUrl`, read by `ExportToolUrl`, which stops the start unless it is an absolute http(s) URL; O-S4-64 (a)), date (UTC day, date cell), catalog release, the selection layers (names joined by commas; test types only when selected; „Keiner davon passt“ without a use case), the requirement criteria per level that applies („Geprüft nach …“ not counted, as U106), the two notes and the BIT inklusiv source line. (4) *Document properties:* ClosedXML stamps created/modified with the machine clock; the formatter sets both to the generation time from `TimeProvider` and author/last modified by to the tool name, so no server user name or clock reaches the file. (5) *No fonts needed:* nothing measures text (no `AdjustToContents`); checked in the API image, which has no system fonts. (6) *Licence (D12):* ClosedXML and its packages are MIT except SixLabors.Fonts, which resolves to 1.0.0 (Apache-2.0); 2.0+ (Six Labors Split License) is ignored by Dependabot and `ClosedXmlLicenceTests` fails if it is ever resolved | S4-20b; owner decisions O-S4-64, O-S4-66 (a), 2026-11-12 |
+
+### Changes from v37
+
+| # | Change | Reason |
+|---|---|---|
+| C124 | **Texts of the export files and the CSV renderer as built (§4.4 Flow A1; R-LST-12; EXP-03, EXP-04; SPEC §8.3).** (1) *Texts on the server (O-S4-62, O-S4-63 (a)):* the sheet names, column headers and „Info“ labels of the files are UX copy keys (`exportFile.*`, UX copy v24 U109); the files also reuse single screen texts (`criteria.priority.*`, `criteria.list.summary.*`, `criteria.list.priorityNote`, `criteria.export.legalNote` ⚖️, `shell.appName`). They live in the Export module as the embedded resource `Texts/de.json` in the format of the client's `de.json`; `scripts/check-i18n.mjs` checks it against the UX copy as its second target and fills it with `--write`. `ExportTexts` (singleton, read in `AddExportModule`) refuses to start without a key the renderers read (`ExportTextKeys.Required`). German only; another language comes with `Accept-Language` (API-06) as another resource. (2) *One column model:* `CriteriaColumns` lists the columns of SPEC §8.3 in their order with the header key and the cell value of a row; every renderer writes from it, so CSV and XLSX hold the same cells. „Titel“ is the plain-language title, else the catalog title (O-S4-32); „Kurzbeschreibung“ stays empty until the catalog has the field (O-S4-6 (a), S4-24 with an ADR); „Priorität (Ihre Wahl)“ is the level that applies — the user's choice, else the recommendation (O-S4-65 (a)); „Gewichtung“ the weight that applies (B only). (3) *CSV (`CsvExportFormatter`):* UTF-8 with BOM, semicolon, CRLF, RFC 4180 quoting, „Katalogversion“ as the first column (EXP-03); a text cell starting with `=`, `+`, `-`, `@`, tab or CR gets a leading apostrophe (OWASP CSV injection, O-S4-67 (a)). The XLSX keeps the placeholder renderer until S4-20b. (4) *Decided for S4-20b:* the data range of the sheet „Kriterien“ is an Excel table named `Kriterien` without a colour style (Excel lists it under that name; O-S4-66 (a)); the tool URL on the sheet „Info“ is the 🔧 server setting `Export:ToolUrl` (`https://procureaccess.de`, O-S4-64 (a)); ClosedXML 0.105.1 (D12; its transitive packages are MIT, and SixLabors.Fonts resolves to 1.0.0, Apache-2.0 — versions 2 and later carry the Six Labors Split License, which fails D12, so S4-20b adds a Dependabot rule that ignores them) | S4-20a; owner decisions O-S4-6, O-S4-62 – O-S4-68 (a), 2026-11-12 |
+
+### Changes from v36
+
+| # | Change | Reason |
+|---|---|---|
+| C123 | **Export pipeline and the ad-hoc export as built (§4.3, §4.4 Flow A1, §7.2, §9.6; R-LST-12; EXP-05, EXP-07, TEN-04).** (1) *Catalog contract:* `Catalog.Contracts` holds its first interface, `ICatalogSelectionResolver.ResolveAsync(releaseVersion, CatalogSelectionQuery)`, with plain records (`CatalogSelectionResult`, `CatalogReleaseSummary`, `ResolvedCatalogSelection`, `ResolvedCatalogCriterion`, `CatalogPriority`, `CatalogValueName`). The Catalog module implements it (`Criteria/CatalogSelectionResolver`, scoped) on the code of `GET /api/v1/catalog/criteria`: the same release rule (a stored release `catalog activate` would accept, else `ReleaseNotFound`), the same selection check (`InvalidSelection`, `ExcludedSelection`, errors keyed as the query) and the same resolution — `CriteriaResolver.ResolveCriteria` now yields typed results that both the endpoint and the resolver map, so the export and S11 cannot disagree. The result says whether the release is active and how many criteria it has, and carries what a file needs: German names of the selection, and per criterion revision id, key, kind, number, title, plain-language title, the original title and test-step link of the first procedure text that applies (for a procedure criterion the page of its test type), the product part name and the recommended level, weight and rationale. (2) *Export module:* `IExportSource<TInput>` with `AdHocSelectionSource` (Flow A1; uses `Catalog.Contracts` only, ARC-03) producing `ExportContent` (release, selection names, one `ExportRow` per included criterion in list order); `ExportFileWriter` adds the generation time from `TimeProvider`, picks the `IExportFormatter` of the format and names the file `ProcureAccess_Kriterien_<release>_<UTC date>.<ext>` (SPEC §8.3); until S4-20 a `StubExportFormatter` per format writes plain text under the format's content type. `PersistedConfigurationSource` follows in step 3. (3) *Endpoint:* `POST /api/v1/exports`, a minimal API (`Http/ExportEndpoint`, `AllowAnonymous`), mapped by `MapExportEndpoints()` after the Configurator endpoints; `AddExportModule(configuration)` now takes the configuration. Body as in §7.2; every member is optional for the binder and checked by the source, and unknown members are refused (`JsonUnmappedMemberHandling.Disallow`), so a resolved level sent by a client is a 400 `validation` at its path. (4) *Request rules:* every criterion of the selection exactly once by its revision — missing, repeated, foreign (another release, not applicable) are field errors (O-S4-57 (a)); only the active release (O-S4-60 (a)): unknown or incomplete → 404 `not-found`, stored but not active → 400 `release-mismatch` at `selection.releaseVersion`, which S13 shows as `criteria.export.outdated` (SPEC §8.6); selection errors keyed below `selection` (`selection.useCaseTemplateId`, `selection.appTypeIds[1]`), `selection-excluded` only when nothing else is wrong; a chosen level equal to the recommendation is no choice; the weight that applies is the user's, else the recommended one while both are B (O-S4-27); caps — entries ≤ the release's criteria, note ≤ 1 000 UTF-16 code units, weight within 🔧 `Configurator:PriorityWeight` (1–10, `appsettings.json`; the client keeps the same range as its setting `priorityWeight`, O-S4-58 (a)) and only while B applies, body ≤ 1 MB through `RequestSizeLimit` metadata (Kestrel answers 413; the test server ignores it). (5) *Nothing stored, no-store:* the file exists only in memory; no row, no file, no log of the body or a note (EXP-05); every answer of the handler carries `Cache-Control: no-store`, an unreadable body ASP.NET's `no-cache,no-store` (TEN-04); Kestrel's 413 carries none and no user data (a POST answer without freshness information is not cached). (6) *Later:* the rate limit of SPEC §7.3 and `ExportCreated` with S4-21; antiforgery stays off for this endpoint also in step 3 (SEC-09). | S4-19; O-S4-57, O-S4-58, O-S4-60 |
+
+### Changes from v35
+
+Sprint 04, task S4-18b (`docs/sprints/sprint_04/S4-18b_criteria_list_shown.md`; owner decisions O-S4-48 (a), O-S4-55 (a), O-S4-56 (b), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C122 | **The first `CriteriaListShown` caller (§5.7, §7.2, §8.1; R-MET-01, R-CON-10; SPEC_v2 §8.7).** (1) *Endpoint (O-S4-48 (a)):* `POST /api/v1/configurator/criteria-list-shown`, a minimal API of the Configurator module (`Usage/CriteriaListShownEndpoint`, `internal`; the module's new public member is `MapConfiguratorEndpoints()`, mapped by the host on the versioned group after `MapCatalogEndpoints()`), open to everyone (`AllowAnonymous`), no body, 204; it calls `IUsageEventWriter.CriteriaListShown(signedIn)` with `signedIn` = the request is authenticated (until step 3 the legacy JWT; an expired token counts as `anonymous`). Not on the criteria endpoint: Catalog would depend on Platform's writer there, and the browser caches the answer of a pinned release, so repeats would not reach the server (O-S4-48 (b) rejected). (2) *When (O-S4-55 (a)):* `withConfigurator().loadCriteriaList()` reports a loaded, applied list when its selection differs from `configurator.list.countedSelection`, the last one counted (`sameSelection`, sets per layer); it sets that before the request, so a failed report is never repeated. Not for `failed` or `noRelease`. (3) *Silent:* the request carries the new marker `BACKGROUND_REQUEST` (`core/errors/problem-details.ts`): the error interceptor shows no snackbar, offline notice or server page for it; an answer still counts for `ConnectionStatus`. It does not use the `withLoading()` counter. (4) *Rate limit (O-S4-56 (b)):* SPEC §7.3, client IP in memory, 30 per 10 minutes 🔧, built with the limiter of the anonymous export in S4-21 — until then a script could inflate the count or fill the bounded queue (`UsageEvents:QueueCapacity`), which would drop other events too. (5) *Antiforgery:* none until step 3 builds it for every non-GET endpoint (SEC-02); this endpoint gets it then like the others, no exception. | SPEC §9.1 names no trigger; O-S4-48, O-S4-55, O-S4-56 |
+
+### Changes from v34
+
+Sprint 04, task S4-17 (`docs/sprints/sprint_04/S4-17_search_filter_tested_empty.md`; owner decisions O-S4-44 – O-S4-47, all (a), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C121 | **Search and filter of S11 as built, and S10 at a later step (§8.1, §8.3; R-LST-06 – R-LST-08).** (1) *Filter on a new selection (O-S4-46 (a)):* `configurator.list` keeps the selection of the last list S11 asked for; `loadCriteriaList()` clears search, levels and „Nur aufgenommene“ (and a pending search) when the draft asks for another selection — compared as sets per layer (`sameSelection`) — and keeps them for the same one. The decisions stay either way (C119 (2)). (2) *Result count:* the S11 page announces `common.results.shown` once per change the user makes to the filter (the search when it applies, 300 ms after the last keystroke), throttled to one per second with the newest count read; not on the first load and not when (1) clears the filter. Its three plural forms are three keys, so `A11yAnnouncerService.announce` takes a `throttleKey` under which they share one throttle — otherwise an older count in one form could be read after a newer one in another. (3) *S10 at a later step (O-S4-47 (a)):* a link to `/kriterien` may name a step in the router state (`ConfiguratorNavigationState`, e.g. `APP_TYPE_STEP_STATE` of S11's `criteria.list.noCriteriaFor`); S10 reads it from `Router.currentNavigation()` while it is created and opens there through `openingStep`, never past the first unanswered step. Like the selection (R-CON-09) it never goes into the URL, and as it is set before the stepper has its steps, the stepper emits no step change: the route change focuses the H1 and announces the page title as on every visit. (4) *Filter row:* `pa-criteria-list-filter` only shows the state and emits; the priority levels are a checkbox group, none checked = every level (O-S4-44 (a)) | S4-17; O-S4-44 – O-S4-47 |
+
+### Changes from v33
+
+Sprint 04, task S4-15b (`docs/sprints/sprint_04/S4-15b_detail_panel_sections.md`; owner decisions O-S4-29, O-S4-30, O-S4-36 – O-S4-39, all (a), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C120 | **„Gilt für“ in the criteria answer and the catalog texts on the client (§7.2, §8.1; R-LST-01, Handoff §5.5).** (1) *Contract:* each criterion of `GET /api/v1/catalog/criteria` carries `appliesTo[]` (SPEC v2.9 §8.2): the selected app types it applies to as `{ id, name }` — the shape of `appTypesWithoutCriteria[]` (C77) — in app-type sort order, from the same rule that decides whether the criterion is listed (`CriterionRules.AppTypesApplyingTo`); empty for a procedure criterion. No new query and no change to caching: the snapshot already holds the rules. (2) *Catalog texts on the client:* the Markdown lines of the procedure texts (S3-15 P6) are parsed by a small pure function (`shared/components/catalog-text/catalog-markdown.ts`) into paragraphs, lists nested by indentation (a line starting with a space continues the item above), `**bold**` and `[text](url)` links — a link only for an http(s) URL — and rendered by `pa-catalog-text` as Angular nodes, never `innerHTML` (O-S4-30, O-S4-36); `marked`/`ngx-markdown` stay legacy-only. (3) *Detail panel:* the sections of Handoff §5.5 come from the procedure texts as sent; with several procedures a section with the same content in every text stands once above a `mat-tab-group`, the rest is shown per tab (short labels, UX copy v19 U101). Examples show three top-level items per group before „Alle {{count}} Beispiele anzeigen“ (O-S4-37). (4) *Document upkeep:* the input documents name UX copy v19, the Handoff and Figma mapping 1.19, SPEC v2.9 and TESTING v46. | O-S4-29, O-S4-30, O-S4-36 – O-S4-38; S3-15 P6 |
+
+### Changes from v32
+
+Sprint 04, task S4-14 (`docs/sprints/sprint_04/S4-14_s11_state.md`; owner decisions O-S4-24 – O-S4-27, all (a), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C119 | **S11 list state (§8.1; R-LST-01 – R-LST-06, R-CON-09).** (1) *Where it lives:* `withConfigurator()` holds the list under `configurator.list` — the typed answer of `GET /api/v1/catalog/criteria` (`models/criteria.ts`, shaped as the Catalog module sends it: `kind` `requirement`/`testProcedure`, procedure texts as strings, `plainLanguage` nullable), its load status, the user's decisions, the search text and the filter; memory only, like the draft. S11 loads the list on every entry with the pinned release (`loadCriteriaList()`; only the latest answer applies, 404 → `noRelease` as for the hand-over); the answer of the check of „Kriterienliste anzeigen“ is still not kept (C118 (3)). (2) *Decisions by criterion key (O-S4-24 (a)):* `included`, `overrideLevel`, `overrideWeight`, `note` per `Criterion.Key`; they stay for the session when the selection changes, also for criteria that leave the list, and apply again when they return; the export sends only the criteria of the current list. A decision equal to the default (included, no override, no note) is not stored. (3) *Override next to the recommendation (R-LST-03, CAT-08 on the client):* `resolvedPriority` is never changed; the decision holds only the user's side. Choosing the recommended level removes the override; a level other than B drops the user's weight. The weight that applies is the user's, else the recommended one when the recommendation is B; an override from A or Info to B has none until the user sets one (O-S4-27 (a)). The weight range (1–10, 🔧 SD23) is the client setting `priorityWeight` of the environment files, read through `PRIORITY_WEIGHT_RANGE` (as C110); the export server checks the same range. (4) *Note:* kept as typed; `noteLengthError` gives the values of `errors.field.maxLength` above 1 000 (SPEC §7.2), counted in UTF-16 code units like the server's `string.Length`. (5) *Search and filter* are pure functions (`state/criteria-list-rules.ts`) over the loaded list, in the order of the answer: search over key and number, title, plain-language title and the original titles of the procedure texts — case-insensitive substring of the trimmed query, umlauts not folded (O-S4-26 (a)); a set of levels compared with the level that applies now, override included, empty = all (O-S4-25 (a)); „Nur aufgenommene Kriterien anzeigen“ (R-LST-04). The search applies 300 ms after the last keystroke (`searchCriteria()`, a timer in the store); `clearCriteriaFilter()` clears all three. `visibleCriteria` is the result | S4-14; O-S4-24 – O-S4-27 |
+
+### Changes from v31
+
+Sprint 04, task S4-12 (`docs/sprints/sprint_04/S4-12_s10_reset_summary_switch.md`; owner decisions O-S4-17 – O-S4-20, all (a), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C118 | **S10 → S11 and the switch to the legacy filter (§8.3, §8.6; R-CON-10, O-S4-3).** (1) *Switch in one place:* start page and header always link `/kriterien`; the route guard `configuratorReleaseGuard` (`features/configurator/guards/`) waits for the filter options (`withConfigurator().filterOptionsReady()`) and opens the legacy `/filters` instead when they answer 404 (no active release). It runs before S10 renders, so the user gets one route change and one announcement; other failures open S10, where the error interceptor shows the system state. The guard goes with the legacy filter when 2026.1 is activated. (2) *Request marker:* `CALLER_HANDLES_PROBLEMS` (`core/errors/problem-details.ts`, an `HttpContextToken` with problem-type names) tells the error interceptor not to show its snackbar for problem types the caller shows itself — the filter options mark `not-found`, the criteria request `validation`, `selection-excluded` and `not-found`. 5xx and requests without an answer keep their system states. (3) *Hand-over:* „Kriterienliste anzeigen“ calls `GET /api/v1/catalog/criteria` with the pinned release (`CatalogApiService.getCriteria`, `withConfigurator().submitSelection()`); accepted → `/kriterien/ergebnis` (S11, a placeholder until S4-14 – S4-18, guarded by `completeSelectionGuard`, which leads back to S10 when the in-memory draft is gone); refused → the error at the step of the first named field; 404 → the legacy filter. The selection is never put in the URL (R-CON-09); the answer is not kept, because a named release is cached by the browser (§9.6). (4) *Page-title state:* `PageTitleStrategy.setPageTitleState({ params, error })` lets the open page fill the parameters of its `pageTitle.*` key and switch the „Fehler:“ prefix (`shell.pageTitle.error`) without an announcement; a route change clears it and announces the title the page filled while it rendered. The app provides the strategy with `useExisting`, so pages and the router share one instance. (5) *Loading counter:* every feature that adds `withLoading()` gets a new `loadingCount` signal from NgRx Signals 22, so the counter methods read the current value inside `patchState`; before, the legacy loads at start left the shared counter at −1 and the configurator's loads never showed the loading bar | S4-12; O-S4-17, O-S4-19 |
+
+### Changes from v30
+
+Sprint 04, task S4-10 (`docs/sprints/sprint_04/S4-10_s10_frame_step1.md`; issue #52; owner decision O-S4-12 (a), 2026-11-11).
+
+| # | Change | Driver |
+|---|---|---|
+| C117 | **Steppers (§8.5; R-CON-01, Handoff §2.2, §5.1).** SPEC R-CON-01 wants the step headers display-only with `aria-current="step"`; the horizontal `mat-stepper` of Angular Material 22 renders them as focusable, clickable `role="tab"` elements and sets `aria-current` only when vertical. The S10 stepper is therefore the shared component `pa-stepper` (`shared/components/stepper/`), a subclass of CDK `CdkStepper` (no new dependency): it keeps CDK's linear step logic (`linear`, `[completed]` per `cdk-step`, `next()`/`previous()`), and renders the headers as an ordered list without any control — the current step with `aria-current="step"`, finished steps with a check icon and the hidden suffix `common.stepper.done` — and, below 600 px, the text line of the page's step-label key instead. A step change moves the focus to the first heading of the new step and announces the step label through `A11yAnnouncerService`. The page decides when „Weiter“ may move on (its own check, e.g. `stepError`), so validation messages stay in the page. S35 and S55 use the same component when they are built; the Handoff's „`mat-stepper`“ is read as „the Material stepper look“ | S4-10; O-S4-12 |
+
+### Changes from v29
+
+Sprint 04, task S4-09 (`docs/sprints/sprint_04/S4-09_configurator_state.md`; owner decision O-S4-8 (a) and the defaults of the task plan, 2026-11-10).
+
+| # | Change | Driver |
+|---|---|---|
+| C116 | **Configurator state (§8.1; R-CON-01 – R-CON-09).** (1) **Where it lives (O-S4-8 (a)):** `withConfigurator()` is a slice of the root store and holds, under the one state key `configurator`, the draft of the four layers and the filter options answered for it — the options belong to the draft, because `excludedBy[]` depends on the selection sent. `withCatalog()` is not started: it comes when `withFilters()`/`withCriteria()` and the legacy filter go. (2) **Release pinning (ADR-002):** the draft keeps the release of the first filter-options answer and names it (`release=`) in every later request, so one draft never mixes two releases, also when another release is activated during the session. (3) **Loading:** the options load again after every change of steps 1–3 (the server computes `excludedBy[]` for the selection it receives); only the answer of the latest request is applied, and until it arrives choices in the layers below the changed one are refused — their options are out of date. 404 is kept apart from other failures (`noRelease`), so S4-12 can fall back to the legacy filter (O-S4-3 (a)). (4) **Rules** are pure functions (`selection-rules.ts`): one use case or „Keiner davon passt“ (sends no `useCase`), at least one app type, the always-selected product parts from `alwaysSelected` and never removable, an excluded option changes nothing, and a change of a layer clears every lower layer except the always-selected parts — also values that would still be allowed (CFG-01) — reporting the changed layer and the cleared layers that held a selection. (5) Memory only, never browser storage (R-CON-09) | S4-09; O-S4-8 |
+
+### Changes from v28
+
+Sprint 04, task S4-08 (`docs/sprints/sprint_04/S4-08_e2e_test_release.md`; issue #241, `TECH_DEBT_v3.md` TD-35; owner decisions of 2026-11-10: O-S4-3 (a) + (b), seeder in the host (A), E2E stack stays `Development` (i), dev compose override (x)).
+
+| # | Change | Driver |
+|---|---|---|
+| C115 | **Test catalog release in development and E2E (§9.7, §10.2; TESTING §6.3 V121).** Until release 2026.1 can be activated (O-1), the development and E2E stacks have an active catalog release: at startup, after the migrations and the `RebuildDatabase` step, the host calls `CatalogModule.SeedTestReleaseAsync`, which imports the test folder `Catalog:TestRelease:Version` (`T.1`, the MiniCatalog) from `Catalog:TestRelease:Path` if that version is not stored and activates it if no release is active — a release activated by hand stays active, and a missing folder is skipped with a warning. (1) **Where it runs (O-S4-3 (b)):** only in `Development` and `E2E`, checked on `IHostEnvironment` like the `RebuildDatabase` guard (`TestCatalogSeedExtensions`); staging keeps no active release and the legacy filter. (2) **Where the folder comes from:** it stays in `tests/ProcureAccess.Tests.Shared/Fixtures/Releases/` and is not in the API image; `docker-compose.e2e.yml` and `docker-compose.dev.yml` mount it read-only at `/app/catalog/test-releases`, `appsettings.Development.json` names it for `dotnet run`. A deployment from `docker-compose.yml` alone has no folder, so a wrong environment there seeds nothing either. (3) The legacy filter and S10 coexist until 2026.1 is active (O-S4-3 (a), S4-12) | S4-08 (#241); S3-17 P4, S3-19 P1, S3-20b P1 |
+
+### Changes from v27
+
+Sprint 04, task S4-07 (`docs/sprints/sprint_04/S4-07_documentation_session.md`; issue #243, `TECH_DEBT_v3.md` TD-37). Documents only; no rule changes.
+
+| # | Change | Driver |
+|---|---|---|
+| C113 | **Document upkeep.** The status line starts with the current version (v27 started with „v26 —“ and said „Supersedes v26“). The header names the current versions: Handoff and Figma mapping 1.16, UX copy v16 (also in the language note, which named v15), SPEC v2.7 and TESTING v40 | TD-37; S3-23 P3, S3-24 P4 |
+| C114 | **`Criterion.Category` (§5.1)** had no meaning in this document (S3-12 P5). It is optional text (≤ 128 characters) that holds the chapter under which Kriterienkatalog Teil A lists the criterion (e.g. „Wahrnehmbarkeit“), as the release format defines it (`category`, S3-15); Teil B and the procedure criteria have none (release 2026.1: 122 of 188 criteria have one). The import sets it, and a stored criterion keeps it (C105). No endpoint, screen or export uses it (C109). Describes the state as built; no new rule | TD-37; S3-12 P5 |
+
+### Changes from v26
+
+Sprint 03, task S3-24 (`docs/sprints/sprint_03/S3-24_data_protection_keys.md`; owner decisions 1a, 2 and 3a of 2026-11-09).
+
+| # | Change | Driver |
+|---|---|---|
+| C112 | **Data Protection key store as built ahead of step 3 (§4.3, §9.1, §10.4; part of C60).** (1) **Owner (decision 1a):** the IdentityAccess module, as §4.3 lists it, not Platform: `IdentityAccessDbContext` (`internal`, schema `identity`, history `identity."__EFMigrationsHistory"`, migration `InitialIdentityAccessSchema`) is the module's first context (ADR-014); it maps only `DataProtectionKeys` until step 3 adds users, memberships and contributor profiles. `AddIdentityAccessModule(configuration)` registers it, its `IModuleDatabaseMigrator` (after Platform, before Catalog) and `AddDataProtection().SetApplicationName("ProcureAccess").PersistKeysToDbContext<IdentityAccessDbContext>()`. The fixed application name replaces the default (the content root path), so hosts started from different folders share the key ring. (2) **Dependency (decision 2):** `Microsoft.AspNetCore.DataProtection.EntityFrameworkCore` 10.0.14 (MIT, Microsoft; D12). (3) **No encryption at rest (decision 3a):** the key XML is stored as written; whoever reads the database or a `pg_dump` reads the keys, and ASP.NET Core logs the warning „No XML encryptor configured“ each time it creates a key (every 90 days). Protecting the keys with a certificate is left for `TECHNICAL.md` before the pilot. *Superseded by C131 (v45, S4-26): the key ring is encrypted with a certificate.* (4) **Effect today:** the legacy Identity token providers (`AddDefaultTokenProviders`: e-mail confirmation, password reset, e-mail change) already use Data Protection, so their links now survive a new container; antiforgery and the session cookie follow in step 3; keys of the old file-system ring (`/home/app/.aspnet/DataProtection-Keys`, locally `~/.aspnet/…`) are not read any more, so a link sent before the deployment fails once. (5) **OPS-04 stays planned** until the cookie session; an integration test without invariant tag shows that a second host on the same database reads what the first protected and a host on another database does not | S3-24, #186; `TECH_DEBT_v2.md` TD-21 |
+
+### Changes from v25
+
+Sprint 03, task S3-23 (`docs/sprints/sprint_03/S3-23_usage_events_fire_and_forget.md`; owner decisions D1 (A), D2, D3 and D4 of 2026-11-09).
+
+| # | Change | Driver |
+|---|---|---|
+| C111 | **Usage events written fire-and-forget (§5.7; replaces the write path of C91).** (1) **Request path (D1 A, D4):** `IUsageEventWriter` has `void` methods (`CriteriaListShown`, `ExportCreated`); they build the event with the UTC day of the call and put it into a bounded in-memory queue (`System.Threading.Channels`, part of .NET) without waiting, and never throw. (2) **Background service:** `UsageEventBackgroundWriter` (Platform, hosted service) stores the queue in batches of at most 100 through `UsageEventStore`, a `PlatformDbContext` with options of its own **without** the retrying execution strategy of the module's registration. (3) **Retry without duplicates (D2):** the store opens the connection first; if that fails, nothing was sent, so the service keeps the batch and tries again every `UsageEvents:RetryDelay` (on `TimeProvider`) for as long as it takes. If the insert was sent and failed, the batch is logged as lost and not repeated, because the database may have committed it — an event can be lost but is never counted twice. An unexpected exception drops only that batch, so counting never stops the host. (4) **Bounded memory (D3):** `UsageEvents:QueueCapacity` (1000) events wait in the queue; beyond it new events are dropped. The outage, the recovery and a full queue are each logged once, and the number of dropped events after the next write. (5) **Shutdown:** the queue takes no further events, the queued ones are stored until the host's shutdown timeout, and what is left is logged as lost. The queue is per process; like the log retention it assumes a single API instance (§10). No new dependency | #115 (R-MET-01 „fire-and-forget with error log“); S1-23 R1/P4; owner D1–D4 |
+
+### Changes from v24
+
+Sprint 03, task S3-21 (`docs/sprints/sprint_03/S3-21_criteria_suggestion_link.md`; owner decisions 1a, 2a, 3a and 4 of 2026-11-09).
+
+| # | Change | Driver |
+|---|---|---|
+| C110 | **Criteria-suggestion channel as built (C85, §9.7, §16.4.2).** (1) **Where it lives (decision 2a):** `Contact:CriteriaSuggestion` (SPEC R-SUG-01) is the client setting `criteriaSuggestion` in `environment.ts` / `environment.prod.ts`, read through the token `CRITERIA_SUGGESTION_CHANNEL` (`core/contact/criteria-suggestion.ts`). No endpoint and no API setting (§16.4.2 option C); a build-time value is enough because the channel is WERTE.IT's, the same in every environment, so the client image stays one image. The value is `mailto:<address>` (no query: the subject comes from the UX copy) or an https URL; any other value throws when the footer is created. (2) **Placeholder (decision 3a):** until O-6 the value is `mailto:kriterium-vorschlagen@example.invalid`; `.invalid` is reserved (RFC 2606) and can never receive mail, so it marks every placeholder. The link is shown with it outside production. (3) **Release check instead of a failing build (decision 1a):** the release build runs in CI stage 2, in the client image (E2E) and in staging, so it cannot fail while O-6 is open. `scripts/check-release-config.mjs` fails while the setting of `environment.prod.ts` is the placeholder or not an accepted form; it runs before a production release (there is no release pipeline yet, §10.3), and its self-test runs in CI stage 1. GP.3 adds the legal pages (R-SHL-07) to the same check. (4) **Footer (decision 4):** the link `shell.footer.suggest` comes first in the footer; a visually hidden suffix `suggest.external` (mail) or `suggest.external.url` (URL) names where it leads; the mail gets the subject `suggest.mailSubject`, no body (the body with the criterion key comes with S11, M2.6) | SPEC v2.5-1 – v2.5-3; UX copy v16 U85 |
+
+### Changes from v23
+
+Sprint 03, task S3-20b (`docs/sprints/sprint_03/S3-20b_criteria_endpoint.md`; owner decisions 2, 3 and 7 of 2026-11-09, the defaults stated before S3-20 and not objected to).
+
+| # | Change | Driver |
+|---|---|---|
+| C109 | **Criteria endpoint as built (§5.1, §7.2, §9.6).** (1) **`GET /api/v1/catalog/criteria`** is a minimal API of the Catalog module like filter-options (C107), with the same `release` rule, the same HTTP caching (one helper, `Http/CatalogJsonAnswer`) and the selection check and priority resolution of C108. (2) **Release content in the cache:** `CatalogReleaseSnapshot` holds each criterion revision with its rules, titles, standard references and procedure texts, the exclusion rules, the app type → procedure mapping and the release's gaps; the reader loads the release once with split queries and caches it without expiry (§9.6). (3) **Complete releases only (decision 7):** the gaps are those `catalog activate` refuses (`Releases/ReleaseCompleteness`, one function for both); a named release with gaps answers 404 `not-found`, so no answer carries a priority without explanation (CAT-02). (4) **Which criteria:** every requirement criterion that applies to a selected app type with no product part or a selected one, and the procedure criterion of each selected test type (CAT-16), in list order (`SortOrder`, then key). (5) **Texts and ratings (C31 as written):** the criterion's procedure texts of the test types the release maps to a *selected* app type (CAT-21), in test-type order; `allowedRatings` is their union, all six levels when none applies, and empty for a procedure criterion (decision 3). (6) **`productPart` (decision 2):** of the applicability rows that match the selection, the selected part with the lowest sort order; null when none names a part. (7) **`appTypesWithoutCriteria[]`:** the selected app types to which no requirement criterion applies under the whole selection, product parts included (CAT-20). (8) **Strings in the answer:** enum values are mapped to strings in the module (camelCase; `level` `A`/`B`/`Info` like SPEC §8.2 and the UX keys), so the JSON does not depend on a serializer setting. The revision's own `RationaleDe` and `Category` are not sent: SPEC §8.2 does not list them and no screen or export column uses them | Owner, S3-20 decisions 2, 3, 7; SPEC_v2.4 |
+
+### Changes from v22
+
+Sprint 03, task S3-20a (`docs/sprints/sprint_03/S3-20a_priority_resolution.md`; owner decisions 1–7 of 2026-11-09 before the task, all as proposed: decision 4 splits S3-20 into S3-20a and S3-20b; decisions 1, 5, 6 and 7 are recorded below; decisions 2 and 3 on the response shape follow with S3-20b).
+
+| # | Change | Driver |
+|---|---|---|
+| C108 | **Priority resolution and selection check as built (§5.1, §7.2).** (1) **Per app type (decision 1):** each selected app type the criterion applies to — an applicability row names it and either no product part or a selected one — runs the whole chain on its own, most specific first: (app type, use case) → (app type, –) → (–, use case) → (–, –); without a use case only rules 2 and 4. The strictest result of these app types wins: level (A > B > Info), then the higher weight (a rule without weight ranks below one with), then the lower `AppType.SortOrder`. So a selected app type never gets a looser priority than its own chain gives; with Web + Software (offen) and no use case, a rule (Software (offen), –) = Info does not lower Web's catalog default B. A selected app type the criterion does not apply to takes no part. `matchedRule` names the app type for rules 1 and 2; rules 3 and 4 name none. (2) **Procedure criteria** have no applicability (C30), so only rules 3 and 4 apply to them. (3) **No guessing:** if the chain of an app type finds no rule, the criterion has no catalog default and the release is incomplete; the resolution gives no result, and the criteria endpoint answers 404 for such a release (decision 7, S3-20b). (4) **Selection check (CAT-11):** a complete selection has at most one use case, at least one app type, every product part with `IsAlwaysSelected` and any test types, each by a known key; otherwise 400 `validation`, one error per field as the client sends it (`useCase`, `appTypeIds`, `productPartIds`, `appTypeIds[1]`). Only a complete selection is checked against the exclusion rules of the release; a value that a selected higher-layer value excludes gives 400 **`selection-excluded`** with the same field-keyed `errors` (decision 5; SPEC §8.6 named the type without a use until now). (5) **Inactive use cases** are accepted by the criteria selection too and their rules apply (decision 6, as in filter-options, CAT-18): the public endpoint cannot tell a new selection from an old one, and filter-options does not offer them. Code: `src/ProcureAccess.Modules.Catalog/Criteria/` (`CriteriaSelectionReader`, `CriterionRules`, `PriorityResolver`), pure and `internal`; the endpoint follows with S3-20b | Owner, S3-20 decisions 1, 5–7 |
+
+### Changes from v21
+
+Sprint 03, task S3-19 (`docs/sprints/sprint_03/S3-19_filter_options_endpoint.md`, owner decisions of 2026-11-06 before the task: O-S3-6 and decisions 1–6, all as proposed).
+
+| # | Change | Driver |
+|---|---|---|
+| C107 | **Catalog filter options as built (§4.3, §7.1, §7.2, §9.6).** (1) **Endpoint style (O-S3-6):** module endpoints are **minimal APIs**, `internal` in the module; the module makes public only `Map<Name>Endpoints(this IEndpointRouteBuilder)` on its registration class, so ARC-03 holds without contract DTOs. The host maps them on its versioned group: `app.NewVersionedApi().MapGroup("/api/v{version:apiVersion}").HasApiVersion(1, 0).MapCatalogEndpoints()`, so a module needs no versioning package. Every `Map…` call comes before the Swagger set-up, which lists the documents through `app.DescribeApiVersions()` (#176). (2) **Versioned routes (#153):** only the new module endpoints live under `/api/v1`; the legacy controllers stay at `/api/<controller>` until their steps retire them, and the dead second route of `BaseCrudController` is gone. The API version is read **from the URL segment only**; the query, header and media-type readers made Swagger list `api-version` and `v` twice on every operation. (3) **`GET /api/v1/catalog/filter-options`** answers in the shape of SPEC §8.1: the four layers with every filter value; use cases sorted by German name (they have no sort order), the other layers by `SortOrder`; inactive use cases are not listed but are accepted in `useCase`, and their rules apply (CAT-18). `excludedBy[]` lists the selected higher-layer values whose rule *of the release* excludes the option (CAT-12, CAT-19); a value counts as selected only if the request names it, also a product part with `IsAlwaysSelected`. `appTypesWithoutCriteria[]` stays with `/criteria` (SPEC §8.2, S3-20). (4) **Release and errors:** `release=<version>` names a stored release, active or not; without it the active release applies. An unknown release, or no active release, answers 404 `not-found`; an unknown key 400 `validation` with one error per key as sent (`useCase`, `appTypeIds[1]`); an empty value counts as not given. (5) **Caching (§9.6):** the content of a release and the filter values are cached in memory without expiry (`CatalogReader`); the HTTP answer carries an `ETag` (hash of the body) and gets 304 for a matching `If-None-Match`; `Cache-Control` is `public, max-age=3600, must-revalidate` for a named release and `public, no-cache` for the active one, so the request after `catalog activate` returns the new release (CAT-09) | O-S3-6; owner, S3-19 decisions 1–6; #153, #176 |
+
+### Changes from v20
+
+Sprint 03, task S3-17 (`docs/sprints/sprint_03/S3-17_catalog_activate.md`, owner decisions 1–4 of 2026-11-06 before the task).
+
+| # | Change | Driver |
+|---|---|---|
+| C106 | **Catalog activation as built (§5.1 „Activation“, §9.6, §10.2).** (1) `catalog activate <version>` is the second command of the API host's command mode (C105), with the same exit codes. (2) **Complete releases only:** every criterion of the release, procedure criteria included, has a catalog-default priority (rule 4 of the priority resolution), and every seeded `TestType` has its procedure criterion (C30); otherwise the command names every gap and writes nothing. A stored release never changes, so a gap is fixed in the folder and imported as a new version (O-S3-5 Q2 (iii); owner, S3-17 decision 1). (3) **One active release:** the release active so far is deactivated in the same transaction; a partial unique index on `IsActive` (migration `AddSingleActiveReleaseIndex`) refuses a second one. An older release may be activated again (rollback); activating the active release writes nothing; no command deactivates the last active release (decision 4). (4) **Cache (§9.6, D10):** `CatalogReader` caches the content of a release in `IMemoryCache` under its `CatalogReleaseId` without expiry and reads which release is active from the database on every call, because the command runs in another process and cannot clear the API's cache; the next request after an activation returns the new release without a restart. Replaces „invalidated when a release is published“ (decision 2). The catalog endpoints (S3-19) read through it (decision 3) | Owner, S3-17 decisions 1–4; S3-12 P4; S3-15 P2; S3-16 P1 |
+
+### Changes from v19
+
+Sprint 03, task S3-16 (`docs/sprints/sprint_03/S3-16_catalog_import.md`, owner decisions 1–6 of 2026-11-06 before the task).
+
+| # | Change | Driver |
+|---|---|---|
+| C105 | **Catalog import as built (§5.1 „Import“, §10.2).** (1) `catalog import <version>` is a command mode of the API host, not a project of its own: `Program.cs` hands `catalog …` arguments to `CatalogModule.RunCommandAsync`, with only the Platform and Catalog modules, no web server, no migration and no background job; exit code 0 / 1 (refused, nothing written) / 2 (usage). The public entry is a method of `CatalogModule`, so `Catalog.Contracts` stays empty of import types (S3-11 §2.2). (2) The release folders ship with the API image (`/app/catalog/releases`); the setting `Catalog:ReleasesPath` (default `catalog/releases`, relative to the working directory) points there or to the repository folder. (3) A version is imported once. (4) `Criterion.MarkSupersededBy` sets the successor key of a stored criterion once, when the next release lists it in `supersedes`; each such key must be a criterion of the previous release (the one stored last). (5) A standard reference is unique per standard, clause **and URL**, so a corrected URL is a new row cited only by the new revision; an exclusion rule is unique per source, target and reason (both indexes `NULLS NOT DISTINCT`, migration `AddImportUniqueIndexes`). (6) `CatalogImmutabilityInterceptor` refuses every change and delete of a stored catalog row except `CatalogRelease.IsActive` and a first `SupersededByKey` (CAT-05). Also: the key example in §5.1 follows the key scheme of S3-15 (decision 1a) | Owner, S3-16 decisions 1–6; S3-11 §2.2; S3-12 P2; S3-13 P1; S3-15 P1, P3, P9 |
+
+### Changes from v18
+
+Sprint 03, task S3-13 (`docs/sprints/sprint_03/S3-13_catalog_filter_dimensions.md`, owner decisions of 2026-11-06 on its plan).
+
+| # | Change | Driver |
+|---|---|---|
+| C104 | **Filter dimensions and rules as built (§4.3, §5.1).** `UseCaseTemplate`, `AppType`, `ProductPart`, `TestType`, `FilterExclusion`, `CatalogReleaseFilterExclusion`, `CatalogReleaseAppTypeProcedure`, `CriterionApplicability`, `PriorityRecommendation`, `CriterionProcedureText` and `Criterion.TestTypeId` live in `ProcureAccess.Modules.Catalog` (`internal`, migration `AddFilterDimensions`); `PriorityLevel` and the flags enum `Rating` (six levels, no `Unknown`) are in `Catalog.Contracts` (S3-11 §2.2). **Seed (O-S3-5 D1):** the migration writes the four filter-value tables with fixed ids and the values of Kriterienkatalog §2; the tables generate no ids, because only migrations write them. **Keys** (owner, 2026-11-06), the contract of release folders and API (SPEC §8.1): use cases `hr`, `reporting`, `trainingManagement`, `travelRequests`, `payroll`, `internalCommunication`, `databaseApplication` (inactive); app types `web`, `softwareOpen`, `softwareClosed`, `mobileOpen`, `mobileClosed`, `document`, `hardware`, `relayEmergencyService`; product parts `base`, `audio`, `video`, `twoWayVoice`, `rtt`, `biometrics`, `authoringTool`; test types `softwareTest`, `appTest`, `pdfTest`, `bikWeb`, `bikApp` (procedure criteria `PROC-<key>`). **`AppType.IsInScope` removed** (owner, 2026-11-06): no document defined it; Hardware and Vermittlungs- oder Notrufdienst stay selectable and are handled by `appTypesWithoutCriteria[]` (§7.2, SPEC §8.2). **`UseCaseTemplate.Description` optional:** no document has a text for it, the seed leaves it empty. **Database rules:** `FilterExclusion` has the CHECK constraints of v7 (one source, one target, target layer lower; CAT-13); `Criterion.TestTypeId` is set exactly for `Kind = TestProcedure` (CHECK); `AllowedRatings` names at least one of the six levels (CHECK); one priority rule per revision, app type and use case, one applicability row per revision, app type and product part (unique, nulls not distinct), one procedure text per revision and test type. **Immutability (CAT-05):** exclusions and procedure mapping are added to a release, applicability, priority rules and procedure texts to a revision, all only before `Publish`; an exclusion rule, like a standard reference, has no method that changes it and can be shared by later releases. A procedure criterion gets no applicability and no procedure text (C30) | S3-13; owner decisions of 2026-11-06 |
+
+### Changes from v17
+
+Sprint 03, tasks S3-11 (`docs/sprints/sprint_03/S3-11_catalog_design_note.md`, owner decision O-S3-5 of 2026-11-06) and S3-12 (`docs/sprints/sprint_03/S3-12_catalog_core_entities.md`, owner decisions of 2026-11-06 on its plan).
+
+| # | Change | Driver |
+|---|---|---|
+| C101 | **Catalog core as built (§4.3, §5.1, ADR-014).** `CatalogRelease`, `Criterion`, `CriterionRevision`, `CatalogReleaseCriterion` and `StandardReference` live in `ProcureAccess.Modules.Catalog`, `internal`, with `CatalogDbContext` (schema `catalog`, history `catalog."__EFMigrationsHistory"`, migration `InitialCatalogSchema`); `CriterionKind` is in `Catalog.Contracts` (S3-11 §2.2). **Published** means stored: the import (S3-16) builds a release in memory and seals it with `Publish`, `PublishedAt` is the import time and `NOT NULL` in the database, so every stored release is published (owner, S3-12 decision 1). After `Publish`, adding a revision, publishing again and changing a revision of the release throw a domain error (`PublishedCatalogChangeException`, CAT-05); a loaded release and its revisions are sealed. Only `IsActive` still changes, through `Activate`/`Deactivate` (`catalog activate`, S3-17). A `StandardReference` cited by a revision of a published release is part of that release; it has no method that changes it, so a corrected clause or URL is a new row (decision 2). A release holds one revision per criterion. `PlainLanguageDe`, `RationaleDe` and `Category` are optional, because release 2026.1 is imported before the plain-language titles exist (O-1, K-1; SPEC R-ADM-01). `Criterion.TestTypeId` follows with `TestType` in S3-13 | S3-12; S3-11 §2.1, §2.2 |
+| C102 | **Step 2 reworded (§12) after O-S3-5.** The existing criteria are not copied into the catalog (option C): `FilterTypes`, `CriteriaFilters`, `CriteriaFilterExclusions` and `Criteria` stay in the legacy context, and the legacy endpoints keep reading them until the configurator S10 replaces `/filters` (sprint 04) and steps 5/6 retire products and proposals; criterion proposals are kept as they are. The filter values (`UseCaseTemplate`, `AppType`, `ProductPart`, `TestType`) are seeded in a catalog migration (D1). Release 2026.1 is produced from Kriterienkatalog Teil A/B plus the priority document (SPEC R-ADM-01), so the existing criteria reach it by their EN 301 549 numbers, not as copied rows. `catalog import` accepts a release without priorities, `catalog activate` refuses it (Q2 (iii)). Replaces „Map the repository's `CriteriaFilter` … onto them“, „Migrate existing criteria into release 2026.1“ and „The existing filter UI keeps working against the extended contract“ | O-S3-5 (a)–(e); S3-11 §2.4 C, F1 |
+| C103 | **The two seed exclusions are named by their entries (§5.1, §12).** `CriteriaFilterExclusion` has a composite key, so „Id 2 and 3“ named no rows: they are the exclusions 17 → 12 and 17 → 13, the second and third entries of `CriteriaFilterExclusionSeed` (HR-Anwendung → Mobile Anwendung (offen) / (geschlossen)) | S3-11 F7, P7 |
+
+### Changes from v16
+
+Sprint 03, task S3-07 (`docs/sprints/sprint_03/S3-07_automapper_replacement.md`, issues #31, #90); owner decision O-S3-4 of 2026-11-05 on the options of the task's first run.
+
+| # | Change | Driver |
+|---|---|---|
+| C99 | **ADR-015: AutoMapper replaced by hand-written maps (§6, §14).** AutoMapper 15+ fails D12 (RPL-1.5 or commercial) and 14.0.0 carries the unpatched GHSA-rvv3-g6hj-g44x. The maps are plain C#: extension methods (`ToDto`, `ToEntity`, `ToLookupDto`) and `Expression` projections for EF queries in `MODELS/Entities/Mapping/` (`CatalogMappings`, `AccountMappings`); no mapping package. Modules write their maps the same way. ARC-06 checks that every map sets every target member or names it as ignored (`TESTING_v27.md` V89). Rejected: Mapperly (Apache-2.0, compile-time checks, a new dependency for code that mostly retires in M2–M6), Mapster (MIT, runtime mapping like AutoMapper), Facet (generates DTOs, does not fit), staying on AutoMapper 14, a commercial licence | #31; O-S3-4 (a), (b) |
+| C100 | **Generic CRUD controllers are read-only (D11, §2.3).** `BaseCrudController` mapped `POST`/`PUT`/`DELETE` for the legacy catalog and proposal controllers without an authorization requirement; an anonymous `DELETE` removed catalog rows. They were removed (PR #201) instead of being fixed (#90): the catalog changes only through the CLI import (SPEC SD20, R-ADM-01), proposals only through their own endpoints until the workflow retires (M5.6). D11 now reads "generic CRUD controllers only for reading catalog data" | #90; S3-07 F7, F8; O-S3-4 (c), (d) |
+
+### Changes from v15
+
+Sprint 03, task S3-05 (`docs/sprints/sprint_03/S3-05_documentation_session.md`, issue #180): findings of sprint 02 and one owner decision of sprint 03 that had been left for "the next ARCHITECTURE version". Apart from C98, no rule changes; C95 writes down a rule the owner set on 2026-10-30.
+
+| # | Change | Driver |
+|---|---|---|
+| C95 | **Interim rule for O-22 (§4.3, §16.5).** Until O-22 is decided, a `Contracts` project references no other project, so also no other module's `Contracts` project. ARC-03 fails on such a reference (`TESTING_v16.md` V74). Before, the rule was only in TESTING and CLAUDE §7 | Owner, 2026-10-30 (S2-08 D1); S2-08 P1 |
+| C96 | **Platform as built includes Problem Details (§4.3).** Since S2-10 Platform answers every error of the API as RFC 9457 Problem Details: validation errors of controllers and minimal APIs, unhandled exceptions as 500 without the exception text, and empty error responses; `type` is `<base>/problems/<name>` with the 13 names of §7.1 (`ProblemTypes` in `Platform.Contracts`). API-01 checks it; legacy actions with a `[Produces]` attribute still send the media type `application/json` (`TESTING_v18.md` V79) | Sprint 02, S2-10 (decision 3), P3 |
+| C97 | **`/api/Health` removed (§4.3, C93).** The legacy endpoint that C93 left with the legacy controllers is gone since S2-19 (#122); readiness is only `/health/ready`, also for the E2E stack | Sprint 02, S2-19 P2 |
+| C98 | **Services of the hosting platform in the licence rule (D12).** GitHub Actions runners, CodeQL code scanning and Dependabot are services of the hosting platform, not dependencies: they are neither shipped nor kept in the repository, so D12 does not apply to them. Actions that a workflow references (`uses:`) are development tools and follow D12 | Owner, 2026-11-05 (S3-03 decision 3); S3-03 P3 |
+| C99 | **Open footer targets (§16.5).** R-SHL-06 names three footer links whose targets do not exist yet. „Kriterium vorschlagen“ is O-6; „Über ProcureAccess“ (O-23) and „Projekt WERTE.IT“ (O-24) are new open points. Until they are decided the footer links only targets that exist (S2-15) | Sprint 02, S2-15 P2 |
+
+### Changes from v14
+
+| # | Change | Driver |
+|---|---|---|
+| C92 | **Module DbContexts and migration histories (ADR-014, §10.5).** Every module that owns tables has its own `internal` `DbContext` and its own migrations in its project, with the history table `<schema>."__EFMigrationsHistory"` in a schema of the module (Platform: `platform`). The legacy `ApplicationDBContext` keeps `public."__EFMigrationsHistory"` until its last entity has moved. At startup the host migrates the legacy context first, then every `IModuleDatabaseMigrator` (Platform.Contracts) in registration order. A table moves from the legacy context to a module with two migrations: an empty one in the legacy context that only removes the entity from its model (never `DropTable`), and a first module migration that creates the table only where it is missing (`IF NOT EXISTS`), checked by a test that compares both layouts. Closes S2-06 open point P5 | Owner, 2026-10-30 (O-S2-1, option A of S2-07); S2-06 P3, P5 |
+| C93 | **Platform as built (§4.3, §5.7, §9.5).** Since S2-07 the Platform module holds the `TimeProvider` registration, the Serilog set-up with the PostgreSQL sink, the log-retention job, the usage-event writer with `UsageEvent`, and `/health/live` and `/health/ready`, with `PlatformDbContext` for `logging."SeriLogs"` and `analytics."UsageEvents"`. `IUsageEventWriter` and `IModuleDatabaseMigrator` are in `Platform.Contracts`; everything else is `internal`. The legacy logging wrapper `IAppLogging<T>` and `/api/Health` stay with the legacy controllers (`/api/Health` is removed with #122) | Sprint 02, S2-07 |
+| C94 | **Module references as built (§4.3).** A module project references Platform only through `Platform.Contracts`; only the host `API` references the `Platform` project (owner, S2-06 D1). A module project never references a legacy project (`API`, `DAL`, `MODELS`, `SERVICES`); the host references the modules, and legacy code waits for its migration step (O-S2-1). The contracts project of *Identity & Access* is `IdentityAccess.Contracts` (the project name). Whether a contracts project may reference another module's contracts project is open (O-22) | Sprint 02, S2-06 D1 and P1 |
+
+### Changes from v13
+
+| # | Change | Driver |
+|---|---|---|
+| C90 | **Logging as built (§9.5):** the sink is the package `Serilog.Sinks.Postgresql.Alternative` (MIT), not a sink of our own; it writes to `logging."SeriLogs"` in batches with a bounded queue. The **migrations own the table** — the sink never creates it — so every environment starts with the same schema. Retention is an **own job** (`LogRetentionJob`) on `TimeProvider`, not the sink's `retentionTime`, which runs on the system clock and could not be tested with `FakeTimeProvider`. Retention 90 days and run interval 1 day are read from `AppLoggingSettings:Retention`; the 90 days are a 🔧 default since SPEC v2.1 (SD24). The job assumes one API instance, as the startup migrations do | Owner decisions D1, D4 of sprint 01, S1-22 (2026-10-25); S1-22 F7 |
+| C91 | **Usage events as built (§5.7):** table `analytics."UsageEvents"` with a surrogate key `Id` (EF needs one), a **random UUID v4** set by the database (`gen_random_uuid()`), so the key does not show the order of events within a day (owner, 2026-10-29, #124; never an identity or a time-ordered UUIDv7); `OccurredOn` is the **UTC** day from `TimeProvider`. `IUsageEventWriter` has one typed method per event of SPEC_v2 §9.1. The writer **awaits** the insert in a DI scope and `DbContext` of its own and logs and swallows every failure, so a failure never fails the caller; there is no queue or background service. SPEC R-MET-01 says "fire-and-forget"; whether the request should also not wait (and not retry) is open in #115. *(v26, C111: fire-and-forget through a bounded queue and a background service; #115 closed)* | Owner decisions D2, D3 of sprint 01, S1-23 (2026-10-25); key: owner, 2026-10-29 (#124, PR #128); S1-23 P1, P3 |
+
+### Changes from v12
+
+| # | Change | Driver |
+|---|---|---|
+| C89 | **Licence rule for dependencies** (owner, 2026-10-27): D12 now states the rule for all dependencies, not only Excel. Shipped dependencies: OSI-approved, no commercial-use restriction, no strong copyleft or reciprocal licence; weak, file-level copyleft allowed if used unmodified; a dual licence counts by the option the project would use. Development and test tools that are not shipped: OSI-approved, no commercial-use restriction. Before, the rule only said "OSI-approved, no commercial-use restriction", which does not exclude RPL-1.5 (AutoMapper 15+) | S1-03 inventory §4, review of PR #32; CLAUDE §2 (no silent conflict resolution) |
+
+### Changes from v11
+
+| # | Change | Driver |
+|---|---|---|
+| C87 | **SPEC proposals confirmed** (owner, 2026-10-19): C74 catalog releases from data files, no editor UI for now (O-17 closed); C75 minimal product-identity administration, `PlatformAdmin` held by the owner in operation (O-18 closed); C76 removing a candidate, published entry stays (O-19 closed); supported browsers per SPEC §7.4 (O-20 closed). *Proposal* markers removed (§7.2); decisions recorded in §16.4.16 | SPEC_v2 SD19–SD22 |
+| C88 | **🔧 default values confirmed** (password length, lockout, token and invitation lifetimes, staleness, rate limits §9.2); they stay configurable | SPEC_v2 SD23 |
+
+### Changes from v10
+
+| # | Change | Driver |
+|---|---|---|
+| C71 | **E-mail delivery.** `IEmailSender` in Platform, implemented with MailKit (MIT) over SMTP with TLS; production provider **Lettermint** (EU-hosted, SMTP relay; credentials only from environment variables); Mailpit (MIT) as SMTP catcher in Development and E2E. Message types: address confirmation, password reset, „already registered“ notice, organisation invitation, product-identity request accepted/rejected. Open and click tracking are switched off in the provider project; recipient addresses are not logged above `Debug`. Sent synchronously with one retry (§2.1, §4.3, §9.1, §9.3, §10.1) | SPEC SD13, §7.6 |
+| C72 | **Account security.** E-mail confirmation (Identity `RequireConfirmedEmail` for the gated actions, not for sign-in): saving lists, creating organisations, accepting invitations, creating contributor profiles and all publication paths require a confirmed address (403 Problem Details `email-unconfirmed`). Lockout after 5 failed sign-ins for 15 minutes; password at least 12 characters; confirmation link 24 h, reset link 2 h, invitation 14 days, all single use and stored hashed (§9.1) | SPEC R-AUTH-01–04, R-ORG-02 |
+| C73 | **Dark theme in v1.** `UserPreferences.Appearance` (`System` / `Light` / `Dark`); anonymous users follow `prefers-color-scheme`. Pure client concern otherwise (§5.2) | SPEC SD11 |
+| C74 | **Catalog releases from data files** (*proposal O-S1*, confirmed in v12, C87): a release is a versioned folder in the repository (`catalog/releases/<version>/`, JSON); CLI commands `catalog import <version>` (validates everything, imports atomically as an immutable release) and `catalog activate <version>`. No catalog-editor UI in v1; `CatalogEditor` stays reserved (§5.1, §12) | SPEC R-ADM-01 |
+| C75 | **Product-identity administration** (*proposal O-S2*, confirmed in v12, C87): `PlatformAdmin` endpoints to list, accept and reject `ProductIdentityRequest`s and to merge duplicate `SoftwareProduct`s; minimal admin pages; actions logged with user and time (§7.2) | SPEC R-ADM-02 |
+| C76 | **Removing a candidate** (*proposal O-S3*, confirmed in v12, C87): `DELETE /api/v1/candidates/{id}` (Owner, Editor); evidences and assessments are deleted, a published entry stays and its `SourceCandidateProductId` becomes null (Y8) (§7.2) | SPEC R-CAN-09 |
+| C77 | **Response shapes fixed** for `GET /catalog/filter-options` and `GET /catalog/criteria` (SPEC §8.1, §8.2): `excludedBy[]` carries `layer`, `id`, `name` and **no reason text** (the client builds it from UX keys); `appTypesWithoutCriteria[]` is a list of `{ id, name }`; `matchedRule.kind` ∈ `appTypeAndUseCase | appType | useCase | default`. O-8 closed (§7.2) | SPEC SD10 |
+| C78 | **Problem types** with a configurable base URI (SPEC §8.6) (§7.1) | SPEC §8.6 |
+| C79 | **Personal data export** `GET /api/v1/account/export` as JSON (SPEC §8.4) and account deletion rules (sole Owner of an organisation with other members is refused; an organisation whose last member deletes the account is deleted with its lists and projects) (§7.2, §9.3) | SPEC SD14, R-AUTH-09/10 |
+| C80 | **Organisation rules:** the last Owner cannot be demoted, removed or leave; invitations are bound to the invited address (§5.2, §7.2) | SPEC R-ORG-02/03 |
+| C81 | **Share links:** expiry required, default 90 days, maximum 1 year (§5.3) | SPEC SD15 |
+| C82 | **Usage events final:** exactly `CriteriaListShown` and `ExportCreated` (SPEC §9.1); staleness threshold 18 months, evaluated by the client from `publishedAt` (O-15 closed) (§5.7, §16.5) | SPEC SD5, SD7 |
+| C83 | **Compare against project copies:** the configuration-scoped directory variant also accepts project copies of the caller's organisation (§7.2) | SPEC R-ENT-04 |
+| C84 | **Rate-limit defaults** per SPEC §7.3, all configurable (§9.2) | SPEC §7.3 |
+| C85 | **Configured content:** legal pages from versioned Markdown files in the repository; the criteria-suggestion channel from configuration (`Contact:CriteriaSuggestion`); production builds fail while either is a placeholder (§9.7) *(v25, C110: the channel is a client setting, and a release check fails instead of the build)* | SPEC SD16, SD17 |
+| C86 | **Open points:** O-8 and O-15 closed; O-17–O-21 added for the SPEC proposals O-S1–O-S5 (§16.5) | SPEC §13 |
+
+### Changes from v9
+
+| # | Change | Driver |
+|---|---|---|
+| C53 | **Project copy of the criteria list (D1).** Assigning a saved list to a procurement project creates a copy owned by the project (`CriteriaConfiguration.ProcurementProjectId`); the copy is not offered for other projects and cannot be shared by link. After assignment the copy's four selection layers (use case, app types, product parts, test types) are fixed; inclusion, priorities and notes stay editable (C51 now applies to the copy). "An assessment exists" means a `CandidateAssessment` with a value other than `Unknown`; assessment rows are created lazily (no row = `Unknown`). Replacing the list is possible until an assessment exists (§5.3, §5.4, §7.2) | D1; owner 2026-10-13; A-F12 |
+| C54 | **Vendor entries without assessments (D2).** A Flow E version without criterion assessments stores no `PublishedAssessment` rows; both directory variants return `fulfillment: null` and the UI shows a note instead of K1. If assessments are given, `productPartIds` is required and the full-scope rule (C43) applies. Flow B always has a scope: publication from a project requires the project's criteria list (§4.4, §4.6, §7.2, §7.3) | D2; B-F13 |
+| C55 | **Republication only by the original profile (D3).** Only the contributor profile under which a workspace entry was published may republish it; Editors and Owners of the source organisation may withdraw it and publish a new entry under another profile. Republication keeps the entry's `State`; a withdrawn entry is never republished — the next publication creates a new entry (§4.4, §4.6, §5.5, §7.2) | D3; B-F3 |
+| C56 | **Content purge on consent withdrawal (D4).** Withdrawing consent for an experience report withdraws it and purges its personal content: one exempt `ContentPurge` operation sets `NarrativeDe`, `AssistiveTechnologyContext`, `ProductVersionUsed` and the assessment notes (`EvidenceNote`) of all its versions to null and keeps a tombstone (ids, dates, state `Withdrawn`, consent timestamp and text version, moderation record). Timing is set by the legal review; default: immediately. Versions are never updated except by `ContentPurge` (§4.5, §5.5, §9.3, §16.2.8) | D4; B-F1 |
+| C57 | **Context of experience reports (D5).** App types are optional and always offered; experience reports carry no use case (`useCaseTemplateIds` removed from Flow D) and never match a set use-case filter; `ContributorDeclared` applies to app types only. Allowed ratings come from the stated app types, all six levels without a statement (§4.5, §5.5, §7.2) | D5; A-F6 |
+| C58 | **Re-pinning decided (D6, O-3).** `POST /api/v1/configurations/{id}/copies { release: "active" }` as proposed in §16.3.1; a project that should use a newer release is a new project with a copy (§5.4, §7.2, §16.3.1) | D6 |
+| C59 | **Share links (D7, O-5).** Shared criteria lists are readable without an account (`GET /api/v1/shared/{token}` → 200). In v1 only organisation lists can be shared (`ShareLink.ResourceType = Configuration`); there are no project share links. `ShareLink` gains `OrganizationId` (global query filter), stores only a hash of the token and is resolved through `IShareableResourceProvider`, implemented by the owning module (authorisation and redacted read DTO) (§4.3, §5.3, §7.2, §9.1, §16.2.3) | D7; B-F14 |
+| C60 | **Session implementation (completes C50, C52).** Sign-in time stored in `AuthenticationProperties.Items`; absolute limit checked in `OnValidatePrincipal`, chained with the security-stamp validator; extend sets `ExpiresUtc` explicitly; `OnCheckSlidingExpiration` renews on every authenticated request except the session probe; expiry times in response headers; anonymous `GET /auth/session` returns 200 and issues the antiforgery token, which rotates on sign-in and sign-out; antiforgery failures return Problem Details; on 401 the shell opens an in-app login overlay and retries the request; Data Protection keys persisted in the database; password change and account deletion end other sessions; lifetimes and warning lead time configurable, time read through `TimeProvider` (§8.3, §9.1, §9.4, §10.4, ADR-006) | B-F7–B-F10, B-F12, B-F17 |
+| C61 | **Migration plan:** step 2 adds `CatalogReleaseAppTypeProcedure`; step 3 adds cookie authentication with antiforgery, the Data Protection key store, the Configurator entities and `ShareLink`; step 4 becomes session warning and hardening (§12) | A-F13; B-F11, B-F18 |
+| C62 | **Module projects.** One .NET project per module plus one `Contracts` project per module; Platform may be used by every module; the dependency table names `Catalog.Contracts`; outside `Contracts` only controllers and the module registration are public; `PersistedConfigurationSource` moves into Export behind `IConfigurationReader` (Configurator.Contracts), which removes the Export ↔ Configurator cycle (§4.3, §4.4) | A-F19; B-F6 |
+| C63 | **Version reference in moderation.** `ContentReport`, `CounterStatement` and `ModerationAction` carry a nullable `PublishedEntryVersionId` (the version that was shown) in addition to the entry (§5.6) | B-F3 |
+| C64 | **Idempotency.** `PublishedEntryVersion.ClientRequestId` with a unique index on that column alone, plus `RequestHash`; Flow B carries `clientRequestId`; the same id with a different payload returns 409 (§7.1, §7.2) | A-F8; B-F4 |
+| C65 | **Test evidence and product versions.** A new product version updates the existing evidence row of that procedure (`TestedVersion`, date); the history lives in the published versions (§5.4; corrects the wording of C51) | B-F15 |
+| C66 | **Enforcement of two invariants.** "`WasTested` is not null for test-result origins" is a factory rule, not a cross-table CHECK; immutability of versions is enforced by an EF Core `SaveChangesInterceptor` (§5.5) | B-F5, B-F16 |
+| C67 | **API details:** directory filter `testKinds[]` (multi); `EvidenceUrl` on `PublishedTestEvidence`; derived `procedureAnswers[]` returned by the server; `PATCH …/criteria/{criterionRevisionId}`; Flow D step 2 reads "no `PublicationConsent`" (§4.5, §5.5, §7.2, §7.3) | A-F7, A-F11; B-F19 |
+| C68 | **Wording aligned:** consent is no longer described as conditional (§9.3, §16.2.8); §13 uses the WSP-02/03 wording for the project list; the §11.2 projection runs inside Directory on configuration data read through `IConfigurationReader` | A-F9, A-F10; B-F19 |
+| C69 | **Usage events for the PRD §10 indicators** listed (§5.7) | Review A (PRD coverage) |
+| C70 | **Open points:** O-3 and O-5 closed; O-14–O-16 added from the UX copy (UX-O2, UX-O8, UX-O19); the number O-10 was never assigned; decisions D1–D7 recorded in §16.4.14 | A-F15, A-F18 |
+
+### Changes from v8
+
+| # | Change | Driver |
+|---|---|---|
+| C52 | **Session timeouts decided:** 30 minutes without activity (sliding), at most 8 hours from sign-in (absolute). The shell warns 5 minutes before either limit; "Angemeldet bleiben" renews only the idle limit and is not offered in the last 5 minutes before the absolute limit (the warning then asks to save and sign in again) (§8.3, §9.1) | O-12; owner 2026-10-13 |
+
+### Changes from v7
+
+| # | Change | Driver |
+|---|---|---|
+| C50 | **Session model: ASP.NET Core Identity cookie authentication with antiforgery** replaces refresh cookie + in-memory access token (D8 revised, ADR-006). One `HttpOnly; Secure; SameSite=Strict` session cookie with sliding expiration; antiforgery token for state-changing requests; no JWT, no silent-refresh endpoint. The session-expiry warning stays (§8.3, §9.1, §12 step 4) | O-11; owner 2026-10-13 |
+| C51 | **Locked criteria list clarified:** only *replacing* the project's configuration (other list or other catalog release) is locked once assessments exist. Adjusting the assigned list within its release (include/exclude criteria, priorities, notes) stays possible; newly included criteria start as `Unknown`, excluded ones keep their assessments hidden. A new version of the product is handled by re-assessing and a new test evidence with `TestedVersion`, not by changing the list (§5.4) | Owner question 2026-10-13 |
+
+### Changes from v6
+
+| # | Change | Driver (review finding) |
+|---|---|---|
+| C41 | **.NET 10 (LTS until Nov 2028)** replaces .NET 8, which reaches end of support on 2026-11-10; EF Core 10, Npgsql 10. Upgrade in migration step 0, before any test project (§2.1, §10, §12) | R1; owner 2026-10-12 |
+| C42 | **Stable entry, immutable versions.** `PublishedEntry` holds identity, channel, origin, contributor, state and `CurrentVersionId`; each publication or republication creates a `PublishedEntryVersion` holding everything that is published. Moderation, counter-statements, reports and URLs attach to the entry. `EntryVersion` is removed (§5.5, §5.6) | R2 |
+| C43 | **Assessment scope is stored.** At publication the factory writes one `PublishedAssessment` per in-scope requirement criterion (`Unknown` where nothing was assessed); Flow E's product parts and Flow B's included criteria define the scope. Projection rule for keys outside the scope fixed (§5.1, §5.5, §7.3) | R3 |
+| C44 | **Module contracts.** Every module exposes a `Contracts` namespace (interfaces, DTOs); the dependency table lists the permitted directions explicitly, including Workspace → Directory.Contracts and Directory → Configurator.Contracts; withdrawal rights via `IEntrySourceAuthorizer` implemented by Workspace; `ShareLink` moves to Platform (§4.3, §5.3) | R4 |
+| C45 | **`CatalogReleaseAppTypeProcedure`** (m:n, release-pinned) replaces `AppType.TextTestTypeId` (§5.1) | R5 |
+| C46 | **Several test evidences per product; procedure criteria are derived.** `TestStatus` moves to `CandidateProduct`; `TestEvidence` becomes 0..n rows (one per procedure or other test). The answer for „Geprüft nach …“ is derived from these rows and is no longer entered; `ProcedureAnswer` columns are removed. Published side: `PublishedEntryVersion.WasTested` plus 0..n `PublishedTestEvidence` (§5.4, §5.5, §7.2, §7.3, §16.4.7) | R6; owner 2026-10-12 (decision E-R6 A) |
+| C47 | **Criteria list of a project is locked once assessments exist** (v1); re-pinning (§16.3.1) applies to new projects (§5.4) | Y1; owner 2026-10-12 |
+| C48 | **Consent for every experience report** with stored consent-text version; withdrawing consent = withdrawing the report (§4.5, §5.5) | Y3; owner 2026-10-12 |
+| C49 | Smaller corrections: assessment kind no longer needs a cross-table CHECK (Y2 resolved by C46); "Merken/Teilen von Produkten" defined (Y4); typed FKs on `FilterExclusion` (Y5); context validation and arrays everywhere (Y6); procedure criteria applicable via `testTypeIds` in the export (Y7); `SourceCandidateProductId` never serialised, `ON DELETE SET NULL` (Y8); `UseCaseTemplate.OwnerOrganizationId` removed until P2 (G1); offset paging in the directory and client request ids instead of an idempotency store (G3); step alignment (G4) | Review |
+
+### Changes from v5
+
+| # | Change | Driver |
+|---|---|---|
+| C30 | **Procedure criteria ("Geprüft nach …").** A criterion kind of its own (`Criterion.Kind = TestProcedure`, one per `TestType`): listed and deselectable, default priority B, exported, assessed as Ja/Nein/Nicht eingeschätzt (`ProcedureAnswer`), **never counted** in the fulfilment breakdown (§4.4, §5.1, §5.4, §7.3, §16.4.7) | Audit E-A; owner 2026-10-12 |
+| C31 | **Allowed ratings with several procedures = union.** A criterion's allowed ratings for a selection are the union of the `AllowedRatings` of all procedure texts that apply to the selected app types; `Unknown` is always allowed; without any procedure text all six levels are allowed (§5.1, §16.4.8) | Audit E-B; owner 2026-10-12 |
+| C32 | **App types and use cases on the published entry (variant A).** `PublishedEntryAppType` and `PublishedEntryUseCase` with a `ContextSource` (`ProjectSelection` / `VendorDeclared` / `ContributorDeclared`). Flow B copies them from the project's criteria list, Flow E takes the vendor's statement (several allowed), Flow D optional. The product identity stays free of any claim (§4.4–4.6, §5.5, §7.2, §16.4.9) | Audit E-C; owner 2026-10-12 |
+| C33 | **Experience reports carry no counts** — only the optional list of assessed criteria (§4.5, §7.3, §16.4.10) | Audit E-D |
+| C34 | **K1 in the project scope has seven rows**; `notCovered` exists only in directory projections (§7.3, §16.4.10) | Audit E-E |
+| C35 | **Multi-selection in the API contracts:** catalog criteria, ad-hoc export, directory search and Flow E use `appTypeIds[]` / `testTypeIds[]`; Flow E body gains `testKind`, `otherTestTypeName`, `testedVersion`, `useCaseTemplateIds[]`; Flow D body gains the assistive-technology consent; directory search gains `testKind`, `hasReport`, `sort` (§7.2) | Audit E-G, L3 |
+| C36 | Catalog details: `UseCaseTemplate.IsActive` (seed „Datenbankgestützte Fachanwendung“ inactive), `AppType.TextTestTypeId` (which procedure texts apply), release pinning of `FilterExclusion` via `CatalogReleaseFilterExclusion`, indicative `excludedBy[]` shape, `appTypesWithoutCriteria[]` for Hardware/Vermittlungsdienst (§5.1, §7.2) | Audit L5, L6, M3, M4 |
+| C37 | **Angular 22** replaces Angular 20 (support window; TESTING §12.1 resolved) (§2.1, §4.2, §8.2) | Owner 2026-10-12 |
+| C38 | Migration plan: step 2 lists all v5/v6 catalog entities; test-type filtering moves from step 7 to steps 2 and 6 (P0) (§12) | Audit L4 |
+| C39 | Re-pinning (§16.3.1) copies the full four-layer selection; consolidated open points in §16.5 | Audit L7, L8 |
+| C40 | Code Connect is not available on the Figma plan in use; the Figma link is kept through documentation links, `@figma` JSDoc tags and a CI check (§8.4) | Owner 2026-10-11 |
+
+### Changes from v4
+
+| # | Change | Driver |
+|---|---|---|
+| C23 | **Four filter layers with a fixed order.** Use case (single choice, optional "none") → app types (multi) → product parts (multi, `Basisfunktionalität` always on) → test types (multi, optional). Configurations and the ad-hoc selection carry **several** app types and optional test types (§4.4, §5.1, §5.3). | Design review 2026-10-06, points 1–4 |
+| C24 | **Exclusion rules** as catalog data (`FilterExclusion`), valid across all lower layers. Changing a higher layer clears all lower selections except `Basisfunktionalität`. The server rejects selections that violate a rule (§5.1, §13). | Design review, point 5 |
+| C25 | **Rating scale of BIT inklusiv** replaces the VPAT-style values: `Fulfilled`, `SlightRestriction`, `Restriction`, `Barrier`, `Blockade`, `NotApplicable`, plus `Unknown`. The count contract grows from six to **eight** properties (§4.4, §5.4, §7.3, §8.4, §16.4.5). | Design review, point 6; owner decision 2026-10-06 |
+| C26 | **Criterion texts per test procedure.** BIT inklusiv texts (applicability, requirement, rationale, allowed ratings, examples, anchor link) are stored per criterion revision and test type (`CriterionProcedureText`). Used with permission (§5.1). | Design review, point 6 |
+| C28 | **Experience reports carry no test status (E13).** Entries with `OriginKind = DirectContribution` have no `PublishedTestEvidence`; they are returned in a separate `experienceReports` list, never in `entries`, and the UI never shows "Auf Barrierefreiheit geprüft" for them. F8 applies to test-result entries (Flows B and E) (§4.5, §5.5, §7.3, §13) | Owner decision 2026-10-06 |
+| C29 | §16.3.2 decided: HR-Anwendung does **not** exclude Mobile Anwendung; the repository seed rule is removed (§5.1) | Owner decision 2026-10-06 |
+| C27 | `TestType` becomes catalog reference data with five procedures, plus two free values for evidence only ("Andere Prüfung" with a name, "Eigene Prüfung ohne festes Verfahren") (§5.1, §5.4). | Design review, point 4 |
+
+### Changes from v3
+
+| # | Change | Driver |
+|---|---|---|
+| C15 | §16.1 decided: **Option A** — the API returns the six fulfilment counts per entry. The open question is closed; the rationale is kept in §16.4. | Owner decision, 2026-10-01 |
+| C16 | §16.3.1 decided: **Option C** — suggestions for the criteria catalog go through an external channel (link to a WERTE.IT contact address or form). No data model, no endpoint. F11 is now fully covered. | Owner decision, 2026-10-01 |
+| C17 | §16.3.2 decided: **Option B** — new **Flow E**, a direct Kanal-1 publication path for vendor and auditor contributor profiles, without organisation or procurement project (§4.6). Flow E may create product identities through the same identity-resolution step as Flow B. `PublishedEntryFactory` now has **three** write paths (§4.3, D5, D13, ADR-008). | Owner decision, 2026-10-01 |
+| C18 | **Flow B publishes Kanal 2 only.** With Flow E as the single Kanal-1 path, the channel choice is removed from Flow B; `PublicationConsent` is no longer captured in the workspace (§4.4, D16). | UX copy assumption A1, confirmed by owner 2026-10-01 |
+| C19 | **Export without an account.** Flow A gains an unauthenticated, non-persisting export of an ad-hoc selection (§4.4, §7.2, D15). Saving, sharing and the workspace still require an account and an organisation. | UX copy finding O1, owner decision 2026-10-01 |
+| C20 | **Tri-state test status in the workspace.** `TestEvidence.WasTested` (bool) becomes `TestStatus` (`Tested` / `NotTested` / `Unknown`, default `Unknown`). The published field stays a non-null boolean; publication is rejected while the status is `Unknown` (§5.4, §5.5). | UX copy finding O6, owner decision 2026-10-01 |
+| C21 | Two items added to the bundled legal review: authenticity of vendor and auditor claims including self-declared consent (§16.2.7), and explicit consent for assistive-technology context in experience reports (§16.2.8). | UX copy decision E4; Art. 9 GDPR placeholder in UX copy S51 |
+| C22 | New §16.3 with an open question raised in step 7: re-pinning a saved configuration to a newer catalog release. | UX copy finding O7 |
+
+### Changes from v2 (retained for history)
+
+| # | Change | Driver |
+|---|---|---|
+| C11 | New open question §16.3.1: the PRD P0 requirement *"Vorschlagen von Kriterien"* has no path in the architecture since the proposal workflow was retired. | Step 5 flow map (board 16) |
+| C12 | New open question §16.3.2: Kanal 1 can only publish through Flow B, so a vendor or auditor needs an organisation and a procurement project although they procure nothing. | Step 5 flow map (board 16) |
+| C13 | Cross-references to §16.3 added in §3.1 (F11), §4.4 (Flow B), §8.1 (`withProposal()`) and §12 (step 6). | Follows C11, C12 |
+| C14 | Reference to the FigJam diagrams added to the document header. | Step 5 |
+
+### Changes from v1 (retained for history)
+
+| # | Change | Driver |
+|---|---|---|
+| C1 | The two-signal guarantee is restated honestly: the architecture prevents a *stored* score, not a *displayed* one. Aggregate ratios removed from the API contract; a five-way breakdown including `notCovered` is returned instead. One decision remained open (§16.1, decided in v4). | Review finding 1 |
+| C2 | The configuration-scoped directory endpoint is now authenticated and membership-checked; a separate unauthenticated variant exists. | Review finding 2 |
+| C3 | **Directory gains a second, direct write path** for experience reports without a workspace. The module dependency rule in §4.3 changed accordingly. | Review finding 3 |
+| C4 | Catalog releases reference criterion revisions through a join table instead of owning them, removing the full-clone-per-release burden. | Review finding 4 |
+| C5 | Cross-release criterion matching is specified, with `NotCoveredByThisRelease` as a distinct value. | Review finding 5 |
+| C6 | The query cost of D3 is stated explicitly, with a pre-filter strategy. | Review finding 6 |
+| C7 | Migration no longer auto-creates a personal organisation per existing user. | Review finding 7 |
+| C8 | `xmin`-derived ETags documented as restore-unstable. | Review finding 8 |
+| C9 | ClamAV sidecar removed from the v1 topology; retained as a documented option. | Review finding 9 |
+| C10 | Catalog versioning (ADR-002) and publish-time product identity (ADR-005) confirmed by the project owner; no longer flagged as beyond-PRD proposals. | Owner decision, 2026-09-29 |
+
+---
+
+## 1. Purpose and scope
+
+This document defines the target architecture for ProcureAccess: module boundaries, the domain model, API contracts, cross-cutting concerns, deployment topology, and a migration path from the existing partial implementation.
+
+The architecture must serve two product pillars defined in the PRD:
+
+1. **Kriterien-Konfigurator** — software type + intended use → prioritised, plain-language accessibility criteria → adjust → export. **Usable without an account up to and including the export** (v4).
+2. **Workspace with optional publication** — organisation-scoped procurement projects with candidate products, assessed against criteria, optionally published into a community-maintained directory.
+
+It must additionally serve two contribution paths that belong to *neither* pillar — experience reports (§4.5) and vendor/auditor test results (§4.6).
+
+---
+
+## 2. Context and constraints
+
+### 2.1 Fixed technology decisions
+
+| Layer | Technology | Status |
+|---|---|---|
+| Backend | ASP.NET Core 10 (.NET 10 LTS), C# | locked (raised from 8 in v7, C41) |
+| ORM | EF Core 10 with Fluent API (`IEntityTypeConfiguration<T>`, no data annotations) | locked |
+| Database | PostgreSQL 17 (Npgsql) | locked |
+| Frontend | Angular 22 (zoneless, standalone, signal inputs), TypeScript, NgRx Signals, Angular Material (M3) | locked (version raised from 20 in v6) |
+| Packaging | Docker / docker-compose | locked |
+| E-mail | SMTP with TLS via MailKit; provider Lettermint (EU); Mailpit locally | locked (new in v11, C71) |
+| Distribution | Open source on GitHub | locked (funding requirement) |
+
+### 2.2 Organisational constraints
+
+- **Team size:** effectively one developer, AI-assisted. Every decision must be justifiable against maintenance cost for a single maintainer.
+- **Funding horizon:** ProcureAccess is a research deliverable. Ownership after the funding period is an open question (PRD §11). **Handover-ability is therefore a first-class quality attribute**, ranked above performance.
+- **Operating model:** one central instance hosted by WERTE.IT. Self-hosting is not a v1 requirement but is not architecturally excluded, since the open-source release invites it.
+- **Workspace ownership:** organisation/team scoped. Colleagues in the same procurement department work on the same Beschaffungsvorgang.
+
+### 2.3 State of the existing codebase
+
+The existing implementation covers parts of the criteria filtering pillar.
+
+**Keep and build on:**
+- The four-layer pattern (Entity/DTO → Repository → Service → Controller), appropriate for reference data and economical for a solo maintainer. *Since v17 (C99):* entity–DTO maps are hand-written (ADR-015); AutoMapper is gone.
+- `BaseEntity` with `Id`, `CreatedAt` and the PostgreSQL `xmin` concurrency token. Optimistic concurrency matters more now that workspaces are team-shared.
+- Serilog, `Result<T>`, Docker setup, ngx-translate i18n, Angular Material.
+- The NgRx Signals store composed from `signalStoreFeature` slices — a good fit, but the slice cut changes (§8.1).
+
+**Structurally outdated (predates the Workspace pivot):**
+- `withProducts()`, `withProposal()`, the `Approver` role and the `objects:approve` claim implement *"central product database + proposal workflow with editorial approval"* — rejected in brainstorm §2.1 and §2.4, listed as a Nicht-Ziel in PRD §6.
+- No Workspace, no organisation concept, no Kanal 1/Kanal 2 separation, no separation of Dokumentationsgrad and Erfüllungsgrad.
+- Global-only roles. Organisation-scoped workspaces need resource-based authorisation.
+- Criteria modelled as mutable rows. Exported criteria can become contractually binding parts of a tender (brainstorm §2.6), which requires reproducibility, which requires versioning.
+- JWT in `localStorage` — replaced by Identity cookie authentication (D8, C50).
+- Generic `BaseCrudController<TEntity, TDto, TController>` is fine for reading catalog data (read-only since v17, C100), but Workspace and Directory have state transitions and invariants that must not be exposed as generic CRUD.
+
+---
+
+## 3. Requirements summary
+
+### 3.1 Functional drivers (from PRD §9)
+
+| # | Driver | Architectural consequence |
+|---|---|---|
+| F1 | Filter by app type (incl. closed software), product parts and test procedure (P0 since PRD v3) | Catalog applicability model; four ordered filter layers with exclusion rules |
+| F2 | Filter by use case (Verwendungszweck; formerly "Anwendungstyp-Template"), extensible | Data-driven templates, org-owned templates prepared; inactive templates possible |
+| F3 | Criteria in plain language, based on BIT inklusiv (Software-, App-, PDF-Test; formerly BITV-Softwaretest) | Criterion text separate from standard references |
+| F4 | Recommended priorities/weights per app type + use case | Rule resolution engine with explainable output |
+| F5 | Excel export | Pluggable export pipeline, accessible output; **available without an account** for an ad-hoc selection (D15) |
+| F6 | Workspace: create and assess candidate products | Org-scoped aggregate, team collaboration |
+| F7 | Optional publication, Kanal 1/2 clearly separated | Publication as explicit snapshot, not a visibility flag; **one write path per channel origin** — Kanal 1 only via Flow E, workspace publication only as Kanal 2 (D16) |
+| F8 | "Getestet: ja/nein" always visible | Mandatory non-nullable boolean on every published **test-result** entry (Flows B and E), never redactable; experience reports (Flow D) are not tests and carry no test status (C28); tri-state only inside the private workspace (§5.4) |
+| F9 | Dokumentationsgrad and Erfüllungsgrad as two separate signals | No combined score in schema or API contract (§4.4); eight counts returned for test-result entries (§16.4.1, §16.4.5); none for experience reports (C33) |
+| F10 | Pseudonymous Kanal-2 participation | Contributor identity decoupled from account **and from organisation membership** |
+| F11 | Save, share, propose | Share links for criteria lists, readable without an account (C59); criteria suggestions via an external WERTE.IT channel (§16.4.2); product proposals via `ProductIdentityRequest` |
+| F12 | Tool is itself accessible | Accessibility as an architectural constraint (§9.4) |
+
+### 3.2 Quality attributes, ranked
+
+1. **Accessibility** — non-negotiable; the tool loses its legitimacy if it fails its own criteria.
+2. **Maintainability / handover-ability** — a future maintainer must onboard from the repository alone.
+3. **Privacy and legal defensibility** — special-category personal data (§9.3) and takedown risk (PRD §7).
+4. **Traceability / reproducibility** — what was exported into a tender must be reconstructible years later.
+5. **Performance and scale** — deliberately last. See §11.
+
+### 3.3 Explicit non-requirements
+
+No high availability, no multi-region, no real-time collaboration, no offline mode, no public write API, no microservices, no message broker in v1.
+
+---
+
+## 4. Architecture overview
+
+### 4.1 Style: modular monolith
+
+One deployable ASP.NET Core application with enforced internal module boundaries.
+
+*Rationale:* a single maintainer, low request volume (§11), and a handover requirement all argue against distributed deployment. Module boundaries give most of the comprehension benefits of services without the operational cost. **→ ADR-001**
+
+### 4.2 Component diagram
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  Browser — Angular 22 SPA (zoneless, NgRx Signals)             │
+│  lazy-loaded features: catalog · configurator · workspace ·    │
+│                        directory · contribute · admin · account│
+└────────────────────────┬───────────────────────────────────────┘
+                         │ HTTPS · JSON · cookie-based session
+┌────────────────────────▼───────────────────────────────────────┐
+│  Reverse proxy (nginx or Caddy)                                │
+│  TLS · static assets · security headers · gzip/brotli          │
+└────────────────────────┬───────────────────────────────────────┘
+┌────────────────────────▼───────────────────────────────────────┐
+│  ASP.NET Core 10 API — single deployable, modular monolith     │
+│                                                                │
+│  ┌──────────┐ ┌─────────────┐ ┌───────────┐ ┌──────────────┐   │
+│  │ Catalog  │ │ Configurator│ │ Workspace │ │  Directory   │   │
+│  └──────────┘ └─────────────┘ └───────────┘ └──────────────┘   │
+│  ┌──────────┐ ┌─────────────┐ ┌───────────────────────────┐    │
+│  │Moderation│ │   Export    │ │  Identity & Access        │    │
+│  └──────────┘ └─────────────┘ └───────────────────────────┘    │
+│  ──────────────────────────────────────────────────────────    │
+│  Platform: AuthZ handlers · caching · ProblemDetails ·         │
+│            Serilog · i18n · rate limiting · file storage       │
+└──────────┬──────────────────────────────────┬──────────────────┘
+           │ EF Core / Npgsql                 │ file I/O
+┌──────────▼──────────────────────┐  ┌────────▼───────────────────┐
+│  PostgreSQL 17                  │  │  File store (volume, S3-   │
+│  schemas: catalog · configurator│  │  compatible later)         │
+│  workspace · directory ·        │  │  ACR/PDF uploads, exports  │
+│  moderation · identity ·        │  │  served as attachments     │
+│  analytics · logging            │  │                            │
+└─────────────────────────────────┘  └────────────────────────────┘
+```
+
+### 4.3 Module responsibilities and dependency rules
+
+| Module | Owns | May depend on |
+|---|---|---|
+| **Catalog** | Criteria, revisions, releases, app types, product parts, use-case templates, test types, priority rules, procedure mapping. *As built (v18, C101; v19, C104):* releases, criteria, revisions and standard references with `CatalogDbContext` (ADR-014); the four filter layers (seeded), exclusions, procedure mapping, applicability, priority rules and procedure texts; *v22 (C107):* `GET /api/v1/catalog/filter-options` as a minimal API; resolution follows in S3-20; *v37 (C123):* `ICatalogSelectionResolver` in its contracts, the server-side resolution of a selection for the export | *no module* (leaf) |
+| **Configurator** | Saved criteria configurations (organisation lists and project copies, C53), user overrides, copies to a newer release | Catalog.Contracts, IdentityAccess.Contracts |
+| **Workspace** | Organisations' procurement projects, candidate products, test evidences, private assessments | Catalog.Contracts, Configurator.Contracts, **Directory.Contracts** (publication, product lookup), IdentityAccess.Contracts |
+| **Directory** | Software product identities, published entries and versions, ACRs, experience reports, consent records | Catalog.Contracts, **Configurator.Contracts** (configuration-scoped projection via `IConfigurationReader`), IdentityAccess.Contracts |
+| **Moderation** | Content reports, counter-statements, moderation audit log | Directory.Contracts, IdentityAccess.Contracts |
+| **Export** | Format renderers (XLSX, CSV, later Vergabetext); export sources `PersistedConfigurationSource` and `AdHocSelectionSource`. *As built (v37, C123):* `AdHocSelectionSource` behind `POST /api/v1/exports`, `ExportFileWriter` and one placeholder formatter per format until S4-20; no tables | Catalog.Contracts, Configurator.Contracts (`IConfigurationReader`) |
+| **Identity & Access** (project `IdentityAccess`) | Users, memberships, contributor profiles, roles, Data Protection key store. *As built (v27, C112):* the Data Protection key store with `IdentityAccessDbContext` (schema `identity`, ADR-014); *v44 (C130):* the contributor-profile tables, no endpoints yet; *v45 (C131):* the key ring encrypted at rest with a certificate; users and roles are legacy until step 3, the platform roles are granted with the `roles` command of the host | *no module* |
+| **Platform** | Share links (resolved through `IShareableResourceProvider`, C59), file storage, e-mail sending (`IEmailSender`, C71), ProblemDetails, rate limiting, i18n, caching. *As built (v15, C93):* `TimeProvider`, logging with retention (§9.5), usage events (§5.7), health endpoints, RFC 9457 Problem Details for every error response (§7.1; v16, C96), with `PlatformDbContext` (ADR-014) | *no module*; **every module may use Platform** through `Platform.Contracts` (not repeated in the rows above) |
+
+**Contracts and projects (v7, C44; enforced by project references since v10, C62).** Each module is one .NET project (`ProcureAccess.Modules.<Name>`) with a separate contracts project (`ProcureAccess.Modules.<Name>.Contracts`, interfaces and DTOs). A module project references only the contracts projects listed in the table and `Platform.Contracts` (v15, C94: never the `Platform` project, which only the host references, and never a legacy project), so the compiler rejects any other dependency, and `internal` has an effect because modules are separate assemblies. **Until O-22 is decided, a contracts project references no other project** (v16, C95; owner, 2026-10-30), and ARC-03 fails on such a reference. Inside a module project only the controllers (needed for MVC discovery) and the module's registration extension (`Add<Name>Module`) are public; for Platform the registration class `PlatformModule` also maps the module's endpoints (`MapPlatformEndpoints`). A module never references another module's entities or `DbContext`; a module that owns tables has its own `internal` `DbContext` (ADR-014). Workspace never references Directory entities: Flow B calls `IPublicationGateway` (implemented in Directory, wraps `PublishedEntryFactory`) and passes a redacted `PublicationRequest` DTO. Withdrawal rights for workspace-origin entries are resolved through `IEntrySourceAuthorizer`, declared in Directory.Contracts and implemented by Workspace (dependency inversion, so Directory never reads workspace tables). Configurations are read by other modules only through `IConfigurationReader` (declared in Configurator.Contracts, implemented in Configurator); this is how `PersistedConfigurationSource` in Export and the configuration-scoped directory projection get their data, so Configurator never depends on Export and there is no cycle (C62). Share links are resolved through `IShareableResourceProvider` (declared in Platform, implemented by Configurator in v1, C59). NetArchTest asserts exactly the dependencies in the table above.
+
+Rules:
+
+```
+Catalog is a leaf — it depends on no other module.
+Modules reference each other only through *.Contracts (table above);
+  every module may use Platform.
+Workspace and Directory MUST NOT reference each other's entities.
+Directory has exactly THREE write paths into PublishedEntry:
+  (a) PublicationService       — Workspace → Directory crossing (§4.4, Flow B)
+                                 channel is always Independent (Kanal 2)
+  (b) ContributionService      — experience report, no Workspace (§4.5, Flow D)
+                                 channel is always Independent (Kanal 2)
+  (c) VendorPublicationService — vendor/auditor test result, no Workspace
+                                 (§4.6, Flow E); channel is always
+                                 VendorOrAuditor (Kanal 1)
+All three converge on the same invariants (channel, contributor, consent,
+release pinning, test status), enforced in a shared PublishedEntryFactory;
+none may bypass it. The factory accepts Channel = VendorOrAuditor only
+together with OriginKind = VendorPublication.
+Product identity creation is shared by (a) and (c) through one
+IProductIdentityResolver; (b) may only link to an existing identity.
+Moderation only reads and state-transitions Directory entries;
+it never mutates their content.
+```
+
+**History:** v1 stated that `PublicationService` was the *only* boundary crossing (wrong, corrected in v2 with Flow D). v4 adds Flow E. The invariant that survives every version is not "one service" but "several paths, one set of invariants, enforced in a shared `PublishedEntryFactory`".
+
+Enforced by namespace conventions plus **NetArchTest** assertions in the test suite, so a violation fails CI rather than being caught in review. This matters disproportionately for a solo project.
+
+### 4.4 Core data flows
+
+**Flow A — Criteria configuration and export**
+
+```
+User selects, in this order (each layer may exclude values of the lower ones):
+  1 UseCaseTemplate? (single; null = "Keiner davon passt")
+  2 AppTypes[]        (multi)
+  3 ProductParts[]    (multi; Basisfunktionalität always included)
+  4 TestTypes[]       (multi, optional)
+      │
+      ▼
+CatalogQueryService                              (public, no account)
+      ├─ validate selection against FilterExclusion rules (400 if violated)
+      ├─ applicable criteria   = f(AppTypes, ProductParts) ∪ one procedure criterion per TestType (C30)
+      ├─ allowed ratings       = ∪ AllowedRatings of the procedures mapped to the AppTypes
+      │                          in this release (C31, C45)
+      ├─ priority per criterion = resolve(criterion, appTypes, useCase)
+      └─ pinned to the active CatalogRelease
+      ▼
+Draft selection in the browser (withConfigurator, in memory)
+user may include/exclude/re-prioritise/annotate
+      │
+      ├── A1: export without account ──────────────────────────────┐
+      │     POST /api/v1/exports  { selection, format }            │
+      │     AdHocSelectionSource: re-resolves priorities on the     │
+      │     server, applies overrides, persists NOTHING             │
+      │                                                             ▼
+      │                                           ExportService → IExportFormatter
+      │                                                             ▲
+      └── A2: save (account + organisation)                        │
+            POST /api/v1/configurations  ──► CriteriaConfiguration │
+            POST /api/v1/configurations/{id}/exports ──────────────┘
+                 PersistedConfigurationSource (Export, reads the
+                 configuration through IConfigurationReader, C62)
+```
+
+**Anonymous export (new in v4, D15).** The primary persona should get from "what do I need to demand?" to a file in the Vergabeunterlagen without registering (PRD §5, goal 1). Persistence, sharing and team work keep requiring an account and an organisation, because `CriteriaConfiguration` is organisation-owned and that ownership is what makes it shareable and auditable.
+
+Design points:
+
+- **The server never trusts client-resolved priorities.** The ad-hoc request carries the selection (`releaseVersion`, `useCaseTemplateId?`, `appTypeIds`, `productPartIds`, `testTypeIds`) and per-criterion user decisions (`criterionRevisionId`, `isIncluded`, `overrideLevel?`, `overrideWeight?`, `note?`). The server resolves recommended priorities itself, rejects revision ids that are not part of the stated release or not applicable to the selection (Problem Details, 400; procedure criteria count as applicable through `testTypeIds`, Y7), and renders the same columns as a persisted export — recommended level, user override, weight, note.
+- **One formatter, two sources.** `IExportSource` has two implementations, both in Export: `PersistedConfigurationSource` (reads the configuration through `IConfigurationReader`, C62) and `AdHocSelectionSource` (depends on Catalog.Contracts only). Identical input yields identical file content apart from generation metadata. This keeps EXP-01–04 valid for both and avoids a second rendering code path.
+- **Nothing is stored.** No configuration row, no file in the file store, no user-derived data in logs. A `UsageEvent` (`ExportCreated`, dimension: format) is the only trace (§5.7).
+- **Reproducibility is preserved** because the file states the catalog release version (EXP-03); the release itself is immutable (ADR-002). What is lost for anonymous exports is only the *server-side* record of the user's overrides — acceptable, since the file is the record.
+- **Abuse surface:** an unauthenticated POST that does CPU work. Mitigated by a dedicated rate-limit policy, a request-size cap (bounded by the release's criterion count) and length caps on notes (§9.2).
+- **As built (v38, C124):** the files are written from one column model (`CriteriaColumns`) with texts from the UX copy embedded in the Export module (`Texts/de.json`, checked by `check-i18n.mjs`); the CSV guards text cells against formulas. The XLSX (v39, C125) holds the data as the Excel table `Kriterien` and a sheet „Info“.
+- **As built (v37, C123):** the request names every criterion of the selection exactly once (O-S4-57 (a)); only the active release is exported, a release replaced since the list was loaded is 400 `release-mismatch` (O-S4-60 (a)); `AdHocSelectionSource` reads the catalog through `ICatalogSelectionResolver`, the code path of the criteria endpoint.
+- **Draft carry-over:** the draft lives in the NgRx store. Login and registration use the in-app `login` outlet, so the store survives; after login the draft can be saved as a `CriteriaConfiguration` without being re-entered (§8.1). The draft is not written to browser storage.
+
+**Flow B — Publication from a workspace (Kanal 2 only, changed in v4)**
+
+```
+CandidateProduct  (private, organisation-scoped)
+      │  user action: "veröffentlichen"
+      │  { contributorProfileId, productIdentity, clientRequestId }
+      ▼
+PublicationService
+   0. require: the project has its criteria list (its own copy, C53);
+      otherwise 422 — Flow B always has a scope (C54)
+   1. resolve product identity → IProductIdentityResolver
+      (trigram search, user confirms, or create a new SoftwareProduct)
+   2. redact: internal notes, tester qualification note, contacts,
+      commercial data are NEVER copied
+   3. require: contributor profile; channel is fixed: Independent.
+      Candidate already has a visible entry: same profile → new version
+      of that entry (State kept); other profile → 409, withdraw first
+      (C55). A withdrawn entry is never republished; the next
+      publication creates a new entry
+   4. require: TestStatus ≠ Unknown (mapped to WasTested true/false);
+      copy the candidate's TestEvidence rows (redacted)
+   5. scope = requirement criteria included in the project's list;
+      one assessment row per criterion in scope (Unknown where the
+      candidate has no row or Unknown, C43, C53)
+      + CatalogReleaseId + timestamp
+   6. context: AppTypeIds and UseCaseTemplateId of the project's
+      criteria list (ContextSource = ProjectSelection, C32); no use case
+      if the list says "Keiner davon passt"
+      ▼
+IPublicationGateway ─► PublishedEntryFactory ─► PublishedEntry
+                                            └─► PublishedEntryVersion (new, immutable)
+```
+
+Publication is a **copy, not a flag**. Consequences, all intentional:
+
+- Editing a workspace entry never silently changes public content; republishing is an explicit act.
+- Redaction is structural, not a UI concern — private and public representations are different types.
+- Withdrawal removes the public entry without touching the user's own procurement record.
+
+*Trade-off:* published data can go stale relative to the workspace. Mitigated by showing the publication date prominently and prompting the owner to republish after significant changes. **→ ADR-004**
+
+**Why Kanal 2 only (D16).** A procuring organisation is never the vendor of the product it evaluates. Its publication is independent by definition — including when it commissioned an accessibility test itself, since the commissioning party is then the buyer, not the vendor. Offering a channel choice in the workspace would invite exactly the mislabelling the two-channel principle exists to prevent, and would scatter consent capture across two UIs. Kanal 1 has a single entry point: Flow E (§4.6). `PublicationConsent` is therefore no longer part of Flow B.
+
+**Flow C — The two signals**
+
+```
+GET /api/v1/directory/products/{id}/entries?configurationId={cfg}   (authenticated)
+GET /api/v1/directory/products/{id}/entries                          (public)
+
+PublishedEntry ─┐
+                ├─► projection computed per request ─► { documentation, fulfillment }
+CriteriaConfig ─┘   (second form: projected against the entry's own criterion scope)
+```
+
+**Erfüllungsgrad is relative to the requesting user's criteria selection and therefore cannot be a stored property of a product.** Dokumentationsgrad *is* an attribute of the entry (what evidence exists, how recent) and is stored — in a separate DTO branch that the API contract never merges. **→ ADR-003**
+
+A Flow E version published without criterion assessments has no scope. Both variants return `fulfillment: null` for it, and the UI shows a note instead of K1 (C54). Every other test-result entry has a scope and a full breakdown.
+
+**What this does and does not guarantee.** v1 claimed a combined score was "structurally impossible". That overstated the protection. The accurate statement:
+
+| Layer | Guarantee |
+|---|---|
+| Persistence | **Hard.** No column, view or index holds an aggregate accessibility score. Nothing can be sorted or filtered by one. |
+| API contract | **Hard for ratios, soft for counts.** No percentage, rating or `overallStatus` field is ever serialised; a contract test asserts this. Category counts *are* returned, and a client could divide them. |
+| Presentation | **Convention only.** Enforced by the UI rule in §8.4, the domain component `pa-fulfillment-breakdown` (UX copy K1) and a review checklist, not by the architecture. |
+
+The counts are returned as a complete seven-way breakdown (`fulfilled`, `slightRestriction`, `restriction`, `barrier`, `blockade`, `notApplicable`, `unknown`) plus `notCovered` (§5.1), and no total (changed in v5 from five-way, C25). Returning all eight together makes a naive "X %" harder to compute correctly than to compute wrongly — a weak deterrent, and named as such rather than dressed up. **Decided in v4** (Option A, §16.4.1): the stricter per-criterion-only contract was rejected because it would make the directory list and comparison views substantially harder to use.
+
+### 4.5 Flow D — Direct contribution without a workspace (new in v2)
+
+The PRD persona *"Mensch mit Behinderung als Beitragende"* has no procurement project, frequently belongs to no organisation in the tool's sense, and must be able to contribute pseudonymously. Routing this person through a workspace would be wrong three times over: it invents a Beschaffungsvorgang that does not exist, it requires an organisation membership that would tie the contribution to an employer, and it therefore undermines exactly the pseudonymity the PRD demands.
+
+```
+Authenticated user with a ContributorProfile
+      │  action: "Erfahrungsbericht zu einem Produkt beitragen"
+      ▼
+ContributionService
+   1. select an EXISTING SoftwareProduct (search only —
+      this path may not create product identities, see below)
+   2. channel is fixed: Independent (Kanal 2); no PublicationConsent
+      (that record belongs to Kanal 1 only, C67)
+   3. contributor profile required; organisation membership is NOT read
+   4. pin CatalogReleaseId (for the optional per-criterion assessment)
+   5. optional context: AppTypeIds[] stated by the contributor
+      (ContextSource = ContributorDeclared); no use case (C57);
+      validated against FilterExclusion
+   6. consent required for every report (C48); withdrawal of consent
+      = withdrawal + ContentPurge (C56)
+      ▼
+PublishedEntryFactory ─► PublishedEntry { originKind: DirectContribution }
+      └─► ExperienceReport (narrative + assistive-technology context)
+          no PublishedTestEvidence — an experience report is not a test
+```
+
+Design points:
+
+- **This path cannot create a `SoftwareProduct`.** Identity creation stays with Flows B and E, where a procurement context or the vendor's own knowledge gives the name and vendor some grounding. A contributor wanting to report on an unlisted product submits a product-identity request that a `PlatformAdmin` resolves. This keeps §5.5's identity hygiene intact without blocking the persona.
+- **`PublishedEntry` carries no `OrganizationId`.** Provenance is expressed by `ContributorProfileId` and `OriginKind` only. An organisation-derived entry is deliberately not attributable to the organisation; that is the same competitor-visibility concern that motivates §5.4.
+- **No test status (E13, changed in v5).** An experience report describes one person's use of the product, not an accessibility test. The factory creates no `PublishedTestEvidence` for this origin, the read API returns these entries only in `experienceReports` (§7.3), and the UI shows the contribution type (`contribute.report.typeNote`) instead of K4. A contributor who has actually tested the product publishes via Flow E (vendor/auditor) or Flow B.
+- **Per-criterion assessment is optional on this path, and no counts are derived from it (C33).** A report has no defined criterion scope, so a projection would be undefined. Only assessed criteria are stored (the C43 full-scope rule applies to test-result entries); the read API returns them as a plain list (`assessments`, possibly empty); there is no `fulfillment` branch on experience reports.
+- **Consent for every report (v7, C48); purge on withdrawal (v10, C56).** Not only the assistive-technology field but the narrative itself can reveal a disability (Art. 9 GDPR, §9.3, §16.2.8). Every experience report therefore requires consent: `ExperienceReport.ConsentedAt` (not null) and `ConsentTextVersion` (which wording was agreed to). Withdrawing consent (Art. 7(3)) is implemented through the existing withdrawal endpoint: the entry becomes `Withdrawn`, and a `ContentPurge` sets `NarrativeDe`, `AssistiveTechnologyContext`, `ProductVersionUsed` and the `EvidenceNote` of the report's assessments to null on all versions. A tombstone remains: entry and version ids, dates, state `Withdrawn`, consent timestamp and text version, and the moderation record. The legal review decides the consent wording, the legal basis and the timing of the purge (default: immediately, in the same transaction as the withdrawal); none of these needs a schema change.
+- **Context (v10, C57).** The contributor may state app types (optional, always offered); experience reports carry no use case. App types decide which criteria and which ratings the optional assessment offers (all six levels without a statement, §5.1).
+- Rate limiting and the moderation flow (§5.6) apply identically to all paths.
+
+### 4.6 Flow E — Direct Kanal-1 publication by vendors and auditors (new in v4)
+
+The PRD persona *"Anbieter / Prüferin"* publishes a test result with the consent of whoever commissioned the test, as a visibility and reputation channel. Like the Flow D persona, this person procures nothing; v3 forced them through an organisation and an invented procurement project (§16.4.3). Flow E removes that detour.
+
+```
+Authenticated user with a ContributorProfile of Kind = Vendor | Auditor
+      │  action: "Prüfergebnis veröffentlichen"
+      ▼
+VendorPublicationService
+   1. resolve product identity → IProductIdentityResolver
+      (same step as Flow B: trigram search, user confirms, or create)
+   2. channel is fixed: VendorOrAuditor (Kanal 1)
+   3. require PublicationConsent { ConsentGivenBy, OnBehalfOf,
+      ConsentedAt, EvidenceNote? }
+   4. require a definite WasTested (bool) and, if true, ≥ 1 test
+      evidence: TestKind (Procedure / Other / Own), TestTypeId or
+      OtherTestTypeName, optional TestedVersion, tester, date,
+      EvidenceUrl (C46, C67)
+   5. context: AppTypeIds[] (≥ 1) and UseCaseTemplateIds[] (0..n),
+      ContextSource = VendorDeclared — shown as "vom Anbieter angegeben";
+      validated against FilterExclusion
+   6. optional per-criterion assessments. With assessments:
+      ProductPartIds required; scope = requirement criteria applicable
+      to the stated AppTypes + ProductParts in the active release; one
+      row per criterion in scope (Unknown if empty, C43). Without
+      assessments: no rows, fulfillment = null (C54).
+      Pin CatalogReleaseId
+   7. optional ConformanceReport (VPAT/ACR, P1)
+   organisation membership is NOT read
+      ▼
+PublishedEntryFactory ─► PublishedEntry { originKind: VendorPublication }
+```
+
+Design points:
+
+- **Identity creation is allowed on this path.** A vendor naming its own product is the best-grounded identity creation the system will ever see; queueing it behind `ProductIdentityRequest` (§16.2.6) would penalise the persona the PRD treats as an incentive mechanism. Flow B and Flow E share one `IProductIdentityResolver`, so duplicate detection behaves identically. Duplicates are handled by the existing admin merge (`MergedIntoId`).
+- **Republishing creates a new version with renewed consent.** A new test result for the same product is a new `PublishedEntryVersion` of the same `PublishedEntry` (C42), never an in-place edit; `PublicationConsent` belongs to the version and is required again for each one. Reports, counter-statements and the entry URL stay attached to the entry. Only the profile that published the entry may republish it, and a withdrawn entry cannot be republished (C55).
+- **Profile kind is self-declared.** Nothing in the system verifies that the user behind a vendor profile works for the vendor, or that the stated consent exists. Flow A of v3 (workspace route) would not have verified this either. The resulting risks — impersonation, publication about a competitor's product, a vendor posting "independent" praise under a second, individual profile — are recorded for the bundled legal review in §16.2.7 and mitigated, not solved, by moderation (§5.6) and rate limiting.
+- **Consent records are never public.** `PublicationConsent` is not part of any directory read DTO; it exists as an evidence record for disputes and moderation.
+
+---
+
+## 5. Domain model
+
+Presented per schema. `BaseEntity` (`Id`, `CreatedAt`, `xmin`) applies throughout; audit columns `CreatedByUserId` / `ModifiedAt` are added where relevant.
+
+### 5.1 `catalog`
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `CatalogRelease` | `Version`, `PublishedAt`, `IsActive`, `ReleaseNotes` | Immutable once published |
+| `CatalogReleaseCriterion` | `CatalogReleaseId`, `CriterionRevisionId` | Join table; see below |
+| `Criterion` | `Key` (stable: the EN 301 549 number as Kriterienkatalog Teil A/B writes it, e.g. `11.1.3.1c`; a PDF/UA-1 clause as `UA1-7.10`; `PROC-<testTypeKey>` for a procedure criterion; v20, S3-15), `Kind` (`Requirement` / `TestProcedure`), `TestTypeId?` (with `TestProcedure`), `Category?`, `SupersededByKey?` | Stable identity across revisions. `Kind` and `TestTypeId` new in v6 (C30). `Category` (≤ 128 characters): the chapter under which Kriterienkatalog Teil A lists the criterion (e.g. „Wahrnehmbarkeit“); none for Teil B and procedure criteria; set by the import, kept by a stored criterion, not used by any endpoint, screen or export (v28, C114) |
+| `CriterionRevision` | `CriterionId`, `RevisionNumber`, `TitleDe`, `PlainLanguageDe`, `ShortDescriptionDe`, `RationaleDe`, `SortOrder` | Content; not owned by a release. `PlainLanguageDe` is the plain-language title, `ShortDescriptionDe` the Kurzbeschreibung (ADR-016); both are the project team's texts and optional until it writes them (K-1) |
+| `StandardReference` | `Standard` (EN 301 549 / WCAG / BIT inklusiv / ISO 9241), `Clause`, `Url` | m:n to `CriterionRevision` |
+| `CriterionProcedureText` | `CriterionRevisionId`, `TestTypeId`, `OriginalNumber`, `OriginalTitleDe`, `ApplicabilityDe`, `RequirementDe`, `RationaleWhyDe`, `AllowedRatings` (flags), `PositiveExamplesDe`, `NegativeExamplesDe`, `SourceUrl` (anchor) | **New in v5.** Verbatim BIT inklusiv texts per procedure (used with permission); 0..n per revision. Testing procedure, delimitation and references are linked, not copied |
+| `AppType` | `Key`, `NameDe`, `HintDe?`, `Functionality` (Open / Closed / NotApplicable), `SortOrder` | UI term „Anwendungstyp“. Eight values: Website/Webanwendung, Software (offen/geschlossen), Mobile Anwendung (offen/geschlossen), Dokument, Hardware, Vermittlungs-/Notrufdienst |
+| `ProductPart` | `Key`, `NameDe`, `ExplanationDe`, `IsAlwaysSelected`, `SortOrder` | UI term „Funktionsbereich“. Seven values; only `Basisfunktionalität` has `IsAlwaysSelected` |
+| `UseCaseTemplate` | `Key`, `NameDe`, `Description?`, `IsActive` | UI term „Verwendungszweck“. Global only; organisation-owned templates (P2) are added when needed (G1, v7). No row for „Keiner davon passt“ (= no template). Inactive templates are not offered for new selections but stay resolvable for old configurations and entries; seed „Datenbankgestützte Fachanwendung“ inactive (v6) |
+| `FilterExclusion` | `SourceUseCaseId?`, `SourceAppTypeId?`, `SourceProductPartId?`, `TargetAppTypeId?`, `TargetProductPartId?`, `TargetTestTypeId?`, `ReasonDe` | **New in v5.** Typed FKs since v7 (Y5): CHECK exactly one source and exactly one target set; target layer lower than source layer. Immutable once part of a published release |
+| `CatalogReleaseAppTypeProcedure` | `CatalogReleaseId`, `AppTypeId`, `TestTypeId` | **New in v7 (C45).** Which procedures' texts and allowed ratings apply to an app type in a release; m:n (Website/Webanwendung may later map to the Software-Test *and* BIK BITV-Test Web, Katalog K-5) |
+| `CatalogReleaseFilterExclusion` | `CatalogReleaseId`, `FilterExclusionId` | **New in v6.** Release pinning of exclusions, same pattern as `CatalogReleaseCriterion` |
+| `CriterionApplicability` | `CriterionRevisionId`, `AppTypeId`, `ProductPartId?` | Which criteria apply where |
+| `PriorityRecommendation` | `CriterionRevisionId`, `AppTypeId?`, `UseCaseTemplateId?`, `Level` (A/B/Info), `Weight`, `RationaleDe`, `Source` | `Source` is a non-nullable enum whose only v1 value is `ExpertJudgement` |
+| `TestType` | `Key`, `NameDe`, `Url`, `SortOrder` | UI term „Prüfverfahren“. BIT inklusiv Software-Test, App-Test, PDF-Test; BIK BITV-Test (Web), (App). Also filter layer 4 |
+
+**Filter layers and exclusions (new in v5).** The four selection layers have a fixed order: `UseCaseTemplate` (1) → `AppType` (2) → `ProductPart` (3) → `TestType` (4). A `FilterExclusion` row says that a value of a higher layer makes a value of a lower layer unavailable. The initial rule set (Kriterienkatalog §3.1):
+
+| Source | Excludes |
+|---|---|
+| UseCase HR-Anwendung | AppType Dokument, Hardware, Vermittlungs-/Notrufdienst; TestType BIT inklusiv PDF-Test |
+| AppType Website/Webanwendung | TestType BIT inklusiv App-Test, BIT inklusiv PDF-Test, BIK BITV-Test (App) |
+
+Rules: excluded values are returned with the reason(s) (`excludedBy[]`, §7.2) so the UI can show them disabled with an explanation; a selection containing an excluded value is rejected (Problem Details, 400, field-level). When a higher layer changes, the client clears all lower layers except `IsAlwaysSelected` parts — this is a client rule, the server only validates the final selection. The existing repository models the four layers as `CriteriaFilter` with `FilterTypeId` 1–4 and exclusions as `CriteriaFilterExclusion`; migration step 2 maps these onto the entities above. *Decided (§16.3.2):* HR-Anwendung does **not** exclude Mobile Anwendung; remove the two seed exclusions 17 → 12 and 17 → 13 in migration step 2 (v18, C103: `CriteriaFilterExclusion` has a composite key; they are the second and third entries of `CriteriaFilterExclusionSeed`).
+
+**Which texts apply.** `CriterionApplicability` decides whether a criterion applies to a selection. `CriterionProcedureText` decides which wording the detail view shows; `CatalogReleaseAppTypeProcedure` names the procedure(s) per release: Software-Test texts for Website/Webanwendung (interim) and Software, App-Test texts for mobile apps, PDF-Test texts for Dokument. Hardware and Vermittlungs-/Notrufdienst have no BIT inklusiv procedure yet (no mapping row, §16.3.3). Because the mapping is release-pinned, a changed mapping never alters the texts or allowed ratings of an older configuration (ADR-002). With several app types the detail view shows one text block per applicable procedure.
+
+**Allowed ratings (v6, C31).** For a criterion and a selection of app types, the allowed ratings are the **union** of `AllowedRatings` over the procedure texts of the procedures mapped to those app types in the pinned release. `Unknown` is always allowed. If no procedure text applies (e.g. only Hardware), all six levels are allowed. The same rule validates `CandidateAssessment` (against the project's configuration), Flow E assessments (against the stated app types) and Flow D assessments (against the stated app types, or all six levels without a statement). Rationale: an assessor must never be unable to record a level that is correct for one of the selected app types.
+
+**Procedure criteria (v6, C30).** For every `TestType` the catalog holds one criterion with `Kind = TestProcedure` (key `PROC-<testTypeKey>`, title „Geprüft nach {{testType}}“), a catalog-default `PriorityRecommendation` of level B, no `CriterionProcedureText` and no `CriterionApplicability` rows. It enters a selection only through layer 4: selecting a test type adds its procedure criterion. It is listed, can be deselected and is exported like any other criterion. It has **no assessment rows**: its answer (Ja / Nein / Nicht angegeben) is **derived** from the product's test evidences (C46, §5.4) — Ja if an evidence with that `TestTypeId` exists, Nein if the test status is `NotTested`, otherwise Nicht angegeben. Every fulfilment projection covers `Kind = Requirement` only — the test status is already shown by K4, counting it again in K1 would weigh it twice.
+
+**Empty selections.** If the selected app types have no applicable requirement criteria (today: only Hardware and/or Vermittlungs-/Notrufdienst), the criteria endpoint returns those app types in `appTypesWithoutCriteria[]`; the UI shows a dedicated empty state instead of an error.
+
+**Published releases (v18, C101).** A release is published as soon as it is stored: `catalog import` builds it in memory, seals it with `Publish` (`PublishedAt` = import time, `NOT NULL` in the database) and stores it; nothing else writes releases. From then on its revisions and their standard references are fixed; a change throws a domain error (CAT-05). Only `IsActive` changes, through `catalog activate`. A `StandardReference` row is shared by the revisions that cite it and never changes; a corrected clause or URL is a new row cited by a new revision (one row per standard, clause and URL, v20).
+
+**Import (v20, C105).** `catalog import <version>` reads `catalog/releases/<version>/` (format: `docs/sprints/sprint_03/S3-15_release_data_format.md` §2.1), validates all of it and checks it against the database before it writes anything; then it stores the release with one `SaveChanges`, so any error leaves the database unchanged (CAT-23). It reuses a criterion by key (kind, test type and category must match), the previous release's revision when the content is the same (CAT-07; the previous release is the one stored last), a standard reference by standard, clause and URL, and an exclusion rule by source, target and reason; everything else is new. A criterion listed in `supersedes` gets its successor key (`Criterion.MarkSupersededBy`, once). The release is stored published and inactive. Besides the domain rules, `CatalogImmutabilityInterceptor` refuses changes and deletes of stored rows through EF, except `IsActive` and a first `SupersededByKey`.
+
+**Activation (v21, C106).** `catalog activate <version>` makes an imported release the active one; the catalog serves it from the next request on. It refuses a release in which a criterion has no catalog-default priority (rule 4 below) or a seeded test type has no procedure criterion, and names every gap; such a release stays inactive for good, and its fixed folder is imported as a new version. One release is active at a time: the previous one is deactivated in the same transaction, and a partial unique index on `IsActive` refuses a second. Activating an older release again is the rollback.
+
+**Filter values (v19, C104).** The four layers are global, not part of a release: a catalog migration seeds them (O-S3-5 D1) with fixed ids and the keys of C104, and release folders refer to them by key. A new value or a changed name is a new migration; a key never changes. Exclusion rules and the procedure mapping come with the release folder and are pinned to the release (CAT-19, CAT-21).
+
+**Release composition.** v1 put `CatalogReleaseId` on `CriterionRevision`, which forced a new revision of every criterion — plus its applicability and priority rows — for every release, even for the ~95 % that did not change. A release is now a **set of revisions**, assembled through `CatalogReleaseCriterion`. Publishing a release that changes three criteria means three new revisions and one new set of join rows; unchanged revisions are referenced by both releases. Reproducibility is identical — a configuration pinned to a release still resolves to exactly the revisions that release contained.
+
+**Priority resolution** — deterministic, most-specific-wins:
+
+```
+1. (criterion, appType, useCaseTemplate)   most specific
+2. (criterion, appType, null)
+3. (criterion, null, useCaseTemplate)
+4. (criterion, null, null)                 catalog default
+```
+
+**Several app types (v5, as built in v23, C108).** Each selected app type the criterion applies to runs the chain 1 → 2 → 3 → 4 on its own; the strictest result wins (A > B > Info, then the higher weight — a rule without weight ranks below one with —, then the lower `AppType.SortOrder` as a deterministic tie-break), and for rules 1 and 2 the matched rule names that app type. A selected app type the criterion does not apply to takes no part. With no use case („Keiner davon passt“) only rules 2 and 4 apply. A procedure criterion has no applicability, so only rules 3 and 4 apply to it. If an app type's chain finds no rule, the release is incomplete and gives no priority (the criteria endpoint answers 404, C108).
+
+The API returns the matched rule together with its `RationaleDe` and `Source`, so the UI can answer *"why is this an A criterion?"* — the technical implementation of PRD §7 "Transparenz der Priorisierungslogik". A priority that cannot explain itself is a bug.
+
+**Assessment scope of a published entry (v7, C43).** A test-result entry stores one `PublishedAssessment` per requirement criterion in its scope — `Unknown` where nothing was assessed. The scope is therefore the set of stored rows, reconstructible forever. When projecting against a configuration: key in the configuration and in the entry's scope → normal comparison; key in the entry's release but outside its scope → `Unknown` (the publisher did not assess it); key not in the entry's release → `NotCoveredByThisRelease` (table below).
+
+**Cross-release matching.** A `PublishedEntry` is pinned to the release that was active when it was published; a `CriteriaConfiguration` may be pinned to a newer one. Matching runs on `Criterion.Key`, with these rules:
+
+| Situation | Result for that criterion |
+|---|---|
+| Key present in both releases | Normal comparison against the assessed value |
+| Key added after the entry was published | `NotCoveredByThisRelease` |
+| Key removed in the newer release | Excluded from the projection entirely |
+| Criterion split or merged | `Criterion.SupersededByKey` maps old → new; if the mapping is not 1:1, `NotCoveredByThisRelease` |
+
+`NotCoveredByThisRelease` is a **distinct value, never folded into `Unknown` or `Blockade`**. Without this distinction an honestly assessed older entry would score worse than a newer one purely because the catalog grew — the same perverse incentive the two-signal principle exists to prevent, one level down. The API surfaces it as its own count (`notCovered`) and the UI renders it as "Damals nicht im Katalog", not as a gap.
+
+**Versioning rationale:** criteria exported into Vergabeunterlagen can become contractual. Mutating criterion text in place would make it impossible to reconstruct what was demanded. Releases are deliberately coarse — expect a handful per year, edited by a `CatalogEditor`. **→ ADR-002** *(confirmed by the project owner, 2026-09-29)*
+
+### 5.2 `identity`
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `AppUser` | ASP.NET Core Identity | Login credentials only |
+| `Organization` | `Name`, `Type` (public body / private company / association), `CreatedByUserId` | Tenant boundary |
+| `OrganizationMembership` | `OrganizationId`, `UserId`, `Role` (Owner/Editor/Reader), `InvitedAt`, `AcceptedAt` | |
+| `OrganizationInvitation` | `Email`, `Token`, `ExpiresAt` | |
+| `ContributorProfile` | `DisplayName` (pseudonym), `Kind` (Individual / Institution / Vendor / Auditor) | **No account reference, no organisation reference.** `Kind` is self-declared (§4.6, §16.2.7) |
+| `UserContributorLink` | `UserId`, `ContributorProfileId` | Restricted table; never exposed through any DTO. One user may hold several profiles; a profile belongs to at most one user (key `ContributorProfileId`, v44 C130) |
+| `UserPreferences` | UI customisation, language, appearance (`System` / `Light` / `Dark`, C73), contrast/motion settings | Extends existing `UICustomization` |
+
+An authenticated user may exist **without any organisation membership** — this is the normal state for a Flow D or Flow E contributor, not an edge case, and no endpoint outside the workspace and configurator modules may require a membership.
+
+### 5.3 `configurator`
+
+| Entity | Key fields |
+|---|---|
+| `CriteriaConfiguration` | `OrganizationId`, `Name`, `CatalogReleaseId`, `UseCaseTemplateId?`, `CreatedByUserId`, **`ProcurementProjectId?`** (**new in v10**, C53: set = copy owned by that project; null = list of the organisation) (**`AppTypeId` removed in v5**) |
+| `ConfigurationAppType` | `ConfigurationId`, `AppTypeId` (**new in v5**, at least one) |
+| `ConfigurationProductPart` | `ConfigurationId`, `ProductPartId` |
+| `ConfigurationTestType` | `ConfigurationId`, `TestTypeId` (**new in v5**, optional; each adds its procedure criterion, C30) |
+| `ConfigurationCriterion` | `ConfigurationId`, `CriterionRevisionId`, `IsIncluded`, `ResolvedLevel`, `OverrideLevel?`, `OverrideWeight?`, `NoteDe` |
+
+`ShareLink` (`OrganizationId`, `TokenHash`, `ResourceType`, `ResourceId`, `Scope`, `ExpiresAt`, `RevokedAt?`) lives in Platform (v7, C44). `ExpiresAt` is required: default 90 days, at most 1 year after creation (v11, C81). Since v10 (C59) it carries `OrganizationId` and is covered by the global query filter for management (create, list, revoke); the token is shown once and stored only as a SHA-256 hash; `ResourceType` is `Configuration` only in v1 (no project share links, D7). The anonymous read `GET /api/v1/shared/{token}` hashes the token, looks the link up with the filter bypassed at this one documented call site, and asks the owning module's `IShareableResourceProvider` for authorisation (not revoked, not expired, resource still exists) and for a redacted read DTO (no organisation, no user names, no project). A project copy (`ProcurementProjectId` set) cannot be shared.
+
+`ProcurementProjectId` is a plain id without a navigation property: Configurator does not depend on Workspace. Workspace creates and replaces the copy through Configurator.Contracts (C53). The column and its foreign key are added in migration step 5, when `ProcurementProject` exists.
+
+Storing the resolved priority alongside the override preserves the audit trail: *what did the tool recommend* vs. *what did the user decide*. Valuable for the pilot evaluation of the prioritisation logic (PRD §5, goal 4). Anonymous ad-hoc exports (§4.4) do not create rows here; the pilot evaluation therefore covers saved configurations only, which is acceptable because pilot partners work with accounts.
+
+### 5.4 `workspace`
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `ProcurementProject` | `OrganizationId`, `Name`, `Status`, `CriteriaConfigurationId?` | The Beschaffungsvorgang. `CriteriaConfigurationId` points to the project's own copy (C53). It can be *replaced* only while no candidate has an assessment (a value other than `Unknown`); editing the copy within its release stays possible (C47, C51) |
+| `CandidateProduct` | `ProcurementProjectId`, `SoftwareProductId?`, `Name`, `VendorName`, `WebsiteUrl`, `FunctionalSummary`, **`TestStatus` (Tested / NotTested / Unknown, not null, default Unknown)**, `ContactNotes` 🔒, `InternalNotes` 🔒 | 🔒 never published. `TestStatus` moved here from `TestEvidence` in v7 (C46) |
+| `TestEvidence` | `CandidateProductId`, `TestKind` (Procedure / Other / Own), `TestTypeId?` (with Procedure), `OtherTestTypeName?` (with Other, required), `TestedByName?`, `TestDate?`, `TestedVersion?`, `TesterQualificationNote` 🔒, `EvidenceUrl?`, `AttachmentId?` | **0..n per candidate since v7 (C46)**, only while `TestStatus = Tested`; at most one row per `TestTypeId`; a new product version updates the row of that procedure (C65) |
+| `CandidateAssessment` | `CandidateProductId`, `CriterionRevisionId`, `Fulfillment` (Fulfilled / SlightRestriction / Restriction / Barrier / Blockade / NotApplicable / **Unknown**), `EvidenceNote` | Requirement criteria only (procedure criteria are derived, C46). Rows are created lazily on the first value; no row means `Unknown` (C53). An *assessment exists* when a row has a value other than `Unknown`. A rating outside the allowed union (C31) is rejected |
+| `Attachment` | `FileName`, `ContentType`, `SizeBytes`, `StoragePath` | |
+
+**Test status (changed in v4).** Buyers often do not know yet whether a candidate has been tested. v3 forced a yes/no answer, which in practice would have been recorded as "no" and later published as a false negative. The workspace now records `Unknown` explicitly. `Unknown` is a working state only: it never leaves the workspace. `PublicationService` rejects publication while `TestStatus = Unknown` with a field-level Problem Details error on `testStatus`, and maps `Tested`/`NotTested` to the published boolean. The F8 invariant — every published entry shows "getestet: ja/nein" — is unchanged and still enforced by a non-nullable column on the published side.
+
+`Unknown` as an explicit value (for assessments and for the test status) prevents "not yet known" from being silently read as "fails".
+
+**Several test evidences (v7, C46).** A product can be tested by several procedures (e.g. BIT inklusiv Software-Test and BIK BITV-Test). One row per procedure is the single source of truth: the procedure criteria of the project's list show the derived Ja/Nein, and the directory filter `testTypeIds[]` matches entries whose published evidences contain that procedure. Rejected: one evidence row plus independently entered procedure answers (two sources that can contradict each other).
+
+**Criteria list of a project (v7, C47; clarified in v8, C51; project copy since v10, C53).** Assigning a saved list to a project copies it: the copy is a `CriteriaConfiguration` with `ProcurementProjectId` set, owned by the project, never offered for other projects and never shareable. The organisation's list stays unchanged, so an adjustment in one project never affects another project or a share link. After assignment the copy's four selection layers (use case, app types, product parts, test types) are fixed; its criteria can still be included, excluded, re-prioritised and annotated. Assessments are pinned to the copy's release, which is what makes the seven-count workspace projection valid (C34). v1 therefore forbids *replacing* the copy (by a copy of another list, or of a list on a newer catalog release) once an assessment exists, i.e. a `CandidateAssessment` with a value other than `Unknown` (409 with field error); until then, replacing deletes the old copy. What stays possible:
+
+| Situation | Handling in v1 |
+|---|---|
+| The buyer's requirements change (criteria added or removed, priorities, notes) | Edit the project's copy within its release. Newly included criteria start as `Unknown` for every candidate; excluded criteria keep their assessments, hidden while excluded |
+| A candidate product is developed further (new version) | Re-assess the changed criteria; update the test evidence of that procedure (`TestedVersion`, date, C65); a published entry is updated by republishing under the same contributor profile (new `PublishedEntryVersion`, C55) |
+| A newer catalog release should be used | New project with a copy of the re-pinned list (`POST /api/v1/configurations/{id}/copies`, D6, §16.3.1); candidates are added again. Carrying assessments over by `Criterion.Key` (with a report of what could not be carried over) is the planned extension and needs no schema change |
+
+**Tenant isolation:** every organisation-scoped entity carries `OrganizationId` and is protected by an EF Core global query filter bound to an `IOrganizationContext` resolved per request. A forgotten `WHERE` clause then cannot leak one organisation's procurement into another's view. This implements the business argument from the team feedback — a company's accessibility maturity must not become visible to competitors. Admin queries opt out via `IgnoreQueryFilters()` at documented call sites only.
+
+### 5.5 `directory`
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `SoftwareProduct` | `Name`, `VendorName`, `WebsiteUrl`, `NormalizedKey`, `MergedIntoId?` | **Identity only — carries no accessibility claim** |
+| `ProductIdentityRequest` | `ProposedName`, `ProposedVendor`, `RequestedByContributorProfileId`, `State` | Flow D's path to an unlisted product |
+| `PublishedEntry` | `SoftwareProductId`, `Channel` (VendorOrAuditor / Independent), `OriginKind` (WorkspacePublication / DirectContribution / VendorPublication), `ContributorProfileId`, `State`, `CurrentVersionId`, `SourceCandidateProductId?`, `FirstPublishedAt` | **Stable identity of a statement (C42).** **No `OrganizationId`.** `Channel = VendorOrAuditor` ⇔ `OriginKind = VendorPublication`. `SourceCandidateProductId` is never serialised and is `ON DELETE SET NULL` (Y8). Moderation, reports and counter-statements reference this row. Republication keeps `State` (C55) |
+| `PublishedEntryVersion` | `PublishedEntryId`, `VersionNumber`, `PublishedAt`, `CatalogReleaseId`, `WasTested?` (bool), `ContextSource?` (ProjectSelection / VendorDeclared / ContributorDeclared), `ClientRequestId` (unique), `RequestHash` | **New in v7 (C42), immutable** (except `ContentPurge`, C56, C66). `ClientRequestId`/`RequestHash` since v10 (C64). `WasTested` is not null for WorkspacePublication and VendorPublication, null for DirectContribution (C28). `ContextSource` set iff the version has app types or use cases |
+| `PublishedEntryAppType` | `PublishedEntryVersionId`, `AppTypeId` | C32; 0..n; Flow E ≥ 1 |
+| `PublishedEntryUseCase` | `PublishedEntryVersionId`, `UseCaseTemplateId` | C32; Flow B at most 1, Flow E 0..n, Flow D none (C57) |
+| `PublishedAssessment` | `PublishedEntryVersionId`, `CriterionRevisionId`, `Fulfillment`, `EvidenceNote` | Requirement criteria only. Test-result versions: one row per criterion in scope (C43); experience reports: only assessed criteria |
+| `PublishedTestEvidence` | `PublishedEntryVersionId`, `TestKind`, `TestTypeId?`, `OtherTestTypeName?`, `TestedByName?`, `TestDate?`, `TestedVersion?`, `EvidenceUrl?` (C67) | Redacted copy; 0..n per version, only when `WasTested = true` (C46); none for DirectContribution |
+| `ConformanceReport` | `PublishedEntryVersionId`, `Format` (VPAT 2.x EU/INT), `ReportDate`, `AttachmentId?`, `SourceUrl?` | P1, Flow E |
+| `ExperienceReport` | `PublishedEntryVersionId`, `NarrativeDe`, `AssistiveTechnologyContext?`, `ProductVersionUsed?`, `ConsentedAt` (not null), `ConsentTextVersion` | Kanal 2; consent required for every report (C48); contributor is on the entry; `NarrativeDe`, `AssistiveTechnologyContext` and `ProductVersionUsed` are set to null by `ContentPurge` when consent is withdrawn (C56) |
+| `PublicationConsent` | `PublishedEntryVersionId`, `ConsentGivenBy`, `OnBehalfOf`, `ConsentedAt`, `EvidenceNote` | **Flow E only** (Kanal 1); one per version; never in a read DTO |
+
+**Entry and version (v7, C42).** v6 modelled republication twice (a `Version` column on `PublishedEntry` and a separate `EntryVersion` table). If each republication created a new entry row, reports, counter-statements, the moderation log and every shared URL would stay attached to the outdated row. Now the entry is the stable thing people refer to; its versions are immutable snapshots, and `CurrentVersionId` selects the one the directory shows. Withdrawal changes the entry's `State`, never a version.
+
+`State` (on `PublishedEntry`): `Published → Flagged → UnderReview → (Published | Restricted | Withdrawn)`. Content is never hard-deleted; withdrawal hides it and retains a minimal moderation record. The one exception is the personal content of an experience report, which `ContentPurge` removes when consent is withdrawn (C56). Republication keeps the current `State`; a withdrawn entry is never republished (C55).
+
+**Enforcement (v10, C66).** An EF Core `SaveChangesInterceptor` rejects `Modified` and `Deleted` states for `PublishedEntryVersion` and its children (`PublishedEntryAppType`, `PublishedEntryUseCase`, `PublishedAssessment`, `PublishedTestEvidence`, `ConformanceReport`, `ExperienceReport`, `PublicationConsent`), except inside a `ContentPurge` scope, which may only set the purgeable fields to null. The rule "`WasTested` is not null for `WorkspacePublication` and `VendorPublication`" spans two tables (`OriginKind` is on the entry, `WasTested` on the version) and is therefore enforced by the factory, not by a CHECK constraint.
+
+**Product identity approach:** identities are created *as a by-product of publication* (Flows B and E), never maintained in advance. The user searches existing products (trigram similarity on `NormalizedKey` via `pg_trgm`) and either links or creates. Flow D may only link; unlisted products go through `ProductIdentityRequest`. A `PlatformAdmin` merges duplicates via `MergedIntoId`. This gives aggregation across organisations without reintroducing the rejected central product database: no product exists that nobody has written about, and WERTE.IT never asserts anything about a product itself. **→ ADR-005** *(confirmed by the project owner, 2026-09-29; extended to Flow E in v4)*
+
+**Context on the entry, not on the product (v6, C32; stored per version since v7).** App types and use cases describe the context of one statement, not a property of the product. The same product can be a web application in one procurement and a mobile app in another, and its use case is a property of the procurement. Storing them on `SoftwareProduct` would make the identity carry a claim (against ADR-005) and would need an owner who decides between conflicting statements. On the entry, every statement keeps its own provenance (`ContextSource`) and is withdrawn with the entry. The directory filters "Anwendungstyp" and "Verwendungszweck" therefore mean *"products with at least one visible entry in this context"*; entries without a use case are returned only when the use-case filter is empty. Experience reports count for the app-type filter (they describe use in a context) but never for the test-type filter (they are not tests); they carry no use case and therefore never match a set use-case filter (C57). Contexts from Flows D and E are validated against `FilterExclusion` like any selection. Rejected: variant B (context on the product), variant C (no use-case filter in the directory).
+
+**"Merken" and "Teilen" of products (PRD §9 P0, Y4).** "Merken" means adding a directory product to a procurement project from the project overview (`POST /api/v1/projects/{id}/candidates { softwareProductId }`, prefilled from the identity). "Teilen" means the public product URL; projects are not shared by link in v1 (D7, C59). Users without an organisation have no saving in v1; the directory itself needs no account.
+
+**No aggregate rating exists.** There is deliberately no `AverageRating`, no `AccessibilityScore`, no aggregated "Betroffenen-Meinung". Experience reports are always returned as an ordered list of individual contributions, each carrying its own assistive-technology context — enforcing the participation principle from brainstorm §3.2 at the schema level.
+
+### 5.6 `moderation`
+
+| Entity | Key fields |
+|---|---|
+| `ContentReport` | `PublishedEntryId`, `PublishedEntryVersionId?`, `ReporterUserId?`, `Reason`, `Description`, `State`, `CreatedAt` |
+| `CounterStatement` | `PublishedEntryId`, `PublishedEntryVersionId?`, `AuthorContributorProfileId`, `TextDe`, `PublishedAt` |
+| `ModerationAction` | `PublishedEntryId`, `PublishedEntryVersionId?`, `ModeratorUserId`, `Action`, `ReasonDe`, `CreatedAt` |
+
+All three reference `PublishedEntry` (the stable identity, C42) and, since v10 (C63), optionally the `PublishedEntryVersionId` that was shown when the report, statement or action was made, so a moderator can see which wording was meant. `CounterStatement` is a first-class sibling of the entry, rendered alongside it — never replacing it. This is the technical shape of "Recht auf Gegendarstellung statt Löschung" (PRD §7). `ModerationAction` is append-only and forms the legal defensibility record.
+
+### 5.7 `analytics` (privacy-preserving)
+
+| Entity | Fields |
+|---|---|
+| `UsageEvent` | `EventType`, `OccurredOn` (date, not timestamp), `Dimension1?`, `Dimension2?` |
+
+*As built (C91):* table `analytics."UsageEvents"` with a random UUID v4 key `Id`; `OccurredOn` is the UTC day. PRV-05 allows exactly these columns. Writing goes through `IUsageEventWriter` (one `void` method per event), which only queues the event, fire-and-forget (v26, C111): a background service stores the queue in batches, retries after `UsageEvents:RetryDelay` only when the connection could not be opened, never repeats a sent insert (no event counted twice) and drops events beyond `UsageEvents:QueueCapacity`; every loss is logged. Since v15 (C93) entity, table mapping and writer live in the Platform module (`PlatformDbContext`, ADR-014); `IUsageEventWriter` is in `Platform.Contracts`.
+
+No user ID, no organisation ID, no IP address, no session identifier — date granularity only. Sufficient for the PRD §10 indicators, including anonymous exports (`ExportCreated`).
+
+**Event types (v10, C69).** Events are written only for indicators that cannot be counted from existing rows: `CriteriaListShown` (S11 shown for a complete selection; dimension: with or without account) and `ExportCreated` (dimensions: format; with or without account). Workspace entries, published versus private entries and published entries over time are counted from the existing tables as aggregate numbers. The list is final (SPEC_v2 §9.1, C82): no other events in v1. Anything more granular would require a DSGVO justification the project does not need. *Callers (v36, C122):* `CriteriaListShown` through `POST /api/v1/configurator/criteria-list-shown`, which the client calls once per new selection shown on S11; `ExportCreated` follows with the export (S4-21).
+
+---
+
+## 6. Key design decisions and trade-offs
+
+| ID | Decision | Alternatives rejected | Trade-off accepted |
+|---|---|---|---|
+| **D1** | Modular monolith, one deployable | Microservices; separate criteria and workspace services | No independent scaling or deployment. Irrelevant at this load; boundaries extractable later. |
+| **D2** | Versioned catalog with immutable releases composed from shared revisions | Mutable criteria rows; release-owned revisions (v1) | One extra join table and an editorial release step. Bought: reproducibility of tender documents without a full clone per release. |
+| **D3** | Erfüllungsgrad computed per request, never stored | Stored score per product | **Directory cannot be sorted or filtered by fulfilment without computing across all entries** — see §11.2. Bought: no stored score can exist. |
+| **D4** | Publication = snapshot copy, not a visibility flag | `IsPublic` boolean on workspace entities | Data duplication, possible staleness. Bought: structural redaction, explicit consent per version, safe withdrawal. |
+| **D5** | Product identity created on publish (**Flows B and E**, shared resolver), admin merge, request path for Flow D | Central curated product registry; free-text names only; identity requests for vendors | Some duplicates; an admin step for contributor-requested products. Bought: aggregation without the rejected maintenance burden, and no bottleneck for vendors listing their own product. |
+| **D6** | Organisation-scoped tenancy with EF global query filters | Row-level checks in each service | Filter must be bypassed deliberately for admin queries. Bought: defence in depth against cross-organisation leaks. |
+| **D7** | Resource-based authorisation for workspace/directory, claims for platform admin | Claim-only (current) | Two authorisation mechanisms to understand. Necessary: permissions depend on membership in a specific organisation. |
+| **D8** | **ASP.NET Core Identity cookie authentication** (`HttpOnly; Secure; SameSite=Strict`, sliding expiration) **with antiforgery** for state-changing requests (revised in v8, C50) | JWT in `localStorage` (current); refresh cookie + in-memory access token + silent refresh (v1–v7) | Same-origin deployment only (SPA and API behind one proxy), which is the planned topology (§10.1). Bought: XSS yields no stealable token, and there is no token plumbing to maintain — material for a tool holding disability-related data and for a solo maintainer. |
+| **D9** | Synchronous export, no job queue | Hangfire / background worker | Long exports block a request thread. Payloads are small; revisit if p95 export exceeds ~3 s. |
+| **D10** | In-process `IMemoryCache` for catalog data | Redis | Cache is per-instance. Fine for a single instance; first thing to change when scaling out. |
+| **D11** | Generic CRUD controllers only for catalog admin; *since v17 (C100) read-only: catalog changes come from the CLI import (SD20)* | Generic CRUD everywhere (current) | More hand-written endpoints. Necessary: workspace and directory invariants would otherwise be bypassable. |
+| **D12** | ClosedXML (MIT) for Excel; **licence rule for all dependencies** (extended in v13, C89; hosting-platform services in v16, C98; notices in v46, C132) | EPPlus (commercial licence since v5); AutoMapper 15+ (RPL-1.5 or commercial); SixLabors.Fonts 2.0+, which ClosedXML would accept (Six Labors Split License, C125) | Fewer features. Required: a publicly funded open-source release must not depend on a commercial licence. **Rule. Shipped dependencies** (API or client image, browser bundle): OSI-approved, no commercial-use restriction, and **no strong copyleft or reciprocal licence** (GPL, AGPL, RPL, OSL …). Weak, file-level copyleft (MPL-2.0, LGPL as a separate library) is allowed if used unmodified. A dual licence counts by the option the project would use. **Development and test tools that are not shipped:** OSI-approved, no commercial-use restriction. **Services of the hosting platform** (GitHub Actions runners, CodeQL code scanning, Dependabot) are not dependencies: they are neither shipped nor kept in the repository, so the rule above does not apply to them. Actions that a workflow references (`uses:`) are development tools and follow the rule (e.g. `github/codeql-action`, MIT). **Notices** (v46, C132): every image ships the licence notices of what it bundles — the client image `/3rdpartylicenses.txt`, the API image `/app/THIRD-PARTY-NOTICES.txt`, generated from the shipped NuGet packages and checked in CI stage 2, which also refuses a NuGet licence outside its allowlist. |
+| **D13** | **Three write paths into Directory, one shared invariant factory** | Single publication path through Workspace (v1); two paths (v2/v3) | The "one crossing" simplification is lost. Necessary: neither the Kanal-2 contributor nor the Kanal-1 vendor has a procurement project, and neither must need an organisation. |
+| **D14** | **No virus-scanning sidecar in v1** | ClamAV container (v1 topology) | Accepted residual risk on an authenticated-only upload path. Bought: one less always-on container to maintain; mitigated by type/size allow-list, `Content-Disposition: attachment`, restrictive CSP, and out-of-origin serving. Revisit if uploads open to unauthenticated users. |
+| **D15** | **Unauthenticated, non-persisting export of an ad-hoc selection** (new in v4) | Export only from a saved configuration (v3); anonymous configurations stored with a token | One unauthenticated POST that does work, guarded by rate limit and size caps; no server-side record of anonymous overrides. Bought: the core flow of the primary persona works without registration (PRD §5, goal 1). |
+| **D16** | **One write path per Kanal-1 origin: Kanal 1 only via Flow E; Flow B always Kanal 2** (new in v4) | Channel choice in Flow B plus Flow E (two Kanal-1 paths) | A vendor that also procures cannot publish Kanal 1 from its workspace and must use Flow E. Bought: no buyer can mislabel an independent entry as a vendor entry; consent capture exists in one place. |
+
+**Entity–DTO maps are hand-written (v17, C99). → ADR-015** *(principle accepted by the owner, 2026-11-05, O-S3-4 option A; rules 1–4 are confirmed with the review of the S3-07 pull request)*
+
+1. **No mapping library.** A map is a static extension method next to its types (legacy: `MODELS/Entities/Mapping/`; modules: inside the module, `internal` outside `Contracts`). Every target member is assigned explicitly; members the server sets (key, audit fields, concurrency token, navigations) are left out on purpose.
+2. **Queries project with an `Expression<Func<TEntity, TDto>>`** passed to `Select`, so EF reads only the columns of the DTO; maps of loaded entities use the method. Where both exist, ARC-06 checks both.
+3. **ARC-06** fills each source with non-default values and fails when a target member stays unset and is not on the map's ignore list, and when a public map has no test case. This replaces AutoMapper's `AssertConfigurationIsValid`, which could not see a missing map (#90).
+4. **Revisit** if the new modules need many maps with large DTOs: Mapperly (Apache-2.0, meets D12; compile-time errors for unmapped members) was the close second.
+
+---
+
+## 7. API design
+
+### 7.1 Conventions
+
+- REST over JSON, base path `/api/v1`. Versioning via URL segment; `v1` stable for the funding period. *v22 (C107):* the URL segment is the only place the API reads the version from; module endpoints are minimal APIs mapped on the host's versioned group, and the legacy controllers stay unversioned at `/api/<controller>` until their steps retire them (#153).
+- Errors as **RFC 9457 Problem Details**, with a machine-readable `errors` map keyed by field path. Not cosmetic: the client must bind server-side validation errors to specific form controls and announce them (WCAG 3.3.1). A generic error string would make the form inaccessible.
+- Pagination: offset-based everywhere (`?page=&pageSize=`); at the expected 2,000 entries cursor paging buys nothing and conflicts with `sort=entries` (G3, v7).
+- Concurrency: `ETag` derived from `xmin`, `If-Match` required on updates to shared workspace resources; conflicts return `409` with the competing editor's display name. **Caveat:** `xmin` is not preserved across `pg_dump`/restore, so ETags issued before a restore may match incorrectly after one. At RPO 24 h this is a theoretical window; the restore runbook in `TECHNICAL.md` must instruct operators to invalidate client caches (bump an `ETagEpoch` config value included in the ETag) after any restore.
+- Idempotency (v10, C64): all three publication paths carry a client-generated `clientRequestId` (UUID per form instance). `PublishedEntryVersion` stores it in `ClientRequestId` with a unique index on that column alone, together with `RequestHash` (SHA-256 of the normalised request body). A replay with the same id and the same hash returns the original result; the same id with a different hash returns 409. There is no separate key store (G3, v7).
+- Antiforgery failures return 400 Problem Details with their own `type`, so the client can tell them apart from validation errors (C60).
+- All list endpoints honour `Accept-Language` (de/en). *v42 (C128):* the answer names its language in `Content-Language` and varies by `Accept-Language`; while a release has German texts only, German is the fallback for every other request. Built for the two catalog endpoints; the directory and workspace lists follow with their steps.
+- Problem `type` URIs (v11, C78): `<base>/problems/<name>` with a configurable base; names `validation`, `antiforgery`, `rate-limit` (with `retryAfterMinutes`), `conflict` (with `editorDisplayName`), `locked-criteria-list`, `test-status-unknown`, `no-criteria-list`, `profile-mismatch`, `entry-withdrawn`, `selection-excluded`, `release-mismatch`, `email-unconfirmed`, `not-found` (SPEC_v2 §8.6).
+
+### 7.2 Endpoint map (indicative)
+
+**Catalog (public read, editor write)**
+
+```
+GET    /api/v1/catalog/releases/active
+GET    /api/v1/catalog/app-types
+GET    /api/v1/catalog/product-parts
+GET    /api/v1/catalog/use-case-templates
+GET    /api/v1/catalog/test-types
+GET    /api/v1/catalog/filter-options?release=&useCase=&appTypeIds[]=&productPartIds[]=
+         → { release, layers: { useCases[], appTypes[], productParts[], testTypes[] } },
+           each item { id, name, …, excludedBy: [ { layer, id, name } ] }
+           (final shape: SPEC_v2 §8.1, C77; no reason text — the client builds it)
+           built in v22 (C107): release = version, active release without it;
+           404 unknown or no active release, 400 unknown key
+GET    /api/v1/catalog/criteria?release=&useCase=&appTypeIds[]=&productPartIds[]=&testTypeIds[]=
+         → criteria [ { kind, appliesTo[] (v34, C120), allowedRatings[], procedureTexts[],
+                        resolvedPriority { level, weight, rationale, source, matchedRule } } ],
+           appTypesWithoutCriteria: [ { id, name } ]       (final shape: SPEC_v2 §8.2, C77)
+         400 `validation` with field errors for an incomplete selection (CAT-11);
+         400 `selection-excluded` with field errors if it violates a FilterExclusion of the release (v23, C108)
+         built in v24 (C109): release = version, active release without it; 404 for an unknown,
+         missing or incomplete release; caching as filter-options
+```
+
+**Export without account (new in v4)**
+
+```
+POST   /api/v1/exports
+         { format: "xlsx" | "csv",
+           selection: { releaseVersion, useCaseTemplateId?, appTypeIds[], productPartIds[],
+                        testTypeIds[] },
+           criteria: [ { criterionRevisionId, isIncluded, overrideLevel?,
+                         overrideWeight?, note? } ] }
+         unauthenticated; rate-limited; request-size capped;
+         priorities re-resolved on the server; nothing persisted;
+         response: file stream with Content-Disposition: attachment
+         built in v37 (C123): criteria[] names every criterion of the selection once;
+         active release only — 404 not-found for an unknown or incomplete release,
+         400 release-mismatch for one no longer active; 400 validation / selection-excluded
+         keyed by body path (selection.appTypeIds[1], criteria[2].overrideWeight);
+         unknown members refused; body ≤ 1 MB (413); Cache-Control: no-store
+         built in v40 (C126): 429 rate-limit per client IP (SPEC_v2 §7.3, 30 per 10 min 🔧);
+         writes ExportCreated (format, signedIn) for a created file only
+```
+
+**Usage event (new in v36, C122)**
+
+```
+POST   /api/v1/configurator/criteria-list-shown
+         no body; unauthenticated (dimension signedIn/anonymous from the request's sign-in);
+         204; writes CriteriaListShown fire-and-forget (§5.7, SPEC_v2 §8.7);
+         rate-limited by client IP (SPEC_v2 §7.3, 30 per 10 min 🔧; built in v40, C126)
+```
+
+**Configurator (authenticated, org-scoped)**
+
+```
+POST   /api/v1/configurations                       accepts an initial criteria[] array,
+                                                    so a draft can be saved in one call
+GET    /api/v1/configurations/{id}
+PATCH  /api/v1/configurations/{id}/criteria/{criterionRevisionId}
+         include/exclude, override, note; the four selection layers of a
+         project copy cannot be changed (C53)
+POST   /api/v1/configurations/{id}/copies           { release: "active" } — re-pinning (D6,
+                                                    §16.3.1); creates a new organisation list
+POST   /api/v1/configurations/{id}/exports          { format: "xlsx" | "csv" }
+POST   /api/v1/configurations/{id}/share-links      organisation lists only; 409 for a
+                                                    project copy (C59)
+DELETE /api/v1/share-links/{id}                     revoke
+GET    /api/v1/shared/{token}                        unauthenticated → 200 with a redacted
+                                                    configuration DTO; 404 if unknown, revoked
+                                                    or expired (D7, C59)
+```
+
+**Session (v8, C50; v10, C60)**
+
+```
+GET    /api/v1/auth/session               always 200: { user: null } when anonymous,
+                                          { user, expiresAt, absoluteExpiresAt } when signed in;
+                                          (re)issues the XSRF-TOKEN cookie; never renews the session
+POST   /api/v1/auth/login                 { email, password } → 204, sets the Identity cookie, issues a new XSRF-TOKEN;
+                                          400 validation with errors["$"] for a wrong address or password,
+                                          a locked or a deleted account (C133)
+POST   /api/v1/auth/logout                204, clears the cookie, issues a new XSRF-TOKEN (also without a session)
+POST   /api/v1/auth/session/extend        renews the idle limit ("Angemeldet bleiben") — step 4
+every authenticated response:             X-Session-Expires-At, X-Session-Absolute-Expires-At — step 4
+                                          (ISO 8601, UTC)
+```
+
+**Workspace (authenticated, membership-checked)**
+
+```
+GET    /api/v1/organizations/{orgId}/projects
+POST   /api/v1/organizations/{orgId}/projects
+GET    /api/v1/projects/{id}
+POST   /api/v1/projects/{id}/candidates               { softwareProductId? , name, vendor, … }
+                                                    "Merken" from the directory (Y4)
+PUT    /api/v1/projects/{id}/criteria-configuration  { sourceConfigurationId } — copies an
+                                                    organisation list into the project (C53);
+                                                    replacing: 409 once an assessment exists
+                                                    (value ≠ Unknown, C47); editing the copy
+                                                    uses the configurator endpoints (C51)
+PATCH  /api/v1/projects/{id}                          name, status
+PATCH  /api/v1/candidates/{id}
+DELETE /api/v1/candidates/{id}                       Owner/Editor; a published entry stays,
+                                                    SourceCandidateProductId → null (C76, SPEC SD21)
+PUT    /api/v1/candidates/{id}/assessments/{criterionRevisionId}
+PUT    /api/v1/candidates/{id}/test-status          { testStatus: tested | notTested | unknown }
+POST   /api/v1/candidates/{id}/test-evidences       one per procedure / other test (C46)
+PUT    /api/v1/test-evidences/{id}
+DELETE /api/v1/test-evidences/{id}
+POST   /api/v1/candidates/{id}/attachments
+POST   /api/v1/candidates/{id}/publication    { contributorProfileId, productIdentity,
+                                                clientRequestId }
+         channel is NOT part of the request (always independent, D16);
+         422 with field error on testStatus if unknown; 422 if the project
+         has no criteria list (C54); visible entry under the same profile →
+         new version; under another profile → 409, withdraw first (C55)
+```
+
+**Directory — read**
+
+```
+GET    /api/v1/directory/products?q=&useCase=&appTypeIds[]=&testTypeIds[]=&testKinds[]=
+                                  &channel=&hasReport=&sort=name|recent|entries&page=&pageSize=
+         filters match products with ≥ 1 visible entry in that context (C32);
+         useCase set ⇒ entries without use case are not counted; experience
+         reports never match it (C57);
+         testTypeIds[] matches published test evidences (C46); experience
+         reports count for the app-type filter, never for test filters;
+         testKinds[] (other, own; multi, C67) covers evidence outside the five
+         procedures; testTypeIds[] and testKinds[] are alternatives (OR);
+         never sortable by fulfilment (D3)
+GET    /api/v1/directory/products/{id}
+GET    /api/v1/directory/products/{id}/entries
+         public; fulfillment projected against each entry's own criterion scope;
+         cacheable
+GET    /api/v1/directory/products/{id}/entries?configurationId={id}
+         AUTHENTICATED; the configuration is resolved against the caller's
+         organisation membership; 404 (not 403) if it belongs to another
+         organisation; Cache-Control: no-store
+GET    /api/v1/directory/entries/{id}
+GET    /api/v1/directory/products/identity-matches?name=&vendor=
+         authenticated; trigram candidates for Flows B and E
+```
+
+The configuration-scoped variant was public in v1. Since `CriteriaConfiguration` is an organisation-private object, that allowed enumeration of another organisation's criteria selection through ID guessing, and it made an otherwise cacheable public endpoint uncacheable. Both are fixed by splitting the two variants.
+
+**Directory — write (Flows D and E), withdrawal and moderation**
+
+```
+POST   /api/v1/directory/products/{id}/contributions                    Flow D
+         { contributorProfileId, clientRequestId, narrative, productVersionUsed?,
+           assistiveTechnologyContext?, consent: { given, textVersion },
+           context?: { appTypeIds[] },          no use cases (C57)
+           assessments?[] }   rate-limited; channel forced to "independent";
+         422 without consent (C48)
+POST   /api/v1/directory/vendor-publications                            Flow E
+         { contributorProfileId, productIdentity: { existingId } | { name, vendor, website },
+           clientRequestId, wasTested,
+           testEvidences: [ { testKind, testTypeId?, otherTestTypeName?, testedVersion?,
+                              testedByName?, testDate?, evidenceUrl? } ]   ≥ 1 if wasTested,
+           context: { appTypeIds[] (≥ 1), useCaseTemplateIds[] },
+           scope?: { productPartIds[] },        required iff assessments are given (C54)
+           assessments?[],
+           consent: { givenBy, onBehalfOf, consentedAt, evidenceNote? } }
+         rate-limited; requires profile kind vendor | auditor;
+         channel forced to "vendorOrAuditor"; without assessments no
+         assessment rows are written and reads return fulfillment: null
+PUT    /api/v1/directory/vendor-publications/{entryId}                  Flow E republish
+         same body; creates a new PublishedEntryVersion of the same entry;
+         consent required again; only the publishing profile (C55);
+         409 for a withdrawn entry
+DELETE /api/v1/directory/entries/{id}                                   withdraw
+         CanWithdrawEntry: the user linked to the entry's contributor profile,
+         or — for WorkspacePublication — an Editor/Owner of the source
+         candidate's organisation; for DirectContribution the withdrawal
+         also runs ContentPurge (C56)
+POST   /api/v1/directory/product-identity-requests
+POST   /api/v1/directory/entries/{id}/reports              rate-limited
+POST   /api/v1/directory/entries/{id}/counter-statements   vendor/auditor profiles only
+```
+
+**Account and organisation (v11, C72, C79, C80)**
+
+```
+POST   /api/v1/auth/register                         same response for new and known addresses
+POST   /api/v1/auth/confirm-email     { token }      single use, 24 h
+POST   /api/v1/auth/confirm-email/resend             rate-limited
+POST   /api/v1/auth/password-reset    { email }      same response for known and unknown addresses
+POST   /api/v1/auth/password-reset/complete { token, newPassword }   2 h; ends other sessions
+GET    /api/v1/account/export                        JSON, no-store (SPEC_v2 §8.4)
+DELETE /api/v1/account                { emailConfirmation }   409 for a sole Owner of an
+                                                    organisation with other members
+PUT    /api/v1/account/preferences                   language, appearance, motion, contrast
+POST   /api/v1/organizations                         creator becomes Owner; confirmed e-mail required
+GET    /api/v1/organizations/{orgId}/members
+PATCH  /api/v1/organizations/{orgId}/members/{userId}   role; 409 for the last Owner
+DELETE /api/v1/organizations/{orgId}/members/{userId}   remove or leave; 409 for the last Owner
+POST   /api/v1/organizations/{orgId}/invitations     { email, role }; 14 days
+DELETE /api/v1/organizations/{orgId}/invitations/{id}
+POST   /api/v1/invitations/{token}/accept            bound to the invited address
+```
+
+**Administration (v11, C75, confirmed SPEC SD22; `PlatformAdmin` only)**
+
+```
+GET    /api/v1/admin/product-identity-requests?state=open
+POST   /api/v1/admin/product-identity-requests/{id}/accept   creates the SoftwareProduct,
+                                                            e-mails the requester
+POST   /api/v1/admin/product-identity-requests/{id}/reject   { reason }; e-mails the requester
+POST   /api/v1/admin/products/{id}/merge     { targetProductId }   sets MergedIntoId
+```
+
+The configuration-scoped directory variant accepts any configuration of the caller's organisation, including project copies (C83).
+
+*v3 had `DELETE /api/v1/publications/{entryId}` under the workspace.* It is replaced by the directory-level withdrawal endpoint, because entries from Flows D and E have no workspace to withdraw them from.
+
+### 7.3 The contract that carries the most product weight
+
+```jsonc
+// GET /api/v1/directory/products/42/entries?configurationId=17   (authenticated)
+{
+  "product": { "id": 42, "name": "…", "vendorName": "…" },
+  "entries": [
+    {
+      "id": 901,
+      "channel": "vendorOrAuditor",       // never merged with "independent"
+      "originKind": "vendorPublication",  // workspacePublication | directContribution | vendorPublication
+      "contributor": { "displayName": "…", "kind": "auditor" },
+      "version": 2,                       // PublishedEntryVersion.VersionNumber (C42)
+      "publishedAt": "2026-05-14",
+      "catalogRelease": "2026.1",
+      "wasTested": true,                  // always present, always boolean (test-result entries: Flows B and E)
+
+      "documentation": {                  // signal 1 — stored
+        "hasConformanceReport": true,
+        "reportFormat": "VPAT 2.5 EU",
+        "reportDate": "2026-03-01",
+        "ageInMonths": 5,
+        "testEvidences": [                // 0..n (C46)
+          { "testType": "BIT inklusiv Software-Test", "testedBy": "…", "testDate": "2026-02-10",
+            "testedVersion": "4.2", "evidenceUrl": "https://…" },
+          { "testType": "BIK BITV-Test (Web)", "testedBy": "…", "testDate": "2026-02-20" }
+        ]
+      },
+
+      "fulfillment": {                    // signal 2 — computed vs. configuration 17
+        "configurationId": 17,
+        "configurationRelease": "2026.2",
+        "fulfilled": 51,
+        "slightRestriction": 3,
+        "restriction": 12,
+        "barrier": 5,
+        "blockade": 9,
+        "notApplicable": 4,
+        "unknown": 6,
+        "notCovered": 2                   // criteria added after this entry was published
+      },                                  // procedure criteria (C30) are never counted;
+                                          // null for a Flow E version without assessments (C54)
+      "procedureAnswers": [               // C67; configuration-scoped variant only,
+        { "testType": "BIT inklusiv Software-Test", "answer": "yes" }   // yes | no | notStated
+      ],
+      "context": {                        // C32; omitted when the entry has none
+        "source": "vendorDeclared",       // projectSelection | vendorDeclared | contributorDeclared
+        "appTypes": [ "Website/Webanwendung" ],
+        "useCases": [ "HR-Anwendung" ]
+      }
+      // no "score", "rating", "percentage", "overallStatus" or total field — by design.
+      // no consent data — PublicationConsent is never serialised.
+    }
+  ],
+  "experienceReports": [               // Flow D only (E13): no wasTested, no documentation signal
+    { "id": 955, "contributor": { "displayName": "…", "kind": "individual" }, "publishedAt": "2026-08-21",
+      "assistiveTechnologyContext": "…", "productVersionUsed": "4.2", "narrative": "…",
+      "context": null,
+      "assessments": [] }               // optional list of assessed criteria; NO counts (C33)
+  ]
+}
+```
+
+A contract test asserts that no property matching `/score|rating|percent|overall/i` is ever serialised from this endpoint, that exactly the eight count properties are present whenever `fulfillment` is not null (Option A, §16.4.1; eight since v5, §16.4.5), that `fulfillment` is null only for `VendorPublication` versions without assessments (C54), that `wasTested` is always present on every item of `entries`, and that no item of `experienceReports` carries `wasTested`, a documentation branch or a `fulfillment` branch.
+
+**Procedure answers (v10, C67).** `procedureAnswers` is derived on the server from the published test evidences — `yes` if an evidence with that procedure exists, `no` if `wasTested` is false, otherwise `notStated` — and returned only in the configuration-scoped variant, for the procedure criteria of that configuration. The client never derives it.
+
+**Workspace scope (v6, C34).** Inside a procurement project the candidate's assessments and the configuration are pinned to the same release, so `notCovered` cannot occur. `GET /api/v1/projects/{id}` returns the seven counts per candidate without `notCovered`, and K1 renders seven rows (`Scope = Workspace`). It also returns `procedureAnswers[]` per candidate for the procedure criteria of the project's copy (C67). The eight-count rule of the contract test applies to directory projections.
+
+---
+
+## 8. Frontend architecture
+
+### 8.1 Store slice restructuring
+
+| Current slice | Target |
+|---|---|
+| `withIdentity()` | keep; extend with organisation memberships (possibly empty), active organisation and the user's contributor profiles (kinds only, never linked to other users) |
+| `withFilters()`, `withCriteria()` | merge into `withCatalog()` (reference data, cached, release-pinned) when the legacy filter goes; the S10 filter options stay in `withConfigurator()` (C116) |
+| — | new `withConfigurator()` — **draft selection** (works without an account, in memory only) with the filter options answered for it and the release it is pinned to (C116), the S11 list with the user's decisions by criterion key, search and filter (C119; cleared for another selection, C121), active saved configuration, export state. On login the draft can be saved as a configuration without re-entry |
+| `withProducts()`, `withFavorites()` | rework into `withWorkspace()` (projects, candidates, assessments, tri-state test status) |
+| — | new `withDirectory()` — search, product detail, entries, contribution (Flow D), vendor publication (Flow E) |
+| `withProposal()` | **retire** — the proposal/approval workflow is out of scope. Criteria suggestions are an external link (§16.4.2) |
+| `withSettings()`, `withLoading()` | keep |
+
+Feature folders keep the existing layout (`models/`, `services/api/`, `state/`, `pages/`, `list/`, `details/`, `dialogs/`). Routes become lazy-loaded per feature; the workspace bundle must not be downloaded by a Flow D or Flow E contributor who never opens a procurement project.
+
+### 8.2 Consequences of zoneless Angular
+
+`provideZonelessChangeDetection()` is already in place; zoneless is the default for new applications from Angular 21 on, so the upgrade to 22 (C37) changes nothing about the change-detection model. The upgrade runs `ng update` one major version at a time (20 → 21 → 22) in migration step 1, before new feature code. Signals-only state means every async boundary must write into a signal; nothing may rely on Zone.js-triggered change detection. Compatible with the NgRx Signals store, but requires care with third-party widgets and `setTimeout`-based patterns.
+
+### 8.3 Interceptor changes (follows D8, revised in v8)
+
+The browser sends the Identity session cookie automatically (`withCredentials` is not needed on the same origin). `authInterceptor` has three jobs (v10, C60):
+
+1. It attaches the antiforgery request token (read from the `XSRF-TOKEN` cookie that the API issues, sent as `X-XSRF-TOKEN`; Angular's `withXsrfConfiguration` covers this). At application start the shell calls `GET /api/v1/auth/session`, which answers 200 also for anonymous users and issues the first `XSRF-TOKEN`, so sign-in, registration and password reset carry a valid token.
+2. It reads `X-Session-Expires-At` and `X-Session-Absolute-Expires-At` from every response and updates the shell's session state.
+3. On `401` from any endpoint except the session probe, it opens the in-app login overlay (the sign-in form in a dialog, without navigation), holds the failed request and retries it after a successful sign-in. The page, its form input and the configurator draft therefore survive both limits (WCAG 2.2.1). A `401` from `GET /auth/session` is not expected (the probe answers 200) and is ignored.
+
+There is no token in JavaScript and no refresh endpoint.
+
+*As built (v50, C136; S5-08).* Job 1 is Angular's own XSRF interceptor (`withXsrfConfiguration` in `app.config.ts`), which needs a relative URL — `apiUrl` is `/api` everywhere, the dev server proxies it (#317). Job 3 is `authInterceptor` with `LoginOverlayService`: one overlay for concurrent 401s, one retry per request (`RETRIED_AFTER_SIGN_IN`), none for the probe or a background request; the error interceptor stays silent on a 401. The session state is `withIdentity()` (`session`, `signedIn`, `permissions`, `sessionReady()`), filled by the probe at start and after every sign-in and sign-out. Job 2 (the expiry headers) and the warning follow with S5-29.
+
+The session uses sliding expiration. A session expiring without warning violates WCAG 2.2.1, so the shell shows a visible, screen-reader-announced expiry warning with a "stay signed in" action; that action calls `POST /api/v1/auth/session/extend` (a cheap authenticated request that renews the sliding cookie). The shell knows the remaining time from `GET /api/v1/auth/session` at start and from the expiry headers afterwards (`expiresAt` for the idle limit, `absoluteExpiresAt` for the 8-hour limit) and warns `Session:WarningLead` (default 5 minutes) before the earlier of the two (C52, C60). WCAG 2.2.1 requires at least 20 seconds to respond; 5 minutes leaves room for screen-reader users to finish an input.
+
+*As built (v51, C137; S5-09).* The overlay and S01 share one form (`pa-login-form`); S01 shows in `main` of the shell in place of the page, which stays alive, so the „no navigation“ property of job 3 also holds for a sign-in the user starts: closing S01 shows the page with its input again.
+
+The anonymous export endpoint is unauthenticated and therefore exempt from antiforgery validation; it changes no server state.
+
+### 8.4 The one UI rule the architecture cannot enforce
+
+Because the two-signal guarantee stops at the API (§4.4), one rule must be carried by the frontend and by review:
+
+> **No view may display a single number, bar, star rating or traffic light that summarises how accessible a product is.** The fulfilment counts are always rendered together (eight in the directory, seven in the workspace, none for experience reports), with `notCovered` labelled as a catalog-scope difference rather than a deficiency. Dokumentationsgrad and Erfüllungsgrad never share a visual container.
+
+The rule is carried by the domain components defined in step 7 (UX copy §4.2: K1 `pa-fulfillment-breakdown`, K2 `pa-documentation-signal`), by the code-review checklist, and by the accessibility/UX review of the directory screens. Code Connect is not available on the Figma plan in use (C40); components are linked to Figma through documentation links on the Figma components, `@figma` JSDoc tags in code and the CI script `scripts/check-figma-links.mjs` (`figma_code_mapping_procureaccess_v1.md`).
+
+### 8.5 Steppers (v31, C117)
+
+Multi-step forms (S10, later S35 and S55) use `pa-stepper`, built on CDK `CdkStepper`, not `mat-stepper`: the step headers only show progress (an ordered list, `aria-current="step"` on the current step; below 600 px one text line), and nothing in them is clickable, as SPEC R-CON-01 requires. Each page checks its own step before calling `next()`; the stepper moves the focus to the new step's heading and announces the step label.
+
+### 8.6 Configurator hand-over and the legacy switch (v32, C118)
+
+S10 opens only through `configuratorReleaseGuard`: without an active catalog release it opens the legacy filter instead (O-S4-3), so start page and header link one address. S10 sends the complete selection to the criteria endpoint before it opens S11 and shows a refused selection at its step. A request whose problem types the page shows itself carries `CALLER_HANDLES_PROBLEMS`; the error interceptor leaves those to the caller. A page that needs values in its title, or the „Fehler:“ prefix, sets them through `PageTitleStrategy.setPageTitleState`.
+
+---
+
+## 9. Cross-cutting concerns
+
+### 9.1 Authentication and authorisation
+
+**Roles**
+
+| Scope | Roles |
+|---|---|
+| Platform | `PlatformAdmin`, `CatalogEditor`, `Moderator` |
+| Organisation | `Owner`, `Editor`, `Reader` (rows in `OrganizationMembership`) |
+| Contributor | any authenticated user with a `ContributorProfile` — **no organisation required**; Flow E additionally requires a profile of kind Vendor or Auditor |
+| Anonymous | catalog reads, public directory reads, ad-hoc export, shared-list reads (D7, C59), session probe |
+
+The existing `Approver` role and `objects:approve` claim are repurposed to `Moderator` / `moderation:review`. `Member` becomes an organisation-level role rather than a global one. *As built (v44, C130):* the rename, `Admin` → `PlatformAdmin`, the three platform roles in every environment, the policy `ModerationReview` and the `roles` command (R-ADM-03) since sprint 04 (S4-25); `Member` is still global.
+
+**Implementation:** ASP.NET Core resource-based authorisation (`IAuthorizationHandler<TRequirement, TResource>`) with requirements such as `CanEditProject`, `CanPublish`, `CanContribute`, `CanPublishAsVendor`, `CanWithdrawEntry`, `CanModerate`. Claim-based policies remain for platform endpoints. Every workspace endpoint resolves the organisation from the resource, never from a client-supplied header. `CanContribute` and `CanPublishAsVendor` deliberately check only authentication plus an existing contributor profile (of the required kind); they never read memberships.
+
+**Session (v8, C50; implementation details v10, C60).** ASP.NET Core Identity with cookie authentication (`AddIdentityCookies`), `Cookie.HttpOnly`, `SecurePolicy = Always`, `SameSite = Strict`; API endpoints return `401`/`403` instead of redirecting (`OnRedirectToLogin` and `OnRedirectToAccessDenied` overrides). Limits: **30 minutes idle** and **8 hours absolute** from sign-in (C52), configured as `Session:IdleTimeout`, `Session:AbsoluteTimeout` and `Session:WarningLead`. All time reads go through `TimeProvider`, so tests control the clock.
+
+- *Sign-in time.* At sign-in the sign-in time is stored in `AuthenticationProperties.Items["pa:signedInUtc"]`. `IssuedUtc` is not used for the absolute limit, because the cookie handler rewrites it on every renewal.
+- *Validation.* `OnValidatePrincipal` first calls `SecurityStampValidator.ValidatePrincipalAsync` (replacing the event would otherwise switch the security-stamp check off), then rejects the principal and signs out when now ≥ sign-in time + absolute limit.
+- *Sliding renewal.* `OnCheckSlidingExpiration` sets `ShouldRenew = true` for every authenticated request except `GET /api/v1/auth/session`. The default renews only after half of the window, which would make the effective idle limit vary between 15 and 30 minutes. Each renewal sets `ExpiresUtc` to min(now + idle limit, sign-in time + absolute limit).
+- *Extend.* `POST /api/v1/auth/session/extend` sets `ExpiresUtc` explicitly (same formula) and signs in again with the existing `Items`, so the sign-in time survives.
+- *Expiry headers.* Every authenticated response carries `X-Session-Expires-At` and `X-Session-Absolute-Expires-At`; the interceptor reads them (§8.3).
+- *Security stamp.* Password change and account deletion update the security stamp. The validation interval is short (default: every request, affordable at the expected load, §11.1), so the user's other sessions end at their next request.
+- *Antiforgery.* `AddAntiforgery` with header `X-XSRF-TOKEN`; validation on all non-GET endpoints except the anonymous export. `GET /auth/session` (also anonymous) issues the token cookie; sign-in and sign-out issue a new one, because the token is bound to the user identity. Validation failures return 400 Problem Details.
+- *As built (v47, C133; S5-07).* Cookie `.ProcureAccess.Session`, not persistent (gone when the browser closes); antiforgery pair `.ProcureAccess.Antiforgery` (`HttpOnly`) and `XSRF-TOKEN` (readable), both `Secure; SameSite=Strict`. The validation middleware runs after authorization and the rate limiter and skips GET/HEAD/OPTIONS/TRACE, endpoints with `DisableAntiforgery()` metadata (the export; until S5-10 the legacy identity endpoints `signUp`, `forgot-password`, `reset-password`); until S5-08 also requests with a Bearer header, when the default scheme `CookieOrBearer` still forwarded to the legacy JWT handler — since S5-08 (C136) the Identity cookie is the only scheme and the JWT is gone. Sliding renewal stays the handler's default until S5-29 (renewal when more than half of the idle window has passed, never on the probe); the absolute limit is enforced in `OnValidatePrincipal`. The probe's `user` is `{ id, email, roles, permissions }` (`permissions` since S5-08, C136; the records live in `IdentityAccess.Contracts`); `expiresAt`/`absoluteExpiresAt` are left out for a sign-in without limits. Sign-in failures: 400 `validation` with `errors["$"]`. The scheme comes from `X-Forwarded-Proto` of the trusted proxies (§9.2): behind Traefik the connection is HTTP, and the Secure cookies need `Request.IsHttps`. Only in `Development` and `E2E` the three cookies are `Secure` on HTTPS requests alone (`SessionCookiePolicy`, owner decision 3a), because those stacks have no TLS.
+- *Account security (v11, C72).* `RequireConfirmedEmail` is not used for sign-in; instead a policy `ConfirmedEmail` guards saving lists, creating organisations, accepting invitations, creating contributor profiles and all publication paths (403 Problem Details `email-unconfirmed`). Lockout: 5 failed attempts, 15 minutes. Password: at least 12 characters, at most 128, no composition rules. Token lifetimes: confirmation 24 h, password reset 2 h, invitation 14 days; all single use and stored hashed. Registration answers identically for new and known addresses; a known address receives an „already registered“ e-mail instead.
+- *Data Protection keys.* Session cookie and antiforgery tokens are protected with ASP.NET Core Data Protection. The key ring is persisted in the database (`PersistKeysToDbContext`, table `DataProtectionKeys` in the `identity` schema) and included in the backup (§10.4); without this, every container restart would end all sessions. *As built (v27, C112):* since sprint 03 (ahead of step 3), with the fixed application name `ProcureAccess` and, until S4-26, without encryption at rest (owner decision S3-24 3a). *v45 (C131):* encrypted at rest with a certificate from the environment (`DataProtection:Certificate`, a base64 PFX; `DataProtection:PreviousCertificate` reads the keys after a rotation), required outside Development and E2E — there the API does not start without it. The database or a backup alone no longer yields usable keys; the certificate is kept outside the repository and apart from the backups. `TECHNICAL.md` documents the key store (until then `docs/sprints/sprint_04/S4-26_key_ring_encryption.md` §6).
+
+### 9.2 Rate limiting and abuse protection
+
+Built-in ASP.NET Core rate limiter with per-endpoint policies (default values in SPEC_v2 §7.3, all configurable, C84): workspace publication, direct contribution, **vendor publication**, product-identity requests, report submission, counter-statements, registration, password reset, and **anonymous export** (partitioned by client IP at the proxy; the IP is used for limiting only and never stored, §9.3).
+
+*As built (v40, C126):* Platform holds the limiter, the anonymous export and `CriteriaListShown` have their policies (fixed window per client IP, 429 `rate-limit` with `retryAfterMinutes`), and the client IP is the address the trusted proxies forward (private and loopback networks, at most 🔧 2 proxies; IPv6 by /64). The other policies come with their endpoints.
+
+Anonymous export additionally: request body size cap, criteria array bounded by the release's criterion count, note length cap.
+
+Uploads (P1, ACR documents): authenticated Flow E submitters only; MIME and extension allow-list (PDF, ODF, OOXML); size cap; stored outside the web root with generated names; served from a separate origin with `Content-Disposition: attachment` and a restrictive CSP. No malware scanner in v1 (D14).
+
+### 9.3 Data protection (DSGVO)
+
+Central hosting makes the operating body the controller. Four architectural consequences:
+
+1. **Special-category data.** An experience report such as *"as a screen reader user I could not complete this workflow"* is health-related data under Art. 9 GDPR, even under a pseudonym. Therefore: contributor identity lives in a separate table (`UserContributorLink`) that no DTO touches; no endpoint returns both the account and the profile; correlation of user IDs with published entry IDs must not appear in logs above `Debug`. Every experience report requires explicit consent with a stored consent-text version (C48); withdrawing consent purges the report's personal content (C56, §16.2.8).
+2. **Pseudonymity must survive the organisation model.** This is why `PublishedEntry` has no `OrganizationId` and why `CanContribute` does not read memberships. A contribution must never be traceable to an employer through the data model — see §4.5.
+3. **Right to erasure vs. content integrity.** Account deletion detaches and anonymises the contributor profile; published content transitions to `Withdrawn` rather than being erased where a legitimate interest in the moderation record exists. This tension needs the bundled legal review (PRD §11); the architecture keeps both options open by never hard-deleting rows. The personal content of experience reports is purged in both cases (C56).
+4. **No third-party tracking.** No external analytics, fonts or CDNs. All assets self-hosted; the `UsageEvent` table (§5.7) covers the PRD metrics.
+
+Additionally: EU hosting, encryption in transit, disk-level encryption at rest, documented retention periods, self-service export of the user's own workspace and contributions. Anonymous exports leave no personal data behind (§4.4); rate-limit partitions are held in memory only.
+
+### 9.4 Accessibility as an architectural constraint
+
+| Requirement | Architectural consequence |
+|---|---|
+| Errors programmatically associated with fields (WCAG 3.3.1) | Field-level `errors` map in Problem Details (§7.1) |
+| No unannounced session expiry (WCAG 2.2.1) | Sliding cookie session + announced warning with "stay signed in" in the shell; after a 401, sign-in in an overlay without losing the page (§8.3) |
+| SPA route changes announced | App-level `A11yAnnouncerService`, focus management on navigation |
+| Exports themselves accessible | XLSX with real header rows, defined names, no colour-only meaning — identical for anonymous and saved exports |
+| Language changes exposed | `lang` driven by i18n state; responses honour `Accept-Language` |
+| Regressions caught | axe-core via Playwright in CI as a blocking gate |
+
+Component-level work belongs to step 7; these items are here because they cannot be retrofitted at component level.
+
+### 9.5 Logging and observability
+
+Serilog stays. Two changes:
+
+- The PostgreSQL sink writes to a dedicated `logging` schema with a **retention job** (e.g. 90 days). Unbounded growth of the log table in the primary database is the most likely operational failure for an under-maintained deployment.
+  *As built (C90):* `Serilog.Sinks.Postgresql.Alternative` writes to `logging."SeriLogs"`, a table the migrations own (the sink never creates it). `LogRetentionJob` deletes rows older than `AppLoggingSettings:Retention:RetentionDays` (default 90) at startup and every `RunInterval` (default 1 day), with `now` from `TimeProvider`; it assumes a single API instance. Since v15 (C93) sink set-up, table mapping and job live in the Platform module.
+- Structured logging with a correlation ID per request; PII and contributor-profile correlation excluded (§9.3). Request bodies of the anonymous export (which contain free-text notes) are not logged.
+
+Health endpoints `/health/live` and `/health/ready` (DB + file store) for the reverse proxy and uptime monitoring. *As built (v40, C126, #112):* at most 🔧 2 ready checks run at a time over all callers (a further probe gets 429 at once), because each holds a pooled database connection; the ready check's timeout is 🔧 5 s.
+
+### 9.6 Caching
+
+- Catalog reads: `IMemoryCache` keyed by `CatalogReleaseId`, without expiry: releases are immutable, so an entry never goes stale. Which release is active is not cached but read from the database on every request (one indexed query), because `catalog activate` runs in another process and cannot clear the API's cache; the next request after an activation returns the new release (v21, C106; `CatalogReader` in the Catalog module).
+- HTTP: `ETag` on catalog endpoints and on the *public* directory endpoints, with 304 for a matching `If-None-Match`. `Cache-Control: public, max-age=3600, must-revalidate` where the answer cannot change: a catalog request that names its release, and the *public* directory endpoints. A catalog request (filter-options and criteria, C109) for the active release gets `public, no-cache`, so the browser revalidates every time and the request after `catalog activate` returns the new release (v22, C107; owner, S3-19). `no-store` on everything workspace-scoped, on the configuration-scoped directory variant and on export responses.
+- Language (v42, C128): a catalog answer varies by `Accept-Language` (`Vary`), and its `ETag` includes the language served, so a cached answer in one language is never revalidated for another.
+- No caching of write paths.
+
+### 9.7 Configuration and secrets
+
+Configuration through `appsettings.json` + environment variables (12-factor). The client has no runtime configuration: its few settings are build-time values in the environment files, the same in every environment (one client image); the criteria-suggestion channel is one of them (C110). Settings that are 🔧 placeholders until an owner decision are refused by the release check `scripts/check-release-config.mjs` before a production release, not by the build (C110). Secrets never in the repository — this matters more than usual for a public GitHub repo. The existing `RebuildDatabase` / `SampleDataInitializer` switch must be hard-disabled outside `Development` (guard on `IHostEnvironment`, not only configuration), otherwise a misconfigured production deployment can wipe data. The same holds for the test catalog release (C115): it is seeded only in `Development` and `E2E`, and only from a folder that the development and E2E compose overrides mount.
+
+---
+
+## 10. Deployment and operations
+
+### 10.1 Topology
+
+```
+Internet
+   │  TLS (Let's Encrypt)
+   ▼
+Reverse proxy container ── static SPA bundle
+   │
+   ▼
+API container (ASP.NET Core 10)
+   ├── PostgreSQL 17 container (named volume)
+   ├── File store volume
+   └── outbound SMTP (TLS) → Lettermint (C71); Mailpit container in Development/E2E
+```
+
+Single host. `docker compose` in production is acceptable at this scale and keeps the handover story simple — a successor organisation can run this on one VM.
+
+### 10.2 Environments
+
+`Development` (local compose, seeded; with `docker-compose.dev.yml` also the active test catalog release `T.1`, C115), `Staging` (pilot with cooperation partners, real data flows, separate database), `Production`.
+
+A catalog release reaches an environment with the API image it ships in: `docker compose run --rm api catalog import <version>` once the API has applied the migrations (v20, C105), then `docker compose run --rm api catalog activate <version>`; the running API serves the new release from its next request, without a restart (v21, C106).
+
+The pilot (PRD §5, goal 4) needs a stable staging environment with realistic data — worth provisioning before the pilot rather than during it.
+
+### 10.3 CI/CD (GitHub Actions)
+
+Build + unit/integration tests (Testcontainers for PostgreSQL) → Angular build + unit tests → axe-core accessibility gate → NetArchTest boundary assertions → container image build → deploy to staging on `main`, manual promotion to production.
+
+Because the repository is public and publicly funded: Dependabot, CodeQL, and an SPDX/REUSE licence header check belong in the pipeline from day one. Licence compliance is an obligation here, not hygiene.
+
+### 10.4 Backup and recovery
+
+Nightly `pg_dump` plus WAL archiving; file store snapshotted on the same schedule; **restore rehearsed at least once and documented in `TECHNICAL.md`**, including the ETag-epoch bump of §7.1. The `DataProtectionKeys` table is part of the database backup; a restore without it ends all sessions (C60). *v45 (C131):* the keys in it are readable only with the key-ring certificate, so a restore needs the backup **and** the certificate (after a rotation also the previous one), kept apart from each other; a restore without the certificate ends all sessions and invalidates outstanding e-mail links like one without the table. Targets, stated explicitly because they are modest by choice: RPO 24 h, RTO best-effort within one working day.
+
+### 10.5 Migrations
+
+EF Core migrations auto-applied on startup (existing behaviour) is acceptable for a single instance but unsafe with more than one. Document the constraint; when scaling out, move migrations to a separate deployment step.
+
+**One context and one migration history per module (v15, C92). → ADR-014** *(accepted by the owner, 2026-10-30: the principle with O-S2-1, rules 1–6 with the review of the S2-07 pull request #148)*
+
+*Context.* Until sprint 02 one `ApplicationDBContext` in the legacy `DAL` project mapped every entity and had one migration history. The module rules (§4.3) forbid a module to reference a legacy project or another module's `DbContext`, so a module with tables needs a context of its own. Platform is the first (S2-07); Catalog follows in step 2.
+
+*Decision.*
+1. Every module that owns tables has one `DbContext` in its own project, `internal` like its entities and configurations. No other module and no legacy code uses it; data of another module is read through its contracts (§4.3).
+2. Its migrations live in the module project (`Persistence/Migrations`), `internal` like everything outside `Contracts` (EF generates them `public`; change it after `migrations add`). The history table is `<schema>."__EFMigrationsHistory"` in a schema of the module, set in the context's `OnConfiguring`, so every instance (application, design-time tools, tests) uses it: Platform uses `platform`, Catalog uses `catalog` (since S3-12, v18). The legacy context keeps `public."__EFMigrationsHistory"` until its last entity has moved; it is never squashed before.
+3. At startup the host first migrates the legacy context (which creates the database if missing), then runs every `IModuleDatabaseMigrator` (declared in Platform.Contracts, one per module, registered by `Add<Name>Module`) in registration order: Platform first, then the modules in their dependency order. A failing migration stops the API as before.
+4. Moving a table from the legacy context to a module takes two migrations. The legacy context gets one with an empty `Up` and `Down`, which only removes the entity from its model; the scaffolded `DropTable` is deleted, because the rows are data. The module's first migration creates the table only where it is missing (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, statements copied from what EF generates for the module's model) and drops nothing in `Down`. Since the legacy context is migrated first, existing and new databases both have the table already, and the module migration only records itself; a module database built without the legacy history still gets the table. An integration test compares the tables created both ways (columns, types, defaults, identity, indexes).
+5. No foreign key or join crosses two contexts. Where an entity being moved has a relation to a legacy entity, the relation moves with it or becomes an ID without a constraint; this is decided per step.
+6. OPS-03 covers every context: each one migrates an empty database and has no pending model changes.
+
+*Consequences.* Each module's schema can change without touching another module's migrations, and `internal` keeps the tables private to their module. The price is one `IF NOT EXISTS` baseline per moved table and the hand edit of generated migrations (`public` → `internal`, the empty legacy migration). Several contexts on one database still share one connection string and one Npgsql pool. Migrations still run at startup with a single instance (above).
+
+*Rejected.* Keeping the mapping of moved entities in `DAL` until step 2 (contradicts O-S2-1 and leaves the Platform code in `SERVICES`); one shared history table for all contexts (it works, but each context then sees the other contexts' migrations as applied migrations it does not know, which makes `migrations list`, `database update <target>` and the history itself harder to read; a module's history would no longer be its own); a generated module migration with `CreateTable` plus a hand-written history row on every deployed database (a manual step per environment); `ExcludeFromMigrations()` in the module context while the legacy context keeps owning the schema (the entity would have to be visible to `DAL`).
+
+---
+
+## 11. Scale and reliability
+
+### 11.1 Load estimation
+
+| Dimension | Expected | Design headroom |
+|---|---|---|
+| Registered organisations | 10 – 200 | 10,000 |
+| Registered users | 50 – 500 | 50,000 |
+| Criteria per release | 300 – 1,500 | uncapped |
+| Published entries | 50 – 2,000 | 1,000,000 |
+| Peak requests | < 5 req/s | ~500 req/s on one container |
+| Database size | < 5 GB | 500 GB on one volume |
+
+The system is over-provisioned by two to three orders of magnitude on a single container. **Optimising for throughput would misallocate the project's scarcest resource, which is maintainer attention.** The anonymous export is the only unauthenticated endpoint that does non-trivial work; at one XLSX of at most ~1,500 rows per request it stays well within this headroom under its rate limit.
+
+### 11.2 Known query costs
+
+**The cost of D3.** Because fulfilment is a per-request projection, the directory cannot be indexed, sorted or filtered by "how well does this product meet my criteria". A query such as *"show products that satisfy my A-criteria"* — which PRD §7 describes as part of the core flow — requires computing the projection across all candidate entries.
+
+Mitigation, in order of when it becomes necessary:
+
+1. **Pre-filter on indexable attributes first** (entry app types and use cases, test type, channel, documentation presence, publication recency), then project fulfilment only over the surviving set. At 2,000 entries the surviving set is typically tens of rows.
+2. **Push the projection into SQL** as a grouped query inside Directory rather than computing in memory: the configuration's included criterion keys are read through `IConfigurationReader` (C62) and passed as a parameter (an array of keys) to a grouped query over `PublishedAssessment`. A direct join with Configurator tables would cross the module boundary.
+3. **Materialised view per (entry, release) pair** holding the per-category counts against the *entry's own* scope, used as a coarse pre-filter only. This is the point to watch: such a view must not acquire a total or ratio column, or D3's guarantee is quietly lost. If this step is ever taken, revisit ADR-003 explicitly rather than treating it as an optimisation detail.
+
+### 11.3 What breaks first, and in what order
+
+1. **Serilog PostgreSQL sink table growth** — mitigated by retention (§9.5). Most likely real incident.
+2. **Uploaded file volume growth** — quota per contributor profile, monitoring, object storage if needed.
+3. **Directory search** — trigram search degrades in the tens of thousands; add a GIN index, then PostgreSQL full-text search. No external search engine.
+4. **Fulfilment projection** — see §11.2.
+5. **In-memory cache** — only when running more than one instance.
+
+### 11.4 Failover
+
+Deliberately none. Single instance, accepted downtime, documented recovery. Redundancy would add operational surface that no one is funded to maintain after the project ends.
+
+### 11.5 Scaling path, if ever needed
+
+Stateless API + external session/cache → horizontal scaling behind the proxy → read replica → module extraction (Directory is the natural first candidate: read-heavy, public, depends only on Catalog).
+
+---
+
+## 12. Migration path from the existing codebase
+
+Sequenced so that a working application exists at the end of every step; nothing is rewritten wholesale.
+
+**Step 0 — Platform upgrade and test foundation (v7)**
+.NET 8 → 10 with EF Core 10 and Npgsql 10 (C41) and Angular 20 → 22 (`ng update` per major version, C37), both before the first test project is created, so the test setup (TESTING §9 step 0) is built once on the target versions.
+
+**Step 1 — Foundations (no user-visible change)**
+Module namespaces and NetArchTest assertions; Serilog to its own schema with retention; guard `RebuildDatabase` on `IHostEnvironment`; `/health` endpoints; Problem Details middleware with the field-level `errors` map.
+
+**Step 2 — Catalog versioning and export**
+Add `CatalogRelease`, `CatalogReleaseCriterion`, `CriterionRevision` (with `Criterion.Kind`), `CriterionApplicability`, `PriorityRecommendation`, `StandardReference`, `CriterionProcedureText`, `AppType`, `ProductPart`, `UseCaseTemplate` (with `IsActive`), `TestType`, `FilterExclusion`, `CatalogReleaseFilterExclusion` and `CatalogReleaseAppTypeProcedure` (C45, C61). *v18 (C102, O-S3-5):* the existing criteria are **not** copied into the catalog. The legacy tables (`FilterTypes`, `CriteriaFilters`, `CriteriaFilterExclusions`, `Criteria`) stay in the legacy context, and the legacy endpoints keep reading them until the configurator S10 replaces `/filters` and steps 5/6 retire products and proposals. The filter values (`UseCaseTemplate`, `AppType`, `ProductPart`, `TestType`) are seeded in a catalog migration; drop the seed exclusions 17 → 12 and 17 → 13 from the legacy seed (§16.3.2, C103). Release `2026.1` is produced from Kriterienkatalog Teil A/B plus the priority document (SPEC R-ADM-01) with the BIT inklusiv texts and one procedure criterion per test type; the existing criteria reach it by their EN 301 549 numbers, not as copied rows. `catalog import` accepts a release without priorities, `catalog activate` refuses it. *v11 (C74, confirmed SPEC SD20):* release content is prepared as a data folder in the repository (`catalog/releases/2026.1/`) and imported with `catalog import` / `catalog activate`; later releases use the same path. **Prerequisite:** priorities and rationales per criterion (Kriterienkatalog K-6, §16.5). Extend the criteria endpoint to return resolved priority with rationale, allowed ratings and procedure texts, and add the filter-options endpoint with exclusions. The existing filter UI keeps working on the legacy tables until S10 replaces it (v18, C102).
+
+*Added in v4:* the export pipeline with `IExportSource` and **both** sources lands here — `AdHocSelectionSource` behind `POST /api/v1/exports`, and `PersistedConfigurationSource` once configurations exist (step 3). `withConfigurator()` gets its in-memory draft. This makes the primary persona's complete flow (select → adjust → export) available before any account or tenancy work, which is also the earliest point at which a pilot partner can try the tool.
+
+**Step 3 — Identity, tenancy, session and saved lists (changed in v10, C61)**
+Add `Organization`, `OrganizationMembership`, `ContributorProfile`, `UserContributorLink`. Rename `Approver` → `Moderator`. *(v44, C130: the contributor-profile tables, the role rename and the `roles` command were built ahead in sprint 04, S4-25.)* Introduce resource-based authorisation and the EF global query filter. Replace the `localStorage` JWT by Identity cookie authentication with antiforgery, the anonymous session probe, the Data Protection key store (built ahead in sprint 03, C112) and the basic interceptor (antiforgery header, 401 → login overlay). *(v47, C133: the server part — cookie, antiforgery, probe, sign-in, sign-out — was built in sprint 05, S5-07, next to the JWT; S5-08 switches the client and removes the JWT.)* Saving a configuration is the first state-changing feature on the new session model, so nothing is built on the JWT that step 4 would have to replace. Add the Configurator entities (`CriteriaConfiguration`, `ConfigurationAppType`, `ConfigurationProductPart`, `ConfigurationTestType`, `ConfigurationCriterion`), `IConfigurationReader` and `PersistedConfigurationSource`, the copy operation (D6) and `ShareLink` with the anonymous read (D7). `CriteriaConfiguration.ProcurementProjectId` follows in step 5. *v11:* `IEmailSender` with Mailpit locally (C71), registration with e-mail confirmation, password reset, lockout (C72), organisation members and invitations (C80), account export and deletion (C79), preferences incl. appearance (C73).
+
+Existing users are **not** auto-assigned a personal organisation. Before the pilot there is little or no real user data, and auto-creation would leave a tail of single-person organisations that later need merging into real team organisations. Existing accounts keep working with no membership; the first workspace or save action prompts the user to create or join an organisation. Any pre-pilot test data is reset rather than migrated.
+
+**Step 4 — Session warning and hardening (D8; changed in v10, C61)**
+Absolute limit with the stored sign-in time, sliding renewal on every request, expiry headers, `POST /auth/session/extend`, security-stamp invalidation on password change and account deletion, the expiry warning in the shell and the configurable lifetimes (C52, C60).
+
+**Step 5 — Workspace module**
+`ProcurementProject` (with its own list copy and the C47 lock, C53), `CriteriaConfiguration.ProcurementProjectId`, `CandidateProduct` (with tri-state `TestStatus`), `TestEvidence` (0..n), `CandidateAssessment`; "Merken" from the directory once step 6 exists. Retire `withProposal()` and the proposal endpoints. Repoint `withProducts()` / `withFavorites()` at the new model.
+
+**Step 6 — Directory, publication and contribution**
+`SoftwareProduct`, `PublishedEntry` and `PublishedEntryVersion` (with app types, use cases, assessments in full scope, test evidences), `IPublicationGateway`, `PublishedEntryFactory`, `IProductIdentityResolver`, **`PublicationService` (Flow B), `ContributionService` (Flow D) and `VendorPublicationService` (Flow E)**, `PublicationConsent`, `ContentPurge` and the version-immutability interceptor (C56, C66), redaction rules, cross-release matching, the two-signal projection endpoints in both variants, directory search with the four context filters (test-type filtering is P0), the directory-level withdrawal endpoint, the product-identity administration (C75, confirmed SPEC SD22), and the contract tests.
+
+All three write paths land in the same step: building the factory around a subset of its paths and retrofitting the rest is how the v1 boundary error happened in the first place.
+
+**Step 7 — Moderation and P1**
+Content reports, counter-statements, moderation log (with optional version reference, C63), `ProductIdentityRequest` handling and ACR upload (Flow E). *(v6: test-type filtering moved to steps 2 and 6, since it is P0.)*
+
+The order puts the two decisions with the widest blast radius — catalog versioning and tenancy — before any new feature code is written on top of them.
+
+---
+
+## 13. Testing hooks
+
+Full strategy belongs to step 6 (the testing strategy, `TESTING_v*.md`). The architecture assumes:
+
+- Integration tests against real PostgreSQL via Testcontainers (global query filters and `xmin` concurrency cannot be tested on an in-memory provider).
+- Contract tests for the invariants that carry product meaning:
+  - no `score`/`rating`/`percentage`/`overallStatus` property is ever serialised; directory projections return exactly the eight counts;
+  - a selection that violates a `FilterExclusion` rule is rejected (configurator, ad-hoc export, directory filter);
+  - an assessment value outside the allowed-ratings union of the selected app types is rejected; `Unknown` is always accepted (C31);
+  - procedure criteria have no assessment rows, their answer is derived from test evidences, and they are never counted (C30, C46);
+  - a test-result version stores one assessment row per criterion in scope (C43);
+  - republication creates a new version of the same entry; reports and counter-statements stay attached (C42);
+  - assigning a list copies it into the project; the copy cannot be *replaced* once an assessment with a value other than `Unknown` exists, while it stays editable within its release with fixed selection layers (C47, C51, C53);
+  - every experience report has a consent timestamp and text version (C48); withdrawing it purges its personal content and keeps a tombstone (C56);
+  - version rows are never modified except by `ContentPurge` (C66);
+  - a Flow E version without assessments has no assessment rows and `fulfillment: null` (C54);
+  - only the publishing profile republishes; withdrawn entries are never republished (C55);
+  - shared configurations are readable without an account; projects have no share links (C59);
+  - anonymous `GET /auth/session` returns 200 with an antiforgery token; sessions end at the idle and absolute limits and survive an application restart (C60);
+  - modules reference each other only through `Contracts` (C44);
+  - experience reports carry no counts; workspace projections carry seven counts without `notCovered` (C33, C34);
+  - the directory use-case filter never returns entries without a use case, and never experience reports (C32, C57);
+  - `wasTested` is always present and boolean on every test-result entry (WorkspacePublication, VendorPublication); DirectContribution versions have `WasTested = null`, no `PublishedTestEvidence` row, and appear only in `experienceReports`;
+  - internal fields (`InternalNotes`, `ContactNotes`, `TesterQualificationNote`) and consent records never appear in any published DTO;
+  - cross-organisation reads return empty, and a foreign `configurationId` yields 404;
+  - `notCovered` is never merged into `unknown` or `blockade`;
+  - Flow D and Flow E succeed for a user with no organisation membership;
+  - `Channel = VendorOrAuditor` exists only with `OriginKind = VendorPublication`; Flow B always yields `Independent`;
+  - publication with `TestStatus = Unknown` is rejected;
+  - the anonymous export persists nothing and produces the same file content as a saved configuration with the same selection.
+- Accessibility tests (axe-core) as a blocking CI gate.
+- Architecture tests (project references and NetArchTest) enforcing §4.3 (C62), including that only `PublishedEntryFactory` constructs a `PublishedEntry` or `PublishedEntryVersion`.
+
+---
+
+## 14. Proposed ADRs
+
+| ID | Subject | Status |
+|---|---|---|
+| ADR-001 | Modular monolith over service decomposition, with `Contracts` namespaces as the only cross-module surface | Proposed |
+| ADR-002 | Catalog versioning via immutable releases composed from shared revisions | **Accepted** (owner, 2026-09-29) |
+| ADR-003 | Erfüllungsgrad as a request-time projection, never a stored score; all category counts returned (Option A; eight since v5) | Proposed; count contract **accepted** (owner, 2026-10-01) |
+| ADR-004 | Publication as snapshot copy rather than a visibility flag (versions per entry since v7) | Proposed |
+| ADR-005 | Product identity created on publish (Flows B and E), with admin merge and a request path for Flow D | **Accepted** (owner, 2026-09-29; Flow E extension 2026-10-01) |
+| ADR-006 | ASP.NET Core Identity cookie session with antiforgery over `localStorage` JWT and over refresh-token plumbing. *Note (v10, C60):* after a `401` the shell re-authenticates in an in-app overlay and retries the request, so no page state is lost at either limit (WCAG 2.2.1); the absolute limit uses a stored sign-in time; Data Protection keys are persisted | **Accepted** (owner, 2026-10-13) |
+| ADR-007 | Organisation-scoped tenancy enforced by EF global query filters | Proposed |
+| ADR-008 | **Three write paths into Directory with a shared invariant factory; Kanal 1 only via Flow E** | **Accepted** (owner, 2026-10-01) |
+| ADR-009 | **Unauthenticated, non-persisting export of an ad-hoc selection** | **Accepted** (owner, 2026-10-01) |
+| ADR-010 | **App types and use cases as context of a published entry, never of the product identity** (variant A) | **Accepted** (owner, 2026-10-12) |
+| ADR-011 | **Stable published entry with immutable versions** | Proposed (review R2) |
+| ADR-012 | **Test evidences as the single source for "tested according to"** | **Accepted** (owner, 2026-10-12) |
+| ADR-013 | **.NET 10 LTS and Angular 22 as the locked platform versions** | **Accepted** (owner, 2026-10-12) |
+| ADR-014 | **One `DbContext` and one migration history per module; tables move from the legacy context with an empty legacy migration and an `IF NOT EXISTS` baseline** (§10.5, C92) | **Accepted** (owner, 2026-10-30; principle O-S2-1, rules 1–6 confirmed with PR #148) |
+| ADR-015 | **Entity–DTO maps are hand-written; no mapping library** (§6, C99) | **Accepted** in principle (owner, 2026-11-05, O-S3-4 option A); rules 1–4 are confirmed with the review of the S3-07 pull request |
+| ADR-016 | **The short description (Kurzbeschreibung) is an optional field of the criterion revision and of the release folder, not derived from another text** (§5.1, C129) | **Accepted** (owner, 2026-11-12, O-S4-6 (a); scope and format O-S4-78 (a), O-S4-79 (a)) |
+
+---
+
+## 15. What I would revisit as the system grows
+
+| Trigger | Revisit |
+|---|---|
+| More than one API instance | In-memory cache (D10), auto-migration on startup (§10.5), rate-limit partitions for the anonymous export |
+| More than ~10,000 published entries | Directory search (§11.3) and the fulfilment projection (§11.2) |
+| A materialised pre-filter view becomes necessary | ADR-003 explicitly — the guarantee is at stake, not just performance |
+| Export p95 above ~3 s | Synchronous export (D9) |
+| Abuse of the anonymous export | Tighter limits first; a proof-of-work or challenge step only as a last resort, since it would hurt assistive-technology users |
+| Uploads opened beyond authenticated Kanal-1 submitters | D14 — reinstate malware scanning |
+| Misuse of self-declared vendor/auditor profiles becomes visible | Verified vendor profiles (e.g. domain e-mail check or confirmation through a cooperation partner) — outcome of §16.2.7 decides |
+| Vergabetext-Generator with AI assistance (P2) | New external dependency, latency budget, prompt/response logging under DSGVO, cost model — likely the first genuinely new architectural component |
+| A second organisation self-hosting | Configuration surface, seed data, upgrade path, federation of published entries between instances |
+| ISO 9241 integration (PRD §6, deferred) | `StandardReference` already accommodates it; `CriterionApplicability` may need a process-level vs. product-level dimension |
+| Duplicate product identities becoming visible | Merge tooling, possibly a lightweight curation role — but not a return to a central maintained database |
+
+---
+
+## 16. Open questions and recorded decisions
+
+### 16.1 (closed in v4)
+
+The former decision on aggregate counts is recorded in §16.4.1.
+
+### 16.2 Requiring external input
+
+1. **Erasure vs. moderation record** (§9.3) — needs the bundled legal review from PRD §11 before retention rules are fixed.
+2. **Attachment liability** — who is responsible if a vendor uploads an ACR containing third-party material? Same legal bundle.
+3. ~~**Share links** — should a shared configuration be readable without an account?~~ **Decided (owner, 2026-10-13, D7):** yes for criteria lists of the organisation; no share links for projects (and for project copies) in v1. Implementation in §5.3 (C59).
+4. **Custom use-case templates** (P2) — removed from the v1 model (G1, v7); `UseCaseTemplate` gains an owner when P2 is planned.
+5. **Handover target** (PRD §11) — if the successor organisation has a fixed platform (e.g. a Bundes-IT environment), parts of §10 need revisiting. Worth asking early.
+6. **`ProductIdentityRequest` turnaround** — a contributor blocked behind an admin step is a poor experience for exactly the persona the project most wants to include. If volume is low this is fine; if not, consider a trusted-contributor capability granted via cooperation partners. *v4 note:* vendors no longer depend on this path (Flow E).
+7. **Authenticity of vendor and auditor claims (new in v4, decision E4).** Neither the v3 workspace route nor Flow E verifies that a user behind a vendor or auditor profile acts for that vendor or test lab, or that the stated consent of the commissioning party exists; `PublicationConsent` is a self-declaration. Specific risks: impersonation of a vendor; Kanal-1 entries about a competitor's product; one user holding a vendor profile and an individual profile and publishing "independent" praise under the latter (the profiles are deliberately unlinkable in public). Questions for the bundled legal review: what level of verification is required before Kanal-1 entries may be shown, who is liable for a false consent declaration, and how this interacts with the binding force of VPAT/ACR data in tenders (PRD §7, §11). Architecture hook: a `VerifiedAt` / `VerifiedBy` pair on `ContributorProfile` can be added without migration pain if verification becomes a requirement.
+8. **Consent for experience reports (new in v4; widened in v7, C48; purge decided in v10, C56).** The narrative and the assistive-technology context of an experience report can reveal a disability, i.e. special-category data under Art. 9 GDPR. Decided: every report requires explicit consent with a stored consent-text version (`ExperienceReport.ConsentedAt`, `ConsentTextVersion`), and withdrawing consent withdraws the report and purges its personal content (D4). The legal review decides only the consent wording, the legal basis and the timing of the purge (default: immediately); none of these needs a schema change.
+
+### 16.3 Raised in step 7
+
+1. **Re-pinning a configuration to a newer catalog release.** The UX copy offers "Neue Liste mit derselben Auswahl" when a saved configuration is pinned to an older release. The architecture has no operation for this. Proposed shape: `POST /api/v1/configurations/{id}/copies { release: "active" }` creates a *new* configuration on the active release with the same four-layer selection (use case, app types, product parts, test types) — values that the new release excludes or deactivates are dropped and reported; user decisions (`IsIncluded`, overrides, notes) are carried over by `Criterion.Key` where the key still exists (1:1 via `SupersededByKey`), and reported as "not carried over" otherwise. The original configuration stays untouched (ADR-002). **Decided (owner, 2026-10-13, D6):** adopted as proposed (C58). A procurement project that should use the newer release is a new project with a copy of the new list (C53).
+
+2. ~~Exclusion HR-Anwendung → Mobile Anwendung~~ **Decided (owner, 2026-10-06):** no exclusion; the seed rows are removed.
+3. **Hardware and Vermittlungs-/Notrufdienst without a procedure (open to-do, accepted for now by the owner on 2026-10-06).** No BIT inklusiv test covers them. Options: map Software-Test criteria of chapters 5 and 6, or mark the app types as "no criteria yet". Until decided, selecting only these app types yields the "tested according to" items and no procedure texts. **Decides:** project team; tracked as Kriterienkatalog K-2.
+4. **One product part per criterion.** The repository assigns each criterion to exactly one product part; 11.1.2.1 concerns audio and video. `CriterionApplicability` already allows several rows per revision; the seed should use that. The repository mapping of 11.8.x and chapter 12 looks swapped (Kriterienkatalog §7).
+
+### 16.4 Decisions recorded in v4
+
+The option analyses are kept so that the rationale, including the rejected alternatives, remains traceable.
+
+#### 16.4.1 Aggregate counts in the API — decided: Option A
+
+| Option | API returns | Consequence |
+|---|---|---|
+| **A — chosen** | Category counts per entry (six at the time; eight since v5) | A list view can show a compact breakdown. A client can still divide two numbers into a percentage. |
+| B — strict | Per-criterion values only, no counts | Aggregation requires deliberate client-side work, making an accidental score much less likely. A scannable list or comparison view becomes substantially harder to build, and every client must implement counting itself. |
+
+**Decision (owner, 2026-10-01):** A. B is a stronger reading of the PRD principle but pays for it in directory usability, which is itself a product goal. The residual risk is carried by the presentation rule (§8.4) and the domain component K1.
+
+#### 16.4.2 "Vorschlagen" for criteria — decided: Option C
+
+PRD §9 lists *"Merken, Teilen, Vorschlagen von Kriterien/Produkten/Filtereinstellungen"* as P0. The retired proposal workflow implemented editorial approval into a central product database (PRD §6 Nicht-Ziel); that justification covered products, not criteria.
+
+| Option | What it means | Cost | Fit |
+|---|---|---|---|
+| A — Clarify the PRD | "Vorschlagen" means sharing a configuration; no catalog suggestions in v1 | PRD wording change | Covered by `ShareLink` |
+| B — Lightweight suggestion channel | `CriterionSuggestion` in the `catalog` schema, triaged by a `CatalogEditor` into the next release | One entity, one endpoint, one editor view | Compatible with ADR-002 |
+| **C — chosen: external channel** | A link from the UI to a contact address or form at WERTE.IT | Lowest; no data model | Compatible; suggestions are not traceable to the release that adopted them |
+
+**Decision (owner, 2026-10-01):** C. The link appears in the criteria list and in the footer (UX copy S70). Option B remains reachable later without migration pain. The PRD acceptance criterion for "Vorschlagen" should be worded accordingly in `SPEC_v1.md`. Open: contact address or form URL (UX copy O4).
+
+#### 16.4.3 Kanal 1 outside the workspace — decided: Option B (Flow E)
+
+In v3 the only way to create a Kanal-1 entry was Flow B, which forced vendors and test labs to create an organisation and a procurement project for a procurement that does not exist.
+
+| Option | What it means | Consequence |
+|---|---|---|
+| A — Keep | Vendors and auditors use a workspace | No code change; workspace semantics stretched; role-dependent labels throughout the workspace UI; heavier onboarding for the persona the PRD calls a reputation channel |
+| **B — chosen: direct Kanal-1 path** | Flow E for vendor/auditor profiles; consent required; optional conformance report | Third factory path; no organisation or project needed |
+
+**Decision (owner, 2026-10-01):** B, with identity creation allowed on Flow E through the shared resolver (D5), and with Flow B restricted to Kanal 2 (D16). Rationale: Kanal 1 depends on voluntary vendor participation, which PRD §13 already considers weakly supported for the German market; every extra hurdle worsens the bootstrapping problem. Building the path now costs little because migration step 6 has not started. The authenticity of vendor claims, which neither option verifies, is recorded in §16.2.7.
+
+#### 16.4.4 Further decisions from step 7
+
+| Topic | Decision (owner, 2026-10-01) | Where |
+|---|---|---|
+| Export without an account | Yes: unauthenticated, non-persisting ad-hoc export | §4.4, D15, ADR-009 |
+| Workspace publication channel | Flow B always publishes as Kanal 2 | §4.4, D16 |
+| Test status while unknown | Tri-state `TestStatus` in the workspace; publication requires a definite answer | §5.4 |
+| Consent for assistive-technology context | UX placeholder accepted for now; legal review decides *(superseded: consent for every report, C48; purge on withdrawal, C56)* | §16.2.8 |
+
+#### 16.4.5 Rating scale — decided: BIT inklusiv (v5)
+
+**Decision (owner, 2026-10-06):** assessments use the six levels of BIT inklusiv (Erfüllt, Leichte Einschränkung, Einschränkung, Barriere, Blockade, Nicht anwendbar) plus `Unknown`. BIT inklusiv counts „Leichte Einschränkung“ as conformant; ProcureAccess does **not** derive a conformance verdict from this — that would be the aggregate the two-signal principle forbids. The count contract therefore has eight properties. Rejected: keeping the VPAT-style four values, because criteria and examples are taken from BIT inklusiv and their allowed ratings would no longer match.
+
+#### 16.4.6 Filter layers and exclusions — decided (v5)
+
+**Decision (owner, 2026-10-06):** four layers in the order use case → app type → product part → test type; only the use case is single choice; exclusions apply to all lower layers; changing a higher layer clears all lower selections with a notice asking the user to select again. Excluded values stay visible (`aria-disabled`) with a reason.
+
+#### 16.4.7 "Geprüft nach …" as procedure criteria — decided (v6, refined in v7)
+
+**Decision (owner, 2026-10-12):** a criterion kind of its own (C30). Listed and deselectable, default priority B, exported, shown Ja/Nein, not counted in K1. **v7 (C46, ADR-012):** the Ja/Nein is derived from the product's test evidences instead of being entered separately. Rejected: treating the item as a pure filter (would disappear from the export, which is where buyers need it) and rating it on the six-level scale (a test procedure is either applied or not).
+
+#### 16.4.8 Allowed ratings with several procedures — decided (v6)
+
+**Decision (owner, 2026-10-12):** union of the allowed ratings, `Unknown` always allowed (C31). Rejected: intersection (would hide correct levels for one of the app types) and per-app-type assessments (would multiply the assessment effort).
+
+#### 16.4.9 Context of directory entries — decided: variant A (v6)
+
+**Decision (owner, 2026-10-12):** app types and use cases are stored on the published entry with their source (C32, ADR-010). The directory keeps the use-case filter with the meaning "products with entries from this use context". Entries from projects with „Keiner davon passt“ carry no use case and appear only when the filter is empty. Vendor statements in Flow E are labelled „vom Anbieter angegeben“.
+
+#### 16.4.10 Counts for experience reports and in the workspace — decided (v6)
+
+**Decision (owner, 2026-10-12):** experience reports show no counts, only the optional list of assessed criteria (C33). K1 in the workspace has seven rows without „Damals nicht im Katalog“ (C34).
+
+#### 16.4.11 Angular version — decided (v6)
+
+**Decision (owner, 2026-10-12):** Angular 22 (C37). Resolves the support-window risk recorded in TESTING §12.1.
+
+### 16.5 Consolidated open points (v6, updated in v10)
+
+One list for all documents; the source documents refer here. The number O-10 was never assigned (gap since v7); the numbers stay stable. The open points of the UX copy are cited as UX-O1 … UX-O22 so that they are not confused with the O-numbers here (C70).
+
+| # | Open point | Blocks | Decides | Source |
+|---|---|---|---|---|
+| O-1 | **Priorities and rationales per criterion, use case and app type; plain-language titles and summaries** (Kriterienkatalog K-6) | Migration step 2 (P0 weightings) | Project team | KAT K-6, PRD §11 |
+| O-2 | Hardware and Vermittlungs-/Notrufdienst without a procedure (§16.3.3) | — (empty state exists) | Project team | KAT K-2 |
+| ~~O-3~~ | ~~Re-pinning to a newer release (§16.3.1)~~ **Decided (owner, 2026-10-13, D6):** copy operation as proposed (C58) | – | – | – |
+| O-4 | Legal review bundle: erasure vs. moderation record, attachment liability, authenticity of vendor claims, consent wording and legal basis for experience reports, timing of the content purge (§16.2.1, .2, .7, .8; C56) | Public launch, not development | Legal review | PRD §11 |
+| ~~O-5~~ | ~~Share links readable without an account (§16.2.3)~~ **Decided (owner, 2026-10-13, D7):** yes for criteria lists; no project share links in v1 (C59) | – | – | – |
+| O-6 | Contact address or form for criteria suggestions (§16.4.2); the footer link „Kriterium vorschlagen“ (SPEC R-SHL-06, R-SUG-01, `Contact:CriteriaSuggestion`) shows a placeholder channel until then (C110); the release check refuses the placeholder | Release | Project team | UX O4; S2-15 P2; S3-21 |
+| O-7 | Handover target platform (§16.2.5) | — | WERTE.IT | PRD §11 |
+| ~~O-8~~ | ~~Final shape of `excludedBy[]` and `appTypesWithoutCriteria[]`~~ **Decided (SPEC_v2 §8.1/§8.2, C77)** | – | – | – |
+| ~~O-9~~ | ~~Relationship between procedure-criterion answers and `TestEvidence`~~ **Decided (v7, C46):** answers derived from test evidences | – | – | – |
+| ~~O-11~~ | ~~Session model~~ **Decided (owner, 2026-10-13):** ASP.NET Core Identity cookie authentication with antiforgery (C50, ADR-006) | – | – | – |
+| ~~O-12~~ | ~~Session timeouts~~ **Decided (owner, 2026-10-13):** 30 minutes idle, 8 hours absolute; warning 5 minutes before (C52) | – | – | – |
+| O-13 | Carrying assessments over to a list on a newer catalog release (§5.4, C51) — v1: new project | Later | Owner | C51 |
+| O-14 | Priority terms „A – Mindestanforderung“, „B – Bewertungskriterium“, „Hinweis“ (UX copy assumption A2) | Export column headers, `SPEC_v1.md` | Project team (accessibility expertise) | UX-O2 |
+| ~~O-15~~ | ~~Threshold for the staleness note~~ **Decided (owner, 2026-10-15, SPEC SD7):** 18 months (C82) | – | – | – |
+| O-16 | Review of the rating-level explanations (`pa-rating-legend`); texts used as provisional (SPEC SD8) | Pilot | Project team, possibly with BIT inklusiv | UX-O19, KAT K-8, Handoff H13 |
+| ~~O-17~~ | ~~Catalog releases from data files with CLI import, no editor UI (C74)~~ **Decided (owner, 2026-10-19, SPEC SD20):** confirmed, no editor UI for now (C87) | – | – | – |
+| ~~O-18~~ | ~~Minimal admin pages for product-identity requests and merges (C75)~~ **Decided (owner, 2026-10-19, SPEC SD22):** confirmed; the owner holds `PlatformAdmin` (C87) | – | – | – |
+| ~~O-19~~ | ~~Removing a candidate from a project (C76)~~ **Decided (owner, 2026-10-19, SPEC SD21):** in v1; a published entry stays (C87) | – | – | – |
+| ~~O-20~~ | ~~Supported browsers (SPEC §7.4)~~ **Decided (owner, 2026-10-19, SPEC SD19):** as proposed (C87) | – | – | – |
+| O-21 | Dark theme: dark mode in Figma and accessibility review (C73) | Release | Philipp, accessibility tester | SPEC O-S5 |
+| O-22 | May a module's `Contracts` project reference another module's `Contracts` project (e.g. a Workspace DTO with a Catalog type)? Until it is decided, a contracts project references no other project, and ARC-03 fails on such a reference (interim rule, owner, 2026-10-30, S2-08 D1; C95) | First contracts type that needs it (step 2 or 3) | Owner | S2-06 P1, S2-08 P1 |
+| O-23 | Target of the footer link „Über ProcureAccess“ (`shell.footer.about`, SPEC R-SHL-06): a page of its own or a text, and its content | Release (footer complete) | Philipp / WERTE.IT | S2-15 P2 (C99) |
+| O-24 | URL of the footer link „Projekt WERTE.IT“ (`shell.footer.werteit`, SPEC R-SHL-06) | Release (footer complete) | WERTE.IT | S2-15 P2 (C99) |
+
+#### 16.4.12 Decisions on the architecture review — v7
+
+| Topic | Decision (owner, 2026-10-12) | Where |
+|---|---|---|
+| Platform version (R1) | .NET 10 in migration step 0 | C41, ADR-013 |
+| Recording tested procedures (R6) | Several test evidences per product; procedure criteria derived | C46, ADR-012 |
+| Changing a project's criteria list (Y1) | Locked once assessments exist (v1) | C47 |
+| Consent for experience reports (Y3) | Every report, with consent-text version | C48 |
+
+The remaining findings (R2–R5, Y2, Y4–Y8, G1, G3, G4) needed no owner decision and are incorporated as C42–C45 and C49.
+
+#### 16.4.13 Decisions of 2026-10-13 — v8
+
+| Topic | Decision (owner) | Where |
+|---|---|---|
+| Session model (O-11) | ASP.NET Core Identity cookie authentication with antiforgery | C50, D8, ADR-006 |
+| Session timeouts (O-12) | 30 minutes idle, 8 hours absolute, warning 5 minutes before | C52 |
+| Locked criteria list | Replacing the list is locked once assessments exist; editing within the release stays possible | C51 |
+
+#### 16.4.14 Decisions of 2026-10-13 — v10 (review of the main documents)
+
+The numbers D1–D7 are those of `pruefung_hauptdokumente_v1.md`; they are unrelated to the design decisions D1–D16 in §6.
+
+| # | Topic | Decision (owner, 2026-10-13) | Where |
+|---|---|---|---|
+| D1 | Several projects using one criteria list | Each project gets its own copy; the four selection layers are fixed after assignment | C53 |
+| D2 | Vendor or auditor entry without assessments | No fulfilment breakdown (`fulfillment: null`), only a note; with assessments, product parts required | C54 |
+| D3 | Who may update a workspace entry | Only the profile it was published under; Editors/Owners withdraw and publish a new entry | C55 |
+| D4 | Consent withdrawal for experience reports | Withdraw and purge the personal content; a tombstone remains; timing set by the legal review (default: immediately) | C56 |
+| D5 | Context of experience reports | App types optional and always offered; no use case | C57 |
+| D6 | Re-pinning (O-3) | Adopted as proposed in §16.3.1 | C58 |
+| D7 | Share links (O-5) | Criteria lists readable without an account; no project share links in v1 | C59 |
+
+#### 16.4.15 Decisions of 2026-10-15 — v11 (feature specification)
+
+The numbers SD1–SD18 are those of `SPEC_v1.md` §0.
+
+| # | Topic | Decision (owner, 2026-10-15) | Where |
+|---|---|---|---|
+| SD7 | Staleness note | 18 months | C82, O-15 |
+| SD10 | Response shapes | As fixed in SPEC_v2 §8.1/§8.2 | C77, O-8 |
+| SD11 | Dark theme | In v1 from the start; release after design and accessibility review | C73, O-21 |
+| SD13 | E-mail | Lettermint; e-mail confirmation in v1 | C71, C72 |
+| SD14 | Personal data export | JSON | C79 |
+| SD15 | Share links | Expiry required, default 90 days, at most 1 year | C81 |
+| SD16, SD17 | Suggestion channel, legal pages | From configuration and repository files | C85 |
+
+#### 16.4.16 Decisions of 2026-10-19 — v12 (confirmation of the SPEC proposals)
+
+The numbers SD19–SD23 are those of `SPEC_v2.md` §0.
+
+| # | Topic | Decision (owner, 2026-10-19) | Where |
+|---|---|---|---|
+| SD19 | Supported browsers | Two latest major versions of Chrome, Edge, Firefox, Safari (desktop); Safari on iOS and Chrome on Android, current and previous | C87, O-20 |
+| SD20 | Catalog maintenance | Releases from data files with CLI import; no editor UI for now; `CatalogEditor` stays reserved | C74, C87, O-17 |
+| SD21 | Removing candidates | In v1; a published entry stays, `SourceCandidateProductId` → null | C76, C87, O-19 |
+| SD22 | Product-identity administration | Minimal admin pages; `PlatformAdmin` held by the owner | C75, C87, O-18 |
+| SD23 | 🔧 defaults | All proposed values adopted, configurable | C88 |
+
+#### 16.4.17 Decision of 2026-10-27 — v13 (licence rule for dependencies)
+
+| # | Topic | Decision (owner, 2026-10-27) | Where |
+|---|---|---|---|
+| – | Licence rule | Shipped dependencies: OSI-approved, no commercial-use restriction, no strong copyleft or reciprocal licence; weak, file-level copyleft allowed if used unmodified; dual licences count by the option used. Development and test tools that are not shipped: OSI-approved, no commercial-use restriction. AutoMapper 15+ is excluded under this rule (issue #31). Each image ships the licence notices of what it bundles (API: `/app/THIRD-PARTY-NOTICES.txt`, checked in CI) | D12, C89, C132 |
+
+#### 16.4.18 Decision of 2026-11-05 — v16 (hosting-platform services and the licence rule)
+
+| # | Topic | Decision (owner, 2026-11-05) | Where |
+|---|---|---|---|
+| – | Services of the hosting platform | GitHub Actions runners, CodeQL code scanning and Dependabot are services of the hosting platform, not dependencies; D12 does not apply to them. Actions referenced with `uses:` are development tools and follow D12 | D12, C98; S3-03 decision 3 |
