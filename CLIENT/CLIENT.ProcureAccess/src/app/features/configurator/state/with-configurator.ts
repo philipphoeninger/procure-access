@@ -403,6 +403,17 @@ export const withConfigurator = () =>
         },
         /** „Filter zurücksetzen“ of `criteria.list.emptyFilter`: search, levels and inclusion at once. */
         clearCriteriaFilter: clearFilter,
+        /**
+         * Forgets the draft, the options and the list with every decision (R-AUTH-08: sign-out
+         * clears the in-memory state, the anonymous draft included). Answers of requests still
+         * running are dropped; S10 loads the options again when it opens.
+         */
+        resetConfigurator(): void {
+          latestRequest++;
+          latestListRequest++;
+          cancelSearchTimer();
+          patchState(store, { configurator: initialConfiguratorState });
+        },
         optionsCurrent,
         filterOptionsReady,
         submitSelection,

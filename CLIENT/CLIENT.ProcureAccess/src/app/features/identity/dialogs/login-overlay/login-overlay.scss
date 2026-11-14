@@ -1,33 +1,17 @@
-// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
-//
-// SPDX-License-Identifier: MIT
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 // Login overlay (Handoff §5.3): the size of the dialog is set by the panel class `pa-dialog` in
-// styles/main.scss; here only its content.
-
+// styles/main.scss; the form brings its own layout.
 .pa-login-overlay {
   display: flex;
   flex-direction: column;
   gap: var(--pa-space-md);
 }
 
-.pa-login-overlay p {
-  margin-block: 0;
-}
-
-.pa-login-overlay__form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pa-space-sm);
-}
-
-.pa-login-overlay__actions {
-  justify-content: flex-end;
-  gap: var(--pa-space-sm);
-}
-
-.pa-login-overlay__submit {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--pa-space-xs);
+.pa-login-overlay__body {
+  margin: 0;
 }

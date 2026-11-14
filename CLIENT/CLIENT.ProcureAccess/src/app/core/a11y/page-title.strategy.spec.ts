@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
@@ -27,7 +27,7 @@ class PageWithHeading {}
 class PageWithoutHeading {}
 
 @Component({
-  template: '<p>Anmeldung</p>',
+  template: '<h1>Anmelden</h1><p>Formular</p>',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class LoginOutlet {}
@@ -50,17 +50,21 @@ class PageWithTitleParams {
   }
 }
 
-/** The shell's `main#main` with the primary outlet, plus the legacy login outlet. */
+/** The shell's `main#main` as in `app.html`: the primary page, hidden while the `login` outlet is open. */
 @Component({
   imports: [RouterOutlet],
   template: `
     <a href="#main">Zum Inhalt springen</a>
-    <main id="main" tabindex="-1"><router-outlet /></main>
-    <router-outlet name="login" />
+    <main id="main" tabindex="-1">
+      <div [hidden]="loginOpen()"><router-outlet /></div>
+      <router-outlet name="login" (activate)="loginOpen.set(true)" (deactivate)="loginOpen.set(false)" />
+    </main>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class Shell {}
+class Shell {
+  protected readonly loginOpen = signal(false);
+}
 
 const ROUTES: Routes = [
   { path: 'home', component: PageWithoutHeading, data: { [PAGE_TITLE_KEY]: 'pageTitle.home' } },
@@ -73,7 +77,8 @@ const ROUTES: Routes = [
   },
   { path: 'legacy', component: PageWithoutHeading },
   { path: 'kriterien', component: PageWithTitleParams, data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.step' } },
-  { path: 'auth', component: LoginOutlet, outlet: 'login' },
+  { path: 'anmelden', component: LoginOutlet, outlet: 'login', data: { [PAGE_TITLE_KEY]: 'pageTitle.login' } },
+  { path: 'register', component: PageWithoutHeading, outlet: 'login' },
 ];
 
 describe('PageTitleStrategy', () => {
@@ -171,17 +176,79 @@ describe('PageTitleStrategy', () => {
     await vi.waitFor(() => expect(announced).toEqual(['Einstellungen – ProcureAccess']));
   });
 
-  it('LoginOutletOrQueryParams_TitleFocusAndAnnouncementUnchanged', async () => {
+  it('QueryParams_TitleFocusAndAnnouncementUnchanged', async () => {
     const fixture = await startOn('/settings');
     await settle(fixture);
 
-    await TestBed.inject(Router).navigateByUrl('/settings(login:auth)');
-    await settle(fixture);
     await TestBed.inject(Router).navigateByUrl('/settings?tab=2');
     await settle(fixture);
 
     expect(document.title).toBe('Einstellungen – ProcureAccess');
     expect(document.activeElement).toBe(document.body);
+    expect(announced).toEqual([]);
+  });
+
+  it('LoginOutletOpened_ItsTitleSetFocusOnItsH1AndAnnounced INV:A11Y-03', async () => {
+    const fixture = await startOn('/impressum');
+    await settle(fixture);
+
+    await TestBed.inject(Router).navigateByUrl('/impressum(login:anmelden)');
+    await settle(fixture);
+
+    // The page underneath is hidden, so its H1 is not the target although it comes first.
+    const heading = screen.getByRole('heading', { level: 1, name: 'Anmelden' });
+    expect(document.activeElement).toBe(heading);
+    expect(document.title).toBe('Anmelden – ProcureAccess');
+    await vi.waitFor(() => expect(announced).toEqual(['Anmelden – ProcureAccess']));
+  });
+
+  it('LoginOutletClosed_PageTitleBackFocusOnPageH1AndAnnounced INV:A11Y-03', async () => {
+    const fixture = await startOn('/impressum(login:anmelden)');
+    await settle(fixture);
+    expect(document.title).toBe('Anmelden – ProcureAccess');
+
+    await TestBed.inject(Router).navigate([{ outlets: { login: null } }]);
+    await settle(fixture);
+
+    expect(TestBed.inject(Router).url).toBe('/impressum');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Impressum' }));
+    expect(document.title).toBe('Impressum – ProcureAccess');
+    await vi.waitFor(() => expect(announced).toEqual(['Impressum – ProcureAccess']));
+  });
+
+  it('LoginOutletClosedOverPageWithParams_PageGetsItsTitleParamsBack INV:A11Y-03', async () => {
+    const fixture = await startOn('/kriterien');
+    await settle(fixture);
+    expect(document.title).toBe('Kriterien zusammenstellen – Schritt 2 von 4 – ProcureAccess');
+
+    await TestBed.inject(Router).navigateByUrl('/kriterien(login:anmelden)');
+    await settle(fixture);
+    expect(document.title).toBe('Anmelden – ProcureAccess');
+    await TestBed.inject(Router).navigate([{ outlets: { login: null } }]);
+    await settle(fixture);
+
+    expect(document.title).toBe('Kriterien zusammenstellen – Schritt 2 von 4 – ProcureAccess');
+  });
+
+  it('LoginOutletWithoutKey_AppNameAsTitle', async () => {
+    const fixture = await startOn('/impressum(login:anmelden)');
+    await settle(fixture);
+
+    await TestBed.inject(Router).navigateByUrl('/impressum(login:register)');
+    await settle(fixture);
+
+    expect(document.title).toBe('ProcureAccess');
+    expect(document.activeElement).toBe(screen.getByRole('main'));
+  });
+
+  it('FocusPageHeading_FocusesTheH1WithoutRouteChange', async () => {
+    const fixture = await startOn('/impressum');
+    await settle(fixture);
+
+    TestBed.inject(PageTitleStrategy).focusPageHeading();
+    await settle(fixture);
+
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1, name: 'Impressum' }));
     expect(announced).toEqual([]);
   });
 

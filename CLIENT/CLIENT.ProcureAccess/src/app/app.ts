@@ -26,7 +26,8 @@ import { ConnectionStatus } from './core/errors/system-errors';
 /**
  * App shell: skip link, header, main, footer (R-SHL-01, Handoff §2.1, §7) and the compact menu;
  * the loading bar and the offline notice at the top of `main` (R-SHL-08, R-SHL-09, Handoff §6.2, §6.5).
- * The legacy login outlet still replaces the whole shell while it is open.
+ * The `login` outlet (S01, R-AUTH-03) shows in `main` in place of the page, which stays alive but
+ * hidden, so its input is still there when the outlet closes (owner decision S5-09 2 (a)).
  *
  * @spec docs/design_handoff_procureaccess_v1.md §2.1, §3.1, §3.2, §6.2, §6.5, §7
  */
@@ -49,7 +50,8 @@ import { ConnectionStatus } from './core/errors/system-errors';
 })
 export class App {
   protected readonly offline = inject(ConnectionStatus).offline;
-  protected readonly showShell = signal(true);
+  /** S01 (or the legacy registration) shows in the `login` outlet; the page underneath is hidden. */
+  protected readonly loginOpen = signal(false);
   protected readonly wide = injectWideLayout();
   /** The compact menu; it closes whenever the layout switches. */
   protected readonly menuOpen = linkedSignal({ source: this.wide, computation: () => false });

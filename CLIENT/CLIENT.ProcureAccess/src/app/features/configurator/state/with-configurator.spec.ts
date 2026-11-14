@@ -18,7 +18,7 @@ import { FilterOptionsLayers } from '../models/filter-options';
 import { criteriaAnswer } from '../testing/criteria-fixture';
 import { excluded, filterOptions, filterOptionsAnswer } from '../testing/filter-options-fixture';
 import { PRIORITY_WEIGHT_RANGE } from './priority-weight-range';
-import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from './with-configurator';
+import { CRITERIA_SEARCH_DEBOUNCE_MS, initialConfiguratorState, withConfigurator } from './with-configurator';
 
 const ConfiguratorTestStore = signalStore(withConfigurator());
 const url = '/api/v1/catalog/filter-options';
@@ -720,6 +720,24 @@ describe('withConfigurator', () => {
 
       expect(store.configurator.list.status()).toBe('loaded');
       expect(shownReports()).toHaveLength(0);
+    });
+  });
+
+  describe('reset on sign-out (R-AUTH-08)', () => {
+    it('forgets draft, options, list and decisions, and drops the answer of a request still running', async () => {
+      await fillAllLayers();
+      const load = store.loadCriteriaList();
+      const listRequest = backend.expectOne((r) => r.url === '/api/v1/catalog/criteria');
+      listRequest.flush(criteriaAnswer());
+      await load;
+      const key = store.configurator.list.answer()!.criteria[0].key;
+      store.setCriterionNote(key, 'Notiz');
+      store.chooseUseCase({ kind: 'useCase', id: 'citizen' });
+
+      store.resetConfigurator();
+      await answer();
+
+      expect(store.configurator()).toEqual(initialConfiguratorState);
     });
   });
 

@@ -5,37 +5,33 @@ SPDX-License-Identifier: MIT
 -->
 
 <!-- Page structure of Handoff §2.1 / §7: skip link → header → main#main → footer -->
-@if (showShell()) {
-  <mat-sidenav-container class="pa-shell">
-    @if (!wide()) {
-      <!-- Compact menu (Handoff §2.2): Esc and „Menü schließen“ close it and return the focus to „Menü“.
-           Open, it traps the focus like a modal, so it is announced as one (role, aria-modal, name). -->
-      <mat-sidenav class="pa-shell__menu" mode="over" position="end" [fixedInViewport]="true"
-        role="dialog" aria-modal="true" [attr.aria-label]="'shell.nav.menu' | translate"
-        [opened]="menuOpen()" (closedStart)="menuOpen.set(false)">
-        <button matButton class="pa-shell__menu-close" type="button" (click)="menuOpen.set(false)">{{ 'shell.nav.menu.close' | translate }}</button>
-        <pa-main-nav layout="drawer" (navigated)="menuOpen.set(false)" />
-      </mat-sidenav>
-    }
+<mat-sidenav-container class="pa-shell">
+  @if (!wide()) {
+    <!-- Compact menu (Handoff §2.2): Esc and „Menü schließen“ close it and return the focus to „Menü“.
+         Open, it traps the focus like a modal, so it is announced as one (role, aria-modal, name). -->
+    <mat-sidenav class="pa-shell__menu" mode="over" position="end" [fixedInViewport]="true"
+      role="dialog" aria-modal="true" [attr.aria-label]="'shell.nav.menu' | translate"
+      [opened]="menuOpen()" (closedStart)="menuOpen.set(false)">
+      <button matButton class="pa-shell__menu-close" type="button" (click)="menuOpen.set(false)">{{ 'shell.nav.menu.close' | translate }}</button>
+      <pa-main-nav layout="drawer" (navigated)="menuOpen.set(false)" />
+    </mat-sidenav>
+  }
 
-    <mat-sidenav-content class="pa-shell__content">
-      <a class="pa-skip-link" href="#main" (click)="skipToMain($event)">{{ 'shell.skipLink' | translate }}</a>
-      <pa-header [menuOpen]="menuOpen()" (menuToggle)="menuOpen.set(true)" />
-      <main id="main" #main class="pa-main" tabindex="-1">
-        <!-- System states at the top of the content column (Handoff §6.2, §6.5) -->
-        <pa-loading-bar />
-        @if (offline()) {
-          <pa-notice class="pa-main__offline" kind="attention" live="polite">{{ 'errors.offline' | translate }}</pa-notice>
-        }
+  <mat-sidenav-content class="pa-shell__content">
+    <a class="pa-skip-link" href="#main" (click)="skipToMain($event)">{{ 'shell.skipLink' | translate }}</a>
+    <pa-header [menuOpen]="menuOpen()" (menuToggle)="menuOpen.set(true)" />
+    <main id="main" #main class="pa-main" tabindex="-1">
+      <!-- System states at the top of the content column (Handoff §6.2, §6.5) -->
+      <pa-loading-bar />
+      @if (offline()) {
+        <pa-notice class="pa-main__offline" kind="attention" live="polite">{{ 'errors.offline' | translate }}</pa-notice>
+      }
+      <!-- The page stays alive with its input while S01 shows in the `login` outlet (R-AUTH-03) -->
+      <div class="pa-main__page" [hidden]="loginOpen()">
         <router-outlet />
-      </main>
-      <pa-footer />
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-}
-
-<router-outlet (activate)="showShell.set(false)" (deactivate)="showShell.set(true)" name="login" />
-@if (!showShell()) {
-  <!-- The legacy login outlet replaces the shell: its requests still show the loading bar -->
-  <pa-loading-bar />
-}
+      </div>
+      <router-outlet name="login" (activate)="loginOpen.set(true)" (deactivate)="loginOpen.set(false)" />
+    </main>
+    <pa-footer />
+  </mat-sidenav-content>
+</mat-sidenav-container>

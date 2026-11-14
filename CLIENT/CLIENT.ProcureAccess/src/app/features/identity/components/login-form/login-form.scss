@@ -1,0 +1,63 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Sign-in form (Handoff §5.3: form card as in S51): the fields in an outlined card on S01, actions
+// below it, stacked below 600 px with the primary last and in one right-aligned row from there.
+:host {
+  display: block;
+  inline-size: 100%;
+}
+
+.pa-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  max-inline-size: 40rem;
+}
+
+.pa-login-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+}
+
+.pa-login-form__fields--card {
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-login-form__required {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-login-form__password-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pa-space-xs);
+}
+
+.pa-login-form__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.pa-login-form__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pa-space-xs);
+}

@@ -46,11 +46,9 @@ export function createShellDoubles(signedIn = false) {
     user: signal<object | null>(signedIn ? { id: 'u1' } : null),
     isLoading: signal(false),
     signedIn: signal(signedIn),
-    signOut: vi.fn().mockResolvedValue(undefined),
-    setProposals: vi.fn(),
-    reloadUICustomization: vi.fn().mockResolvedValue(undefined),
+    endSession: vi.fn().mockResolvedValue(undefined),
   };
-  const authService = { showLogin: vi.fn() };
+  const authService = { showLogin: vi.fn().mockResolvedValue(true) };
   const providers: Provider[] = [
     { provide: ProcureAccessStore, useValue: store },
     { provide: AuthService, useValue: authService },
