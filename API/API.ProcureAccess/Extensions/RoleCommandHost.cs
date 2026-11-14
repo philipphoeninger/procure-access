@@ -19,7 +19,7 @@ internal static class RoleCommandHost
                         .AddIdentityAccessModule(builder.Configuration, builder.Environment)
                         .AddPostgreSQLConnection(builder.Configuration)
                         .AddIdentityHandlersAndStores()
-                        .ConfigureIdentityOptions();
+                        .ConfigureIdentityOptions(builder.Configuration);
 
         await using var app = builder.Build();
         try

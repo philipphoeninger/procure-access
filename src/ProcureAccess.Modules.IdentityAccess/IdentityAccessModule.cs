@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProcureAccess.Modules.IdentityAccess.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Session;
@@ -80,6 +82,10 @@ public static class IdentityAccessModule
         // the session lifetimes of 🔧 Session:* and the antiforgery token pair; Secure cookies only on
         // HTTPS requests in Development and E2E (SessionCookiePolicy).
         services.AddSession(configuration, environment);
+
+        // Single-use, hashed tokens of the account e-mails (S5-12a, C72); 🔧 lifetimes read at start.
+        services.AddSingleton(AccountTokenSettings.From(configuration));
+        services.AddScoped<IAccountTokens, AccountTokenService>();
 
         return services;
     }

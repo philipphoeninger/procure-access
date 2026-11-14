@@ -40,7 +40,7 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
         // The roles as the Development rebuild created them before S4-25, with one user each.
         var approver = new IdentityRole("Approver") { NormalizedName = "APPROVER" };
         var admin = new IdentityRole("Admin") { NormalizedName = "ADMIN" };
-        var member = new IdentityRole(Roles.Member) { NormalizedName = "MEMBER" };
+        var member = new IdentityRole("Member") { NormalizedName = "MEMBER" };
         db.Roles.AddRange(approver, admin, member);
         db.RoleClaims.AddRange(
             new IdentityRoleClaim<string> { RoleId = approver.Id, ClaimType = CustomClaimTypes.Permission, ClaimValue = LegacyApproveClaim },
@@ -57,7 +57,7 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
         await db.Database.MigrateAsync(cancellationToken);
 
         var roles = await db.Roles.AsNoTracking().ToListAsync(cancellationToken);
-        roles.Select(r => r.Name).ShouldBe([Roles.Member, .. Roles.PlatformRoles], ignoreOrder: true);
+        roles.Select(r => r.Name).ShouldBe(["Member", .. Roles.PlatformRoles], ignoreOrder: true);
         roles.Single(r => r.Name == Roles.Moderator).Id.ShouldBe(approver.Id);
         roles.Single(r => r.Name == Roles.PlatformAdmin).Id.ShouldBe(admin.Id);
         roles.ShouldAllBe(r => r.NormalizedName == r.Name!.ToUpperInvariant());

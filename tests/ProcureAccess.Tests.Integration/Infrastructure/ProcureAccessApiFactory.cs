@@ -79,6 +79,8 @@ public sealed class ProcureAccessApiFactory(
         // small ones in settings (S4-21a, API-05).
         builder.UseSetting("RateLimits:AnonymousExport:PermitLimit", RelaxedPermitLimit);
         builder.UseSetting("RateLimits:CriteriaListShown:PermitLimit", RelaxedPermitLimit);
+        builder.UseSetting("RateLimits:Registration:PermitLimit", RelaxedPermitLimit);
+        builder.UseSetting("RateLimits:ConfirmationResend:PermitLimit", RelaxedPermitLimit);
 
         foreach (var (key, value) in settings ?? new Dictionary<string, string?>())
         {

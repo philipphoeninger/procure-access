@@ -43,6 +43,44 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.ToTable("DataProtectionKeys", "identity");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.AccountToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AccountTokens", "identity");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.ContributorProfile", b =>
                 {
                     b.Property<Guid>("Id")

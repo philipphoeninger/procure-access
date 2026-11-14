@@ -75,13 +75,13 @@ public class SmtpEmailSenderTests
         var transport = new ScriptedTransport(failures: 0);
 
         await Should.ThrowAsync<EmailDeliveryException>(() => Sender(transport).SendAsync(
-            new AddressConfirmationEmail(recipient, new Uri("https://procureaccess.example/confirm-email?token=t")),
+            new AddressConfirmationEmail(recipient, new Uri("https://procureaccess.example/confirm-email?token=t"), 24),
             TestContext.Current.CancellationToken));
 
         transport.Attempts.ShouldBe(0);
     }
 
-    private static AddressConfirmationEmail Message() => new(Recipient, new Uri("https://procureaccess.example/confirm-email?token=t"));
+    private static AddressConfirmationEmail Message() => new(Recipient, new Uri("https://procureaccess.example/confirm-email?token=t"), 24);
 
     private static SmtpEmailSender Sender(ISmtpTransport transport)
     {

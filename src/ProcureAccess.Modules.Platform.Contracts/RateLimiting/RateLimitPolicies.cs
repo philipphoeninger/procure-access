@@ -17,4 +17,13 @@ public static class RateLimitPolicies
 
     /// <summary><c>POST /api/v1/configurator/criteria-list-shown</c>: per client IP, 30 per 10 minutes 🔧 (O-S4-56 (b)).</summary>
     public const string CriteriaListShown = "CriteriaListShown";
+
+    /// <summary><c>POST /api/v1/auth/register</c>: per client IP, 5 per hour 🔧 (S5-12a).</summary>
+    public const string Registration = "Registration";
+
+    /// <summary>
+    /// <c>POST /api/v1/auth/confirm-email/resend</c>: per signed-in user, 5 per hour 🔧 (S5-12a); the
+    /// first policy partitioned by user, not by client IP.
+    /// </summary>
+    public const string ConfirmationResend = "ConfirmationResend";
 }

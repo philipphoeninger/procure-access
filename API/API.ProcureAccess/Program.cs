@@ -28,7 +28,7 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddPostgreSQLConnection(builder.Configuration)
                 .AddIdentityHandlersAndStores()
-                .ConfigureIdentityOptions()
+                .ConfigureIdentityOptions(builder.Configuration)
                 .AddHttpContextAccessor()
                 .AddIdentityAuth()
                 .AddAuthorizationPolicies()
@@ -115,7 +115,8 @@ try
        .MapConfiguratorEndpoints()
        .MapExportEndpoints()
        .MapIdentityAccessEndpoints()
-       .MapAuthEndpoints();
+       .MapAuthEndpoints()
+       .MapRegistrationEndpoints();
 
     app.ConfigureSwaggerExplorer();
 

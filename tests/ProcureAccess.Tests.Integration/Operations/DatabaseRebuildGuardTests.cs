@@ -62,7 +62,7 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
     }
 
     [Fact]
-    public async Task Startup_RebuildInDevelopmentWithSamplePassword_CreatesSampleUserWithThatPasswordAsMemberOnly()
+    public async Task Startup_RebuildInDevelopmentWithSamplePassword_CreatesSampleUserWithThatPasswordWithoutRole()
     {
         await CreateDatabaseWithUserAsync();
 
@@ -78,7 +78,7 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
             .Where(userRole => userRole.UserId == user.Id)
             .Join(db.Roles, userRole => userRole.RoleId, role => role.Id, (_, role) => role.Name)
             .ToListAsync(TestContext.Current.CancellationToken);
-        roles.ShouldBe([Roles.Member]);
+        roles.ShouldBeEmpty(); // no global Member role since S5-12a (O-S5-3 (a))
     }
 
     [Fact]

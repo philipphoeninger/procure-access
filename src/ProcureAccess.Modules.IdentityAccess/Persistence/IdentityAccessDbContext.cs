@@ -12,7 +12,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 /// <summary>
 /// The IdentityAccess module's own database context (ARCHITECTURE ADR-014) in the <c>identity</c>
 /// schema. It holds the Data Protection key ring (§9.1, C60; S3-24) and, since S4-25, the contributor
-/// profiles and their user links (§5.2); users and memberships follow with migration step 3. No other
+/// profiles and their user links (§5.2) and, since S5-12a, the hashed account tokens (§9.1); users and memberships follow with migration step 3. No other
 /// module and no legacy code uses it.
 /// </summary>
 /// <remarks>Its history table is <c>identity."__EFMigrationsHistory"</c>.</remarks>
@@ -38,6 +38,9 @@ internal sealed class IdentityAccessDbContext(DbContextOptions<IdentityAccessDbC
     /// <summary>Restricted (PRV-04): never mapped to a DTO, never returned with a profile.</summary>
     public DbSet<UserContributorLink> UserContributorLinks => Set<UserContributorLink>();
 
+    /// <summary>The hashed single-use tokens of the account e-mails (S5-12a, C72).</summary>
+    public DbSet<AccountToken> AccountTokens => Set<AccountToken>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -52,5 +55,6 @@ internal sealed class IdentityAccessDbContext(DbContextOptions<IdentityAccessDbC
         modelBuilder.ApplyConfiguration(new DataProtectionKeyConfiguration());
         modelBuilder.ApplyConfiguration(new ContributorProfileConfiguration());
         modelBuilder.ApplyConfiguration(new UserContributorLinkConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountTokenConfiguration());
     }
 }

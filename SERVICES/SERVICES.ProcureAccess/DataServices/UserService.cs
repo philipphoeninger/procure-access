@@ -71,7 +71,8 @@ public class UserService : IUserService
         if (!result.Succeeded)
             return result; //gate
 
-        await _userManager.AddToRoleAsync(user, Roles.Member);
+        // No global role: the legacy Member role is gone (S5-12a, owner decision O-S5-3 (a), #301);
+        // roles come from organisation memberships (ARCHITECTURE §9.1).
 
         try
         {
@@ -157,7 +158,8 @@ public class UserService : IUserService
 
         var confirmationLink = AppLink($"/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={encodedToken}");
 
-        await _emailSender.SendAsync(new AddressConfirmationEmail(user.Email!, confirmationLink));
+        var validHours = (int)Math.Ceiling(_tokenLifespan.TotalHours);
+        await _emailSender.SendAsync(new AddressConfirmationEmail(user.Email!, confirmationLink, validHours));
     }
 
     /// <summary>A link into the client: <c>App:BaseUrl</c> (absolute) plus the path and query.</summary>
