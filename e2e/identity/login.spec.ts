@@ -2,16 +2,19 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
-import { expireSessionOnce, fakeSession } from '../support/session';
+import { expireSessionOnce } from '../support/session';
+import { CONFIRMED_USER, TEST_USER_PASSWORD } from '../support/users';
 
 /**
  * Sign-in S01, the login overlay and sign-out (S5-09; R-AUTH-03, R-AUTH-07 base, R-AUTH-08) on
- * the E2E stack with the test release T.1, by keyboard. The session is faked
- * (`support/session.ts`) until the E2E users of S5-14 exist; everything else is the real stack.
- * Axe in both appearances on each new state (A11Y-01, A11Y-08).
+ * the E2E stack with the test release T.1, by keyboard. Since S5-14 the sessions are real: the tests
+ * sign in as the seeded E2E user (`support/users.ts`); only the expired session is faked
+ * (`expireSessionOnce`). A refused sign-in uses an unknown address, never a wrong password for the
+ * shared user, which would lock it (SEC-11). Axe in both appearances on each new state (A11Y-01,
+ * A11Y-08).
  */
 const WIDE = { width: 1280, height: 800 };
 
@@ -33,10 +36,27 @@ async function press(control: Locator, key: string): Promise<void> {
 }
 
 /** Types the address and the password and submits with Enter in the password field. */
-async function signIn(scope: Locator): Promise<void> {
-  await scope.getByLabel('E-Mail-Adresse').fill('e2e@example.test');
-  await scope.getByLabel('Passwort', { exact: true }).fill('ein-passwort');
+async function signIn(scope: Locator, address = CONFIRMED_USER, password = TEST_USER_PASSWORD): Promise<void> {
+  await scope.getByLabel('E-Mail-Adresse').fill(address);
+  await scope.getByLabel('Passwort', { exact: true }).fill(password);
   await scope.getByLabel('Passwort', { exact: true }).press('Enter');
+}
+
+/** Signs the page's browser context in through the API, with the probe's antiforgery token (S5-07). */
+async function signInThroughApi(page: Page): Promise<void> {
+  expect((await page.request.get('/api/v1/auth/session')).ok()).toBe(true);
+  const token = (await page.context().cookies()).find((cookie) => cookie.name === 'XSRF-TOKEN')?.value;
+  expect(token, 'the probe issues XSRF-TOKEN').toBeTruthy();
+  const response = await page.request.post('/api/v1/auth/login', {
+    headers: { 'X-XSRF-TOKEN': token! },
+    data: { email: CONFIRMED_USER, password: TEST_USER_PASSWORD },
+  });
+  expect(response.status()).toBe(204);
+}
+
+/** An address no account has, per browser project and worker. */
+function unknownAddress(testInfo: TestInfo): string {
+  return `unbekannt-${testInfo.project.name}-${testInfo.workerIndex}@example.invalid`;
 }
 
 /** „Weiter“, then waits for the focus on the heading of the next step. */
@@ -68,7 +88,6 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
   });
 
   test('INV:A11Y-01 INV:A11Y-08 „Anmelden“ opens S01 over the page; an empty submit shows the error summary', async ({ page }, testInfo) => {
-    await fakeSession(page);
     await chooseHr(page);
 
     await press(header(page).getByRole('button', { name: 'Anmelden' }), 'Enter');
@@ -94,19 +113,11 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
     await expect(main(page).getByLabel('E-Mail-Adresse')).toBeFocused();
   });
 
-  test('a refused sign-in names no field', async ({ page }) => {
-    await fakeSession(page);
-    await page.route('**/api/v1/auth/login', (route) =>
-      route.fulfill({
-        status: 400,
-        contentType: 'application/problem+json',
-        body: JSON.stringify({ type: 'https://procureaccess.de/problems/validation', status: 400, errors: { $: ['Invalid sign-in.'] } }),
-      }),
-    );
+  test('a refused sign-in names no field', async ({ page }, testInfo) => {
     await page.goto('/(login:anmelden)');
     await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
 
-    await signIn(main(page));
+    await signIn(main(page), unknownAddress(testInfo));
 
     const summary = main(page).locator('pa-error-summary pa-notice');
     await expect(summary).toBeFocused();
@@ -116,7 +127,6 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
   });
 
   test('after the sign-in S01 closes and the page underneath keeps its input', async ({ page }) => {
-    await fakeSession(page);
     await chooseHr(page);
     await press(header(page).getByRole('button', { name: 'Anmelden' }), 'Enter');
     await expect(main(page).getByRole('heading', { level: 1, name: 'Anmelden' })).toBeFocused();
@@ -130,7 +140,6 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
   });
 
   test('INV:A11Y-01 INV:A11Y-08 the overlay after a 401 keeps the selection and sends the request again', async ({ page }, testInfo) => {
-    await fakeSession(page);
     await expireSessionOnce(page, '**/api/v1/catalog/criteria?**');
     await toStep4(page);
 
@@ -151,7 +160,6 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
   });
 
   test('„Schließen“ in the overlay leaves the user signed out on the page', async ({ page }) => {
-    await fakeSession(page);
     await expireSessionOnce(page, '**/api/v1/catalog/criteria?**');
     await toStep4(page);
     const submit = main(page).getByRole('button', { name: 'Kriterienliste anzeigen' });
@@ -168,7 +176,7 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
   });
 
   test('„Abmelden“ clears the selection and moves the focus to the H1 of the start page', async ({ page }) => {
-    await fakeSession(page, true);
+    await signInThroughApi(page);
     await chooseHr(page);
     const signOut = header(page).getByRole('button', { name: 'Abmelden' });
     await expect(signOut).toBeVisible();

@@ -100,6 +100,10 @@ try
     // Test catalog release (T.1) only in Development and E2E, when the stack mounts it (S4-08, O-S4-3)
     await app.SeedTestCatalogIfAllowedAsync();
 
+    // E2E users with known test credentials, only in Development and E2E, when the E2E stack sets
+    // their password (S5-14)
+    await app.SeedTestUsersIfAllowedAsync();
+
     // First in the pipeline: errors of every later middleware become Problem Details (S2-10)
     app.UsePlatformMiddleware();
 

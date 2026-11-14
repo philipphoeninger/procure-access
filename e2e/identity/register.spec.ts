@@ -8,11 +8,10 @@ import { linksOf, waitForMail } from '../support/mailpit';
 
 /**
  * Registration S02 and the confirmation page (S5-12b; R-AUTH-01, R-AUTH-02) on the real E2E stack,
- * by keyboard: the account is created by the API, the mail is read from Mailpit
- * (`support/mailpit.ts`) and its link opened (owner decision S5-12 2 (a)). PRV-11 (E2E part) checks
- * that mail. Answers the stack cannot produce on demand (the rate limit) are faked. S5-14 builds
- * the whole account journey with sign-in and sign-out on this. Axe in both appearances on each new
- * state (A11Y-01, A11Y-08).
+ * by keyboard: the edge cases — a known address, an unknown link, the empty submit, the rate limit.
+ * The way through registration, the mail from Mailpit (PRV-11, E2E part), confirmation, sign-in and
+ * sign-out is journey J8 (`journeys/j8-account.spec.ts`, S5-14). Answers the stack cannot produce on
+ * demand (the rate limit) are faked. Axe in both appearances on each new state (A11Y-01, A11Y-08).
  */
 const WIDE = { width: 1280, height: 800 };
 const PASSWORD = 'e2e-Passwort-lang-genug';
@@ -49,55 +48,6 @@ async function register(page: Page, address: string): Promise<void> {
 test.describe('S02 „Konto erstellen“ and the confirmation page', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(WIDE);
-  });
-
-  test('INV:PRV-11 INV:A11Y-01 INV:A11Y-08 registers; the mail links to the confirmation page, which takes the token out of the address and confirms', async ({ page, request }, testInfo) => {
-    const address = newAddress(testInfo);
-    await page.goto('/registrieren');
-    await expect(main(page).getByRole('heading', { level: 1, name: 'Konto erstellen' })).toBeVisible();
-    await expect(page).toHaveTitle('Konto erstellen – ProcureAccess');
-    await settled(main(page));
-    await expectNoAxeViolations(page, testInfo, 's02-form');
-
-    await register(page, address);
-
-    await expect(main(page).getByRole('heading', { level: 2, name: 'E-Mail-Adresse bestätigen' })).toBeFocused();
-    await expect(main(page).getByText(`Wir haben Ihnen eine E-Mail an ${address} geschickt.`, { exact: false })).toBeVisible();
-    await expectNoAxeViolations(page, testInfo, 's02-success');
-
-    // PRV-11 (E2E part): only the purpose of the message — no image, no tracking, one link to the client itself
-    const mail = await waitForMail(request, address);
-    expect(mail.to).toEqual([address]);
-    expect(mail.subject).toBe('Bitte bestätigen Sie Ihre E-Mail-Adresse');
-    expect(mail.html).not.toMatch(/<img|src=|style|<script/i);
-    const links = linksOf(mail.html);
-    expect(links).toHaveLength(1);
-    const link = new URL(links[0]);
-    expect(link.origin).toBe(new URL(page.url()).origin);
-    expect(link.pathname).toBe('/registrieren/bestaetigen');
-    expect(mail.text).toContain(link.href);
-    expect(`${mail.text}${mail.html}`).not.toContain(PASSWORD);
-
-    // No request of the page carries the token in its Referer (the referrer policy of index.html).
-    // `ng serve` injects its /@vite/client script before that meta tag; the release build has none.
-    const referers: string[] = [];
-    page.on('request', (request) => {
-      if (!new URL(request.url()).pathname.startsWith('/@vite/')) referers.push(request.headers()['referer'] ?? '');
-    });
-    await page.goto(link.href);
-
-    await expect(main(page).getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeVisible();
-    await expect(page).toHaveURL(/\/registrieren\/bestaetigen$/);
-    expect(page.url()).not.toContain('token');
-    expect(referers.length).toBeGreaterThan(1);
-    expect(referers.filter((referer) => referer.includes('token'))).toEqual([]);
-    await expect(page).toHaveTitle('E-Mail-Adresse bestätigt – ProcureAccess');
-    await settled(main(page));
-    await expectNoAxeViolations(page, testInfo, 'confirm-done');
-
-    // A second click (or a mail scanner first) still says „bestätigt“ (decision S5-12 4 (b))
-    await page.goto(link.href);
-    await expect(main(page).getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeVisible();
   });
 
   test('a known address gets the same success and the „already registered“ mail instead (no account enumeration)', async ({ page, request }, testInfo) => {
