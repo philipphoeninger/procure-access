@@ -38,11 +38,17 @@ public static class ProblemTypes
 
     public const string NotFound = "not-found";
 
+    /// <summary>
+    /// 503: an e-mail could not be sent after its retry, while the action itself is kept (SPEC §7.6,
+    /// §8.6 v2.21; S5-12a); the client shows <c>errors.email.sendFailed</c> with a retry.
+    /// </summary>
+    public const string EmailDelivery = "email-delivery";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
-        EmailUnconfirmed, NotFound,
+        EmailUnconfirmed, NotFound, EmailDelivery,
     ];
 }

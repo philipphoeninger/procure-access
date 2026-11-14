@@ -62,6 +62,8 @@ services:
       # Relaxed rate limits (S4-21a): all tests share one client address
       RateLimits__AnonymousExport__PermitLimit: "10000"
       RateLimits__CriteriaListShown__PermitLimit: "10000"
+      RateLimits__Registration__PermitLimit: "10000"
+      RateLimits__ConfirmationResend__PermitLimit: "10000"
     volumes:
       - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
 

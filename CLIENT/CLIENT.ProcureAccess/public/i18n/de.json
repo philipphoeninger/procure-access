@@ -286,7 +286,8 @@
       "url": "Bitte geben Sie eine vollständige Webadresse ein, die mit https:// beginnt.",
       "maxLength": "Bitte kürzen Sie den Text auf höchstens {{max}} Zeichen. Derzeit sind es {{current}}.",
       "date": "Bitte geben Sie ein Datum im Format TT.MM.JJJJ ein.",
-      "dateFuture": "Das Datum liegt in der Zukunft. Bitte prüfen Sie es."
+      "dateFuture": "Das Datum liegt in der Zukunft. Bitte prüfen Sie es.",
+      "minLength": "Bitte geben Sie mindestens {{min}} Zeichen ein. Derzeit sind es {{current}}."
     },
     "notFound": {
       "title": "Seite nicht gefunden",
@@ -356,7 +357,12 @@
     "admin": {
       "requests": "Produktvorschläge – Verwaltung"
     },
-    "login": "Anmelden"
+    "login": "Anmelden",
+    "register": "Konto erstellen",
+    "confirm": {
+      "done": "E-Mail-Adresse bestätigt",
+      "invalid": "Link nicht mehr gültig"
+    }
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Infrastructure;
+using ProcureAccess.Tests.Shared.Auth;
 using Shouldly;
 using Xunit;
 
@@ -15,7 +16,8 @@ namespace ProcureAccess.Tests.Integration.Api;
 /// <summary>
 /// The rate limits of SPEC §7.3 on the anonymous endpoints (API-05; S4-21a, owner decisions
 /// O-S4-56 (b), O-S4-69 (a)): limit + 1 → 429 as Problem Details of type <c>rate-limit</c> with
-/// <c>retryAfterMinutes</c>, counted per client IP as the trusted proxies forward it. Runs on an API
+/// <c>retryAfterMinutes</c>, counted per client IP as the trusted proxies forward it; since S5-12a
+/// also the registration (per client IP) and the confirmation resend (per signed-in user). Runs on an API
 /// host of its own with a limit of <see cref="PermitLimit"/>, on the shared database.
 /// </summary>
 public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -24,6 +26,8 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
     private const string WindowSetting = "00:10:00";
     private const string ExportPath = "/api/v1/exports";
     private const string CriteriaListShownPath = "/api/v1/configurator/criteria-list-shown";
+    private const string RegisterPath = "/api/v1/auth/register";
+    private const string ResendPath = "/api/v1/auth/confirm-email/resend";
 
     /// <summary>Address of the client's nginx in the Docker network: a trusted proxy.</summary>
     private const string Nginx = "172.18.0.3";
@@ -46,6 +50,10 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 ["RateLimits:AnonymousExport:Window"] = WindowSetting,
                 ["RateLimits:CriteriaListShown:PermitLimit"] = $"{PermitLimit}",
                 ["RateLimits:CriteriaListShown:Window"] = WindowSetting,
+                ["RateLimits:Registration:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:Registration:Window"] = WindowSetting,
+                ["RateLimits:ConfirmationResend:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:ConfirmationResend:Window"] = WindowSetting,
             },
             configureServices: TestRemoteAddress.AddTo);
         return ValueTask.CompletedTask;
@@ -59,7 +67,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         }
     }
 
-    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath];
+    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath, RegisterPath];
 
     [Theory(DisplayName = "INV:API-05 " + nameof(Post_OneMoreThanTheLimit_Returns429WithRetryAfterMinutes))]
     [Trait("Invariant", "API-05")]
@@ -154,6 +162,44 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         invented.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
     }
 
+    [Fact(DisplayName = "INV:API-05 " + nameof(Resend_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree))]
+    [Trait("Invariant", "API-05")]
+    public async Task Resend_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree()
+    {
+        using var client = Host.CreateDefaultClient(BaseAddress);
+        const string sharedAddress = "203.0.113.60";
+
+        // Refused requests count too: these carry no antiforgery token and answer 400.
+        for (var i = 0; i < PermitLimit; i++)
+        {
+            using var allowed = await PostAsUserAsync(client, ResendPath, "member", sharedAddress);
+            allowed.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests, $"request {i + 1}");
+        }
+
+        using var limited = await PostAsUserAsync(client, ResendPath, "member", sharedAddress);
+        using var otherUser = await PostAsUserAsync(client, ResendPath, "moderator", sharedAddress);
+
+        var problem = await ProblemResponse.ReadAsync(limited, Cancellation);
+        problem.Deviations(HttpStatusCode.TooManyRequests, TypeUri(ProblemTypes.RateLimit), requireErrors: false).ShouldBeEmpty();
+        problem.Json!.Value.GetProperty("retryAfterMinutes").GetInt32().ShouldBe(10);
+
+        // Per user, not per address: another user behind the same address still has requests left.
+        otherUser.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
+    }
+
+    [Fact]
+    public async Task Resend_Anonymous_Returns401AndDoesNotCount()
+    {
+        using var client = Host.CreateDefaultClient(BaseAddress);
+        const string address = "203.0.113.70";
+
+        for (var i = 0; i <= PermitLimit; i++)
+        {
+            using var anonymous = await PostAsync(client, ResendPath, new Request(address, null));
+            anonymous.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
+    }
+
     [Fact]
     public void Configuration_Defaults_AreTheValuesOfSpec73()
     {
@@ -166,6 +212,12 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         {
             configuration[$"RateLimits:{policy}:PermitLimit"].ShouldBe("30", policy);
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("00:10:00", policy);
+        }
+
+        foreach (var policy in new[] { "Registration", "ConfirmationResend" })
+        {
+            configuration[$"RateLimits:{policy}:PermitLimit"].ShouldBe("5", policy);
+            configuration[$"RateLimits:{policy}:Window"].ShouldBe("01:00:00", policy);
         }
 
         configuration["ForwardedHeaders:ForwardLimit"].ShouldBe("2");
@@ -203,6 +255,14 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
             message.Headers.Add("X-Forwarded-For", forwardedFor);
         }
 
+        return SendAndDisposeRequestAsync(client, message);
+    }
+
+    private static Task<HttpResponseMessage> PostAsUserAsync(HttpClient client, string path, string testUser, string remote)
+    {
+        var message = new HttpRequestMessage(HttpMethod.Post, path);
+        message.Headers.Add(TestRemoteAddress.Header, remote);
+        message.Headers.Add(TestAuthHandler.UserHeader, testUser);
         return SendAndDisposeRequestAsync(client, message);
     }
 

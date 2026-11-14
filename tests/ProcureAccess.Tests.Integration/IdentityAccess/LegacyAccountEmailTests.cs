@@ -79,19 +79,10 @@ public sealed class LegacyAccountEmailTests(ApiFixture api) : IntegrationTest(ap
         user.ShouldNotBeNull().EmailConfirmed.ShouldBeFalse();
     }
 
-    /// <summary>A fresh database with the legacy <c>Member</c> role, which sign-up grants (#301), and no mail sent.</summary>
+    /// <summary>A fresh, only migrated database (no legacy <c>Member</c> role since S5-12a, #301) and no mail sent.</summary>
     private async Task<HttpClient> PrepareAsync()
     {
         await Api.ResetDatabaseAsync();
-        using (var scope = Api.Factory.Services.CreateScope())
-        {
-            var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            if (!await roles.RoleExistsAsync(Roles.Member))
-            {
-                await roles.CreateAsync(new IdentityRole(Roles.Member));
-            }
-        }
-
         Emails.Clear();
         return CreateClient();
     }

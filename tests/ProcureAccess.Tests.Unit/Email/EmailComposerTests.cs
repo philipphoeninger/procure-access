@@ -24,7 +24,7 @@ public class EmailComposerTests
     [Fact]
     public void Compose_AddressConfirmation_TextOfTheUxCopyWithLinkAndFooter()
     {
-        var email = Composer.Compose(new AddressConfirmationEmail("ada@example.test", Link));
+        var email = Composer.Compose(new AddressConfirmationEmail("ada@example.test", Link, 24));
 
         email.Subject.ShouldBe("Bitte bestätigen Sie Ihre E-Mail-Adresse");
         email.Text.ShouldBe(
@@ -33,6 +33,14 @@ public class EmailComposerTests
             Link.AbsoluteUri + "\n\n" +
             "Der Link ist 24 Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren.\n\n" +
             "Diese E-Mail wurde automatisch von ProcureAccess (Projekt WERTE.IT) versendet. Bitte antworten Sie nicht darauf.");
+    }
+
+    [Fact]
+    public void Compose_AddressConfirmation_FillsTheConfiguredHours()
+    {
+        var email = Composer.Compose(new AddressConfirmationEmail("ada@example.test", Link, 48));
+
+        email.Text.ShouldContain("Der Link ist 48 Stunden gültig.");
     }
 
     [Fact]
@@ -102,14 +110,14 @@ public class EmailComposerTests
     [InlineData("ftp://procureaccess.example/x")]
     [InlineData("javascript:alert(1)")]
     public void Compose_LinkThatIsNotHttp_IsRefused(string link) =>
-        Should.Throw<ArgumentException>(() => Composer.Compose(new AddressConfirmationEmail("ada@example.test", new Uri(link))));
+        Should.Throw<ArgumentException>(() => Composer.Compose(new AddressConfirmationEmail("ada@example.test", new Uri(link), 24)));
 
     [Fact]
     public void Compose_TextWithAPlaceholderTheTypeDoesNotFill_IsRefused()
     {
         var composer = new EmailComposer(Texts(("email.confirm.body", "Hallo {{name}}:\\n{{link}}")));
 
-        Should.Throw<InvalidOperationException>(() => composer.Compose(new AddressConfirmationEmail("ada@example.test", Link)))
+        Should.Throw<InvalidOperationException>(() => composer.Compose(new AddressConfirmationEmail("ada@example.test", Link, 24)))
             .Message.ShouldContain("{{name}}");
     }
 
@@ -118,7 +126,7 @@ public class EmailComposerTests
     {
         var composer = new EmailComposer(Texts(("email.confirm.body", "Hallo.")));
 
-        Should.Throw<InvalidOperationException>(() => composer.Compose(new AddressConfirmationEmail("ada@example.test", Link)))
+        Should.Throw<InvalidOperationException>(() => composer.Compose(new AddressConfirmationEmail("ada@example.test", Link, 24)))
             .Message.ShouldContain("link");
     }
 
@@ -128,7 +136,7 @@ public class EmailComposerTests
         var date = new DateTimeOffset(2026, 11, 14, 10, 0, 0, TimeSpan.Zero);
         var sender = new MailboxAddress("ProcureAccess", "noreply@procureaccess.example");
 
-        var mime = Composer.Build(new AddressConfirmationEmail("ada@example.test", Link), sender, date);
+        var mime = Composer.Build(new AddressConfirmationEmail("ada@example.test", Link, 24), sender, date);
 
         mime.From.Mailboxes.Single().ShouldBe(sender);
         mime.To.Mailboxes.Single().Address.ShouldBe("ada@example.test");
@@ -148,7 +156,7 @@ public class EmailComposerTests
     public void Build_RecipientThatIsNotOneAddress_IsRefusedWithoutQuotingIt(string recipient)
     {
         var exception = Should.Throw<ArgumentException>(() =>
-            Composer.Build(new AddressConfirmationEmail(recipient, Link), new MailboxAddress("", "noreply@procureaccess.example"), DateTimeOffset.UnixEpoch));
+            Composer.Build(new AddressConfirmationEmail(recipient, Link, 24), new MailboxAddress("", "noreply@procureaccess.example"), DateTimeOffset.UnixEpoch));
 
         exception.Message.ShouldNotContain(recipient);
     }
@@ -159,7 +167,7 @@ public class EmailComposerTests
 
     public static TheoryData<EmailMessage> EveryMessageType() =>
     [
-        new AddressConfirmationEmail("ada@example.test", Link),
+        new AddressConfirmationEmail("ada@example.test", Link, 24),
         new PasswordResetEmail("ada@example.test", Link, 2),
         new AlreadyRegisteredEmail("ada@example.test", Link),
         new OrganisationInvitationEmail("ada@example.test", "Stadt Musterhausen", InvitationRole.Reader, Link, 14),

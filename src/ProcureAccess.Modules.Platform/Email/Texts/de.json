@@ -15,7 +15,7 @@
     "footer": "Diese E-Mail wurde automatisch von ProcureAccess (Projekt WERTE.IT) versendet. Bitte antworten Sie nicht darauf.",
     "confirm": {
       "subject": "Bitte bestätigen Sie Ihre E-Mail-Adresse",
-      "body": "Guten Tag,\\n\\nbitte bestätigen Sie Ihre E-Mail-Adresse für ProcureAccess mit diesem Link:\\n{{link}}\\n\\nDer Link ist 24 Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren."
+      "body": "Guten Tag,\\n\\nbitte bestätigen Sie Ihre E-Mail-Adresse für ProcureAccess mit diesem Link:\\n{{link}}\\n\\nDer Link ist {{hours}} Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren."
     },
     "alreadyRegistered": {
       "subject": "Anmeldung bei ProcureAccess",

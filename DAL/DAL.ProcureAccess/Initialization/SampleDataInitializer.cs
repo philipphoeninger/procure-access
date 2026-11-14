@@ -51,7 +51,6 @@ public static class SampleDataInitializer
                     string.Join(", ", result.Errors.Select(e => e.Code)) +
                     ". The sample user password must meet the Identity password rules.");
             }
-            await userManager.AddToRoleAsync(user, Roles.Member);
         }
         return true;
     }

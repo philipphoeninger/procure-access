@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Globalization;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,8 @@ namespace ProcureAccess.Modules.Platform.RateLimiting;
 /// <summary>
 /// The rate limits of SPEC §7.3 (ARCHITECTURE §9.2) on ASP.NET Core's rate limiter: one policy
 /// per name of <see cref="RateLimitPolicies"/>, a fixed window per client IP
-/// (<see cref="ClientAddress"/>), held in memory only. A rejected request gets 429 as Problem
+/// (<see cref="ClientAddress"/>) or, for the policies of signed-in actions, per user (S5-12a), held
+/// in memory only. A rejected request gets 429 as Problem
 /// Details of type <c>rate-limit</c> with <c>retryAfterMinutes</c> and a <c>Retry-After</c> header
 /// (API-05); other modules and Platform itself add policies of their own kind (the ready check,
 /// <c>Health/HealthChecks.cs</c>).
@@ -35,16 +37,28 @@ internal static class RateLimitingRegistration
     /// <summary>Extension member of the 429 problem that <c>errors.rateLimit</c> shows (SPEC §7.3).</summary>
     public const string RetryAfterMinutesExtension = "retryAfterMinutes";
 
-    /// <summary>The fixed-window policies, all partitioned by client IP.</summary>
+    /// <summary>The fixed-window policies partitioned by client IP.</summary>
     private static readonly string[] ClientIpPolicies =
     [
         RateLimitPolicies.AnonymousExport,
         RateLimitPolicies.CriteriaListShown,
+        RateLimitPolicies.Registration,
+    ];
+
+    /// <summary>
+    /// The fixed-window policies partitioned by the signed-in user (SPEC §7.3 „user“). Their
+    /// endpoints require a sign-in, and authorization runs before the limiter, so an anonymous
+    /// request never reaches them; should one, it counts by its client IP.
+    /// </summary>
+    private static readonly string[] UserPolicies =
+    [
+        RateLimitPolicies.ConfirmationResend,
     ];
 
     public static IServiceCollection AddPlatformRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
-        var limits = ClientIpPolicies.ToDictionary(name => name, name => FixedWindowLimit.From(configuration, name));
+        var limits = ClientIpPolicies.Concat(UserPolicies)
+                                     .ToDictionary(name => name, name => FixedWindowLimit.From(configuration, name));
 
         services.AddRateLimiter(options =>
         {
@@ -53,8 +67,9 @@ internal static class RateLimitingRegistration
 
             foreach (var (name, limit) in limits)
             {
+                var byUser = UserPolicies.Contains(name);
                 options.AddPolicy(name, context => RateLimitPartition.GetFixedWindowLimiter(
-                    ClientAddress.PartitionOf(context),
+                    byUser ? UserPartitionOf(context) : ClientAddress.PartitionOf(context),
                     _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = limit.PermitLimit,
@@ -66,6 +81,18 @@ internal static class RateLimitingRegistration
         });
 
         return services;
+    }
+
+    /// <summary>
+    /// The partition of a per-user policy: the user id of the sign-in (<c>NameIdentifier</c>), else
+    /// the client IP. Prefixed, so a user id can never share a counter with an address.
+    /// </summary>
+    internal static string UserPartitionOf(HttpContext context)
+    {
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return string.IsNullOrEmpty(userId)
+            ? "ip:" + ClientAddress.PartitionOf(context)
+            : "user:" + userId;
     }
 
     /// <summary>

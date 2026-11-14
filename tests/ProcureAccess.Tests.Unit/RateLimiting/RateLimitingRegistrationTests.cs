@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Net;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using ProcureAccess.Modules.Platform.RateLimiting;
 using Shouldly;
@@ -45,6 +48,20 @@ public sealed class RateLimitingRegistrationTests
     }
 
     [Fact]
+    public void UserPartition_SignedIn_IsTheUserIdWhateverTheAddress()
+    {
+        var first = Context("203.0.113.1", userId: "user-1");
+        var second = Context("203.0.113.2", userId: "user-1");
+
+        RateLimitingRegistration.UserPartitionOf(first).ShouldBe("user:user-1");
+        RateLimitingRegistration.UserPartitionOf(second).ShouldBe("user:user-1");
+    }
+
+    [Fact]
+    public void UserPartition_Anonymous_IsTheClientAddressWithItsOwnPrefix() =>
+        RateLimitingRegistration.UserPartitionOf(Context("203.0.113.1", userId: null)).ShouldBe("ip:203.0.113.1");
+
+    [Fact]
     public void FixedWindowLimit_ConfiguredPolicy_IsRead()
     {
         var limit = RateLimitingRegistration.FixedWindowLimit.From(Configuration(("PermitLimit", "30"), ("Window", "00:10:00")), "AnonymousExport");
@@ -69,4 +86,16 @@ public sealed class RateLimitingRegistrationTests
         new ConfigurationBuilder()
             .AddInMemoryCollection(values.Select(v => KeyValuePair.Create($"RateLimits:AnonymousExport:{v.Key}", v.Value)))
             .Build();
+
+    private static DefaultHttpContext Context(string address, string? userId)
+    {
+        var context = new DefaultHttpContext();
+        context.Connection.RemoteIpAddress = IPAddress.Parse(address);
+        if (userId is not null)
+        {
+            context.User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId)], "Test"));
+        }
+
+        return context;
+    }
 }

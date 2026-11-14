@@ -32,10 +32,22 @@ public abstract class EmailMessage
 }
 
 /// <summary>Confirmation of the e-mail address after registration (<c>email.confirm.*</c>, R-AUTH-02).</summary>
-public sealed class AddressConfirmationEmail(string recipient, Uri link) : EmailMessage(recipient)
+public sealed class AddressConfirmationEmail : EmailMessage
 {
+    public AddressConfirmationEmail(string recipient, Uri link, int validHours)
+        : base(recipient)
+    {
+        ArgumentNullException.ThrowIfNull(link);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(validHours);
+        Link = link;
+        ValidHours = validHours;
+    }
+
     /// <summary>The confirmation link, written out in full.</summary>
-    public Uri Link { get; } = link ?? throw new ArgumentNullException(nameof(link));
+    public Uri Link { get; }
+
+    /// <summary>How many hours the link is valid (<c>{{hours}}</c>, 🔧 since S5-12a, UX copy U113).</summary>
+    public int ValidHours { get; }
 }
 
 /// <summary>Password reset (<c>email.reset.*</c>, R-AUTH-04).</summary>

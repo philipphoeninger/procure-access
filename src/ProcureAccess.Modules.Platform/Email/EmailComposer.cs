@@ -100,7 +100,7 @@ internal sealed partial class EmailComposer(EmailTexts texts)
         switch (message)
         {
             case AddressConfirmationEmail confirm:
-                return ("email.confirm", Values(("link", LinkText(confirm.Link))), LinkText(confirm.Link));
+                return ("email.confirm", Values(("link", LinkText(confirm.Link)), ("hours", Number(confirm.ValidHours))), LinkText(confirm.Link));
             case PasswordResetEmail reset:
                 return ("email.reset", Values(("link", LinkText(reset.Link)), ("hours", Number(reset.ValidHours))), LinkText(reset.Link));
             case AlreadyRegisteredEmail registered:

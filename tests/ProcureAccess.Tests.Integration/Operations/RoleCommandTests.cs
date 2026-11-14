@@ -139,7 +139,13 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
         (await RunAsync($"roles list {Bob}")).Output.ShouldBe($"{Bob} has no platform role.{Environment.NewLine}");
     }
 
-    /// <summary>Stores Alice and Bob; the Member role is not in a fresh database, so it is added when asked for.</summary>
+    /// <summary>
+    /// The global role that sign-up granted until S5-12a (O-S5-3 (a), #301). Databases may still
+    /// hold it; <c>roles list</c> must keep ignoring it like every other non-platform role.
+    /// </summary>
+    private const string LegacyMemberRole = "Member";
+
+    /// <summary>Stores Alice and Bob; the legacy Member role is not in a fresh database, so it is added when asked for.</summary>
     private async Task StoreUsersAsync(string? memberRoleFor = null)
     {
         await Api.ResetDatabaseAsync();
@@ -148,14 +154,14 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
         {
             await using var scope = Api.Factory.Services.CreateAsyncScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            if (!await roleManager.RoleExistsAsync(Roles.Member))
+            if (!await roleManager.RoleExistsAsync(LegacyMemberRole))
             {
-                await roleManager.CreateAsync(new IdentityRole(Roles.Member));
+                await roleManager.CreateAsync(new IdentityRole(LegacyMemberRole));
             }
 
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var user = await userManager.FindByEmailAsync(memberRoleFor);
-            await userManager.AddToRoleAsync(user!, Roles.Member);
+            await userManager.AddToRoleAsync(user!, LegacyMemberRole);
         }
     }
 
