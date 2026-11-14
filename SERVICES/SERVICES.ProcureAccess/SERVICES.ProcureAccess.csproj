@@ -13,7 +13,6 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.15" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.12.1">
@@ -26,6 +25,8 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
     <ProjectReference Include="../../DAL/DAL.ProcureAccess/DAL.ProcureAccess.csproj" />
+    <!-- IEmailSender of Platform (S5-11, #302); a contracts project, so ARC-03 allows it. -->
+    <ProjectReference Include="../../src/ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

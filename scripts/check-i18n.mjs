@@ -6,13 +6,14 @@
 //   node scripts/check-i18n.mjs           check only
 //   node scripts/check-i18n.mjs --write   first copy the texts of the areas from the UX copy into each de.json
 // Source of the texts: the tables of §5 and §6 in the highest docs/ux_copy_procureaccess_v*.md.
-// Two text files (TARGETS): the client's de.json (AREAS) and the export file texts of the Export
-// module (EXPORT_AREAS, S4-20a, owner decision O-S4-63). Checks, per file:
+// Three text files (TARGETS): the client's de.json (AREAS), the export file texts of the Export
+// module (EXPORT_AREAS, S4-20a, owner decision O-S4-63) and the e-mail texts of the Platform
+// module (EMAIL_AREAS, S5-11, owner decision 2a). Checks, per file:
 //   1. every UX copy key of its areas is in it with exactly the UX copy text;
 //   2. every lowercase key in it is a UX copy key with the same text (uppercase = legacy);
 //   3. every text in it is found under its own path (no two keys hide each other);
 //   4. client only: every literal key before `| translate` / `| translatePlural` resolves. The
-//      Export module checks its keys itself: ExportTexts refuses to start without one.
+//      modules check their keys themselves: ExportTexts and EmailTexts refuse to start without one.
 // A key with text can also be the start of a longer key (`shell.nav.menu`, `shell.nav.menu.close`;
 // SPEC SD25 `.one`/`.zero`). Nested JSON cannot hold both, so the longer key is stored as one
 // property name with dots next to the text: "menu": "Menü", "menu.close": "Menü schließen".
@@ -44,6 +45,16 @@ export const EXPORT_AREAS = [
   'criteria.export.legalNote',
 ];
 
+// UX copy keys of the e-mails (UX copy §5.17 „E-Mails“), in the Platform module (S5-11, ARCHITECTURE
+// C71): every message type, and the role labels the invitation names (`{{role}}`; each whole key
+// also brings its `.hint`, which no e-mail uses).
+export const EMAIL_AREAS = [
+  'email',
+  'org.members.role.owner',
+  'org.members.role.editor',
+  'org.members.role.reader',
+];
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CLIENT = 'CLIENT/CLIENT.ProcureAccess';
 const DE_JSON = `${CLIENT}/public/i18n/de.json`;
@@ -52,6 +63,7 @@ const DE_JSON = `${CLIENT}/public/i18n/de.json`;
 const TARGETS = [
   { file: DE_JSON, areas: AREAS, sources: `${CLIENT}/src` },
   { file: 'src/ProcureAccess.Modules.Export/Texts/de.json', areas: EXPORT_AREAS },
+  { file: 'src/ProcureAccess.Modules.Platform/Email/Texts/de.json', areas: EMAIL_AREAS },
 ];
 const KEY = /^[a-z][A-Za-z0-9]*(\.[A-Za-z0-9]+)+$/;
 

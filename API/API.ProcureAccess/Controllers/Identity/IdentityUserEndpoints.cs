@@ -39,7 +39,7 @@ public static class IdentityUserEndpoints
             IUserService service,
             ForgotPWRequest request) =>
         {
-            await service.RequestPasswordResetAsync("ok@testing.lettermint.co"); //request.Email
+            await service.RequestPasswordResetAsync(request.Email);
             return Results.Ok();
         }).DisableAntiforgery();
 

@@ -1,0 +1,43 @@
+{
+  "org": {
+    "members": {
+      "role": {
+        "owner": "Verwalten",
+        "owner.hint": "Kann Mitglieder einladen, Rollen ändern und alles bearbeiten.",
+        "editor": "Bearbeiten",
+        "editor.hint": "Kann Listen und Projekte anlegen und bearbeiten.",
+        "reader": "Lesen",
+        "reader.hint": "Kann Listen und Projekte ansehen."
+      }
+    }
+  },
+  "email": {
+    "footer": "Diese E-Mail wurde automatisch von ProcureAccess (Projekt WERTE.IT) versendet. Bitte antworten Sie nicht darauf.",
+    "confirm": {
+      "subject": "Bitte bestätigen Sie Ihre E-Mail-Adresse",
+      "body": "Guten Tag,\\n\\nbitte bestätigen Sie Ihre E-Mail-Adresse für ProcureAccess mit diesem Link:\\n{{link}}\\n\\nDer Link ist 24 Stunden gültig. Wenn Sie kein Konto angelegt haben, können Sie diese E-Mail ignorieren."
+    },
+    "alreadyRegistered": {
+      "subject": "Anmeldung bei ProcureAccess",
+      "body": "Guten Tag,\\n\\njemand wollte mit dieser E-Mail-Adresse ein Konto bei ProcureAccess anlegen. Es gibt dafür bereits ein Konto. Sie können sich hier anmelden oder Ihr Passwort zurücksetzen:\\n{{link}}\\n\\nWenn Sie das nicht waren, müssen Sie nichts tun."
+    },
+    "reset": {
+      "subject": "Passwort zurücksetzen",
+      "body": "Guten Tag,\\n\\nmit diesem Link legen Sie ein neues Passwort für ProcureAccess fest:\\n{{link}}\\n\\nDer Link ist {{hours}} Stunden gültig. Wenn Sie das nicht angefordert haben, können Sie diese E-Mail ignorieren. Ihr Passwort bleibt dann unverändert."
+    },
+    "invitation": {
+      "subject": "Einladung in die Organisation {{org}}",
+      "body": "Guten Tag,\\n\\nSie wurden in die Organisation {{org}} bei ProcureAccess eingeladen (Rolle: {{role}}). Dort arbeiten Sie gemeinsam an Kriterienlisten und Beschaffungsprojekten.\\n\\nEinladung annehmen:\\n{{link}}\\n\\nDie Einladung ist {{days}} Tage gültig."
+    },
+    "productRequest": {
+      "accepted": {
+        "subject": "Ihr Produktvorschlag wurde aufgenommen",
+        "body": "Guten Tag,\\n\\n„{{product}}“ ist jetzt im Produktverzeichnis. Sie können Ihren Erfahrungsbericht hier schreiben:\\n{{link}}"
+      },
+      "rejected": {
+        "subject": "Ihr Produktvorschlag",
+        "body": "Guten Tag,\\n\\nwir konnten „{{product}}“ nicht ins Produktverzeichnis aufnehmen. Begründung: {{reason}}\\n\\nWenn Sie Fragen haben, schreiben Sie uns über die Kontaktseite."
+      }
+    }
+  }
+}

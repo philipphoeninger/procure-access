@@ -26,10 +26,4 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="EmailTemplates\**\*.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

@@ -21,6 +21,16 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.3.0" />
   </ItemGroup>
 
+  <!-- E-mail over SMTP (S5-11, ARCHITECTURE C71); moved from SERVICES, version unchanged. -->
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="5.0.0" />
+  </ItemGroup>
+
+  <!-- The e-mail texts from the UX copy, written by scripts/check-i18n.mjs (S5-11). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Email/Texts/de.json" LogicalName="ProcureAccess.Modules.Platform.Email.Texts.de.json" />
+  </ItemGroup>
+
   <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
   <ItemGroup>
     <ProjectReference Include="../ProcureAccess.Modules.Platform.Contracts/ProcureAccess.Modules.Platform.Contracts.csproj" />

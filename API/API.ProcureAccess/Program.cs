@@ -27,7 +27,6 @@ builder.Services.AddControllers()
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddPostgreSQLConnection(builder.Configuration)
-                .AddEmailConfig(builder.Configuration)
                 .AddIdentityHandlersAndStores()
                 .ConfigureIdentityOptions()
                 .AddHttpContextAccessor()
@@ -39,10 +38,12 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
 
 // Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,
 // the health checks (S2-07) and Problem Details (S2-10); IdentityAccess the Data Protection key
-// store (S3-24); Catalog its database context (S3-12). The others register nothing yet: the legacy
+// store (S3-24); Catalog its database context (S3-12). E-mail (S5-11) is registered only here, not in
+// the command hosts, which send none. The others register nothing yet: the legacy
 // code in API, DAL, MODELS and SERVICES moves into them with the migration step that replaces it
 // (S2-06, owner decision O-S2-1).
 builder.Services.AddPlatformModule(builder.Configuration)
+                .AddPlatformEmail(builder.Configuration, builder.Environment)
                 .AddIdentityAccessModule(builder.Configuration, builder.Environment)
                 .AddCatalogModule(builder.Configuration)
                 .AddConfiguratorModule()
