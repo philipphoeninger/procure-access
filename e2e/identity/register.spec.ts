@@ -35,7 +35,9 @@ async function settled(locator: Locator): Promise<void> {
 async function register(page: Page, address: string): Promise<void> {
   await main(page).getByLabel('E-Mail-Adresse').fill(address);
   await main(page).getByLabel('Passwort', { exact: true }).fill(PASSWORD);
-  const consent = main(page).getByRole('checkbox', { name: /^Ich habe die Datenschutzhinweise/ });
+  // By role alone, the only checkbox of S02: a name check of a mat-checkbox together with axe crashes
+  // Firefox (TESTING V129, V165); the component test and axe check its name.
+  const consent = main(page).getByRole('checkbox');
   await consent.focus();
   await consent.press('Space');
   await expect(consent).toBeChecked();
@@ -135,6 +137,9 @@ test.describe('S02 „Konto erstellen“ and the confirmation page', () => {
 
   test('INV:A11Y-01 INV:A11Y-08 an empty submit shows the error summary with every field', async ({ page }, testInfo) => {
     await page.goto('/registrieren');
+    // Material adds `mat-form-field-animations-enabled` 300 ms after a field starts; errors shown
+    // before that fade in again once the class arrives, and axe measured them mid-fade (CI)
+    await expect(main(page).locator('mat-form-field.mat-form-field-animations-enabled')).toHaveCount(2);
     const submit = main(page).getByRole('button', { name: 'Konto erstellen' });
     await submit.focus();
     await submit.press('Enter');
@@ -143,12 +148,8 @@ test.describe('S02 „Konto erstellen“ and the confirmation page', () => {
     await expect(summary).toBeFocused();
     await expect(summary.getByRole('link')).toHaveCount(3);
     await expect(page).toHaveTitle('Fehler: Konto erstellen – ProcureAccess');
-    // Material fades the field errors in from opacity 0; axe measured one mid-fade on mobile Safari
-    const fieldErrors = main(page).locator('.mat-mdc-form-field-error-wrapper');
-    await expect(fieldErrors).toHaveCount(2);
-    for (const fieldError of await fieldErrors.all()) await expect(fieldError).toHaveCSS('opacity', '1');
-    // WebKit still failed once after that (CI run 3): wait for every animation of the page, not only main
-    await settled(page.locator('body'));
+    await expect(main(page).locator('.mat-mdc-form-field-error-wrapper')).toHaveCount(2);
+    await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's02-errors');
   });
 
