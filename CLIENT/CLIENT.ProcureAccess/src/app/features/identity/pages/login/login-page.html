@@ -1,0 +1,19 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1 class="pa-login-page__title">{{ 'auth.login.title' | translate }}</h1>
+
+@if (reasonSave) {
+  <pa-notice class="pa-login-page__reason" kind="info">
+    <p>{{ 'auth.login.reasonSave' | translate }}</p>
+  </pa-notice>
+}
+
+<pa-login-form idPrefix="pa-login" formLayout="card" (signedIn)="signedIn()" (errorsShown)="showTitleError($event)" />
+
+<p class="pa-login-page__register">
+  <a [routerLink]="['/', { outlets: { login: ['register'] } }]">{{ 'auth.login.noAccount' | translate }}</a>
+</p>

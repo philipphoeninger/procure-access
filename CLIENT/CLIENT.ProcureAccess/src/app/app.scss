@@ -62,6 +62,12 @@
   padding: var(--pa-space-lg) var(--pa-space-md);
 }
 
+// The primary outlet's wrapper takes no part in the column layout, so pages stay its direct items;
+// `hidden` while the `login` outlet is open.
+.pa-main__page:not([hidden]) {
+  display: contents;
+}
+
 .pa-shell__menu {
   inline-size: min(20rem, 85vw);
   padding: var(--pa-space-md);

@@ -2,27 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { AbstractControl, FormControl, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
-import { problemTypeName } from '@app/core/errors/problem-details';
-import { ProcureAccessStore } from '@app/core/state/app.store';
-import { Notice } from '@app/shared/components/notice/notice';
-
-/** `Validators.required` as a plain function (the lint rule `unbound-method` refuses the static method). */
-function required(control: AbstractControl<string>): ValidationErrors | null {
-  return control.value.trim().length === 0 ? { required: true } : null;
-}
-
-/** What the overlay shows above the fields; the failures keep the form. */
-type OverlayStatus = 'ready' | 'busy' | 'invalid' | 'antiforgery';
+import { LoginForm } from '../../components/login-form/login-form';
 
 /** Panel class of the dialog: 600 px from 600 px, full screen below (`styles/main.scss`, Handoff §2.3). */
 export const LOGIN_OVERLAY_PANEL_CLASS = 'pa-dialog';
@@ -35,24 +21,15 @@ export const LOGIN_OVERLAY_PANEL_CLASS = 'pa-dialog';
  * closes with `true`, so the interceptor retries the held request; „Schließen“ and Esc close with
  * nothing, and the user stays signed out on the page.
  *
- * Minimal in S5-08 (owner, sprint 05): S5-09 completes it into the S01 form card (password
- * toggle, „Passwort vergessen?“, error summary) and shares the form with the `login` outlet.
+ * The form is the one of S01 (`pa-login-form`, S5-09): error summary, „Passwort anzeigen“ and
+ * „Passwort vergessen?“, with „Schließen“ before „Anmelden“.
  *
- * @spec docs/SPEC_v2.md R-AUTH-07, §8.8
+ * @spec docs/SPEC_v2.md R-AUTH-07, §8.8; docs/design_handoff_procureaccess_v1.md §5.3
  * @invariants SEC-03
  */
 @Component({
   selector: 'pa-login-overlay',
-  imports: [
-    MatButtonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    Notice,
-    ReactiveFormsModule,
-    TranslatePipe,
-  ],
+  imports: [LoginForm, MatButtonModule, MatDialogModule, TranslatePipe],
   templateUrl: './login-overlay.html',
   styleUrl: './login-overlay.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,43 +44,10 @@ export class LoginOverlay {
     });
   }
 
-  private readonly store = inject(ProcureAccessStore);
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly dialogRef = inject<MatDialogRef<LoginOverlay, boolean>>(MatDialogRef);
 
-  protected readonly email = new FormControl('', { nonNullable: true, validators: [required] });
-  protected readonly password = new FormControl('', { nonNullable: true, validators: [required] });
-  protected readonly status = signal<OverlayStatus>('ready');
-  protected readonly busy = computed(() => this.status() === 'busy');
-  /** The text of the error notice; null while there is none. */
-  protected readonly errorKey = computed(() => {
-    switch (this.status()) {
-      case 'invalid':
-        return 'auth.login.error.invalid';
-      case 'antiforgery':
-        return 'errors.antiforgery';
-      default:
-        return null;
-    }
-  });
-
-  protected async submit(event: Event): Promise<void> {
-    event.preventDefault();
-    if (this.busy()) {
-      return;
-    }
-    this.email.markAsTouched();
-    this.password.markAsTouched();
-    if (this.email.invalid || this.password.invalid) {
-      return;
-    }
-    this.status.set('busy');
-    try {
-      await this.store.signIn(this.email.value, this.password.value);
-    } catch (error) {
-      this.status.set(problemTypeName(error) === 'antiforgery' ? 'antiforgery' : 'invalid');
-      return;
-    }
+  protected signedIn(): void {
     void this.announcer.announce('shell.session.restored');
     this.dialogRef.close(true);
   }

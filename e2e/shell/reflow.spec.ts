@@ -4,13 +4,15 @@
 
 import { expect, test, type Page } from '@playwright/test';
 import { chooseFirstOption } from '../support/combobox';
+import { expireSessionOnce, fakeSession } from '../support/session';
 
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
  * 1280 × 1024 window at 400 % zoom, no page scrolls sideways and every link and button lies
  * inside the viewport. Covers the pages of the new shell and the rebuilt screens: S10 since S4-13,
  * S11 with its summary, notices, detail panel and action bar since S4-18a, the export dialog S13
- * (full screen below 600 px, S13-M) since S4-21b. The legacy screens are
+ * (full screen below 600 px, S13-M) since S4-21b, the sign-in page S01 (#170 L1) and the login
+ * overlay since S5-09. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -149,6 +151,29 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(page.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
     await expectReflow(page);
+  });
+
+  test('S01 with the error summary needs no horizontal scrolling (#170 L1)', async ({ page }) => {
+    await page.goto('/(login:anmelden)');
+    await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
+    await expectReflow(page);
+
+    await page.getByRole('main').getByRole('button', { name: 'Anmelden' }).click();
+    await expect(page.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('the login overlay after a 401 needs no horizontal scrolling', async ({ page }) => {
+    await fakeSession(page);
+    await expireSessionOnce(page, '**/api/v1/catalog/criteria?**');
+    await toStep4(page);
+    await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
+    const overlay = page.getByRole('dialog', { name: 'Sie wurden abgemeldet' });
+    await expect(overlay.getByLabel('E-Mail-Adresse')).toBeFocused();
+
+    await expectReflow(page);
+    await overlay.getByRole('button', { name: 'Anmelden' }).scrollIntoViewIfNeeded();
+    await expect(overlay.getByRole('button', { name: 'Anmelden' })).toBeInViewport();
   });
 
   test('S11 with a card of two procedures (tabs) needs no horizontal scrolling and keeps both tabs reachable', async ({ page }) => {

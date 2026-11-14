@@ -1,0 +1,52 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<form class="pa-login-form" [id]="formId()" novalidate (submit)="submit($event)">
+  <pa-error-summary [items]="summary()" />
+
+  <div class="pa-login-form__fields" [class.pa-login-form__fields--card]="formLayout() === 'card'">
+    <p class="pa-login-form__required">{{ 'common.requiredNote' | translate }}</p>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auth.login.email' | translate }}</mat-label>
+      <input matInput [id]="emailId()" type="email" name="email" autocomplete="email" required
+        [formControl]="email" [errorStateMatcher]="errorState" />
+      @if (email.hasError('server')) {
+        <mat-error>{{ 'errors.field.server' | translate: { message: email.getError('server') } }}</mat-error>
+      } @else if (email.hasError('required')) {
+        <mat-error>{{ 'errors.field.required' | translate: { field: ('auth.login.email' | translate) } }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auth.login.password' | translate }}</mat-label>
+      <input matInput [id]="passwordId()" [type]="passwordShown() ? 'text' : 'password'" name="password"
+        autocomplete="current-password" required [formControl]="password" [errorStateMatcher]="errorState" />
+      @if (password.hasError('server')) {
+        <mat-error>{{ 'errors.field.server' | translate: { message: password.getError('server') } }}</mat-error>
+      } @else if (password.hasError('required')) {
+        <mat-error>{{ 'errors.field.required' | translate: { field: ('auth.login.password' | translate) } }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="pa-login-form__password-actions">
+      <button matButton type="button" [attr.aria-pressed]="passwordShown()" [attr.aria-controls]="passwordId()"
+        (click)="togglePassword()">{{ 'auth.login.showPassword' | translate }}</button>
+      <button matButton type="button" (click)="openForgotPassword()">{{ 'auth.login.forgot' | translate }}</button>
+    </div>
+  </div>
+
+  <!-- DOM order = visual order: stacked below 600 px with the primary last (Handoff §2.2) -->
+  <div class="pa-login-form__actions">
+    <ng-content select="[paLoginSecondaryAction]" />
+    <button matButton="filled" type="submit" class="pa-login-form__submit" [attr.aria-disabled]="busy() || null">
+      @if (busy()) {
+        <mat-progress-spinner class="pa-login-form__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+      }
+      {{ 'auth.login.submit' | translate }}
+    </button>
+  </div>
+</form>

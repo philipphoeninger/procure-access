@@ -5,6 +5,7 @@
 import { Routes } from '@angular/router';
 import { Home } from '@pages/home/home';
 import { authGuard } from '@core/guards/auth.guard';
+import { LOGIN_PATH } from '@features/identity/models/login-navigation';
 import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
@@ -29,9 +30,17 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: '',
   },
+  // S01 „Anmelden“ (R-AUTH-03) in the `login` outlet inside the shell, over the page that opened it;
+  // `auth` is the legacy path, redirected until S5-10 removes its last callers
+  {
+    path: LOGIN_PATH,
+    loadComponent: () => import('@features/identity/pages/login/login-page').then((m) => m.LoginPage),
+    outlet: 'login',
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.login' },
+  },
   {
     path: 'auth',
-    loadComponent: () => import('@features/identity/login/login').then((m) => m.Login),
+    redirectTo: LOGIN_PATH,
     outlet: 'login',
   },
   {

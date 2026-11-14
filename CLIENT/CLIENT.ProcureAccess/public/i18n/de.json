@@ -355,7 +355,8 @@
     },
     "admin": {
       "requests": "Produktvorschläge – Verwaltung"
-    }
+    },
+    "login": "Anmelden"
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",

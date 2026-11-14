@@ -9,6 +9,7 @@ import { lastValueFrom, Observable } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
 import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
+import { LOGIN_PATH, LoginNavigationState, LoginReason } from '../models/login-navigation';
 import { LoginModel } from '../models/login.model';
 import { ResetPasswordModel } from '../models/reset-password.model';
 import { SessionResponse } from '../models/session';
@@ -76,8 +77,13 @@ export class AuthService {
     return this.http.post<{ succeeded: boolean; errors: unknown[] }>(`${this.apiUrl}/signUp`, command);
   }
 
-  showLogin(): void {
-    void this.router.navigate(['', { outlets: { login: ['auth'] } }]);
+  /**
+   * Opens S01 in the `login` outlet over the current page, which stays (R-AUTH-03); `save` adds
+   * `auth.login.reasonSave` (S11 „Liste speichern“, S5-20).
+   */
+  showLogin(reason?: LoginReason): Promise<boolean> {
+    const state: LoginNavigationState | undefined = reason ? { loginReason: reason } : undefined;
+    return this.router.navigate([{ outlets: { login: [LOGIN_PATH] } }], { state });
   }
 
   showRegister(): void {

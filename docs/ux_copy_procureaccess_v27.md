@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v25 (12. November 2026) – v25 ergänzt die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v25):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.12), `ARCHITECTURE_v40.md`, `TESTING_v51.md`, `design_handoff_procureaccess_v1.md` (1.23), `figma_code_mapping_procureaccess_v1.md` (1.23), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v27 (14. November 2026) – v27 ergänzt den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v27):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.19), `ARCHITECTURE_v51.md`, `TESTING_v58.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,22 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v26
+
+Quelle: Aufgabe S5-09 (Anmeldeseite S01, Anmelde-Overlay und Abmelden), Wortlaut vom Product Owner bestätigt am 14. November 2026 (Entscheidung S5-09 3).
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U112 | **Seitentitel der Anmeldeseite:** neu `pageTitle.login` „Anmelden“ (§5.16), im Rahmen `shell.pageTitle` also „Anmelden – ProcureAccess“; gilt, solange S01 im Outlet `login` angezeigt wird | S01 steht seit S5-09 im Inhaltsbereich des App-Rahmens statt der Seite darunter; ein eigener Titel nennt die angezeigte Seite (R-SHL-04, WCAG 2.4.2). Der Wortlaut ist die H1 `auth.login.title` | S5-09 |
+
+### Änderungen gegenüber v25
+
+Quelle: Aufgabe S4-24 (Kurzbeschreibung im Katalogmodell), Owner-Entscheidungen O-S4-6 (a) und O-S4-78 (a) vom 12. November 2026 (`ARCHITECTURE_v43.md` ADR-016). Kein Wortlaut ändert sich, daher keine Bestätigung nötig.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U111 | **Anmerkung zu `exportFile.column.shortDescription`** (§6): „Kurzbeschreibung des Kriteriums (Katalogfeld `shortDescriptionDe`); leer, solange das Projektteam sie nicht geschrieben hat“ statt „Leer, bis der Katalog das Feld hat“ | Der Katalog hat das Feld jetzt; die Texte schreibt das Projektteam (K-1) | S4-24, O-S4-6 |
 
 ### Änderungen gegenüber v24
 
@@ -805,7 +821,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `exportFile.column.number` | Spaltenkopf | Nummer | Nummer nach EN 301 549; leer bei „Geprüft nach …“ |
 | `exportFile.column.title` | Spaltenkopf | Titel | Verständlicher Titel, solange er fehlt der Titel aus dem Katalog (O-S4-32) |
 | `exportFile.column.originalTitle` | Spaltenkopf | Originaltitel | Titel des Prüfschritts bei BIT inklusiv; leer bei „Geprüft nach …“ |
-| `exportFile.column.shortDescription` | Spaltenkopf | Kurzbeschreibung | Leer, bis der Katalog das Feld hat (O-S4-6, S4-24) |
+| `exportFile.column.shortDescription` | Spaltenkopf | Kurzbeschreibung | Kurzbeschreibung des Kriteriums (Katalogfeld `shortDescriptionDe`); leer, solange das Projektteam sie nicht geschrieben hat (O-S4-6, U111) |
 | `exportFile.column.productPart` | Spaltenkopf | Funktionsbereich | |
 | `exportFile.column.recommended` | Spaltenkopf | Priorität (empfohlen) | Werte `criteria.priority.A` / `.B` / `.Info` |
 | `exportFile.column.chosen` | Spaltenkopf | Priorität (Ihre Wahl) | Die Stufe, die gilt: die eigene Wahl, sonst die Empfehlung (O-S4-65) |
@@ -1429,6 +1445,7 @@ Wert für `{{page}}` in `shell.pageTitle`. Vom Speziellen zum Allgemeinen, damit
 | Schlüssel | Screen | Text |
 |---|---|---|
 | `pageTitle.home` | S04 | Barrierefreie Software beschaffen |
+| `pageTitle.login` | S01 | Anmelden |
 | `pageTitle.criteria.step` | S10 | Kriterien zusammenstellen – Schritt {{n}} von 4 |
 | `pageTitle.criteria.list` | S11 | Ihre Kriterienliste |
 | `pageTitle.criteria.list.saved` | S11 (gespeicherte Liste) | {{name}} – Gespeicherte Kriterienlisten |

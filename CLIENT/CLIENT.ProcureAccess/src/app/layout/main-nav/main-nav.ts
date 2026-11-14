@@ -8,6 +8,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@features/identity/services/auth.service';
 import { CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '@app/features/configurator/guards/configurator-guards';
@@ -40,6 +41,7 @@ export class MainNav {
   private readonly store = inject(ProcureAccessStore);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly pageTitle = inject(PageTitleStrategy);
 
   private readonly navigationEnd = toSignal(
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)),
@@ -57,18 +59,22 @@ export class MainNav {
   /** From the session of `withIdentity()` (S5-08): follows sign-in, sign-out and account deletion. */
   protected readonly signedIn = this.store.signedIn;
 
+  /** S01 over the current page, which stays (R-AUTH-03). */
   protected login(): void {
     this.navigated.emit();
-    this.authService.showLogin();
+    void this.authService.showLogin();
   }
 
-  /** Ends the session (R-AUTH-08 base; the focus to the H1 of the start page follows in S5-09). */
-  protected logout(): void {
+  /**
+   * Ends the session and clears every in-memory state of the user (R-AUTH-08), then shows the
+   * start page with the focus on its H1 — also when it was already open, where the router sees no
+   * page change.
+   */
+  protected async logout(): Promise<void> {
     this.navigated.emit();
-    void this.store.signOut().then(() => {
-      this.store.setProposals([]);
-      void this.store.reloadUICustomization();
-      return this.router.navigateByUrl('/');
-    });
+    // The session is forgotten here also when the request fails; the error interceptor shows that.
+    await this.store.endSession().catch(() => undefined);
+    await this.router.navigateByUrl('/');
+    this.pageTitle.focusPageHeading();
   }
 }

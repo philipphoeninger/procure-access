@@ -6,6 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
 
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { createShellDoubles, SHELL_TEST_ROUTES } from '@app/testing/shell-test-doubles';
 import { MainNav } from './main-nav';
@@ -94,16 +95,27 @@ describe('MainNav', () => {
     expect(screen.queryByRole('button', { name: 'Abmelden' })).toBeNull();
   });
 
-  it('ends the session and returns to the start page when „Abmelden“ is pressed', async () => {
+  it('ends the session, opens the start page and focuses its heading when „Abmelden“ is pressed (R-AUTH-08)', async () => {
     const { fixture, store } = await renderNav('bar', true);
+    await TestBed.inject(Router).navigateByUrl('/products');
+    const focusPageHeading = vi.spyOn(TestBed.inject(PageTitleStrategy), 'focusPageHeading').mockImplementation(() => undefined);
+
+    screen.getByRole('button', { name: 'Abmelden' }).click();
+    await fixture.whenStable();
+
+    expect(store.endSession).toHaveBeenCalledOnce();
+    expect(TestBed.inject(Router).url).toBe('/');
+    expect(focusPageHeading).toHaveBeenCalledOnce();
+  });
+
+  it('opens the start page also when the sign-out request fails', async () => {
+    const { fixture, store } = await renderNav('bar', true);
+    store.endSession.mockRejectedValue(new Error('offline'));
     await TestBed.inject(Router).navigateByUrl('/products');
 
     screen.getByRole('button', { name: 'Abmelden' }).click();
     await fixture.whenStable();
 
-    expect(store.signOut).toHaveBeenCalledOnce();
-    expect(store.setProposals).toHaveBeenCalledWith([]);
-    expect(store.reloadUICustomization).toHaveBeenCalledOnce();
     expect(TestBed.inject(Router).url).toBe('/');
   });
 
