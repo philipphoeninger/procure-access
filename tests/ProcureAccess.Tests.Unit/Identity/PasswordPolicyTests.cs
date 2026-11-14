@@ -69,6 +69,11 @@ public sealed class PasswordPolicyTests
 
     private static IConfiguration Configuration(string? minLength) =>
         new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { [PasswordPolicy.MinLengthSetting] = minLength })
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [PasswordPolicy.MinLengthSetting] = minLength,
+                [LockoutPolicy.MaxFailedAttemptsSetting] = "5",
+                [LockoutPolicy.DurationSetting] = "00:15:00",
+            })
             .Build();
 }

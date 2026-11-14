@@ -12,6 +12,9 @@ public static class ClientLinks
     /// <summary>The address-confirmation page of S02 (UX copy §3, U118); the token follows as <c>?token=</c>.</summary>
     public const string ConfirmationPagePath = "/registrieren/bestaetigen";
 
+    /// <summary>The new-password step of S03 (S5-13a); the token follows as <c>?token=</c>.</summary>
+    public const string PasswordResetPagePath = "/passwort/neu";
+
     /// <summary>Sign-in S01 in the <c>login</c> outlet (UX copy §3); its „Passwort vergessen?“ leads to the reset.</summary>
     public const string LoginPagePath = "/(login:anmelden)";
 

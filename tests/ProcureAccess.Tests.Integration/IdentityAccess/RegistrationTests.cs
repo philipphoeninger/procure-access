@@ -95,7 +95,8 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         TokenOf(mail).ShouldNotBeNullOrEmpty();
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:SEC-11 " + nameof(Register_KnownAddress_AnswersAsForANewOneAndSendsAlreadyRegistered))]
+    [Trait("Invariant", "SEC-11")]
     public async Task Register_KnownAddress_AnswersAsForANewOneAndSendsAlreadyRegistered()
     {
         using var client = CreateClient();
@@ -161,7 +162,8 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         Host.Emails.Sent.ShouldBeEmpty();
     }
 
-    [Theory]
+    [Theory(DisplayName = "INV:SEC-11 " + nameof(Register_PasswordLength_AcceptsTwelveTo128Characters))]
+    [Trait("Invariant", "SEC-11")]
     [InlineData(11, false)]
     [InlineData(12, true)]
     [InlineData(128, true)]
@@ -335,7 +337,8 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         (await ErrorKeysOf(response)).ShouldBe(["token"]);
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:SEC-11 " + nameof(Token_IsStoredOnlyAsTheSha256OfItsBytes))]
+    [Trait("Invariant", "SEC-11")]
     public async Task Token_IsStoredOnlyAsTheSha256OfItsBytes()
     {
         using var client = CreateClient();

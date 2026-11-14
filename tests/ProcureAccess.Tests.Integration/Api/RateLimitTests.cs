@@ -28,6 +28,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
     private const string CriteriaListShownPath = "/api/v1/configurator/criteria-list-shown";
     private const string RegisterPath = "/api/v1/auth/register";
     private const string ResendPath = "/api/v1/auth/confirm-email/resend";
+    private const string PasswordResetPath = "/api/v1/auth/password-reset";
 
     /// <summary>Address of the client's nginx in the Docker network: a trusted proxy.</summary>
     private const string Nginx = "172.18.0.3";
@@ -54,6 +55,8 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 ["RateLimits:Registration:Window"] = WindowSetting,
                 ["RateLimits:ConfirmationResend:PermitLimit"] = $"{PermitLimit}",
                 ["RateLimits:ConfirmationResend:Window"] = WindowSetting,
+                ["RateLimits:PasswordReset:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:PasswordReset:Window"] = WindowSetting,
             },
             configureServices: TestRemoteAddress.AddTo);
         return ValueTask.CompletedTask;
@@ -67,7 +70,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         }
     }
 
-    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath, RegisterPath];
+    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath, RegisterPath, PasswordResetPath];
 
     [Theory(DisplayName = "INV:API-05 " + nameof(Post_OneMoreThanTheLimit_Returns429WithRetryAfterMinutes))]
     [Trait("Invariant", "API-05")]
@@ -214,11 +217,14 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("00:10:00", policy);
         }
 
-        foreach (var policy in new[] { "Registration", "ConfirmationResend" })
+        foreach (var policy in new[] { "Registration", "ConfirmationResend", "PasswordReset" })
         {
             configuration[$"RateLimits:{policy}:PermitLimit"].ShouldBe("5", policy);
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("01:00:00", policy);
         }
+
+        configuration["RateLimits:PasswordResetAddress:PermitLimit"].ShouldBe("3");
+        configuration["RateLimits:PasswordResetAddress:Window"].ShouldBe("01:00:00");
 
         configuration["ForwardedHeaders:ForwardLimit"].ShouldBe("2");
         configuration["Health:ReadyConcurrentChecks"].ShouldBe("2");

@@ -81,6 +81,8 @@ public sealed class ProcureAccessApiFactory(
         builder.UseSetting("RateLimits:CriteriaListShown:PermitLimit", RelaxedPermitLimit);
         builder.UseSetting("RateLimits:Registration:PermitLimit", RelaxedPermitLimit);
         builder.UseSetting("RateLimits:ConfirmationResend:PermitLimit", RelaxedPermitLimit);
+        builder.UseSetting("RateLimits:PasswordReset:PermitLimit", RelaxedPermitLimit);
+        builder.UseSetting("RateLimits:PasswordResetAddress:PermitLimit", RelaxedPermitLimit);
 
         foreach (var (key, value) in settings ?? new Dictionary<string, string?>())
         {

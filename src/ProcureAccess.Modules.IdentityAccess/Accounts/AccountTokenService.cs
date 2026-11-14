@@ -73,6 +73,16 @@ internal sealed class AccountTokenService(
             : new AccountTokenRedemption(AccountTokenOutcome.AlreadyUsed, row.UserId);
     }
 
+    public async Task RevokeAsync(string userId, AccountTokenPurpose purpose, CancellationToken cancellationToken = default)
+    {
+        var now = clock.GetUtcNow();
+        await db.AccountTokens
+            .Where(t => t.UserId == userId && t.Purpose == purpose && t.UsedAt == null && t.ExpiresAt > now)
+            .ExecuteUpdateAsync(set => set.SetProperty(t => t.UsedAt, now), cancellationToken);
+    }
+
+    public TimeSpan LifetimeOf(AccountTokenPurpose purpose) => settings.LifetimeOf(purpose);
+
     /// <summary>The hash of a token in the link's form; false for anything that is not one.</summary>
     internal static bool TryHash(string? token, out byte[] hash)
     {

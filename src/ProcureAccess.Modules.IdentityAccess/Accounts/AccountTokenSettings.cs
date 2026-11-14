@@ -10,7 +10,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 
 /// <summary>
 /// The 🔧 lifetimes of the account tokens (ARCHITECTURE §9.1, C72; SPEC R-AUTH-02), read from the
-/// section <see cref="SectionName"/>: <c>EmailConfirmationLifetime</c> 24 h. Never hard-code them
+/// section <see cref="SectionName"/>: <c>EmailConfirmationLifetime</c> 24 h, <c>PasswordResetLifetime</c> 2 h (S5-13a). Never hard-code them
 /// (CLAUDE §6.6); a missing or unusable value stops the start.
 /// </summary>
 internal sealed class AccountTokenSettings
@@ -19,9 +19,12 @@ internal sealed class AccountTokenSettings
 
     public TimeSpan EmailConfirmationLifetime { get; init; }
 
+    public TimeSpan PasswordResetLifetime { get; init; }
+
     public TimeSpan LifetimeOf(AccountTokenPurpose purpose) => purpose switch
     {
         AccountTokenPurpose.EmailConfirmation => EmailConfirmationLifetime,
+        AccountTokenPurpose.PasswordReset => PasswordResetLifetime,
         _ => throw new ArgumentOutOfRangeException(nameof(purpose), purpose, "Unknown token purpose."),
     };
 
@@ -31,6 +34,7 @@ internal sealed class AccountTokenSettings
         return new AccountTokenSettings
         {
             EmailConfirmationLifetime = Read(section, nameof(EmailConfirmationLifetime)),
+            PasswordResetLifetime = Read(section, nameof(PasswordResetLifetime)),
         };
     }
 

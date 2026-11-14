@@ -11,10 +11,8 @@ public static class IdentityExtensions
         services.AddIdentityCore<User>(options =>
                     {
                         options.SignIn.RequireConfirmedEmail = false;
-
-                        options.Lockout.MaxFailedAccessAttempts = 5;
-                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                     })
+                .AddUserManager<ClockedUserManager>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddSignInManager()
@@ -24,15 +22,21 @@ public static class IdentityExtensions
     }
 
     /// <summary>
-    /// Unique e-mail addresses and the password rule of <see cref="PasswordPolicy"/> (S5-12a): a
-    /// 🔧 minimum length, no composition rules. The user name is the e-mail address, so it may hold
-    /// every character an address may (the default allows only letters, digits and <c>-._@+</c>).
+    /// Unique e-mail addresses, the password rule of <see cref="PasswordPolicy"/> (S5-12a): a
+    /// 🔧 minimum length, no composition rules, and the 🔧 lockout of <see cref="LockoutPolicy"/>
+    /// (S5-13a). The user name is the e-mail address, so it may hold every character an address may
+    /// (the default allows only letters, digits and <c>-._@+</c>).
     /// </summary>
     public static IServiceCollection ConfigureIdentityOptions(this IServiceCollection services, IConfiguration configuration)
     {
         var minLength = PasswordPolicy.MinLengthFrom(configuration);
+        var lockout = LockoutPolicy.From(configuration);
         services.Configure<IdentityOptions>(options =>
         {
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.MaxFailedAccessAttempts = lockout.MaxFailedAttempts;
+            options.Lockout.DefaultLockoutTimeSpan = lockout.Duration;
+
             options.User.RequireUniqueEmail = true;
             options.User.AllowedUserNameCharacters = "";
             options.Password.RequireNonAlphanumeric = false;
