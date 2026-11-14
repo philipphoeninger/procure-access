@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-11 (3 points) · **Issues:** #302 (closed by this task)
 > **Requirements / invariants:** SPEC §7.6, SD13 (base of R-AUTH-01, R-AUTH-02, R-AUTH-04, R-ORG-02); **PRV-11 → `active`** for its integration part (TESTING_v59 V184), E2E part deferred to the first rebuilt screen that sends mail (S5-12 or S5-14); ARC-01 – ARC-03 stay green with the new reference SERVICES → `Platform.Contracts`
-> **Status:** done — pull request open (2026-11-14)
+> **Status:** done — pull request #332 open (2026-11-14)
 > **Scope:** `IEmailSender` in Platform with MailKit over SMTP/TLS (synchronous, one retry), configured only from the environment; the four message types of sprint 05 rendered from the UX copy's `email.*` texts as a plain-text and an HTML part, no tracking pixel, no rewritten link, no recipient in the logs above `Debug`; Mailpit in the dev and E2E stacks; the legacy confirmation and reset mails to the user's own address (#302); the E2E `compose.log` artefact checked for secrets (TD-12). No EF migration.
 > **Owner decisions (2026-11-14):** 1 (A) — plain-text **and** HTML part (the prompt's wording; it overrides the first answer (a), so SPEC §7.6 stays as it was) · 2a — the texts live in Platform as the third `check-i18n` target; only the message types with a sender in sprint 05 (confirmation, reset, „already registered“, invitation) · 3a — the legacy mails go through the new `IEmailSender` with the `email.*` texts; the legacy mail service, templates and settings are removed · 4a — strict settings: only Development and E2E may send without credentials or TLS · Mailpit (MIT) approved (B)
 
