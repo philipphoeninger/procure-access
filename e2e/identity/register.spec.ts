@@ -143,6 +143,10 @@ test.describe('S02 „Konto erstellen“ and the confirmation page', () => {
     await expect(summary).toBeFocused();
     await expect(summary.getByRole('link')).toHaveCount(3);
     await expect(page).toHaveTitle('Fehler: Konto erstellen – ProcureAccess');
+    // Material fades the field errors in from opacity 0; axe measured one mid-fade on mobile Safari
+    const fieldErrors = main(page).locator('.mat-mdc-form-field-error-wrapper');
+    await expect(fieldErrors).toHaveCount(2);
+    for (const fieldError of await fieldErrors.all()) await expect(fieldError).toHaveCSS('opacity', '1');
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's02-errors');
   });
