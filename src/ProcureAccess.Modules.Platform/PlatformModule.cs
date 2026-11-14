@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.Platform.Analytics;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Platform.Email;
 using ProcureAccess.Modules.Platform.Errors;
 using ProcureAccess.Modules.Platform.Health;
 using ProcureAccess.Modules.Platform.Logging;
@@ -21,8 +23,8 @@ namespace ProcureAccess.Modules.Platform;
 /// may use through <c>Platform.Contracts</c>. Since S2-07 it holds the platform code built ahead
 /// in sprint 01: time, logging with retention, usage events and the health endpoints, with their
 /// own database context (ADR-014); since S2-10 Problem Details for every error response; since
-/// S4-21a the client address behind the proxies and rate limiting. Share links, file storage,
-/// e-mail sending, i18n and caching follow with their steps.
+/// S4-21a the client address behind the proxies and rate limiting; since S5-11 e-mail sending
+/// (<see cref="AddPlatformEmail"/>). Share links, file storage, i18n and caching follow with their steps.
 /// </summary>
 public static class PlatformModule
 {
@@ -76,6 +78,15 @@ public static class PlatformModule
 
         return services;
     }
+
+    /// <summary>
+    /// Registers <c>IEmailSender</c> (ARCHITECTURE C71, SPEC §7.6): MailKit over SMTP with TLS, settings
+    /// from <c>Email:*</c>. Only the web host calls it — the <c>catalog</c> and <c>roles</c> command
+    /// hosts send no e-mail and need no SMTP settings. Outside Development and E2E the start fails
+    /// without credentials or with an unencrypted connection (owner decision S5-11 4a).
+    /// </summary>
+    public static IServiceCollection AddPlatformEmail(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
+        services.AddEmailSender(configuration, environment);
 
     /// <summary>
     /// Adds the middleware of the Platform module: the client address from the trusted proxies,

@@ -2,35 +2,46 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.Platform.Contracts.Email;
+using IEmailSender = ProcureAccess.Modules.Platform.Contracts.Email.IEmailSender;
+
 namespace SERVICES.ProcureAccess.DataServices;
 
+/// <summary>
+/// Legacy account flows (replaced by S5-12, S5-13 and removed by S5-10). Since S5-11 (#302, owner
+/// decision 3a) the confirmation and reset mails go to the user's own address through Platform's
+/// <see cref="IEmailSender"/> with the <c>email.*</c> texts; a failed send is logged and the request
+/// answers as before (the account stays; the reset answers the same for every address).
+/// </summary>
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly ApplicationDBContext _db;
-    private readonly IEmailService _emailService;
-    private readonly IEmailTemplateService _templateService;
+    private readonly IEmailSender _emailSender;
     private readonly IConfiguration _config;
     private readonly IHttpContextAccessor _httpContextAccessor;
-
+    private readonly TimeSpan _tokenLifespan;
+    private readonly ILogger<UserService> _logger;
 
     public UserService(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ApplicationDBContext db,
-        IEmailService emailService,
-        IEmailTemplateService templateService,
+        IEmailSender emailSender,
         IConfiguration config,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<DataProtectionTokenProviderOptions> tokenOptions,
+        ILogger<UserService> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _db = db;
-        _emailService = emailService;
-        _templateService = templateService;
+        _emailSender = emailSender;
         _config = config;
         _httpContextAccessor = httpContextAccessor;
+        _tokenLifespan = tokenOptions.Value.TokenLifespan;
+        _logger = logger;
     }
 
     public async Task<UserDto?> GetCurrentUserAsync()
@@ -62,7 +73,15 @@ public class UserService : IUserService
 
         await _userManager.AddToRoleAsync(user, Roles.Member);
 
-        await SendConfirmationEmailAsync("ok@testing.lettermint.co"); //user.Email
+        try
+        {
+            await SendConfirmationEmailAsync(user.Email!);
+        }
+        catch (EmailDeliveryException)
+        {
+            // No address in the log (PRV-11); the account stays, S5-12 adds the resend.
+            _logger.LogWarning("The confirmation e-mail of a new account could not be sent.");
+        }
 
         return IdentityResult.Success;
     }
@@ -78,18 +97,18 @@ public class UserService : IUserService
 
         var encodedToken = Uri.EscapeDataString(token);
 
-        var link = $"{_config["App:BaseUrl"]}/reset-password?email={email}&token={encodedToken}";
+        var link = AppLink($"/reset-password?email={Uri.EscapeDataString(user.Email!)}&token={encodedToken}");
+        var validHours = (int)Math.Ceiling(_tokenLifespan.TotalHours);
 
-        var html = await _templateService.RenderAsync("ResetPassword",
-            new Dictionary<string, string>
-            {
-                { "link", link }
-            });
-
-        await _emailService.SendEmailAsync(
-            email,
-            "Reset your password",
-            html);
+        try
+        {
+            await _emailSender.SendAsync(new PasswordResetEmail(user.Email!, link, validHours));
+        }
+        catch (EmailDeliveryException)
+        {
+            // Same answer for every address (no user enumeration); no address in the log (PRV-11).
+            _logger.LogWarning("A password reset e-mail could not be sent.");
+        }
     }
 
     public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto)
@@ -136,14 +155,20 @@ public class UserService : IUserService
 
         var encodedToken = Uri.EscapeDataString(token);
 
-        var confirmationLink = $"{_config["App:BaseUrl"]}/confirm-email?userId={user.Id}&token={encodedToken}";
+        var confirmationLink = AppLink($"/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={encodedToken}");
 
-        var html = await _templateService.RenderAsync("ConfirmEmail",
-            new Dictionary<string, string>
-            {
-                { "link", confirmationLink }
-            });
+        await _emailSender.SendAsync(new AddressConfirmationEmail(user.Email!, confirmationLink));
+    }
 
-        await _emailService.SendEmailAsync(user.Email!, "Confirm your email", html);
+    /// <summary>A link into the client: <c>App:BaseUrl</c> (absolute) plus the path and query.</summary>
+    private Uri AppLink(string pathAndQuery)
+    {
+        var baseUrl = _config["App:BaseUrl"];
+        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var root))
+        {
+            throw new InvalidOperationException("App:BaseUrl must be the absolute address of the client.");
+        }
+
+        return new Uri(root.GetLeftPart(UriPartial.Authority) + root.AbsolutePath.TrimEnd('/') + pathAndQuery);
     }
 }

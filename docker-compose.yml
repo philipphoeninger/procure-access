@@ -45,8 +45,10 @@ services:
       # the API refuses to start without it. Base64 PFX, see .env.example.
       DataProtection__Certificate: ${DATA_PROTECTION_CERTIFICATE:-}
       DataProtection__PreviousCertificate: ${DATA_PROTECTION_PREVIOUS_CERTIFICATE:-}
-      Email__Username: ${SMTP_USERNAME:-}
-      Email__Password: ${SMTP_PASSWORD:-}
+      # SMTP relay (Lettermint, S5-11): host, port and sender are in appsettings.json. Outside
+      # Development and E2E the API refuses to start without these credentials (owner decision 4a).
+      Email__Smtp__Username: ${SMTP_USERNAME:-}
+      Email__Smtp__Password: ${SMTP_PASSWORD:-}
       # Sample user for the local stack; empty = no sample user (only used in Development)
       SampleData__UserPassword: ${SAMPLE_USER_PASSWORD:-}
     ports:

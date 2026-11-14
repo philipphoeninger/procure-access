@@ -10,7 +10,8 @@
 # - own project name, so containers, network and images do not mix with the dev stack;
 # - database in memory (tmpfs): every start begins with an empty database, nothing persists;
 # - stack-local network instead of the external dokploy-network (CI has none);
-# - SMTP credentials cleared, so no e-mail can leave an E2E run;
+# - every e-mail goes to Mailpit (S5-11), so none can leave an E2E run; its API on
+#   http://localhost:8025 lets a test read a mail (from S5-14);
 # - the test release folders mounted read-only, so the API seeds and activates T.1 at startup
 #   (S4-08, #241; catalog part of the seeder of TESTING §6.3, Development/E2E only);
 # - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
@@ -23,8 +24,8 @@
 # stop one before starting the other.
 #
 # Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment of its own, the
-# users and products of the seeder, Mailpit and the test clock endpoint. Until then the API runs
-# as Development, like the dev stack.
+# users and products of the seeder and the test clock endpoint. Until then the API runs as
+# Development, like the dev stack.
 name: procureaccess-e2e
 
 services:
@@ -35,10 +36,26 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
 
+  # SMTP catcher (S5-11, ARCHITECTURE C71, TESTING §3.3): every e-mail of the stack lands here and
+  # nowhere else. MIT, development tool, never shipped; same image as the integration tests
+  # (EmailDeliveryTests.MailpitContainer.Image) — change them together.
+  mailpit:
+    image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    ports:
+      - "127.0.0.1:8025:8025"
+
   api:
+    depends_on:
+      mailpit:
+        condition: service_started
     environment:
-      Email__Username: ""
-      Email__Password: ""
+      # Mail to Mailpit, without TLS or sign-in (Development and E2E only, S5-11), with links to the client
+      Email__Smtp__Host: mailpit
+      Email__Smtp__Port: "1025"
+      Email__Smtp__Security: None
+      Email__Smtp__Username: ""
+      Email__Smtp__Password: ""
+      App__BaseUrl: http://localhost:4200
       # Active test release T.1 (MiniCatalog), seeded at startup in Development/E2E only (S4-08, #241)
       Catalog__TestRelease__Path: /app/catalog/test-releases
       Catalog__TestRelease__Version: T.1

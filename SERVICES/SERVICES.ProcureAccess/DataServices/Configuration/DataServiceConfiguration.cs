@@ -28,8 +28,6 @@ public static class DataServiceConfiguration
         services.AddScoped<IFilterTypeService, FilterTypeService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<IProposalService, ProposalService>();
 
         return services;

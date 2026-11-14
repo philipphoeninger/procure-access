@@ -37,14 +37,6 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
 
-# E-mail templates: sent as raw HTML, so a header comment would end up in
-# every e-mail.
-[[annotations]]
-path = "DAL/MODELS.ProcureAccess/EmailTemplates/**"
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
-SPDX-License-Identifier = "MIT"
-
 # Generated files: EF Core migrations.
 [[annotations]]
 path = [

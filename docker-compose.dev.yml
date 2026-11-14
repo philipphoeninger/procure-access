@@ -13,10 +13,33 @@
 # The seeder imports T.1 once and activates it only while no release is active, so a release
 # activated by hand stays active. After a change to the T.1 folder, the stored T.1 is the old one:
 # remove the database volume (docker compose down -v) to get the new one.
+#
+# Every e-mail goes to Mailpit (S5-11): read it at http://localhost:8025. Its SMTP port is published on
+# the host loopback too, so `dotnet run` can send there (Email__Smtp__Host=localhost,
+# Email__Smtp__Port=1025, Email__Smtp__Security=None).
 services:
+  # SMTP catcher (S5-11, ARCHITECTURE C71, TESTING §3.3): every e-mail of the stack lands here and
+  # nowhere else. MIT, development tool, never shipped; same image as the integration tests
+  # (EmailDeliveryTests.MailpitContainer.Image) — change them together.
+  mailpit:
+    image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    ports:
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1025:1025"
+    networks:
+      - dokploy-network
+
   api:
+    depends_on:
+      mailpit:
+        condition: service_started
     environment:
       Catalog__TestRelease__Path: /app/catalog/test-releases
       Catalog__TestRelease__Version: T.1
+      # Mail to Mailpit, without TLS or sign-in (Development and E2E only, S5-11), with links to the local client
+      Email__Smtp__Host: mailpit
+      Email__Smtp__Port: "1025"
+      Email__Smtp__Security: None
+      App__BaseUrl: http://localhost:4200
     volumes:
       - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
