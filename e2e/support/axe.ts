@@ -24,6 +24,8 @@ interface Finding {
   readonly helpUrl: string;
   readonly target: string;
   readonly html: string;
+  /** axe's own explanation of the node, e.g. the measured colours and ratio of a contrast finding. */
+  readonly summary: string | undefined;
 }
 
 interface SuppressedFinding extends Finding {
@@ -168,6 +170,7 @@ function toFinding(violation: Result, node: NodeResult): Finding {
     helpUrl: violation.helpUrl,
     target: JSON.stringify(node.target),
     html: node.html,
+    summary: node.failureSummary,
   };
 }
 
@@ -195,7 +198,9 @@ function formatFailure(state: string, appearance: Appearance, url: string, block
   const lines = blocking.map(
     (finding) =>
       `- ${finding.rule} (${finding.impact ?? 'n/a'}): ${finding.help}\n` +
-      `    target ${finding.target}\n    html   ${finding.html}\n    ${finding.helpUrl}`,
+      `    target ${finding.target}\n    html   ${finding.html}\n` +
+      (finding.summary ? `    ${finding.summary.replaceAll('\n', '\n    ')}\n` : '') +
+      `    ${finding.helpUrl}`,
   );
   return (
     `axe found ${blocking.length} WCAG 2.0/2.1 A/AA violation(s) in state "${state}", ${appearance} appearance (${url}).\n` +

@@ -137,6 +137,15 @@ export const withIdentity = () =>
             }
           },
 
+          /**
+           * Sends the confirmation e-mail again to the signed-in user's address (R-AUTH-02). Rejects
+           * with the `HttpErrorResponse`: 503 `email-delivery` and 429 `rate-limit` for the notice
+           * `auth.confirm.required` to show.
+           */
+          resendConfirmation(): Promise<void> {
+            return authService.resendConfirmation();
+          },
+
           setUser(user: User | null) {
             patchState(state, { user });
           },

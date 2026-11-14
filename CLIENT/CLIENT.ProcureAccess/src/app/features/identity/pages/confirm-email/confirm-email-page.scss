@@ -1,0 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// As S80 (Handoff §5.3): H1, text and „Zur Startseite“ in one column.
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--pa-space-md);
+}
+
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
+.pa-confirm-email-page__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.pa-confirm-email-page__text {
+  margin: 0;
+  max-inline-size: 40rem;
+  font: var(--mat-sys-body-large);
+}

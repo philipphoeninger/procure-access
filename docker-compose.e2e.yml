@@ -43,6 +43,10 @@ services:
     image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
     ports:
       - "127.0.0.1:8025:8025"
+    # The API reaches it as `mailpit` only on the stack's network (S5-12b: without this line it sat
+    # on the default network and every send failed with a SocketException)
+    networks:
+      - dokploy-network
 
   api:
     depends_on:

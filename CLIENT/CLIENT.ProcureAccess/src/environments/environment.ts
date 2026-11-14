@@ -13,5 +13,8 @@ export const environment = {
   // `.invalid`, which scripts/check-release-config.mjs refuses for a production release.
   criteriaSuggestion: 'mailto:kriterium-vorschlagen@example.invalid',
   // Range of a user weight for a B criterion (R-LST-03). 🔧 Confirmed default (SPEC SD23).
-  priorityWeight: { min: 1, max: 10 }
+  priorityWeight: { min: 1, max: 10 },
+  // Shortest password of the registration (R-AUTH-01). 🔧 Confirmed default (SPEC SD23); keep it in
+  // step with the server's Account:Password:MinLength, which decides.
+  passwordMinLength: 12
 };

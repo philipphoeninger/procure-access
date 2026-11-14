@@ -167,6 +167,18 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
     expect(store.permissions()).toEqual([]);
   });
 
+  it('resendConfirmation() posts the resend without a body and rejects with its problem (R-AUTH-02)', async () => {
+    const store = setUp();
+
+    const sending = store.resendConfirmation();
+    const request = await expectRequest('/api/v1/auth/confirm-email/resend');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBeNull();
+    request.flush({ type: 'https://procureaccess.de/problems/email-delivery' }, { status: 503, statusText: 'Service Unavailable' });
+
+    await expect(sending).rejects.toMatchObject({ status: 503 });
+  });
+
   // SEC-01 (FE part): no token is written to or read from browser storage, and no request carries a
   // credential of its own — the session is the HttpOnly cookie, which the browser sends itself.
   it('Session_StorageBlocked_SignsInAndOutWithoutTokenOrAuthorizationHeader INV:SEC-01', async () => {

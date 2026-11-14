@@ -93,10 +93,10 @@ public sealed class AntiforgeryValidationTests(ApiFixture api) : IntegrationTest
 
         exempt.ShouldBe(
         [
-            // Legacy anonymous identity POSTs until S5-10 (S5-12, S5-13): no session to forge a request into.
+            // Legacy anonymous identity POSTs until S5-10 (S5-13): no session to forge a request into;
+            // /api/signUp went with S5-12b.
             "/api/forgot-password",
             "/api/reset-password",
-            "/api/signUp",
             // The anonymous export changes no server state (SEC-02, EXP-05).
             "/api/v{version:apiVersion}/exports",
         ]);

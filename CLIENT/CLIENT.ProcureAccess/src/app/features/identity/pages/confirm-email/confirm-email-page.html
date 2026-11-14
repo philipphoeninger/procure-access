@@ -1,0 +1,11 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1 class="pa-confirm-email-page__title">{{ texts().title | translate }}</h1>
+<p class="pa-confirm-email-page__text">{{ texts().body | translate }}</p>
+
+<!-- „Button“ in the UX copy, but it navigates: a link with the look of a filled button, as on S80. -->
+<a matButton="filled" routerLink="/">{{ 'errors.home' | translate }}</a>

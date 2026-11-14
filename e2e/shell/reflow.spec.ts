@@ -12,7 +12,7 @@ import { expireSessionOnce, fakeSession } from '../support/session';
  * inside the viewport. Covers the pages of the new shell and the rebuilt screens: S10 since S4-13,
  * S11 with its summary, notices, detail panel and action bar since S4-18a, the export dialog S13
  * (full screen below 600 px, S13-M) since S4-21b, the sign-in page S01 (#170 L1) and the login
- * overlay since S5-09. The legacy screens are
+ * overlay since S5-09, the registration S02 and its confirmation pages since S5-12b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -77,6 +77,9 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     // Both H1s carry a soft hyphen (U94): match the part before it (Playwright matches a substring).
     ['/datenschutz', 'Datenschutz'],
     ['/barrierefreiheit', 'Erklärung zur Barriere'],
+    ['/registrieren', 'Konto erstellen'],
+    // Without a token the page shows its „invalid“ result and sends nothing (S5-12b)
+    ['/registrieren/bestaetigen', 'Link nicht mehr gültig'],
   ] as const) {
     test(`${path} („${heading}“) needs no horizontal scrolling`, async ({ page }) => {
       await page.goto(path);
@@ -160,6 +163,30 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await page.getByRole('main').getByRole('button', { name: 'Anmelden' }).click();
     await expect(page.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('S02 with the error summary and after the submit needs no horizontal scrolling', async ({ page }) => {
+    // The registration is answered here: the real one is tested in identity/register.spec.ts
+    await page.route('**/api/v1/auth/register', (route) => route.fulfill({ status: 204 }));
+    await page.goto('/registrieren');
+    const submit = page.getByRole('main').getByRole('button', { name: 'Konto erstellen' });
+    await submit.click();
+    await expect(page.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+
+    await page.getByLabel('E-Mail-Adresse').fill('reflow@example.test');
+    await page.getByLabel('Passwort', { exact: true }).fill('lang-genug-2026');
+    await page.getByRole('checkbox', { name: /^Ich habe die Datenschutzhinweise/ }).check();
+    await submit.click();
+    await expect(page.getByRole('heading', { level: 2, name: 'E-Mail-Adresse bestätigen' })).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('the confirmation page with „E-Mail-Adresse bestätigt“ needs no horizontal scrolling', async ({ page }) => {
+    await page.route('**/api/v1/auth/confirm-email', (route) => route.fulfill({ status: 204 }));
+    await page.goto('/registrieren/bestaetigen?token=reflow');
+    await expect(page.getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeVisible();
     await expectReflow(page);
   });
 
