@@ -8,6 +8,9 @@ SPDX-License-Identifier: MIT
 
 <head>
   <meta charset="utf-8" />
+  <!-- Requests of this page send only the origin as Referer, never path or query: the token of the
+       confirmation link (/registrieren/bestaetigen?token=…) must not reach a server log (S5-12b) -->
+  <meta name="referrer" content="strict-origin" />
   <title>ProcureAccess</title>
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

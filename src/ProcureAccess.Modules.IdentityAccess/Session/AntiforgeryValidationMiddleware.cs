@@ -20,8 +20,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Session;
 /// with <c>DisableAntiforgery()</c> (<see cref="IAntiforgeryMetadata.RequiresValidation"/> false),
 /// which the anonymous export carries, the only exemption the architecture names. The test
 /// <c>INV:SEC-02</c> lists every exempt endpoint, so the list can only shrink knowingly.</para>
-/// <para>Until S5-10 the anonymous legacy identity endpoints (<c>signUp</c>, <c>forgot-password</c>,
-/// <c>reset-password</c>) are exempt by metadata. The skip for a Bearer header went with the JWT
+/// <para>Until S5-10 the anonymous legacy identity endpoints <c>forgot-password</c> and
+/// <c>reset-password</c> are exempt by metadata (<c>signUp</c> went with S5-12b). The skip for a Bearer header went with the JWT
 /// (S5-08): every request is validated by its endpoint alone.</para>
 /// <para>Runs after authorization and the rate limiter, so a forged request still counts against
 /// its limit and an anonymous request to a protected endpoint stays a 401.</para>

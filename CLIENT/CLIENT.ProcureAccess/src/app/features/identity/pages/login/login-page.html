@@ -15,5 +15,5 @@ SPDX-License-Identifier: MIT
 <pa-login-form idPrefix="pa-login" formLayout="card" (signedIn)="signedIn()" (errorsShown)="showTitleError($event)" />
 
 <p class="pa-login-page__register">
-  <a [routerLink]="['/', { outlets: { login: ['register'] } }]">{{ 'auth.login.noAccount' | translate }}</a>
+  <a [routerLink]="['/', { outlets: { primary: [registerPath], login: null } }]">{{ 'auth.login.noAccount' | translate }}</a>
 </p>

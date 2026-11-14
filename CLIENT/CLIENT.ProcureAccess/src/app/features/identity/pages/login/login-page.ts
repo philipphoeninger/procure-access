@@ -11,7 +11,7 @@ import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { Notice } from '@app/shared/components/notice/notice';
 import { LoginForm } from '../../components/login-form/login-form';
-import { LoginNavigationState } from '../../models/login-navigation';
+import { LoginNavigationState, REGISTER_PATH } from '../../models/login-navigation';
 
 /**
  * S01 „Anmelden“ in the `login` outlet (SPEC R-AUTH-03; UX copy §3, §5.2; Handoff §5.3: no Figma
@@ -19,7 +19,8 @@ import { LoginNavigationState } from '../../models/login-navigation';
  * over, which stays alive with its input (ARCHITECTURE §8.3, owner decision S5-09 2 (a)).
  *
  * H1, `auth.login.reasonSave` when S11 „Liste speichern“ opened it (router state, never the URL),
- * the sign-in form, and `auth.login.noAccount` to the registration. After the sign-in the outlet
+ * the sign-in form, and `auth.login.noAccount` to S02, which opens in place of the page and closes
+ * the outlet (S5-12b). After the sign-in the outlet
  * closes, the page underneath gets the focus on its H1 (route change, A11Y-03), and with a list
  * that is not saved `auth.login.draftKept` is announced. „Fehler:“ prefixes the page title while
  * the error summary shows.
@@ -39,6 +40,8 @@ export class LoginPage {
   private readonly store = inject(ProcureAccessStore);
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly pageTitle = inject(PageTitleStrategy);
+
+  protected readonly registerPath = REGISTER_PATH;
 
   /** S11 „Liste speichern“ opened S01 (`auth.login.reasonSave`); read once, while the navigation runs. */
   protected readonly reasonSave =

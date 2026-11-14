@@ -8,10 +8,10 @@ using IEmailSender = ProcureAccess.Modules.Platform.Contracts.Email.IEmailSender
 namespace SERVICES.ProcureAccess.DataServices;
 
 /// <summary>
-/// Legacy account flows (replaced by S5-12, S5-13 and removed by S5-10). Since S5-11 (#302, owner
-/// decision 3a) the confirmation and reset mails go to the user's own address through Platform's
-/// <see cref="IEmailSender"/> with the <c>email.*</c> texts; a failed send is logged and the request
-/// answers as before (the account stays; the reset answers the same for every address).
+/// Legacy account flows (replaced by S5-13 and removed by S5-10). Since S5-11 (#302, owner decision
+/// 3a) the reset mail goes to the user's own address through Platform's <see cref="IEmailSender"/>
+/// with the <c>email.*</c> texts; a failed send is logged and the request answers the same for every
+/// address. The legacy sign-up and address confirmation went with S5-12b (owner decision 3 (a)).
 /// </summary>
 public class UserService : IUserService
 {
@@ -57,36 +57,6 @@ public class UserService : IUserService
         return user.ToDto();
     }
 
-    // SIGN UP
-    public async Task<IdentityResult> SignUpAsync(RegistrationRequest request)
-    {
-        var user = new User
-        {
-            Email = request.Email,
-            UserName = request.Email
-        };
-
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-            return result; //gate
-
-        // No global role: the legacy Member role is gone (S5-12a, owner decision O-S5-3 (a), #301);
-        // roles come from organisation memberships (ARCHITECTURE §9.1).
-
-        try
-        {
-            await SendConfirmationEmailAsync(user.Email!);
-        }
-        catch (EmailDeliveryException)
-        {
-            // No address in the log (PRV-11); the account stays, S5-12 adds the resend.
-            _logger.LogWarning("The confirmation e-mail of a new account could not be sent.");
-        }
-
-        return IdentityResult.Success;
-    }
-
     public async Task RequestPasswordResetAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -128,38 +98,6 @@ public class UserService : IUserService
             user,
             decodedToken,
             dto.NewPassword);
-    }
-
-    public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "User not found"
-            }); //gate
-
-        var decodedToken = Uri.UnescapeDataString(token);
-
-        return await _userManager.ConfirmEmailAsync(user, decodedToken);
-    }
-
-    public async Task SendConfirmationEmailAsync(string email)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-
-        if (user == null || user.EmailConfirmed)
-            return; //gate
-
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-        var encodedToken = Uri.EscapeDataString(token);
-
-        var confirmationLink = AppLink($"/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={encodedToken}");
-
-        var validHours = (int)Math.Ceiling(_tokenLifespan.TotalHours);
-        await _emailSender.SendAsync(new AddressConfirmationEmail(user.Email!, confirmationLink, validHours));
     }
 
     /// <summary>A link into the client: <c>App:BaseUrl</c> (absolute) plus the path and query.</summary>

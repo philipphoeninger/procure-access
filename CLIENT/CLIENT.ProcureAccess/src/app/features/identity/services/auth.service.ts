@@ -8,15 +8,27 @@ import { Router } from '@angular/router';
 import { lastValueFrom, Observable } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
-import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
-import { LOGIN_PATH, LoginNavigationState, LoginReason } from '../models/login-navigation';
-import { LoginModel } from '../models/login.model';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
+import { LOGIN_PATH, LoginNavigationState, LoginReason, REGISTER_PATH } from '../models/login-navigation';
 import { ResetPasswordModel } from '../models/reset-password.model';
 import { SessionResponse } from '../models/session';
 import { User } from '../models/user.model';
 
 /** Problem types of `POST /api/v1/auth/login` that the sign-in form shows itself (SPEC §8.8). */
 export const LOGIN_PROBLEMS: readonly string[] = ['validation', 'antiforgery'];
+
+/** Problem types of `POST /api/v1/auth/register` that S02 shows in its error summary (SPEC §8.8). */
+export const REGISTER_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'rate-limit'];
+
+/** Problem types of `POST /api/v1/auth/confirm-email/resend` that the notice shows itself (SPEC §8.8). */
+export const RESEND_PROBLEMS: readonly string[] = ['email-delivery', 'rate-limit'];
+
+/** The body of `POST /api/v1/auth/register` (SPEC §8.8). */
+export interface RegistrationRequest {
+  email: string;
+  password: string;
+  privacyAcknowledged: boolean;
+}
 
 /**
  * HTTP calls of the session and the legacy account flows (ARCHITECTURE §8.3, §9.1; S5-08).
@@ -26,8 +38,9 @@ export const LOGIN_PROBLEMS: readonly string[] = ['validation', 'antiforgery'];
  * source of the antiforgery cookie), `POST /api/v1/auth/login` and `POST /api/v1/auth/logout`
  * (SPEC §8.8). The state lives in `withIdentity()`, which is the only caller of them.
  *
- * `register`, `forgotPassword`, `resetPassword` and `confirmEmail` still call the legacy identity
- * endpoints until S5-12 and S5-13 replace their screens.
+ * Registration and address confirmation (S5-12b, SPEC §8.8): `register`, `confirmEmail` and
+ * `resendConfirmation`. `forgotPassword` and `resetPassword` still call the legacy identity
+ * endpoints until S5-13 replaces their screens.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -73,8 +86,43 @@ export class AuthService {
     return lastValueFrom(this.http.get<User | null>(`${this.apiUrl}/me`));
   }
 
-  register(command: LoginModel): Observable<{ succeeded: boolean; errors: unknown[] }> {
-    return this.http.post<{ succeeded: boolean; errors: unknown[] }>(`${this.apiUrl}/signUp`, command);
+  /**
+   * Registers (R-AUTH-01): 204 for a new and a known address alike, so the answer never tells
+   * whether the address has an account. S02 shows field errors, a missing antiforgery token and the
+   * rate limit itself ({@link REGISTER_PROBLEMS}).
+   */
+  register(request: RegistrationRequest): Promise<void> {
+    return lastValueFrom(
+      this.http.post<void>(`${this.apiUrl}/v1/auth/register`, request, {
+        context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, REGISTER_PROBLEMS),
+      }),
+    );
+  }
+
+  /**
+   * Redeems the token of the confirmation link (R-AUTH-02): 204 confirmed, 400 `validation` for a
+   * link that is no longer valid. The confirmation page shows every failure in place.
+   */
+  confirmEmail(token: string): Promise<void> {
+    return lastValueFrom(
+      this.http.post<void>(
+        `${this.apiUrl}/v1/auth/confirm-email`,
+        { token },
+        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true) },
+      ),
+    );
+  }
+
+  /**
+   * Sends the confirmation e-mail again (R-AUTH-02), signed in only. A failed send (503
+   * `email-delivery`) and the rate limit are shown by the notice ({@link RESEND_PROBLEMS}).
+   */
+  resendConfirmation(): Promise<void> {
+    return lastValueFrom(
+      this.http.post<void>(`${this.apiUrl}/v1/auth/confirm-email/resend`, null, {
+        context: new HttpContext().set(CALLER_HANDLES_PROBLEMS, RESEND_PROBLEMS),
+      }),
+    );
   }
 
   /**
@@ -86,8 +134,9 @@ export class AuthService {
     return this.router.navigate([{ outlets: { login: [LOGIN_PATH] } }], { state });
   }
 
+  /** Opens S02 in place of the page and closes S01 (R-AUTH-01). */
   showRegister(): void {
-    void this.router.navigate(['', { outlets: { login: ['register'] } }]);
+    void this.router.navigate([{ outlets: { primary: [REGISTER_PATH], login: null } }]);
   }
 
   forgotPassword(email: string): Observable<HttpResponse<unknown>> {
@@ -96,12 +145,5 @@ export class AuthService {
 
   resetPassword(command: ResetPasswordModel): Observable<{ succeeded: boolean }> {
     return this.http.post<{ succeeded: boolean }>(`${this.apiUrl}/reset-password`, command);
-  }
-
-  confirmEmail(userId: string, token: string): Observable<HttpResponse<unknown>> {
-    return this.http.get<unknown>(`${this.apiUrl}/confirm-email`, {
-      params: { userId, token },
-      observe: 'response',
-    });
   }
 }

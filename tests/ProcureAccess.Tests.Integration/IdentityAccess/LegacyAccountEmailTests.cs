@@ -16,9 +16,10 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.IdentityAccess;
 
 /// <summary>
-/// The legacy sign-up and password reset send their mails to the user's own address (#302, S5-11,
-/// owner decision 3a), through Platform's <see cref="IEmailSender"/> with the <c>email.*</c> texts.
-/// These flows go with S5-10; S5-12 and S5-13 test their replacements.
+/// The legacy password reset sends its mail to the user's own address (#302, S5-11, owner decision
+/// 3a), through Platform's <see cref="IEmailSender"/> with the <c>email.*</c> texts. The legacy
+/// sign-up and its cases went with S5-12b (owner decision 3 (a)).
+/// The reset goes with S5-10; S5-13 tests its replacement.
 /// </summary>
 public sealed class LegacyAccountEmailTests(ApiFixture api) : IntegrationTest(api)
 {
@@ -28,25 +29,10 @@ public sealed class LegacyAccountEmailTests(ApiFixture api) : IntegrationTest(ap
     private CapturingEmailSender Emails => Api.Factory.Emails;
 
     [Fact]
-    public async Task SignUp_NewAccount_SendsTheConfirmationToItsOwnAddress()
-    {
-        var client = await PrepareAsync();
-
-        (await SignUpAsync(client)).StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var confirmation = Emails.Sent.ShouldHaveSingleItem().ShouldBeOfType<AddressConfirmationEmail>();
-        confirmation.Recipient.ShouldBe(Address);
-        confirmation.Link.AbsoluteUri.ShouldStartWith("http://procureaccess.tech:4200/confirm-email?userId=");
-    }
-
-    [Fact]
     public async Task ForgotPassword_ConfirmedAccount_SendsTheResetToItsOwnAddress()
     {
         var client = await PrepareAsync();
-        await SignUpAsync(client);
-        var confirmation = (AddressConfirmationEmail)Emails.Sent.Single();
-        (await client.GetAsync($"/api{confirmation.Link.PathAndQuery}", TestContext.Current.CancellationToken)).StatusCode.ShouldBe(HttpStatusCode.OK);
-        Emails.Clear();
+        await CreateConfirmedAccountAsync();
 
         (await ForgotPasswordAsync(client, Address.ToUpperInvariant())).StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -66,19 +52,6 @@ public sealed class LegacyAccountEmailTests(ApiFixture api) : IntegrationTest(ap
         Emails.Sent.ShouldBeEmpty();
     }
 
-    [Fact]
-    public async Task SignUp_MailCannotBeSent_KeepsTheAccount()
-    {
-        var client = await PrepareAsync();
-        Emails.Fail = true;
-
-        (await SignUpAsync(client)).StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        using var scope = Api.Factory.Services.CreateScope();
-        var user = await scope.ServiceProvider.GetRequiredService<UserManager<User>>().FindByEmailAsync(Address);
-        user.ShouldNotBeNull().EmailConfirmed.ShouldBeFalse();
-    }
-
     /// <summary>A fresh, only migrated database (no legacy <c>Member</c> role since S5-12a, #301) and no mail sent.</summary>
     private async Task<HttpClient> PrepareAsync()
     {
@@ -87,8 +60,14 @@ public sealed class LegacyAccountEmailTests(ApiFixture api) : IntegrationTest(ap
         return CreateClient();
     }
 
-    private static Task<HttpResponseMessage> SignUpAsync(HttpClient client) =>
-        client.PostAsJsonAsync("/api/signUp", new { email = Address, password = Password }, TestContext.Current.CancellationToken);
+    /// <summary>A confirmed account, stored directly: the legacy sign-up went with S5-12b, and <c>RegistrationTests</c> covers the new one.</summary>
+    private async Task CreateConfirmedAccountAsync()
+    {
+        using var scope = Api.Factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var result = await users.CreateAsync(new User { Email = Address, UserName = Address, EmailConfirmed = true }, Password);
+        result.Succeeded.ShouldBeTrue();
+    }
 
     private static Task<HttpResponseMessage> ForgotPasswordAsync(HttpClient client, string email) =>
         client.PostAsJsonAsync("/api/forgot-password", new { email }, TestContext.Current.CancellationToken);

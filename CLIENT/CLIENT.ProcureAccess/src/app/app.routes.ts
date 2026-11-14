@@ -5,7 +5,7 @@
 import { Routes } from '@angular/router';
 import { Home } from '@pages/home/home';
 import { authGuard } from '@core/guards/auth.guard';
-import { LOGIN_PATH } from '@features/identity/models/login-navigation';
+import { CONFIRM_EMAIL_PATH, LOGIN_PATH, REGISTER_PATH } from '@features/identity/models/login-navigation';
 import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { LegalPage } from './pages/legal/legal-page';
@@ -43,10 +43,22 @@ export const routes: Routes = [
     redirectTo: LOGIN_PATH,
     outlet: 'login',
   },
+  // S02 „Konto erstellen“ (R-AUTH-01) in place of the page; `register` is the legacy path
+  {
+    path: REGISTER_PATH,
+    loadComponent: () => import('@features/identity/pages/register/register-page').then((m) => m.RegisterPage),
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.register' },
+  },
   {
     path: 'register',
-    loadComponent: () => import('@features/identity/register/register').then((m) => m.Register),
-    outlet: 'login',
+    pathMatch: 'full',
+    redirectTo: REGISTER_PATH,
+  },
+  // The confirmation page of the e-mail link (R-AUTH-02): its guard takes the token out of the URL,
+  // its resolver redeems it and names the page title of the result (lazy child routes, see there)
+  {
+    path: CONFIRM_EMAIL_PATH,
+    loadChildren: () => import('@features/identity/pages/confirm-email/confirm-email.routing').then((m) => m.CONFIRM_EMAIL_ROUTES),
   },
   {
     path: 'proposals',
@@ -110,10 +122,6 @@ export const routes: Routes = [
   { 
     path: 'reset-password', 
     loadComponent: () => import('./features/identity/reset-password/reset-password').then((m) => m.ResetPassword)
-  },
-  { 
-    path: 'confirm-email', 
-    loadComponent: () => import('./features/identity/pages/email-confirmed/email-confirmation').then((m) => m.EmailConfirmation)
   },
   // S80 error pages (R-SHL-08); the page title is the H1
   {

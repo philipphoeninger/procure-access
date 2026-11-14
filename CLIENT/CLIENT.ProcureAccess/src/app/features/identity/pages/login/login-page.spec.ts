@@ -46,7 +46,7 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
       routes: [
         { path: 'kriterien/ergebnis', component: ListPage, data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.list' } },
         { path: LOGIN_PATH, component: LoginPage, outlet: 'login', data: { [PAGE_TITLE_KEY]: 'pageTitle.login' } },
-        { path: 'register', component: ListPage, outlet: 'login' },
+        { path: 'registrieren', component: ListPage },
       ],
       providers: [
         provideTestTranslations(),
@@ -86,7 +86,7 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
     expect(screen.getByLabelText('E-Mail-Adresse').id).toBe('pa-login-email');
     expect(screen.queryByText(/um Ihre Kriterienliste zu speichern/)).toBeNull();
     const register = screen.getByRole('link', { name: 'Noch kein Konto? Jetzt registrieren' });
-    expect(register.getAttribute('href')).toBe('/kriterien/ergebnis(login:register)');
+    expect(register.getAttribute('href')).toBe('/registrieren');
     expect(document.title).toBe('Anmelden – ProcureAccess');
     await expectNoAxeViolations();
   });

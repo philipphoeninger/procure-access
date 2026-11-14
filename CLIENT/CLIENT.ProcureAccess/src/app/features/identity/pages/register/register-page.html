@@ -1,0 +1,73 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h1 class="pa-register-page__title">{{ 'auth.register.title' | translate }}</h1>
+
+@if (registeredEmail(); as registered) {
+  <!-- Replaces the form after the submit and takes the focus (UX copy U115) -->
+  <section class="pa-register-page__success" aria-labelledby="pa-register-success-title">
+    <h2 #successHeading id="pa-register-success-title" class="pa-register-page__success-title" tabindex="-1">
+      {{ 'auth.register.success.title' | translate }}
+    </h2>
+    <p>{{ 'auth.register.success' | translate: { email: registered } }}</p>
+  </section>
+} @else {
+  <p class="pa-register-page__intro">{{ 'auth.register.intro' | translate }}</p>
+
+  <form class="pa-register-page__form" id="pa-register-form" novalidate (submit)="submit($event)">
+    <pa-error-summary [items]="summary()" />
+
+    <div class="pa-register-page__card">
+      <p class="pa-register-page__required">{{ 'common.requiredNote' | translate }}</p>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'auth.register.email' | translate }}</mat-label>
+        <input matInput [id]="emailId" type="email" name="email" autocomplete="email" required
+          [formControl]="email" [errorStateMatcher]="errorState" />
+        @if (emailMessage(); as message) {
+          <mat-error>{{ message.key | translate: message.params }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'auth.register.password' | translate }}</mat-label>
+        <input matInput [id]="passwordId" [type]="passwordShown() ? 'text' : 'password'" name="password"
+          autocomplete="new-password" required [formControl]="password" [errorStateMatcher]="errorState" />
+        <mat-hint>{{ 'auth.register.password.hint' | translate: { min: rule.minLength } }}</mat-hint>
+        @if (passwordMessage(); as message) {
+          <mat-error>{{ message.key | translate: message.params }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="pa-register-page__password-actions">
+        <button matButton type="button" [attr.aria-pressed]="passwordShown()" [attr.aria-controls]="passwordId"
+          (click)="togglePassword()">{{ 'auth.login.showPassword' | translate }}</button>
+      </div>
+
+      <p class="pa-register-page__privacy-note">{{ 'auth.register.privacyNote' | translate }}</p>
+
+      <div class="pa-register-page__consent">
+        <mat-checkbox [id]="consentId" name="privacyAcknowledged" required [formControl]="consent"
+          [aria-describedby]="consentError() ? consentErrorId : ''" (change)="consentChanged()">
+          @let label = consentLabel();
+          {{ label.before }}@if (label.link) {<a routerLink="/datenschutz" target="_blank">{{ label.link }}&ngsp;<span class="cdk-visually-hidden">{{ 'common.newTab' | translate }}</span></a>}{{ label.after }}
+        </mat-checkbox>
+        @if (consentError(); as message) {
+          <p class="pa-register-page__consent-error" [id]="consentErrorId">{{ message.key | translate: message.params }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="pa-register-page__actions">
+      <button matButton="filled" type="submit" class="pa-register-page__submit" [attr.aria-disabled]="busy() || null">
+        @if (busy()) {
+          <mat-progress-spinner class="pa-register-page__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'auth.register.submit' | translate }}
+      </button>
+    </div>
+  </form>
+}

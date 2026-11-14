@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<pa-notice kind="attention">
+  <p>{{ 'auth.confirm.required' | translate }}</p>
+  <button matButton="outlined" type="button" class="pa-confirm-required-notice__resend" [attr.aria-disabled]="busy() || null"
+    (click)="resend()">
+    @if (busy()) {
+      <mat-progress-spinner class="pa-confirm-required-notice__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+    }
+    {{ 'auth.confirm.resend' | translate }}
+  </button>
+  @if (result(); as line) {
+    <!-- Announced through A11yAnnouncerService, so no live region here -->
+    <p class="pa-confirm-required-notice__result">{{ line.key | translate: line.params }}</p>
+  }
+</pa-notice>

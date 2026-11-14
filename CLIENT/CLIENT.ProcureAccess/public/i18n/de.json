@@ -254,7 +254,13 @@
   },
   "auth": {
     "confirm": {
-      "required": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Danach können Sie Listen speichern, Organisationen anlegen, Einladungen annehmen und Beiträge veröffentlichen."
+      "required": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Danach können Sie Listen speichern, Organisationen anlegen, Einladungen annehmen und Beiträge veröffentlichen.",
+      "resend": "Bestätigungs-E-Mail erneut senden",
+      "sent": "Wir haben die E-Mail erneut an {{email}} geschickt.",
+      "done.title": "E-Mail-Adresse bestätigt",
+      "done": "Ihre E-Mail-Adresse ist bestätigt. Sie können jetzt alle Funktionen nutzen.",
+      "invalid.title": "Link nicht mehr gültig",
+      "invalid": "Dieser Bestätigungslink ist nicht mehr gültig. Melden Sie sich an und fordern Sie einen neuen Link an."
     },
     "login": {
       "title": "Anmelden",
@@ -270,6 +276,19 @@
       "reasonSave": "Melden Sie sich an, um Ihre Kriterienliste zu speichern. Ihre Auswahl bleibt dabei erhalten.",
       "draftKept": "Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden.",
       "locked": "Zu viele Anmeldeversuche. Aus Sicherheitsgründen können Sie sich erst in {{minutes}} Minuten erneut anmelden."
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "intro": "Mit einem Konto können Sie Kriterienlisten speichern und exportieren, in Beschaffungsprojekten arbeiten und Beiträge veröffentlichen. Zum Lesen von Kriterien und Produkten brauchen Sie kein Konto.",
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "password.hint": "Mindestens {{min}} Zeichen.",
+      "privacyNote": "Ihre E-Mail-Adresse wird nie öffentlich angezeigt.",
+      "consent": "Ich habe die Datenschutzhinweise gelesen.",
+      "consent.required": "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise gelesen haben.",
+      "submit": "Konto erstellen",
+      "success.title": "E-Mail-Adresse bestätigen",
+      "success": "Fast geschafft. Wir haben Ihnen eine E-Mail an {{email}} geschickt. Bitte bestätigen Sie darin Ihre Adresse."
     }
   },
   "errors": {
