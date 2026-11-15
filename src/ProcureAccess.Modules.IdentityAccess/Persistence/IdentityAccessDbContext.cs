@@ -6,19 +6,31 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 
 namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 
 /// <summary>
 /// The IdentityAccess module's own database context (ARCHITECTURE ADR-014) in the <c>identity</c>
 /// schema. It holds the Data Protection key ring (§9.1, C60; S3-24) and, since S4-25, the contributor
-/// profiles and their user links (§5.2) and, since S5-12a, the hashed account tokens (§9.1); users and memberships follow with migration step 3. No other
+/// profiles and their user links (§5.2), since S5-12a the hashed account tokens (§9.1) and since
+/// S5-15 the organisations and their memberships (§5.2, §5.4); the users follow with M3.1. No other
 /// module and no legacy code uses it.
 /// </summary>
-/// <remarks>Its history table is <c>identity."__EFMigrationsHistory"</c>.</remarks>
-internal sealed class IdentityAccessDbContext(DbContextOptions<IdentityAccessDbContext> options)
+/// <remarks>
+/// Its history table is <c>identity."__EFMigrationsHistory"</c>. The organisation-scoped tables
+/// carry the global query filter of ADR-007, bound to <paramref name="organizations"/> (TEN-01):
+/// the context sees only the organisations of the request. A context built outside a request
+/// (design-time factory, fixtures) gets <see cref="FixedOrganizationContext.None"/>.
+/// </remarks>
+internal sealed class IdentityAccessDbContext(
+    DbContextOptions<IdentityAccessDbContext> options, IOrganizationContext organizations)
     : DbContext(options), IDataProtectionKeyContext
 {
+    // A field, not the primary-constructor parameter: EF turns a member chain rooted at the context
+    // instance into a query parameter, so the filter is evaluated per query, never cached in the model.
+    private readonly IOrganizationContext _organizations = organizations;
+
     public const string Schema = "identity";
     public const string HistoryTable = "__EFMigrationsHistory";
 
@@ -41,6 +53,15 @@ internal sealed class IdentityAccessDbContext(DbContextOptions<IdentityAccessDbC
     /// <summary>The hashed single-use tokens of the account e-mails (S5-12a, C72).</summary>
     public DbSet<AccountToken> AccountTokens => Set<AccountToken>();
 
+    /// <summary>The tenants (§5.2); filtered to the organisations of the request (TEN-01).</summary>
+    public DbSet<Organization> Organizations => Set<Organization>();
+
+    /// <summary>
+    /// The memberships (§5.2, §9.1); filtered like the organisations. The per-request loader of the
+    /// current user's own rows is the one allow-listed unfiltered read (TEN-02).
+    /// </summary>
+    public DbSet<OrganizationMembership> OrganizationMemberships => Set<OrganizationMembership>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -56,5 +77,14 @@ internal sealed class IdentityAccessDbContext(DbContextOptions<IdentityAccessDbC
         modelBuilder.ApplyConfiguration(new ContributorProfileConfiguration());
         modelBuilder.ApplyConfiguration(new UserContributorLinkConfiguration());
         modelBuilder.ApplyConfiguration(new AccountTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
+        modelBuilder.ApplyConfiguration(new OrganizationMembershipConfiguration());
+
+        // The organisation filter (ADR-007, TEN-01): a row of an organisation the request's user is
+        // no member of does not exist for this context. The organisation row is scoped by its own id.
+        modelBuilder.Entity<Organization>()
+                    .HasQueryFilter(o => _organizations.OrganizationIds.Contains(o.Id));
+        modelBuilder.Entity<OrganizationMembership>()
+                    .HasQueryFilter(m => _organizations.OrganizationIds.Contains(m.OrganizationId));
     }
 }

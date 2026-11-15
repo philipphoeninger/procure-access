@@ -20,6 +20,7 @@ using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Email;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
@@ -72,7 +73,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
 
         NpgsqlConnection.ClearAllPools();
         await using var context = new IdentityAccessDbContext(
-            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options);
+            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
         await context.Database.EnsureDeletedAsync();
     }
 
@@ -457,7 +458,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
     }
 
     private IdentityAccessDbContext IdentityAccess() =>
-        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options);
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
 
     private static async Task<string> ProblemTypeOf(HttpResponseMessage response)
     {

@@ -1,9 +1,11 @@
 <!--
 SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
-
 SPDX-License-Identifier: MIT
 -->
-
 <!-- Public contracts of the IdentityAccess module: interfaces and DTOs other modules may use (ARCHITECTURE §4.3). -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- The organisation requirements (S5-15) are ASP.NET Core authorization requirements; the shared framework is not a project reference (ARC-03). -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

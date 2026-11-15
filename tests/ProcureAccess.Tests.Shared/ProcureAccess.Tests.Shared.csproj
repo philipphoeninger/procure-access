@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="../../DAL/MODELS.ProcureAccess/MODELS.ProcureAccess.csproj" />
     <!-- Catalog builders and the MiniCatalog (S3-14) use the module's internal types. -->
     <ProjectReference Include="../../src/ProcureAccess.Modules.Catalog/ProcureAccess.Modules.Catalog.csproj" />
+    <!-- The Tenants fixture (S5-15) builds the IdentityAccess module's internal organisations and memberships. -->
+    <ProjectReference Include="../../src/ProcureAccess.Modules.IdentityAccess/ProcureAccess.Modules.IdentityAccess.csproj" />
   </ItemGroup>
 
   <!-- The test release folders T.1 and T.2 (S3-15); copied into the output of every test project that references this one. -->

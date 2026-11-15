@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.DataProtection;
 using Shouldly;
@@ -176,5 +177,5 @@ public sealed class DataProtectionKeyStoreTests(ApiFixture api) : IAsyncDisposab
     }
 
     private static IdentityAccessDbContext IdentityAccess(string connectionString) =>
-        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(connectionString).Options);
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
 }

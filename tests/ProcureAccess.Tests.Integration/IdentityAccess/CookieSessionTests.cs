@@ -15,6 +15,7 @@ using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Session;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -65,7 +66,7 @@ public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
 
         NpgsqlConnection.ClearAllPools();
         await using var context = new IdentityAccessDbContext(
-            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options);
+            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
         await context.Database.EnsureDeletedAsync();
     }
 

@@ -108,6 +108,59 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.ToTable("ContributorProfiles", "identity");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.Organization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Organizations", "identity");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationMembership", b =>
+                {
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("InvitedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.HasKey("OrganizationId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OrganizationMemberships", "identity");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserContributorLink", b =>
                 {
                     b.Property<Guid>("ContributorProfileId")
@@ -122,6 +175,15 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserContributorLinks", "identity");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationMembership", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserContributorLink", b =>

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -100,7 +101,7 @@ public sealed class IdentityAccessMigrationTests(ApiFixture api) : IAsyncDisposa
         new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options);
 
     private static IdentityAccessDbContext IdentityAccess(string connectionString) =>
-        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(connectionString).Options);
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
 
     private static async Task<long> ScalarAsync(string connectionString, string sql)
     {
