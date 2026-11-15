@@ -23,16 +23,6 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 const main = (page: Page) => page.getByRole('main');
 const membersPath = (id: string) => `/organisation/${id}/mitglieder`;
 
-/*
- * On an Owner's S21, which holds the invite form since S5-17b, Playwright's name and role lookups
- * followed by an axe run crash Firefox's page process (TESTING V226, V228; like V129 and V165): the
- * Owner tests with axe find S21's elements by CSS. Roles and names are checked by the component
- * tests (`members-page.spec.ts`, `invite-form.spec.ts`) and by axe.
- */
-const memberRow = (page: Page, email: string) => page.locator('.pa-members__table tr', { hasText: email });
-const roleOption = (page: Page, name: string) =>
-  page.locator('mat-option').filter({ has: page.locator('.pa-members__role-name', { hasText: new RegExp(`^\\s*${name}\\s*$`) }) });
-
 /** A new address per test and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
   return `org-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
@@ -93,14 +83,12 @@ test.describe('S20 „Organisation anlegen oder beitreten“', () => {
     await other.close();
 
     await main(page).getByRole('button', { name: 'Organisation anlegen' }).click();
-    // S21 as its Owner: CSS locators from here (see memberRow)
-    await expect(page.locator('main h1')).toBeFocused();
-    await expect(page.locator('main h1')).toHaveText(`Mitglieder von ${name}`);
+    await expect(main(page).getByRole('heading', { level: 1, name: `Mitglieder von ${name}` })).toBeFocused();
     await expect(page).toHaveURL(/\/organisation\/[0-9a-f-]{36}\/mitglieder$/);
-    const row = memberRow(page, address);
-    await expect(row).toContainText('(Sie)');
-    await expect(row.locator('mat-select')).toHaveText(/Verwalten/);
-    await settled(page.locator('main'));
+    const row = main(page).getByRole('row', { name: new RegExp(address.replaceAll('.', '\\.')) });
+    await expect(row.getByText('(Sie)')).toBeVisible();
+    await expect(row.getByRole('combobox', { name: `Rolle von ${address}` })).toHaveText(/Verwalten/);
+    await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's21-new-organization');
   });
 });
@@ -113,24 +101,21 @@ test.describe('S21 „Mitglieder“ of the seeded organisation', () => {
   test('INV:A11Y-01 INV:A11Y-08 the Owner sees every member with a role select and is refused as the last Owner (TEN-11)', async ({
     page,
   }, testInfo) => {
-    // CSS locators on the Owner's S21 (see memberRow)
-    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
-    await page.goto(membersPath(E2E_ORGANIZATION.id));
-    await expect(page.locator('main h1')).toHaveText(`Mitglieder von ${E2E_ORGANIZATION.name}`);
-    await expect(page.locator('.pa-members__table th')).toHaveText(['Mitglied', 'Rolle', 'Aktionen']);
-    await expect(page.locator('.pa-members__table mat-select')).toHaveCount(3);
-    await expect(page.locator('.pa-members__table .pa-members__remove')).toHaveCount(2);
-    await settled(page.locator('main'));
+    await openMembers(page, ORG_OWNER);
+    await expect(main(page).getByRole('columnheader')).toHaveText(['Mitglied', 'Rolle', 'Aktionen']);
+    await expect(main(page).getByRole('combobox')).toHaveCount(3);
+    await expect(main(page).getByRole('button', { name: 'Aus der Organisation entfernen' })).toHaveCount(2);
+    await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's21-owner');
 
     // The only Owner gives up the role: 409 last-owner, the notice above the list, nothing changes
-    await memberRow(page, ORG_OWNER).locator('mat-select').click();
-    await roleOption(page, 'Bearbeiten').click();
-    const alert = page.locator('main .pa-members__error');
+    await main(page).getByRole('combobox', { name: `Rolle von ${ORG_OWNER}` }).click();
+    await page.getByRole('option', { name: /^Bearbeiten/ }).click();
+    const alert = main(page).getByRole('alert');
     await expect(alert).toContainText('Änderung nicht möglich');
     await expect(alert).toContainText('Jede Organisation braucht mindestens ein Mitglied mit der Rolle „Verwalten“.');
-    await expect(memberRow(page, ORG_OWNER).locator('mat-select')).toHaveText(/Verwalten/);
-    await settled(page.locator('main'));
+    await expect(main(page).getByRole('combobox', { name: `Rolle von ${ORG_OWNER}` })).toHaveText(/Verwalten/);
+    await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's21-last-owner');
   });
 
