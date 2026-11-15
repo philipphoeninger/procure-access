@@ -102,6 +102,12 @@ public static class IdentityAccessModule
         // Organisations and members (S5-16a): the rules behind the host's organisation endpoints,
         // which add the members' addresses from the legacy users until M3.1 (owner decision S5-16 4a).
         services.AddScoped<IOrganizationMembers, OrganizationMemberService>();
+
+        // Invitations by e-mail (S5-17a, SPEC R-ORG-02): 🔧 lifetime read at start; expired rows are
+        // deleted by a background job (owner decision S5-17 D7 (a)), which only the web host starts.
+        services.AddSingleton(InvitationSettings.From(configuration));
+        services.AddScoped<IOrganizationInvitations, OrganizationInvitationService>();
+        services.AddHostedService<InvitationCleanupService>();
         services.AddScoped<TestOrganizationSeeder>();
 
         return services;

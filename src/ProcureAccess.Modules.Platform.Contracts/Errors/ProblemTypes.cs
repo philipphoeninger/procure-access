@@ -51,11 +51,18 @@ public static class ProblemTypes
     /// </summary>
     public const string LastOwner = "last-owner";
 
+    /// <summary>
+    /// 403: the invitation is for another e-mail address than the signed-in account's (SPEC §8.6
+    /// v2.29, R-ORG-02; ARCHITECTURE C80; S5-17a); carries the extension <c>invitedEmail</c>, which the
+    /// client shows in <c>org.invite.mismatch</c>.
+    /// </summary>
+    public const string InvitationMismatch = "invitation-mismatch";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
-        EmailUnconfirmed, NotFound, EmailDelivery, LastOwner,
+        EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch,
     ];
 }

@@ -48,6 +48,8 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
             [typeof(Organization)] = (_, _) => null,
             [typeof(OrganizationMembership)] = (a, now) =>
                 OrganizationMembership.Create(a.Id, "sample-user", OrganizationRole.Reader, now, now),
+            [typeof(OrganizationInvitation)] = (a, now) =>
+                OrganizationInvitation.Create(a.Id, "sample@example.test", OrganizationRole.Reader, new byte[32], now, TimeSpan.FromDays(14)),
         };
 
     public static TheoryData<string> ScopedEntityNames => [.. ScopedEntityTypes().Select(t => t.FullName!)];
@@ -60,6 +62,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
 
         types.ShouldContain(typeof(Organization));
         types.ShouldContain(typeof(OrganizationMembership));
+        types.ShouldContain(typeof(OrganizationInvitation));
         types.ShouldBe(Samples.Keys, ignoreOrder: true,
             "Every entity with OrganizationId needs a sample row in Samples (TEN-01), and every sample a live entity.");
     }

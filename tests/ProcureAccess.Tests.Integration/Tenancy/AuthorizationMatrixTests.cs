@@ -5,6 +5,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using API.ProcureAccess.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
 using ProcureAccess.Tests.Shared.Fixtures;
@@ -18,8 +20,9 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// Owner of B, user without organisation, anonymous × every organisation endpoint on organisation A,
 /// with the expected status codes (non-member 404, member below the role 403, anonymous 401). The
 /// organisation comes from the route (the resource); a client-supplied organisation header changes
-/// nothing. Since S5-16a on the real organisation endpoints (the test-only probe of S5-15 is gone);
-/// the workspace and configurator endpoints add their rows with their steps.
+/// nothing. Since S5-16a on the real organisation endpoints (the test-only probe of S5-15 is gone),
+/// since S5-17a with the invitation endpoints; the workspace and configurator endpoints add their
+/// rows with their steps.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -36,6 +39,17 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     /// <summary><c>DELETE members/{own id}</c> (leave): every member; the last Owner gets 409 (TEN-11).</summary>
     private const string Leave = "leave";
+
+    /// <summary><c>POST invitations</c> (S5-17a): Owner only.</summary>
+    private const string Invite = "invite";
+
+    /// <summary><c>GET invitations</c>, the pending list (S5-17a): Owner only (owner decision S5-17 D4 (a)).</summary>
+    private const string ListInvitations = "list-invitations";
+
+    /// <summary><c>DELETE invitations/{id}</c> of an open invitation of A (S5-17a): Owner only.</summary>
+    private const string RevokeInvitation = "revoke-invitation";
+
+    private OrganizationInvitation? _invitation;
 
     private Tenants? _tenants;
 
@@ -66,13 +80,33 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.ReaderA.Name, Leave, HttpStatusCode.NoContent },
         { TestUsers.OwnerB.Name, Leave, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, Leave, HttpStatusCode.NotFound },
+        { TestUsers.OwnerA.Name, Invite, HttpStatusCode.Created },
+        { TestUsers.EditorA.Name, Invite, HttpStatusCode.Forbidden },
+        { TestUsers.ReaderA.Name, Invite, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, Invite, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, Invite, HttpStatusCode.NotFound },
+        { Anonymous, Invite, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ListInvitations, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ListInvitations, HttpStatusCode.Forbidden },
+        { TestUsers.ReaderA.Name, ListInvitations, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ListInvitations, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ListInvitations, HttpStatusCode.NotFound },
+        { Anonymous, ListInvitations, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, RevokeInvitation, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, RevokeInvitation, HttpStatusCode.Forbidden },
+        { TestUsers.ReaderA.Name, RevokeInvitation, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, RevokeInvitation, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, RevokeInvitation, HttpStatusCode.NotFound },
+        { Anonymous, RevokeInvitation, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
-        await StoreAsync(_tenants.Entities);
+        _invitation = OrganizationInvitation.Create(
+            _tenants.A.Id, "eingeladen@example.test", OrganizationRole.Reader, new byte[32], Clock.GetUtcNow(), TimeSpan.FromDays(14));
+        await StoreAsync([.. _tenants.Entities, _invitation]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -174,6 +208,8 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     private static string MemberPath(Guid organizationId, string userId) => $"{MembersPath(organizationId)}/{userId}";
 
+    private static string InvitationsPath(Guid organizationId) => $"/api/v1/organizations/{organizationId}/invitations";
+
     /// <summary>The request of <paramref name="action"/> on organisation A for <paramref name="user"/>.</summary>
     private Task<HttpResponseMessage> SendAsync(HttpClient client, string action, TestUser? user)
     {
@@ -186,6 +222,9 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             RemoveOther => client.DeleteAsync(
                 MemberPath(a, user == TestUsers.EditorA ? TestUsers.ReaderA.Id : TestUsers.EditorA.Id), Cancellation),
             Leave => client.DeleteAsync(MemberPath(a, user!.Id), Cancellation),
+            Invite => client.PostAsJsonAsync(InvitationsPath(a), new { email = "neu@example.test", role = "reader" }, Cancellation),
+            ListInvitations => client.GetAsync(InvitationsPath(a), Cancellation),
+            RevokeInvitation => client.DeleteAsync($"{InvitationsPath(a)}/{_invitation!.Id}", Cancellation),
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, "Unknown action."),
         };
     }

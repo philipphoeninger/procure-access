@@ -127,7 +127,8 @@ try
        .MapAuthEndpoints()
        .MapRegistrationEndpoints()
        .MapPasswordResetEndpoints()
-       .MapOrganizationEndpoints();
+       .MapOrganizationEndpoints()
+       .MapInvitationEndpoints();
 
     app.ConfigureSwaggerExplorer();
 
