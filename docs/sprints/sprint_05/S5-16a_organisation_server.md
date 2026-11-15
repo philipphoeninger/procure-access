@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-16a (part 1 of S5-16, 4 points together) · **Issues:** none
 > **Requirements / invariants:** SPEC R-ORG-01, R-ORG-03, R-ORG-04 (server part), R-ORG-06 (no join or directory endpoint); **TEN-11 `active` for its organisation part** (TESTING_v66 V211); TEN-05 on the real endpoints (V212); SEC-10 on the first real gated action (V213); TEN-02 widened to raw SQL (V214); ARCHITECTURE_v59 C145; SPEC v2.27 §8.6, §8.9
-> **Status:** done — pull request #341 open (2026-11-15); CI result to be recorded
+> **Status:** done — pull request #341 open (2026-11-15); CI green (18 of 18 checks, Firefox E2E after one re-run)
 > **Scope:** the four organisation endpoints in the host behind the IdentityAccess contract `IOrganizationMembers`, the last-Owner rule under a row lock with the problem type `last-owner`, the TEN-05 matrix and the SEC-10 gate moved off the test-only probes. No screen, text, EF migration or E2E change.
 > **Owner decisions (2026-11-15, before the task):** 1a — S5-16 is split: S5-16a server, S5-16b client (S20, S21, leave dialog, notice, E2E, reflow) · 2a — revoking invitations moves to S5-17 with the invitations · 3a — new problem type `last-owner` for the 409 (`conflict` stays API-03's) · 4a — the endpoints live in the host and add the members' addresses from the legacy users; members see each other's addresses · 5a — S5-16b drafts the missing UX copy keys as v30 for review, with a confirmation dialog for removing a member · 6a — no menu entry before S5-18: S20 at `/organisation`, S21 at `/organisation/:id/mitglieder` · 7a — the E2E seeder gets one organisation with Owner, Editor and Reader; E2E only reads it. Decisions 5a–7a are for S5-16b. **Defaults accepted with the plan:** the name is trimmed, a name of spaces counts as missing; no rate limit on creating organisations; a sole member cannot leave (open points 3, 4).
 
@@ -78,6 +78,7 @@ No correctness or security finding that affects current behaviour.
 - Backend: build with `-warnaserror` clean; `dotnet format --verify-no-changes` clean; `dotnet test --solution` 1214 passed (Unit, Architecture, Integration; the organisation tests three times in a row).
 - `node scripts/check-invariants.mjs` passed (TESTING_v66: TEN-11 6 tests, TEN-05 4, TEN-02 1, SEC-10 9); `check-figma-links`, `check-i18n` passed; `reuse lint` compliant.
 - OPS-03 unchanged (no migration). No E2E run: no client change.
+- CI of #341: every check green. The first Firefox E2E attempt failed with „Page crashed“ in `identity/password-reset.spec.ts`, which this PR does not touch — the known flake #337, which also failed `main` after #338 and #340; the re-run of the job passed.
 
 ## 5. Open points
 
