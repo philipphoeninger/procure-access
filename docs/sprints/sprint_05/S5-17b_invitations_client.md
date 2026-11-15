@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-17b (part 2 of S5-17, 3 points together) · **Issues:** none
 > **Requirements / invariants:** SPEC R-ORG-02, R-ORG-03 (revoking), client part; SEC-10 E2E accept case (TESTING_v69 V224); A11Y-09 for the invitation screens (V225); the Firefox workaround (V226) and the E2E account helpers (V227); ARCHITECTURE_v62 C148; SPEC v2.30 §8.9; UX copy v31 U133–U137
-> **Status:** done — pull request open (2026-11-15)
+> **Status:** done — pull request #344 open (2026-11-15)
 > **Scope:** on S21 the open invitations with revoking and the invite form for Owners; the page of the invitation link `/organisation/einladung` with its states; the UX copy drafts; the problem-type mapping of `invitation-mismatch`; component tests, E2E (journey, SEC-10, mismatch, invalid) and the reflow check. No server change (S5-17a), no menu entry (S5-18).
 > **Owner decisions (2026-11-15):** D2 (a) of S5-17 — the missing UX copy keys drafted as UX copy v31 for review · S5-17b 1 (a) — no preselected role in the invite form; a choice is required, as the organisation type on S20 · S5-17b 2 — UX copy v30 (U125–U132) confirmed
 
