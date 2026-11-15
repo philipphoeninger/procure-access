@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-16b (part 2 of S5-16, 4 points together with S5-16a) · **Issues:** none
 > **Requirements / invariants:** SPEC R-ORG-01, R-ORG-03, R-ORG-04, R-ORG-06 (screens); **SEC-10 E2E part done** (TESTING_v67 V215); A11Y-09 with S20 and S21 (V216); TESTING §6.3 E2E organisation (V217); TEN-02 allow-list (V218); ARCHITECTURE_v60 C146; SPEC v2.28 §8.9; UX copy v30 U125–U132 (**draft, for the owner's review**)
-> **Status:** done — pull request to be opened (2026-11-15)
+> **Status:** done — pull request #342 open (2026-11-15); CI result to be recorded
 > **Scope:** S20 and S21 with the role select, removal and leaving behind a shared confirmation dialog, the confirmation notice on S20, the missing UX copy keys as a draft, the organisation of the E2E seeder, the E2E tests and the reflow check. No server endpoint changes (S5-16a), no menu entry (S5-18), no invitations (S5-17).
 > **Owner decisions (2026-11-15, before the task):** 1a — S5-16 split; this is the client half · 5a — the missing UX copy keys are drafted as UX copy v30 and confirmed in review; removing a member asks first · 6a — no menu entry before S5-18: S20 at `/organisation`, S21 at `/organisation/:id/mitglieder` · 7a — the E2E seeder gets one organisation with Owner, Editor and Reader, which E2E tests only read. **Defaults from the plan:** SEC-10's E2E part registers a fresh account instead of confirming the shared `e2e-unconfirmed`; the notice shows where the 403 `email-unconfirmed` arrives.
 
