@@ -4,7 +4,7 @@
 > **Requirements / invariants:** SPEC R-ORG-02, R-ORG-03 (revoking), client part; SEC-10 E2E accept case (TESTING_v69 V224); A11Y-09 for the invitation screens (V225); the Firefox workarounds (V226, V228) and the E2E account helpers (V227); ARCHITECTURE_v62 C148; SPEC v2.30 §8.9; UX copy v31 U133–U137
 > **Status:** done — pull request #344 open (2026-11-15)
 > **Scope:** on S21 the open invitations with revoking and the invite form for Owners; the page of the invitation link `/organisation/einladung` with its states; the UX copy drafts; the problem-type mapping of `invitation-mismatch`; component tests, E2E (journey, SEC-10, mismatch, invalid) and the reflow check. No server change (S5-17a), no menu entry (S5-18).
-> **Owner decisions (2026-11-15):** D2 (a) of S5-17 — the missing UX copy keys drafted as UX copy v31 for review · S5-17b 1 (a) — no preselected role in the invite form; a choice is required, as the organisation type on S20 · S5-17b 2 — UX copy v30 (U125–U132) confirmed · #337 option 2 — after the Firefox job of pull request #344 crashed twice, Firefox runs the organisation specs one at a time
+> **Owner decisions (2026-11-15):** D2 (a) of S5-17 — the missing UX copy keys drafted as UX copy v31 for review · S5-17b 1 (a) — no preselected role in the invite form; a choice is required, as the organisation type on S20 · S5-17b 2 — UX copy v30 (U125–U132) confirmed · after the Firefox CI crashes: #337 option 2 (the organisation specs one at a time in Firefox) tried and, since it did not help, replaced by CSS locators on the Owner's S21 (V228)
 
 ## 1. Starting point
 
@@ -43,7 +43,7 @@
 - `pages/invitation/invitation.routing.spec.ts` (12): token out of the address, signed out, S01/S02, reading again after a sign-in, accepting, SEC-10 notice with focus, mismatch from the read and from a refused accept, invalid in place (title, focus, announcement), invalid link, reload, server failure, a member's redirect; axe.
 - `e2e/support/accounts.ts` (new) and `e2e/organization/invitations.spec.ts` (new, 3 tests): the journey (invite on S21, the link signed out, S01, accept, S21, role change, removal), `INV:SEC-10` (unconfirmed invitee), mismatch and invalid; axe in both appearances. `organization.spec.ts` uses the shared `registerAccount`.
 - `e2e/shell/reflow.spec.ts` (+2): S21 with an open invitation and the form's error summary; the link's page signed out and invalid.
-- `e2e/playwright.config.ts`: the project `firefox-organization` (`e2e/organization/*.spec.ts`, `workers: 1`), which `firefox` leaves out and depends on, so the CI job `--project=firefox` runs the organisation specs first and alone (#337 option 2, V228).
+- `e2e/organization/organization.spec.ts`: the two S21 Owner tests with axe (S20 → S21, last-Owner refusal) find S21's elements by CSS (`memberRow`, `roleOption`; V228).
 
 ### 2.4 Documents
 
@@ -57,7 +57,7 @@ Checklist of CLAUDE §6.7 over the whole diff; findings sorted per §6.8.
 | # | Finding | Sorting |
 |---|---|---|
 | R1 | Firefox crashes the page in the axe run after the invite form was used through Playwright's label and role lookups (reproducible; `getByLabel` of the address field alone is enough) | **fixed in the test** — CSS locators on S21 until that axe run, recorded as V226 like V129/V165; names and roles stay covered by component tests and axe |
-| R2 | In long Firefox runs of the whole suite one S21 test crashed now and then (`organization.spec.ts:101` twice, the journey once in 3 full runs); `organization/`, `identity/` and the reflow spec repeated twice in Firefox: 102 of 102 passed | **fixed in the test set-up** — CI then crashed the same way twice: the Firefox job of pull request #344 failed in `organization.spec.ts:49` and `:101`, and on re-run in `:101` again, each time while another S21 Owner test ran in the other worker. On main these tests never crashed, so the invite form on S21 raised the rate. Firefox now runs `e2e/organization/` one test at a time (#337 option 2, owner decision; V228) |
+| R2 | In long Firefox runs of the whole suite one S21 test crashed now and then (`organization.spec.ts:101` twice, the journey once in 3 full runs); `organization/`, `identity/` and the reflow spec repeated twice in Firefox: 102 of 102 passed | **fixed in the test** — CI showed it was not load: the Firefox job of pull request #344 crashed in `organization.spec.ts:49` and `:101`, on re-run in `:101` again, and with the organisation specs run one at a time (#337 option 2, commit 9aacac4, reverted) in `:101` alone, at its first axe run after name lookups on S21. These tests never crashed on main, before the invite form; the journey with CSS locators passed every time. The S21 Owner tests with axe now use CSS locators (V228) |
 | R3 | The token of the link: memory only, out of the address and the history before any request, sent only in a POST body; the page reads it again after a sign-in but never stores it | — |
 | R4 | Accessibility: H1 and page title in every state, focus on the notice after an unconfirmed refusal, invalid in place with title/focus/announcement, revoke and invite announced, the remove button described by the address, no preselected radio, error summary with focus | — |
 | R5 | S21 reads the invitations only for an Owner (D4 (a)); two requests per load, no N+1 | — |
@@ -69,8 +69,8 @@ No correctness or security finding that affects current behaviour remains.
 ## 4. Checks
 
 - Client: `ng build` clean; `npm run lint` clean; Vitest 633 passed.
-- E2E, locally against this branch (E2E stack): Chromium, Firefox, mobile Chrome — 344 of 345 passed in the full run; the failure was a Firefox „Page crashed“ (R2), which passed on re-run; the invitation spec 3 × in Firefox (9 of 9). With the serial organisation project: `--project=firefox` 115 of 115. WebKit and mobile Safari only in CI.
-- CI of pull request #344: every job green except Firefox E2E, which crashed in the organisation specs in both attempts (R2) — the reason for the serial organisation project.
+- E2E, locally against this branch (E2E stack): Chromium, Firefox, mobile Chrome — 344 of 345 passed in the full run; the failure was a Firefox „Page crashed“ (R2), which passed on re-run; the invitation spec 3 × in Firefox (9 of 9). WebKit and mobile Safari only in CI.
+- CI of pull request #344: every job green except Firefox E2E, which crashed on the Owner's S21 in three attempts (R2), the third with the organisation specs run one at a time — hence V228.
 - `e2e/`: `npm run typecheck`, `npm run lint` clean.
 - `check-invariants`, `check-figma-links`, `check-i18n`, `check-icons` passed; `reuse lint` compliant.
 - No backend change.
@@ -78,6 +78,6 @@ No correctness or security finding that affects current behaviour remains.
 ## 5. Open points
 
 1. **UX copy v31 U133–U137** are drafts (decision D2 (a)): the owner confirms or changes the wording in review.
-2. **#337** (Firefox page crash): the organisation specs run one at a time in Firefox now (V228); the identity specs still crash now and then, and the issue stays open for them. If an organisation test fails in Firefox, the rest of that job is not run.
+2. **#337** (Firefox page crash): the S21 crashes were the V226 class, handled by CSS locators (V228); the identity specs still crash now and then, and the issue stays open for them.
 3. **S5-18:** the header states and the organisation switch link S20, S21 and the link's page into the navigation.
 4. From S5-16a, still open: no rate limit on creating organisations, a sole member cannot leave. From S5-17a: 5 invitations per hour 🔧.

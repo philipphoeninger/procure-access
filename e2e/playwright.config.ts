@@ -10,18 +10,11 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * Browsers: Chromium, Firefox and WebKit on desktop plus one Android and one iOS viewport
  * (SPEC §7.4, CLAUDE.md §9).
- *
- * Firefox runs the organisation specs one at a time in the project `firefox-organization`, which
- * `firefox` depends on, so `--project=firefox` runs them first and then the rest in parallel: two
- * S21 tests at once crashed Firefox's page process in axe (#337, TESTING V228).
  */
-const ORGANIZATION_SPECS = '**/organization/*.spec.ts';
-const NODE_MODULES = '**/node_modules/**';
-
 export default defineConfig({
   testDir: '.',
   testMatch: '**/*.spec.ts',
-  testIgnore: NODE_MODULES,
+  testIgnore: '**/node_modules/**',
   globalSetup: './support/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
@@ -38,13 +31,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox-organization', testMatch: ORGANIZATION_SPECS, workers: 1, use: { ...devices['Desktop Firefox'] } },
-    {
-      name: 'firefox',
-      testIgnore: [NODE_MODULES, ORGANIZATION_SPECS],
-      dependencies: ['firefox-organization'],
-      use: { ...devices['Desktop Firefox'] },
-    },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     { name: 'mobile-chrome', use: { ...devices['Pixel 7'] } },
     { name: 'mobile-safari', use: { ...devices['iPhone 15'] } },
