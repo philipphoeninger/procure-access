@@ -17,6 +17,7 @@ using MODELS.ProcureAccess.Entities;
 using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Email;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
@@ -72,7 +73,7 @@ public sealed class PasswordResetTests(ApiFixture api) : IAsyncLifetime
 
         NpgsqlConnection.ClearAllPools();
         await using var context = new IdentityAccessDbContext(
-            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options);
+            new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
         await context.Database.EnsureDeletedAsync();
     }
 
@@ -446,7 +447,7 @@ public sealed class PasswordResetTests(ApiFixture api) : IAsyncLifetime
         QueryHelpers.ParseQuery(mail.Link.Query)["token"].ToString();
 
     private IdentityAccessDbContext IdentityAccess() =>
-        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options);
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
 
     /// <summary>The answer without its <c>traceId</c>, which differs per request.</summary>
     private static async Task<string> WithoutTraceIdAsync(HttpResponseMessage response)

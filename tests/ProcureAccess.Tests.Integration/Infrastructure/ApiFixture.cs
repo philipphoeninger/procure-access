@@ -12,6 +12,7 @@ using Npgsql;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Respawn.Graph;
@@ -231,8 +232,9 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private IdentityAccessDbContext CreateIdentityAccessDbContext() =>
         new(new DbContextOptionsBuilder<IdentityAccessDbContext>()
-            .UseNpgsql(_database.GetConnectionString())
-            .Options);
+                .UseNpgsql(_database.GetConnectionString())
+                .Options,
+            FixedOrganizationContext.None);
 
     private CatalogDbContext CreateCatalogDbContext() =>
         new(new DbContextOptionsBuilder<CatalogDbContext>()

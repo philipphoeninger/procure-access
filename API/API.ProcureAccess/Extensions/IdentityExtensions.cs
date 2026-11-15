@@ -79,6 +79,10 @@ public static class IdentityExtensions
     public static WebApplication AddIdentityAuthMiddlewares(this WebApplication app)
     {
         app.UseAuthentication();
+        // The memberships of the signed-in user, loaded once per request between authentication
+        // and authorization (S5-15, ARCHITECTURE §5.4): the organisation query filters and the
+        // role requirements both read them.
+        app.UseIdentityAccessOrganizationContext();
         app.UseAuthorization();
         return app;
     }

@@ -81,7 +81,7 @@ internal sealed partial class ProjectGraph
     private static string ProjectName(string include) =>
         Path.GetFileNameWithoutExtension(include.Replace('\\', '/'));
 
-    private static string FindRepositoryRoot()
+    internal static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
         {

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +15,9 @@ using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Session;
+using ProcureAccess.Modules.IdentityAccess.Tenancy;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 
 namespace ProcureAccess.Modules.IdentityAccess;
 
@@ -87,7 +90,25 @@ public static class IdentityAccessModule
         services.AddSingleton(AccountTokenSettings.From(configuration));
         services.AddScoped<IAccountTokens, AccountTokenService>();
 
+        // Tenancy (S5-15, ARCHITECTURE §5.4, ADR-007): the memberships of the request's user, filled
+        // by UseIdentityAccessOrganizationContext, read by every module's organisation query filter
+        // through IOrganizationContext and by the resource-based role requirement (§9.1, TEN-05).
+        services.AddScoped<OrganizationContext>();
+        services.AddScoped<IOrganizationContext>(provider => provider.GetRequiredService<OrganizationContext>());
+        services.AddScoped<IAuthorizationHandler, OrganizationRoleHandler>();
+
         return services;
+    }
+
+    /// <summary>
+    /// Loads the signed-in user's organisation memberships for the request
+    /// (<see cref="OrganizationContextMiddleware"/>; TEN-01, TEN-05). Add it after authentication
+    /// and before authorization.
+    /// </summary>
+    public static IApplicationBuilder UseIdentityAccessOrganizationContext(this IApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+        return app.UseMiddleware<OrganizationContextMiddleware>();
     }
 
     /// <summary>

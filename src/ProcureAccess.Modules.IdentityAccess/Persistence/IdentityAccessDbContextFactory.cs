@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 
 namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 
@@ -32,6 +33,7 @@ internal sealed class IdentityAccessDbContextFactory : IDesignTimeDbContextFacto
         var options = new DbContextOptionsBuilder<IdentityAccessDbContext>()
             .UseNpgsql(connectionString)
             .Options;
-        return new IdentityAccessDbContext(options);
+        // No request, no organisation: the tools never read scoped rows.
+        return new IdentityAccessDbContext(options, FixedOrganizationContext.None);
     }
 }
