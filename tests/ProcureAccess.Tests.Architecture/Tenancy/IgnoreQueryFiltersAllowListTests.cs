@@ -36,9 +36,17 @@ public class IgnoreQueryFiltersAllowListTests
         // Loads the signed-in user's own memberships, which define the filter, so they cannot be
         // read through it (ARCHITECTURE §5.4; one query per signed-in request).
         ["src/ProcureAccess.Modules.IdentityAccess/Tenancy/OrganizationContextMiddleware.cs"] = 1,
-        // Raw SQL that reads nothing: the row lock of the organisation before a role change or a
-        // removal (TEN-11), taken only after the filtered read found the organisation (S5-16a).
-        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/OrganizationMemberService.cs"] = 1,
+        // Raw SQL that reads nothing: the row lock of the organisation before a role change, a
+        // removal (TEN-11, S5-16a), an invitation, a revocation or an acceptance (S5-17a), taken only after a
+        // filtered read found the organisation or the link's token found the invitation.
+        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/OrganizationRowLock.cs"] = 1,
+        // The invitation of a link and its organisation's name: the invitee is no member yet, so the
+        // filter would hide it; the token, which only the invited mailbox received, is the credential
+        // (S5-17a). One query, used by the page's read and by accepting.
+        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/OrganizationInvitationService.cs"] = 1,
+        // The clean-up of expired invitations runs outside a request, where the filter shows nothing
+        // (S5-17a, owner decision S5-17 D7 (a)).
+        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/InvitationCleanupService.cs"] = 1,
         // The E2E seeder runs outside a request, where the filter shows nothing: its check whether
         // the test organisation exists reads past it (Development and E2E only, S5-16b).
         ["src/ProcureAccess.Modules.IdentityAccess/Organizations/TestOrganizationSeeder.cs"] = 1,

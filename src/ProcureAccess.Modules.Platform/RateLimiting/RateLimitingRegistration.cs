@@ -55,6 +55,7 @@ internal static class RateLimitingRegistration
     private static readonly string[] UserPolicies =
     [
         RateLimitPolicies.ConfirmationResend,
+        RateLimitPolicies.Invitation,
     ];
 
     /// <summary>

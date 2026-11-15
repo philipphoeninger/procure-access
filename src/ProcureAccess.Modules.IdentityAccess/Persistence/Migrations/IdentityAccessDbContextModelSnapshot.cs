@@ -135,6 +135,57 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.ToTable("Organizations", "identity");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId", "NormalizedEmail")
+                        .IsUnique()
+                        .HasFilter("\"AcceptedAt\" IS NULL");
+
+                    b.ToTable("OrganizationInvitations", "identity");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationMembership", b =>
                 {
                     b.Property<Guid>("OrganizationId")
@@ -175,6 +226,15 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserContributorLinks", "identity");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationInvitation", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationMembership", b =>

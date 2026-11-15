@@ -14,7 +14,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 /// The IdentityAccess module's own database context (ARCHITECTURE ADR-014) in the <c>identity</c>
 /// schema. It holds the Data Protection key ring (§9.1, C60; S3-24) and, since S4-25, the contributor
 /// profiles and their user links (§5.2), since S5-12a the hashed account tokens (§9.1) and since
-/// S5-15 the organisations and their memberships (§5.2, §5.4); the users follow with M3.1. No other
+/// S5-15 the organisations and their memberships (§5.2, §5.4), since S5-17a the invitations; the
+/// users follow with M3.1. No other
 /// module and no legacy code uses it.
 /// </summary>
 /// <remarks>
@@ -62,6 +63,12 @@ internal sealed class IdentityAccessDbContext(
     /// </summary>
     public DbSet<OrganizationMembership> OrganizationMemberships => Set<OrganizationMembership>();
 
+    /// <summary>
+    /// The invitations (§5.2, S5-17a); filtered like the memberships. The read by the link's token and
+    /// the clean-up of expired rows are the allow-listed unfiltered reads (TEN-02).
+    /// </summary>
+    public DbSet<OrganizationInvitation> OrganizationInvitations => Set<OrganizationInvitation>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -79,6 +86,7 @@ internal sealed class IdentityAccessDbContext(
         modelBuilder.ApplyConfiguration(new AccountTokenConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationMembershipConfiguration());
+        modelBuilder.ApplyConfiguration(new OrganizationInvitationConfiguration());
 
         // The organisation filter (ADR-007, TEN-01): a row of an organisation the request's user is
         // no member of does not exist for this context. The organisation row is scoped by its own id.
@@ -86,5 +94,7 @@ internal sealed class IdentityAccessDbContext(
                     .HasQueryFilter(o => _organizations.OrganizationIds.Contains(o.Id));
         modelBuilder.Entity<OrganizationMembership>()
                     .HasQueryFilter(m => _organizations.OrganizationIds.Contains(m.OrganizationId));
+        modelBuilder.Entity<OrganizationInvitation>()
+                    .HasQueryFilter(i => _organizations.OrganizationIds.Contains(i.OrganizationId));
     }
 }

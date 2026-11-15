@@ -83,9 +83,8 @@ internal sealed class OrganizationMemberService(IdentityAccessDbContext db, Time
                     return MembershipChangeResult.NotFound;
                 }
 
-                // Serialises every role change and removal of this organisation until the commit.
-                await db.Database.ExecuteSqlAsync(
-                    $"""SELECT 1 FROM identity."Organizations" WHERE "Id" = {organizationId} FOR UPDATE""", ct);
+                // Serialises every role change, removal and invitation of this organisation until the commit.
+                await OrganizationRowLock.LockAsync(db, organizationId, ct);
 
                 var membership = await db.OrganizationMemberships
                                          .SingleOrDefaultAsync(m => m.OrganizationId == organizationId && m.UserId == userId, ct);

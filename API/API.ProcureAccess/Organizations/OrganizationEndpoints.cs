@@ -41,7 +41,7 @@ public static class OrganizationEndpoints
             ["association"] = OrganizationType.Association,
         };
 
-    private static readonly IReadOnlyDictionary<string, OrganizationRole> Roles =
+    internal static readonly IReadOnlyDictionary<string, OrganizationRole> Roles =
         new Dictionary<string, OrganizationRole>(StringComparer.Ordinal)
         {
             ["owner"] = OrganizationRole.Owner,
@@ -221,7 +221,7 @@ public static class OrganizationEndpoints
     };
 
     /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
-    private static async Task<ProblemHttpResult?> RefusedAsync(
+    internal static async Task<ProblemHttpResult?> RefusedAsync(
         IAuthorizationService authorization, ClaimsPrincipal user, Guid orgId, OrganizationRoleRequirement requirement)
     {
         var result = await authorization.AuthorizeAsync(user, new OrganizationReference(orgId), requirement);
@@ -229,11 +229,11 @@ public static class OrganizationEndpoints
     }
 
     /// <summary>The signed-in user's id; the group requires a sign-in, so it is always there.</summary>
-    private static string UserIdOf(ClaimsPrincipal user) =>
+    internal static string UserIdOf(ClaimsPrincipal user) =>
         user.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new InvalidOperationException("A signed-in principal without a user id reached an organisation endpoint.");
 
-    private static string NameOf(OrganizationRole role) => Roles.Single(r => r.Value == role).Key;
+    internal static string NameOf(OrganizationRole role) => Roles.Single(r => r.Value == role).Key;
 
     private static string NameOf(OrganizationType type) => Types.Single(t => t.Value == type).Key;
 }

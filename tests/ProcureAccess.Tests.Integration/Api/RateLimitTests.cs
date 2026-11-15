@@ -57,6 +57,8 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 ["RateLimits:ConfirmationResend:Window"] = WindowSetting,
                 ["RateLimits:PasswordReset:PermitLimit"] = $"{PermitLimit}",
                 ["RateLimits:PasswordReset:Window"] = WindowSetting,
+                ["RateLimits:Invitation:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:Invitation:Window"] = WindowSetting,
             },
             configureServices: TestRemoteAddress.AddTo);
         return ValueTask.CompletedTask;
@@ -190,6 +192,31 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         otherUser.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
     }
 
+    [Fact(DisplayName = "INV:API-05 " + nameof(Invite_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree))]
+    [Trait("Invariant", "API-05")]
+    public async Task Invite_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree()
+    {
+        using var client = Host.CreateDefaultClient(BaseAddress);
+        const string sharedAddress = "203.0.113.80";
+        // Any organisation: the limit counts before the route's organisation is checked.
+        var path = $"/api/v1/organizations/{Guid.NewGuid()}/invitations";
+
+        // Refused requests count too: these carry no antiforgery token and answer 400.
+        for (var i = 0; i < PermitLimit; i++)
+        {
+            using var allowed = await PostAsUserAsync(client, path, "owner-a", sharedAddress);
+            allowed.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests, $"request {i + 1}");
+        }
+
+        using var limited = await PostAsUserAsync(client, path, "owner-a", sharedAddress);
+        using var otherUser = await PostAsUserAsync(client, path, "owner-b", sharedAddress);
+
+        var problem = await ProblemResponse.ReadAsync(limited, Cancellation);
+        problem.Deviations(HttpStatusCode.TooManyRequests, TypeUri(ProblemTypes.RateLimit), requireErrors: false).ShouldBeEmpty();
+        problem.Json!.Value.GetProperty("retryAfterMinutes").GetInt32().ShouldBe(10);
+        otherUser.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
+    }
+
     [Fact]
     public async Task Resend_Anonymous_Returns401AndDoesNotCount()
     {
@@ -217,7 +244,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("00:10:00", policy);
         }
 
-        foreach (var policy in new[] { "Registration", "ConfirmationResend", "PasswordReset" })
+        foreach (var policy in new[] { "Registration", "ConfirmationResend", "PasswordReset", "Invitation" })
         {
             configuration[$"RateLimits:{policy}:PermitLimit"].ShouldBe("5", policy);
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("01:00:00", policy);

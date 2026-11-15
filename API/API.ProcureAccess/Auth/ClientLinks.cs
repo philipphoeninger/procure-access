@@ -15,6 +15,9 @@ public static class ClientLinks
     /// <summary>The new-password step of S03 (S5-13a); the token follows as <c>?token=</c>.</summary>
     public const string PasswordResetPagePath = "/passwort/neu";
 
+    /// <summary>The page that accepts an invitation into an organisation (S5-17); the token follows as <c>?token=</c>.</summary>
+    public const string InvitationPagePath = "/organisation/einladung";
+
     /// <summary>Sign-in S01 in the <c>login</c> outlet (UX copy §3); its „Passwort vergessen?“ leads to the reset.</summary>
     public const string LoginPagePath = "/(login:anmelden)";
 

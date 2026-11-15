@@ -36,4 +36,11 @@ public static class RateLimitPolicies
     /// <see cref="IKeyedRateLimiter"/> with it after binding.
     /// </summary>
     public const string PasswordResetAddress = "PasswordResetAddress";
+
+    /// <summary>
+    /// <c>POST /api/v1/organizations/{orgId}/invitations</c>: per signed-in user, 5 per hour 🔧
+    /// (SPEC §7.3 „invitation“; S5-17a, owner decision S5-17 D8 (a): its own counter, not the one of
+    /// <see cref="ConfirmationResend"/>).
+    /// </summary>
+    public const string Invitation = "Invitation";
 }
