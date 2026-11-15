@@ -4,7 +4,7 @@
 
 import { expect, test, type Page } from '@playwright/test';
 import { chooseFirstOption } from '../support/combobox';
-import { expireSessionOnce, fakeSession } from '../support/session';
+import { expireSessionOnce } from '../support/session';
 
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
@@ -224,7 +224,6 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
   });
 
   test('the login overlay after a 401 needs no horizontal scrolling', async ({ page }) => {
-    await fakeSession(page);
     await expireSessionOnce(page, '**/api/v1/catalog/criteria?**');
     await toStep4(page);
     await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();

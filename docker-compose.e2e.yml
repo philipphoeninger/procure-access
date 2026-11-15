@@ -14,6 +14,8 @@
 #   http://localhost:8025 lets a test read a mail (from S5-14);
 # - the test release folders mounted read-only, so the API seeds and activates T.1 at startup
 #   (S4-08, #241; catalog part of the seeder of TESTING §6.3, Development/E2E only);
+# - the E2E users with known test credentials, seeded at startup (S5-14; user part of the seeder,
+#   Development/E2E only, switched on by TestUsers__Password below);
 # - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
 #   client answers and the API reaches its database;
 # - relaxed rate limits of the anonymous export and of CriteriaListShown (SPEC §7.3, S4-21a): every
@@ -24,7 +26,7 @@
 # stop one before starting the other.
 #
 # Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment of its own, the
-# users and products of the seeder and the test clock endpoint. Until then the API runs as
+# products of the seeder and the test clock endpoint. Until then the API runs as
 # Development, like the dev stack.
 name: procureaccess-e2e
 
@@ -63,6 +65,10 @@ services:
       # Active test release T.1 (MiniCatalog), seeded at startup in Development/E2E only (S4-08, #241)
       Catalog__TestRelease__Path: /app/catalog/test-releases
       Catalog__TestRelease__Version: T.1
+      # E2E users e2e-confirmed@ / e2e-unconfirmed@example.invalid, seeded at startup in
+      # Development/E2E only, when this password is set (S5-14). Test data, not a secret: the same
+      # value is in e2e/support/users.ts (owner decision S5-14 3 (a))
+      TestUsers__Password: e2e-Testkonto-Passwort
       # Relaxed rate limits (S4-21a): all tests share one client address
       RateLimits__AnonymousExport__PermitLimit: "10000"
       RateLimits__CriteriaListShown__PermitLimit: "10000"
