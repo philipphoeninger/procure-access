@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
+import { fireEvent } from '@testing-library/dom';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
@@ -13,7 +14,7 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { provideLayout } from '@app/testing/shell-test-doubles';
-import { OrganizationMembers } from '../../models/organization';
+import { OrganizationMembers, PendingInvitation } from '../../models/organization';
 import { OrganizationApiService } from '../../services/api/organization-api.service';
 import { MembersPage } from './members-page';
 import { MembersPageLoad, MembersPageView } from './members-page-load';
@@ -29,21 +30,35 @@ const ORG: OrganizationMembers = {
   ],
 };
 
-describe('MembersPage (S21, R-ORG-03, R-ORG-04)', () => {
-  let api: { members: ReturnType<typeof vi.fn>; changeRole: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> };
+const PENDING: PendingInvitation = { id: 'i-1', email: 'neu@example.test', role: 'reader', expiresAt: '2026-11-29T09:00:00Z' };
+
+describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
+  let api: {
+    members: ReturnType<typeof vi.fn>;
+    invitations: ReturnType<typeof vi.fn>;
+    changeRole: ReturnType<typeof vi.fn>;
+    remove: ReturnType<typeof vi.fn>;
+    revokeInvitation: ReturnType<typeof vi.fn>;
+    invite: ReturnType<typeof vi.fn>;
+  };
   let announce: ReturnType<typeof vi.fn>;
   let setPageTitleState: ReturnType<typeof vi.fn>;
 
-  async function openPage(options: { userId?: string; wide?: boolean; view?: MembersPageView } = {}) {
+  async function openPage(options: { userId?: string; wide?: boolean; view?: MembersPageView; invitations?: PendingInvitation[] } = {}) {
+    const userId = options.userId ?? 'u-owner';
+    const invitations = userId === 'u-owner' ? (options.invitations ?? []) : null;
     api = {
       members: vi.fn().mockResolvedValue(ORG),
+      invitations: vi.fn().mockResolvedValue(invitations ?? []),
       changeRole: vi.fn().mockResolvedValue(undefined),
       remove: vi.fn().mockResolvedValue(undefined),
+      revokeInvitation: vi.fn().mockResolvedValue(undefined),
+      invite: vi.fn().mockResolvedValue({ id: 'i-new', validDays: 14 }),
     };
     announce = vi.fn().mockResolvedValue(undefined);
     setPageTitleState = vi.fn();
     const load = new MembersPageLoad();
-    load.view = options.view ?? { kind: 'members', data: ORG };
+    load.view = options.view ?? { kind: 'members', data: ORG, invitations };
     return render(MembersPage, {
       routes: [{ path: 'organisation', children: [] }],
       providers: [
@@ -54,7 +69,7 @@ describe('MembersPage (S21, R-ORG-03, R-ORG-04)', () => {
         { provide: OrganizationApiService, useValue: api },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: ProcureAccessStore, useValue: { session: () => ({ id: options.userId ?? 'u-owner', email: 'x@example.test' }) } },
+        { provide: ProcureAccessStore, useValue: { session: () => ({ id: userId, email: 'x@example.test' }) } },
       ],
     });
   }
@@ -167,6 +182,60 @@ describe('MembersPage (S21, R-ORG-03, R-ORG-04)', () => {
     expect(api.remove).toHaveBeenCalledWith('org-1', 'u-editor');
     expect(announce).toHaveBeenCalledWith('org.left', { org: 'Stadt Musterhausen' });
     expect(navigate).toHaveBeenCalledWith(['organisation']);
+  });
+
+  it('shows an Owner the open invitations and the invite form, a Reader neither (R-ORG-02, owner decision S5-17 D4 (a))', async () => {
+    await openPage({ invitations: [PENDING] });
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Offene Einladungen' })).toBeTruthy();
+    expect(screen.getByText('neu@example.test')).toBeTruthy();
+    expect(screen.getByText('Eingeladen, noch nicht angenommen')).toBeTruthy();
+    const revoke = screen.getByRole('button', { name: 'Einladung zurücknehmen' });
+    expect(revoke.getAttribute('aria-describedby')).toBe('pa-invitation-i-1');
+    expect(screen.getByRole('heading', { level: 2, name: 'Mitglied einladen' })).toBeTruthy();
+    await expectNoAxeViolations();
+  });
+
+  it('shows no open invitations section while there are none', async () => {
+    await openPage();
+
+    expect(screen.queryByRole('heading', { level: 2, name: 'Offene Einladungen' })).toBeNull();
+    expect(screen.getByRole('heading', { level: 2, name: 'Mitglied einladen' })).toBeTruthy();
+  });
+
+  it('shows a Reader neither open invitations nor the invite form', async () => {
+    await openPage({ userId: 'u-reader' });
+
+    expect(screen.queryByRole('heading', { name: 'Offene Einladungen' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Mitglied einladen' })).toBeNull();
+  });
+
+  it('revokes an invitation at once, announces it and reads both lists again (R-ORG-03)', async () => {
+    const { fixture } = await openPage({ invitations: [PENDING] });
+    api.invitations.mockResolvedValue([]);
+
+    screen.getByRole('button', { name: 'Einladung zurücknehmen' }).click();
+    await settle(fixture);
+
+    expect(api.revokeInvitation).toHaveBeenCalledWith('org-1', 'i-1');
+    expect(announce).toHaveBeenCalledWith('org.invite.revoked', { email: 'neu@example.test' });
+    expect(api.members).toHaveBeenCalledWith('org-1');
+    expect(api.invitations).toHaveBeenCalledWith('org-1');
+    expect(screen.queryByRole('heading', { level: 2, name: 'Offene Einladungen' })).toBeNull();
+  });
+
+  it('reads the open invitations again after an invitation was sent', async () => {
+    const { fixture } = await openPage();
+    api.invitations.mockResolvedValue([PENDING]);
+
+    fireEvent.input(screen.getByLabelText(/^E-Mail-Adresse/), { target: { value: 'neu@example.test' } });
+    screen.getByRole('radio', { name: /^Lesen/ }).click();
+    await fixture.whenStable();
+    screen.getByRole('button', { name: 'Einladung senden' }).click();
+    await settle(fixture);
+
+    expect(api.invite).toHaveBeenCalledWith('org-1', { email: 'neu@example.test', role: 'reader' });
+    expect(screen.getByRole('heading', { level: 2, name: 'Offene Einladungen' })).toBeTruthy();
   });
 
   it('shows „Seite nicht gefunden“ in place for an organisation the user cannot see (TEN-05)', async () => {

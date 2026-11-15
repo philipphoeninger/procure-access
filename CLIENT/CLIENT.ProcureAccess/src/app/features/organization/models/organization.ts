@@ -12,6 +12,9 @@ export const ORGANIZATION_PATH = 'organisation';
 /** The path segment of S21 after the organisation id. */
 export const MEMBERS_SEGMENT = 'mitglieder';
 
+/** The page of the invitation link, `<path>/einladung?token=…` (S5-17b; the link of the e-mail, ARCHITECTURE C147). */
+export const INVITATION_SEGMENT = 'einladung';
+
 /** The organisation types as the API names them (SPEC §8.9); the UX copy key is `org.create.type.<key>`. */
 export type OrganizationType = 'publicBody' | 'company' | 'association';
 
@@ -56,4 +59,42 @@ export interface OrganizationMember {
 export interface OrganizationMembers {
   organization: { id: string; name: string; type: OrganizationType };
   members: OrganizationMember[];
+}
+
+/** One open invitation as `GET /api/v1/organizations/{id}/invitations` lists it, by address (Owner only, SPEC §8.9). */
+export interface PendingInvitation {
+  id: string;
+  email: string;
+  role: OrganizationRole;
+  expiresAt: string;
+}
+
+/** The body of `POST /api/v1/organizations/{id}/invitations` (SPEC §8.9). */
+export interface InviteRequest {
+  email: string;
+  role: OrganizationRole;
+}
+
+/** The answer of `POST /api/v1/organizations/{id}/invitations`: `validDays` for `org.invite.sent`. */
+export interface CreatedInvitation {
+  id: string;
+  validDays: number;
+}
+
+/**
+ * The answer of `POST /api/v1/invitations/view` (SPEC §8.9): `addressMatches` is null when signed
+ * out; `invitedEmail` only when signed in with another address; `organizationId` only for a member.
+ */
+export interface InvitationDetails {
+  organizationName: string;
+  role: OrganizationRole;
+  addressMatches: boolean | null;
+  invitedEmail: string | null;
+  alreadyMember: boolean;
+  organizationId: string | null;
+}
+
+/** The answer of `POST /api/v1/invitations/accept`. */
+export interface AcceptedInvitation {
+  organizationId: string;
 }

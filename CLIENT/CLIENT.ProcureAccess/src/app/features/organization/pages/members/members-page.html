@@ -48,6 +48,28 @@ SPDX-License-Identifier: MIT
     </ul>
   }
 
+  @if (isOwner()) {
+    @if (invitations().length > 0) {
+      <section class="pa-members__pending" aria-labelledby="pa-pending-title">
+        <h2 id="pa-pending-title" class="pa-members__subtitle">{{ 'org.invite.pendingTitle' | translate }}</h2>
+        <ul class="pa-members__list">
+          @for (invitation of invitations(); track invitation.id + ':' + version()) {
+            <li class="pa-members__item">
+              <span class="pa-members__name" [id]="invitationAddressId(invitation)">{{ invitation.email }}</span>
+              <span class="pa-members__role-text">{{ roleKey(invitation.role) | translate }}</span>
+              <span class="pa-members__status">{{ 'org.invite.pending' | translate }}</span>
+              <button matButton type="button" class="pa-members__revoke" [attr.aria-describedby]="invitationAddressId(invitation)"
+                (click)="revoke(organization, invitation)">{{ 'org.invite.revoke' | translate }}</button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <pa-invite-form [organizationId]="organization.organization.id" [memberEmails]="memberEmails()"
+      (invited)="invited(organization)" (errorsShown)="formErrors(organization, $event)" />
+  }
+
   <div class="pa-members__leave">
     <button matButton="outlined" type="button" (click)="leave(organization)">{{ 'org.leave' | translate }}</button>
   </div>

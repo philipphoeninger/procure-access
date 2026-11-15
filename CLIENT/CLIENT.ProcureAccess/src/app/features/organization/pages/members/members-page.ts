@@ -32,9 +32,18 @@ import { injectWideLayout } from '@app/layout/shell/wide-layout';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { Notice } from '@app/shared/components/notice/notice';
-import { ORGANIZATION_PATH, ORGANIZATION_ROLES, OrganizationMember, OrganizationMembers, OrganizationRole, roleKey } from '../../models/organization';
+import { InviteForm } from '../../components/invite-form/invite-form';
+import {
+  ORGANIZATION_PATH,
+  ORGANIZATION_ROLES,
+  OrganizationMember,
+  OrganizationMembers,
+  OrganizationRole,
+  PendingInvitation,
+  roleKey,
+} from '../../models/organization';
 import { OrganizationApiService } from '../../services/api/organization-api.service';
-import { failedView, MembersPageLoad, MembersPageView } from './members-page-load';
+import { loadMembersView, MembersPageLoad, MembersPageView } from './members-page-load';
 
 /**
  * S21 „Mitglieder von {{org}}“ at `/organisation/:id/mitglieder` (SPEC R-ORG-03, R-ORG-04, §8.9;
@@ -52,15 +61,30 @@ import { failedView, MembersPageLoad, MembersPageView } from './members-page-loa
  * stored role. When the focused control is gone after a change (the removed member's button, the
  * own select after demoting oneself), the focus moves to the H1.
  *
+ * An Owner also sees „Offene Einladungen“ (while there are any; address, role, `org.invite.pending`
+ * and „Einladung zurücknehmen“, described by the address, which revokes at once and announces
+ * `org.invite.revoked`) and the form „Mitglied einladen“ (`pa-invite-form`; S5-17b, SPEC R-ORG-02,
+ * UX copy U136, U137). Both lists are read again after every change.
+ *
  * An unknown organisation, or one the user is no member of, shows „Seite nicht gefunden“ in place
  * (404, TEN-05); any other load failure the S80 server text.
  *
- * @spec docs/SPEC_v2.md R-ORG-03, R-ORG-04, §8.9; docs/design_handoff_procureaccess_v1.md §5.3, §2.2
+ * @spec docs/SPEC_v2.md R-ORG-02, R-ORG-03, R-ORG-04, §8.9; docs/design_handoff_procureaccess_v1.md §5.3, §2.2
  * @invariants TEN-11, A11Y-09
  */
 @Component({
   selector: 'pa-members-page',
-  imports: [ErrorPage, MatButtonModule, MatFormFieldModule, MatSelectModule, MatTableModule, NgTemplateOutlet, Notice, TranslatePipe],
+  imports: [
+    ErrorPage,
+    InviteForm,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatTableModule,
+    NgTemplateOutlet,
+    Notice,
+    TranslatePipe,
+  ],
   templateUrl: './members-page.html',
   styleUrl: './members-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -90,6 +114,13 @@ export class MembersPage {
     return view.kind === 'members' ? view.data : null;
   });
   protected readonly members = computed(() => this.organization()?.members ?? []);
+  /** The open invitations; only an Owner reads them (owner decision S5-17 D4 (a)). */
+  protected readonly invitations = computed(() => {
+    const view = this.view();
+    return view.kind === 'members' ? (view.invitations ?? []) : [];
+  });
+  /** The members' addresses, so the invite form refuses a member's address before sending. */
+  protected readonly memberEmails = computed(() => this.members().map((member) => member.email));
   private readonly ownId = computed(() => this.store.session()?.id ?? null);
   /** True while the signed-in user is an Owner: the role selects and „entfernen“ show. */
   protected readonly isOwner = computed(() => this.members().some((m) => m.userId === this.ownId() && m.role === 'owner'));
@@ -112,6 +143,11 @@ export class MembersPage {
 
   protected isSelf(member: OrganizationMember): boolean {
     return member.userId === this.ownId();
+  }
+
+  /** The id of the element with the invited address: the description of „Einladung zurücknehmen“. */
+  protected invitationAddressId(invitation: PendingInvitation): string {
+    return `pa-invitation-${invitation.id}`;
   }
 
   /** The id of the element with the member's address: the description of „entfernen“. */
@@ -187,6 +223,30 @@ export class MembersPage {
     await this.router.navigate([ORGANIZATION_PATH]);
   }
 
+  /** Revokes an open invitation at once (UX copy U137), announces it and reads the lists again. */
+  protected async revoke(organization: OrganizationMembers, invitation: PendingInvitation): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.api.revokeInvitation(organization.organization.id, invitation.id);
+    } catch (error: unknown) {
+      // 404: no longer open (accepted, expired or revoked meanwhile); the reload shows it.
+      await this.refused(organization, error);
+      return;
+    }
+    void this.announcer.announce('org.invite.revoked', { email: invitation.email });
+    await this.reload(organization);
+  }
+
+  /** A stored invitation (sent, or kept after a failed send): the list of open invitations is read again. */
+  protected async invited(organization: OrganizationMembers): Promise<void> {
+    await this.reload(organization);
+  }
+
+  /** „Fehler:“ in the page title while the invite form shows field errors (A11Y-03). */
+  protected formErrors(organization: OrganizationMembers, error: boolean): void {
+    this.pageTitle.setPageTitleState({ params: { org: organization.organization.name }, error });
+  }
+
   /** Shows a refusal the page shows itself and reads the list again; other failures keep the interceptor's states. */
   private async refused(organization: OrganizationMembers, error: unknown): Promise<void> {
     switch (problemTypeName(error)) {
@@ -204,13 +264,7 @@ export class MembersPage {
 
   /** Reads the list again; the focus goes to the H1 when the focused control is gone. */
   private async reload(organization: OrganizationMembers): Promise<void> {
-    let view: MembersPageView;
-    try {
-      view = { kind: 'members', data: await this.api.members(organization.organization.id) };
-    } catch (error: unknown) {
-      view = failedView(error);
-    }
-    this.view.set(view);
+    this.view.set(await loadMembersView(this.api, organization.organization.id, this.ownId()));
     this.version.update((v) => v + 1);
     afterNextRender(
       () => {

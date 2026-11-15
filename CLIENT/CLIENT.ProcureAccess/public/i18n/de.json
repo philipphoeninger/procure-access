@@ -400,7 +400,9 @@
     "reset.invalid": "Link nicht mehr gültig",
     "org": {
       "start": "Organisation anlegen oder beitreten",
-      "members": "Mitglieder von {{org}}"
+      "members": "Mitglieder von {{org}}",
+      "invite": "Einladung in eine Organisation",
+      "invite.invalid": "Einladung nicht mehr gültig"
     }
   },
   "home": {
@@ -725,6 +727,31 @@
     },
     "leave": "Organisation verlassen",
     "leave.body": "Sie verlieren den Zugriff auf die Kriterienlisten und Projekte von {{org}}. Ihre veröffentlichten Beiträge bleiben unter Ihrem Beitragsprofil sichtbar.",
-    "left": "Sie haben die Organisation {{org}} verlassen."
+    "left": "Sie haben die Organisation {{org}} verlassen.",
+    "invite": {
+      "email": "E-Mail-Adresse",
+      "submit": "Einladung senden",
+      "sent": "Einladung an {{email}} gesendet. Sie ist {{days}} Tage gültig.",
+      "pending": "Eingeladen, noch nicht angenommen",
+      "revoke": "Einladung zurücknehmen",
+      "accept": "Einladung annehmen",
+      "accept.text": "Sie wurden in die Organisation {{org}} eingeladen. Ihre Rolle: {{role}}.",
+      "mismatch": "Diese Einladung gilt für eine andere E-Mail-Adresse. Melden Sie sich mit {{email}} an oder bitten Sie um eine neue Einladung.",
+      "invalid": "Diese Einladung ist nicht mehr gültig. Sie ist abgelaufen oder wurde zurückgenommen. Bitten Sie ein Mitglied mit der Rolle „Verwalten“ um eine neue Einladung.",
+      "title": "Einladung in eine Organisation",
+      "invalid.title": "Einladung nicht mehr gültig",
+      "signIn": "Melden Sie sich mit der eingeladenen E-Mail-Adresse an, um die Einladung anzunehmen. Noch kein Konto? Erstellen Sie eines mit dieser Adresse, bestätigen Sie die Adresse und öffnen Sie danach den Link aus der Einladung erneut.",
+      "accepted": "Sie sind jetzt Mitglied von {{org}}.",
+      "form": {
+        "title": "Mitglied einladen"
+      },
+      "role": "Rolle",
+      "alreadyMember": "Diese E-Mail-Adresse gehört schon zu einem Mitglied.",
+      "error": {
+        "title": "Einladung nicht gesendet"
+      },
+      "pendingTitle": "Offene Einladungen",
+      "revoked": "Einladung an {{email}} zurückgenommen."
+    }
   }
 }

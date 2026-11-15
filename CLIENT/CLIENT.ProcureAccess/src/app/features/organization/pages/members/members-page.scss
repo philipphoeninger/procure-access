@@ -5,7 +5,8 @@
  */
 
 // S21 (Handoff §5.3, §2.2): a list of members below 600 px, a table from there; the error notice
-// above the list and „Organisation verlassen“ after it.
+// above the list; for an Owner the open invitations and the invite form after it (S5-17b), then
+// „Organisation verlassen“.
 :host {
   display: flex;
   flex-direction: column;
@@ -61,6 +62,22 @@
 .pa-members__role-hint {
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-body-small);
+}
+
+.pa-members__pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-members__subtitle {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.pa-members__status {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
 }
 
 .pa-members__table {

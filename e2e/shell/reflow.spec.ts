@@ -15,7 +15,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * (full screen below 600 px, S13-M) since S4-21b, the sign-in page S01 (#170 L1) and the login
  * overlay since S5-09, the registration S02 and its confirmation pages since S5-12b, the password reset
  * S03 with both steps since S5-13b, the organisation pages S20 and S21 (with the error summary, the
- * last-Owner notice and the confirmation dialog) since S5-16b. The legacy screens are
+ * last-Owner notice and the confirmation dialog) since S5-16b, S21's open invitations and invite form
+ * and the page of an invitation link since S5-17b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -254,6 +255,51 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expect(page.getByRole('dialog').getByRole('heading', { name: 'Mitglied entfernen?' })).toBeFocused();
     await expectReflow(page);
     await page.getByRole('dialog').getByRole('button', { name: 'Abbrechen' }).click();
+  });
+
+  test('S21 with open invitations and the invite form with its error summary needs no horizontal scrolling', async ({ page }) => {
+    // The open invitation is answered here and the form is only submitted empty: the seeded
+    // organisation stays unchanged (owner decision S5-16 7a); the real flow is organization/invitations.spec.ts
+    await page.route(`**/api/v1/organizations/${E2E_ORGANIZATION.id}/invitations`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: [{ id: 'reflow', email: 'eine-recht-lange-adresse-zum-umbrechen@example.test', role: 'editor', expiresAt: '2026-12-01T00:00:00Z' }],
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto(`/organisation/${E2E_ORGANIZATION.id}/mitglieder`);
+    const main = page.getByRole('main');
+    await expect(main.getByRole('region', { name: 'Offene Einladungen' })).toBeVisible();
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Einladung senden' }).click();
+    await expect(page.locator('pa-invite-form pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('the page of an invitation link, signed out and „nicht mehr gültig“, needs no horizontal scrolling', async ({ page }) => {
+    await page.route('**/api/v1/invitations/view', (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          organizationName: 'Bezirksamt Hamburg-Mitte',
+          role: 'editor',
+          addressMatches: null,
+          invitedEmail: null,
+          alreadyMember: false,
+          organizationId: null,
+        },
+      }),
+    );
+    await page.goto('/organisation/einladung?token=reflow');
+    await expect(page.getByRole('heading', { level: 1, name: 'Einladung in eine Organisation' })).toBeVisible();
+    await expect(page.getByRole('main').getByRole('button', { name: 'Konto erstellen' })).toBeVisible();
+    await expectReflow(page);
+
+    await page.unroute('**/api/v1/invitations/view');
+    await page.goto('/organisation/einladung');
+    await expect(page.getByRole('heading', { level: 1, name: 'Einladung nicht mehr gültig' })).toBeVisible();
+    await expectReflow(page);
   });
 
   test('the login overlay after a 401 needs no horizontal scrolling', async ({ page }) => {

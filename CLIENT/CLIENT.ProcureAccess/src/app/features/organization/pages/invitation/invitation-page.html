@@ -1,0 +1,60 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@let current = view();
+@switch (current.kind) {
+  @case ('open') {
+    <h1 class="pa-invitation__title">{{ 'org.invite.title' | translate }}</h1>
+    <p class="pa-invitation__text">
+      {{ 'org.invite.accept.text' | translate: { org: current.details.organizationName, role: (roleKey(current.details.role) | translate) } }}
+    </p>
+
+    @if (confirmationRequired()) {
+      <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+      <div #confirmNotice class="pa-invitation__notice" tabindex="-1">
+        <pa-confirm-required-notice />
+      </div>
+    }
+
+    @if (mismatch(); as email) {
+      <pa-notice kind="error" live="polite" class="pa-invitation__notice">
+        <p>{{ 'org.invite.mismatch' | translate: { email } }}</p>
+      </pa-notice>
+    }
+
+    @if (failure(); as message) {
+      <pa-notice kind="error" live="assertive" class="pa-invitation__notice">
+        <p>{{ message.key | translate: message.params }}</p>
+      </pa-notice>
+    }
+
+    @if (!signedIn()) {
+      <p class="pa-invitation__text">{{ 'org.invite.signIn' | translate }}</p>
+      <div class="pa-invitation__actions">
+        <button matButton="filled" type="button" (click)="signIn()">{{ 'auth.login.submit' | translate }}</button>
+        <button matButton="outlined" type="button" (click)="register()">{{ 'auth.register.submit' | translate }}</button>
+      </div>
+    } @else if (mismatch() === null) {
+      <div class="pa-invitation__actions">
+        <button matButton="filled" type="button" class="pa-invitation__accept" [attr.aria-disabled]="busy() || null" (click)="accept(current)">
+          @if (busy()) {
+            <mat-progress-spinner class="pa-invitation__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+          }
+          {{ 'org.invite.accept' | translate }}
+        </button>
+      </div>
+    }
+  }
+  @case ('invalid') {
+    <h1 class="pa-invitation__title">{{ 'org.invite.invalid.title' | translate }}</h1>
+    <p class="pa-invitation__text">{{ 'org.invite.invalid' | translate }}</p>
+    <!-- A link with the look of a filled button, as on S80 and the confirmation pages -->
+    <a matButton="filled" routerLink="/">{{ 'errors.home' | translate }}</a>
+  }
+  @default {
+    <pa-error-page kind="server" />
+  }
+}

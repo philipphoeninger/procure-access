@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v29):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.24), `ARCHITECTURE_v56.md`, `TESTING_v62.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v31 (15. November 2026) – v31 ergänzt die Texte der Einladungen (Sprint 05, S5-17b, U133–U137; Entwurf, Bestätigung durch den Product Owner im Review): auf „Mitglieder“ S21 das Formular „Mitglied einladen“ mit der Rollenwahl, den Hinweis auf eine Adresse, die schon zu einem Mitglied gehört, die Liste „Offene Einladungen“ und die Ansage nach dem Zurücknehmen, sowie die Seite des Einladungslinks (`/organisation/einladung`) mit H1, Seitentiteln, dem Hinweis für Abgemeldete und der Ansage nach dem Annehmen. v30 (15. November 2026; vom Product Owner bestätigt am 15. November 2026) – v30 ergänzt die Texte von „Organisation anlegen“ S20 und „Mitglieder“ S21, die §5.7 noch fehlten: Seitentitel, Spaltenköpfe der Mitgliederliste, Name der Rollenauswahl, Kennzeichen der eigenen Zeile und eines gelöschten Kontos, die Ansagen nach Rollenänderung, Entfernen und Verlassen, den Bestätigungsdialog „Mitglied entfernen?“ und die Dialoge zum Verlassen (Sprint 05, S5-16b, U125–U132). v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v31):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.30), `ARCHITECTURE_v62.md`, `TESTING_v69.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,33 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v30
+
+Quelle: Aufgabe S5-17b (Einladungen in eine Organisation, Bildschirme; Serverteil S5-17a; Entscheidungen S5-17 D2 (a) vom 15. November 2026: fehlende Schlüssel als Entwurf in v31, und S5-17b 1 (a): keine vorausgewählte Rolle). **Entwurf** – Wortlaut vom Product Owner im Review zu bestätigen. v30 (U125–U132) hat der Product Owner am 15. November 2026 bestätigt.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U133 | **Seite des Einladungslinks** (S21, Route `/organisation/einladung`, wie die Bestätigungsseiten von S02): neu `org.invite.title` „Einladung in eine Organisation“ als H1 über `org.invite.accept.text` und dem Button `org.invite.accept`, Seitentitel `pageTitle.org.invite` mit demselben Wortlaut; neu `org.invite.invalid.title` „Einladung nicht mehr gültig“ als H1 über `org.invite.invalid` (Seite wie S80), Seitentitel `pageTitle.org.invite.invalid` (§5.7, §5.16). Die Tabelle der Bildschirme (§3) nennt die Routen von S20 und S21, wie sie gebaut sind | Die Seite braucht eine H1 und einen Seitentitel in jedem Zustand (A11Y-03); Wortlaut wie U118 und U123 | S5-17b |
+| U134 | **Abgemeldet auf der Einladungsseite:** neu `org.invite.signIn` „Melden Sie sich mit der eingeladenen E-Mail-Adresse an, um die Einladung anzunehmen. Noch kein Konto? Erstellen Sie eines mit dieser Adresse, bestätigen Sie die Adresse und öffnen Sie danach den Link aus der Einladung erneut.“ unter `org.invite.accept.text`, darunter die Buttons `auth.login.submit` „Anmelden“ (S01 öffnet sich über der Seite) und `auth.register.submit` „Konto erstellen“ (S02) (§5.7) | Annehmen braucht eine Anmeldung mit bestätigter Adresse (SPEC R-ORG-02, SEC-10); nach der Registrierung ist die Seite nicht mehr offen, darum der Hinweis auf den Link | S5-17b |
+| U135 | **Nach dem Annehmen:** neu die Ansage `org.invite.accepted` „Sie sind jetzt Mitglied von {{org}}.“ vor dem Wechsel zu „Mitglieder“ S21 (§5.7). Ohne bestätigte Adresse erscheint der Hinweis `auth.confirm.required` mit „erneut senden“ (U72), bei einer anderen Adresse `org.invite.mismatch` | Der Seitenwechsel allein sagt nicht, dass die Mitgliedschaft angelegt wurde (Handoff §3.4); wie `org.left` (U130) | S5-17b |
+| U136 | **Mitglied einladen auf S21** (nur mit der Rolle „Verwalten“): neu `org.invite.form.title` „Mitglied einladen“ (H2), `org.invite.role` „Rolle“ (`legend` der drei Optionsfelder `org.members.role.*` mit ihren Hinweisen, keine Vorauswahl; ohne Auswahl `errors.field.requiredChoice`), `org.invite.alreadyMember` „Diese E-Mail-Adresse gehört schon zu einem Mitglied.“ (Feldfehler) und `org.invite.error.title` „Einladung nicht gesendet“ (Titel des Fehlerhinweises über dem Button; darin `errors.email.sendFailed`, `errors.rateLimit` oder `errors.antiforgery`) (§5.7) | Die Rolle wird beim Einladen gewählt (SPEC R-ORG-02); keine Vorauswahl wie die Art der Organisation auf S20 (U131, Entscheidung S5-17b 1 (a)); wer schon Mitglied ist, braucht keine Einladung (Entscheidung S5-17 D3 (a)) | S5-17b |
+| U137 | **Offene Einladungen auf S21** (nur mit der Rolle „Verwalten“, Entscheidung S5-17 D4 (a)): neu `org.invite.pendingTitle` „Offene Einladungen“ (H2; nur, solange es offene Einladungen gibt), je Einladung Adresse, Rolle, `org.invite.pending` und `org.invite.revoke` (Name per `aria-describedby`); neu die Ansage `org.invite.revoked` „Einladung an {{email}} zurückgenommen.“ (§5.7) | Zurücknehmen ohne Rückfrage, denn eine neue Einladung ist schnell gesendet; die Ansage bestätigt es, weil der Eintrag verschwindet | S5-17b |
+
+### Änderungen gegenüber v29
+
+Quelle: Aufgabe S5-16b (Bildschirme S20 und S21; Entscheidung S5-16 5a vom 15. November 2026: fehlende Schlüssel als Entwurf in v30, Bestätigungsdialog beim Entfernen). **Entwurf** – Wortlaut vom Product Owner im Review zu bestätigen.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U125 | **Seitentitel von S20 und S21:** neu `pageTitle.org.start` „Organisation anlegen oder beitreten“ und `pageTitle.org.members` „Mitglieder von {{org}}“ (§5.16) | Wortlaut der H1 `org.start.title` und `org.members.title`, wie U112 und U120 | S5-16b |
+| U126 | **Mitgliederliste:** neu `org.members.column.member` „Mitglied“, `org.members.column.role` „Rolle“ und `org.members.column.actions` „Aktionen“ (Spaltenköpfe ab 600 px; „Aktionen“ nur für Screenreader); `org.members.role.label` „Rolle von {{email}}“ als Name der Rollenauswahl je Mitglied (§5.7) | Unter 600 px ist die Liste eine `<ul>` ohne Spaltenköpfe (Handoff §2.2); jede Auswahl braucht einen eigenen Namen, der das Mitglied nennt | S5-16b |
+| U127 | **Kennzeichen:** neu `org.members.you` „(Sie)“ hinter der eigenen Adresse und `org.members.deletedAccount` „Gelöschtes Konto“ statt einer Adresse, die es nicht mehr gibt (§5.7) | Die eigene Zeile ist die, in der „Organisation verlassen“ wirkt; ein Konto kann vor dem Entfernen der Mitgliedschaften gelöscht sein (bis S5-28) | S5-16b |
+| U128 | **Ansage nach Rollenänderung:** neu `org.members.roleChanged` „Rolle von {{email}} geändert: {{role}}.“ (§5.7) | Die Auswahl schließt ohne sichtbare Rückmeldung; die Ansage bestätigt das Speichern (Handoff §3.4) | S5-16b |
+| U129 | **Mitglied entfernen:** neu `org.members.remove.title` „Mitglied entfernen?“ und `org.members.remove.body` „{{email}} verliert den Zugriff auf die Kriterienlisten und Projekte von {{org}}.“ für den Bestätigungsdialog (Bestätigen mit `org.members.remove`, Abbrechen mit `common.actions.cancel`) und die Ansage `org.members.removed` „{{email}} wurde aus der Organisation entfernt.“ (§5.7) | Entscheidung S5-16 5a: Bestätigungsdialog wie beim Entfernen eines Kandidaten; Text nach dem Muster von `org.leave.body` | S5-16b |
+| U130 | **Organisation verlassen:** der Dialog hat `org.leave` als Titel und als Bestätigen-Button, `org.leave.body` als Text und `common.actions.cancel`; neu die Ansage `org.left` „Sie haben die Organisation {{org}} verlassen.“ auf S20 danach (§5.7) | Nach dem Verlassen gibt es die Mitgliederseite nicht mehr; S20 nennt, was geschehen ist | S5-16b |
+| U132 | **Fehlerhinweis auf S21:** neu `org.members.error.title` „Änderung nicht möglich“ als Titel des Fehlerhinweises über der Liste; darin `org.members.lastOwner` (409) oder `errors.antiforgery` (§5.7) | Ein Fehlerhinweis braucht einen Titel (Handoff §3.3); er nennt, dass die Rolle oder Mitgliedschaft unverändert bleibt | S5-16b |
+| U131 | **Art der Organisation:** die drei Optionen `org.create.type.*` stehen als Optionsfelder in der Feldgruppe `org.create.type`; Fehler ohne Auswahl `errors.field.requiredChoice` „Bitte wählen Sie eine Option.“ unter der Gruppe und in der Fehlerübersicht (§5.7) | Drei Optionen, alle sichtbar; kein neuer Text | S5-16b |
 
 ### Änderungen gegenüber v28
 
@@ -424,8 +451,8 @@ Priorität: P0 = Teil des MVP, P1 = später. „Anmeldung“: ✗ = ohne Konto n
 | S14 | Gespeicherte Kriterienlisten | `/kriterienlisten` | A | Beschaffende | ✓O | P0 |
 | S15 | Dialog: Freigabelink erstellen | – | A | Beschaffende | ✓O | P0 |
 | S16 | Geteilte Kriterienliste (Ansicht über Freigabelink) | `/geteilt/:token` | A | Empfangende | ✗ (D7) | P0 |
-| S20 | Organisation anlegen oder beitreten | `/organisation/neu` | Workspace | Beschaffende | ✓ | P0 |
-| S21 | Organisation: Mitglieder und Einladungen | `/organisation` | Workspace | Verwaltende | ✓O | P0 |
+| S20 | Organisation anlegen oder beitreten | `/organisation` | Workspace | Beschaffende | ✓ | P0 |
+| S21 | Organisation: Mitglieder und Einladungen; Seite des Einladungslinks (v31, U133) | `/organisation/:id/mitglieder`, `/organisation/einladung` | Workspace | Verwaltende | ✓O | P0 |
 | S30 | Beschaffungsprojekte – Liste | `/projekte` | B | Beschaffende | ✓O | P0 |
 | S31 | Dialog: Projekt anlegen | – | B | Beschaffende | ✓O | P0 |
 | S32 | Projekt – Übersicht | `/projekte/:id` | B | Beschaffende | ✓O | P0 |
@@ -893,6 +920,16 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `org.members.role.editor.hint` | Hint | Kann Listen und Projekte anlegen und bearbeiten. | |
 | `org.members.role.reader` | Rolle | Lesen | |
 | `org.members.role.reader.hint` | Hint | Kann Listen und Projekte ansehen. | |
+| `org.members.column.member` | Spaltenkopf | Mitglied | U126; ab 600 px |
+| `org.members.column.role` | Spaltenkopf | Rolle | U126 |
+| `org.members.column.actions` | Spaltenkopf (nur Screenreader) | Aktionen | U126 |
+| `org.members.role.label` | `aria-label` der Rollenauswahl | Rolle von {{email}} | U126 |
+| `org.members.you` | Kennzeichen | (Sie) | U127; hinter der eigenen Adresse |
+| `org.members.deletedAccount` | Anzeige | Gelöschtes Konto | U127; statt der Adresse |
+| `org.members.roleChanged` | Ansage | Rolle von {{email}} geändert: {{role}}. | U128 |
+| `org.members.remove.title` | Dialog-Titel | Mitglied entfernen? | U129 |
+| `org.members.remove.body` | Dialog-Text | {{email}} verliert den Zugriff auf die Kriterienlisten und Projekte von {{org}}. | U129; Bestätigen mit `org.members.remove` |
+| `org.members.removed` | Ansage | {{email}} wurde aus der Organisation entfernt. | U129 |
 | `org.invite.email` | Label | E-Mail-Adresse | |
 | `org.invite.submit` | Button | Einladung senden | |
 | `org.invite.sent` | Ansage | Einladung an {{email}} gesendet. Sie ist {{days}} Tage gültig. | |
@@ -902,10 +939,22 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `org.invite.accept.text` | Text | Sie wurden in die Organisation {{org}} eingeladen. Ihre Rolle: {{role}}. | |
 | `org.invite.mismatch` | Fehler | Diese Einladung gilt für eine andere E-Mail-Adresse. Melden Sie sich mit {{email}} an oder bitten Sie um eine neue Einladung. | U74 |
 | `org.invite.invalid` | Seite | Diese Einladung ist nicht mehr gültig. Sie ist abgelaufen oder wurde zurückgenommen. Bitten Sie ein Mitglied mit der Rolle „Verwalten“ um eine neue Einladung. | 14 Tage gültig |
+| `org.invite.title` | H1 (Seite des Einladungslinks) | Einladung in eine Organisation | U133 |
+| `org.invite.invalid.title` | H1 (Einladung nicht mehr gültig) | Einladung nicht mehr gültig | U133; über `org.invite.invalid` |
+| `org.invite.signIn` | Text (abgemeldet) | Melden Sie sich mit der eingeladenen E-Mail-Adresse an, um die Einladung anzunehmen. Noch kein Konto? Erstellen Sie eines mit dieser Adresse, bestätigen Sie die Adresse und öffnen Sie danach den Link aus der Einladung erneut. | U134; Buttons `auth.login.submit`, `auth.register.submit` |
+| `org.invite.accepted` | Ansage | Sie sind jetzt Mitglied von {{org}}. | U135; vor dem Wechsel zu S21 |
+| `org.invite.form.title` | H2 (S21) | Mitglied einladen | U136; nur mit der Rolle „Verwalten“ |
+| `org.invite.role` | `legend` | Rolle | U136; Optionen `org.members.role.*` mit Hinweisen, keine Vorauswahl |
+| `org.invite.alreadyMember` | Feldfehler | Diese E-Mail-Adresse gehört schon zu einem Mitglied. | U136 |
+| `org.invite.error.title` | Titel des Fehlerhinweises | Einladung nicht gesendet | U136; darin `errors.email.sendFailed`, `errors.rateLimit` oder `errors.antiforgery` |
+| `org.invite.pendingTitle` | H2 (S21) | Offene Einladungen | U137; nur, solange es offene Einladungen gibt |
+| `org.invite.revoked` | Ansage | Einladung an {{email}} zurückgenommen. | U137 |
+| `org.members.error.title` | Titel des Fehlerhinweises | Änderung nicht möglich | U132; Titel des Hinweises über der Liste |
 | `org.members.lastOwner` | Fehler | Jede Organisation braucht mindestens ein Mitglied mit der Rolle „Verwalten“. Geben Sie diese Rolle zuerst einem anderen Mitglied. | U74; TEN-11 |
 | `org.members.remove` | Button | Aus der Organisation entfernen | Name per `aria-describedby` |
 | `org.leave` | Button | Organisation verlassen | |
-| `org.leave.body` | Dialog-Text | Sie verlieren den Zugriff auf die Kriterienlisten und Projekte von {{org}}. Ihre veröffentlichten Beiträge bleiben unter Ihrem Beitragsprofil sichtbar. | R-ORG-04 |
+| `org.leave.body` | Dialog-Text | Sie verlieren den Zugriff auf die Kriterienlisten und Projekte von {{org}}. Ihre veröffentlichten Beiträge bleiben unter Ihrem Beitragsprofil sichtbar. | R-ORG-04; Dialog-Titel und Bestätigen-Button `org.leave` (U130) |
+| `org.left` | Ansage (S20) | Sie haben die Organisation {{org}} verlassen. | U130 |
 
 ### 5.8 S30–S34 Beschaffungsprojekte (`projects.`, `candidate.`)
 
@@ -1485,6 +1534,10 @@ Wert für `{{page}}` in `shell.pageTitle`. Vom Speziellen zum Allgemeinen, damit
 | `pageTitle.confirm.done` / `.invalid` | S02 (Bestätigungsseiten) | E-Mail-Adresse bestätigt / Link nicht mehr gültig |
 | `pageTitle.reset` | S03 (beide Schritte) | Passwort zurücksetzen |
 | `pageTitle.reset.invalid` | S03 (Link nicht mehr gültig) | Link nicht mehr gültig |
+| `pageTitle.org.start` | S20 | Organisation anlegen oder beitreten |
+| `pageTitle.org.members` | S21 | Mitglieder von {{org}} |
+| `pageTitle.org.invite` | S21 (Seite des Einladungslinks) | Einladung in eine Organisation |
+| `pageTitle.org.invite.invalid` | S21 (Einladung nicht mehr gültig) | Einladung nicht mehr gültig |
 | `pageTitle.criteria.step` | S10 | Kriterien zusammenstellen – Schritt {{n}} von 4 |
 | `pageTitle.criteria.list` | S11 | Ihre Kriterienliste |
 | `pageTitle.criteria.list.saved` | S11 (gespeicherte Liste) | {{name}} – Gespeicherte Kriterienlisten |

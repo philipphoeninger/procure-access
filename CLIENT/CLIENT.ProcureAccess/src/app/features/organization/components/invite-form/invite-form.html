@@ -1,0 +1,57 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<section class="pa-invite" [attr.aria-labelledby]="headingId">
+  <h2 class="pa-invite__title" [id]="headingId">{{ 'org.invite.form.title' | translate }}</h2>
+
+  <form class="pa-invite__form" novalidate (submit)="submit($event)">
+    <pa-error-summary [items]="summary()" />
+
+    <div class="pa-invite__card">
+      <p class="pa-invite__required">{{ 'common.requiredNote' | translate }}</p>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'org.invite.email' | translate }}</mat-label>
+        <input matInput [id]="emailId" type="email" name="email" autocomplete="off" required
+          [formControl]="email" [errorStateMatcher]="errorState" />
+        @if (emailMessage(); as message) {
+          <mat-error>{{ message.key | translate: message.params }}</mat-error>
+        }
+      </mat-form-field>
+
+      <fieldset class="pa-invite__role">
+        <legend class="pa-invite__legend">{{ 'org.invite.role' | translate }}</legend>
+        <mat-radio-group name="role" class="pa-invite__options" required [formControl]="role"
+          [attr.aria-describedby]="roleError() ? roleErrorId : null" (change)="roleChanged()">
+          @for (option of roles; track option) {
+            <mat-radio-button [id]="'pa-invite-role-' + option" [value]="option">
+              <span class="pa-invite__role-name">{{ roleKey(option) | translate }}</span>
+              <span class="pa-invite__role-hint">{{ roleKey(option) + '.hint' | translate }}</span>
+            </mat-radio-button>
+          }
+        </mat-radio-group>
+        @if (roleError(); as message) {
+          <p class="pa-invite__role-error" [id]="roleErrorId">{{ message.key | translate: message.params }}</p>
+        }
+      </fieldset>
+    </div>
+
+    @if (failure(); as message) {
+      <pa-notice kind="error" live="assertive" class="pa-invite__failure" [title]="'org.invite.error.title' | translate">
+        <p>{{ message.key | translate: message.params }}</p>
+      </pa-notice>
+    }
+
+    <div class="pa-invite__actions">
+      <button matButton="filled" type="submit" class="pa-invite__submit" [attr.aria-disabled]="busy() || null">
+        @if (busy()) {
+          <mat-progress-spinner class="pa-invite__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'org.invite.submit' | translate }}
+      </button>
+    </div>
+  </form>
+</section>

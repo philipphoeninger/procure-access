@@ -17,6 +17,8 @@ export interface ProblemDetails {
   errors?: Record<string, string[]>;
   /** Of a `rate-limit` problem (429): whole minutes until the action works again (SPEC §7.3, `errors.rateLimit`). */
   retryAfterMinutes?: number;
+  /** Of an `invitation-mismatch` problem (403): the invited address for `org.invite.mismatch` (SPEC §8.6 v2.29). */
+  invitedEmail?: string;
 }
 
 /**
@@ -27,6 +29,7 @@ export interface ProblemDetails {
 export const PROBLEM_TYPE_KEYS: Readonly<Record<string, string>> = {
   'email-unconfirmed': 'auth.confirm.required',
   'last-owner': 'org.members.lastOwner',
+  'invitation-mismatch': 'org.invite.mismatch',
 };
 
 /**
