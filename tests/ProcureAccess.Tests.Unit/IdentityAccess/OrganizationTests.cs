@@ -32,6 +32,14 @@ public class OrganizationTests
     }
 
     [Fact]
+    public void Create_GivenId_KeepsIt()
+    {
+        var id = new Guid("0e2e0000-0000-4000-8000-000000000001");
+
+        Organization.Create("E2E-Organisation", OrganizationType.PublicBody, "user-1", Now, id).Id.ShouldBe(id);
+    }
+
+    [Fact]
     public void Create_NameOf120Characters_IsAccepted() =>
         Organization.Create(new string('a', 120), OrganizationType.Company, "user-1", Now).Name.Length.ShouldBe(120);
 

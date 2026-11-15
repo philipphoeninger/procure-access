@@ -36,8 +36,11 @@ internal sealed class Organization
     /// Creates an organisation. <paramref name="createdAt"/> comes from <see cref="TimeProvider"/>
     /// (CLAUDE.md §7). Throws for an empty or too long name, an undefined type or an empty creator.
     /// The creator's Owner membership is a separate <see cref="OrganizationMembership"/> (R-ORG-01).
+    /// <paramref name="id"/> is for the E2E seeder only, whose organisation the tests address by a
+    /// known id (S5-16b); every other organisation gets a random one.
     /// </summary>
-    public static Organization Create(string name, OrganizationType type, string createdByUserId, DateTimeOffset createdAt)
+    public static Organization Create(
+        string name, OrganizationType type, string createdByUserId, DateTimeOffset createdAt, Guid? id = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         if (name.Length > NameMaxLength)
@@ -54,7 +57,7 @@ internal sealed class Organization
 
         return new Organization
         {
-            Id = Guid.NewGuid(),
+            Id = id ?? Guid.NewGuid(),
             Name = name,
             Type = type,
             CreatedByUserId = createdByUserId,

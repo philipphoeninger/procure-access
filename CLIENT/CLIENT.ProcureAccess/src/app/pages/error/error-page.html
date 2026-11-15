@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 SPDX-License-Identifier: MIT
 -->
 
-@switch (kind) {
+@switch (page()) {
   @case ('notFound') {
     <h1 class="pa-error-page__title">{{ 'errors.notFound.title' | translate }}</h1>
     <p class="pa-error-page__text">{{ 'errors.notFound.body' | translate }}</p>

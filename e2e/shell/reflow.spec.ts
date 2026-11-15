@@ -4,7 +4,8 @@
 
 import { expect, test, type Page } from '@playwright/test';
 import { chooseFirstOption } from '../support/combobox';
-import { expireSessionOnce } from '../support/session';
+import { expireSessionOnce, signInThroughApi } from '../support/session';
+import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from '../support/users';
 
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
@@ -13,7 +14,8 @@ import { expireSessionOnce } from '../support/session';
  * S11 with its summary, notices, detail panel and action bar since S4-18a, the export dialog S13
  * (full screen below 600 px, S13-M) since S4-21b, the sign-in page S01 (#170 L1) and the login
  * overlay since S5-09, the registration S02 and its confirmation pages since S5-12b, the password reset
- * S03 with both steps since S5-13b. The legacy screens are
+ * S03 with both steps since S5-13b, the organisation pages S20 and S21 (with the error summary, the
+ * last-Owner notice and the confirmation dialog) since S5-16b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -221,6 +223,37 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await submit.click();
     await expect(page.getByRole('heading', { level: 2, name: 'Passwort geändert' })).toBeFocused();
     await expectReflow(page);
+  });
+
+  test('S20 with the error summary needs no horizontal scrolling', async ({ page }) => {
+    await signInThroughApi(page, CONFIRMED_USER, TEST_USER_PASSWORD);
+    await page.goto('/organisation');
+    await expect(page.getByRole('heading', { level: 1, name: 'Organisation anlegen oder beitreten' })).toBeVisible();
+    await expectReflow(page);
+
+    await page.getByRole('main').getByRole('button', { name: 'Organisation anlegen' }).click();
+    await expect(page.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('S21 as a list with the last-Owner notice and the confirmation dialog needs no horizontal scrolling', async ({ page }) => {
+    // The seeded organisation is only read: the refusal changes nothing, the dialog is cancelled
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto(`/organisation/${E2E_ORGANIZATION.id}/mitglieder`);
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: `Mitglieder von ${E2E_ORGANIZATION.name}` })).toBeVisible();
+    await expect(main.getByRole('listitem')).toHaveCount(3);
+    await expectReflow(page);
+
+    await main.getByRole('combobox', { name: `Rolle von ${ORG_OWNER}` }).click();
+    await page.getByRole('option', { name: /^Bearbeiten/ }).click();
+    await expect(main.getByRole('alert')).toContainText('Änderung nicht möglich');
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Aus der Organisation entfernen' }).first().click();
+    await expect(page.getByRole('dialog').getByRole('heading', { name: 'Mitglied entfernen?' })).toBeFocused();
+    await expectReflow(page);
+    await page.getByRole('dialog').getByRole('button', { name: 'Abbrechen' }).click();
   });
 
   test('the login overlay after a 401 needs no horizontal scrolling', async ({ page }) => {
