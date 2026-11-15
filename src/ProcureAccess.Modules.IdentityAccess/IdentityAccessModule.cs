@@ -12,7 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.IdentityAccess.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
+using ProcureAccess.Modules.IdentityAccess.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Session;
 using ProcureAccess.Modules.IdentityAccess.Tenancy;
@@ -96,6 +98,10 @@ public static class IdentityAccessModule
         services.AddScoped<OrganizationContext>();
         services.AddScoped<IOrganizationContext>(provider => provider.GetRequiredService<OrganizationContext>());
         services.AddScoped<IAuthorizationHandler, OrganizationRoleHandler>();
+
+        // Organisations and members (S5-16a): the rules behind the host's organisation endpoints,
+        // which add the members' addresses from the legacy users until M3.1 (owner decision S5-16 4a).
+        services.AddScoped<IOrganizationMembers, OrganizationMemberService>();
 
         return services;
     }

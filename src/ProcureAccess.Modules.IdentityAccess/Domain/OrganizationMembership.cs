@@ -10,7 +10,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// A user's membership in an organisation with its role (ARCHITECTURE §5.2, §9.1): one row per
 /// organisation and user. The rows of an organisation are visible only to its members (TEN-01);
 /// the loader of the current user's own memberships is the one call site that reads them unfiltered
-/// (TEN-02). Role changes, removal and the last-Owner rule come with S5-16.
+/// (TEN-02). Role changes go through <see cref="ChangeRole"/>; the last-Owner rule is
+/// <see cref="LeavesNoOwner"/> (TEN-11, S5-16a).
 /// </summary>
 internal sealed class OrganizationMembership
 {
@@ -72,4 +73,23 @@ internal sealed class OrganizationMembership
             AcceptedAt = acceptedAt,
         };
     }
+
+    /// <summary>Gives the membership <paramref name="role"/>. Throws for an undefined role.</summary>
+    public void ChangeRole(OrganizationRole role)
+    {
+        if (!Enum.IsDefined(role))
+        {
+            throw new ArgumentOutOfRangeException(nameof(role), role, "Unknown organisation role.");
+        }
+
+        Role = role;
+    }
+
+    /// <summary>
+    /// The last-Owner rule (ARCHITECTURE C80, TEN-11): true when giving a member of
+    /// <paramref name="currentRole"/> the role <paramref name="newRole"/> — or removing it, for
+    /// <c>null</c> — would leave an organisation with <paramref name="ownerCount"/> Owners without one.
+    /// </summary>
+    public static bool LeavesNoOwner(OrganizationRole currentRole, OrganizationRole? newRole, int ownerCount) =>
+        currentRole == OrganizationRole.Owner && newRole != OrganizationRole.Owner && ownerCount <= 1;
 }

@@ -7,9 +7,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +29,8 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// <summary>
 /// Registration, address confirmation and the confirmation gate (S5-12a; SPEC R-AUTH-01, R-AUTH-02,
 /// §8.8; ARCHITECTURE §9.1, C72): <c>POST /api/v1/auth/register</c>, <c>/confirm-email</c>,
-/// <c>/confirm-email/resend</c> and the policy <c>ConfirmedEmail</c> (SEC-10) on a test endpoint,
-/// because no gated action exists yet. Runs on a host with the API's own authentication
+/// <c>/confirm-email/resend</c> and the policy <c>ConfirmedEmail</c> (SEC-10) on its first real
+/// gated action, <c>POST /api/v1/organizations</c> (S5-16a). Runs on a host with the API's own authentication
 /// (<c>realAuthentication</c>) on a database of this class that was only migrated, so it has no
 /// legacy <c>Member</c> role (#301), with a clock of its own.
 /// </summary>
@@ -42,6 +40,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
     private const string Confirm = "/api/v1/auth/confirm-email";
     private const string Resend = "/api/v1/auth/confirm-email/resend";
     private const string Login = "/api/v1/auth/login";
+    private const string CreateOrganization = "/api/v1/organizations";
     private const string Address = "neu@example.test";
     private const string Password = "zwoelf-zeichen";
 
@@ -56,11 +55,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
     public ValueTask InitializeAsync()
     {
         _connectionString = api.ConnectionStringForNewDatabase();
-        _host = new ProcureAccessApiFactory(
-            _connectionString,
-            _clock,
-            configureServices: services => services.AddControllers().AddApplicationPart(typeof(ConfirmedEmailProbeController).Assembly),
-            realAuthentication: true);
+        _host = new ProcureAccessApiFactory(_connectionString, _clock, realAuthentication: true);
         return ValueTask.CompletedTask;
     }
 
@@ -227,18 +222,20 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         using var login = await LoginAsync(client);
         login.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        using var refused = await client.PostAsync(ConfirmedEmailProbeController.Path, content: null, Cancellation);
+        using var refused = await CreateOrganizationAsync(client);
         refused.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         refused.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json");
         (await ProblemTypeOf(refused)).ShouldEndWith("/problems/" + ProblemTypes.EmailUnconfirmed);
+        (await CountOrganizationsAsync()).ShouldBe(0);
 
         // Confirmed in another browser (no session there): the open session passes at once.
         using var other = CreateClient();
         using var confirmed = await ConfirmAsync(other, TokenOf(SingleConfirmation()));
         confirmed.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        using var allowed = await client.PostAsync(ConfirmedEmailProbeController.Path, content: null, Cancellation);
-        allowed.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        using var allowed = await CreateOrganizationAsync(client);
+        allowed.StatusCode.ShouldBe(HttpStatusCode.Created);
+        (await CountOrganizationsAsync()).ShouldBe(1);
     }
 
     [Fact(DisplayName = "INV:SEC-10 " + nameof(Gate_Anonymous_Returns401))]
@@ -247,9 +244,10 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
     {
         using var client = CreateClient();
 
-        using var response = await client.PostAsync(ConfirmedEmailProbeController.Path, content: null, Cancellation);
+        using var response = await CreateOrganizationAsync(client);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await CountOrganizationsAsync()).ShouldBe(0);
     }
 
     [Fact(DisplayName = "INV:SEC-10 " + nameof(Confirm_TokenUsedTwice_IsRedeemedOnceAndTheSecondClickShowsConfirmed))]
@@ -423,6 +421,9 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
     private static Task<HttpResponseMessage> ConfirmAsync(HttpClient client, string token) =>
         client.PostAsJsonAsync(Confirm, new { token }, Cancellation);
 
+    private static Task<HttpResponseMessage> CreateOrganizationAsync(HttpClient client) =>
+        client.PostAsJsonAsync(CreateOrganization, new { name = "Stadt Musterhausen", type = "publicBody" }, Cancellation);
+
     private static Task<HttpResponseMessage> LoginAsync(HttpClient client) =>
         client.PostAsJsonAsync(Login, new { email = Address, password = Password }, Cancellation);
 
@@ -457,6 +458,13 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         return await db.AccountTokens.AsNoTracking().Where(t => t.TokenHash == hash).Select(t => t.UsedAt).SingleAsync(Cancellation);
     }
 
+    /// <summary>Every organisation, read past the filter by a context outside a request (all of them).</summary>
+    private async Task<int> CountOrganizationsAsync()
+    {
+        await using var db = IdentityAccess();
+        return await db.Organizations.IgnoreQueryFilters().CountAsync(Cancellation);
+    }
+
     private IdentityAccessDbContext IdentityAccess() =>
         new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString!).Options, FixedOrganizationContext.None);
 
@@ -471,19 +479,4 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Cancellation));
         return [.. body.RootElement.GetProperty("errors").EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal)];
     }
-}
-
-/// <summary>
-/// A gated action for the tests of the confirmation gate (SEC-10) until the first real one exists
-/// (saving a list, S5-20; organisations, S5-16).
-/// </summary>
-[ApiController]
-[Route(Path)]
-[Authorize(Policy = IdentityAccessPolicies.ConfirmedEmail)]
-public sealed class ConfirmedEmailProbeController : ControllerBase
-{
-    public const string Path = "/test/confirmed-email";
-
-    [HttpPost]
-    public IActionResult Post() => NoContent();
 }

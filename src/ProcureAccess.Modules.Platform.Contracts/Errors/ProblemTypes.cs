@@ -44,11 +44,18 @@ public static class ProblemTypes
     /// </summary>
     public const string EmailDelivery = "email-delivery";
 
+    /// <summary>
+    /// 409: the change would leave an organisation without an Owner — demoting, removing or the
+    /// leaving of its last Owner (SPEC §8.6 v2.27, R-ORG-03, R-ORG-04; TEN-11; S5-16a); the client
+    /// shows <c>org.members.lastOwner</c>.
+    /// </summary>
+    public const string LastOwner = "last-owner";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
-        EmailUnconfirmed, NotFound, EmailDelivery,
+        EmailUnconfirmed, NotFound, EmailDelivery, LastOwner,
     ];
 }

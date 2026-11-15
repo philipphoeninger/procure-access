@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MODELS.ProcureAccess.Entities;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
@@ -32,7 +33,7 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
 {
     private const string MalformedJson = "{";
 
-    /// <summary>Value for every route parameter except the API version: today all of them are numbers.</summary>
+    /// <summary>Value for every route parameter except the API version: today all of them are numbers or GUIDs.</summary>
     private const string InvalidRouteValue = "not-a-number";
 
     private static readonly HashSet<string> WriteMethods = ["POST", "PUT", "PATCH", "DELETE"];
@@ -54,7 +55,17 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
         requests.ShouldNotBeEmpty("endpoint discovery found no write endpoint");
 
         // The moderator passes every authorisation check of today's write endpoints, so each request
-        // reaches model binding.
+        // reaches model binding; its account has a confirmed address for the gated ones (SEC-10).
+        await StoreAsync(new User
+        {
+            Id = TestUsers.Moderator.Id,
+            UserName = TestUsers.Moderator.Email,
+            NormalizedUserName = TestUsers.Moderator.Email.ToUpperInvariant(),
+            Email = TestUsers.Moderator.Email,
+            NormalizedEmail = TestUsers.Moderator.Email.ToUpperInvariant(),
+            EmailConfirmed = true,
+            SecurityStamp = Guid.NewGuid().ToString(),
+        });
         using var client = CreateClient(TestUsers.Moderator);
         var failures = new List<string>();
         foreach (var (method, path) in requests)
