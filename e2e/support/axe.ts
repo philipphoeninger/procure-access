@@ -58,6 +58,10 @@ export async function expectNoAxeViolations(
   const suppressions = options.suppressions ?? axeSuppressions;
   validateAxeSuppressions(suppressions);
 
+  // DEBUG (#337 bisect, never merged): variants of the Firefox crash on an Owner's S21
+  if (process.env['E2E_DEBUG_NO_AXE']) return;
+  const remove = process.env['E2E_DEBUG_REMOVE'];
+  if (remove) await page.evaluate((selector) => document.querySelectorAll(selector).forEach((element) => element.remove()), remove);
   const current = await shownAppearance(page);
   const other: Appearance = current === 'light' ? 'dark' : 'light';
 
@@ -79,7 +83,10 @@ async function checkOneAppearance(
   appearance: Appearance,
   suppressions: readonly AxeSuppression[],
 ): Promise<Finding[]> {
-  const results = await new AxeBuilder({ page }).withTags([...BLOCKING_TAGS, ...REPORTED_TAGS]).analyze();
+  let builder = new AxeBuilder({ page });
+  const exclude = process.env['E2E_DEBUG_EXCLUDE'];
+  if (exclude) builder = builder.exclude(exclude);
+  const results = await builder.withTags([...BLOCKING_TAGS, ...REPORTED_TAGS]).analyze();
 
   const blocking: Finding[] = [];
   const suppressed: SuppressedFinding[] = [];
