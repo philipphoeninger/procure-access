@@ -56,7 +56,7 @@ Checklist of CLAUDE §6.7 over the whole diff; findings sorted per §6.8.
 
 | # | Finding | Sorting |
 |---|---|---|
-| R1 | Firefox crashed its page process in axe runs on an Owner's S21. Locally it looked tied to Playwright's label lookups on the invite form (CSS locators in the journey); in CI it came back in every attempt of pull request #344, also with the organisation specs run one at a time (9aacac4) and with CSS locators in every S21 Owner test (696086b) | **fixed** — narrowed down in CI on draft pull request #345 (V226): the trigger is the form's `<section aria-labelledby>`, a named region; without the name 360 of 360 runs passed. Both attempts are backed out, the journey uses role lookups again |
+| R1 | Firefox crashed its page process in axe runs on an Owner's S21. Locally it looked tied to Playwright's label lookups on the invite form (CSS locators in the journey); in CI it came back in every attempt of pull request #344, also with the organisation specs run one at a time (9aacac4) and with CSS locators in every S21 Owner test (696086b) | **fixed** — narrowed down in CI on draft pull request #345 (V226): the trigger is the form's `<section aria-labelledby>`, a named region; without the name 360 of 360 runs passed, with the journey's CSS locators. Switched back to role and label lookups, the journey crashed once more in CI (8606e0d), so it keeps the CSS locators; the serial runs and the CSS locators in the other S21 tests are backed out |
 | R2 | Before that, in long local Firefox runs of the whole suite, an S21 test crashed now and then (`organization.spec.ts:101` twice, the journey once in 3 full runs) | **fixed** with R1 — the same crash |
 | R3 | The token of the link: memory only, out of the address and the history before any request, sent only in a POST body; the page reads it again after a sign-in but never stores it | — |
 | R4 | Accessibility: H1 and page title in every state, focus on the notice after an unconfirmed refusal, invalid in place with title/focus/announcement, revoke and invite announced, the remove button described by the address, no preselected radio, error summary with focus | — |
@@ -70,7 +70,7 @@ No correctness or security finding that affects current behaviour remains.
 
 - Client: `ng build` clean; `npm run lint` clean; Vitest 633 passed.
 - E2E, locally against this branch (E2E stack): Chromium, Firefox, mobile Chrome — 344 of 345 passed in the full run; the failure was a Firefox „Page crashed“ (R2), which passed on re-run; the invitation spec 3 × in Firefox (9 of 9). WebKit and mobile Safari only in CI.
-- CI of pull request #344: Firefox E2E crashed on an Owner's S21 in four attempts (R1); the cause was found on draft pull request #345 (six variants per round, three rounds, then the fix 3 × 120 runs without a crash). The local E2E run after the fix was skipped (less than 1 GB of disk; the crash never happened locally), so CI is the check.
+- CI of pull request #344: Firefox E2E crashed on an Owner's S21 in four attempts (R1); the cause was found on draft pull request #345 (six variants per round, three rounds, then the fix 3 × 120 runs without a crash); one more crash in the journey after its CSS locators had been replaced by role lookups, which are back to CSS. The local E2E run after the fix was skipped (less than 1 GB of disk; the crash never happened locally), so CI is the check.
 - `e2e/`: `npm run typecheck`, `npm run lint` clean.
 - `check-invariants`, `check-figma-links`, `check-i18n`, `check-icons` passed; `reuse lint` compliant.
 - No backend change.

@@ -62,11 +62,14 @@ test.describe('Invitations', () => {
     // S21: the Owner invites with the role „Bearbeiten“
     await page.goto(membersPath(organizationId));
     await expect(main(page).getByRole('heading', { level: 1, name: `Mitglieder von ${name}` })).toBeVisible();
-    const address = main(page).getByLabel(/^E-Mail-Adresse/);
+    // CSS locators only until the axe run below: Playwright's name and label lookups on this form
+    // followed by its reset crash Firefox in the next axe run (TESTING V226, like V129 and V165);
+    // the roles and names are checked by the component tests and by axe
+    const address = page.locator('#pa-invite-email');
     await address.fill(invitee);
-    await main(page).getByRole('radio', { name: /^Bearbeiten/ }).check();
-    await main(page).getByRole('button', { name: 'Einladung senden' }).click();
-    const pending = main(page).getByRole('region', { name: 'Offene Einladungen' }).getByRole('listitem');
+    await page.locator('#pa-invite-role-editor-input').check();
+    await page.locator('pa-invite-form button[type="submit"]').click();
+    const pending = page.locator('.pa-members__pending li');
     await expect(pending).toHaveCount(1);
     await expect(pending).toContainText(invitee);
     await expect(pending).toContainText('Eingeladen, noch nicht angenommen');
