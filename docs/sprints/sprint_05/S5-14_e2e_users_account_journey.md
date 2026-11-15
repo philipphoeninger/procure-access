@@ -81,5 +81,5 @@ No correctness or security finding that affects current behaviour.
 1. If CI shows the Firefox crash in J8, split the journey at the confirmation (registration and confirmation / sign-in and sign-out) — fewer axe runs per page.
 2. S5-15/S5-16: organisation users in the seeder (Owner, Editor, Reader) with the steps that need them; S5-16 uses `e2e-unconfirmed` for SEC-10's E2E part.
 3. S5-20: the J1 second part signs in as `e2e-confirmed` (or registers, as TESTING §5.4 J1 describes — decide there).
-4. Proposed issue: `s10-step1.spec.ts` runs axe on „s10 step 1, wide“ right after the H1 is visible, before the form field's fade-in ends (mobile Safari flake in #338, §4); wait as `register.spec.ts` does (`mat-form-field-animations-enabled` and `settled`) before that axe run.
+4. Issue #339: `s10-step1.spec.ts` runs axe on „s10 step 1, wide“ right after the H1 is visible, before the form field's fade-in ends (mobile Safari flake in #338, §4); wait as `register.spec.ts` does (`mat-form-field-animations-enabled` and `settled`) before that axe run.
 5. When the stack gets its own `E2E` environment (TESTING §3.3), the seeder's check stays as it is; `RebuildDatabase` then no longer runs, and the idempotent path is used.
