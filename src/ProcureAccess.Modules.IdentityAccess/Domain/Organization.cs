@@ -14,7 +14,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 internal sealed class Organization
 {
     /// <summary>Longest name (SPEC §7.2), counted in UTF-16 code units like <see cref="string.Length"/>.</summary>
-    public const int NameMaxLength = 120;
+    public const int NameMaxLength = OrganizationLimits.NameMaxLength;
 
     private Organization()
     {

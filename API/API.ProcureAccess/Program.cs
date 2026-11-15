@@ -126,7 +126,8 @@ try
        .MapIdentityAccessEndpoints()
        .MapAuthEndpoints()
        .MapRegistrationEndpoints()
-       .MapPasswordResetEndpoints();
+       .MapPasswordResetEndpoints()
+       .MapOrganizationEndpoints();
 
     app.ConfigureSwaggerExplorer();
 

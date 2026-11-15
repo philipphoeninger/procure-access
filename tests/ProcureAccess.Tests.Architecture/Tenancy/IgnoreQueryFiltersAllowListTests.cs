@@ -10,8 +10,9 @@ namespace ProcureAccess.Tests.Architecture.Tenancy;
 
 /// <summary>
 /// TEN-02 (ARCHITECTURE §5.4, ADR-007; S5-15): <c>IgnoreQueryFilters()</c> bypasses the organisation
-/// filter, so it appears only at the call sites listed in <see cref="AllowList"/>, each with its
-/// reason. The scan reads every production source file (the modules, the host and the legacy
+/// filter, and so does raw SQL (<c>FromSql…</c>, <c>SqlQuery…</c>, <c>ExecuteSql…</c>; since S5-16a,
+/// the first module call), so they appear only at the call sites listed in <see cref="AllowList"/>,
+/// each with its reason. The scan reads every production source file (the modules, the host and the legacy
 /// projects); tests are not scanned, because they bypass the filter to set data up.
 /// </summary>
 /// <remarks>
@@ -20,22 +21,30 @@ namespace ProcureAccess.Tests.Architecture.Tenancy;
 /// </remarks>
 public class IgnoreQueryFiltersAllowListTests
 {
-    /// <summary>The call, not the name: the legacy repositories have methods named after it.</summary>
-    private const string Token = ".IgnoreQueryFilters(";
+    /// <summary>
+    /// The calls, not the names: the legacy repositories have methods named after them
+    /// (<c>IgnoreQueryFilters</c>, <c>ExecuteSqlString</c>). Each prefix covers its variants
+    /// (<c>FromSqlRaw</c>, <c>ExecuteSqlAsync</c> …).
+    /// </summary>
+    private static readonly string[] Tokens = [".IgnoreQueryFilters(", ".FromSql", ".SqlQuery", ".ExecuteSql"];
 
     private static readonly string[] ProductionFolders = ["src", "API", "DAL", "SERVICES"];
 
-    /// <summary>Allowed call sites: repository-relative path → expected number of calls in that file.</summary>
+    /// <summary>Allowed call sites: repository-relative path → expected number of calls (all tokens) in that file.</summary>
     private static readonly IReadOnlyDictionary<string, int> AllowList = new Dictionary<string, int>(StringComparer.Ordinal)
     {
         // Loads the signed-in user's own memberships, which define the filter, so they cannot be
         // read through it (ARCHITECTURE §5.4; one query per signed-in request).
         ["src/ProcureAccess.Modules.IdentityAccess/Tenancy/OrganizationContextMiddleware.cs"] = 1,
-        // Legacy: the generic repositories bypass the legacy context's own filters (soft delete).
+        // Raw SQL that reads nothing: the row lock of the organisation before a role change or a
+        // removal (TEN-11), taken only after the filtered read found the organisation (S5-16a).
+        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/OrganizationMemberService.cs"] = 1,
+        // Legacy: the generic repositories bypass the legacy context's own filters (soft delete)
+        // and offer raw SQL (ExecuteSqlRaw, FromSqlRaw; two calls each with IgnoreQueryFilters).
         // The legacy context has no organisation-scoped entity (TEN-01 finds none), so these touch
         // no organisation filter; they go with the legacy repositories in their migration steps.
-        ["DAL/DAL.ProcureAccess/Repos/Base/BaseRepo.cs"] = 1,
-        ["DAL/DAL.ProcureAccess/Repos/Base/BaseViewRepo.cs"] = 1,
+        ["DAL/DAL.ProcureAccess/Repos/Base/BaseRepo.cs"] = 2,
+        ["DAL/DAL.ProcureAccess/Repos/Base/BaseViewRepo.cs"] = 2,
         ["DAL/DAL.ProcureAccess/Repos/UserRepo.cs"] = 1,
     };
 
@@ -55,7 +64,7 @@ public class IgnoreQueryFiltersAllowListTests
             .ToDictionary(hit => hit.Path, hit => hit.Count, StringComparer.Ordinal);
 
         found.ShouldBe(AllowList, ignoreOrder: true,
-            $"{Token}) bypasses the organisation filter (TEN-02): list every call site with its reason in {nameof(AllowList)}.");
+            $"{string.Join(", ", Tokens)} bypass the organisation filter (TEN-02): list every call site with its reason in {nameof(AllowList)}.");
     }
 
     [Fact]
@@ -80,11 +89,14 @@ public class IgnoreQueryFiltersAllowListTests
                 continue; // a comment that names the method, e.g. this file's own documentation
             }
 
-            var index = 0;
-            while ((index = line.IndexOf(Token, index, StringComparison.Ordinal)) >= 0)
+            foreach (var token in Tokens)
             {
-                count++;
-                index += Token.Length;
+                var index = 0;
+                while ((index = line.IndexOf(token, index, StringComparison.Ordinal)) >= 0)
+                {
+                    count++;
+                    index += token.Length;
+                }
             }
         }
 

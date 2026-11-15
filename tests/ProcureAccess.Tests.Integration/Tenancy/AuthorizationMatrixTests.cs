@@ -4,13 +4,7 @@
 
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing.Handlers;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
-using ProcureAccess.Modules.IdentityAccess.Persistence;
+using API.ProcureAccess.Organizations;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
 using ProcureAccess.Tests.Shared.Fixtures;
@@ -20,48 +14,58 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.Tenancy;
 
 /// <summary>
-/// TEN-05, the skeleton (ARCHITECTURE §9.1, SPEC R-ORG-05; S5-15): the matrix Owner / Editor /
-/// Reader of organisation A, Owner of B, user without organisation, anonymous × a read, an edit and
-/// an owner endpoint on organisation A, with the expected status codes. The organisation comes from
-/// the route (the resource); a client-supplied organisation header changes nothing. Until S5-16
-/// adds the real organisation endpoints, the endpoints are the test-only
-/// <see cref="OrganizationProbeController"/>, which uses the requirement and the filter exactly as
-/// a module endpoint will; S5-16 moves the matrix onto the real endpoints.
+/// TEN-05 (ARCHITECTURE §9.1, SPEC R-ORG-05): the matrix Owner / Editor / Reader of organisation A,
+/// Owner of B, user without organisation, anonymous × every organisation endpoint on organisation A,
+/// with the expected status codes (non-member 404, member below the role 403, anonymous 401). The
+/// organisation comes from the route (the resource); a client-supplied organisation header changes
+/// nothing. Since S5-16a on the real organisation endpoints (the test-only probe of S5-15 is gone);
+/// the workspace and configurator endpoints add their rows with their steps.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
     private const string Anonymous = "anonymous";
 
-    private ProcureAccessApiFactory? _host;
-    private Tenants? _tenants;
+    /// <summary><c>GET members</c>: Reader and up.</summary>
+    private const string Read = "read";
 
-    private ProcureAccessApiFactory Host => _host ?? throw new InvalidOperationException("The host is not started.");
+    /// <summary><c>PATCH members/{reader-a}</c> to Editor: Owner only.</summary>
+    private const string ChangeRole = "change-role";
+
+    /// <summary><c>DELETE members/{someone else of A}</c>: Owner only.</summary>
+    private const string RemoveOther = "remove-other";
+
+    /// <summary><c>DELETE members/{own id}</c> (leave): every member; the last Owner gets 409 (TEN-11).</summary>
+    private const string Leave = "leave";
+
+    private Tenants? _tenants;
 
     private Tenants Fixture => _tenants ?? throw new InvalidOperationException("The fixture is not stored.");
 
     public static TheoryData<string, string, HttpStatusCode> Matrix => new()
     {
-        // Read (Reader or above)
-        { TestUsers.OwnerA.Name, "GET", HttpStatusCode.OK },
-        { TestUsers.EditorA.Name, "GET", HttpStatusCode.OK },
-        { TestUsers.ReaderA.Name, "GET", HttpStatusCode.OK },
-        { TestUsers.OwnerB.Name, "GET", HttpStatusCode.NotFound },
-        { TestUsers.Member.Name, "GET", HttpStatusCode.NotFound },
-        { Anonymous, "GET", HttpStatusCode.Unauthorized },
-        // Edit (Editor or above)
-        { TestUsers.OwnerA.Name, "POST", HttpStatusCode.NoContent },
-        { TestUsers.EditorA.Name, "POST", HttpStatusCode.NoContent },
-        { TestUsers.ReaderA.Name, "POST", HttpStatusCode.Forbidden },
-        { TestUsers.OwnerB.Name, "POST", HttpStatusCode.NotFound },
-        { TestUsers.Member.Name, "POST", HttpStatusCode.NotFound },
-        { Anonymous, "POST", HttpStatusCode.Unauthorized },
-        // Owner only
-        { TestUsers.OwnerA.Name, "DELETE", HttpStatusCode.NoContent },
-        { TestUsers.EditorA.Name, "DELETE", HttpStatusCode.Forbidden },
-        { TestUsers.ReaderA.Name, "DELETE", HttpStatusCode.Forbidden },
-        { TestUsers.OwnerB.Name, "DELETE", HttpStatusCode.NotFound },
-        { TestUsers.Member.Name, "DELETE", HttpStatusCode.NotFound },
-        { Anonymous, "DELETE", HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, Read, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, Read, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, Read, HttpStatusCode.OK },
+        { TestUsers.OwnerB.Name, Read, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, Read, HttpStatusCode.NotFound },
+        { Anonymous, Read, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ChangeRole, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, ChangeRole, HttpStatusCode.Forbidden },
+        { TestUsers.ReaderA.Name, ChangeRole, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ChangeRole, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ChangeRole, HttpStatusCode.NotFound },
+        { Anonymous, ChangeRole, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, RemoveOther, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, RemoveOther, HttpStatusCode.Forbidden },
+        { TestUsers.ReaderA.Name, RemoveOther, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, RemoveOther, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, RemoveOther, HttpStatusCode.NotFound },
+        { Anonymous, RemoveOther, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, Leave, HttpStatusCode.Conflict },
+        { TestUsers.EditorA.Name, Leave, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, Leave, HttpStatusCode.NoContent },
+        { TestUsers.OwnerB.Name, Leave, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, Leave, HttpStatusCode.NotFound },
     };
 
     public async ValueTask InitializeAsync()
@@ -69,30 +73,19 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        _host = new ProcureAccessApiFactory(
-            Api.ConnectionString,
-            Clock,
-            configureServices: services => services.AddControllers().AddApplicationPart(typeof(OrganizationProbeController).Assembly));
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        if (_host is not null)
-        {
-            await _host.DisposeAsync();
-        }
-    }
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    [Theory(DisplayName = "INV:TEN-05 " + nameof(Endpoint_UserAndMethod_AnswersTheMatrixStatus))]
+    [Theory(DisplayName = "INV:TEN-05 " + nameof(Endpoint_UserAndAction_AnswersTheMatrixStatus))]
     [Trait("Invariant", "TEN-05")]
     [MemberData(nameof(Matrix))]
-    public async Task Endpoint_UserAndMethod_AnswersTheMatrixStatus(string userName, string method, HttpStatusCode expected)
+    public async Task Endpoint_UserAndAction_AnswersTheMatrixStatus(string userName, string action, HttpStatusCode expected)
     {
-        using var client = CreateHostClient(userName == Anonymous ? null : TestUsers.ByName[userName]);
+        var user = userName == Anonymous ? null : TestUsers.ByName[userName];
+        using var client = CreateClient(user);
 
-        using var response = await client.SendAsync(
-            new HttpRequestMessage(new HttpMethod(method), $"{OrganizationProbeController.Path}/{Fixture.A.Id}"),
-            TestContext.Current.CancellationToken);
+        using var response = await SendAsync(client, action, user);
 
         response.StatusCode.ShouldBe(expected);
     }
@@ -101,12 +94,11 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     [Trait("Invariant", "TEN-05")]
     public async Task Read_MemberOfA_SeesTheOrganizationName()
     {
-        using var client = CreateHostClient(TestUsers.ReaderA);
+        using var client = CreateClient(TestUsers.ReaderA);
 
-        var answer = await client.GetFromJsonAsync<OrganizationProbeController.OrganizationAnswer>(
-            $"{OrganizationProbeController.Path}/{Fixture.A.Id}", TestContext.Current.CancellationToken);
+        var answer = await client.GetFromJsonAsync<OrganizationMembersResponse>(MembersPath(Fixture.A.Id), Cancellation);
 
-        answer.ShouldNotBeNull().Name.ShouldBe("Organisation A");
+        answer.ShouldNotBeNull().Organization.Name.ShouldBe("Organisation A");
     }
 
     [Theory(DisplayName = "INV:TEN-05 " + nameof(Endpoint_ClientOrganizationHeader_HasNoEffect))]
@@ -116,111 +108,85 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     [InlineData("owner-a", "B", HttpStatusCode.OK)]
     public async Task Endpoint_ClientOrganizationHeader_HasNoEffect(string userName, string headerOrganization, HttpStatusCode expected)
     {
-        using var client = CreateHostClient(TestUsers.ByName[userName]);
+        using var client = CreateClient(TestUsers.ByName[userName]);
         var named = headerOrganization == "A" ? Fixture.A.Id : Fixture.B.Id;
         client.DefaultRequestHeaders.Add("X-Organization-Id", named.ToString());
 
-        using var response = await client.GetAsync($"{OrganizationProbeController.Path}/{Fixture.A.Id}", TestContext.Current.CancellationToken);
+        using var response = await client.GetAsync(MembersPath(Fixture.A.Id), Cancellation);
 
         response.StatusCode.ShouldBe(expected);
     }
 
-    [Theory(DisplayName = "INV:TEN-01 " + nameof(Memberships_Request_ListsOnlyTheUsersOrganizations))]
+    [Theory(DisplayName = "INV:TEN-05 " + nameof(Change_MemberOfAnotherOrganizationAsTarget_Returns404))]
+    [Trait("Invariant", "TEN-05")]
+    [InlineData("PATCH")]
+    [InlineData("DELETE")]
+    public async Task Change_MemberOfAnotherOrganizationAsTarget_Returns404(string method)
+    {
+        // Owner of A names a member of B on A's route: no such member of A exists.
+        using var client = CreateClient(TestUsers.OwnerA);
+        using var request = new HttpRequestMessage(new HttpMethod(method), MemberPath(Fixture.A.Id, TestUsers.ReaderB.Id))
+        {
+            Content = method == "PATCH" ? JsonContent.Create(new { role = "editor" }) : null,
+        };
+
+        using var response = await client.SendAsync(request, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Theory(DisplayName = "INV:TEN-01 " + nameof(Members_Request_ListsOnlyTheUsersOrganization))]
     [Trait("Invariant", "TEN-01")]
     [InlineData("owner-a", "A")]
     [InlineData("reader-b", "B")]
-    public async Task Memberships_Request_ListsOnlyTheUsersOrganizations(string userName, string organization)
+    public async Task Members_Request_ListsOnlyTheUsersOrganization(string userName, string organization)
     {
-        using var client = CreateHostClient(TestUsers.ByName[userName]);
-        var own = organization == "A" ? Fixture.A.Id : Fixture.B.Id;
-        var other = organization == "A" ? Fixture.B.Id : Fixture.A.Id;
+        using var client = CreateClient(TestUsers.ByName[userName]);
+        var own = organization == "A" ? Fixture.A : Fixture.B;
+        var other = organization == "A" ? Fixture.B : Fixture.A;
         // Naming the other organisation changes nothing: the filter follows the memberships.
-        client.DefaultRequestHeaders.Add("X-Organization-Id", other.ToString());
+        client.DefaultRequestHeaders.Add("X-Organization-Id", other.Id.ToString());
 
-        var memberships = await client.GetFromJsonAsync<List<OrganizationProbeController.MembershipAnswer>>(
-            OrganizationProbeController.MembershipsPath, TestContext.Current.CancellationToken);
+        var answer = await client.GetFromJsonAsync<OrganizationMembersResponse>(MembersPath(own.Id), Cancellation);
+        using var foreign = await client.GetAsync(MembersPath(other.Id), Cancellation);
 
-        memberships.ShouldNotBeNull().Count.ShouldBe(3);
-        memberships.ShouldAllBe(m => m.OrganizationId == own);
+        var expected = Fixture.Memberships.Where(m => m.OrganizationId == own.Id).Select(m => m.UserId).Order(StringComparer.Ordinal);
+        answer.ShouldNotBeNull().Members.Select(m => m.UserId).Order(StringComparer.Ordinal).ShouldBe(expected);
+        foreign.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
-    [Fact(DisplayName = "INV:TEN-01 " + nameof(Memberships_UserWithoutOrganization_SeesNone))]
+    [Fact(DisplayName = "INV:TEN-01 " + nameof(Members_UserWithoutOrganization_SeesNoOrganization))]
     [Trait("Invariant", "TEN-01")]
-    public async Task Memberships_UserWithoutOrganization_SeesNone()
+    public async Task Members_UserWithoutOrganization_SeesNoOrganization()
     {
-        using var client = CreateHostClient(TestUsers.Member);
+        using var client = CreateClient(TestUsers.Member);
 
-        var memberships = await client.GetFromJsonAsync<List<OrganizationProbeController.MembershipAnswer>>(
-            OrganizationProbeController.MembershipsPath, TestContext.Current.CancellationToken);
+        using var a = await client.GetAsync(MembersPath(Fixture.A.Id), Cancellation);
+        using var b = await client.GetAsync(MembersPath(Fixture.B.Id), Cancellation);
 
-        memberships.ShouldNotBeNull().ShouldBeEmpty();
+        a.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        b.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
-    /// <summary>A client of the probe host with its own cookie jar and the antiforgery hook (as <see cref="IntegrationTest.CreateClient"/>).</summary>
-    private HttpClient CreateHostClient(TestUser? user)
+    private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
+
+    private static string MembersPath(Guid organizationId) => $"/api/v1/organizations/{organizationId}/members";
+
+    private static string MemberPath(Guid organizationId, string userId) => $"{MembersPath(organizationId)}/{userId}";
+
+    /// <summary>The request of <paramref name="action"/> on organisation A for <paramref name="user"/>.</summary>
+    private Task<HttpResponseMessage> SendAsync(HttpClient client, string action, TestUser? user)
     {
-        var cookies = new CookieContainer();
-        var client = Host.CreateDefaultClient(BaseAddress, new AntiforgeryHandler(cookies), new CookieContainerHandler(cookies));
-        if (user is not null)
+        var a = Fixture.A.Id;
+        return action switch
         {
-            client.DefaultRequestHeaders.Add(TestAuthHandler.UserHeader, user.Name);
-        }
-
-        return client;
+            Read => client.GetAsync(MembersPath(a), Cancellation),
+            ChangeRole => client.PatchAsJsonAsync(MemberPath(a, TestUsers.ReaderA.Id), new { role = "editor" }, Cancellation),
+            // Someone else than the caller: the Editor for everybody but the Editor, who names the Reader.
+            RemoveOther => client.DeleteAsync(
+                MemberPath(a, user == TestUsers.EditorA ? TestUsers.ReaderA.Id : TestUsers.EditorA.Id), Cancellation),
+            Leave => client.DeleteAsync(MemberPath(a, user!.Id), Cancellation),
+            _ => throw new ArgumentOutOfRangeException(nameof(action), action, "Unknown action."),
+        };
     }
-}
-
-/// <summary>
-/// Test-only endpoints on organisation A's route, built as a module endpoint of S5-16 will be: the
-/// organisation is the route's (<see cref="OrganizationReference"/>), the check is the resource-based
-/// <see cref="OrganizationRoleRequirement"/>, a refusal answers <see cref="OrganizationAccess.StatusOf"/>,
-/// and reads go through the filtered context.
-/// </summary>
-[ApiController]
-[Route(Path)]
-[Authorize]
-public sealed class OrganizationProbeController(IAuthorizationService authorization) : ControllerBase
-{
-    public const string Path = "/test/organizations";
-    public const string MembershipsPath = "/test/organizations/memberships";
-
-    public sealed record OrganizationAnswer(Guid Id, string Name);
-
-    public sealed record MembershipAnswer(Guid OrganizationId, string UserId, string Role);
-
-    [HttpGet("{orgId:guid}")]
-    public async Task<IActionResult> Read(Guid orgId)
-    {
-        if (await RefusedAsync(orgId, OrganizationRoleRequirement.Reader) is { } status)
-        {
-            return StatusCode(status);
-        }
-
-        var db = HttpContext.RequestServices.GetRequiredService<IdentityAccessDbContext>();
-        var organization = await db.Organizations.AsNoTracking().SingleOrDefaultAsync(o => o.Id == orgId, HttpContext.RequestAborted);
-        return organization is null ? NotFound() : Ok(new OrganizationAnswer(organization.Id, organization.Name));
-    }
-
-    [HttpPost("{orgId:guid}")]
-    public async Task<IActionResult> Edit(Guid orgId) =>
-        await RefusedAsync(orgId, OrganizationRoleRequirement.Editor) is { } status ? StatusCode(status) : NoContent();
-
-    [HttpDelete("{orgId:guid}")]
-    public async Task<IActionResult> Own(Guid orgId) =>
-        await RefusedAsync(orgId, OrganizationRoleRequirement.Owner) is { } status ? StatusCode(status) : NoContent();
-
-    /// <summary>Every membership the request may see: the filter alone decides, no role check.</summary>
-    [HttpGet("memberships")]
-    public async Task<IActionResult> Memberships()
-    {
-        var db = HttpContext.RequestServices.GetRequiredService<IdentityAccessDbContext>();
-        var memberships = await db.OrganizationMemberships.AsNoTracking()
-                                  .OrderBy(m => m.UserId)
-                                  .Select(m => new MembershipAnswer(m.OrganizationId, m.UserId, m.Role.ToString()))
-                                  .ToListAsync(HttpContext.RequestAborted);
-        return Ok(memberships);
-    }
-
-    private async Task<int?> RefusedAsync(Guid orgId, OrganizationRoleRequirement requirement) =>
-        OrganizationAccess.StatusOf(await authorization.AuthorizeAsync(User, new OrganizationReference(orgId), requirement));
 }

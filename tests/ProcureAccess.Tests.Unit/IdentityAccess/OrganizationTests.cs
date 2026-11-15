@@ -104,4 +104,43 @@ public class OrganizationTests
         (OrganizationRole.Reader < OrganizationRole.Editor).ShouldBeTrue();
         (OrganizationRole.Editor < OrganizationRole.Owner).ShouldBeTrue();
     }
+
+    [Fact]
+    public void ChangeRole_DefinedRole_SetsIt()
+    {
+        var membership = OrganizationMembership.Create(Guid.NewGuid(), "user-2", OrganizationRole.Reader, Now, Now);
+
+        membership.ChangeRole(OrganizationRole.Owner);
+
+        membership.Role.ShouldBe(OrganizationRole.Owner);
+    }
+
+    [Fact]
+    public void ChangeRole_UndefinedRole_ThrowsAndKeepsTheRole()
+    {
+        var membership = OrganizationMembership.Create(Guid.NewGuid(), "user-2", OrganizationRole.Editor, Now, Now);
+
+        Should.Throw<ArgumentOutOfRangeException>(() => membership.ChangeRole((OrganizationRole)7));
+
+        membership.Role.ShouldBe(OrganizationRole.Editor);
+    }
+
+    [Theory(DisplayName = "INV:TEN-11 " + nameof(LeavesNoOwner_RoleChangeOrRemoval_IsTrueOnlyForTheLastOwner))]
+    [Trait("Invariant", "TEN-11")]
+    // The last Owner: demoting or removing leaves none.
+    [InlineData(OrganizationRole.Owner, OrganizationRole.Editor, 1, true)]
+    [InlineData(OrganizationRole.Owner, OrganizationRole.Reader, 1, true)]
+    [InlineData(OrganizationRole.Owner, null, 1, true)]
+    // The last Owner stays Owner: nothing changes.
+    [InlineData(OrganizationRole.Owner, OrganizationRole.Owner, 1, false)]
+    // Another Owner remains.
+    [InlineData(OrganizationRole.Owner, OrganizationRole.Editor, 2, false)]
+    [InlineData(OrganizationRole.Owner, null, 2, false)]
+    // Members below Owner never take the last Owner away.
+    [InlineData(OrganizationRole.Editor, OrganizationRole.Reader, 1, false)]
+    [InlineData(OrganizationRole.Reader, null, 1, false)]
+    [InlineData(OrganizationRole.Editor, OrganizationRole.Owner, 1, false)]
+    public void LeavesNoOwner_RoleChangeOrRemoval_IsTrueOnlyForTheLastOwner(
+        OrganizationRole current, OrganizationRole? next, int owners, bool expected) =>
+        OrganizationMembership.LeavesNoOwner(current, next, owners).ShouldBe(expected);
 }
