@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-15 (4 points) · **Issues:** none
 > **Requirements / invariants:** SPEC R-ORG-05 (the authorisation model; its endpoints come with S5-16 and the workspace steps); **TEN-01, TEN-02 `active`, TEN-05 `active` as the skeleton** (TESTING_v65 V207–V209); ARCHITECTURE_v58 C144, ADR-007 accepted; TESTING §6.2 Tenants fixture in part (V210)
-> **Status:** done — pull request open (2026-11-15); CI result to be recorded
+> **Status:** done — pull request #340 open (2026-11-15); CI result to be recorded
 > **Scope:** `Organization` and `OrganizationMembership` (Owner / Editor / Reader) in the IdentityAccess module with the migration; the EF global query filter on `OrganizationId`, bound to the memberships of the request; the resource-based role requirement; the reflection-driven isolation test, the `IgnoreQueryFilters()` allow-list test and the authorisation-matrix skeleton. No endpoint, screen or text.
 > **Owner decisions (2026-11-15, before the task, all as recommended):** 1 (a) — `IOrganizationContext` is declared in `Platform.Contracts` and implemented by IdentityAccess (the pattern of `IShareableResourceProvider`; Platform's own `ShareLink` is scoped) · 2 (a) — the filter is bound to the set of the signed-in user's memberships, loaded once per request, never to a header or a stored „current organisation“ · 3 (a) — TEN-05 starts on a test-only probe controller until S5-16 adds the real endpoints · 4 — `OrganizationMembership` is itself under the filter; the membership loader is the first allow-listed bypass. **O-S5-5 (O-22) was not needed:** no `Contracts` project references another.
 
