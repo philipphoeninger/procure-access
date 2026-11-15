@@ -228,11 +228,11 @@ jobs:
         # DEBUG (#337 bisect, never merged)
         variant:
           - { name: baseline, noAxe: '', remove: '', exclude: '' }
-          - { name: remove-radios-and-field, noAxe: '', remove: 'pa-invite-form mat-radio-group, pa-invite-form mat-form-field', exclude: '' }
-          - { name: remove-fieldset, noAxe: '', remove: 'pa-invite-form fieldset', exclude: '' }
-          - { name: remove-card, noAxe: '', remove: 'pa-invite-form .pa-invite__card', exclude: '' }
-          - { name: remove-actions, noAxe: '', remove: 'pa-invite-form .pa-invite__actions', exclude: '' }
-          - { name: remove-summary, noAxe: '', remove: 'pa-invite-form pa-error-summary', exclude: '' }
+          - { name: remove-section, noAxe: '', remove: 'pa-invite-form section', exclude: '' }
+          - { name: remove-form-element, noAxe: '', remove: 'pa-invite-form form', exclude: '' }
+          - { name: empty-form-element, noAxe: '', remove: 'pa-invite-form form > *', exclude: '' }
+          - { name: remove-h2, noAxe: '', remove: 'pa-invite-form h2', exclude: '' }
+          - { name: remove-members-table, noAxe: '', remove: '.pa-members__table', exclude: '' }
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
