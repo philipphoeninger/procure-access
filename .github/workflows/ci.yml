@@ -228,11 +228,11 @@ jobs:
         # DEBUG (#337 bisect, never merged)
         variant:
           - { name: baseline, noAxe: '', remove: '', exclude: '' }
-          - { name: no-axe, noAxe: '1', remove: '', exclude: '' }
-          - { name: axe-exclude-form, noAxe: '', remove: '', exclude: 'pa-invite-form' }
-          - { name: remove-form, noAxe: '', remove: 'pa-invite-form', exclude: '' }
-          - { name: remove-radios, noAxe: '', remove: 'pa-invite-form mat-radio-group', exclude: '' }
-          - { name: remove-field, noAxe: '', remove: 'pa-invite-form mat-form-field', exclude: '' }
+          - { name: remove-radios-and-field, noAxe: '', remove: 'pa-invite-form mat-radio-group, pa-invite-form mat-form-field', exclude: '' }
+          - { name: remove-fieldset, noAxe: '', remove: 'pa-invite-form fieldset', exclude: '' }
+          - { name: remove-card, noAxe: '', remove: 'pa-invite-form .pa-invite__card', exclude: '' }
+          - { name: remove-actions, noAxe: '', remove: 'pa-invite-form .pa-invite__actions', exclude: '' }
+          - { name: remove-summary, noAxe: '', remove: 'pa-invite-form pa-error-summary', exclude: '' }
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -296,7 +296,7 @@ jobs:
           -e CI -e GITHUB_ACTIONS -e GITHUB_WORKSPACE=/work -e PROJECT
           -e E2E_DEBUG_NO_AXE -e E2E_DEBUG_REMOVE -e E2E_DEBUG_EXCLUDE
           -v "$GITHUB_WORKSPACE:/work" -w /work/e2e
-          "$IMAGE" npx playwright test organization/ --project="$PROJECT" --repeat-each=10
+          "$IMAGE" npx playwright test organization/ --project="$PROJECT" --repeat-each=15
         env:
           IMAGE: ${{ steps.image.outputs.image }}
           PROJECT: ${{ matrix.project }}
