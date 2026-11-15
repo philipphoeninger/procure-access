@@ -26,6 +26,7 @@ export interface ProblemDetails {
  */
 export const PROBLEM_TYPE_KEYS: Readonly<Record<string, string>> = {
   'email-unconfirmed': 'auth.confirm.required',
+  'last-owner': 'org.members.lastOwner',
 };
 
 /**

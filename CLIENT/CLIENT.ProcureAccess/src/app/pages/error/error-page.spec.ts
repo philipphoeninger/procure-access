@@ -26,4 +26,17 @@ describe('ErrorPage (S80, R-SHL-08)', () => {
     expect(screen.getByText(body)).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Zur Startseite' }).getAttribute('href')).toBe('/');
   });
+
+  it('shows the page of its kind input instead of the one of the route, for a page that embeds S80 (S21)', async () => {
+    await render(ErrorPage, {
+      inputs: { kind: 'server' },
+      providers: [
+        provideTestTranslations(),
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: { snapshot: { data: { [ERROR_PAGE_KEY]: 'notFound' } } } },
+      ],
+    });
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Etwas ist schiefgelaufen' })).toBeTruthy();
+  });
 });

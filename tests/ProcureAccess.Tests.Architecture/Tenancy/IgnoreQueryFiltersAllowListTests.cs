@@ -39,6 +39,9 @@ public class IgnoreQueryFiltersAllowListTests
         // Raw SQL that reads nothing: the row lock of the organisation before a role change or a
         // removal (TEN-11), taken only after the filtered read found the organisation (S5-16a).
         ["src/ProcureAccess.Modules.IdentityAccess/Organizations/OrganizationMemberService.cs"] = 1,
+        // The E2E seeder runs outside a request, where the filter shows nothing: its check whether
+        // the test organisation exists reads past it (Development and E2E only, S5-16b).
+        ["src/ProcureAccess.Modules.IdentityAccess/Organizations/TestOrganizationSeeder.cs"] = 1,
         // Legacy: the generic repositories bypass the legacy context's own filters (soft delete)
         // and offer raw SQL (ExecuteSqlRaw, FromSqlRaw; two calls each with IgnoreQueryFilters).
         // The legacy context has no organisation-scoped entity (TEN-01 finds none), so these touch

@@ -12,6 +12,7 @@ import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
+import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -137,6 +138,21 @@ export const routes: Routes = [
     loadComponent: () => import('@app/features/criteria/proposal/criterion-proposal').then((m) => m.CriterionProposal),
     canActivate: [authGuard]
    },
+  // S20 „Organisation anlegen oder beitreten“ and S21 „Mitglieder“ (R-ORG-01, R-ORG-03, R-ORG-04;
+  // signed in only; no menu entry until S5-18, owner decision S5-16 6a). S21 loads its members
+  // through a resolver, so its title names the organisation at the route change.
+  {
+    path: ORGANIZATION_PATH,
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./features/organization/pages/organization-start/organization-start-page').then((m) => m.OrganizationStartPage),
+    canActivate: [authGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.org.start' },
+  },
+  {
+    path: `${ORGANIZATION_PATH}/:id/${MEMBERS_SEGMENT}`,
+    loadChildren: () => import('./features/organization/pages/members/members.routing').then((m) => m.MEMBERS_ROUTES),
+  },
   // S80 error pages (R-SHL-08); the page title is the H1
   {
     path: 'unauthorized',

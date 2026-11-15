@@ -397,7 +397,11 @@
       "invalid": "Link nicht mehr gültig"
     },
     "reset": "Passwort zurücksetzen",
-    "reset.invalid": "Link nicht mehr gültig"
+    "reset.invalid": "Link nicht mehr gültig",
+    "org": {
+      "start": "Organisation anlegen oder beitreten",
+      "members": "Mitglieder von {{org}}"
+    }
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",
@@ -673,5 +677,54 @@
       "notApplicable.explain": "Das Produkt hat die Funktion nicht, um die es im Kriterium geht, zum Beispiel keine Videos. Das ist weder ein Mangel noch ein Pluspunkt.",
       "unknown.explain": "Zu diesem Kriterium gibt es noch keine Bewertung. Das heißt nicht, dass es nicht erfüllt ist."
     }
+  },
+  "org": {
+    "start": {
+      "title": "Organisation anlegen oder beitreten",
+      "intro": "Kriterienlisten und Beschaffungsprojekte gehören zu einer Organisation, damit Sie gemeinsam mit Ihrem Team daran arbeiten können. Andere Organisationen sehen Ihre Listen und Projekte nicht.",
+      "contributeNote": "Sie möchten nur einen Erfahrungsbericht schreiben oder ein Prüfergebnis veröffentlichen? Dafür brauchen Sie keine Organisation."
+    },
+    "create": {
+      "name": "Name der Organisation",
+      "type": "Art der Organisation",
+      "type.public": "Öffentliche Stelle",
+      "type.company": "Unternehmen",
+      "type.association": "Verband oder Verein",
+      "submit": "Organisation anlegen"
+    },
+    "join": {
+      "text": "Wenn Ihre Organisation schon angelegt ist, bitten Sie ein Mitglied mit der Rolle „Verwalten“ um eine Einladung."
+    },
+    "members": {
+      "title": "Mitglieder von {{org}}",
+      "role": {
+        "owner": "Verwalten",
+        "owner.hint": "Kann Mitglieder einladen, Rollen ändern und alles bearbeiten.",
+        "editor": "Bearbeiten",
+        "editor.hint": "Kann Listen und Projekte anlegen und bearbeiten.",
+        "reader": "Lesen",
+        "reader.hint": "Kann Listen und Projekte ansehen.",
+        "label": "Rolle von {{email}}"
+      },
+      "column": {
+        "member": "Mitglied",
+        "role": "Rolle",
+        "actions": "Aktionen"
+      },
+      "you": "(Sie)",
+      "deletedAccount": "Gelöschtes Konto",
+      "roleChanged": "Rolle von {{email}} geändert: {{role}}.",
+      "remove.title": "Mitglied entfernen?",
+      "remove.body": "{{email}} verliert den Zugriff auf die Kriterienlisten und Projekte von {{org}}.",
+      "removed": "{{email}} wurde aus der Organisation entfernt.",
+      "lastOwner": "Jede Organisation braucht mindestens ein Mitglied mit der Rolle „Verwalten“. Geben Sie diese Rolle zuerst einem anderen Mitglied.",
+      "remove": "Aus der Organisation entfernen",
+      "error": {
+        "title": "Änderung nicht möglich"
+      }
+    },
+    "leave": "Organisation verlassen",
+    "leave.body": "Sie verlieren den Zugriff auf die Kriterienlisten und Projekte von {{org}}. Ihre veröffentlichten Beiträge bleiben unter Ihrem Beitragsprofil sichtbar.",
+    "left": "Sie haben die Organisation {{org}} verlassen."
   }
 }

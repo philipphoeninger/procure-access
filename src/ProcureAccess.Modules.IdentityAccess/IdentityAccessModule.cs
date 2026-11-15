@@ -102,6 +102,7 @@ public static class IdentityAccessModule
         // Organisations and members (S5-16a): the rules behind the host's organisation endpoints,
         // which add the members' addresses from the legacy users until M3.1 (owner decision S5-16 4a).
         services.AddScoped<IOrganizationMembers, OrganizationMemberService>();
+        services.AddScoped<TestOrganizationSeeder>();
 
         return services;
     }
@@ -140,6 +141,32 @@ public static class IdentityAccessModule
         var auth = routes.MapGroup("/auth").WithTags("Auth");
         SessionProbeEndpoint.Map(auth);
         return routes;
+    }
+
+    /// <summary>
+    /// The organisation part of the E2E seeder (TESTING §6.3; S5-16b, owner decision S5-16 7a):
+    /// creates the organisation <paramref name="id"/> named <paramref name="name"/> with
+    /// <paramref name="members"/> (exactly one Owner); an existing one of the same Owner stays, one of
+    /// another Owner (users created again after a rebuild) is replaced. Returns true when it created it.
+    /// The host calls it only where it seeds the E2E users (<c>Development</c> and <c>E2E</c>, the
+    /// switch <c>TestUsers:Password</c>), after the migrations; nothing here checks the environment.
+    /// </summary>
+    public static async Task<bool> SeedTestOrganizationAsync(
+        IServiceProvider services,
+        Guid id,
+        string name,
+        IReadOnlyList<(string UserId, OrganizationRole Role)> members,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(members);
+        if (members.Count(m => m.Role == OrganizationRole.Owner) != 1)
+        {
+            throw new ArgumentException("A test organisation has exactly one Owner.", nameof(members));
+        }
+
+        await using var scope = services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<TestOrganizationSeeder>().SeedAsync(id, name, members, cancellationToken);
     }
 
     /// <summary>

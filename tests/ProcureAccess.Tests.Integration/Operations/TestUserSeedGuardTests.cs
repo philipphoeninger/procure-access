@@ -7,6 +7,9 @@ using DAL.ProcureAccess.EFStructures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MODELS.ProcureAccess.Entities;
+using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
@@ -34,6 +37,7 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
         await StartApiAsync(environment, Password);
 
         (await UsersAsync()).ShouldBeEmpty();
+        (await OrganizationsAsync()).ShouldBeEmpty();
     }
 
     /// <summary>
@@ -61,6 +65,25 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
         (await db.UserRoles.CountAsync(TestContext.Current.CancellationToken)).ShouldBe(0);
     }
 
+    /// <summary>The E2E organisation with its Owner, Editor and Reader (S5-16b, owner decision S5-16 7a).</summary>
+    [Fact]
+    public async Task Startup_TestUsersConfigured_CreatesTheE2EOrganizationWithItsThreeMembers()
+    {
+        await StartApiAsync(TestCatalogSeedExtensions.E2EEnvironmentName, Password);
+
+        var users = (await UsersAsync()).ToDictionary(u => u.Email!, u => u.Id);
+        var organization = (await OrganizationsAsync()).ShouldHaveSingleItem();
+        organization.Id.ShouldBe(TestUserSeedExtensions.OrganizationId);
+        organization.Name.ShouldBe(TestUserSeedExtensions.OrganizationName);
+        organization.CreatedByUserId.ShouldBe(users[TestUserSeedExtensions.OrganizationOwnerEmail]);
+        await using var identity = CreateIdentityAccessContext();
+        var memberships = await identity.OrganizationMemberships.IgnoreQueryFilters().AsNoTracking()
+            .Select(m => new { m.UserId, m.Role })
+            .ToListAsync(TestContext.Current.CancellationToken);
+        memberships.Select(m => (m.UserId, m.Role)).OrderBy(m => m.Role)
+            .ShouldBe(TestUserSeedExtensions.OrganizationMembers.Select(m => (users[m.Email], m.Role)).OrderBy(m => m.Item2));
+    }
+
     [Fact]
     public async Task Startup_NoTestUserPassword_SeedsNothing()
     {
@@ -81,6 +104,26 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
         var second = await UsersAsync();
         second.Select(u => (u.Id, u.PasswordHash, u.SecurityStamp)).OrderBy(u => u.Id)
             .ShouldBe(first.Select(u => (u.Id, u.PasswordHash, u.SecurityStamp)).OrderBy(u => u.Id));
+        (await OrganizationsAsync()).ShouldHaveSingleItem();
+    }
+
+    /// <summary>
+    /// A rebuild deletes the users and the seeder creates them again with new ids: the E2E
+    /// organisation is created again for them, so its memberships never name a deleted user.
+    /// </summary>
+    [Fact]
+    public async Task Startup_RebuildDatabaseTwice_TheE2EOrganizationNamesTheCurrentUsers()
+    {
+        await StartApiAsync("Development", Password, rebuildDatabase: true);
+        await StartApiAsync("Development", Password, rebuildDatabase: true);
+
+        var users = (await UsersAsync()).ToDictionary(u => u.Email!, u => u.Id);
+        (await OrganizationsAsync()).ShouldHaveSingleItem().CreatedByUserId
+            .ShouldBe(users[TestUserSeedExtensions.OrganizationOwnerEmail]);
+        await using var identity = CreateIdentityAccessContext();
+        var memberIds = await identity.OrganizationMemberships.IgnoreQueryFilters().AsNoTracking()
+            .Select(m => m.UserId).ToListAsync(TestContext.Current.CancellationToken);
+        memberIds.Order().ShouldBe(TestUserSeedExtensions.OrganizationMembers.Select(m => users[m.Email]).Order());
     }
 
     /// <summary>
@@ -116,6 +159,15 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
         await using var db = CreateDbContext();
         return await db.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync(TestContext.Current.CancellationToken);
     }
+
+    private async Task<List<Organization>> OrganizationsAsync()
+    {
+        await using var db = CreateIdentityAccessContext();
+        return await db.Organizations.IgnoreQueryFilters().AsNoTracking().ToListAsync(TestContext.Current.CancellationToken);
+    }
+
+    private IdentityAccessDbContext CreateIdentityAccessContext() =>
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString).Options, FixedOrganizationContext.None);
 
     private ApplicationDBContext CreateDbContext() =>
         new(new DbContextOptionsBuilder<ApplicationDBContext>()
