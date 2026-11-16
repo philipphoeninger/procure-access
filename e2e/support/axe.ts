@@ -58,6 +58,9 @@ export async function expectNoAxeViolations(
   const suppressions = options.suppressions ?? axeSuppressions;
   validateAxeSuppressions(suppressions);
 
+  // DEBUG (#337, never merged): drop the names of sections before axe
+  const strip = process.env['E2E_DEBUG_STRIP'];
+  if (strip) await page.evaluate((selector) => document.querySelectorAll(selector).forEach((element) => element.removeAttribute('aria-labelledby')), strip);
   const current = await shownAppearance(page);
   const other: Appearance = current === 'light' ? 'dark' : 'light';
 
