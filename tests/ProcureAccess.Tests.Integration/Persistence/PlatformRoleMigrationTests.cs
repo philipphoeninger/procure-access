@@ -45,12 +45,11 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
         db.RoleClaims.AddRange(
             new IdentityRoleClaim<string> { RoleId = approver.Id, ClaimType = CustomClaimTypes.Permission, ClaimValue = LegacyApproveClaim },
             new IdentityRoleClaim<string> { RoleId = admin.Id, ClaimType = CustomClaimTypes.Permission, ClaimValue = LegacyApproveClaim });
-        var reviewer = UserRow("reviewer@example.test");
-        var owner = UserRow("owner@example.test");
-        db.Users.AddRange(reviewer, owner);
+        var reviewerId = await InsertUserAsync(db, "reviewer@example.test", cancellationToken);
+        var ownerId = await InsertUserAsync(db, "owner@example.test", cancellationToken);
         db.UserRoles.AddRange(
-            new IdentityUserRole<string> { UserId = reviewer.Id, RoleId = approver.Id },
-            new IdentityUserRole<string> { UserId = owner.Id, RoleId = admin.Id });
+            new IdentityUserRole<string> { UserId = reviewerId, RoleId = approver.Id },
+            new IdentityUserRole<string> { UserId = ownerId, RoleId = admin.Id });
         await db.SaveChangesAsync(cancellationToken);
         db.ChangeTracker.Clear();
 
@@ -61,8 +60,8 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
         roles.Single(r => r.Name == Roles.Moderator).Id.ShouldBe(approver.Id);
         roles.Single(r => r.Name == Roles.PlatformAdmin).Id.ShouldBe(admin.Id);
         roles.ShouldAllBe(r => r.NormalizedName == r.Name!.ToUpperInvariant());
-        (await RoleNamesOfAsync(db, reviewer.Id, cancellationToken)).ShouldBe([Roles.Moderator]);
-        (await RoleNamesOfAsync(db, owner.Id, cancellationToken)).ShouldBe([Roles.PlatformAdmin]);
+        (await RoleNamesOfAsync(db, reviewerId, cancellationToken)).ShouldBe([Roles.Moderator]);
+        (await RoleNamesOfAsync(db, ownerId, cancellationToken)).ShouldBe([Roles.PlatformAdmin]);
         await AssertPermissionsAsync(db, cancellationToken);
     }
 
@@ -128,13 +127,26 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
             where userRole.UserId == userId
             select role.Name).ToListAsync(cancellationToken);
 
-    private static User UserRow(string email) => new()
+    /// <summary>
+    /// Stores a user row in the schema of <see cref="MigrationBefore"/> with SQL, not through the
+    /// current <see cref="User"/> model, whose later columns (e.g. <c>CreatedAt</c>, S5-27) that
+    /// schema lacks. Nothing reads the row back as a <see cref="User"/>, so the JSON column holds
+    /// an empty object.
+    /// </summary>
+    private static async Task<string> InsertUserAsync(ApplicationDBContext db, string email, CancellationToken cancellationToken)
     {
-        UserName = email,
-        NormalizedUserName = email.ToUpperInvariant(),
-        Email = email,
-        NormalizedEmail = email.ToUpperInvariant(),
-    };
+        var id = Guid.NewGuid().ToString();
+        var normalized = email.ToUpperInvariant();
+        const string uiCustomization = "{}";
+        await db.Database.ExecuteSqlAsync(
+            $"""
+            INSERT INTO identity."Users" ("Id", "UserName", "NormalizedUserName", "Email", "NormalizedEmail", "EmailConfirmed",
+                "PhoneNumberConfirmed", "TwoFactorEnabled", "LockoutEnabled", "AccessFailedCount", "IsDeleted", "UICustomization")
+            VALUES ({id}, {email}, {normalized}, {email}, {normalized}, false, false, false, false, 0, false, CAST({uiCustomization} AS jsonb))
+            """,
+            cancellationToken);
+        return id;
+    }
 
     private string NewDatabase()
     {

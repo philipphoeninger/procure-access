@@ -127,6 +127,7 @@ try
        .MapAuthEndpoints()
        .MapRegistrationEndpoints()
        .MapPasswordResetEndpoints()
+       .MapAccountExportEndpoints()
        .MapOrganizationEndpoints()
        .MapInvitationEndpoints();
 
