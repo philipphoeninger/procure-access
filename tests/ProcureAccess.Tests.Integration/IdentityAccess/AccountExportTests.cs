@@ -6,8 +6,11 @@ using System.Net;
 using System.Text.Json;
 using API.ProcureAccess.Account;
 using MODELS.ProcureAccess.Entities;
+using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Tests.Integration.Configurator;
+using ProcureAccess.Tests.Integration.Export;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
 using ProcureAccess.Tests.Shared.Fixtures;
@@ -20,9 +23,10 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// The personal data export <c>GET /api/v1/account/export</c> (S5-27; SPEC R-AUTH-09, §8.4;
 /// ARCHITECTURE C79; PRV-07, account part). Every test starts from the Tenants fixture with the
 /// legacy accounts of its users stored. Editor A is also a Reader of organisation B and has a
-/// contributor profile; Owner B has one too, which Editor A's export must not show. The parts of
-/// PRV-07 that later tasks fill (criteria lists S5-19, preferences S5-25, projects step 5,
-/// contributions and purged content step 6) are empty or <c>null</c> here (owner decision S5-27 1a).
+/// contributor profile; Owner B has one too, which Editor A's export must not show. The criteria
+/// lists the user created came with S5-19 (owner decision S5-19 4). The parts of PRV-07 that later
+/// tasks fill (preferences S5-25, projects step 5, contributions and purged content step 6) are
+/// empty or <c>null</c> here (owner decision S5-27 1a).
 /// </summary>
 public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -98,6 +102,85 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         text.ShouldNotContain(_ownProfile.Id.ToString(), Case.Insensitive);
         text.ShouldNotContain(_otherProfile!.Id.ToString(), Case.Insensitive);
         text.ShouldNotContain("Prüfstelle Nord");
+    }
+
+    [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWhoCreatedLists_ContainsTheirContentAndNoListOfOthersOrOfALeftOrganization))]
+    [Trait("Invariant", "PRV-07")]
+    public async Task Export_UserWhoCreatedLists_ContainsTheirContentAndNoListOfOthersOrOfALeftOrganization()
+    {
+        await ExportTestCatalog.ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
+        var selection = await SavedLists.ResolveAsync(Api.Factory.Services, MiniCatalog.T1Version, Cancellation);
+        var now = Clock.GetUtcNow();
+        var (excluded, changed) = (selection.Criteria[0], selection.Criteria[1]);
+        var changedTo = changed.RecommendedPriority.Level == PriorityLevel.B ? PriorityLevel.A : PriorityLevel.B;
+
+        // Editor A created two lists: one in A with decisions, a later one in B (where Editor A only reads by now).
+        var own = SavedLists.Build(Fixture.A.Id, TestUsers.EditorA.Id, "Vergabe 2027", now.AddHours(-3), MiniCatalog.T1Version, selection, c =>
+            c == excluded ? SavedLists.Draft(c, isIncluded: false)
+            : c == changed ? SavedLists.Draft(c, overrideLevel: changedTo, overrideWeight: changedTo == PriorityLevel.B ? 8 : null, note: "Mit Anbieter klären")
+            : null);
+        var ownInB = SavedLists.Build(Fixture.B.Id, TestUsers.EditorA.Id, "Rahmenvertrag", now.AddHours(-1), MiniCatalog.T1Version, selection);
+        // Not Editor A's: a list of a colleague in A, and one Editor A created in an organisation they have left.
+        var colleagues = SavedLists.Build(Fixture.A.Id, TestUsers.OwnerA.Id, "Liste der Kollegin", now, MiniCatalog.T1Version, selection);
+        var left = Organization.Create("Verlassene Organisation", OrganizationType.Association, TestUsers.OwnerB.Id, now);
+        var inLeft = SavedLists.Build(left.Id, TestUsers.EditorA.Id, "Liste von früher", now, MiniCatalog.T1Version, selection);
+        await StoreAsync(left, own, ownInB, colleagues, inLeft);
+        using var client = CreateClient(TestUsers.EditorA);
+
+        using var response = await client.GetAsync(Export, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var text = await response.Content.ReadAsStringAsync(Cancellation);
+        using var body = JsonDocument.Parse(text);
+        var lists = body.RootElement.GetProperty("createdByMe").GetProperty("criteriaLists").EnumerateArray().ToList();
+        lists.Select(l => (l.GetProperty("name").GetString(), l.GetProperty("organization").GetString(), l.GetProperty("release").GetString()))
+             .ShouldBe([("Vergabe 2027", "Organisation A", "T.1"), ("Rahmenvertrag", "Organisation B", "T.1")]);
+
+        var first = lists[0];
+        first.EnumerateObject().Select(p => p.Name).ShouldBe(["name", "organization", "release", "createdAt", "selection", "criteria"]);
+        first.GetProperty("createdAt").GetDateTimeOffset().ShouldBe(now.AddHours(-3));
+        var chosen = first.GetProperty("selection");
+        chosen.EnumerateObject().Select(p => p.Name).ShouldBe(["useCase", "appTypes", "productParts", "testTypes"]);
+        chosen.GetProperty("useCase").GetString().ShouldBe(selection.UseCase!.Name);
+        chosen.GetProperty("appTypes").EnumerateArray().Select(v => v.GetString()).ShouldBe(selection.AppTypes.Select(v => v.Name));
+        chosen.GetProperty("productParts").EnumerateArray().Select(v => v.GetString()).ShouldBe(selection.ProductParts.Select(v => v.Name));
+        chosen.GetProperty("testTypes").EnumerateArray().Select(v => v.GetString()).ShouldBe(selection.TestTypes.Select(v => v.Name));
+
+        // Every criterion of the selection in list order, with the user's decision next to the recommendation.
+        var criteria = first.GetProperty("criteria").EnumerateArray().ToList();
+        criteria[0].EnumerateObject().Select(p => p.Name).ShouldBe(
+            ["number", "title", "isIncluded", "recommendedLevel", "effectiveLevel", "weight", "note"]);
+        criteria.Select(c => c.GetProperty("title").GetString()).ShouldBe(selection.Criteria.Select(c => c.PlainLanguageTitle ?? c.Title));
+        criteria.Select(c => c.GetProperty("number").GetString()).ShouldBe(selection.Criteria.Select(c => c.Number));
+        criteria.Select(c => c.GetProperty("recommendedLevel").GetString())
+                .ShouldBe(selection.Criteria.Select(c => c.RecommendedPriority.Level.ToString()));
+        criteria.Select(c => c.GetProperty("isIncluded").GetBoolean()).ShouldBe(selection.Criteria.Select(c => c != excluded));
+        criteria[1].GetProperty("effectiveLevel").GetString().ShouldBe(changedTo.ToString());
+        criteria[1].GetProperty("note").GetString().ShouldBe("Mit Anbieter klären");
+        if (changedTo == PriorityLevel.B)
+        {
+            criteria[1].GetProperty("weight").GetInt32().ShouldBe(8);
+        }
+        else
+        {
+            criteria[1].GetProperty("weight").ValueKind.ShouldBe(JsonValueKind.Null);
+        }
+
+        criteria[2].GetProperty("effectiveLevel").GetString().ShouldBe(selection.Criteria[2].RecommendedPriority.Level.ToString());
+        criteria[2].GetProperty("note").ValueKind.ShouldBe(JsonValueKind.Null);
+
+        // Nothing of the other lists, and no id: no list, organisation or user id, no revision id member.
+        text.ShouldNotContain("Liste der Kollegin");
+        text.ShouldNotContain("Liste von früher");
+        text.ShouldNotContain("Verlassene Organisation");
+        foreach (var id in new[] { own.Id, ownInB.Id, colleagues.Id, inLeft.Id, Fixture.A.Id, Fixture.B.Id, left.Id })
+        {
+            text.ShouldNotContain(id.ToString(), Case.Insensitive);
+        }
+
+        text.ShouldNotContain(TestUsers.EditorA.Id, Case.Insensitive);
+        text.ShouldNotContain(TestUsers.OwnerA.Id, Case.Insensitive);
+        text.ShouldNotContain("revisionId", Case.Insensitive);
     }
 
     [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWithoutMembershipOrProfile_HasEverySectionOfSpec84AndTheUnbuiltOnesEmpty))]

@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Npgsql;
 using ProcureAccess.Modules.Catalog.Persistence;
+using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
@@ -126,6 +127,11 @@ public sealed class ApiFixture : IAsyncLifetime
             await context.Database.MigrateAsync();
         }
 
+        await using (var context = CreateConfiguratorDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
         await using (var connection = await OpenConnectionAsync())
         {
             _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
@@ -137,6 +143,7 @@ public sealed class ApiFixture : IAsyncLifetime
                     new Table(PlatformDbContext.HistorySchema, PlatformDbContext.HistoryTable),
                     new Table(IdentityAccessDbContext.Schema, IdentityAccessDbContext.HistoryTable),
                     new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
+                    new Table(ConfiguratorDbContext.Schema, ConfiguratorDbContext.HistoryTable),
                     .. CatalogFilterValueTables,
                     DataProtectionKeysTable,
                     .. LegacyRoleTables,
@@ -166,7 +173,7 @@ public sealed class ApiFixture : IAsyncLifetime
     /// Stores entities through the application's own context that maps them, never through raw
     /// SQL, so the EF configuration is exercised (TESTING §6.1): the module contexts
     /// (<see cref="PlatformDbContext"/>, <see cref="CatalogDbContext"/>,
-    /// <see cref="IdentityAccessDbContext"/>) for their entities, the
+    /// <see cref="IdentityAccessDbContext"/>, <see cref="ConfiguratorDbContext"/>) for their entities, the
     /// legacy <see cref="ApplicationDBContext"/> for all others.
     /// </summary>
     public async Task StoreAsync(params object[] entities)
@@ -178,6 +185,7 @@ public sealed class ApiFixture : IAsyncLifetime
             scope.ServiceProvider.GetRequiredService<PlatformDbContext>(),
             scope.ServiceProvider.GetRequiredService<CatalogDbContext>(),
             scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>(),
+            scope.ServiceProvider.GetRequiredService<ConfiguratorDbContext>(),
         ];
         foreach (var entity in entities)
         {
@@ -232,6 +240,12 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private IdentityAccessDbContext CreateIdentityAccessDbContext() =>
         new(new DbContextOptionsBuilder<IdentityAccessDbContext>()
+                .UseNpgsql(_database.GetConnectionString())
+                .Options,
+            FixedOrganizationContext.None);
+
+    private ConfiguratorDbContext CreateConfiguratorDbContext() =>
+        new(new DbContextOptionsBuilder<ConfiguratorDbContext>()
                 .UseNpgsql(_database.GetConnectionString())
                 .Options,
             FixedOrganizationContext.None);

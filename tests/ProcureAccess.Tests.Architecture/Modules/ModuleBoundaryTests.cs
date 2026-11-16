@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Export.Sources;
 using Shouldly;
 using Xunit;
@@ -18,6 +19,7 @@ public class ModuleBoundaryTests
     private const string Workspace = ModuleMap.Prefix + "Workspace";
     private const string Directory = ModuleMap.Prefix + "Directory";
     private const string Export = ModuleMap.Prefix + "Export";
+    private const string Configurator = ModuleMap.Prefix + "Configurator";
     private const string Contracts = ModuleMap.ContractsSuffix;
 
     private static readonly ProjectGraph Graph = ProjectGraph.LoadSolution();
@@ -80,5 +82,32 @@ public class ModuleBoundaryTests
             .Select(ModuleRules.Load);
 
         ModuleRules.TypeUsingAny(typeof(AdHocSelectionSource), forbidden).ShouldBeEmpty();
+    }
+
+    /// <summary>
+    /// ARC-03, the <c>IConfigurationReader</c> part (ARCHITECTURE §4.3, C62; S5-19): Export reads a
+    /// saved list only through the reader of <c>Configurator.Contracts</c>. The Export project
+    /// cannot see the Configurator module at all, the source of saved lists takes the reader, and
+    /// no other type of Export uses a type of <c>Configurator.Contracts</c>.
+    /// </summary>
+    [Fact(DisplayName = "INV:ARC-03 " + nameof(Export_SavedLists_AreReadOnlyThroughIConfigurationReader))]
+    [Trait("Invariant", "ARC-03")]
+    public void Export_SavedLists_AreReadOnlyThroughIConfigurationReader()
+    {
+        Graph.AllReferences(Export).ShouldNotContain(Configurator);
+        Graph.AllReferences(Export + Contracts).ShouldNotContain(Configurator);
+
+        typeof(PersistedConfigurationSource).GetConstructors().Single().GetParameters()
+            .ShouldContain(parameter => parameter.ParameterType == typeof(IConfigurationReader));
+
+        string[] allowed = [Export, Export + Contracts, Catalog + Contracts, Configurator + Contracts, ModuleMap.PlatformContracts];
+        var forbidden = ModuleMap.AllModuleProjects
+            .Except(allowed)
+            .Concat(ModuleMap.LegacyProjects)
+            .Select(ModuleRules.Load);
+        ModuleRules.TypeUsingAny(typeof(PersistedConfigurationSource), forbidden).ShouldBeEmpty();
+
+        ModuleRules.TypesUsingAny(ModuleRules.Load(Export), Export, [ModuleRules.Load(Configurator + Contracts)])
+            .ShouldAllBe(type => type.StartsWith(typeof(PersistedConfigurationSource).FullName!, StringComparison.Ordinal));
     }
 }

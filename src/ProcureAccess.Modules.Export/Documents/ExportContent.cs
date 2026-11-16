@@ -46,6 +46,38 @@ internal sealed record ExportRow(
 {
     /// <summary>The level that applies: the user's choice, else the recommendation.</summary>
     public PriorityLevel EffectiveLevel => ChosenLevel ?? RecommendedLevel;
+
+    /// <summary>
+    /// The row of an included criterion as the catalog resolved it, with the user's decision. Both
+    /// export sources build their rows here, so the same decision gives the same row (EXP-06). A
+    /// chosen level equal to the recommendation counts as no choice, an empty note as none.
+    /// </summary>
+    public static ExportRow Of(ResolvedCatalogCriterion criterion, PriorityLevel? overrideLevel, int? overrideWeight, string? note)
+    {
+        ArgumentNullException.ThrowIfNull(criterion);
+        var recommended = criterion.RecommendedPriority;
+        var chosen = overrideLevel == recommended.Level ? null : overrideLevel;
+        var effective = chosen ?? recommended.Level;
+        int? weight = effective != PriorityLevel.B
+            ? null
+            : overrideWeight ?? (recommended.Level == PriorityLevel.B ? recommended.Weight : null);
+
+        return new ExportRow(
+            criterion.Key,
+            criterion.Kind,
+            criterion.Number,
+            criterion.Title,
+            criterion.PlainLanguageTitle,
+            criterion.ShortDescription,
+            criterion.OriginalTitle,
+            criterion.ProductPart,
+            recommended.Level,
+            chosen,
+            weight,
+            recommended.Rationale,
+            string.IsNullOrEmpty(note) ? null : note,
+            criterion.TestStepUrl);
+    }
 }
 
 /// <summary>The content with the moment it was generated, which the formatters write into the file and its name.</summary>

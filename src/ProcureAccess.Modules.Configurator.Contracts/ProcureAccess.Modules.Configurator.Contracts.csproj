@@ -6,4 +6,11 @@ SPDX-License-Identifier: MIT
 
 <!-- Public contracts of the Configurator module: interfaces and DTOs other modules may use (ARCHITECTURE §4.3). -->
 <Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- A contracts project may reference the contracts of the modules its row of ARCHITECTURE §4.3 lists, nothing else
+       (ADR-017, O-22; ARC-03). Here: the priority level of the catalog in IConfigurationReader. -->
+  <ItemGroup>
+    <ProjectReference Include="../ProcureAccess.Modules.Catalog.Contracts/ProcureAccess.Modules.Catalog.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
