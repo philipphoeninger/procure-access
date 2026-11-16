@@ -7,7 +7,7 @@
 > - TECH_DEBT TD-40 and TD-45 settled;
 > - UX copy v35 U148, U149; ARCHITECTURE C157; client tests V268.
 >
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #359 open (2026-11-16)
 > **Scope:**
 > - the weight range served by the API instead of the client's copy (TD-45);
 > - S13 leading to a note over 1 000 characters (TD-40);
