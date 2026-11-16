@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-21b (client part of S5-21, 4.5 points for S5-21 in all) · **Issues:** none
 > **Requirements / invariants:** SPEC R-SAV-03, R-SAV-06, R-LST-12, R-LST-14 (client parts, v2.38); J1 second part complete with the file comparison (EXP-06, TESTING_v78 V263) and with it the M3 exit criterion; component tests V264; A11Y-09 V265; UX copy v34 V266; ARCHITECTURE C156. No invariant changes its status
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #358 open (2026-11-16)
 > **Scope:**
 > - a saved list editable for Editor and Owner, read only with export for Readers;
 > - „Auswahl ändern“ on S10 apart from the draft;
