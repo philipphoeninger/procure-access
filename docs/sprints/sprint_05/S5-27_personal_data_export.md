@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-27 (M3.8 part, 2 points) · **Issues:** none
 > **Requirements / invariants:** SPEC R-AUTH-09, §8.4, SD14 (v2.33); **PRV-07 account part `active`** (TESTING_v73 V237); ARCHITECTURE C79, C151
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #352 open (2026-11-16)
 > **Scope:** `GET /api/v1/account/export` returns the signed-in user's own data as JSON per SPEC §8.4, nothing of other users, as an attachment with `no-store`. No screen: the download on S61 is S5-28.
 > **Owner decisions (2026-11-16):** S5-27 **1a** — the full shape of §8.4 now (`formatVersion` 1); sections whose data later tasks build are empty arrays, `preferences` is `null`; each later task fills its section and its PRV-07 case, recorded as deferred parts in TESTING; the S5-19 and S5-25 prompts get one line · **2a** — the legacy `User` gets `CreatedAt`, set at creation from `TimeProvider`; existing accounts `null` · **3a** — exactly what §8.4 lists; legacy proposals and open invitations stay out (open point) · **4a** — no rate limit (§7.3 names none)
 
