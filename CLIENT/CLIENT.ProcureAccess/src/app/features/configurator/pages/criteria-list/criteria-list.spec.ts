@@ -13,6 +13,7 @@ import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { AuthService } from '@app/features/identity/services/auth.service';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
@@ -28,7 +29,7 @@ import { CriteriaListPage } from './criteria-list';
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
   withConfigurator(),
-  withMethods(() => ({ signedIn: () => signedIn })),
+  withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => null })),
 );
 
 @Component({ template: '' })
@@ -56,6 +57,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
         { provide: CatalogApiService, useValue: api },
         { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
         { provide: ExportApiService, useValue: { exportList: vi.fn() } },
+        { provide: AuthService, useValue: { showLogin: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         // jsdom never ends a CSS transition, so the K5 menu would never finish closing.
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
@@ -357,13 +359,14 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
       const filter = screen.getByRole('group', { name: 'Liste filtern' });
       const suggest = screen.getByRole('link', { name: /^Fehlt ein Kriterium oder ist eine Formulierung unklar\?/ });
       const status = screen.getByText('4 von 4 Kriterien in Ihrer Liste');
+      const saveButton = screen.getByRole('button', { name: 'Liste speichern' });
       const exportButton = screen.getByRole('button', { name: 'Liste exportieren' });
 
       expect(priorityNote.textContent).toContain('Die Prioritäten sind eine Empfehlung des Projektteams');
       expect(
-        order(summary, priorityNote, draftNote, counts, filter, screen.getByRole('list'), suggest, status, exportButton),
+        order(summary, priorityNote, draftNote, counts, filter, screen.getByRole('list'), suggest, status, saveButton, exportButton),
       ).toBe(true);
-      expect(screen.queryByRole('button', { name: 'Liste speichern' })).toBeNull();
+      // „Liste speichern“ since S5-20b; `criteria.list.unsaved` comes with S5-22.
       expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
       expect(screen.queryByRole('button', { name: /schließen|ausblenden/i })).toBeNull();
       await expectNoAxeViolations();

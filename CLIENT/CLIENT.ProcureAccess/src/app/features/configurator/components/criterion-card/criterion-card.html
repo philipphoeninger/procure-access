@@ -5,14 +5,16 @@ SPDX-License-Identifier: MIT
 -->
 
 <div class="pa-criterion-card__title-row">
-  <mat-checkbox
-    class="pa-criterion-card__include"
-    [checked]="decision().included"
-    [aria-labelledby]="includeLabelId() + ' ' + titleId()"
-    (change)="includedChange.emit($event.checked)"
-  >
-    <span class="cdk-visually-hidden" [id]="includeLabelId()">{{ 'criteria.item.include' | translate }}</span>
-  </mat-checkbox>
+  @if (!readonly()) {
+    <mat-checkbox
+      class="pa-criterion-card__include"
+      [checked]="decision().included"
+      [aria-labelledby]="includeLabelId() + ' ' + titleId()"
+      (change)="includedChange.emit($event.checked)"
+    >
+      <span class="cdk-visually-hidden" [id]="includeLabelId()">{{ 'criteria.item.include' | translate }}</span>
+    </mat-checkbox>
+  }
   @if (testType()) {
     <h2 class="pa-criterion-card__title" [id]="titleId()">
       {{ 'criteria.item.testedBy.title' | translate: { testType: (testTypeKey() | translate) } }}
@@ -60,6 +62,7 @@ SPDX-License-Identifier: MIT
   [recommendedWeight]="recommendedWeight()"
   [criterionTitleId]="titleId()"
   [weightRange]="weightRange"
+  [readonly]="readonly()"
   (levelChange)="levelChange.emit($event)"
   (weightChange)="emitWeight($event)"
   (restoreRecommendation)="priorityReset.emit()"
@@ -76,34 +79,45 @@ SPDX-License-Identifier: MIT
   >
     {{ (expanded() ? 'criteria.item.hideDetails' : 'criteria.item.showDetails') | translate }}
   </button>
-  <button
-    matButton
-    type="button"
-    [attr.aria-expanded]="noteOpen()"
-    [attr.aria-controls]="noteId()"
-    [attr.aria-describedby]="titleId()"
-    (click)="toggleNote()"
-  >
-    {{ (decision().note === '' ? 'criteria.item.note.add' : 'criteria.item.note.edit') | translate }}
-  </button>
+  @if (!readonly()) {
+    <button
+      matButton
+      type="button"
+      [attr.aria-expanded]="noteOpen()"
+      [attr.aria-controls]="noteId()"
+      [attr.aria-describedby]="titleId()"
+      (click)="toggleNote()"
+    >
+      {{ (decision().note === '' ? 'criteria.item.note.add' : 'criteria.item.note.edit') | translate }}
+    </button>
+  }
 </div>
 
-<div class="pa-criterion-card__note" [id]="noteId()" [hidden]="!noteOpen()">
-  <mat-form-field appearance="outline" subscriptSizing="dynamic">
-    <mat-label>{{ 'criteria.item.note' | translate }}</mat-label>
-    <textarea
-      #noteField
-      matInput
-      cdkTextareaAutosize
-      cdkAutosizeMinRows="3"
-      [formControl]="noteControl"
-      [attr.aria-describedby]="titleId()"
-    ></textarea>
-    @if (noteError(); as error) {
-      <mat-error>{{ 'errors.field.maxLength' | translate: error }}</mat-error>
-    }
-  </mat-form-field>
-</div>
+@if (readonly()) {
+  @if (decision().note !== '') {
+    <div class="pa-criterion-card__note-text">
+      <h3 class="pa-criterion-card__section-title">{{ 'criteria.item.note.heading' | translate }}</h3>
+      <p class="pa-criterion-card__text">{{ decision().note }}</p>
+    </div>
+  }
+} @else {
+  <div class="pa-criterion-card__note" [id]="noteId()" [hidden]="!noteOpen()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'criteria.item.note' | translate }}</mat-label>
+      <textarea
+        #noteField
+        matInput
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="3"
+        [formControl]="noteControl"
+        [attr.aria-describedby]="titleId()"
+      ></textarea>
+      @if (noteError(); as error) {
+        <mat-error>{{ 'errors.field.maxLength' | translate: error }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+}
 
 <div class="pa-criterion-card__details" [id]="panelId()" [hidden]="!expanded()">
   <section class="pa-criterion-card__section">

@@ -8,6 +8,8 @@ import { expectNoAxeViolations } from '../support/axe';
 import { recordThirdPartyRequests, thirdPartyLinksInDocument } from '../support/third-party-requests';
 import { chooseFirstOption } from '../support/combobox';
 import { readXlsxSheet } from '../support/xlsx';
+import { organizationOfAccount, registerConfirmedAccount } from '../support/accounts';
+import { accountMenuButton } from '../support/session';
 
 /**
  * J1, configurator without account (TESTING §5.4), on S10 and the active test release T.1 of the
@@ -16,7 +18,13 @@ import { readXlsxSheet } from '../support/xlsx';
  * in both appearances (A11Y-01, A11Y-08). After the hand-over (S4-13) it goes on on S11 — the
  * rationale of a priority, a priority change, a note, an excluded criterion and the „Geprüft nach …“
  * card — and exports the list as XLSX through S13, then opens the downloaded file and checks it
- * (S4-22). The second part (save after sign-in) comes with step 3.
+ * (S4-22). The second part (S5-20b) is a test of its own on a fresh page: a draft of the same
+ * selection, built by keyboard and still signed out, goes to „Liste speichern“, which opens S01 with
+ * the reason; after the sign-in S11 shows the draft unchanged and says so, S12
+ * saves it under a name, the page becomes the saved list (read only until S5-21), and „Kriterienlisten“
+ * in the account menu opens S14 with it. The account and its organisation are the test's own, built
+ * through the API (owner decision S5-20 6a). Exporting the saved list again and comparing both files
+ * come with S5-21 (owner decision S5-20 7a).
  *
  * The selection meets an exclusion by each higher layer of T.1
  * (`tests/ProcureAccess.Tests.Shared/Fixtures/Releases/T.1/exclusions.json`): HR-Anwendung excludes
@@ -42,6 +50,10 @@ const CHANGED = {
 } as const;
 
 const NOTE = 'Mit der Vergabestelle abstimmen: gilt auch für das Bewerberportal.';
+
+/** The password of the account J1 builds for its second part (test data, not a secret). */
+const PASSWORD = 'e2e-Passwort-lang-genug';
+const LIST_NAME = 'Vergabe Personalsoftware 2027';
 
 /** The header row of the sheet „Kriterien“ (SPEC §8.3, UX copy `exportFile.column.*`). */
 const XLSX_HEADERS = [
@@ -134,6 +146,17 @@ function labelledBy(locator: Locator): Promise<string> {
       .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
       .join(' '),
   );
+}
+
+/** Presses a key until the target has the focus, as in a menu or listbox; fails after `max` presses. */
+async function arrowTo(page: Page, target: Locator, key = 'ArrowDown', max = 10): Promise<void> {
+  for (let presses = 0; presses <= max; presses++) {
+    if (await target.evaluate((element) => element === document.activeElement)) {
+      return;
+    }
+    await page.keyboard.press(key);
+  }
+  throw new Error(`${target.toString()} was not reached with ${max} presses of ${key}`);
 }
 
 /** The S11 card whose H2 is the title. */
@@ -367,5 +390,158 @@ test.describe('J1 configurator without account', () => {
       expect(thirdPartyRequests).toEqual([]);
       expect(await thirdPartyLinksInDocument(page, appOrigin)).toEqual([]);
     });
+  });
+
+  test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 second part: the draft survives the sign-in from „Liste speichern“ and is saved, opened and listed (S5-20b)', async ({ page, request, browserName }, testInfo) => {
+    // Firefox's page process crashes right after the save is answered when Playwright runs two or
+    // more workers (TESTING V254; owner decision S5-20b: skipped on Firefox until the issue finds why).
+    test.fixme(browserName === 'firefox', 'Firefox page crash after saving (TESTING V254)');
+    // Seven states, each checked by axe in two appearances, after S10 and S11 by keyboard.
+    test.setTimeout(240_000);
+    const checkbox = (name: string) => page.getByRole('checkbox', { name, exact: true });
+    const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
+    const address = `j1-${suffix}@example.test`;
+    const organization = `Vergabestelle ${suffix}`;
+
+    await test.step('second part prepared: an own confirmed account with an organisation, through the API (S5-20 6a)', async () => {
+      // The request context has its own cookies: the page stays signed out until S01.
+      await registerConfirmedAccount(request, address, PASSWORD);
+      await organizationOfAccount(request, address, PASSWORD, organization);
+    });
+
+    await test.step('a draft by keyboard: the selection of the first part on S10, then S11', async () => {
+      // A direct load: the keyboard starts at the top of the document (the first part covers the start page).
+      await page.goto('/kriterien');
+      await expect(page.getByRole('heading', { level: 1, name: 'Kriterien zusammenstellen' })).toBeVisible();
+      const combobox = page.getByRole('combobox', { name: 'Verwendungszweck' });
+      await tabTo(page, combobox);
+      await page.keyboard.type('HR');
+      await chooseFirstOption(page, combobox, 'HR-Anwendung');
+      await next(page, 'Was möchten Sie beschaffen?');
+      await check(page, checkbox('Website oder Webanwendung'));
+      await check(page, checkbox('Software (offen)'));
+      await next(page, 'Welche Funktionen hat das Produkt?');
+      await check(page, checkbox('Audio'));
+      await next(page, /Soll das Produkt nach einem bestimmten Verfahren geprüft sein/);
+      await check(page, checkbox('BIK BITV-Test (Web)'));
+      await tabTo(page, page.getByRole('button', { name: 'Kriterienliste anzeigen' }));
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+      await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(EXPECTED_KEYS.length);
+    });
+
+    await test.step('S11: 99.1 to Hinweis and 99.7 left out, as in the first part', async () => {
+      const priority = card(page, CHANGED.priority.title);
+      await tabTo(page, priority.getByRole('button', { name: 'Priorität: A – Mindestanforderung' }));
+      await page.keyboard.press('Enter');
+      const menu = page.getByRole('menu', { name: 'Priorität für dieses Kriterium' });
+      await arrowTo(page, menu.getByRole('menuitemradio', { name: 'Hinweis' }));
+      await page.keyboard.press('Enter');
+      await expect(priority.getByRole('button', { name: 'Priorität: Hinweis' })).toBeFocused();
+
+      // The checkbox's name is read through `labelledBy` (Firefox, see there); no axe has run yet.
+      const include = card(page, CHANGED.excluded.title).getByRole('checkbox');
+      await tabTo(page, include);
+      await page.keyboard.press('Space');
+      await expect(include).not.toBeChecked();
+    });
+
+    await test.step('S11 „Liste speichern“, signed out, opens S01 with the reason (R-SAV-01, R-AUTH-03)', async () => {
+      await tabTo(page, page.getByRole('button', { name: 'Liste speichern' }));
+      await page.keyboard.press('Enter');
+
+      await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeFocused();
+      await expect(page.getByRole('main')).toContainText('Melden Sie sich an, um Ihre Kriterienliste zu speichern. Ihre Auswahl bleibt dabei erhalten.');
+      await settled(page.getByRole('main'));
+      await expectNoAxeViolations(page, testInfo, 'j1 s01 save');
+    });
+
+    await test.step('S01: sign-in by keyboard; S11 again with the draft as changed and the hint (S5-20b 1a)', async () => {
+      // CSS locators: after axe on S01, Playwright's name computation of these fields crashed the
+      // Firefox page process (the class of TESTING V165, V226; S5-20b).
+      await tabTo(page, page.locator('main input[name="email"]'));
+      await page.keyboard.type(address);
+      await tabTo(page, page.locator('main input[name="password"]'));
+      await page.keyboard.type(PASSWORD);
+      await page.keyboard.press('Enter');
+
+      await expect(page).toHaveURL(/\/kriterien\/ergebnis$/);
+      const main = page.getByRole('main');
+      await expect(main).toContainText('Sie sind angemeldet. Ihre Auswahl ist noch da und kann jetzt gespeichert werden.');
+      // The draft as changed before the sign-in: the priority of 99.1 and the excluded 99.7.
+      await expect(card(page, CHANGED.priority.title).getByRole('button', { name: 'Priorität: Hinweis' })).toBeVisible();
+      await expect(card(page, CHANGED.excluded.title)).toContainText('Nicht in Ihrer Liste');
+      await expect(main).not.toContainText('Ihre Auswahl wird nicht gespeichert, solange Sie nicht angemeldet sind');
+      await settled(main);
+      await expectNoAxeViolations(page, testInfo, 'j1 s11 signed in');
+    });
+
+    await test.step('S12: „Liste speichern“ saves the draft under a name for the organisation', async () => {
+      await tabTo(page, page.getByRole('button', { name: 'Liste speichern' }));
+      await page.keyboard.press('Enter');
+
+      const dialog = page.getByRole('dialog', { name: 'Kriterienliste speichern' });
+      const name = dialog.getByRole('textbox', { name: 'Name der Liste' });
+      await expect(name).toBeFocused();
+      await expect(dialog).toContainText(`Die Liste ist für alle Mitglieder Ihrer Organisation ${organization} sichtbar.`);
+      await settled(dialog);
+      await expectNoAxeViolations(page, testInfo, 'j1 s12');
+
+      const saved = page.waitForResponse((response) => new URL(response.url()).pathname === '/api/v1/configurations');
+      await page.keyboard.type(LIST_NAME);
+      await page.keyboard.press('Enter');
+      expect((await saved).status()).toBe(201);
+    });
+
+    await test.step('the saved list: S11 read only with its name as H1 and the decisions as saved (S5-20 4a, 5a)', async () => {
+      await expect(page).toHaveURL(/\/kriterienlisten\/[0-9a-f-]{36}$/);
+      await expect(page.getByRole('heading', { level: 1, name: LIST_NAME })).toBeFocused();
+      await expect(page).toHaveTitle(`${LIST_NAME} – Gespeicherte Kriterienlisten – ProcureAccess`);
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 2 })).toHaveCount(EXPECTED_KEYS.length);
+      await expect(main.getByRole('checkbox')).toHaveCount(0);
+      await expect(card(page, CHANGED.priority.title)).toContainText('Priorität: Hinweis');
+      await expect(card(page, CHANGED.priority.title)).toContainText('Empfohlen war: A – Mindestanforderung');
+      await expect(card(page, CHANGED.excluded.title)).toContainText('Nicht in Ihrer Liste');
+      await settled(main);
+      await expectNoAxeViolations(page, testInfo, 'j1 saved list');
+    });
+
+    await test.step('S14 through „Kriterienlisten“ of the account menu, sorted by name (R-SAV-02)', async () => {
+      if (await accountMenuButton(page).isVisible()) {
+        await tabTo(page, accountMenuButton(page));
+        await page.keyboard.press('Enter');
+        await arrowTo(page, page.getByRole('menu').getByRole('menuitem', { name: 'Kriterienlisten' }));
+      } else {
+        await tabTo(page, page.getByRole('button', { name: 'Menü', exact: true }));
+        await page.keyboard.press('Enter');
+        await tabTo(page, page.getByRole('dialog', { name: 'Menü' }).getByRole('link', { name: 'Kriterienlisten' }));
+      }
+      await page.keyboard.press('Enter');
+
+      await expect(page).toHaveURL(/\/kriterienlisten$/);
+      await expect(page.getByRole('heading', { level: 1, name: 'Gespeicherte Kriterienlisten' })).toBeFocused();
+      const main = page.getByRole('main');
+      await expect(main.getByRole('link', { name: LIST_NAME })).toBeVisible();
+      await settled(main);
+      await expectNoAxeViolations(page, testInfo, 'j1 s14');
+
+      // mat-select keeps the focus on the combobox and points at the active option. A CSS locator and
+      // its name through `labelledBy`: after axe on S14, Playwright's name computation of the select
+      // (`aria-labelledby`, like the S11 checkbox) crashed the Firefox page process (TESTING V165).
+      const sort = main.locator('mat-select');
+      expect(await labelledBy(sort)).toContain('Sortieren nach');
+      await tabTo(page, sort);
+      await page.keyboard.press('Enter');
+      const optionId = await page.getByRole('listbox').getByRole('option', { name: 'Name' }).getAttribute('id');
+      for (let presses = 0; (await sort.getAttribute('aria-activedescendant')) !== optionId; presses++) {
+        expect(presses, 'the option „Name“ is reached with the arrow keys').toBeLessThan(5);
+        await page.keyboard.press('ArrowDown');
+      }
+      await page.keyboard.press('Enter');
+      await expect(sort).toContainText('Name');
+      await expect(page.getByRole('listbox')).toHaveCount(0);
+    });
+
   });
 });

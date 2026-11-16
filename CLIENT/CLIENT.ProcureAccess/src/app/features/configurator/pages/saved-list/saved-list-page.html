@@ -1,0 +1,43 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (shown(); as shown) {
+  <h1 class="pa-saved-list__title">{{ shown.list.name }}</h1>
+
+  @if (selection(); as selection) {
+    <pa-criteria-list-summary [count]="counts().total" [names]="selection" />
+  }
+
+  <pa-notice kind="info">{{ 'criteria.list.priorityNote' | translate }}</pa-notice>
+
+  @if (counts().total > 0) {
+    <p class="pa-saved-list__counts">
+      {{
+        'criteria.list.counts'
+          | translate
+            : {
+                a: ('criteria.list.counts.a' | translatePlural: counts().A),
+                b: ('criteria.list.counts.b' | translatePlural: counts().B),
+                info: ('criteria.list.counts.info' | translatePlural: counts().Info),
+              }
+      }}
+    </p>
+  }
+
+  @if (shown.criteria.criteria.length > 0) {
+    <ul class="pa-saved-list__items">
+      @for (criterion of shown.criteria.criteria; track criterion.key) {
+        <li>
+          <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" [readonly]="true" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="pa-saved-list__empty">{{ 'criteria.list.empty' | translate }}</p>
+  }
+} @else {
+  <pa-error-page [kind]="view().kind === 'server' ? 'server' : 'notFound'" />
+}

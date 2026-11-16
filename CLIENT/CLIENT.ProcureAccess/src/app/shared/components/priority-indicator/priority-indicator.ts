@@ -56,6 +56,9 @@ let nextId = 0;
  *   „Empfehlung wiederherstellen“ emits `restoreRecommendation`, puts the focus on the level
  *   button (the reset button goes away) and announces the recommended level.
  *
+ * With `readonly` (S5-20b) the same level, weight and override line show as text, without the
+ * menu, the weight field and „Empfehlung wiederherstellen“.
+ *
  * The rationale, the matched rule and the source are {@link PriorityRationale}: in the criteria
  * list S11 they are the first section of the card's detail panel (`showRationaleToggle=false`, U28);
  * the „Warum diese Priorität?“ toggle of K5 itself comes with the first screen that shows K5 without
@@ -89,12 +92,17 @@ export class PriorityIndicator {
   readonly criterionTitleId = input<string | null>(null);
   /** With a range the weight of B can be chosen; without one it is shown only. */
   readonly weightRange = input<PriorityWeightRange | null>(null);
+  /**
+   * Read only (a saved list before S5-21, owner decision S5-20 5a; later the shared list S16): the
+   * level and weight as text, the override line without „Empfehlung wiederherstellen“, no menu.
+   */
+  readonly readonly = input(false);
   /** „Empfehlung wiederherstellen“ (Handoff §4.5 `(reset)`; `reset` is a DOM event name). */
   readonly restoreRecommendation = output<void>();
 
   protected readonly levels = PRIORITY_LEVELS;
   protected readonly weightFieldId = `pa-priority-weight-${nextId++}`;
-  private readonly levelButton = viewChild.required<string, ElementRef<HTMLElement>>('levelButton', {
+  private readonly levelButton = viewChild<string, ElementRef<HTMLElement>>('levelButton', {
     read: ElementRef,
   });
 
@@ -143,7 +151,7 @@ export class PriorityIndicator {
 
   protected restore(): void {
     this.restoreRecommendation.emit();
-    this.levelButton().nativeElement.focus();
+    this.levelButton()?.nativeElement.focus();
     void this.announcer.announce('criteria.priority.changed', {
       level: this.levelText(this.recommendedLevel()),
     });

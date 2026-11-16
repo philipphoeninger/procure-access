@@ -17,6 +17,8 @@ SPDX-License-Identifier: MIT
   <pa-notice kind="info">{{ 'criteria.list.priorityNote' | translate }}</pa-notice>
   @if (!signedIn()) {
     <pa-notice kind="attention">{{ 'criteria.list.draftNote' | translate }}</pa-notice>
+  } @else if (store.configurator.draftKept()) {
+    <pa-notice kind="info">{{ 'auth.login.draftKept' | translate }}</pa-notice>
   }
 
   @if (appTypesWithoutCriteria(); as appTypes) {
@@ -99,6 +101,9 @@ SPDX-License-Identifier: MIT
       <p class="pa-criteria-list__status">
         {{ 'criteria.list.status.count' | translate: { included: included(), total: answer.criteria.length } }}
       </p>
+      @if (saveAction()) {
+        <button matButton="outlined" type="button" (click)="save()">{{ 'criteria.list.save' | translate }}</button>
+      }
       <button matButton="filled" type="button" (click)="openExport()">{{ 'criteria.list.export' | translate }}</button>
     </div>
   }

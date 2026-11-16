@@ -77,7 +77,8 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
     const suggest = main.getByRole('link', { name: /^Fehlt ein Kriterium oder ist eine Formulierung unklar\?/ });
     await expect(suggest).toHaveAttribute('href', /^(mailto:[^?]+\?subject=Vorschlag%20f%C3%BCr%20den%20Kriterienkatalog|https:)/);
     await expect(actionBar(page)).toContainText(/^\s*(\d+) von \1 Kriterien in Ihrer Liste/);
-    await expect(main.getByRole('button', { name: 'Liste speichern' })).toHaveCount(0);
+    // „Liste speichern“ since S5-20b, before „Liste exportieren“; signed out it opens S01 (R-SAV-01).
+    await expect(actionBar(page).getByRole('button')).toHaveText(['Liste speichern', 'Liste exportieren']);
   });
 
   test('the action bar is sticky from 600 px width and height and in the flow below', async ({ page }) => {
@@ -154,7 +155,7 @@ test.describe('S13 export dialog', () => {
   /** Opens S13 from the action bar by keyboard and returns the button that opened it. */
   async function openExport(page: Page): Promise<Locator> {
     await toList(page);
-    const exportButton = actionBar(page).getByRole('button');
+    const exportButton = actionBar(page).getByRole('button', { name: 'Liste exportieren' });
     await exportButton.focus();
     await page.keyboard.press('Enter');
     // The dialog moves the focus to the selected format once it is open; keys go there only then.

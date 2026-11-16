@@ -125,7 +125,8 @@
       "account": "Konto",
       "login": "Anmelden",
       "logout": "Abmelden",
-      "organization": "Organisation"
+      "organization": "Organisation",
+      "savedLists": "Kriterienlisten"
     },
     "skipLink": "Zum Inhalt springen",
     "appName": "ProcureAccess",
@@ -559,7 +560,8 @@
       },
       "note": "Ihre Notiz zu diesem Kriterium (optional)",
       "note.add": "Notiz hinzufügen",
-      "note.edit": "Notiz bearbeiten"
+      "note.edit": "Notiz bearbeiten",
+      "note.heading": "Notiz"
     },
     "priority": {
       "A": "A – Mindestanforderung",
@@ -601,6 +603,37 @@
       "error.title": "Export fehlgeschlagen",
       "error": "Die Datei konnte nicht erstellt werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
       "outdated": "Die Datei konnte nicht erstellt werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen."
+    },
+    "save": {
+      "title": "Kriterienliste speichern",
+      "name": "Name der Liste",
+      "name.hint": "Zum Beispiel der Name Ihres Vergabeverfahrens.",
+      "orgNote": "Die Liste ist für alle Mitglieder Ihrer Organisation {{org}} sichtbar.",
+      "submit": "Liste speichern",
+      "success": "Liste „{{name}}“ gespeichert.",
+      "needOrg": "Um Kriterienlisten zu speichern, brauchen Sie eine Organisation. So können Sie die Liste mit Ihrem Team teilen.",
+      "needOrg.cta": "Organisation anlegen oder beitreten",
+      "error.title": "Liste nicht gespeichert",
+      "error": "Die Liste konnte nicht gespeichert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
+      "outdated": "Die Liste konnte nicht gespeichert werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen.",
+      "notAllowed": "Sie können für {{org}} keine Listen speichern. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“."
+    },
+    "saved": {
+      "title": "Gespeicherte Kriterienlisten",
+      "empty": "Ihre Organisation hat noch keine Kriterienlisten gespeichert. Stellen Sie eine Liste zusammen und speichern Sie sie, um sie hier wiederzufinden.",
+      "empty.cta": "Kriterien zusammenstellen",
+      "sort": "Sortieren nach",
+      "sort.modified": "Zuletzt geändert",
+      "sort.name": "Name",
+      "sort.updated": "Sortiert nach: {{sort}}.",
+      "name": "Name",
+      "modified": "Zuletzt geändert",
+      "release": "Katalogversion",
+      "delete": "Liste löschen",
+      "delete.title": "Kriterienliste löschen?",
+      "delete.body": "Die Liste „{{name}}“ wird gelöscht. Freigabelinks zu dieser Liste funktionieren danach nicht mehr. Beschaffungsprojekte, die eine Kopie der Liste nutzen, sind nicht betroffen.",
+      "delete.confirm": "Liste löschen",
+      "deleted": "Die Liste „{{name}}“ wurde gelöscht."
     }
   },
   "testType": {

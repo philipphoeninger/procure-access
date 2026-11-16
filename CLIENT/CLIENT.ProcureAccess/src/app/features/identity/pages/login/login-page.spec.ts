@@ -36,11 +36,13 @@ const base = 'https://procureaccess.de/problems/';
 describe('LoginPage (S01, R-AUTH-03)', () => {
   let startSession: ReturnType<typeof vi.fn>;
   let announce: ReturnType<typeof vi.fn>;
+  let keepDraftAfterSignIn: ReturnType<typeof vi.fn>;
 
   async function openLogin(options: { state?: object; listLoaded?: boolean; rejectWith?: unknown } = {}) {
     startSession =
       options.rejectWith === undefined ? vi.fn().mockResolvedValue(undefined) : vi.fn().mockRejectedValue(options.rejectWith);
     announce = vi.fn().mockResolvedValue(undefined);
+    keepDraftAfterSignIn = vi.fn();
     const rendered = await render(Host, {
       routes: [
         { path: 'kriterien/ergebnis', component: ListPage, data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.list' } },
@@ -54,6 +56,7 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
           provide: ProcureAccessStore,
           useValue: {
             startSession,
+            keepDraftAfterSignIn,
             configurator: { list: { answer: () => (options.listLoaded ? { criteria: [] } : null) } },
           },
         },
@@ -113,6 +116,8 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
     await fillAndSubmit(fixture);
 
     expect(announce).toHaveBeenCalledWith('auth.login.draftKept');
+    // S11 also shows it until the list is saved or S11 is left (owner decision S5-20b 1a).
+    expect(keepDraftAfterSignIn).toHaveBeenCalled();
   });
 
   it('prefixes the page title with „Fehler:“ while the error summary shows', async () => {

@@ -12,6 +12,7 @@ import { render, screen, within } from '@testing-library/angular';
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { FileSaver } from '@app/core/files/file-saver';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { AuthService } from '@app/features/identity/services/auth.service';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { ExportRequest } from '../../models/export';
@@ -27,7 +28,7 @@ import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
   withConfigurator(),
-  withMethods(() => ({ signedIn: () => signedIn })),
+  withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => null })),
 );
 
 @Component({ template: '' })
@@ -74,6 +75,7 @@ describe('ExportDialog (S13, R-LST-11)', () => {
         { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
         { provide: ExportApiService, useValue: { exportList } },
         { provide: FileSaver, useValue: { save } },
+        { provide: AuthService, useValue: { showLogin: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],

@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v31 (15. November 2026) – v31 ergänzt die Texte der Einladungen (Sprint 05, S5-17b, U133–U137; Entwurf, Bestätigung durch den Product Owner im Review): auf „Mitglieder“ S21 das Formular „Mitglied einladen“ mit der Rollenwahl, den Hinweis auf eine Adresse, die schon zu einem Mitglied gehört, die Liste „Offene Einladungen“ und die Ansage nach dem Zurücknehmen, sowie die Seite des Einladungslinks (`/organisation/einladung`) mit H1, Seitentiteln, dem Hinweis für Abgemeldete und der Ansage nach dem Annehmen. v30 (15. November 2026; vom Product Owner bestätigt am 15. November 2026) – v30 ergänzt die Texte von „Organisation anlegen“ S20 und „Mitglieder“ S21, die §5.7 noch fehlten: Seitentitel, Spaltenköpfe der Mitgliederliste, Name der Rollenauswahl, Kennzeichen der eigenen Zeile und eines gelöschten Kontos, die Ansagen nach Rollenänderung, Entfernen und Verlassen, den Bestätigungsdialog „Mitglied entfernen?“ und die Dialoge zum Verlassen (Sprint 05, S5-16b, U125–U132). v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v31):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.30), `ARCHITECTURE_v62.md`, `TESTING_v69.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.24), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v33 (16. November 2026) – v33 ergänzt die Texte zum Speichern und zu den gespeicherten Kriterienlisten (Sprint 05, S5-20b, U140–U144; **Entwurf**, Bestätigung durch den Product Owner im Review): den Eintrag „Kriterienlisten“ im Menü „Konto“, Sortierung und Angaben der Liste „Gespeicherte Kriterienlisten“ S14 und die Fehlerhinweise des Dialogs „Kriterienliste speichern“ S12. v32 (16. November 2026) – v32 ergänzt die Kopfzeile im angemeldeten Zustand (Sprint 05, S5-18, U138–U139; vom Product Owner bestätigt am 16. November 2026): den Eintrag „Organisation“ im Menü „Konto“ und die Form der Organisationsauswahl bei mehreren Mitgliedschaften. v31 (15. November 2026) – v31 ergänzt die Texte der Einladungen (Sprint 05, S5-17b, U133–U137; Entwurf, Bestätigung durch den Product Owner im Review): auf „Mitglieder“ S21 das Formular „Mitglied einladen“ mit der Rollenwahl, den Hinweis auf eine Adresse, die schon zu einem Mitglied gehört, die Liste „Offene Einladungen“ und die Ansage nach dem Zurücknehmen, sowie die Seite des Einladungslinks (`/organisation/einladung`) mit H1, Seitentiteln, dem Hinweis für Abgemeldete und der Ansage nach dem Annehmen. v30 (15. November 2026; vom Product Owner bestätigt am 15. November 2026) – v30 ergänzt die Texte von „Organisation anlegen“ S20 und „Mitglieder“ S21, die §5.7 noch fehlten: Seitentitel, Spaltenköpfe der Mitgliederliste, Name der Rollenauswahl, Kennzeichen der eigenen Zeile und eines gelöschten Kontos, die Ansagen nach Rollenänderung, Entfernen und Verlassen, den Bestätigungsdialog „Mitglied entfernen?“ und die Dialoge zum Verlassen (Sprint 05, S5-16b, U125–U132). v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v33):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.36), `ARCHITECTURE_v68.md`, `TESTING_v76.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.25), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,27 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v32
+
+Quelle: Aufgabe S5-20b (Speichern einer Kriterienliste, gespeicherte Kriterienlisten; Serverteil S5-20a; Entscheidungen S5-20 vom 16. November 2026: 3a – fehlende Schlüssel als Entwurf in v33, eine Liste in S14 zeigt Name, Datum und Katalogversion, nicht wer sie angelegt hat; 2a und S5-20b 2a – eine Auswahl „Sortieren nach“ in jeder Breite; S5-20b 4a – Menüeintrag „Kriterienlisten“). **Entwurf** – Wortlaut vom Product Owner im Review zu bestätigen. v32 (U138–U139) hat der Product Owner am 16. November 2026 bestätigt.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U140 | **Eintrag „Kriterienlisten“:** neu `shell.nav.savedLists` „Kriterienlisten“ im Menü „Konto“ (unter 600 px in der Liste des Menüs) zwischen `shell.nav.organization` und `shell.nav.settings`, nur mit Mitgliedschaft; er öffnet „Gespeicherte Kriterienlisten“ S14 (§5.1) | S14 war nur über seine Adresse erreichbar; kurz wie die anderen Einträge, die Überschrift von S14 bleibt `criteria.saved.title` (Entscheidung S5-20b 4a) | S5-20b |
+| U141 | **Sortierung in S14:** neu `criteria.saved.sort` „Sortieren nach“ (Label der Auswahl über der Liste, in jeder Breite) mit den Optionen `criteria.saved.sort.modified` „Zuletzt geändert“ (vorausgewählt, neueste zuerst) und `criteria.saved.sort.name` „Name“ (A–Z); nach einem Wechsel die Ansage `criteria.saved.sort.updated` „Sortiert nach: {{sort}}.“ (§5.6) | Eine Bedienung für schmale und breite Ansicht (Entscheidung S5-20b 2a); Muster wie `directory.sort.*`; „geändert“ statt „gespeichert“, weil Listen ab S5-21 bearbeitet werden | S5-20b |
+| U142 | **Angaben einer Liste in S14:** neu `criteria.saved.name` „Name“, `criteria.saved.modified` „Zuletzt geändert“ und `criteria.saved.release` „Katalogversion“ – als Spaltenköpfe der Tabelle ab 600 px und als Begriffe der Angaben je Liste darunter; der Name ist der Link zur Liste (§5.6) | Ohne die Person, die die Liste angelegt hat (Entscheidung S5-20 3a); dieselben Wörter in Tabelle und Karte | S5-20b |
+| U143 | **Fehlerhinweise in S12:** neu `criteria.save.error.title` „Liste nicht gespeichert“ (Titel des Fehlerhinweises über den Buttons), darin `criteria.save.error` „Die Liste konnte nicht gespeichert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.“, `criteria.save.outdated` „Die Liste konnte nicht gespeichert werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen.“ (`release-mismatch`), `criteria.save.notAllowed` „Sie können für {{org}} keine Listen speichern. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“.“ (403 ohne `email-unconfirmed`) oder `errors.antiforgery`. Ein leerer Name zeigt `errors.field.required` mit dem Label wie auf S20 (§5.6) | Ein Fehlerhinweis braucht einen Titel (wie U132, U136); `outdated` wie `criteria.export.outdated`, nur für das Speichern; die Rolle kann sich ändern, während der Dialog offen ist | S5-20b |
+| U144 | **Notiz einer gespeicherten Liste:** neu `criteria.item.note.heading` „Notiz“ (H3 über dem Text der Notiz auf der Karte einer gespeicherten Liste, die nur gelesen wird) (§5.5) | Das Label `criteria.item.note` „Ihre Notiz zu diesem Kriterium (optional)“ beschreibt ein Eingabefeld; über einem gespeicherten Text passt es nicht (Entscheidung S5-20 5a: gespeicherte Liste nur lesend bis S5-21) | S5-20b |
+
+### Änderungen gegenüber v31
+
+Quelle: Aufgabe S5-18 (Kopfzeile in den Zuständen „Angemeldet“ und „Angemeldet ohne Organisation“, Organisationsauswahl; Entscheidungen S5-18 1a–4a vom 16. November 2026, darunter 2a: fehlender Schlüssel als Entwurf in v32). Wortlaut vom Product Owner bestätigt am 16. November 2026.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U138 | **Eintrag „Organisation“:** neu `shell.nav.organization` „Organisation“ im Menü „Konto“ (unter 600 px in der Liste des Menüs) zwischen `shell.nav.account` und `shell.nav.settings`; er öffnet „Mitglieder“ S21 der gewählten Organisation, ohne Mitgliedschaft „Organisation anlegen oder beitreten“ S20 (§5.1) | S20 und S21 waren bisher nur über ihre Adresse erreichbar (Entscheidung S5-16 6a); ein Eintrag für beide Fälle, damit das Menü in beiden Zuständen gleich aufgebaut ist (Entscheidung S5-18 2a) | S5-18 |
+| U139 | **Organisationsauswahl bei mehreren Mitgliedschaften:** `shell.org.active` „Organisation: {{name}}“ ist dann der sichtbare Text eines Buttons, der ein Menü mit dem Namen `shell.org.switch` „Organisation wechseln“ öffnet; darin je Organisation ihr Name, die gewählte mit Häkchen. Unter 600 px steht `shell.org.active` als Text über der Liste der Organisationen (Liste mit dem Namen `shell.org.switch`) (§5.1). Kein neuer Text | Der Name des Buttons beginnt mit seinem sichtbaren Text (WCAG 2.5.3); ein Auswahlfeld würde beim Ändern die Seite wechseln (WCAG 3.2.2), ein Menü wechselt erst beim Auswählen | S5-18 |
 
 ### Änderungen gegenüber v30
 
@@ -569,11 +590,13 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `shell.nav.contribute` | Navigation | Beitragen | |
 | `shell.nav.settings` | Menü | Einstellungen | |
 | `shell.nav.account` | Menü | Konto | |
+| `shell.nav.organization` | Menü „Konto“ | Organisation | U138; öffnet S21 der gewählten Organisation, ohne Mitgliedschaft S20 |
+| `shell.nav.savedLists` | Menü „Konto“ | Kriterienlisten | U140; nur mit Mitgliedschaft; öffnet S14 |
 | `shell.nav.login` | Button | Anmelden | |
 | `shell.nav.logout` | Menü | Abmelden | |
 | `shell.userMenu.label` | `aria-label` des Buttons „Konto“ (`shell.nav.account`) | Konto, angemeldet als {{displayName}} | U95; beginnt mit dem sichtbaren Text (WCAG 2.5.3) |
-| `shell.org.active` | Anzeige | Organisation: {{name}} | bei mehreren Mitgliedschaften als Auswahl |
-| `shell.org.switch` | `aria-label` | Organisation wechseln | |
+| `shell.org.active` | Anzeige | Organisation: {{name}} | bei mehreren Mitgliedschaften als Auswahl: sichtbarer Text des Buttons, der das Menü `shell.org.switch` öffnet (U139) |
+| `shell.org.switch` | `aria-label` | Organisation wechseln | Name des Menüs der Organisationen (unter 600 px: der Liste) (U139) |
 | `shell.footer.about` | Link | Über ProcureAccess | |
 | `shell.footer.werteit` | Link | Projekt WERTE.IT | |
 | `shell.footer.suggest` | Link | Kriterium vorschlagen | → S70 |
@@ -780,6 +803,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.item.testedBy.meta` | Metazeile | Prüfverfahren · {{link}} | |
 | `criteria.item.testedBy.note` | Zusatz in den Details | Im Beschaffungsprojekt ergibt sich Ja oder Nein aus dem Prüfnachweis des Produkts. Im Abgleich mit Kriterien zählt dieses Kriterium nicht mit, weil der Prüfstatus dort schon unter „Auf Barrierefreiheit geprüft“ steht. | U34, U46 |
 | `criteria.item.note` | Label | Ihre Notiz zu diesem Kriterium (optional) | |
+| `criteria.item.note.heading` | H3 (Karte einer gespeicherten Liste, nur lesend) | Notiz | U144 |
 | `criteria.item.note.add` | Button (Disclosure) | Notiz hinzufügen | U104; solange keine Notiz da ist; `aria-expanded`, Fokus ins Feld; Kriteriumstitel per `aria-describedby` |
 | `criteria.item.note.edit` | Button (Disclosure) | Notiz bearbeiten | U104; sobald eine Notiz da ist |
 | **K5 Priorität mit Begründung** (`criteria.priority.`) | | | |
@@ -834,6 +858,10 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.save.success` | Snackbar / Ansage | Liste „{{name}}“ gespeichert. | |
 | `criteria.save.needOrg` | Dialog (ohne Organisation) | Um Kriterienlisten zu speichern, brauchen Sie eine Organisation. So können Sie die Liste mit Ihrem Team teilen. | → S20 |
 | `criteria.save.needOrg.cta` | Button | Organisation anlegen oder beitreten | |
+| `criteria.save.error.title` | Titel des Fehlerhinweises im Dialog | Liste nicht gespeichert | U143; `pa-notice` Fehler, `role="alert"` |
+| `criteria.save.error` | Fehler | Die Liste konnte nicht gespeichert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns. | U143 |
+| `criteria.save.outdated` | Fehler (`release-mismatch`) | Die Liste konnte nicht gespeichert werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen. | U143 |
+| `criteria.save.notAllowed` | Fehler (403, Rolle) | Sie können für {{org}} keine Listen speichern. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“. | U143 |
 | `criteria.export.title` | Dialog-Titel | Kriterienliste exportieren | |
 | `criteria.export.format` | `legend` | Dateiformat | |
 | `criteria.export.xlsx` | Option | Excel-Datei (.xlsx) – für Vergabeunterlagen | Vorauswahl |
@@ -865,6 +893,13 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.saved.title` | H1 (S14) | Gespeicherte Kriterienlisten | |
 | `criteria.saved.empty` | Leerzustand | Ihre Organisation hat noch keine Kriterienlisten gespeichert. Stellen Sie eine Liste zusammen und speichern Sie sie, um sie hier wiederzufinden. | |
 | `criteria.saved.empty.cta` | Button | Kriterien zusammenstellen | |
+| `criteria.saved.sort` | Label (Auswahl über der Liste) | Sortieren nach | U141 |
+| `criteria.saved.sort.modified` | Option (vorausgewählt) | Zuletzt geändert | U141; neueste zuerst |
+| `criteria.saved.sort.name` | Option | Name | U141; A–Z |
+| `criteria.saved.sort.updated` | Ansage | Sortiert nach: {{sort}}. | U141 |
+| `criteria.saved.name` | Spaltenkopf / Begriff | Name | U142; der Name ist der Link zur Liste |
+| `criteria.saved.modified` | Spaltenkopf / Begriff | Zuletzt geändert | U142; Datum |
+| `criteria.saved.release` | Spaltenkopf / Begriff | Katalogversion | U142 |
 | `criteria.saved.delete` | Button (je Liste, Rollen Verwalten und Bearbeiten) | Liste löschen | U75; Name der Liste per `aria-describedby` |
 | `criteria.saved.delete.title` | Dialog-Titel | Kriterienliste löschen? | |
 | `criteria.saved.delete.body` | Text | Die Liste „{{name}}“ wird gelöscht. Freigabelinks zu dieser Liste funktionieren danach nicht mehr. Beschaffungsprojekte, die eine Kopie der Liste nutzen, sind nicht betroffen. | D1 |

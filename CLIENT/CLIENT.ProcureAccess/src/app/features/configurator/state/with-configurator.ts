@@ -128,6 +128,11 @@ export interface ConfiguratorState {
   /** What the last change cleared, for the reset notice; gone with the next selection (R-CON-07). */
   reset: ResetReport | null;
   list: CriteriaListState;
+  /**
+   * True after the user signed in on S01 from „Liste speichern“ with a list on S11 (S5-20b, owner
+   * decision S5-20b 1a): S11 shows `auth.login.draftKept` until the list is saved or S11 is left.
+   */
+  draftKept: boolean;
 }
 
 export const initialConfiguratorState: ConfiguratorState = {
@@ -138,6 +143,7 @@ export const initialConfiguratorState: ConfiguratorState = {
   changedSinceAnswer: null,
   reset: null,
   list: initialCriteriaListState,
+  draftKept: false,
 };
 
 /**
@@ -408,6 +414,14 @@ export const withConfigurator = () =>
          * clears the in-memory state, the anonymous draft included). Answers of requests still
          * running are dropped; S10 loads the options again when it opens.
          */
+        /** S01 signed the user in from „Liste speichern“ while S11 had a list (owner decision S5-20b 1a). */
+        keepDraftAfterSignIn(): void {
+          patch({ draftKept: true });
+        },
+        /** S11 is left: the hint `auth.login.draftKept` has done its job. */
+        forgetDraftKept(): void {
+          patch({ draftKept: false });
+        },
         resetConfigurator(): void {
           latestRequest++;
           latestListRequest++;

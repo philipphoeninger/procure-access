@@ -67,3 +67,22 @@ export async function invitationLinkOf(request: APIRequestContext, address: stri
   const url = new URL(link!);
   return url.pathname + url.search;
 }
+
+/**
+ * Signs the request context in as `address` and creates an organisation it owns (S5-20b): the
+ * account of a test that saves lists, so the browser page itself can stay signed out until the test
+ * signs in through S01. Returns the organisation's id.
+ */
+export async function organizationOfAccount(request: APIRequestContext, address: string, password: string, name: string): Promise<string> {
+  const signIn = await request.post('/api/v1/auth/login', {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+    data: { email: address, password },
+  });
+  expect(signIn.status(), `sign-in of ${address}`).toBe(204);
+  const response = await request.post('/api/v1/organizations', {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+    data: { name, type: 'publicBody' },
+  });
+  expect(response.status(), `creating ${name}`).toBe(201);
+  return ((await response.json()) as { id: string }).id;
+}

@@ -13,6 +13,7 @@ import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
 import { INVITATION_SEGMENT, MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
+import { SAVED_LISTS_PATH } from './features/configurator/models/saved-lists';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -110,6 +111,21 @@ export const routes: Routes = [
     loadComponent: () => import('./features/configurator/pages/criteria-list/criteria-list').then((m) => m.CriteriaListPage),
     canActivate: [completeSelectionGuard],
     data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.list' },
+  },
+  // S14 „Gespeicherte Kriterienlisten“ (R-SAV-02, S5-20b): the lists of the organisation the
+  // header shows; signed in only
+  {
+    path: SAVED_LISTS_PATH,
+    pathMatch: 'full',
+    loadComponent: () => import('./features/configurator/pages/saved-lists/saved-lists-page').then((m) => m.SavedListsPage),
+    canActivate: [authGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.saved' },
+  },
+  // A saved list, S11 read only until S5-21 (owner decision S5-20 5a): its resolver loads the list
+  // and names the page title (lazy child routes like S21)
+  {
+    path: `${SAVED_LISTS_PATH}/:id`,
+    loadChildren: () => import('./features/configurator/pages/saved-list/saved-list.routing').then((m) => m.SAVED_LIST_ROUTES),
   },
   {
     path: 'filters',

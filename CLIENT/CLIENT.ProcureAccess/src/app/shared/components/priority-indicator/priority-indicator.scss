@@ -30,6 +30,19 @@
   background: var(--mat-sys-primary-container);
 }
 
+// Read only (S5-20b): the same box as text, without the button's touch target.
+.pa-priority-indicator__level--text {
+  margin: 0;
+  padding: var(--pa-space-xs) var(--pa-space-sm);
+  border-radius: var(--mat-sys-corner-small);
+  color: var(--mat-sys-on-primary-container);
+  font: var(--mat-sys-label-large);
+
+  &.pa-priority-indicator__level--info {
+    color: var(--mat-sys-on-surface);
+  }
+}
+
 .pa-priority-indicator__level--info {
   --mat-button-text-label-text-color: var(--mat-sys-on-surface);
 
