@@ -19,18 +19,20 @@ const base = 'https://procureaccess.de/problems/';
 describe('OrganizationStartPage (S20, R-ORG-01)', () => {
   let create: ReturnType<typeof vi.fn>;
   let setPageTitleState: ReturnType<typeof vi.fn>;
+  let organizationJoined: ReturnType<typeof vi.fn>;
 
   async function openPage(options: { rejectWith?: unknown } = {}) {
     create =
       options.rejectWith === undefined ? vi.fn().mockResolvedValue({ id: 'org-1' }) : vi.fn().mockRejectedValue(options.rejectWith);
     setPageTitleState = vi.fn();
+    organizationJoined = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(OrganizationStartPage, {
       routes: [{ path: 'organisation/:id/mitglieder', children: [] }],
       providers: [
         provideTestTranslations(),
         { provide: OrganizationApiService, useValue: { create } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: ProcureAccessStore, useValue: { session: () => ({ id: 'u1', email: 'ada@example.test' }), resendConfirmation: vi.fn() } },
+        { provide: ProcureAccessStore, useValue: { session: () => ({ id: 'u1', email: 'ada@example.test' }), resendConfirmation: vi.fn(), organizationJoined } },
       ],
     });
     return rendered;
@@ -93,7 +95,7 @@ describe('OrganizationStartPage (S20, R-ORG-01)', () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it('sends the trimmed name and the type and opens S21 of the new organisation', async () => {
+  it('sends the trimmed name and the type, makes the new organisation the header\'s and opens its S21 (R-SHL-02)', async () => {
     const { fixture } = await openPage();
     const router = fixture.debugElement.injector.get(Router);
     const navigate = vi.spyOn(router, 'navigate');
@@ -103,6 +105,7 @@ describe('OrganizationStartPage (S20, R-ORG-01)', () => {
     await submit(fixture);
 
     expect(create).toHaveBeenCalledWith({ name: 'Stadt Musterhausen', type: 'association' });
+    expect(organizationJoined).toHaveBeenCalledExactlyOnceWith('org-1');
     expect(navigate).toHaveBeenCalledWith(['organisation', 'org-1', 'mitglieder']);
   });
 

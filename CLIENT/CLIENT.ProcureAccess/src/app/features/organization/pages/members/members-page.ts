@@ -20,7 +20,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { skip } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -100,7 +102,8 @@ export class MembersPage {
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
 
-  protected readonly view = signal<MembersPageView>(inject(MembersPageLoad).view);
+  private readonly load = inject(MembersPageLoad);
+  protected readonly view = signal<MembersPageView>(this.load.view);
   protected readonly wide = injectWideLayout();
   protected readonly roles = ORGANIZATION_ROLES;
   protected readonly roleKey = roleKey;
@@ -132,6 +135,17 @@ export class MembersPage {
   private readonly heading = viewChild<ElementRef<HTMLElement>>('heading');
 
   constructor() {
+    // Angular keeps the page when only the id changes — the organisation switch on S21 (R-SHL-03,
+    // S5-18) or a link to another organisation's S21 — and runs the resolver again: take its view.
+    // The route data stays equal (the same title key), so the new id is what tells.
+    inject(ActivatedRoute)
+      .paramMap.pipe(skip(1), takeUntilDestroyed())
+      .subscribe(() => {
+        this.error.set(null);
+        this.version.update((version) => version + 1);
+        this.view.set(this.load.view);
+      });
+
     // The route change clears the title state; the name is known from the resolver.
     effect(() => {
       const name = this.organization()?.organization.name;
@@ -218,6 +232,8 @@ export class MembersPage {
       await this.refused(organization, error);
       return;
     }
+    // The header drops the organisation (R-SHL-02); the switch falls back to the first by name.
+    await this.store.loadOrganizations();
     // Announced first, so it is read before the title of S20 (UX copy U130).
     void this.announcer.announce('org.left', { org: name });
     await this.router.navigate([ORGANIZATION_PATH]);

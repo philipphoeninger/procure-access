@@ -21,12 +21,16 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// with the expected status codes (non-member 404, member below the role 403, anonymous 401). The
 /// organisation comes from the route (the resource); a client-supplied organisation header changes
 /// nothing. Since S5-16a on the real organisation endpoints (the test-only probe of S5-15 is gone),
-/// since S5-17a with the invitation endpoints; the workspace and configurator endpoints add their
+/// since S5-17a with the invitation endpoints, since S5-18 with the list of the user's own
+/// organisations (every signed-in user; which ones it lists is TEN-01 in <c>OrganizationEndpointsTests</c>); the workspace and configurator endpoints add their
 /// rows with their steps.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
     private const string Anonymous = "anonymous";
+
+    /// <summary><c>GET /organizations</c>, the user's own organisations (S5-18): every signed-in user.</summary>
+    private const string ListMine = "list-mine";
 
     /// <summary><c>GET members</c>: Reader and up.</summary>
     private const string Read = "read";
@@ -57,6 +61,12 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     public static TheoryData<string, string, HttpStatusCode> Matrix => new()
     {
+        { TestUsers.OwnerA.Name, ListMine, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ListMine, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ListMine, HttpStatusCode.OK },
+        { TestUsers.OwnerB.Name, ListMine, HttpStatusCode.OK },
+        { TestUsers.Member.Name, ListMine, HttpStatusCode.OK },
+        { Anonymous, ListMine, HttpStatusCode.Unauthorized },
         { TestUsers.OwnerA.Name, Read, HttpStatusCode.OK },
         { TestUsers.EditorA.Name, Read, HttpStatusCode.OK },
         { TestUsers.ReaderA.Name, Read, HttpStatusCode.OK },
@@ -216,6 +226,7 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         var a = Fixture.A.Id;
         return action switch
         {
+            ListMine => client.GetAsync("/api/v1/organizations", Cancellation),
             Read => client.GetAsync(MembersPath(a), Cancellation),
             ChangeRole => client.PatchAsJsonAsync(MemberPath(a, TestUsers.ReaderA.Id), new { role = "editor" }, Cancellation),
             // Someone else than the caller: the Editor for everybody but the Editor, who names the Reader.

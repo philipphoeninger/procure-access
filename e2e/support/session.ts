@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
  * Answers the next request to `url` with 401, as after an expired session (R-AUTH-07); later ones
@@ -35,4 +35,26 @@ export async function signInThroughApi(page: Page, email: string, password: stri
     data: { email, password },
   });
   expect(response.status(), `sign-in of ${email}`).toBe(204);
+}
+
+/**
+ * „Konto“ of the full header (S5-18): a menu button whose name names the signed-in address
+ * (`shell.userMenu.label`); it is there exactly while somebody is signed in.
+ */
+export function accountMenuButton(page: Page): Locator {
+  return page.getByRole('banner').getByRole('button', { name: /^Konto, angemeldet als / });
+}
+
+/** Opens the menu „Konto“ of the full header with the keyboard and returns the menu. */
+export async function openAccountMenu(page: Page): Promise<Locator> {
+  await accountMenuButton(page).press('Enter');
+  const menu = page.getByRole('menu');
+  await expect(menu.getByRole('menuitem').first()).toBeFocused();
+  return menu;
+}
+
+/** „Abmelden“ in the menu „Konto“ of the full header, by keyboard (R-AUTH-08). */
+export async function signOutThroughHeader(page: Page): Promise<void> {
+  const menu = await openAccountMenu(page);
+  await menu.getByRole('menuitem', { name: 'Abmelden' }).press('Enter');
 }

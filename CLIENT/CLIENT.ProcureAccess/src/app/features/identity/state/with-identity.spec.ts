@@ -10,6 +10,7 @@ import { signalStore } from '@ngrx/signals';
 
 import { API_URL } from '@app/app.config';
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { SessionResponse } from '../models/session';
 import { IdentityApiService } from '../services/identity-api.service';
 import { withIdentity } from './with-identity';
@@ -20,6 +21,7 @@ const PROBE = '/api/v1/auth/session';
 const LOGIN = '/api/v1/auth/login';
 const LOGOUT = '/api/v1/auth/logout';
 const ME = '/api/me';
+const ORGANIZATIONS = '/api/v1/organizations';
 
 const moderator: SessionResponse = {
   user: { id: 'u1', email: 'mod@example.test', roles: ['Moderator'], permissions: ['moderation:review'] },
@@ -28,6 +30,8 @@ const moderator: SessionResponse = {
 };
 const anonymous: SessionResponse = { user: null };
 const legacyUser = { id: 'u1', email: 'mod@example.test', uiCustomization: { language: 'de' } };
+const amt: OrganizationSummary = { id: 'org-a', name: 'Ämter Musterhausen', type: 'publicBody', role: 'owner' };
+const verein: OrganizationSummary = { id: 'org-v', name: 'Verein Beispiel', type: 'association', role: 'reader' };
 
 let backend: HttpTestingController;
 let router: { navigateByUrl: ReturnType<typeof vi.fn> };
@@ -55,11 +59,12 @@ async function expectRequest(url: string): Promise<TestRequest> {
   return backend.expectOne(url);
 }
 
-/** Answers the probe and, for a signed-in user, the legacy user request. */
-async function answerProbe(response: SessionResponse): Promise<void> {
+/** Answers the probe and, for a signed-in user, the legacy user and the organisations requests. */
+async function answerProbe(response: SessionResponse, organizations: OrganizationSummary[] = []): Promise<void> {
   (await expectRequest(PROBE)).flush(response);
   if (response.user) {
     (await expectRequest(ME)).flush(legacyUser);
+    backend.expectOne(ORGANIZATIONS).flush(organizations);
   }
 }
 
@@ -204,6 +209,8 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
       requests.at(-1)!.flush(moderator);
       requests.push(await expectRequest(ME));
       requests.at(-1)!.flush(legacyUser);
+      requests.push(backend.expectOne(ORGANIZATIONS));
+      requests.at(-1)!.flush([]);
       await signingIn;
       expect(store.signedIn()).toBe(true);
 
@@ -243,5 +250,94 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
 
     expect(store.signedIn()).toBe(false);
     expect(router.navigateByUrl).toHaveBeenCalledWith('/');
+  });
+
+  describe('organisations (R-SHL-02, R-SHL-03; S5-18)', () => {
+    async function signedInWith(organizations: OrganizationSummary[]) {
+      const store = setUp();
+      const loading = store.loadSession();
+      await answerProbe(moderator, organizations);
+      await loading;
+      return store;
+    }
+
+    it('reads the organisations with the session; without a membership there is no active one', async () => {
+      const store = await signedInWith([]);
+
+      expect(store.organizations()).toEqual([]);
+      expect(store.activeOrganization()).toBeNull();
+    });
+
+    it('starts with the first organisation by name and switches to another one of the user', async () => {
+      const store = await signedInWith([amt, verein]);
+      expect(store.activeOrganization()).toEqual(amt);
+
+      store.switchOrganization(verein.id);
+
+      expect(store.activeOrganization()).toEqual(verein);
+    });
+
+    it('ignores a switch to an organisation that is not the user\'s', async () => {
+      const store = await signedInWith([amt, verein]);
+
+      store.switchOrganization('foreign');
+
+      expect(store.activeOrganization()).toEqual(amt);
+    });
+
+    it('falls back to the first organisation when the chosen one is gone after reading them again', async () => {
+      const store = await signedInWith([amt, verein]);
+      store.switchOrganization(verein.id);
+
+      const reading = store.loadOrganizations();
+      backend.expectOne(ORGANIZATIONS).flush([amt]);
+      await reading;
+
+      expect(store.activeOrganization()).toEqual(amt);
+    });
+
+    it('keeps the organisations when reading them again fails (background request)', async () => {
+      const store = await signedInWith([amt, verein]);
+
+      const reading = store.loadOrganizations();
+      backend.expectOne(ORGANIZATIONS).flush('', { status: 503, statusText: 'Service Unavailable' });
+      await reading;
+
+      expect(store.organizations()).toEqual([amt, verein]);
+    });
+
+    it('forgets the organisations and the choice on sign-out', async () => {
+      const store = await signedInWith([amt, verein]);
+      store.switchOrganization(verein.id);
+
+      const signingOut = store.signOut();
+      (await expectRequest(LOGOUT)).flush(null, { status: 204, statusText: 'No Content' });
+      await signingOut;
+
+      expect(store.organizations()).toEqual([]);
+      expect(store.activeOrganization()).toBeNull();
+    });
+
+    it('drops an answer that arrives after the user signed out', async () => {
+      const store = await signedInWith([]);
+
+      const reading = store.loadOrganizations();
+      const pending = backend.expectOne(ORGANIZATIONS);
+      const signingOut = store.signOut();
+      (await expectRequest(LOGOUT)).flush(null, { status: 204, statusText: 'No Content' });
+      await signingOut;
+      pending.flush([amt]);
+      await reading;
+
+      expect(store.organizations()).toEqual([]);
+    });
+
+    it('reads nothing while nobody is signed in', async () => {
+      const store = setUp();
+
+      await store.loadOrganizations();
+
+      backend.expectNone(ORGANIZATIONS);
+    });
   });
 });

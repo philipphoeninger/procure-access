@@ -13,6 +13,7 @@ import { AuthService } from '@app/features/identity/services/auth.service';
 import { IdentityApiService } from '@app/features/identity/services/identity-api.service';
 import { DARK_SCHEME, FakeMediaMatcher, provideFakeMediaMatcher } from '@app/testing/fake-media-matcher';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
+import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
 import { LanguageService } from '../services/language.service';
 import { SettingsApiService } from '../services/settings-api.service';
 import { initialSettingsState, withSettings } from './with-settings';
@@ -40,6 +41,7 @@ function setUp(
       provideRouter([]),
       { provide: AuthService, useValue: {} },
       { provide: IdentityApiService, useValue: {} },
+      { provide: OrganizationApiService, useValue: {} },
       { provide: LanguageService, useValue: { init: vi.fn(), get: () => 'de' } },
       { provide: SnackbarService, useValue: { showInfo } },
     ],

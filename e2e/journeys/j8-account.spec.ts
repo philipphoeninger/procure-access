@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
+import { accountMenuButton, signOutThroughHeader } from '../support/session';
 
 /**
  * J8, account (TESTING §5.4; S5-14), on the real E2E stack by keyboard: register on S02 → read the
@@ -128,7 +129,7 @@ test.describe('J8 account: register, confirm, sign in, sign out', () => {
     // Signed in: S01 closes, the page underneath is back with the focus on its H1
     await expect(main(page).getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeFocused();
     await expect(page).toHaveURL(/\/registrieren\/bestaetigen$/);
-    await expect(header(page).getByRole('button', { name: 'Abmelden' })).toBeVisible();
+    await expect(accountMenuButton(page)).toBeVisible();
     expect(await sessionEmail(page)).toBe(address);
     await settled(page.locator('body'));
     await expectNoAxeViolations(page, testInfo, 'j8-signed-in');
@@ -157,8 +158,8 @@ test.describe('J8 account: register, confirm, sign in, sign out', () => {
       expect(value, `storage entry ${key}`).not.toMatch(/eyJ[\w-]+\.[\w-]+/); // no JWT
     }
 
-    // „Abmelden“: the start page with the focus on its H1, the session gone
-    await press(header(page).getByRole('button', { name: 'Abmelden' }));
+    // „Abmelden“ in the menu „Konto“ (S5-18): the start page with the focus on its H1, the session gone
+    await signOutThroughHeader(page);
 
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole('heading', { level: 1 })).toBeFocused();

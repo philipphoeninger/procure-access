@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
 
 import { SnackbarService } from '@app/core/services/snackbar.service';
+import { OrganizationSummary } from '@app/features/organization/models/organization';
+import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
 import { withLoading } from '@app/shared/state/with-loading';
 import { SessionResponse, SessionUser } from '../models/session';
 import { User } from '../models/user.model';
@@ -26,6 +28,13 @@ export interface IdentityState {
   /** Absolute limit of the session (ISO 8601); null without a session. */
   sessionAbsoluteExpiresAt: string | null;
   sessionStatus: SessionStatus;
+  /** The signed-in user's organisations by name (`GET /api/v1/organizations`); empty without a membership. */
+  organizations: OrganizationSummary[];
+  /**
+   * The organisation the user chose with the switch (R-SHL-03), in memory only: a reload or a new
+   * sign-in starts again from the first by name (owner decision S5-18 3a). Null until a switch.
+   */
+  activeOrganizationId: string | null;
 }
 
 export const initialIdentityState: IdentityState = {
@@ -34,6 +43,8 @@ export const initialIdentityState: IdentityState = {
   sessionExpiresAt: null,
   sessionAbsoluteExpiresAt: null,
   sessionStatus: 'unknown',
+  organizations: [],
+  activeOrganizationId: null,
 };
 
 /**
@@ -41,7 +52,9 @@ export const initialIdentityState: IdentityState = {
  * from `GET /api/v1/auth/session` alone. The session is the Identity cookie, which the browser
  * sends on its own — nothing here reads or writes a token, `localStorage` or `sessionStorage`
  * (SEC-01). The probe runs once at application start (`ProcureAccessStore.init()`), after a sign-in
- * and a sign-out; guards wait for it through {@link sessionReady}.
+ * and a sign-out; guards wait for it through {@link sessionReady}. For a new signed-in user it also
+ * reads the user's organisations, which decide the header state (SignedIn or SignedInNoOrg,
+ * R-SHL-02) and the organisation of the switch (R-SHL-03; S5-18).
  */
 export const withIdentity = () =>
   signalStoreFeature(
@@ -52,12 +65,23 @@ export const withIdentity = () =>
       signedIn: computed(() => state.session() !== null),
       /** The permissions of the signed-in user's roles (e.g. `moderation:review`); empty when signed out. */
       permissions: computed(() => state.session()?.permissions ?? []),
+      /**
+       * The organisation lists, projects and the compare select are scoped to (R-SHL-03): the one
+       * chosen with the switch while the user is still its member, otherwise the first by name;
+       * null without a membership (header state SignedInNoOrg, R-SHL-02). A query scope, not a
+       * security boundary: the server's filter covers every membership (ARCHITECTURE C144).
+       */
+      activeOrganization: computed(() => {
+        const organizations = state.organizations();
+        return organizations.find((o) => o.id === state.activeOrganizationId()) ?? organizations[0] ?? null;
+      }),
     })),
     withMethods(
       (
         state,
         authService = inject(AuthService),
         identityApiService = inject(IdentityApiService),
+        organizationApiService = inject(OrganizationApiService),
         snackbarService = inject(SnackbarService),
         router = inject(Router),
       ) => {
@@ -79,7 +103,29 @@ export const withIdentity = () =>
             sessionExpiresAt: null,
             sessionAbsoluteExpiresAt: null,
             sessionStatus: 'ready',
+            organizations: [],
+            activeOrganizationId: null,
           });
+        }
+
+        /**
+         * Reads the signed-in user's organisations. A failure keeps the list as it was (a
+         * background request, nothing is shown); an answer for a user who signed out meanwhile is
+         * dropped.
+         */
+        async function loadOrganizations(): Promise<void> {
+          const userId = state.session()?.id;
+          if (!userId) {
+            return;
+          }
+          try {
+            const organizations = await organizationApiService.mine();
+            if (state.session()?.id === userId) {
+              patchState(state, { organizations });
+            }
+          } catch {
+            // BACKGROUND_REQUEST: the header keeps what it shows.
+          }
         }
 
         /**
@@ -98,19 +144,48 @@ export const withIdentity = () =>
           }
           setSession(response);
           if (response.user === null) {
-            patchState(state, { user: null });
+            patchState(state, { user: null, organizations: [], activeOrganizationId: null });
             return null;
           }
           if (state.user()?.id === response.user.id) {
             return null;
           }
-          const user = await authService.me();
+          // Another user than before: the switch starts again from the first organisation (3a).
+          patchState(state, { organizations: [], activeOrganizationId: null });
+          const [user] = await Promise.all([authService.me(), loadOrganizations()]);
           patchState(state, { user });
           return user;
         }
 
         return {
           loadSession,
+
+          /**
+           * Reads the organisations again after a membership changed here: an organisation created
+           * (S20), an invitation accepted, the organisation left (S21).
+           */
+          loadOrganizations,
+
+          /**
+           * After the user created or joined an organisation (S20, the invitation link): reads the
+           * organisations again and makes the new one the active one, as the user works in it next.
+           */
+          async organizationJoined(organizationId: string): Promise<void> {
+            await loadOrganizations();
+            if (state.organizations().some((o) => o.id === organizationId)) {
+              patchState(state, { activeOrganizationId: organizationId });
+            }
+          },
+
+          /**
+           * Chooses the organisation lists, projects and the compare select show (R-SHL-03). An id
+           * that is not one of the user's organisations changes nothing.
+           */
+          switchOrganization(organizationId: string): void {
+            if (state.organizations().some((o) => o.id === organizationId)) {
+              patchState(state, { activeOrganizationId: organizationId });
+            }
+          },
 
           /** Resolves once the first probe answered; starts it when nobody did yet (guards). */
           async sessionReady(): Promise<void> {

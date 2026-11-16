@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
@@ -17,6 +18,9 @@ namespace ProcureAccess.Modules.IdentityAccess.Organizations;
 /// </summary>
 internal sealed class OrganizationMemberService(IdentityAccessDbContext db, TimeProvider clock) : IOrganizationMembers
 {
+    /// <summary>German collation for names („Ämter“ before „Bauamt“), as the header shows them.</summary>
+    private static readonly StringComparer NameOrder = StringComparer.Create(CultureInfo.GetCultureInfo("de-DE"), ignoreCase: true);
+
     public async Task<Guid> CreateAsync(
         string creatorUserId, string name, OrganizationType type, CancellationToken cancellationToken)
     {
@@ -48,6 +52,18 @@ internal sealed class OrganizationMemberService(IdentityAccessDbContext db, Time
             organization.Name,
             organization.Type,
             [.. members.OrderByDescending(m => m.Role).ThenBy(m => m.UserId, StringComparer.Ordinal)]);
+    }
+
+    public async Task<IReadOnlyList<OrganizationSummary>> ListOfAsync(string userId, CancellationToken cancellationToken)
+    {
+        // Both sets go through the organisation filter of the request, so a caller only ever lists
+        // organisations it is a member of, whatever user id it passes (TEN-01).
+        var organizations = await (from m in db.OrganizationMemberships.AsNoTracking()
+                                   join o in db.Organizations.AsNoTracking() on m.OrganizationId equals o.Id
+                                   where m.UserId == userId
+                                   select new OrganizationSummary(o.Id, o.Name, o.Type, m.Role))
+                                  .ToListAsync(cancellationToken);
+        return [.. organizations.OrderBy(o => o.Name, NameOrder).ThenBy(o => o.Id)];
     }
 
     public Task<MembershipChangeResult> ChangeRoleAsync(

@@ -43,6 +43,17 @@ export interface CreateOrganizationRequest {
   type: OrganizationType;
 }
 
+/**
+ * One organisation of `GET /api/v1/organizations` (SPEC §8.9; S5-18): the signed-in user's
+ * organisations, by name, with the user's role in each — the header's display and switch.
+ */
+export interface OrganizationSummary {
+  id: string;
+  name: string;
+  type: OrganizationType;
+  role: OrganizationRole;
+}
+
 /** The answer of `POST /api/v1/organizations`. */
 export interface CreatedOrganization {
   id: string;

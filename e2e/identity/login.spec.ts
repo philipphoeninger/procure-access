@@ -5,7 +5,7 @@
 import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
-import { expireSessionOnce } from '../support/session';
+import { accountMenuButton, expireSessionOnce, signOutThroughHeader } from '../support/session';
 import { CONFIRMED_USER, TEST_USER_PASSWORD } from '../support/users';
 
 /**
@@ -136,7 +136,7 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
     await expect(page).toHaveURL(/\/kriterien$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Kriterien zusammenstellen' })).toBeFocused();
     await expect(combobox(page)).toHaveValue('HR-Anwendung');
-    await expect(header(page).getByRole('button', { name: 'Abmelden' })).toBeVisible();
+    await expect(accountMenuButton(page)).toBeVisible();
   });
 
   test('INV:A11Y-01 INV:A11Y-08 the overlay after a 401 keeps the selection and sends the request again', async ({ page }, testInfo) => {
@@ -175,13 +175,12 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
     await expect(header(page).getByRole('button', { name: 'Anmelden' })).toBeVisible();
   });
 
-  test('„Abmelden“ clears the selection and moves the focus to the H1 of the start page', async ({ page }) => {
+  test('„Abmelden“ in the menu „Konto“ clears the selection and moves the focus to the H1 of the start page', async ({ page }) => {
     await signInThroughApi(page);
     await chooseHr(page);
-    const signOut = header(page).getByRole('button', { name: 'Abmelden' });
-    await expect(signOut).toBeVisible();
+    await expect(accountMenuButton(page)).toBeVisible();
 
-    await press(signOut, 'Enter');
+    await signOutThroughHeader(page);
 
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
