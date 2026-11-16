@@ -50,7 +50,7 @@ Code review per CLAUDE §6.7 (`/engineering:code-review`), sorted per §6.8:
 |---|---|---|
 | R1 | `languages.map.ts` became dead with the legacy page | **fixed** — deleted |
 | R2 | A signed-in user with an explicit appearance sees the system appearance for a moment after a page load, until the probe and `GET /api/v1/account/preferences` answered | **won't fix** — R-SET-02 forbids browser storage, which is the only way to know earlier; the sign-in itself switches without reload |
-| R3 | `en.json`, `es.json`, `fr.json` and `EnLanguage.en/es/fr` are unreachable now (German only, R-SET-01; the language switch is gone) | **follow-up issue** (proposed) — remove the legacy languages with `LanguageService`'s lint debt; not this row's scope |
+| R3 | `en.json`, `es.json`, `fr.json` and `EnLanguage.en/es/fr` are unreachable now (German only, R-SET-01; the language switch is gone) | **follow-up issue #368** — remove the legacy languages with `LanguageService`'s lint debt; not this row's scope |
 | R4 | `.contrast-more` now applies the legacy high-contrast colours for every visitor whose system asks for more contrast, as the legacy store did after its first start | **kept** — decision 3 (i); the colours wait for H2 |
 | R5 | `pageTitle.settings` and `shell.nav.settings` stay in `de.json` without a user until S5-26 | **won't fix** — UX copy keys of S60, which S5-26 uses |
 | R6 | Components shown before an explicit „reduziert“ keep Material's animation state until they are created again; only their CSS transitions are shortened | **won't fix** — Handoff §1.7 allows either mechanism; every dialog, menu and page created after the change is without animation |
@@ -68,4 +68,4 @@ Code review per CLAUDE §6.7 (`/engineering:code-review`), sorted per §6.8:
 
 1. **S5-26**: S60 at `/einstellungen` with the menu entry, a save method in `withSettings` (applied at once, `settings.saved`), the A11Y-08 part „applied without reload“ through S60.
 2. **S5-28**: the account deletion removes the user's `UserPreferences` row (S5-25a R2); TD-26 closes #234.
-3. **Proposed issue (R3):** remove the legacy languages (`en/es/fr.json`, `EnLanguage` values) and fix `language.service.ts`'s lint exception.
+3. **Issue #368 (R3):** remove the legacy languages (`en/es/fr.json`, `EnLanguage` values) and fix `language.service.ts`'s lint exception.
