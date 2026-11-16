@@ -16,6 +16,7 @@ import { AuthService } from '@features/identity/services/auth.service';
 import { CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '@app/features/configurator/guards/configurator-guards';
 import { SAVED_LISTS_PATH } from '@app/features/configurator/models/saved-lists';
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from '@app/features/organization/models/organization';
+import { SETTINGS_PATH } from '@app/features/settings/models/user-preferences';
 
 /**
  * Main navigation and account actions of the header (Handoff §3.1; SPEC R-SHL-02, R-SHL-03). `bar`
@@ -86,6 +87,9 @@ export class MainNav {
 
   /** „Kriterienlisten“ (U140, owner decision S5-20b 4a): S14, only with a membership. */
   protected readonly savedListsLink = `/${SAVED_LISTS_PATH}`;
+
+  /** „Einstellungen“ (U138, U140): S60, the last entry before „Abmelden“. */
+  protected readonly settingsLink = `/${SETTINGS_PATH}`;
 
   /** S20, S21 and the page of the invitation link count as „Organisation“. */
   protected readonly organizationCurrent = computed(() => {

@@ -15,6 +15,7 @@ import { completeSelectionGuard, configuratorReleaseGuard } from './features/con
 import { INVITATION_SEGMENT, MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
 import { SAVED_LISTS_PATH } from './features/configurator/models/saved-lists';
 import { SHARED_PATH } from './features/configurator/models/share-links';
+import { SETTINGS_PATH } from './features/settings/models/user-preferences';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -128,6 +129,10 @@ export const routes: Routes = [
   {
     path: `${SHARED_PATH}/:token`,
     loadChildren: () => import('./features/configurator/pages/shared-list/shared-list.routing').then((m) => m.SHARED_LIST_ROUTES),
+  },
+  {
+    path: SETTINGS_PATH,
+    loadChildren: () => import('./features/settings/pages/settings/settings.routing').then((m) => m.SETTINGS_ROUTES),
   },
   {
     path: 'filters',

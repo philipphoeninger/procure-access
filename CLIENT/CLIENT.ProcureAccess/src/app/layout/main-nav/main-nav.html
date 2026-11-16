@@ -76,6 +76,7 @@ SPDX-License-Identifier: MIT
         @if (activeOrganization()) {
           <a mat-menu-item [routerLink]="savedListsLink" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.savedLists' | translate }}</a>
         }
+        <a mat-menu-item [routerLink]="settingsLink" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.settings' | translate }}</a>
         <button mat-menu-item type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
       </mat-menu>
     } @else {
@@ -91,6 +92,9 @@ SPDX-License-Identifier: MIT
           routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
           (click)="navigated.emit()">{{ 'shell.nav.savedLists' | translate }}</a>
       }
+      <a matButton class="pa-main-nav__item" [routerLink]="settingsLink"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        (click)="navigated.emit()">{{ 'shell.nav.settings' | translate }}</a>
       <button matButton class="pa-main-nav__item" type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
     }
   } @else {

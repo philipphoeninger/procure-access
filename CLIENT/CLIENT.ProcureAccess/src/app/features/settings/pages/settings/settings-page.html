@@ -1,0 +1,52 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (failed) {
+  <pa-error-page kind="server" />
+} @else {
+  <h1 class="pa-settings__title">{{ 'settings.title' | translate }}</h1>
+  <p class="pa-settings__intro">{{ 'settings.intro' | translate }}</p>
+
+  <div class="pa-settings__card">
+    <fieldset class="pa-settings__group">
+      <legend class="pa-settings__legend">{{ 'settings.language' | translate }}</legend>
+      <!-- German is the only UI language of v1 (SD12): one option, chosen -->
+      <mat-radio-group name="language" class="pa-settings__options" [value]="preferences().language"
+        [attr.aria-describedby]="languageHintId">
+        <mat-radio-button value="de">{{ 'settings.language.de' | translate }}</mat-radio-button>
+      </mat-radio-group>
+      <p class="pa-settings__hint" [id]="languageHintId">{{ 'settings.language.hint' | translate }}</p>
+    </fieldset>
+
+    <fieldset class="pa-settings__group">
+      <legend class="pa-settings__legend">{{ 'settings.appearance' | translate }}</legend>
+      <mat-radio-group name="appearance" class="pa-settings__options" [value]="preferences().appearance"
+        (change)="appearanceChanged($event)">
+        @for (option of appearances; track option.value) {
+          <mat-radio-button [value]="option.value">{{ option.key | translate }}</mat-radio-button>
+        }
+      </mat-radio-group>
+    </fieldset>
+
+    <fieldset class="pa-settings__group">
+      <legend class="pa-settings__legend">{{ 'settings.motion' | translate }}</legend>
+      <mat-radio-group name="motion" class="pa-settings__options" [value]="preferences().motion"
+        (change)="motionChanged($event)">
+        @for (option of motions; track option.value) {
+          <mat-radio-button [value]="option.value">{{ option.key | translate }}</mat-radio-button>
+        }
+      </mat-radio-group>
+    </fieldset>
+
+    <fieldset class="pa-settings__group">
+      <legend class="pa-settings__legend">{{ 'settings.contrast' | translate }}</legend>
+      <!-- „Hoher Kontrast“ comes with H2 (R-SET-04); until then only the system option -->
+      <mat-radio-group name="contrast" class="pa-settings__options" [value]="preferences().contrast">
+        <mat-radio-button value="system">{{ 'settings.contrast.system' | translate }}</mat-radio-button>
+      </mat-radio-group>
+    </fieldset>
+  </div>
+}

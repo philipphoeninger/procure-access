@@ -1,0 +1,67 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// S60 (Handoff §5.3: form card as in S51): one column, at most 40rem wide; the four fieldsets in
+// one outlined card. No actions: a choice applies and is saved at once.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  inline-size: 100%;
+}
+
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
+.pa-settings__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.pa-settings__intro {
+  margin: 0;
+  max-inline-size: 40rem;
+  font: var(--mat-sys-body-large);
+}
+
+.pa-settings__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  max-inline-size: 40rem;
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-settings__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.pa-settings__legend {
+  padding: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-settings__options {
+  display: flex;
+  flex-direction: column;
+}
+
+.pa-settings__hint {
+  margin: 0 0 0 var(--pa-space-xs);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
