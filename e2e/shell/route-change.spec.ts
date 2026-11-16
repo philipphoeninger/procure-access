@@ -29,16 +29,11 @@ test.describe('Route change', () => {
     await expectNoAxeViolations(page, testInfo, 'imprint after route change, H1 focused');
   });
 
-  test('INV:A11Y-05 html lang follows the UI language', async ({ page }) => {
+  // German is the only UI language of v1 (SPEC R-SET-01, SD12): the legacy language switch went
+  // with its settings page in S5-25b (owner decision S5-25 2a). That <html lang> follows a change of
+  // the language is checked in document-language.spec.ts.
+  test('INV:A11Y-05 html lang is the UI language', async ({ page }) => {
     await page.goto(START_PAGE);
     await expect(page.locator('html')).toHaveAttribute('lang', 'de');
-
-    // The legacy settings page (S60 rebuilt in step 3) is the only language switch so far.
-    await page.goto('/settings');
-    await expect(page).toHaveTitle('Einstellungen – ProcureAccess');
-    await page.locator('#language-select').click();
-    await page.getByRole('option', { name: 'English' }).click();
-
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 });

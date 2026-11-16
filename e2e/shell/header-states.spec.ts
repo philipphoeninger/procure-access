@@ -55,7 +55,8 @@ test.describe('Signed-in header', () => {
     await expect(banner(page).getByRole('link', { name: 'Projekte' })).toHaveCount(0);
 
     const menu = await openAccountMenu(page);
-    await expect(menu.getByRole('menuitem')).toHaveText(['Konto', 'Organisation', 'Einstellungen', 'Abmelden']);
+    // „Einstellungen“ comes back with S60 (S5-26); the legacy page went with S5-25b (owner decision S5-25 2a).
+    await expect(menu.getByRole('menuitem')).toHaveText(['Konto', 'Organisation', 'Abmelden']);
     await settled(menu);
     await expectNoAxeViolations(page, testInfo, 'header-signed-in-no-org-menu');
 

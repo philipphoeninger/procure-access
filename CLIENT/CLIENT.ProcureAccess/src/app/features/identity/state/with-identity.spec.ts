@@ -29,7 +29,7 @@ const moderator: SessionResponse = {
   absoluteExpiresAt: '2026-11-13T18:00:00+00:00',
 };
 const anonymous: SessionResponse = { user: null };
-const legacyUser = { id: 'u1', email: 'mod@example.test', uiCustomization: { language: 'de' } };
+const legacyUser = { id: 'u1', email: 'mod@example.test' };
 const amt: OrganizationSummary = { id: 'org-a', name: 'Ämter Musterhausen', type: 'publicBody', role: 'owner' };
 const verein: OrganizationSummary = { id: 'org-v', name: 'Verein Beispiel', type: 'association', role: 'reader' };
 

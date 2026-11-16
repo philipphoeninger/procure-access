@@ -3,134 +3,224 @@
 // SPDX-License-Identifier: MIT
 
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { patchState, signalStore } from '@ngrx/signals';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { patchState, signalStore, withState } from '@ngrx/signals';
 
-import { APP_NAME } from '@app/app.config';
-import { AppearanceService } from '@app/core/a11y/appearance';
+import { AppearanceService, provideAppearance } from '@app/core/a11y/appearance';
 import { SnackbarService } from '@app/core/services/snackbar.service';
-import { AuthService } from '@app/features/identity/services/auth.service';
-import { IdentityApiService } from '@app/features/identity/services/identity-api.service';
-import { DARK_SCHEME, FakeMediaMatcher, provideFakeMediaMatcher } from '@app/testing/fake-media-matcher';
-import { provideTestTranslations } from '@app/testing/provide-test-translations';
-import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
+import { SessionUser } from '@app/features/identity/models/session';
+import {
+  DARK_SCHEME,
+  FakeMediaMatcher,
+  MORE_CONTRAST,
+  provideFakeMediaMatcher,
+  REDUCED_MOTION,
+} from '@app/testing/fake-media-matcher';
+import { UserPreferences } from '../models/user-preferences';
+import { PreferencesApiService } from '../services/api/preferences-api.service';
 import { LanguageService } from '../services/language.service';
-import { SettingsApiService } from '../services/settings-api.service';
-import { initialSettingsState, withSettings } from './with-settings';
+import { withSettings } from './with-settings';
 
-// #168: a failed request of a signed-in user must not leave the loading bar on
-// (pa-loading-bar, R-SHL-09). Signed-out users never call the API here.
-// Unprotected, so setUp can put the session state in place (patchState from outside the store).
-const SettingsTestStore = signalStore({ protectedState: false }, withSettings());
+// The session of withIdentity() as the probe would report it, set from outside the store.
+const SettingsTestStore = signalStore(
+  { protectedState: false },
+  withState<{ session: SessionUser | null }>({ session: null }),
+  withSettings(),
+);
+
+const DEFAULTS: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system' };
+const DARK_REDUCED: UserPreferences = { ...DEFAULTS, appearance: 'dark', motion: 'reduced' };
+
+const userOne: SessionUser = { id: 'u1', email: 'one@example.test', roles: [], permissions: [] };
+const userTwo: SessionUser = { id: 'u2', email: 'two@example.test', roles: [], permissions: [] };
+
 let media: FakeMediaMatcher;
+let get: ReturnType<typeof vi.fn<() => Promise<UserPreferences>>>;
 let showInfo: ReturnType<typeof vi.fn>;
+let languageInit: ReturnType<typeof vi.fn>;
 
-function setUp(
-  apiService: Partial<SettingsApiService>,
-  { signedIn = true, systemDark = false }: { signedIn?: boolean; systemDark?: boolean } = {},
-) {
-  media = new FakeMediaMatcher({ [DARK_SCHEME]: systemDark });
+function setUp(system: Record<string, boolean> = {}) {
+  media = new FakeMediaMatcher(system);
+  get = vi.fn<() => Promise<UserPreferences>>();
   showInfo = vi.fn();
+  languageInit = vi.fn();
   TestBed.configureTestingModule({
     providers: [
-      provideTestTranslations(),
       provideFakeMediaMatcher(media),
+      provideAppearance(),
       SettingsTestStore,
-      { provide: APP_NAME, useValue: 'ProcureAccess' },
-      { provide: SettingsApiService, useValue: apiService },
-      provideRouter([]),
-      { provide: AuthService, useValue: {} },
-      { provide: IdentityApiService, useValue: {} },
-      { provide: OrganizationApiService, useValue: {} },
-      { provide: LanguageService, useValue: { init: vi.fn(), get: () => 'de' } },
+      { provide: PreferencesApiService, useValue: { get } },
+      { provide: LanguageService, useValue: { init: languageInit } },
       { provide: SnackbarService, useValue: { showInfo } },
     ],
   });
   const store = TestBed.inject(SettingsTestStore);
-  // The session as the probe would report it (withIdentity(), S5-08), without a request.
-  patchState(store, {
-    session: signedIn ? { id: 'u1', email: 'user@example.test', roles: [], permissions: [] } : null,
-    sessionStatus: 'ready',
-  });
+  TestBed.tick();
   return store;
 }
 
-// The store does not look at the reason; HttpClient would reject with an HttpErrorResponse.
-const failure = new Error('request failed');
+/** Signs `user` in or out as the probe would, and waits until the store has read the settings. */
+async function sessionOf(store: InstanceType<typeof SettingsTestStore>, user: SessionUser | null) {
+  patchState(store, { session: user });
+  TestBed.tick();
+  await new Promise((resolve) => setTimeout(resolve));
+  TestBed.tick();
+}
+
+const html = () => document.documentElement.classList;
+const appearance = () => TestBed.inject(AppearanceService).appearance();
 
 describe('withSettings', () => {
-  it('stops loading when loading the settings of a signed-in user fails', async () => {
-    const store = setUp({ getUICustomization: () => Promise.reject(failure) });
+  afterEach(() => html().remove('theme-light', 'theme-dark', 'motion-reduced', 'contrast-more'));
 
-    await expect(store.reloadUICustomization()).rejects.toBe(failure);
+  it('INV:A11Y-06 SignedInUserWithDarkAndReducedMotion_OverridesTheLightSystemOnThePage', async () => {
+    const store = setUp({ [DARK_SCHEME]: false, [REDUCED_MOTION]: false });
+    get.mockResolvedValue(DARK_REDUCED);
 
-    expect(store.isLoading()).toBe(false);
+    await sessionOf(store, userOne);
+
+    expect(store.preferences()).toEqual(DARK_REDUCED);
+    expect(appearance()).toBe('dark');
+    expect(html().contains('theme-dark')).toBe(true);
+    expect(html().contains('motion-reduced')).toBe(true);
+    expect(TestBed.inject(MATERIAL_ANIMATIONS).animationsDisabled).toBe(true);
   });
 
-  it('stops loading when saving the settings of a signed-in user fails', async () => {
-    const store = setUp({ updateUICustomization: () => Promise.reject(failure) });
+  it('INV:A11Y-06 SignedInUserWithSystemSettings_FollowsTheSystemAndItsChanges', async () => {
+    const store = setUp({ [DARK_SCHEME]: false });
+    get.mockResolvedValue(DEFAULTS);
+    await sessionOf(store, userOne);
+    expect(appearance()).toBe('light');
 
-    await expect(store.updateUICustomization(store.uiCustomization())).rejects.toBe(failure);
+    media.set(DARK_SCHEME, true);
+    TestBed.tick();
 
-    expect(store.isLoading()).toBe(false);
+    expect(appearance()).toBe('dark');
+    expect(html().contains('motion-reduced')).toBe(false);
   });
 
-  // S3-09, owner decision D3: only an explicit choice overrides the system appearance (R-SET-02).
-  describe('appearance', () => {
-    const storageKey = 'procureaccess-uiCustomization';
-    const appearance = () => TestBed.inject(AppearanceService).appearance();
+  it('INV:A11Y-06 SignOut_FollowsTheSystemAgain', async () => {
+    const store = setUp({ [DARK_SCHEME]: false });
+    get.mockResolvedValue(DARK_REDUCED);
+    await sessionOf(store, userOne);
 
-    afterEach(() => localStorage.removeItem(storageKey));
+    await sessionOf(store, null);
 
-    it('follows the system after sign-out and ignores a stored dark mode value', async () => {
-      const stored = { ...initialSettingsState.uiCustomization, darkModeOn: true };
-      localStorage.setItem(storageKey, JSON.stringify(stored));
-      const store = setUp({}, { signedIn: false, systemDark: false });
-      TestBed.inject(AppearanceService).setExplicit('dark'); // the signed-in user's setting
+    expect(store.preferences()).toBeNull();
+    expect(appearance()).toBe('light');
+    expect(html().contains('motion-reduced')).toBe(false);
+  });
 
-      await store.reloadUICustomization();
+  it('HighContrastAnswered_SetsContrastMore', async () => {
+    const store = setUp({ [MORE_CONTRAST]: false });
+    get.mockResolvedValue({ ...DEFAULTS, contrast: 'high' });
 
-      expect(appearance()).toBe('light');
-      expect(store.darkModeOn()).toBe(false);
+    await sessionOf(store, userOne);
+
+    expect(html().contains('contrast-more')).toBe(true);
+  });
+
+  it('SessionOfAUser_ReadsTheirSettingsOnceWhileTheSessionIsRenewed', async () => {
+    const store = setUp();
+    get.mockResolvedValue(DEFAULTS);
+
+    patchState(store, { session: userOne });
+    TestBed.tick();
+    patchState(store, { session: { ...userOne } }); // the next probe answers a new object
+    TestBed.tick();
+    await Promise.resolve();
+
+    expect(get).toHaveBeenCalledTimes(1);
+  });
+
+  it('ReadingFails_FollowsTheSystemWithoutShowingAnything', async () => {
+    const store = setUp({ [DARK_SCHEME]: true });
+    get.mockRejectedValue(new Error('request failed'));
+
+    await sessionOf(store, userOne);
+
+    expect(store.preferences()).toBeNull();
+    expect(appearance()).toBe('dark');
+    expect(showInfo).not.toHaveBeenCalled();
+  });
+
+  it('AnswerForAUserWhoSignedOutMeanwhile_IsDropped', async () => {
+    const store = setUp({ [DARK_SCHEME]: false });
+    let answer: (preferences: UserPreferences) => void = () => undefined;
+    get.mockReturnValueOnce(new Promise<UserPreferences>((resolve) => (answer = resolve)));
+    const reading = store.loadPreferences(userOne.id);
+
+    await store.loadPreferences(null);
+    answer(DARK_REDUCED);
+    await reading;
+    TestBed.tick();
+
+    expect(store.preferences()).toBeNull();
+    expect(appearance()).toBe('light');
+  });
+
+  it('AnotherUserSignsIn_TheirSettingsReplaceThePrevious', async () => {
+    const store = setUp({ [DARK_SCHEME]: false });
+    get.mockResolvedValueOnce(DARK_REDUCED).mockResolvedValueOnce(DEFAULTS);
+    await sessionOf(store, userOne);
+
+    await sessionOf(store, userTwo);
+
+    expect(appearance()).toBe('light');
+    expect(html().contains('motion-reduced')).toBe(false);
+  });
+
+  it('Anonymous_NoRequestAndGerman', () => {
+    setUp();
+
+    expect(get).not.toHaveBeenCalled();
+    expect(languageInit).toHaveBeenCalledWith('de');
+  });
+
+  // TD-25 (#234): the legacy store wrote to localStorage for signed-out users, threw when storage
+  // was blocked, and opened an English snackbar on a contrast change.
+  describe('without browser storage (R-SET-02, TD-25)', () => {
+    afterEach(() => vi.restoreAllMocks());
+
+    it('StartAndSignInAndOut_NeverTouchStorage', async () => {
+      const touched = [
+        vi.spyOn(Storage.prototype, 'getItem'),
+        vi.spyOn(Storage.prototype, 'setItem'),
+        vi.spyOn(Storage.prototype, 'removeItem'),
+      ];
+      const store = setUp();
+      get.mockResolvedValue(DARK_REDUCED);
+
+      await sessionOf(store, userOne);
+      await sessionOf(store, null);
+
+      touched.forEach((spy) => expect(spy).not.toHaveBeenCalled());
     });
 
-    it('applies the dark mode toggle of a signed-out user', async () => {
-      localStorage.setItem(storageKey, JSON.stringify(initialSettingsState.uiCustomization));
-      const store = setUp({}, { signedIn: false, systemDark: false });
-      await store.reloadUICustomization();
+    it('StorageBlocked_StartsAndAppliesTheSettings', async () => {
+      const blocked = () => {
+        throw new DOMException('blocked', 'SecurityError');
+      };
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(blocked);
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(blocked);
+      const store = setUp({ [DARK_SCHEME]: false });
+      get.mockResolvedValue(DARK_REDUCED);
 
-      store.toggleDarkMode();
+      await sessionOf(store, userOne);
 
       expect(appearance()).toBe('dark');
     });
 
-    it('applies the saved setting of a signed-in user over the system', async () => {
-      const saved = { ...initialSettingsState.uiCustomization, darkModeOn: true };
-      const store = setUp({ getUICustomization: () => Promise.resolve(saved) }, { systemDark: false });
+    it('SystemContrastChanges_FollowedWithoutSnackbar', async () => {
+      const store = setUp({ [MORE_CONTRAST]: false });
+      get.mockResolvedValue(DEFAULTS);
+      await sessionOf(store, userOne);
 
-      await store.reloadUICustomization();
+      media.set(MORE_CONTRAST, true);
+      TestBed.tick();
 
-      expect(appearance()).toBe('dark');
-    });
-
-    // S3-10: the legacy listener opened an English snackbar without duration on every system change.
-    describe('system appearance changes while the page is open', () => {
-      afterEach(() => vi.unstubAllGlobals());
-
-      it.each([
-        ['SignedOut', false],
-        ['SignedIn', true],
-      ])('SystemChange_%s_FollowsWithoutSnackbar', (_, signedIn) => {
-        const store = setUp({}, { signedIn, systemDark: false });
-        vi.stubGlobal('matchMedia', (query: string) => media.matchMedia(query));
-        store.activateMediaEventListeners();
-
-        media.set(DARK_SCHEME, true);
-        TestBed.tick();
-
-        expect(appearance()).toBe('dark');
-        expect(showInfo).not.toHaveBeenCalled();
-      });
+      expect(html().contains('contrast-more')).toBe(true);
+      expect(showInfo).not.toHaveBeenCalled();
     });
   });
 });

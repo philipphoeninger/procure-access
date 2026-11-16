@@ -10,10 +10,7 @@
     "cancel",
     "check",
     "checklist",
-    "contrast",
-    "contrast_rtl_off",
     "create",
-    "dark_mode",
     "delete",
     "done",
     "done_all",
@@ -29,7 +26,6 @@
     "help",
     "image",
     "info",
-    "light_mode",
     "link",
     "remove",
     "rule",
@@ -38,5 +34,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "bc1fe58eba54fe7aee4a14d794e2311245f48def8b5d9c98af8b80775cb20490"
+  "sha256": "88555e385f488f0519dad481e6b245bc7790b45ca039566a823e3133a1719783"
 }

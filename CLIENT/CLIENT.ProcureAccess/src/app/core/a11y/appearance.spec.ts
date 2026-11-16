@@ -8,6 +8,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import {
   DARK_SCHEME,
   FakeMediaMatcher,
+  MORE_CONTRAST,
   provideFakeMediaMatcher,
   REDUCED_MOTION,
 } from '@app/testing/fake-media-matcher';
@@ -26,7 +27,7 @@ describe('provideAppearance', () => {
 
   const html = () => document.documentElement.classList;
 
-  afterEach(() => html().remove('theme-light', 'theme-dark'));
+  afterEach(() => html().remove('theme-light', 'theme-dark', 'motion-reduced', 'contrast-more'));
 
   it('SystemDark_HtmlGetsThemeDark', () => {
     setUp({ [DARK_SCHEME]: true });
@@ -81,5 +82,56 @@ describe('provideAppearance', () => {
     setUp({ [REDUCED_MOTION]: reduced });
 
     expect(TestBed.inject(MATERIAL_ANIMATIONS).animationsDisabled).toBe(disabled);
+    expect(html().contains('motion-reduced')).toBe(reduced);
+  });
+
+  it('ExplicitReducedMotion_ClassAndMaterialAnimationsFollowWithoutReload', () => {
+    setUp({ [REDUCED_MOTION]: false });
+    const appearance = TestBed.inject(AppearanceService);
+    const animations = TestBed.inject(MATERIAL_ANIMATIONS);
+    expect(animations.animationsDisabled).toBe(false);
+
+    appearance.setExplicitReducedMotion(true);
+    TestBed.tick();
+    expect(html().contains('motion-reduced')).toBe(true);
+    expect(animations.animationsDisabled).toBe(true);
+
+    appearance.setExplicitReducedMotion(false);
+    TestBed.tick();
+    expect(html().contains('motion-reduced')).toBe(false);
+    expect(animations.animationsDisabled).toBe(false);
+  });
+
+  it('SystemReducedMotionChanges_ClassFollowsWithoutReload', () => {
+    setUp({ [REDUCED_MOTION]: false });
+
+    media.set(REDUCED_MOTION, true);
+    TestBed.tick();
+
+    expect(html().contains('motion-reduced')).toBe(true);
+    expect(TestBed.inject(MATERIAL_ANIMATIONS).animationsDisabled).toBe(true);
+  });
+
+  it('SystemMoreContrast_ContrastMoreFollowsItsChangesWithoutReload', () => {
+    setUp({ [MORE_CONTRAST]: true });
+    expect(html().contains('contrast-more')).toBe(true);
+
+    media.set(MORE_CONTRAST, false);
+    TestBed.tick();
+
+    expect(html().contains('contrast-more')).toBe(false);
+  });
+
+  it('ExplicitHighContrast_OverridesSystemUntilCleared', () => {
+    setUp({ [MORE_CONTRAST]: false });
+    const appearance = TestBed.inject(AppearanceService);
+
+    appearance.setExplicitHighContrast(true);
+    TestBed.tick();
+    expect(html().contains('contrast-more')).toBe(true);
+
+    appearance.setExplicitHighContrast(false);
+    TestBed.tick();
+    expect(html().contains('contrast-more')).toBe(false);
   });
 });

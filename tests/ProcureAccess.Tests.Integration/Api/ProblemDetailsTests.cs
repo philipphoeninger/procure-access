@@ -103,12 +103,13 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
         missingProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
         missingProblem.ErrorKeys.ShouldContain("product.name");
 
-        // A value of the wrong type: the key is the path in the payload, without the JSON-path root "$.".
-        using var wrongType = await client.PutAsync(
-            "/api/UICustomization", Json("""{"darkModeOn":"x"}"""), cancellationToken);
+        // A value of the wrong type: the key is the path in the payload, without the JSON-path root "$."
+        // (the legacy UI settings of S2-10 went with S5-25b; minimal APIs: UserPreferencesTests).
+        using var wrongType = await client.PostAsync(
+            "/api/Proposals/upsert", Json("""{"product":{"name":5}}"""), cancellationToken);
         var wrongTypeProblem = await ProblemResponse.ReadAsync(wrongType, cancellationToken);
         wrongTypeProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
-        wrongTypeProblem.ErrorKeys.ShouldContain("darkModeOn");
+        wrongTypeProblem.ErrorKeys.ShouldContain("product.name");
         wrongTypeProblem.ErrorKeys.ShouldNotContain(key => key.StartsWith("$.", StringComparison.Ordinal));
     }
 
@@ -122,35 +123,6 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
 
         var problem = await ProblemResponse.ReadAsync(response, cancellationToken);
         problem.Deviations(HttpStatusCode.NotFound, TypeUri(ProblemTypes.NotFound), requireErrors: false).ShouldBeEmpty();
-    }
-
-    [Fact]
-    public async Task UICustomizationUpdate_UserHasNoRecord_Returns400ProblemDetailsWithoutExceptionText()
-    {
-        var cancellationToken = TestContext.Current.CancellationToken;
-
-        // The test user exists only as a principal, so the repository finds no user row.
-        using var client = CreateClient(TestUsers.Member);
-
-        using var response = await client.PutAsync(
-            "/api/UICustomization", Json("""{"darkModeOn":true}"""), cancellationToken);
-
-        ShouldBeLegacyFailure(await ProblemResponse.ReadAsync(response, cancellationToken));
-    }
-
-    /// <summary>
-    /// A failure of the legacy UI customisation endpoints: still 400 as before S2-10 (owner,
-    /// 2026-11-01), now as Problem Details, and neither the exception text nor the former members
-    /// <c>code</c> and <c>message</c> reach the client.
-    /// </summary>
-    private static void ShouldBeLegacyFailure(ProblemResponse problem)
-    {
-        problem.StatusCode.ShouldBe(HttpStatusCode.BadRequest, problem.Body);
-        ProblemResponse.AcceptedMediaTypes.ShouldContain(problem.MediaTypeOfResponse!);
-        problem.Property("title").ShouldNotBeNullOrWhiteSpace();
-        problem.Property("code").ShouldBeNull();
-        problem.Property("message").ShouldBeNull();
-        problem.Body.ShouldNotContain("Sequence contains");
     }
 
     private static StringContent Json(string body) => new(body, Encoding.UTF8, "application/json");

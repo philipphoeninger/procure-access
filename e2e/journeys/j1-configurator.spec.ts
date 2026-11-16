@@ -177,7 +177,12 @@ async function exportThroughS13(page: Page, fileName = /^ProcureAccess_Kriterien
   await tabTo(page, page.getByRole('button', { name: 'Liste exportieren' }));
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
-  await expect(dialog.getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' })).toBeChecked();
+  const xlsx = dialog.getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' });
+  await expect(xlsx).toBeChecked();
+  // The first focus (S13: the selected format) comes when the dialog has opened; tabbing before it
+  // could reach „Datei herunterladen“ and lose the focus to the radio again, so Enter downloaded
+  // nothing (CI of #362, S5-25b).
+  await expect(xlsx).toBeFocused();
   await tabTo(page, dialog.getByRole('button', { name: 'Datei herunterladen' }));
   const downloaded = page.waitForEvent('download');
   await page.keyboard.press('Enter');

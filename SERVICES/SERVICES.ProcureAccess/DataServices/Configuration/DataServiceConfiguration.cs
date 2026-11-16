@@ -13,7 +13,6 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriterionRepo, CriterionRepo>();
         services.AddScoped<ICriteriaFilterRepo, CriteriaFilterRepo>();
         services.AddScoped<IProductRepo, ProductRepo>();
-        services.AddScoped<IUICustomizationRepo, UICustomizationRepo>();
         services.AddScoped<IUserRepo, UserRepo>();
         services.AddScoped<IProposalRepo, ProposalRepo>();
 

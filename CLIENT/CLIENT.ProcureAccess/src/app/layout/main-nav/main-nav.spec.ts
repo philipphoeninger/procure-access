@@ -101,18 +101,18 @@ describe('MainNav', () => {
       expect(screen.queryByRole('button', { name: /^Organisation:/ })).toBeNull();
     });
 
-    it('lists Konto, Organisation, Kriterienlisten, Einstellungen and Abmelden in the menu „Konto“; „Organisation“ opens S21', async () => {
+    // „Einstellungen“ comes back with S60 at /einstellungen (S5-26); the legacy page went with S5-25b (owner decision S5-25 2a).
+    it('lists Konto, Organisation, Kriterienlisten and Abmelden in the menu „Konto“; „Organisation“ opens S21', async () => {
       const { fixture } = await renderNav('bar', true, ONE_ORGANIZATION);
 
       const menu = await openAccountMenu(fixture);
 
       const items = within(menu).getAllByRole('menuitem');
-      expect(items.map((item) => item.textContent?.trim())).toEqual(['Konto', 'Organisation', 'Kriterienlisten', 'Einstellungen', 'Abmelden']);
+      expect(items.map((item) => item.textContent?.trim())).toEqual(['Konto', 'Organisation', 'Kriterienlisten', 'Abmelden']);
       expect(items[0].getAttribute('href')).toBe('/profile');
       expect(items[1].getAttribute('href')).toBe('/organisation/org-a/mitglieder');
       // S14 (U140, owner decision S5-20b 4a)
       expect(items[2].getAttribute('href')).toBe('/kriterienlisten');
-      expect(items[3].getAttribute('href')).toBe('/settings');
     });
 
     it('marks „Organisation“ in the menu as the current page on S20 and S21', async () => {
@@ -125,14 +125,14 @@ describe('MainNav', () => {
       expect(within(menu).getByRole('menuitem', { name: 'Konto' }).hasAttribute('aria-current')).toBe(false);
     });
 
-    it('shows Konto, Organisation, Einstellungen and Abmelden as a flat list in the compact menu', async () => {
+    it('shows Konto, Organisation, Kriterienlisten and Abmelden as a flat list in the compact menu', async () => {
       await renderNav('drawer', true, ONE_ORGANIZATION);
 
       expect(screen.getByText('Organisation: Ämter Musterhausen')).toBeTruthy();
       expect(screen.getByRole('link', { name: 'Konto' }).getAttribute('href')).toBe('/profile');
       expect(screen.getByRole('link', { name: 'Organisation' }).getAttribute('href')).toBe('/organisation/org-a/mitglieder');
       expect(screen.getByRole('link', { name: 'Kriterienlisten' }).getAttribute('href')).toBe('/kriterienlisten');
-      expect(screen.getByRole('link', { name: 'Einstellungen' }).getAttribute('href')).toBe('/settings');
+      expect(screen.queryByRole('link', { name: 'Einstellungen' })).toBeNull();
       expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
       expect(screen.queryByRole('menu')).toBeNull();
     });

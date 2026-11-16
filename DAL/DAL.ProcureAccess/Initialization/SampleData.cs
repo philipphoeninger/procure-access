@@ -19,7 +19,6 @@ public static class SampleData
         {
             UserName = SampleUserEmail,
             Email = SampleUserEmail,
-            UICustomization = new(),
             EmailConfirmed = true
         }
     };

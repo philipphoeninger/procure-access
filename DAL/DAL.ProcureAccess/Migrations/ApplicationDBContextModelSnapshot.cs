@@ -2790,47 +2790,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Proposer");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
-                {
-                    b.OwnsOne("MODELS.ProcureAccess.Entities.UICustomization", "UICustomization", b1 =>
-                        {
-                            b1.Property<string>("UserId")
-                                .HasMaxLength(200);
-
-                            b1.Property<string>("BackgroundColor")
-                                .IsRequired()
-                                .HasMaxLength(10);
-
-                            b1.Property<bool>("DarkModeOn");
-
-                            b1.Property<string>("ForegroundColor")
-                                .IsRequired()
-                                .HasMaxLength(10);
-
-                            b1.Property<bool>("HighContrastOn");
-
-                            b1.Property<int>("Language");
-
-                            b1.Property<string>("TextColor")
-                                .IsRequired()
-                                .HasMaxLength(10);
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users", "identity");
-
-                            b1
-                                .ToJson("UICustomization")
-                                .HasColumnType("jsonb");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.Navigation("UICustomization")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)

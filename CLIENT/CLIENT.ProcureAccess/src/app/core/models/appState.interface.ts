@@ -8,12 +8,10 @@ import { ProductSave } from "@app/features/favorites/models/productSave.model";
 import { FilterSet } from "@app/features/favorites/models/filterSet.model";
 import { Product } from "@app/features/products/models/product.model";
 import { FiltersState } from "@app/features/filters/state/with-filters";
-import { initialSettingsState, SettingsState } from "@app/features/settings/state/with-settings";
 import { ProposalDto } from "@app/features/proposal/models/proposal.dto";
 
 export interface AppState {
     loadingCount: number;
-    settings: SettingsState;
     identity: IdentityState;
     filters: FiltersState;
     criteria: Criterion[];
@@ -25,7 +23,6 @@ export interface AppState {
 
 export const initialAppState: AppState = {
     loadingCount: 0,
-    settings: initialSettingsState,
     identity: initialIdentityState,
     filters: {
         filterTypes: [],

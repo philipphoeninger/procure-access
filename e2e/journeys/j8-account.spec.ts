@@ -134,9 +134,9 @@ test.describe('J8 account: register, confirm, sign in, sign out', () => {
     await settled(page.locator('body'));
     await expectNoAxeViolations(page, testInfo, 'j8-signed-in');
 
-    // SEC-01 (E2E part): the session lives only in the HttpOnly cookie. Browser storage holds no
-    // token (the legacy settings store keeps its UI settings there until S5-25), and the only
-    // cookie the page can read is XSRF-TOKEN. `Secure` is not set on the plain-HTTP E2E stack
+    // SEC-01 (E2E part): the session lives only in the HttpOnly cookie. Browser storage is empty
+    // (since S5-25b nothing writes to it, R-SET-02, TD-25), and the only cookie the page can read
+    // is XSRF-TOKEN. `Secure` is not set on the plain-HTTP E2E stack
     // (S5-07 decision 3a); CookieSessionTests check it on HTTPS.
     const cookies = await page.context().cookies();
     const session = cookies.find((cookie) => cookie.name === SESSION_COOKIE);
@@ -152,11 +152,7 @@ test.describe('J8 account: register, confirm, sign in, sign out', () => {
       };
     });
     expect(storage.cookieNames).toEqual(['XSRF-TOKEN']);
-    for (const [key, value] of storage.entries) {
-      expect(key, 'no storage key for a token or the session').not.toMatch(/token|jwt|session|auth/i);
-      expect(value, `storage entry ${key}`).not.toContain(session!.value);
-      expect(value, `storage entry ${key}`).not.toMatch(/eyJ[\w-]+\.[\w-]+/); // no JWT
-    }
+    expect(storage.entries, 'local and session storage').toEqual([]);
 
     // „Abmelden“ in the menu „Konto“ (S5-18): the start page with the focus on its H1, the session gone
     await signOutThroughHeader(page);

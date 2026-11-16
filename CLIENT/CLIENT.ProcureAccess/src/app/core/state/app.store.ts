@@ -29,24 +29,19 @@ export const ProcureAccessStore = signalStore(
     withMethods((state) => {
         return {
             /**
-             * Signs in (R-AUTH-03, R-AUTH-07) and applies the signed-in user's saved legacy settings
-             * (S60 replaces them in S5-25). Rejects with the error of the login request; the sign-in
-             * form shows it.
+             * Signs in (R-AUTH-03, R-AUTH-07). Rejects with the error of the login request; the
+             * sign-in form shows it. The user's settings follow the new session (withSettings).
              */
             async startSession(email: string, password: string): Promise<void> {
-                const user = await state.signIn(email, password);
-                if (user) {
-                    state.setUICustomization(user.uiCustomization);
-                    state.setLanguage(user.uiCustomization.language);
-                    state.removeSettingsFromLocalStorage();
-                }
+                await state.signIn(email, password);
                 void state.loadProposals();
             },
 
             /**
              * Signs out (R-AUTH-08): the server deletes the cookie and issues a new antiforgery token,
              * and every in-memory state of the user goes — the configurator draft and list too, the
-             * legacy proposals and favourites; the anonymous settings come back.
+             * legacy proposals and favourites; appearance, motion and contrast follow the system
+             * again (withSettings).
              */
             async endSession(): Promise<void> {
                 try {
@@ -55,25 +50,13 @@ export const ProcureAccessStore = signalStore(
                     state.resetConfigurator();
                     state.setProposals([]);
                     patchState(state, { productSaves: [], filterSets: [] });
-                    await state.reloadUICustomization();
                 }
             },
 
             async init() {
-                // load necessary data:
-                // the UI texts and the anonymous settings first (nobody is signed in before the probe):
-                // they come from the browser, so no text waits for an API answer
-                await state.reloadUICustomization();
-
                 // the session probe (ARCHITECTURE §8.3): who is signed in, and the antiforgery cookie;
-                // a signed-in user's saved settings replace the anonymous ones
-                const user = await state.sessionReady().then(() => state.user());
-                if (user != null) {
-                    state.setUICustomization(user.uiCustomization);
-                    state.setLanguage(user.uiCustomization.language);
-                    state.removeSettingsFromLocalStorage();
-                }
-                state.activateMediaEventListeners();
+                // a signed-in user's settings are read when the session arrives (withSettings)
+                await state.sessionReady();
 
                 // products
                 await state.loadProducts();
@@ -82,7 +65,7 @@ export const ProcureAccessStore = signalStore(
     }),
     withHooks((store) => ({
         onInit() {
-            store.init().finally(() => console.log("store initialized"));
+            void store.init().finally(() => console.log("store initialized"));
         }
     }))
 );

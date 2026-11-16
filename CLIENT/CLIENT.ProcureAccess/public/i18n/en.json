@@ -105,13 +105,6 @@
     "CREATED_AT": "Created At",
     "FINISHED_AT": "Finished At"
   },
-  "SETTINGS": {
-    "LABEL": "Settings",
-    "CONTRAST_MODE": "Contrast mode:",
-    "DARK_MODE": "Dark mode:",
-    "SAVED_AS_COOKIE": "Settings saved as cookie",
-    "SAVED_PERMANENTLY": "Settings saved permanently"
-  },
   "HOME": {
     "WELCOME_MSG": "Hello and welcome back.",
     "FIND_A11Y_CTA": "Find accessibility",

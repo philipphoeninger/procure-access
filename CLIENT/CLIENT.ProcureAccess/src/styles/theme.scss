@@ -111,7 +111,21 @@ html.theme-dark {
   color: var(--mat-sys-error-container);
 }
 
-// Legacy contrast setting (with-settings.ts). The high-contrast design is still open (Handoff §1.1, H2).
+// More contrast (on html, AppearanceService): follows prefers-contrast: more (owner decision S5-25 3 (i)).
+// The colours are the legacy ones; the high-contrast design is still open (Handoff §1.1, H2).
 .contrast-more {
   @include custom-colors.high-contrast-overrides(color-scheme);
+}
+
+// Reduced motion (Handoff §1.7; on html, AppearanceService): the system setting or the user's
+// choice. Material components created from then on start without animation (provideAppearance);
+// this shortens the CSS transitions of those already shown, without stopping progress indicators.
+// 0.01ms rather than 0, so that transitionend still fires for components that wait for it.
+html.motion-reduced,
+html.motion-reduced *,
+html.motion-reduced *::before,
+html.motion-reduced *::after {
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
 }
