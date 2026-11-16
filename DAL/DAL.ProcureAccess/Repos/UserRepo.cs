@@ -9,115 +9,27 @@ public class UserRepo : IUserRepo
     private readonly bool _disposeContext;
     public ApplicationDBContext Context { get; }
     private readonly UserManager<User> _userManager;
+    private readonly TimeProvider _timeProvider;
 
+    /// <summary>The <see cref="IdentityError.Code"/> of a delete for a user that does not exist.</summary>
+    public const string UserNotFoundCode = "UserNotFound";
 
     #region ctors
-    public UserRepo(ApplicationDBContext context, UserManager<User> userManager)
+    public UserRepo(ApplicationDBContext context, UserManager<User> userManager, TimeProvider timeProvider)
     {
         Context = context;
         _userManager = userManager;
+        _timeProvider = timeProvider;
     }
-    protected UserRepo(DbContextOptions<ApplicationDBContext> options, UserManager<User> userManager)
-        : this(new ApplicationDBContext(options), userManager)
+    protected UserRepo(
+        DbContextOptions<ApplicationDBContext> options, UserManager<User> userManager, TimeProvider timeProvider)
+        : this(new ApplicationDBContext(options), userManager, timeProvider)
     {
         _disposeContext = true;
     }
     #endregion
 
     #region methods
-    public async Task<User> GetAsync(string userId)
-    {
-        return await Context.Users
-            .AsNoTracking()
-            .Where(u => u.Id == userId)
-            .FirstAsync();
-    }
-
-    public async Task<IdentityResult> ChangeEmailAsync(
-        string userId,
-        string newEmail)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "User not found."
-            });
-
-        // Optional: check if email already exists
-        var existing = await _userManager.FindByEmailAsync(newEmail);
-        if (existing != null && existing.Id != userId)
-        {
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "Email already in use."
-            });
-        }
-
-        // Generate secure token
-        var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
-
-        var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
-
-        if (!result.Succeeded)
-            return result;
-
-        // If you use Email as Username
-        user.UserName = newEmail;
-        user.NormalizedUserName = _userManager.NormalizeName(newEmail);
-
-        await _userManager.UpdateAsync(user);
-
-        return IdentityResult.Success;
-    }
-
-    public async Task<IdentityResult> ChangePasswordAsync(
-        string userId,
-        string currentPassword,
-        string newPassword)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-        {
-            return IdentityResult.Failed(new IdentityError
-            {
-                Code = "UserNotFound",
-                Description = "User not found."
-            });
-        }
-
-        var result = await _userManager.ChangePasswordAsync(
-            user,
-            currentPassword,
-            newPassword);
-
-        if (!result.Succeeded)
-            return result;
-
-        // Optional but recommended: revoke all sessions
-        await _userManager.UpdateSecurityStampAsync(user);
-
-        return IdentityResult.Success;
-    }
-
-    public async Task<IdentityResult> RevokeSessionsAsync(string userId)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "User not found."
-            });
-
-        // This invalidates all existing login cookies/tokens
-        await _userManager.UpdateSecurityStampAsync(user);
-
-        return IdentityResult.Success;
-    }
-
     public async Task<IdentityResult> DeleteUserAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -125,6 +37,7 @@ public class UserRepo : IUserRepo
         if (user == null)
             return IdentityResult.Failed(new IdentityError
             {
+                Code = UserNotFoundCode,
                 Description = "User not found."
             });
 
@@ -133,46 +46,13 @@ public class UserRepo : IUserRepo
         user.UserName = user.Email;
         // Soft delete
         user.IsDeleted = true;
-        user.DeletedAt = DateTime.UtcNow;
+        user.DeletedAt = _timeProvider.GetUtcNow().UtcDateTime;
 
         // Invalidate all sessions
         await _userManager.UpdateSecurityStampAsync(user);
 
         return await _userManager.UpdateAsync(user);
     }
-
-    public async Task<IdentityResult> RestoreUserAsync(string userId)
-    {
-        var user = await Context.Users
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null)
-            return IdentityResult.Failed(new IdentityError
-            {
-                Description = "User not found."
-            });
-
-        user.IsDeleted = false;
-        user.DeletedAt = null;
-
-        return await _userManager.UpdateAsync(user);
-    }
-
-    // public async Task UpdateDarkModeAsync(string userId, bool enabled)
-    // {
-    //     var user = new User { Id = userId };
-
-    //     _context.Attach(user);
-
-    //     user.UISettings = new UISettings { DarkMode = enabled };
-
-    //     _context.Entry(user)
-    //         .Property(u => u.UISettings)
-    //         .IsModified = true;
-
-    //     await _context.SaveChangesAsync();
-    // }
 
     public virtual void Dispose()
     {

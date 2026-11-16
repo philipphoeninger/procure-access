@@ -35,7 +35,6 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
     public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<ProductCriteriaFilter> ProductCriteriaFilters { get; set; }
     public virtual DbSet<CriteriaFilterExclusion> CriteriaFilterExclusions { get; set; }
-    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     public virtual DbSet<Proposal> Proposals { get; set; }
     #endregion
 
@@ -59,7 +58,6 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new ProductCriteriaFilterConfiguration().Configure(modelBuilder.Entity<ProductCriteriaFilter>());
         new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
         new UserConfiguration().Configure(modelBuilder.Entity<User>());
-        new RefreshTokenConfiguration().Configure(modelBuilder.Entity<RefreshToken>());
 
         //modelBuilder.ApplyConfigurationsFromAssembly(
         //	typeof(ApplicationDBContext).Assembly);

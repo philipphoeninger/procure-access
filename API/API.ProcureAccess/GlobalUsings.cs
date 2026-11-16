@@ -37,7 +37,6 @@ global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Dto;
-global using MODELS.ProcureAccess.Entities.Identity;
 global using MODELS.ProcureAccess.Entities.Mapping;
 global using MODELS.ProcureAccess.Entities.Requests;
 

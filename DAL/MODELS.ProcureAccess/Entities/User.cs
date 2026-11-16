@@ -7,8 +7,6 @@ namespace MODELS.ProcureAccess.Entities;
 public class User : IdentityUser
 {
     #region fields
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-
     public ICollection<Proposal> Proposals { get; set; } = new List<Proposal>();
     public ICollection<Proposal> Approvals { get; set; } = new List<Proposal>();
 

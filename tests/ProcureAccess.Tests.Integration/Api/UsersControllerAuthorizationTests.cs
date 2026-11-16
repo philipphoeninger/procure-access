@@ -21,20 +21,27 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.Api;
 
 /// <summary>
-/// The legacy account actions of <c>UsersController</c> need a signed-in user (S4-03, #205): before,
-/// an anonymous request reached the action and answered 400. The token-less
-/// <c>POST /api/Users/reset-password</c> is gone (owner decision O-S4-7 (a)); the password reset
-/// goes through <c>POST /api/v1/auth/password-reset</c> (S5-13).
+/// The legacy account deletion <c>DELETE /api/Users</c> needs a signed-in user (S4-03, #205): before,
+/// an anonymous request reached the action and answered 400. Its failures are Problem Details
+/// (S5-10, API-01). The token-less <c>POST /api/Users/reset-password</c> is gone (owner decision
+/// O-S4-7 (a)); the password reset goes through <c>POST /api/v1/auth/password-reset</c> (S5-13).
+/// <c>change-email</c>, <c>change-password</c> and <c>revoke-sessions</c> went with S5-10 (owner
+/// decision S5-10 2a): no screen called them.
 /// </summary>
 public sealed class UsersControllerAuthorizationTests(ApiFixture api) : IntegrationTest(api)
 {
     /// <summary>Every action of the controller with a body it would accept.</summary>
     public static TheoryData<string, string, string?> AccountActions => new()
     {
-        { "POST", "/api/Users/change-email", """{"newEmail":"new@example.test"}""" },
-        { "POST", "/api/Users/change-password", """{"currentPassword":"Old-Pass1","newPassword":"New-Pass1"}""" },
-        { "POST", "/api/Users/revoke-sessions", null },
         { "DELETE", "/api/Users", null },
+    };
+
+    /// <summary>The legacy account actions S5-10 removed, with the body they accepted.</summary>
+    public static TheoryData<string, string> RemovedActions => new()
+    {
+        { "/api/Users/change-email", """{"newEmail":"new@example.test"}""" },
+        { "/api/Users/change-password", """{"currentPassword":"Old-Pass1","newPassword":"New-Pass1"}""" },
+        { "/api/Users/revoke-sessions", "{}" },
     };
 
     [Theory]
@@ -70,11 +77,11 @@ public sealed class UsersControllerAuthorizationTests(ApiFixture api) : Integrat
     }
 
     [Fact]
-    public async Task RevokeSessions_SignedIn_Returns200AndRenewsSecurityStamp()
+    public async Task DeleteUser_SignedIn_Returns200AndSoftDeletesAtTheClockTime()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await Api.ResetDatabaseAsync();
-        const string stamp = "stamp-before-revoke";
+        const string stamp = "stamp-before-delete";
         await StoreAsync(new User
         {
             Id = TestUsers.Member.Id,
@@ -84,12 +91,47 @@ public sealed class UsersControllerAuthorizationTests(ApiFixture api) : Integrat
             NormalizedEmail = TestUsers.Member.Email.ToUpperInvariant(),
             SecurityStamp = stamp,
         });
+        Clock.Advance(TimeSpan.FromMinutes(7));
         using var client = CreateClient(TestUsers.Member);
 
-        using var response = await client.PostAsync("/api/Users/revoke-sessions", content: null, cancellationToken);
+        using var response = await client.DeleteAsync("/api/Users", cancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        (await SecurityStampAsync(TestUsers.Member.Id, cancellationToken)).ShouldNotBe(stamp);
+        var deleted = await StoredUserAsync(TestUsers.Member.Id, cancellationToken);
+        deleted.IsDeleted.ShouldBeTrue();
+        deleted.DeletedAt.ShouldBe(Clock.GetUtcNow().UtcDateTime);
+        deleted.Email.ShouldNotBe(TestUsers.Member.Email);
+        deleted.SecurityStamp.ShouldNotBe(stamp);
+    }
+
+    /// <summary>The signed-in principal names a user the database does not hold (any more).</summary>
+    [Fact]
+    public async Task DeleteUser_UserMissing_Returns404NotFoundProblem()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await Api.ResetDatabaseAsync();
+        using var client = CreateClient(TestUsers.Member);
+
+        using var response = await client.DeleteAsync("/api/Users", cancellationToken);
+
+        var problem = await ProblemResponse.ReadAsync(response, cancellationToken);
+        problem.Deviations(HttpStatusCode.NotFound, TypeUri(ProblemTypes.NotFound), requireErrors: false).ShouldBeEmpty();
+        problem.MediaTypeOfResponse.ShouldBe(ProblemResponse.MediaType);
+        problem.Json.ShouldNotBeNull().TryGetProperty("code", out _).ShouldBeFalse();
+    }
+
+    [Theory]
+    [MemberData(nameof(RemovedActions))]
+    public async Task RemovedAccountAction_SignedIn_Returns404(string path, string body)
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var client = CreateClient(TestUsers.Member);
+
+        using var request = Request("POST", path, body);
+        using var response = await client.SendAsync(request, cancellationToken);
+
+        var problem = await ProblemResponse.ReadAsync(response, cancellationToken);
+        problem.Deviations(HttpStatusCode.NotFound, TypeUri(ProblemTypes.NotFound), requireErrors: false).ShouldBeEmpty();
     }
 
     [Fact]
@@ -120,14 +162,14 @@ public sealed class UsersControllerAuthorizationTests(ApiFixture api) : Integrat
     private string TypeUri(string name) =>
         $"{Api.Factory.Services.GetRequiredService<IConfiguration>()["ProblemTypes:BaseUri"]}/problems/{name}";
 
-    private async Task<string?> SecurityStampAsync(string userId, CancellationToken cancellationToken)
+    /// <summary>The stored user, also when soft-deleted (test code, outside the TEN-02 allow-list).</summary>
+    private async Task<User> StoredUserAsync(string userId, CancellationToken cancellationToken)
     {
         using var scope = Api.Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         return await db.Users.AsNoTracking()
-            .Where(u => u.Id == userId)
-            .Select(u => u.SecurityStamp)
-            .SingleAsync(cancellationToken);
+            .IgnoreQueryFilters()
+            .SingleAsync(u => u.Id == userId, cancellationToken);
     }
 
     private static HttpRequestMessage Request(string method, string path, string? body) =>

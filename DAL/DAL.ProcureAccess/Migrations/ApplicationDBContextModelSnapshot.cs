@@ -2473,40 +2473,6 @@ namespace DAL.ProcureAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens", "public");
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -2821,17 +2787,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Proposer");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("MODELS.ProcureAccess.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.User", b =>
                 {
                     b.OwnsOne("MODELS.ProcureAccess.Entities.UICustomization", "UICustomization", b1 =>
@@ -2957,8 +2912,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Approvals");
 
                     b.Navigation("Proposals");
-
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

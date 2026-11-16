@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, from, switchMap, tap, throwError } from 'rxjs';
 import { SnackbarService } from '../services/snackbar.service';
-import { ERROR_TRANSLATIONS } from '../models/error-translation.map';
 import {
   BACKGROUND_REQUEST,
   CALLER_HANDLES_PROBLEMS,
@@ -21,11 +20,11 @@ import {
 } from '../errors/problem-details';
 import { ConnectionStatus, SERVER_ERROR_PATH } from '../errors/system-errors';
 
-/** Error body of the legacy identity endpoints (until migration step 3). */
-interface LegacyErrorBody {
-  code?: string;
-  errors?: { code?: string }[];
-}
+/**
+ * The general notice for an error whose problem type has no text of its own yet (UX copy §6.3: „Bis
+ * der Screen eines Problemtyps umgebaut ist, zeigt der Client dafür den allgemeinen Hinweis“).
+ */
+const GENERAL_ERROR_KEY = 'ERROR.GENERIC';
 
 /**
  * System states of Handoff §6.5 for every request (R-SHL-08): no answer at all (status 0) shows
@@ -93,16 +92,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      // Problem Details name a type (SPEC §8.6); the legacy identity endpoints still send `code`.
-      const legacyBody = error?.error as LegacyErrorBody | null | undefined;
-      const errorCode =
-        legacyBody?.code ||
-        legacyBody?.errors?.[0]?.code ||
-        'Default';
-      const key =
-        (problemType && PROBLEM_TYPE_KEYS[problemType]) ||
-        ERROR_TRANSLATIONS[errorCode] ||
-        ERROR_TRANSLATIONS['Default'];
+      // Problem Details name a type (SPEC §8.6); the last `{ code, message }` bodies went with S5-10.
+      const key = (problemType && PROBLEM_TYPE_KEYS[problemType]) || GENERAL_ERROR_KEY;
 
       return translate.get(key).pipe(
         switchMap((message: string) => {
