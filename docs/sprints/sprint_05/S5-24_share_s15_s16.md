@@ -7,7 +7,7 @@
 > - TEN-08 gains two malformed-token cases (V274); A11Y-09 green with S15 and S16 in the reflow check, SEC-10 gains the client part of creating a link (V275);
 > - SPEC R-SAV-04, R-SAV-05, SD15, §8.10 (v2.41); ARCHITECTURE C159; UX copy v36 U150 – U156.
 >
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #361 open (2026-11-16)
 > **Scope:**
 > - the expiry dates of a new link served by the API with the new 🔧 default;
 > - S15 on a saved list: required expiry with default, the link shown once and copied, the active links with revoke;
