@@ -59,7 +59,7 @@ Prompts are listed in task-ID order; the working order and the parallel lines ar
 
 - **S5-07 first among the big tasks:** the server session is the base of every M3 task; it runs alone in the IdentityAccess module.
 - **Parallel lines after S5-07:** client (S5-08 → S5-09), accounts (S5-11 → S5-12, S5-13 → S5-14), organisations (S5-15 → S5-16, S5-17 → S5-18), later saved lists (S5-19 → S5-20 → S5-21/S5-22, S5-23 → S5-24), settings (S5-25 → S5-26), account (S5-27 → S5-28). Run them in separate worktrees (`claude --worktree s5-nn`).
-- **EF migrations:** only one open branch with a migration per module (IdentityAccess: S5-07 if it adds tables, S5-12, S5-13, S5-15, S5-17, S5-25; Configurator: S5-19, S5-23). The later branch rebases and regenerates.
+- **EF migrations:** only one open branch with a migration per module (IdentityAccess: S5-07 if it adds tables, S5-12, S5-13, S5-15, S5-17, S5-25; Configurator: S5-19; Platform: S5-23, owner decision S5-23 5). The later branch rebases and regenerates.
 - **TESTING versions:** almost every task flips an invariant; the later PR rebases and renumbers.
 - **Local E2E:** one session at a time (shared host ports); the others leave E2E to CI.
 - **Stretch tasks** (S5-29 – S5-32) only after all P0 tasks are done.

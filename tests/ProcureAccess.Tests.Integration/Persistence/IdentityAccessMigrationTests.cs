@@ -98,7 +98,7 @@ public sealed class IdentityAccessMigrationTests(ApiFixture api) : IAsyncDisposa
         new(new DbContextOptionsBuilder<ApplicationDBContext>().UseNpgsql(connectionString).Options);
 
     private static PlatformDbContext Platform(string connectionString) =>
-        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options);
+        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
 
     private static IdentityAccessDbContext IdentityAccess(string connectionString) =>
         new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);

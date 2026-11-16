@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ProcureAccess.Modules.Platform.Analytics;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using Shouldly;
@@ -85,7 +86,7 @@ public class UsageEventPrivacyTests
         var options = new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql("Host=unused")
             .Options;
-        using var context = new PlatformDbContext(options);
+        using var context = new PlatformDbContext(options, FixedOrganizationContext.None);
 
         var model = context.GetService<IDesignTimeModel>().Model;
         return model.FindEntityType(typeof(UsageEvent))

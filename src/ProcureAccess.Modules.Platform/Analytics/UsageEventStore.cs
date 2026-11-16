@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.EntityFrameworkCore;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 
 namespace ProcureAccess.Modules.Platform.Analytics;
@@ -85,5 +86,5 @@ internal sealed class UsageEventStore(DbContextOptions<PlatformDbContext> option
     }
 
     /// <summary>A new context with the store's options; internal for the tests.</summary>
-    internal PlatformDbContext CreateContext() => new(options);
+    internal PlatformDbContext CreateContext() => new(options, FixedOrganizationContext.None);
 }

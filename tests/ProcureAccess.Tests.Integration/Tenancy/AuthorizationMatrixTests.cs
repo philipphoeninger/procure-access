@@ -12,6 +12,8 @@ using ProcureAccess.Modules.Configurator.Configurations;
 using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.Platform.Contracts.Sharing;
+using ProcureAccess.Modules.Platform.Sharing;
 using ProcureAccess.Tests.Integration.Export;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
@@ -31,7 +33,8 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// organisations (every signed-in user; which ones it lists is TEN-01 in <c>OrganizationEndpointsTests</c>), since S5-20a
 /// with the saved criteria lists (save: Editor; read one, list: Reader; the organisation named in the body or query, or taken
 /// from the stored list), since S5-21a with changing, deleting and copying a list (Editor, the organisation taken from the stored
-/// list) and its export (every member); since S5-22 every answer of the matrix also carries <c>no-store</c>
+/// list) and its export (every member); since S5-23 with the share links of a list (Editor; the organisation taken from the stored
+/// list or link); since S5-22 every answer of the matrix also carries <c>no-store</c>
 /// (TEN-04 workspace part). Every user has a confirmed legacy account, so the gate of saving (SEC-10) passes; the workspace
 /// endpoints add their rows with their step.
 /// </summary>
@@ -87,12 +90,23 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     /// <summary><c>POST /configurations/{id}/exports</c> of a list of A (S5-21a): every member of A.</summary>
     private const string ExportList = "export-list";
 
+    /// <summary><c>POST /configurations/{id}/share-links</c> of a list of A (S5-23): Editor and Owner.</summary>
+    private const string CreateShareLink = "create-share-link";
+
+    /// <summary><c>GET /configurations/{id}/share-links</c> of a list of A (S5-23): Editor and Owner (owner decision S5-23 4a).</summary>
+    private const string ListShareLinks = "list-share-links";
+
+    /// <summary><c>DELETE /share-links/{id}</c> of a link of A (S5-23): Editor and Owner.</summary>
+    private const string RevokeShareLink = "revoke-share-link";
+
     /// <summary>The revision of the one criterion of <see cref="_listOfA"/>; the domain needs no catalog for it.</summary>
     private const int RevisionOfListOfA = 1;
 
     private OrganizationInvitation? _invitation;
 
     private CriteriaConfiguration? _listOfA;
+
+    private ShareLink? _linkOfA;
 
     private bool _catalogImported;
 
@@ -197,6 +211,24 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, ExportList, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, ExportList, HttpStatusCode.NotFound },
         { Anonymous, ExportList, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, CreateShareLink, HttpStatusCode.Created },
+        { TestUsers.EditorA.Name, CreateShareLink, HttpStatusCode.Created },
+        { TestUsers.ReaderA.Name, CreateShareLink, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, CreateShareLink, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, CreateShareLink, HttpStatusCode.NotFound },
+        { Anonymous, CreateShareLink, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ListShareLinks, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ListShareLinks, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ListShareLinks, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ListShareLinks, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ListShareLinks, HttpStatusCode.NotFound },
+        { Anonymous, ListShareLinks, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, RevokeShareLink, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, RevokeShareLink, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, RevokeShareLink, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, RevokeShareLink, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, RevokeShareLink, HttpStatusCode.NotFound },
+        { Anonymous, RevokeShareLink, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
@@ -209,7 +241,9 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         _listOfA = CriteriaConfiguration.Create(
             _tenants.A.Id, "Liste von A", TestUsers.OwnerA.Id, Clock.GetUtcNow(), MiniCatalog.T1Version, null, ["web"], [], [],
             [new ConfigurationCriterionDraft(RevisionOfListOfA, PriorityLevel.B)]);
-        await StoreAsync([.. _tenants.Entities, _invitation, _listOfA]);
+        _linkOfA = ShareLink.Create(
+            _tenants.A.Id, ShareableResourceType.Configuration, _listOfA.Id, new byte[32], Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(30));
+        await StoreAsync([.. _tenants.Entities, _invitation, _listOfA, _linkOfA]);
         await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: true))]);
     }
 
@@ -406,6 +440,12 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
                 $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T2Version)}/copies", new { release = "active" }, Cancellation),
             ExportList => await client.PostAsJsonAsync(
                 $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T1Version)}/exports", new { format = "csv" }, Cancellation),
+            CreateShareLink => await client.PostAsJsonAsync(
+                $"{ConfigurationsPath}/{_listOfA!.Id}/share-links",
+                new { expiresOn = DateOnly.FromDateTime(Clock.GetUtcNow().UtcDateTime).AddDays(30).ToString("yyyy-MM-dd") },
+                Cancellation),
+            ListShareLinks => await client.GetAsync($"{ConfigurationsPath}/{_listOfA!.Id}/share-links", Cancellation),
+            RevokeShareLink => await client.DeleteAsync($"/api/v1/share-links/{_linkOfA!.Id}", Cancellation),
             _ => await SendOrganizationRequestAsync(client, action, user),
         };
     }

@@ -120,6 +120,7 @@ try
     app.NewVersionedApi()
        .MapGroup("/api/v{version:apiVersion}")
        .HasApiVersion(1, 0)
+       .MapPlatformApiEndpoints()
        .MapCatalogEndpoints()
        .MapConfiguratorEndpoints()
        .MapExportEndpoints()

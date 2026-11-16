@@ -75,6 +75,9 @@ in method {MemberName} at {FilePath}:{LineNumber}
 
             .Enrich.FromLogContext()
 
+            // The token of a share link travels in the read's path: no sink may write it (TEN-08, S5-23).
+            .Enrich.With(new ShareTokenMaskingEnricher())
+
             // "AppName", not "ApplicationName": that key is the host's own application name
             // (keys ignore case), which WebApplicationFactory sets in tests but production does not.
             .Enrich.With(new PropertyEnricher(

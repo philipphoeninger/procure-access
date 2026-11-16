@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
+
 namespace API.ProcureAccess.Extensions;
 
 /// <summary>
@@ -19,6 +21,10 @@ internal static class CatalogCommandHost
         var builder = WebApplication.CreateBuilder();
         builder.Services.AddPlatformModule(builder.Configuration)
                         .AddCatalogModule(builder.Configuration);
+
+        // Platform's context binds its share-link filter to the organisation context, which only
+        // the IdentityAccess module registers; this host has no request and no organisation (S5-23).
+        builder.Services.AddSingleton<IOrganizationContext>(FixedOrganizationContext.None);
 
         await using var app = builder.Build();
         try

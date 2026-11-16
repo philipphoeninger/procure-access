@@ -15,7 +15,9 @@ using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Tenancy;
+using ProcureAccess.Modules.Platform.Contracts.Sharing;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Platform.Sharing;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
@@ -58,6 +60,8 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
                 CriteriaConfiguration.Create(
                     a.Id, "Sample list", "sample-user", now, "T.1", "hr", ["web"], ["base"], [],
                     [new ConfigurationCriterionDraft(1, PriorityLevel.A)]),
+            [typeof(ShareLink)] = (a, now) =>
+                ShareLink.Create(a.Id, ShareableResourceType.Configuration, Guid.NewGuid(), new byte[32], now, now.AddDays(90)),
         };
 
     public static TheoryData<string> ScopedEntityNames => [.. ScopedEntityTypes().Select(t => t.FullName!)];
@@ -72,6 +76,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         types.ShouldContain(typeof(OrganizationMembership));
         types.ShouldContain(typeof(OrganizationInvitation));
         types.ShouldContain(typeof(CriteriaConfiguration));
+        types.ShouldContain(typeof(ShareLink));
         types.ShouldBe(Samples.Keys, ignoreOrder: true,
             "Every entity with OrganizationId needs a sample row in Samples (TEN-01), and every sample a live entity.");
     }
@@ -148,7 +153,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         var contexts = new DbContext[]
         {
             new ApplicationDBContext(Options<ApplicationDBContext>(connectionString)),
-            new PlatformDbContext(Options<PlatformDbContext>(connectionString)),
+            new PlatformDbContext(Options<PlatformDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),
             new CatalogDbContext(Options<CatalogDbContext>(connectionString), TimeProvider.System),
             new IdentityAccessDbContext(Options<IdentityAccessDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),
             new ConfiguratorDbContext(Options<ConfiguratorDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),

@@ -98,7 +98,7 @@ public sealed class ConfiguratorMigrationTests(ApiFixture api) : IAsyncDisposabl
         new(new DbContextOptionsBuilder<ApplicationDBContext>().UseNpgsql(connectionString).Options);
 
     private static PlatformDbContext Platform(string connectionString) =>
-        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options);
+        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
 
     private static ConfiguratorDbContext Configurator(string connectionString) =>
         new(new DbContextOptionsBuilder<ConfiguratorDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);

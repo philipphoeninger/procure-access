@@ -82,19 +82,27 @@ internal sealed class ConfigurationService(
                 list.ReleaseVersion,
                 list.CreatedAt,
                 list.ModifiedAt,
-                new ConfigurationSelectionResponse(
-                    list.UseCaseKey,
-                    [.. list.AppTypes.Select(v => v.AppTypeKey)],
-                    [.. list.ProductParts.Select(v => v.ProductPartKey)],
-                    [.. list.TestTypes.Select(v => v.TestTypeKey)]),
-                [.. list.Criteria.OrderBy(c => c.CriterionRevisionId).Select(c => new ConfigurationCriterionResponse(
-                    c.CriterionRevisionId,
-                    c.IsIncluded,
-                    LevelName(c.ResolvedLevel),
-                    c.OverrideLevel is { } level ? LevelName(level) : null,
-                    c.OverrideWeight,
-                    c.NoteDe))]);
+                SelectionOf(list),
+                DecisionsOf(list));
     }
+
+    /// <summary>The selection of a list by the value keys of its release, as S11 reads it.</summary>
+    internal static ConfigurationSelectionResponse SelectionOf(CriteriaConfiguration list) =>
+        new(
+            list.UseCaseKey,
+            [.. list.AppTypes.Select(v => v.AppTypeKey)],
+            [.. list.ProductParts.Select(v => v.ProductPartKey)],
+            [.. list.TestTypes.Select(v => v.TestTypeKey)]);
+
+    /// <summary>The decision on each criterion of a list, by revision id, as S11 reads them.</summary>
+    internal static IReadOnlyList<ConfigurationCriterionResponse> DecisionsOf(CriteriaConfiguration list) =>
+        [.. list.Criteria.OrderBy(c => c.CriterionRevisionId).Select(c => new ConfigurationCriterionResponse(
+            c.CriterionRevisionId,
+            c.IsIncluded,
+            LevelName(c.ResolvedLevel),
+            c.OverrideLevel is { } level ? LevelName(level) : null,
+            c.OverrideWeight,
+            c.NoteDe))];
 
     /// <summary>
     /// The lists of <paramref name="organizationId"/>, the most recently changed first; the client
@@ -266,7 +274,8 @@ internal sealed class ConfigurationService(
 
     /// <summary>
     /// Deletes the list with its rows (R-SAV-06); <c>false</c> when it does not exist for the
-    /// request. Project copies are separate lists (D1) and stay; share links come with S5-23.
+    /// request. Project copies are separate lists (D1) and stay. Its share links stay in Platform's
+    /// table and answer 404, because the read finds no list (owner decision S5-23 8).
     /// </summary>
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {

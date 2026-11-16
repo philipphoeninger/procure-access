@@ -327,7 +327,7 @@ internal static class ConfigurationEndpoints
     /// through the filter — 404 for an unknown list or one of another organisation (TEN-01) —, then
     /// Editor on it — 403 for a Reader. <c>null</c> when it passed.
     /// </summary>
-    private static async Task<IResult?> RefusedForListAsync(
+    internal static async Task<IResult?> RefusedForListAsync(
         IAuthorizationService authorization,
         ClaimsPrincipal user,
         ConfigurationService configurations,
@@ -350,7 +350,7 @@ internal static class ConfigurationEndpoints
     };
 
     /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
-    private static async Task<ProblemHttpResult?> RefusedAsync(
+    internal static async Task<ProblemHttpResult?> RefusedAsync(
         IAuthorizationService authorization, ClaimsPrincipal user, Guid organizationId, OrganizationRoleRequirement requirement)
     {
         var result = await authorization.AuthorizeAsync(user, new OrganizationReference(organizationId), requirement);

@@ -16,8 +16,10 @@ using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.Configurator.Settings;
+using ProcureAccess.Modules.Configurator.Sharing;
 using ProcureAccess.Modules.Configurator.Usage;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Sharing;
 
 namespace ProcureAccess.Modules.Configurator;
 
@@ -31,7 +33,9 @@ namespace ProcureAccess.Modules.Configurator;
 /// <c>/configurations</c> (<see cref="ConfigurationEndpoints"/>: save, read, list) and answers
 /// <see cref="IConfigurationDraftCheck"/>, the draft check of the anonymous export and of saving.
 /// Since S5-22 it serves its 🔧 weight range at <c>GET /configurator/settings</c>
-/// (<see cref="ConfiguratorSettingsEndpoint"/>).
+/// (<see cref="ConfiguratorSettingsEndpoint"/>). Since S5-23 it maps the share links of a list
+/// (<see cref="ShareLinkEndpoints"/>) and reads a shared list for Platform
+/// (<see cref="ConfigurationShareProvider"/>).
 /// </summary>
 public static class ConfiguratorModule
 {
@@ -69,6 +73,9 @@ public static class ConfiguratorModule
         services.AddSingleton(PriorityWeightRange.From(configuration));
         services.AddScoped<IConfigurationDraftCheck, ConfigurationDraftCheck>();
         services.AddScoped<ConfigurationService>();
+
+        // The saved lists' side of a share link (S5-23, C59): Platform reads a shared list through it.
+        services.AddScoped<IShareableResourceProvider, ConfigurationShareProvider>();
         return services;
     }
 
@@ -85,6 +92,7 @@ public static class ConfiguratorModule
         CriteriaListShownEndpoint.Map(configurator);
         ConfiguratorSettingsEndpoint.Map(configurator);
         ConfigurationEndpoints.Map(routes);
+        ShareLinkEndpoints.Map(routes);
         return routes;
     }
 }

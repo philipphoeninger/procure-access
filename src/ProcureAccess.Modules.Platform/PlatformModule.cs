@@ -10,12 +10,14 @@ using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.Platform.Analytics;
 using ProcureAccess.Modules.Platform.Caching;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Sharing;
 using ProcureAccess.Modules.Platform.Email;
 using ProcureAccess.Modules.Platform.Errors;
 using ProcureAccess.Modules.Platform.Health;
 using ProcureAccess.Modules.Platform.Logging;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Modules.Platform.RateLimiting;
+using ProcureAccess.Modules.Platform.Sharing;
 
 namespace ProcureAccess.Modules.Platform;
 
@@ -25,8 +27,14 @@ namespace ProcureAccess.Modules.Platform;
 /// in sprint 01: time, logging with retention, usage events and the health endpoints, with their
 /// own database context (ADR-014); since S2-10 Problem Details for every error response; since
 /// S4-21a the client address behind the proxies and rate limiting; since S5-11 e-mail sending
-/// (<see cref="AddPlatformEmail"/>). Share links, file storage, i18n and caching follow with their steps.
+/// (<see cref="AddPlatformEmail"/>); since S5-23 share links (<c>IShareLinks</c>, the anonymous read).
+/// File storage, i18n and caching follow with their steps.
 /// </summary>
+/// <remarks>
+/// Its context binds the organisation filter of the share links to <c>IOrganizationContext</c>,
+/// which the IdentityAccess module registers; a host without that module registers
+/// <c>FixedOrganizationContext.None</c> itself (the <c>catalog</c> command host).
+/// </remarks>
 public static class PlatformModule
 {
     /// <summary>Name of the connection string of the application database.</summary>
@@ -77,6 +85,13 @@ public static class PlatformModule
         // Errors as RFC 9457 Problem Details with the problem types of SPEC §8.6 (API-01)
         services.AddPlatformProblemDetails(configuration);
 
+        // Share links (ARCHITECTURE §5.3, C59): read once here, so an impossible 🔧 maximum or an
+        // unknown time zone stops the start (SPEC SD15, SD23). The providers come from the modules
+        // that own the shared resources.
+        services.AddSingleton(ShareLinkSettings.From(configuration));
+        services.AddScoped<ShareLinkService>();
+        services.AddScoped<IShareLinks>(provider => provider.GetRequiredService<ShareLinkService>());
+
         return services;
     }
 
@@ -107,7 +122,15 @@ public static class PlatformModule
     public static IApplicationBuilder UsePlatformRateLimiting(this IApplicationBuilder app) =>
         app.UseRateLimiter();
 
-    /// <summary>Maps the endpoints of the Platform module: <c>/health/live</c> and <c>/health/ready</c>.</summary>
+    /// <summary>Maps the endpoints of the Platform module at the root: <c>/health/live</c> and <c>/health/ready</c>.</summary>
     public static IEndpointRouteBuilder MapPlatformEndpoints(this IEndpointRouteBuilder endpoints) =>
         endpoints.MapPlatformHealthChecks();
+
+    /// <summary>
+    /// Maps the API endpoints of the Platform module on <paramref name="routes"/>, the host's
+    /// versioned group <c>/api/v{version}</c>: the anonymous read of a share link,
+    /// <c>/shared/{token}</c> (S5-23). Map it before the Swagger set-up (#176).
+    /// </summary>
+    public static IEndpointRouteBuilder MapPlatformApiEndpoints(this IEndpointRouteBuilder routes) =>
+        SharedEndpoints.Map(routes);
 }
