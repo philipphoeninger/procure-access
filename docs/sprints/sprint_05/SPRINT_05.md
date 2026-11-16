@@ -110,7 +110,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
-| S5-25 | `UserPreferences` (language, appearance, motion, contrast „wie im System“) stored per user with its API; the client applies them and replaces the legacy settings store (no storage for signed-out users, no English snackbar, no crash with blocked storage — #234 TD-25); anonymous users keep following the system | 3 | **A11Y-06** and the explicit-setting part of **A11Y-08** `active`; TD-25 part of #234 done |
+| S5-25 | `UserPreferences` (language, appearance, motion, contrast „wie im System“) stored per user with its API; the client applies them and replaces the legacy settings store (no storage for signed-out users, no English snackbar, no crash with blocked storage — #234 TD-25); anonymous users keep following the system. *Split (owner decision of 2026-11-16, (a)): S5-25a the server (`UserPreferences`, `GET`/`PUT /api/v1/account/preferences`, the export's `account.preferences`), S5-25b the client, the legacy settings store and page and the legacy `UICustomization`; decisions S5-25 1a, 2a, 3 (System/High, (i)), 4 (effective values)* | 3 | **A11Y-06** and the explicit-setting part of **A11Y-08** `active`; TD-25 part of #234 done |
 | S5-26 | Settings page S60 per Handoff §5.3 (fieldsets „Sprache“, „Erscheinungsbild“, „Bewegung und Animation“, „Kontrast“); the change applies without reload | 3.5 | R-SET-01 met; S60 in `reflow.spec.ts` |
 
 #### M3.8 Account — 5 points

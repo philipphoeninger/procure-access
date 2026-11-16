@@ -95,6 +95,10 @@ public static class IdentityAccessModule
         // The memberships and contributor profiles of the personal data export (S5-27, SPEC §8.4).
         services.AddScoped<IAccountDataExport, AccountDataExportService>();
 
+        // The user's settings (S5-25a, SPEC R-SET-01): the endpoints and the export's section.
+        services.AddScoped<UserPreferencesService>();
+        services.AddScoped<IUserPreferences>(provider => provider.GetRequiredService<UserPreferencesService>());
+
         // Tenancy (S5-15, ARCHITECTURE §5.4, ADR-007): the memberships of the request's user, filled
         // by UseIdentityAccessOrganizationContext, read by every module's organisation query filter
         // through IOrganizationContext and by the resource-based role requirement (§9.1, TEN-05).
@@ -141,14 +145,16 @@ public static class IdentityAccessModule
     /// <summary>
     /// Maps the module's endpoints as minimal APIs below <c>/auth</c> of <paramref name="routes"/>,
     /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
-    /// before the Swagger set-up (#176). Today only the session probe; sign-in and sign-out live in
-    /// the host until the users move into this module (M3.1).
+    /// before the Swagger set-up (#176). The session probe, and the user's settings at
+    /// <c>/account/preferences</c> (S5-25a); sign-in and sign-out live in the host until the users
+    /// move into this module (M3.1).
     /// </summary>
     public static IEndpointRouteBuilder MapIdentityAccessEndpoints(this IEndpointRouteBuilder routes)
     {
         ArgumentNullException.ThrowIfNull(routes);
         var auth = routes.MapGroup("/auth").WithTags("Auth");
         SessionProbeEndpoint.Map(auth);
+        UserPreferencesEndpoints.Map(routes);
         return routes;
     }
 
