@@ -17,6 +17,14 @@ using ProcureAccess.Modules.Platform.Contracts.Sharing;
 namespace ProcureAccess.Modules.Configurator.Sharing;
 
 /// <summary>
+/// The answer of <c>GET /configurations/{id}/share-links</c> for S15 (owner decision S5-24 1a, A (a)):
+/// the dates a new link may end on today, worked out by the server in its time zone, and the active links.
+/// </summary>
+/// <param name="Expiry">Tomorrow, the 🔧 default and the 🔧 maximum (TEN-12).</param>
+/// <param name="Links">The links neither revoked nor expired, the oldest first; never a token.</param>
+internal sealed record ShareLinksResponse(ShareLinkExpiryWindow Expiry, IReadOnlyList<ActiveShareLink> Links);
+
+/// <summary>
 /// The share links of a saved list (SPEC R-SAV-04, SD15; ARCHITECTURE §5.3, §7.2, C59, C81; S5-23):
 /// create one, list the active ones, revoke one. The links live in Platform (<see cref="IShareLinks"/>);
 /// these endpoints are Configurator's because the role is checked on the list's organisation, and
@@ -59,11 +67,12 @@ internal static class ShareLinkEndpoints
 
         ofList.MapGet("", ListAsync)
               .WithName("GetConfigurationShareLinks")
-              .WithSummary("The active links to a saved list (Editor or Owner), for S15")
+              .WithSummary("The expiry dates a new link may take and the active links to a saved list (Editor or Owner), for S15")
               .WithDescription(
-                  "200 [ { id, createdAt, expiresAt } ], the oldest first; neither revoked nor expired links, and never a token. " +
-                  "401; 403 below Editor; 404 for an unknown list or one of another organisation.")
-              .Produces<IReadOnlyList<ActiveShareLink>>()
+                  "200 { expiry: { earliest, default, latest }, links: [ { id, createdAt, expiresAt, expiresOn } ] }: the dates " +
+                  "(yyyy-MM-dd) counted in the server's time zone; the links neither revoked nor expired, the oldest first, " +
+                  "never with a token. 401; 403 below Editor; 404 for an unknown list or one of another organisation.")
+              .Produces<ShareLinksResponse>()
               .ProducesProblem(StatusCodes.Status403Forbidden)
               .ProducesProblem(StatusCodes.Status404NotFound);
 
@@ -122,7 +131,9 @@ internal static class ShareLinkEndpoints
         CancellationToken cancellationToken) =>
         await ConfigurationEndpoints.RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused
             ? refused
-            : TypedResults.Ok(await links.ListActiveAsync(ShareableResourceType.Configuration, id, cancellationToken));
+            : TypedResults.Ok(new ShareLinksResponse(
+                links.ExpiryWindow(),
+                await links.ListActiveAsync(ShareableResourceType.Configuration, id, cancellationToken)));
 
     private static async Task<IResult> RevokeAsync(
         Guid id,

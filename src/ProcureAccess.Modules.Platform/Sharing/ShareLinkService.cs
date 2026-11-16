@@ -37,7 +37,7 @@ internal sealed class ShareLinkService(
         CancellationToken cancellationToken)
     {
         var now = clock.GetUtcNow();
-        if (ExpiryErrorOf(expiresOn, now) is { } error)
+        if (ExpiryErrorOf(expiresOn) is { } error)
         {
             return new ShareLinkCreation(null, error);
         }
@@ -49,17 +49,25 @@ internal sealed class ShareLinkService(
         return new ShareLinkCreation(new CreatedShareLink(link.Id, Base64Url.EncodeToString(bytes), link.ExpiresAt), null);
     }
 
+    public ShareLinkExpiryWindow ExpiryWindow()
+    {
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(clock.GetUtcNow(), settings.TimeZone).DateTime);
+        return new ShareLinkExpiryWindow(
+            today.AddDays(1), today.AddDays(settings.DefaultExpiryDays), today.AddMonths(settings.MaxExpiryMonths));
+    }
+
     public async Task<IReadOnlyList<ActiveShareLink>> ListActiveAsync(
         ShareableResourceType resourceType, Guid resourceId, CancellationToken cancellationToken)
     {
         var now = clock.GetUtcNow();
-        return await db.ShareLinks.AsNoTracking()
-                       .Where(l => l.ResourceType == resourceType && l.ResourceId == resourceId
-                                   && l.RevokedAt == null && l.ExpiresAt > now)
-                       .OrderBy(l => l.CreatedAt)
-                       .ThenBy(l => l.Id)
-                       .Select(l => new ActiveShareLink(l.Id, l.CreatedAt, l.ExpiresAt))
-                       .ToListAsync(cancellationToken);
+        var links = await db.ShareLinks.AsNoTracking()
+                            .Where(l => l.ResourceType == resourceType && l.ResourceId == resourceId
+                                        && l.RevokedAt == null && l.ExpiresAt > now)
+                            .OrderBy(l => l.CreatedAt)
+                            .ThenBy(l => l.Id)
+                            .Select(l => new { l.Id, l.CreatedAt, l.ExpiresAt })
+                            .ToListAsync(cancellationToken);
+        return [.. links.Select(l => new ActiveShareLink(l.Id, l.CreatedAt, l.ExpiresAt, LastDayOf(l.ExpiresAt)))];
     }
 
     public async Task<ShareLinkTarget?> FindAsync(Guid id, CancellationToken cancellationToken) =>
@@ -108,23 +116,25 @@ internal sealed class ShareLinkService(
     }
 
     /// <summary>
-    /// Why <paramref name="expiresOn"/> cannot be a link's last day at <paramref name="now"/>, or
+    /// Why <paramref name="expiresOn"/> cannot be a link's last day now, or
     /// <c>null</c>: it is required and lies between tomorrow and today plus the 🔧 maximum, both
     /// counted in the configured zone (TEN-12; UX copy <c>criteria.share.expiry.error</c>).
     /// </summary>
-    private string? ExpiryErrorOf(DateOnly? expiresOn, DateTimeOffset now)
+    private string? ExpiryErrorOf(DateOnly? expiresOn)
     {
-        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, settings.TimeZone).DateTime);
-        var earliest = today.AddDays(1);
-        var latest = today.AddMonths(settings.MaxExpiryMonths);
+        var window = ExpiryWindow();
         return expiresOn switch
         {
             null => "The expiry date is required.",
-            { } date when date < earliest || date > latest =>
-                $"The expiry date lies between {earliest:yyyy-MM-dd} and {latest:yyyy-MM-dd}.",
+            { } date when date < window.Earliest || date > window.Latest =>
+                $"The expiry date lies between {window.Earliest:yyyy-MM-dd} and {window.Latest:yyyy-MM-dd}.",
             _ => null,
         };
     }
+
+    /// <summary>The last day a link ending at <paramref name="expiresAt"/> works: the day before that midnight in the configured zone.</summary>
+    private DateOnly LastDayOf(DateTimeOffset expiresAt) =>
+        DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(expiresAt, settings.TimeZone).DateTime).AddDays(-1);
 
     /// <summary>The end of <paramref name="day"/> in the configured zone: the start of the next day, in UTC.</summary>
     private DateTimeOffset EndOf(DateOnly day)
@@ -145,8 +155,19 @@ internal sealed class ShareLinkService(
         }
 
         Span<byte> bytes = stackalloc byte[TokenBytes];
-        if (!Base64Url.TryDecodeFromChars(token, bytes, out var written) || written != TokenBytes)
+        int written;
+        try
         {
+            if (!Base64Url.TryDecodeFromChars(token, bytes, out written) || written != TokenBytes)
+            {
+                return false;
+            }
+        }
+        catch (FormatException)
+        {
+            // TryDecodeFromChars returns false only for a short buffer: a text of the right length
+            // that is no Base64url (a character outside it, or spare bits set in the last one)
+            // throws. It is a malformed link like any other: 404 (R-SAV-05; found in S5-24).
             return false;
         }
 

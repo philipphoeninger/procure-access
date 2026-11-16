@@ -21,6 +21,13 @@
   }
 }
 
+// „Auswahl ändern“ and „Freigabelink erstellen“ below the H1: they wrap at 320 px.
+.pa-saved-list__title-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pa-space-sm);
+}
+
 .pa-saved-list__counts {
   margin: 0;
 }

@@ -1,0 +1,48 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (shown(); as shown) {
+  <h1 class="pa-shared-list__title">{{ 'criteria.shared.title' | translate: { name: shown.list.name } }}</h1>
+
+  <pa-notice kind="info">
+    <p>{{ 'criteria.shared.note' | translate }}</p>
+    <a matButton="outlined" [routerLink]="configuratorPath">{{ 'home.card.criteria.cta' | translate }}</a>
+  </pa-notice>
+
+  @if (selection(); as selection) {
+    <pa-criteria-list-summary [count]="counts().total" [names]="selection" />
+  }
+
+  <pa-notice kind="info">{{ 'criteria.list.priorityNote' | translate }}</pa-notice>
+
+  @if (counts().total > 0) {
+    <p class="pa-shared-list__counts">
+      {{
+        'criteria.list.counts'
+          | translate
+            : {
+                a: ('criteria.list.counts.a' | translatePlural: counts().A),
+                b: ('criteria.list.counts.b' | translatePlural: counts().B),
+                info: ('criteria.list.counts.info' | translatePlural: counts().Info),
+              }
+      }}
+    </p>
+    <ul class="pa-shared-list__items">
+      @for (criterion of shown.criteria.criteria; track criterion.key) {
+        <li>
+          <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" [readonly]="true" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="pa-shared-list__text">{{ 'criteria.list.empty' | translate }}</p>
+  }
+} @else if (view().kind === 'invalid') {
+  <h1 class="pa-shared-list__title">{{ 'criteria.shared.invalid.title' | translate }}</h1>
+  <p class="pa-shared-list__text">{{ 'criteria.shared.invalid' | translate }}</p>
+} @else {
+  <pa-error-page kind="server" />
+}

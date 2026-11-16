@@ -156,6 +156,8 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
     [InlineData("list-deleted")]
     [InlineData("unknown")]
     [InlineData("malformed")]
+    [InlineData("malformed-full-length")]
+    [InlineData("not-base64url")]
     public async Task Read_LinkNoLongerValid_Returns404(string state)
     {
         var created = await CreateAsync(TestUsers.EditorA, InDays(1));
@@ -177,6 +179,13 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 break;
             case "malformed":
                 token = token[..20];
+                break;
+            case "malformed-full-length":
+                // 43 characters of the alphabet whose last one sets spare bits: no token (S5-24, a 500 before).
+                token = new string('C', token.Length);
+                break;
+            case "not-base64url":
+                token = new string('*', token.Length);
                 break;
         }
 
@@ -264,7 +273,8 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
     [Trait("Invariant", "TEN-01")]
     public async Task List_EditorOfA_ShowsOnlyActiveLinksOfThisList()
     {
-        var first = await CreateAsync(TestUsers.OwnerA, InDays(10));
+        var firstExpiresOn = InDays(10);
+        var first = await CreateAsync(TestUsers.OwnerA, firstExpiresOn);
         var revoked = await CreateAsync(TestUsers.OwnerA, InDays(10));
         var expiring = await CreateAsync(TestUsers.OwnerA, InDays(1));
         var other = CriteriaConfiguration.Create(
@@ -276,10 +286,33 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
         (await client.DeleteAsync($"/api/v1/share-links/{revoked.Id}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
         Clock.SetUtcNow(expiring.ExpiresAt);
 
-        var links = await client.GetFromJsonAsync<List<ActiveShareLink>>(LinksPath(List.Id), Cancellation);
+        var answer = await client.GetFromJsonAsync<ShareLinksAnswer>(LinksPath(List.Id), Cancellation);
 
-        links.ShouldNotBeNull().Select(l => l.Id).ShouldBe([first.Id]);
+        var links = answer.ShouldNotBeNull().Links;
+        links.Select(l => l.Id).ShouldBe([first.Id]);
         links[0].ExpiresAt.ShouldBe(first.ExpiresAt);
+        links[0].ExpiresOn.ToString("yyyy-MM-dd").ShouldBe(firstExpiresOn);
+    }
+
+    /// <summary>
+    /// S15 offers the dates the server works out (owner decision S5-24 1a): with the clock at 23:30
+    /// UTC — already the next day in Berlin — tomorrow, today plus 90 days and today plus one year
+    /// are counted from the Berlin day, and the default is accepted as an expiry date.
+    /// </summary>
+    [Fact(DisplayName = "INV:TEN-12 " + nameof(List_ExpiryWindow_CountsFromTheBerlinDayWithTheDefaultOf90Days))]
+    [Trait("Invariant", "TEN-12")]
+    public async Task List_ExpiryWindow_CountsFromTheBerlinDayWithTheDefaultOf90Days()
+    {
+        var berlinToday = SetClockToLateEveningUtc();
+        using var client = CreateClient(TestUsers.EditorA);
+
+        var answer = await client.GetFromJsonAsync<ShareLinksAnswer>(LinksPath(List.Id), Cancellation);
+
+        var expiry = answer.ShouldNotBeNull().Expiry;
+        expiry.ShouldBe(new ShareLinkExpiryWindow(berlinToday.AddDays(1), berlinToday.AddDays(90), berlinToday.AddYears(1)));
+        answer.Links.ShouldBeEmpty();
+        var created = await CreateAsync(TestUsers.EditorA, expiry.Default.ToString("yyyy-MM-dd"));
+        TimeZoneInfo.ConvertTime(created.ExpiresAt, Berlin).Date.ShouldBe(expiry.Default.AddDays(1).ToDateTime(TimeOnly.MinValue));
     }
 
     [Fact(DisplayName = "INV:TEN-01 " + nameof(Revoke_LinkOfAnotherOrganization_Returns404AndKeepsItWorking))]
@@ -350,6 +383,9 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
         response.StatusCode.ShouldBe(HttpStatusCode.Created, await response.Content.ReadAsStringAsync(Cancellation));
         return (await response.Content.ReadFromJsonAsync<CreatedShareLink>(Cancellation)).ShouldNotBeNull();
     }
+
+    /// <summary>The answer of <c>GET /configurations/{id}/share-links</c> (SPEC §8.10).</summary>
+    private sealed record ShareLinksAnswer(ShareLinkExpiryWindow Expiry, List<ActiveShareLink> Links);
 
     private static string LinksPath(Guid listId) => $"/api/v1/configurations/{listId}/share-links";
 

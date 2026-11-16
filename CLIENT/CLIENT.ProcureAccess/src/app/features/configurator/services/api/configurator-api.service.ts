@@ -18,6 +18,7 @@ import {
   SavedListSummary,
   SaveListRequest,
 } from '../../models/saved-lists';
+import { CreatedShareLink, SharedList, ShareLinksResponse } from '../../models/share-links';
 
 /**
  * Client of the configurator endpoints (ARCHITECTURE §7.2): the usage event of S11 and, since
@@ -25,7 +26,9 @@ import {
  * (SPEC §8.10). The saved-list requests are marked {@link CALLER_SHOWS_FAILURES}: S12, S14 and the
  * page of a saved list show every failure in place — except the changes of a list (a decision, the
  * selection, deleting, the copy), whose failure the error interceptor shows as everywhere (owner
- * decision S5-21b 1a).
+ * decision S5-21b 1a). Since S5-24 also the share links of a list for S15 and the shared list of
+ * S16 (`/api/v1/shared/{token}`, SPEC §8.5), both marked {@link CALLER_SHOWS_FAILURES}: S15 and S16
+ * show every failure in place.
  */
 @Injectable({ providedIn: 'root' })
 export class ConfiguratorApiService {
@@ -102,6 +105,44 @@ export class ConfiguratorApiService {
   /** „Neue Liste mit derselben Auswahl“ (R-LST-14, CAT-22): a copy on the active release. */
   copyToActiveRelease(id: string): Promise<CopiedList> {
     return lastValueFrom(this.http.post<CopiedList>(`${this.listUrl(id)}/copies`, { release: 'active' }));
+  }
+
+  /** S15: the dates a new link may end on today and the active links of a list (R-SAV-04; owner decision S5-24 1a). */
+  shareLinks(id: string): Promise<ShareLinksResponse> {
+    return lastValueFrom(
+      this.http.get<ShareLinksResponse>(`${this.listUrl(id)}/share-links`, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+      }),
+    );
+  }
+
+  /** S15 „Link erstellen“ (R-SAV-04): a link that works until the end of `expiresOn` (`yyyy-MM-dd`). */
+  createShareLink(id: string, expiresOn: string): Promise<CreatedShareLink> {
+    return lastValueFrom(
+      this.http.post<CreatedShareLink>(
+        `${this.listUrl(id)}/share-links`,
+        { expiresOn },
+        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true) },
+      ),
+    );
+  }
+
+  /** S15 „Link ungültig machen“ (R-SAV-04, US-SAV-03). */
+  revokeShareLink(linkId: string): Promise<unknown> {
+    return lastValueFrom(
+      this.http.delete(`${this.apiUrl}/v1/share-links/${encodeURIComponent(linkId)}`, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+      }),
+    );
+  }
+
+  /** S16: the list behind a share link, without an account (R-SAV-05, TEN-09); 404 for a link that no longer works. */
+  shared(token: string): Promise<SharedList> {
+    return lastValueFrom(
+      this.http.get<SharedList>(`${this.apiUrl}/v1/shared/${encodeURIComponent(token)}`, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+      }),
+    );
   }
 
   private listUrl(id: string): string {

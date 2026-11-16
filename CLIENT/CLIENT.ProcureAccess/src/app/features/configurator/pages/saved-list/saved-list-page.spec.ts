@@ -17,6 +17,7 @@ import { OrganizationRole, OrganizationSummary } from '@app/features/organizatio
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
+import { ShareDialog } from '../../dialogs/share-dialog/share-dialog';
 import { CriteriaResponse } from '../../models/criteria';
 import { SavedList } from '../../models/saved-lists';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
@@ -127,6 +128,8 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
       expect(screen.queryByRole('button', { name: /Notiz/ })).toBeNull();
       expect(screen.getByRole('searchbox')).toBeTruthy();
       expect(screen.queryByRole('link', { name: 'Auswahl ändern' })).toBeNull();
+      // Sharing is for Editor and Owner (owner decision S5-24 2a).
+      expect(screen.queryByRole('button', { name: 'Freigabelink erstellen' })).toBeNull();
       expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
       // A saved list saves each change: no „Noch nicht gespeichert“ (owner decision S5-22 4).
       expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
@@ -185,6 +188,16 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
       await vi.waitFor(() =>
         expect(open).toHaveBeenCalledWith(expect.anything(), { listId: 'list-1', release: 'T.1', included: 3, tooLongNote: null }),
       );
+      open.mockRestore();
+    });
+
+    it('opens S15 for the stored list with „Freigabelink erstellen“, also on an older release (R-SAV-04, S5-24 2a)', async () => {
+      const open = vi.spyOn(ShareDialog, 'open').mockReturnValue({} as never);
+      await openPage({ view: listView('T.2'), role: 'owner' });
+
+      screen.getByRole('button', { name: 'Freigabelink erstellen' }).click();
+
+      expect(open).toHaveBeenCalledWith(expect.anything(), { listId: 'list-1' });
       open.mockRestore();
     });
 

@@ -51,8 +51,8 @@ export interface SavedListNavigationState {
   savedListArrival?: SavedListArrival;
 }
 
-/** The selection of a saved list as the catalog endpoints read it. */
-export function selectionOf(list: SavedList): CriteriaSelection {
+/** The selection of a saved or shared list (S16) as the catalog endpoints read it. */
+export function selectionOf(list: Pick<SavedList, 'selection'>): CriteriaSelection {
   const { useCaseTemplateId, appTypeIds, productPartIds, testTypeIds } = list.selection;
   return {
     ...(useCaseTemplateId === null ? {} : { useCase: useCaseTemplateId }),
@@ -63,10 +63,10 @@ export function selectionOf(list: SavedList): CriteriaSelection {
 }
 
 /**
- * The stored decisions by criterion key, as `pa-criterion-card` reads them: the server names each
+ * The stored decisions of a saved or shared list (S16) by criterion key, as `pa-criterion-card` reads them: the server names each
  * criterion by its revision in the pinned release, the criteria answer of that release gives its key.
  */
-export function decisionsOf(list: SavedList, criteria: CriteriaResponse): CriterionDecisions {
+export function decisionsOf(list: Pick<SavedList, 'criteria'>, criteria: CriteriaResponse): CriterionDecisions {
   const byRevision = new Map(list.criteria.map((criterion) => [criterion.criterionRevisionId, criterion]));
   const decisions: Record<string, CriterionDecision> = {};
   for (const criterion of criteria.criteria) {
