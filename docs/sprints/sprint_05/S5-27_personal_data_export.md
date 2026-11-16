@@ -4,7 +4,7 @@
 > **Requirements / invariants:** SPEC R-AUTH-09, §8.4, SD14 (v2.33); **PRV-07 account part `active`** (TESTING_v73 V237); ARCHITECTURE C79, C151
 > **Status:** done — pull request #352 open (2026-11-16)
 > **Scope:** `GET /api/v1/account/export` returns the signed-in user's own data as JSON per SPEC §8.4, nothing of other users, as an attachment with `no-store`. No screen: the download on S61 is S5-28.
-> **Owner decisions (2026-11-16):** S5-27 **1a** — the full shape of §8.4 now (`formatVersion` 1); sections whose data later tasks build are empty arrays, `preferences` is `null`; each later task fills its section and its PRV-07 case, recorded as deferred parts in TESTING; the S5-19 and S5-25 prompts get one line · **2a** — the legacy `User` gets `CreatedAt`, set at creation from `TimeProvider`; existing accounts `null` · **3a** — exactly what §8.4 lists; legacy proposals and open invitations stay out (open point) · **4a** — no rate limit (§7.3 names none)
+> **Owner decisions (2026-11-16):** S5-27 **1a** — the full shape of §8.4 now (`formatVersion` 1); sections whose data later tasks build are empty arrays, `preferences` is `null`; each later task fills its section and its PRV-07 case, recorded as deferred parts in TESTING; the S5-19 and S5-25 prompts get one line · **2a** — the legacy `User` gets `CreatedAt`, set at creation from `TimeProvider`; existing accounts `null` · **3a** — exactly what §8.4 lists; legacy proposals and open invitations stay out (open point) · **4a** — no rate limit (§7.3 names none) · **PRV-04** (after the review, R1) — the export is PRV-04's one exception
 
 ## 1. Starting point
 
@@ -45,7 +45,7 @@ Code review per CLAUDE §6.7 (`/engineering:code-review`), sorted per §6.8:
 
 | # | Finding | Sorting |
 |---|---|---|
-| R1 | **PRV-04** (planned, identity part step 3) reads „no endpoint returns both a user identifier and a contributor profile“; the export returns the address with the user's own profiles, as SPEC §8.4 and R-AUTH-09 („never … `UserContributorLink` beyond the user's own profiles“) require | **owner question** — a conflict between TESTING and SPEC, not decided here (CLAUDE §2); proposal: PRV-04 names the account export of the user's own profiles as its one exception when its identity part is activated (open point 1) |
+| R1 | **PRV-04** (planned, identity part step 3) reads „no endpoint returns both a user identifier and a contributor profile“; the export returns the address with the user's own profiles, as SPEC §8.4 and R-AUTH-09 („never … `UserContributorLink` beyond the user's own profiles“) require | **decided by the owner** (2026-11-16): the export is PRV-04's one exception — PRV-04 in TESTING_v73 (V238) and ARCHITECTURE §9.3 / C151 say so |
 | R2 | `since` falls back to `InvitedAt` for a membership without acceptance | **kept** — invitations live in their own table since S5-17a, so every membership row is accepted; the fallback only keeps the field non-null |
 | R3 | `IAccountDataExport` reads memberships through the request's organisation filter, so for another user than the signed-in one it would return no memberships | **kept** — the only caller passes the signed-in user; the contract remarks say so |
 | R4 | Accounts created before S5-27 export `createdAt: null` | **kept** — decision 2a; pre-pilot data |
@@ -60,7 +60,7 @@ Code review per CLAUDE §6.7 (`/engineering:code-review`), sorted per §6.8:
 
 ## 5. Open points
 
-1. **PRV-04 vs. the export** (R1): owner decision needed before PRV-04's identity part is activated.
+1. **PRV-04** (R1): decided — the export is its one exception (TESTING V238); the endpoint scan of PRV-04's identity part has to skip it by name when it is activated.
 2. **Legacy proposals** (decision 3a): the proposals a user made (`Proposals.ProposerId`) are personal data outside §8.4; they go with the legacy product proposal of their step. If they outlive the pilot start, the export or the deletion has to cover them.
 3. **Sections of later tasks** (decision 1a): S5-19 (`createdByMe.criteriaLists`), S5-25 (`account.preferences`), step 5 (`createdByMe.projects`, PRV-07 workspace part), step 6 (`contributions`, purged content as null); the S5-19 and S5-25 prompts name it.
 4. **S5-28** builds the download on S61 (`account.export.*` of the UX copy) on this endpoint.
