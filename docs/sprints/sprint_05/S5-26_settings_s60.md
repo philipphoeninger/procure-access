@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-26 (3.5 points) · **Issues:** none
 > **Requirements / invariants:** SPEC R-SET-01 (met), R-SET-02, R-SET-04, §8.12 (v2.44); **A11Y-08** complete — „applied without reload“ through S60 (TESTING_v84 V283); A11Y-06 stays green (V284); **A11Y-09** S60 in `reflow.spec.ts` (V285); ARCHITECTURE C162; UX copy v37 U157
-> **Status:** done — pull request open (2026-11-17)
+> **Status:** done — pull request #369 open (2026-11-17)
 > **Scope:** S60 at `/einstellungen` per Handoff §5.3 with its menu entry; a change applies without reload and is saved; S60 in `reflow.spec.ts`. No server change, no EF migration. The legacy settings page and its `LEGACY_EXCEPTIONS` entries had already gone with S5-25b (decision S5-25 2a), so the prompt's line about deleting them had nothing left to do.
 > **Owner decisions (2026-11-17, before the task):** **D1 (a)** — „Deutsch“ as the one chosen option of „Sprache“, new UX key `settings.language.de` in UX copy v37 · **D2 (a)** — each change is saved at once; a failed save shows the existing system states of the error interceptor, announces nothing, and the choice stays applied for this session and is saved with the next change (instead of the prompt's „error summary on a failed save“: S60 has no field that can be wrong, and the error summary of Handoff §6.4 lists field errors) · **defaults** — the entry last in the menu „Konto“ before „Abmelden“ (U138, U140), also in the compact menu; sign-in required (UX copy §4); no redirect from the old `/settings`; S60 reads the settings again before it shows; several quick changes are saved one after another, each with all four settings.
 
