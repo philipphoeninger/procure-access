@@ -22,7 +22,7 @@
 
 ### Changes from v62
 
-Sprint 05, task S5-18 (`docs/sprints/sprint_05/S5-18_header_states_org_switch.md`; owner decisions S5-18 of 2026-11-16: 1a — „Projekte“ comes with the projects screens; 2a — one entry „Organisation“, drafted as UX copy v32; 3a — the active organisation in memory only; 4a — the switch now, the list scoping with the lists; defaults accepted with them).
+Sprint 05, task S5-18 (`docs/sprints/sprint_05/S5-18_header_states_org_switch.md`; owner decisions S5-18 of 2026-11-16: 1a — „Projekte“ comes with the projects screens; 2a — one entry „Organisation“, drafted as UX copy v32 and confirmed in review; 3a — the active organisation in memory only; 4a — the switch now, the list scoping with the lists; defaults accepted with them).
 
 | # | Change | Reason |
 |---|---|---|
