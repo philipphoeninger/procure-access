@@ -86,3 +86,27 @@ export async function organizationOfAccount(request: APIRequestContext, address:
   expect(response.status(), `creating ${name}`).toBe(201);
   return ((await response.json()) as { id: string }).id;
 }
+
+/**
+ * Saves a list of the test release T.1 (use case `hr`, app type `web`, product part `base`, every
+ * criterion included) into the organisation as the user `request` is signed in as (S5-24): for tests
+ * whose subject is not saving, such as sharing. Returns the list's id.
+ */
+export async function saveListThroughApi(request: APIRequestContext, organizationId: string, name: string): Promise<string> {
+  const criteria = await request.get('/api/v1/catalog/criteria', {
+    params: new URLSearchParams([['release', 'T.1'], ['useCase', 'hr'], ['appTypeIds[]', 'web'], ['productPartIds[]', 'base']]),
+  });
+  expect(criteria.ok(), 'the criteria of T.1').toBe(true);
+  const answer = (await criteria.json()) as { release: string; criteria: { revisionId: number }[] };
+  const response = await request.post('/api/v1/configurations', {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+    data: {
+      organizationId,
+      name,
+      selection: { releaseVersion: answer.release, useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
+      criteria: answer.criteria.map((criterion) => ({ criterionRevisionId: criterion.revisionId, isIncluded: true })),
+    },
+  });
+  expect(response.status(), `saving ${name}`).toBe(201);
+  return ((await response.json()) as { id: string }).id;
+}

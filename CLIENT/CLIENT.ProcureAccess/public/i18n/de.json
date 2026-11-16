@@ -321,7 +321,8 @@
       "list": "Ihre Kriterienliste",
       "list.saved": "{{name}} – Gespeicherte Kriterienlisten",
       "saved": "Gespeicherte Kriterienlisten",
-      "shared": "Geteilte Kriterienliste: {{name}}"
+      "shared": "Geteilte Kriterienliste: {{name}}",
+      "sharedInvalid": "Link nicht mehr gültig"
     },
     "settings": "Einstellungen",
     "account": "Konto",
@@ -640,6 +641,32 @@
       "delete.body": "Die Liste „{{name}}“ wird gelöscht. Freigabelinks zu dieser Liste funktionieren danach nicht mehr. Beschaffungsprojekte, die eine Kopie der Liste nutzen, sind nicht betroffen.",
       "delete.confirm": "Liste löschen",
       "deleted": "Die Liste „{{name}}“ wurde gelöscht."
+    },
+    "share": {
+      "title": "Freigabelink erstellen",
+      "intro": "Wer diesen Link hat, kann die Liste lesen, auch ohne Konto, aber nicht ändern.",
+      "expiry": "Gültig bis",
+      "expiry.hint": "Vorgabe: in 90 Tagen. Höchstens ein Jahr.",
+      "expiry.error": "Bitte wählen Sie ein Datum zwischen morgen und {{maxDate}}.",
+      "create": "Link erstellen",
+      "link": "Freigabelink",
+      "link.hint": "Kopieren Sie den Link jetzt. Später können Sie ihn nicht mehr anzeigen lassen.",
+      "copy": "Link kopieren",
+      "copyFailed": "Der Link konnte nicht kopiert werden. Bitte markieren und kopieren Sie ihn selbst.",
+      "copied": "Link kopiert.",
+      "revoke": "Link ungültig machen",
+      "revoked": "Der Link ist nicht mehr gültig.",
+      "active": "Gültige Links",
+      "active.item": "Erstellt am {{created}}, gültig bis {{expires}}",
+      "active.empty": "Für diese Liste gibt es keinen gültigen Link.",
+      "error.title": "Aktion fehlgeschlagen",
+      "error": "Das hat nicht geklappt. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns."
+    },
+    "shared": {
+      "title": "Geteilte Kriterienliste: {{name}}",
+      "note": "Diese Liste wurde mit Ihnen geteilt. Sie können sie ohne Konto lesen. Um eine eigene Liste zu erstellen, wählen Sie „Kriterien zusammenstellen“.",
+      "invalid.title": "Link nicht mehr gültig",
+      "invalid": "Dieser Link ist nicht mehr gültig. Er ist abgelaufen oder wurde zurückgenommen. Bitten Sie die Person, die ihn geteilt hat, um einen neuen Link."
     }
   },
   "testType": {

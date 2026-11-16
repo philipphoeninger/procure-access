@@ -1,0 +1,116 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'criteria.share.title' | translate }}</h2>
+
+<form class="pa-share" novalidate (submit)="create($event)">
+  <mat-dialog-content class="pa-share__content">
+    <p class="pa-share__text">{{ 'criteria.share.intro' | translate }}</p>
+
+    <pa-error-summary [items]="summary()" />
+
+    @if (confirmationRequired()) {
+      <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+      <div #confirmNotice class="pa-share__confirm" tabindex="-1">
+        <pa-confirm-required-notice />
+      </div>
+    }
+
+    @if (status() === 'ready') {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'criteria.share.expiry' | translate }}</mat-label>
+        <input
+          #expiryInput
+          matInput
+          type="date"
+          name="expiresOn"
+          required
+          [id]="expiryId"
+          [attr.min]="expiry()?.earliest"
+          [attr.max]="expiry()?.latest"
+          [formControl]="expiresOn"
+          [errorStateMatcher]="errorState"
+        />
+        <mat-hint [id]="expiryHintId">{{ 'criteria.share.expiry.hint' | translate }}</mat-hint>
+        @if (expiresOn.invalid) {
+          <mat-error>{{ 'criteria.share.expiry.error' | translate: { maxDate: maxDate() } }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (created(); as created) {
+        <div class="pa-share__created">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'criteria.share.link' | translate }}</mat-label>
+            <input #linkInput matInput type="text" readonly [id]="linkId" [value]="created.url" />
+            <mat-hint>{{ 'criteria.share.link.hint' | translate }}</mat-hint>
+          </mat-form-field>
+          <div>
+            <button matButton="outlined" type="button" (click)="copy()">{{ 'criteria.share.copy' | translate }}</button>
+          </div>
+          @if (copyFailed()) {
+            <pa-notice kind="attention" live="polite">
+              <p>{{ 'criteria.share.copyFailed' | translate }}</p>
+            </pa-notice>
+          }
+        </div>
+      }
+
+      <h3 #linksHeading class="pa-share__heading" tabindex="-1" [id]="linksHeadingId">
+        {{ 'criteria.share.active' | translate }}
+      </h3>
+      @if (links().length === 0) {
+        <p class="pa-share__text">{{ 'criteria.share.active.empty' | translate }}</p>
+      } @else {
+        <ul class="pa-share__links" [attr.aria-labelledby]="linksHeadingId">
+          @for (link of links(); track link.id; let i = $index) {
+            <li class="pa-share__link">
+              <span class="pa-share__text" [id]="'pa-share-item-' + i">
+                {{ 'criteria.share.active.item' | translate: itemParams(link) }}
+              </span>
+              <button
+                #revokeButton
+                matButton="outlined"
+                type="button"
+                [attr.aria-describedby]="'pa-share-item-' + i"
+                [attr.aria-disabled]="revoking() === link.id ? 'true' : null"
+                (click)="revoke(link)"
+              >
+                {{ 'criteria.share.revoke' | translate }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    @if (status() === 'loadFailed') {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.share.error.title' | translate">
+        <p>{{ 'criteria.share.error' | translate }}</p>
+      </pa-notice>
+    }
+
+    @if (error(); as error) {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.share.error.title' | translate">
+        <p>{{ errorKey(error) | translate }}</p>
+      </pa-notice>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="pa-share__actions">
+    <button matButton type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+    @if (status() === 'loadFailed') {
+      <button matButton="filled" type="button" (click)="retry()">{{ 'common.actions.retry' | translate }}</button>
+    } @else {
+      <!-- While loading or creating: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->
+      <button matButton="filled" type="submit" [attr.aria-disabled]="busy() || status() === 'loading' ? 'true' : null">
+        @if (busy() || status() === 'loading') {
+          <mat-progress-spinner class="pa-share__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'criteria.share.create' | translate }}
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

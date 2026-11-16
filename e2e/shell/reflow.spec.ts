@@ -276,6 +276,78 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
   });
 
+  test('S15 with a created link and two active links needs no horizontal scrolling', async ({ page }) => {
+    // The list and its links are answered here, so the seeded organisation stays unchanged
+    const id = '0e2e0000-0000-4000-8000-0000000000a2';
+    await page.route(`**/api/v1/configurations/${id}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id,
+          organizationId: E2E_ORGANIZATION.id,
+          name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+          releaseVersion: 'T.1',
+          createdAt: '2026-11-16T09:00:00Z',
+          modifiedAt: '2026-11-16T09:00:00Z',
+          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
+          criteria: [],
+        },
+      }),
+    );
+    const link = (n: string, expiresOn: string) => ({ id: `0e2e0000-0000-4000-8000-0000000000b${n}`, createdAt: '2026-11-02T10:00:00Z', expiresAt: `${expiresOn}T23:00:00Z`, expiresOn });
+    await page.route(`**/api/v1/configurations/${id}/share-links`, (route) =>
+      route.request().method() === 'POST'
+        ? route.fulfill({ status: 201, json: { id: link('3', '2027-02-14').id, token: 'A'.repeat(43), expiresAt: '2027-02-14T23:00:00Z' } })
+        : route.fulfill({
+            status: 200,
+            json: {
+              expiry: { earliest: '2026-11-17', default: '2027-02-14', latest: '2027-11-16' },
+              links: [link('1', '2026-12-01'), link('2', '2027-01-31')],
+            },
+          }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto(`/kriterienlisten/${id}`);
+    await page.getByRole('main').getByRole('button', { name: 'Freigabelink erstellen' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Freigabelink erstellen' });
+    await expect(dialog.getByRole('button', { name: 'Link ungültig machen' })).toHaveCount(2);
+    await expectReflow(page);
+
+    await dialog.getByRole('button', { name: 'Link erstellen' }).click();
+    await expect(dialog.getByRole('textbox', { name: 'Freigabelink' })).toBeFocused();
+    await expectReflow(page);
+    await dialog.getByRole('button', { name: 'Schließen' }).click();
+  });
+
+  test('S16, a shared list without an account, and its „Link nicht mehr gültig“ need no horizontal scrolling', async ({ page }) => {
+    // The shared list is answered here; its criteria come from T.1
+    const token = 'B'.repeat(43);
+    await page.route(`**/api/v1/shared/${token}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+          releaseVersion: 'T.1',
+          expiresAt: '2027-02-14T23:00:00Z',
+          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
+          criteria: [],
+        },
+      }),
+    );
+    await page.goto(`/geteilt/${token}`);
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: /^Geteilte Kriterienliste: Barrierefreie Beschaffung/ })).toBeVisible();
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Details anzeigen' }).first().click();
+    await expect(main.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
+    await expectReflow(page);
+
+    await page.goto(`/geteilt/${'C'.repeat(43)}`);
+    await expect(main.getByRole('heading', { level: 1, name: 'Link nicht mehr gültig' })).toBeVisible();
+    await expectReflow(page);
+  });
+
   test('S01 with the error summary needs no horizontal scrolling (#170 L1)', async ({ page }) => {
     await page.goto('/(login:anmelden)');
     await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();

@@ -14,6 +14,7 @@ import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
 import { INVITATION_SEGMENT, MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
 import { SAVED_LISTS_PATH } from './features/configurator/models/saved-lists';
+import { SHARED_PATH } from './features/configurator/models/share-links';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -126,6 +127,12 @@ export const routes: Routes = [
   {
     path: `${SAVED_LISTS_PATH}/:id`,
     loadChildren: () => import('./features/configurator/pages/saved-list/saved-list.routing').then((m) => m.SAVED_LIST_ROUTES),
+  },
+  // S16 „Geteilte Kriterienliste“ (R-SAV-05, S5-24): the list behind a share link, without an
+  // account (TEN-09); its resolver loads it and names the page title
+  {
+    path: `${SHARED_PATH}/:token`,
+    loadChildren: () => import('./features/configurator/pages/shared-list/shared-list.routing').then((m) => m.SHARED_LIST_ROUTES),
   },
   {
     path: 'filters',

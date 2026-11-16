@@ -25,6 +25,13 @@ public interface IShareLinks
         DateOnly? expiresOn,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The dates a new link may end on now: tomorrow, the 🔧 default S15 offers and the 🔧 maximum,
+    /// counted in the configured time zone (TEN-12; owner decision S5-24 1a), so the client does no
+    /// date arithmetic of its own.
+    /// </summary>
+    ShareLinkExpiryWindow ExpiryWindow();
+
     /// <summary>The links to the resource that are neither revoked nor expired, the oldest first.</summary>
     Task<IReadOnlyList<ActiveShareLink>> ListActiveAsync(
         ShareableResourceType resourceType, Guid resourceId, CancellationToken cancellationToken);
@@ -48,7 +55,17 @@ public sealed record ShareLinkCreation(CreatedShareLink? Link, string? ExpiryErr
 public sealed record CreatedShareLink(Guid Id, string Token, DateTimeOffset ExpiresAt);
 
 /// <summary>A link as S15 lists it: no token, which only exists as a hash.</summary>
-public sealed record ActiveShareLink(Guid Id, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt);
+/// <param name="Id">The link, for its revocation.</param>
+/// <param name="CreatedAt">When it was created.</param>
+/// <param name="ExpiresAt">The instant it stops working: the midnight after <paramref name="ExpiresOn"/> in the configured zone.</param>
+/// <param name="ExpiresOn">The last day it works, as it was chosen (S15 shows this day, owner decision S5-24 1a).</param>
+public sealed record ActiveShareLink(Guid Id, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt, DateOnly ExpiresOn);
+
+/// <summary>The last days a new link may have now, in the configured zone (TEN-12).</summary>
+/// <param name="Earliest">Tomorrow.</param>
+/// <param name="Default">The date S15 offers: today plus the 🔧 default (SD15: 90 days).</param>
+/// <param name="Latest">Today plus the 🔧 maximum (SD15: one year).</param>
+public sealed record ShareLinkExpiryWindow(DateOnly Earliest, DateOnly Default, DateOnly Latest);
 
 /// <summary>What a link points to and whose it is, for the role check before a revocation.</summary>
 public sealed record ShareLinkTarget(Guid Id, Guid OrganizationId, ShareableResourceType ResourceType, Guid ResourceId);

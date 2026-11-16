@@ -35,6 +35,7 @@ import { CriteriaListFilterRow } from '../../components/criteria-list-filter/cri
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
 import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
+import { ShareDialog } from '../../dialogs/share-dialog/share-dialog';
 import { PriorityLevel } from '../../models/criteria';
 import { CriteriaListFilter } from '../../models/criteria-list';
 import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '../../models/saved-lists';
@@ -66,6 +67,9 @@ const STATUS_KEY = 'criteria.list.status.count';
  * derselben Auswahl“, which copies the list to the active release and opens the copy with its
  * report (R-LST-14, CAT-22).
  *
+ * „Freigabelink erstellen“ next to it opens S15 with the list's share links (R-SAV-04; owner
+ * decision S5-24 2a), also on a list of an older release.
+ *
  * **Readers** see the cards read only, the filter row and an action bar with „Liste exportieren“
  * only (owner decision S5-21b 6a), and no older-release notice (owner decision S5-21b 5b).
  *
@@ -77,8 +81,8 @@ const STATUS_KEY = 'criteria.list.status.count';
  * the route change; a list that does not exist for the user shows „Seite nicht gefunden“ in place.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
- * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-LST-06, R-LST-10, R-LST-14, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
- * @invariants CAT-02, CAT-06, CAT-22, TEN-01, A11Y-09
+ * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-SAV-04, R-LST-06, R-LST-10, R-LST-14, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
+ * @invariants CAT-02, CAT-06, CAT-22, TEN-01, TEN-08, A11Y-09
  */
 @Component({
   selector: 'pa-saved-list-page',
@@ -252,6 +256,12 @@ export class SavedListPage {
       .subscribe((result) => {
         if (result !== undefined) this.showNote(result.toNote);
       });
+  }
+
+  /** „Freigabelink erstellen“: S15 for the stored list (R-SAV-04); MatDialog returns the focus here. */
+  protected openShare(): void {
+    const shown = this.shown();
+    if (shown !== null) ShareDialog.open(this.dialog, { listId: shown.list.id });
   }
 
   /** „Zur Notiz“ of S13 (TD-40): the card opens its note; a filter that hides the card is cleared first. */
