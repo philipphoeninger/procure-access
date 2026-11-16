@@ -55,7 +55,7 @@
 }
 
 // Action bar (Handoff §2.1, §5.1): in the flow after the list; sticky at the bottom from 600 px
-// width AND 600 px height (keep the query in step with STICKY_ACTION_BAR_QUERY). Status and button
+// width AND 600 px height (keep the query in step with STICKY_ACTION_BAR_QUERY). Status and buttons
 // stack below 600 px and share a row from there; DOM order = visual order.
 .pa-criteria-list__actions {
   display: flex;
@@ -84,4 +84,9 @@
 .pa-criteria-list__status {
   margin: 0;
   font: var(--mat-sys-body-medium);
+
+  // From 600 px the counter keeps the start and the two buttons share the end of the row (S5-20b).
+  @media (min-width: 37.5em) {
+    margin-inline-end: auto;
+  }
 }

@@ -83,6 +83,10 @@ function noteLength(control: AbstractControl<string>): ValidationErrors | null {
  * The card holds no list state: every change is an output, which the page hands to the in-memory
  * draft of `withConfigurator()`.
  *
+ * With `readonly` (S5-20b, a saved list) the card shows the stored decision only: no checkbox (an
+ * excluded card keeps `criteria.item.excluded`), K5 read only, and a note as text under
+ * `criteria.item.note.heading` instead of the note button and field.
+ *
  * The toggle keeps the focus and names the criterion through `aria-describedby`; the panel stays in
  * the DOM while hidden, so `aria-controls` always points at it. The title carries the anchor
  * `k-<key>` (the host keeps its own id, which the test library uses to remove a rendered card).
@@ -120,6 +124,11 @@ export class CriterionCard implements OnInit {
   readonly criterion = input.required<Criterion>();
   readonly decision = input.required<CriterionDecision>();
   readonly names = input.required<CatalogNames>();
+  /**
+   * Read only (a saved list before S5-21, owner decision S5-20 5a; later the shared list S16): no
+   * checkbox, K5 without its menu, the note as text; the detail panel stays.
+   */
+  readonly readonly = input(false);
 
   /** „In Liste aufnehmen“ checked or not (R-LST-04). */
   readonly includedChange = output<boolean>();

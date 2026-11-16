@@ -53,8 +53,12 @@ export class LoginPage {
 
   /** Closes the outlet: the page underneath shows again with everything the user entered. */
   protected async signedIn(): Promise<void> {
-    // The list of S11 is not saved before step 3 saves lists, so any loaded list counts (E7).
+    // The draft of S11 lives only in memory, so any loaded list is unsaved (E7). S11 also shows the
+    // text, until the list is saved or S11 is left (owner decision S5-20b 1a).
     const draftKept = this.reasonSave && this.store.configurator.list.answer() !== null;
+    if (draftKept) {
+      this.store.keepDraftAfterSignIn();
+    }
     await this.router.navigate([{ outlets: { login: null } }]);
     if (draftKept) {
       void this.announcer.announce('auth.login.draftKept');

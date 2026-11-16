@@ -1,0 +1,55 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'criteria.save.title' | translate }}</h2>
+
+<form class="pa-save-list" novalidate (submit)="submit($event)">
+  <mat-dialog-content class="pa-save-list__content">
+    <pa-error-summary [items]="summary()" />
+
+    @if (confirmationRequired()) {
+      <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+      <div #confirmNotice class="pa-save-list__confirm" tabindex="-1">
+        <pa-confirm-required-notice />
+      </div>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'criteria.save.name' | translate }}</mat-label>
+      <input matInput [id]="nameId" type="text" name="name" autocomplete="off" required
+        [formControl]="name" [errorStateMatcher]="errorState" />
+      <mat-hint [id]="hintId">{{ 'criteria.save.name.hint' | translate }}</mat-hint>
+      @if (nameMessage(); as message) {
+        <mat-error>{{ message.key | translate: message.params }}</mat-error>
+      }
+    </mat-form-field>
+
+    @if (organization) {
+      <p class="pa-save-list__note">{{ 'criteria.save.orgNote' | translate: { org: organizationName } }}</p>
+    }
+
+    @if (error(); as error) {
+      <pa-notice kind="error" live="assertive" [title]="'criteria.save.error.title' | translate">
+        <p>{{ errorKey(error) | translate: { org: organizationName } }}</p>
+      </pa-notice>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="pa-save-list__actions">
+    @if (outdated()) {
+      <button #closeButton matButton="filled" type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+    } @else {
+      <button matButton type="button" mat-dialog-close>{{ 'common.actions.cancel' | translate }}</button>
+      <!-- While the list is saved: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->
+      <button matButton="filled" type="submit" [attr.aria-disabled]="busy() ? 'true' : null">
+        @if (busy()) {
+          <mat-progress-spinner class="pa-save-list__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'criteria.save.submit' | translate }}
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

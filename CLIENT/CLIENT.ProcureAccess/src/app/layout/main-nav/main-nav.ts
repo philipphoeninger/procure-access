@@ -14,6 +14,7 @@ import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@features/identity/services/auth.service';
 import { CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '@app/features/configurator/guards/configurator-guards';
+import { SAVED_LISTS_PATH } from '@app/features/configurator/models/saved-lists';
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from '@app/features/organization/models/organization';
 
 /**
@@ -83,6 +84,9 @@ export class MainNav {
     return active ? ['/', ORGANIZATION_PATH, active.id, MEMBERS_SEGMENT] : ['/', ORGANIZATION_PATH];
   });
 
+  /** „Kriterienlisten“ (U140, owner decision S5-20b 4a): S14, only with a membership. */
+  protected readonly savedListsLink = `/${SAVED_LISTS_PATH}`;
+
   /** S20, S21 and the page of the invitation link count as „Organisation“. */
   protected readonly organizationCurrent = computed(() => {
     this.navigationEnd();
@@ -92,9 +96,9 @@ export class MainNav {
 
   /**
    * Makes another organisation the active one (R-SHL-03). On S21 the page follows: it opens S21 of
-   * the chosen organisation, which loads its data and is announced as a page change. Lists,
-   * projects and the compare select read the active organisation when they are built (S5-21,
-   * workspace and directory steps).
+   * the chosen organisation, which loads its data and is announced as a page change. S14 reads the
+   * active organisation and loads its lists (S5-20b); projects and the compare select read it when
+   * they are built (workspace and directory steps).
    */
   protected async switchTo(organizationId: string): Promise<void> {
     this.navigated.emit();

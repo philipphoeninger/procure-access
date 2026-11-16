@@ -6,6 +6,7 @@ import { CriteriaSelection } from '../models/configurator-draft';
 import { CriteriaResponse } from '../models/criteria';
 import { CriterionDecisions } from '../models/criteria-list';
 import { ExportCriterionEntry, ExportFormat, ExportRequest } from '../models/export';
+import { SaveListRequest } from '../models/saved-lists';
 import { decisionOf, effectiveLevel } from './criteria-list-rules';
 
 /**
@@ -58,4 +59,20 @@ export function fileNameOf(contentDisposition: string | null): string | null {
   }
   const plain = /filename\s*=\s*"?([^";]+)"?/i.exec(contentDisposition);
   return plain ? plain[1].trim() : null;
+}
+
+/**
+ * The body of `POST /api/v1/configurations` for the list S11 shows (SPEC §8.10, R-SAV-01): the
+ * draft exactly as the export sends it — the server checks it with the export's check (C153) — with
+ * the organisation the header shows and the trimmed name instead of the format.
+ */
+export function toSaveRequest(
+  organizationId: string,
+  name: string,
+  answer: CriteriaResponse,
+  selection: CriteriaSelection,
+  decisions: CriterionDecisions,
+): SaveListRequest {
+  const { selection: selectionBody, criteria } = toExportRequest('xlsx', answer, selection, decisions);
+  return { organizationId, name, selection: selectionBody, criteria };
 }

@@ -117,6 +117,17 @@ p {
   padding-block-start: var(--pa-space-md);
 }
 
+// The note of a read-only card (S5-20b): heading and text, kept as typed.
+.pa-criterion-card__note-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+
+  .pa-criterion-card__text {
+    white-space: pre-line;
+  }
+}
+
 .pa-criterion-card__note {
   display: flex;
   flex-direction: column;

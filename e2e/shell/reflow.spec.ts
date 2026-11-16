@@ -17,7 +17,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * S03 with both steps since S5-13b, the organisation pages S20 and S21 (with the error summary, the
  * last-Owner notice and the confirmation dialog) since S5-16b, S21's open invitations and invite form
  * and the page of an invitation link since S5-17b, the signed-in compact menu with the organisation
- * switch since S5-18. The legacy screens are
+ * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
+ * (S11 read only) since S5-20b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -192,6 +193,77 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await page.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(page.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
+    await expectReflow(page);
+  });
+
+  test('S12 with the error summary needs no horizontal scrolling', async ({ page }) => {
+    // Only submitted empty and cancelled: the seeded organisation stays unchanged (owner decision S5-16 7a)
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await toStep4(page);
+    await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
+    await page.getByRole('button', { name: 'Liste speichern' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Kriterienliste speichern' });
+    await expect(dialog.getByRole('textbox', { name: 'Name der Liste' })).toBeFocused();
+    await expectReflow(page);
+
+    await dialog.getByRole('button', { name: 'Liste speichern' }).click();
+    await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+    await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+  });
+
+  test('S14 with lists needs no horizontal scrolling', async ({ page }) => {
+    // The lists are answered here: the seeded organisation stays unchanged (owner decision S5-16 7a)
+    await page.route(`**/api/v1/configurations?organizationId=${E2E_ORGANIZATION.id}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: [
+          {
+            id: '0e2e0000-0000-4000-8000-0000000000a1',
+            name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+            releaseVersion: 'T.1',
+            createdAt: '2026-11-16T09:00:00Z',
+            modifiedAt: '2026-11-16T09:00:00Z',
+          },
+          { id: '0e2e0000-0000-4000-8000-0000000000a2', name: 'Zeiterfassung', releaseVersion: 'T.1', createdAt: '2026-11-15T09:00:00Z', modifiedAt: '2026-11-15T09:00:00Z' },
+        ],
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto('/kriterienlisten');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: 'Gespeicherte Kriterienlisten' })).toBeVisible();
+    await expect(main.getByRole('listitem')).toHaveCount(2);
+    await expectReflow(page);
+  });
+
+  test('a saved list, read only with an open detail panel, needs no horizontal scrolling', async ({ page }) => {
+    // The list is answered here; its criteria come from T.1 (the seeded organisation stays unchanged)
+    const id = '0e2e0000-0000-4000-8000-0000000000a1';
+    await page.route(`**/api/v1/configurations/${id}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id,
+          organizationId: E2E_ORGANIZATION.id,
+          name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+          releaseVersion: 'T.1',
+          createdAt: '2026-11-16T09:00:00Z',
+          modifiedAt: '2026-11-16T09:00:00Z',
+          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
+          criteria: [],
+        },
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto(`/kriterienlisten/${id}`);
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: /^Barrierefreie Beschaffung/ })).toBeVisible();
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Details anzeigen' }).first().click();
+    await expect(main.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
     await expectReflow(page);
   });
 

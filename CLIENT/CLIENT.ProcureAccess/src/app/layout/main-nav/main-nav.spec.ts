@@ -101,16 +101,18 @@ describe('MainNav', () => {
       expect(screen.queryByRole('button', { name: /^Organisation:/ })).toBeNull();
     });
 
-    it('lists Konto, Organisation, Einstellungen and Abmelden in the menu „Konto“; „Organisation“ opens S21', async () => {
+    it('lists Konto, Organisation, Kriterienlisten, Einstellungen and Abmelden in the menu „Konto“; „Organisation“ opens S21', async () => {
       const { fixture } = await renderNav('bar', true, ONE_ORGANIZATION);
 
       const menu = await openAccountMenu(fixture);
 
       const items = within(menu).getAllByRole('menuitem');
-      expect(items.map((item) => item.textContent?.trim())).toEqual(['Konto', 'Organisation', 'Einstellungen', 'Abmelden']);
+      expect(items.map((item) => item.textContent?.trim())).toEqual(['Konto', 'Organisation', 'Kriterienlisten', 'Einstellungen', 'Abmelden']);
       expect(items[0].getAttribute('href')).toBe('/profile');
       expect(items[1].getAttribute('href')).toBe('/organisation/org-a/mitglieder');
-      expect(items[2].getAttribute('href')).toBe('/settings');
+      // S14 (U140, owner decision S5-20b 4a)
+      expect(items[2].getAttribute('href')).toBe('/kriterienlisten');
+      expect(items[3].getAttribute('href')).toBe('/settings');
     });
 
     it('marks „Organisation“ in the menu as the current page on S20 and S21', async () => {
@@ -129,6 +131,7 @@ describe('MainNav', () => {
       expect(screen.getByText('Organisation: Ämter Musterhausen')).toBeTruthy();
       expect(screen.getByRole('link', { name: 'Konto' }).getAttribute('href')).toBe('/profile');
       expect(screen.getByRole('link', { name: 'Organisation' }).getAttribute('href')).toBe('/organisation/org-a/mitglieder');
+      expect(screen.getByRole('link', { name: 'Kriterienlisten' }).getAttribute('href')).toBe('/kriterienlisten');
       expect(screen.getByRole('link', { name: 'Einstellungen' }).getAttribute('href')).toBe('/settings');
       expect(screen.getByRole('button', { name: 'Abmelden' })).toBeTruthy();
       expect(screen.queryByRole('menu')).toBeNull();
@@ -142,6 +145,8 @@ describe('MainNav', () => {
       expect(screen.queryByText(/^Organisation:/)).toBeNull();
       const menu = await openAccountMenu(fixture);
       expect(within(menu).getByRole('menuitem', { name: 'Organisation' }).getAttribute('href')).toBe('/organisation');
+      // „Kriterienlisten“ only with a membership (owner decision S5-20b 4a)
+      expect(within(menu).queryByRole('menuitem', { name: 'Kriterienlisten' })).toBeNull();
     });
 
     it('shows no organisation display in the compact menu either', async () => {
@@ -149,6 +154,7 @@ describe('MainNav', () => {
 
       expect(screen.queryByText(/^Organisation:/)).toBeNull();
       expect(screen.getByRole('link', { name: 'Organisation' }).getAttribute('href')).toBe('/organisation');
+      expect(screen.queryByRole('link', { name: 'Kriterienlisten' })).toBeNull();
     });
 
     it('shows the organisation display as soon as the first membership is read', async () => {

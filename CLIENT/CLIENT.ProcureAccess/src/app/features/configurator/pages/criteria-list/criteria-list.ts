@@ -22,6 +22,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { injectSuggestionLink } from '@app/core/contact/criteria-suggestion';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { AuthService } from '@app/features/identity/services/auth.service';
+import { ORGANIZATION_PATH } from '@app/features/organization/models/organization';
+import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { Notice } from '@app/shared/components/notice/notice';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
@@ -29,6 +32,7 @@ import { CriteriaListFilterRow } from '../../components/criteria-list-filter/cri
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
 import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
+import { SaveListDialog } from '../../dialogs/save-list-dialog/save-list-dialog';
 import { APP_TYPE_STEP_STATE, CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
 import { CriteriaListFilter } from '../../models/criteria-list';
 import { CriteriaResponse } from '../../models/criteria';
@@ -74,15 +78,21 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
  * now (`criteria.list.counts`, U106, owner decisions O-S4-50, O-S4-51 (a)). After the list the link
  * „Kriterium vorschlagen“ to the configured channel (R-LST-13). Last the action bar (R-LST-10): the
  * live counter `criteria.list.status.count` — announced, throttled, only when the user includes or
- * excludes a criterion — and „Liste exportieren“, which opens the export dialog S13; „Liste
- * speichern“ and `criteria.list.unsaved` wait for step 3 (owner decision O-S4-49 (a)). The bar is in
+ * excludes a criterion — „Liste speichern“ (S5-20b) and „Liste exportieren“, which opens the export
+ * dialog S13; `criteria.list.unsaved` comes with S5-22. The bar is in
  * the flow below 600 px width or height and sticky from there; while it is sticky its height is the
  * page's `scroll-padding-bottom`, so it never covers the focused element (WCAG 2.4.11). Not
  * `pa-criteria-list`: the legacy list has that selector.
  *
+ * „Liste speichern“ (R-SAV-01, S5-20b): signed out it opens S01 with `auth.login.reasonSave`; after
+ * the sign-in S11 shows `auth.login.draftKept` until the list is saved or S11 is left (owner
+ * decision S5-20b 1a). Without a membership it asks for an organisation (`criteria.save.needOrg`,
+ * whose action opens S20; owner decision S5-20b 3a); a Reader of the organisation the header shows
+ * does not see it; an Editor or Owner gets S12.
+ *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2546 (320 px)
- * @spec docs/SPEC_v2.md R-CON-10, R-LST-01 – R-LST-11, R-LST-13
+ * @spec docs/SPEC_v2.md R-CON-10, R-LST-01 – R-LST-11, R-LST-13, R-SAV-01
  * @invariants CAT-02, CAT-16, CAT-20
  */
 @Component({
@@ -113,6 +123,7 @@ export class CriteriaListPage {
     type: 'conjunction',
   });
   private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly filterRow = viewChild(CriteriaListFilterRow);
   private readonly actionBar = viewChild<ElementRef<HTMLElement>>('actionBar');
@@ -141,6 +152,16 @@ export class CriteriaListPage {
   /** From the session (S5-08): the draft note follows every sign-in and sign-out. */
   protected readonly signedIn = this.store.signedIn;
   protected readonly suggest = injectSuggestionLink();
+  /**
+   * What „Liste speichern“ does (R-SAV-01): sign in first, ask for an organisation, open S12 — or
+   * nothing, for a Reader of the organisation the header shows, who does not see the button.
+   */
+  protected readonly saveAction = computed<'signIn' | 'needOrganization' | 'save' | null>(() => {
+    if (!this.signedIn()) return 'signIn';
+    const organization = this.store.activeOrganization();
+    if (organization === null) return 'needOrganization';
+    return organization.role === 'reader' ? null : 'save';
+  });
   /** The names of the selected app types without criteria, joined; null when there are none. */
   protected readonly appTypesWithoutCriteria = computed(() => {
     const appTypes = this.answer()?.appTypesWithoutCriteria ?? [];
@@ -155,7 +176,11 @@ export class CriteriaListPage {
   private countedIncluded = 0;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => (this.destroyed = true));
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      // The hint after the sign-in belongs to this visit of S11 (owner decision S5-20b 1a).
+      this.store.forgetDraftKept();
+    });
     void this.load();
 
     // A change of the filter while the list is shown is the user's: announce the cards shown. The
@@ -195,6 +220,32 @@ export class CriteriaListPage {
   /** „Liste exportieren“: the export dialog S13 (R-LST-11). */
   protected openExport(): void {
     ExportDialog.open(this.dialog);
+  }
+
+  /** „Liste speichern“ (R-SAV-01): see {@link saveAction}. */
+  protected async save(): Promise<void> {
+    switch (this.saveAction()) {
+      case 'signIn':
+        await this.auth.showLogin('save');
+        return;
+      case 'needOrganization':
+        if (
+          await ConfirmDialog.confirm(this.dialog, {
+            titleKey: 'criteria.save.title',
+            bodyKey: 'criteria.save.needOrg',
+            confirmKey: 'criteria.save.needOrg.cta',
+          })
+        ) {
+          // The draft stays in memory; the way back is „Kriterien“ (owner decision S5-20b 3a).
+          await this.router.navigate(['/', ORGANIZATION_PATH]);
+        }
+        return;
+      case 'save':
+        SaveListDialog.open(this.dialog);
+        return;
+      default:
+        return;
+    }
   }
 
   /** „Filter zurücksetzen“: the button goes with the empty state, so the focus goes to the search. */

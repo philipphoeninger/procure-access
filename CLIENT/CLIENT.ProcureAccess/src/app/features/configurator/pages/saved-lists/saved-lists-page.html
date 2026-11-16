@@ -1,0 +1,74 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (status() === 'failed') {
+  <pa-error-page kind="server" />
+} @else {
+  <h1 class="pa-saved-lists__title" [id]="titleId">{{ 'criteria.saved.title' | translate }}</h1>
+
+  @switch (status()) {
+    @case ('noOrganization') {
+      <p class="pa-saved-lists__text">{{ 'criteria.save.needOrg' | translate }}</p>
+      <div>
+        <a matButton="filled" [routerLink]="organizationPath">{{ 'criteria.save.needOrg.cta' | translate }}</a>
+      </div>
+    }
+    @case ('loaded') {
+      @if (sorted().length === 0) {
+        <p class="pa-saved-lists__text">{{ 'criteria.saved.empty' | translate }}</p>
+        <div>
+          <a matButton="filled" [routerLink]="configuratorPath">{{ 'criteria.saved.empty.cta' | translate }}</a>
+        </div>
+      } @else {
+        <mat-form-field appearance="outline" class="pa-saved-lists__sort" subscriptSizing="dynamic">
+          <mat-label>{{ 'criteria.saved.sort' | translate }}</mat-label>
+          <mat-select [value]="sort()" (selectionChange)="chooseSort($event.value)">
+            @for (option of sorts; track option) {
+              <mat-option [value]="option">{{ sortKey(option) | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (wide()) {
+          <table mat-table class="pa-saved-lists__table" [dataSource]="sorted()" [attr.aria-labelledby]="titleId">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'criteria.saved.name' | translate }}</th>
+              <td mat-cell *matCellDef="let list">
+                <a class="pa-saved-lists__link" [routerLink]="path(list)">{{ list.name }}</a>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="modified">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'criteria.saved.modified' | translate }}</th>
+              <td mat-cell *matCellDef="let list">{{ date(list.modifiedAt) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="release">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'criteria.saved.release' | translate }}</th>
+              <td mat-cell *matCellDef="let list">{{ list.releaseVersion }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let list; columns: columns"></tr>
+          </table>
+        } @else {
+          <ul class="pa-saved-lists__list">
+            @for (list of sorted(); track list.id) {
+              <li class="pa-saved-lists__item">
+                <h2 class="pa-saved-lists__name">
+                  <a class="pa-saved-lists__link" [routerLink]="path(list)">{{ list.name }}</a>
+                </h2>
+                <dl class="pa-saved-lists__facts">
+                  <dt>{{ 'criteria.saved.modified' | translate }}</dt>
+                  <dd>{{ date(list.modifiedAt) }}</dd>
+                  <dt>{{ 'criteria.saved.release' | translate }}</dt>
+                  <dd>{{ list.releaseVersion }}</dd>
+                </dl>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  }
+}
