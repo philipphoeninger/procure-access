@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type APIRequestContext, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { registerAccount } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
 import { signInThroughApi } from '../support/session';
@@ -34,19 +35,6 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
-/** Registers through the API with the probe's antiforgery token (S02 is tested in register.spec.ts). */
-async function registerAccount(request: APIRequestContext, address: string): Promise<void> {
-  expect((await request.get('/api/v1/auth/session')).ok()).toBe(true);
-  const token = (await request.storageState()).cookies.find((cookie) => cookie.name === 'XSRF-TOKEN')?.value;
-  expect(token, 'the probe issues XSRF-TOKEN').toBeTruthy();
-  const response = await request.post('/api/v1/auth/register', {
-    headers: { 'X-XSRF-TOKEN': token! },
-    data: { email: address, password: PASSWORD, privacyAcknowledged: true },
-  });
-  expect(response.status()).toBe(204);
-  await waitForMail(request, address);
-}
-
 async function openMembers(page: Page, email: string): Promise<void> {
   await signInThroughApi(page, email, TEST_USER_PASSWORD);
   await page.goto(membersPath(E2E_ORGANIZATION.id));
@@ -64,7 +52,7 @@ test.describe('S20 „Organisation anlegen oder beitreten“', () => {
   }, testInfo) => {
     const address = newAddress(testInfo);
     const name = `Stadt ${testInfo.project.name} ${Date.now()}`;
-    await registerAccount(request, address);
+    await registerAccount(request, address, PASSWORD);
     await signInThroughApi(page, address, PASSWORD);
 
     await page.goto('/organisation');

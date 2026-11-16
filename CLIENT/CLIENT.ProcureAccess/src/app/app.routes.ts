@@ -12,7 +12,7 @@ import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
-import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
+import { INVITATION_SEGMENT, MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -148,6 +148,13 @@ export const routes: Routes = [
       import('./features/organization/pages/organization-start/organization-start-page').then((m) => m.OrganizationStartPage),
     canActivate: [authGuard],
     data: { [PAGE_TITLE_KEY]: 'pageTitle.org.start' },
+  },
+  // The page of an invitation link (R-ORG-02, S5-17b): no sign-in needed; its guard takes the
+  // token out of the URL and its resolvers read the invitation (lazy child routes like the
+  // confirmation page)
+  {
+    path: `${ORGANIZATION_PATH}/${INVITATION_SEGMENT}`,
+    loadChildren: () => import('./features/organization/pages/invitation/invitation.routing').then((m) => m.INVITATION_ROUTES),
   },
   {
     path: `${ORGANIZATION_PATH}/:id/${MEMBERS_SEGMENT}`,

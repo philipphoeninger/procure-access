@@ -1,0 +1,98 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// „Mitglied einladen“ (Handoff §5.3: form card as on S20): one column, at most 40rem wide; the
+// action below the card, full width below 600 px and right-aligned from there.
+:host {
+  display: block;
+}
+
+.pa-invite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  max-inline-size: 40rem;
+}
+
+.pa-invite__title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.pa-invite__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-invite__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-invite__required {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-invite__role {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.pa-invite__legend {
+  padding: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-invite__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+}
+
+// The role on the first line, its hint below it (as the options of the role select on S21)
+.pa-invite__role-name,
+.pa-invite__role-hint {
+  display: block;
+}
+
+.pa-invite__role-hint {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.pa-invite__role-error {
+  margin: 0 0 0 var(--pa-space-xs);
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+.pa-invite__actions {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.pa-invite__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pa-space-xs);
+}

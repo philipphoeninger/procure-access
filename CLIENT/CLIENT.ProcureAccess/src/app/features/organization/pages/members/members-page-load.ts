@@ -5,11 +5,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { OrganizationMembers } from '../../models/organization';
+import { OrganizationMembers, PendingInvitation } from '../../models/organization';
+import { OrganizationApiService } from '../../services/api/organization-api.service';
 
-/** What S21 shows: the members, or the S80 page in place. */
+/** What S21 shows: the members with, for an Owner, the open invitations (else null), or the S80 page in place. */
 export type MembersPageView =
-  | { kind: 'members'; data: OrganizationMembers }
+  | { kind: 'members'; data: OrganizationMembers; invitations: PendingInvitation[] | null }
   | { kind: 'notFound' }
   | { kind: 'server' };
 
@@ -23,4 +24,20 @@ export class MembersPageLoad {
 export function failedView(error: unknown): MembersPageView {
   const status = error instanceof HttpErrorResponse ? error.status : 0;
   return status === 404 || status === 400 ? { kind: 'notFound' } : { kind: 'server' };
+}
+
+/**
+ * Reads the members and — when the user `ownId` is an Owner — the open invitations
+ * (SPEC §8.9; only Owners may read them, owner decision S5-17 D4 (a)); a failure gives the view of
+ * {@link failedView}.
+ */
+export async function loadMembersView(api: OrganizationApiService, organizationId: string, ownId: string | null): Promise<MembersPageView> {
+  try {
+    const data = await api.members(organizationId);
+    const owner = data.members.some((member) => member.userId === ownId && member.role === 'owner');
+    const invitations = owner ? await api.invitations(organizationId) : null;
+    return { kind: 'members', data, invitations };
+  } catch (error: unknown) {
+    return failedView(error);
+  }
 }
