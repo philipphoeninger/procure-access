@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-25b (client part of S5-25, 3 points for S5-25 in all) · **Issues:** #234 (TD-25 part done; the issue stays open for TD-26, S5-28)
 > **Requirements / invariants:** SPEC R-SET-01 (persistence), R-SET-02, §7.5, §8.12 (v2.43); **A11Y-06** `active` (TESTING_v83 V278); **A11Y-08** explicit-setting part `active` (V279); SEC-01 E2E storage inspection strict (V280); A11Y-05 E2E check (V282); ARCHITECTURE C161
-> **Status:** done — pull request open (2026-11-17)
+> **Status:** done — pull request #367 open (2026-11-17)
 > **Scope:** the client applies a signed-in user's settings and follows the system otherwise, without browser storage; the legacy settings store, its page `/settings` and the legacy `UICustomization` go; the fixes of the two CI findings of #362 (axe helper, J1). No S60: it comes with S5-26.
 > **Owner decisions (2026-11-16):** S5-25 **1a** — the legacy `UICustomization` removed (legacy migration, no data migrated, O-S5-4) · **2a** — the legacy settings page `/settings` with route, menu entries and `LEGACY_EXCEPTIONS` entries goes now; S5-26 adds the menu entry of `/einstellungen` · **3** — contrast `System` / `High`, `High` refused until H2 (S5-25a); **(i)** `.contrast-more` follows `prefers-contrast: more`, without the snackbar · **4** — the export shows the effective values (S5-25a) · **split (a)** · the axe-helper fix and the J1 download fix go into this task (both found in the CI of #362)
 
