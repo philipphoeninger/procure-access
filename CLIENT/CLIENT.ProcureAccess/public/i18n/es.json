@@ -105,13 +105,6 @@
     "CREATED_AT": "Creado el",
     "FINISHED_AT": "Finalizado el"
   },
-  "SETTINGS": {
-    "LABEL": "Configuración",
-    "CONTRAST_MODE": "Modo de contraste",
-    "DARK_MODE": "Modo oscuro",
-    "SAVED_AS_COOKIE": "Configuración guardada en una cookie",
-    "SAVED_PERMANENTLY": "Configuración guardada de forma permanente"
-  },
   "HOME": {
     "WELCOME_MSG": "Bienvenido de nuevo.",
     "FIND_A11Y_CTA": "Buscar accesibilidad",

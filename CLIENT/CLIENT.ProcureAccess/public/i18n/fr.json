@@ -105,13 +105,6 @@
     "CREATED_AT": "Créé le",
     "FINISHED_AT": "Terminé le"
   },
-  "SETTINGS": {
-    "LABEL": "Paramètres",
-    "CONTRAST_MODE": "Mode contraste",
-    "DARK_MODE": "Mode sombre",
-    "SAVED_AS_COOKIE": "Paramètres enregistrés sous forme de cookie",
-    "SAVED_PERMANENTLY": "Paramètres enregistrés de manière permanente"
-  },
   "HOME": {
     "WELCOME_MSG": "Bienvenue.",
     "FIND_A11Y_CTA": "Trouver accessibilité",

@@ -142,7 +142,6 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
       ...(await switchList.getByRole('button').all()),
       drawer.getByRole('link', { name: 'Konto' }),
       drawer.getByRole('link', { name: 'Organisation', exact: true }),
-      drawer.getByRole('link', { name: 'Einstellungen' }),
       drawer.getByRole('button', { name: 'Abmelden' }),
     ]) {
       await item.scrollIntoViewIfNeeded();

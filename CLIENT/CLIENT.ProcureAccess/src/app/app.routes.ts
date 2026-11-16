@@ -93,11 +93,6 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { [PAGE_TITLE_KEY]: 'pageTitle.account' },
   },
-  {
-    path: 'settings',
-    loadComponent: () => import('@features/settings/settings').then((m) => m.Settings),
-    data: { [PAGE_TITLE_KEY]: 'pageTitle.settings' },
-  },
   // S10 configurator (R-CON-01): start page and header link it; without an active catalog release
   // the guard opens the legacy /filters instead (O-S4-3). The page fills the step number of its title.
   {

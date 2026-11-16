@@ -15,6 +15,11 @@ export const REPORTED_TAGS = ['wcag22aa'] as const;
 export interface AxeCheckOptions {
   /** Replaces the central list; only for the helper's own tests. */
   readonly suppressions?: readonly AxeSuppression[];
+  /**
+   * The page shows a signed-in user's explicit appearance (A11Y-08, S5-25b), which does not follow
+   * `prefers-color-scheme`: one run, in the appearance of the page's `theme-*` class.
+   */
+  readonly explicitAppearance?: boolean;
 }
 
 interface Finding {
@@ -58,12 +63,22 @@ export async function expectNoAxeViolations(
   const suppressions = options.suppressions ?? axeSuppressions;
   validateAxeSuppressions(suppressions);
 
+  const failures: string[] = [];
+  if (options.explicitAppearance) {
+    const explicit = await explicitAppearanceOf(page);
+    await settled(page);
+    const blocking = await checkOneAppearance(page, testInfo, state, explicit, suppressions);
+    if (blocking.length > 0) failures.push(formatFailure(state, explicit, page.url(), blocking));
+    expect(failures, failures.join('\n')).toEqual([]);
+    return;
+  }
+
   const current = await shownAppearance(page);
   const other: Appearance = current === 'light' ? 'dark' : 'light';
 
-  const failures: string[] = [];
   for (const appearance of [current, other]) {
     if (appearance !== current) await showAppearance(page, appearance);
+    await settled(page);
     const blocking = await checkOneAppearance(page, testInfo, state, appearance, suppressions);
     if (blocking.length > 0) failures.push(formatFailure(state, appearance, page.url(), blocking));
   }
@@ -134,6 +149,28 @@ async function checkOneAppearance(
 async function shownAppearance(page: Page): Promise<Appearance> {
   const dark = await page.evaluate(() => matchMedia('(prefers-color-scheme: dark)').matches);
   return dark ? 'dark' : 'light';
+}
+
+/** The appearance of the page's `theme-*` class, which an explicit setting decides. */
+async function explicitAppearanceOf(page: Page): Promise<Appearance> {
+  const dark = await page.evaluate(() => document.documentElement.classList.contains('theme-dark'));
+  return dark ? 'dark' : 'light';
+}
+
+/**
+ * Waits until every running CSS animation and transition that ends has ended (two frames first,
+ * so those just started are counted), so axe never measures a colour halfway — e.g. a dialog
+ * still fading in (S5-24's S15 check failed so in CI, S5-25b). Infinite ones such as spinners
+ * are left running.
+ */
+async function settled(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const ending = document
+      .getAnimations()
+      .filter((animation) => animation.playState === 'running' && animation.effect?.getComputedTiming().endTime !== Infinity);
+    await Promise.all(ending.map((animation) => animation.finished.catch(() => undefined)));
+  });
 }
 
 /**

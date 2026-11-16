@@ -48,10 +48,9 @@ public class MappingCompletenessTests
     public void MapCases_AllMappingMethods_AreListed()
     {
         // Every public map method and query projection of the mapping classes has a case, so a new
-        // map cannot skip the check above. ToLanguage/ToLanguageCode map values, not objects.
+        // map cannot skip the check above.
         var methods = new[] { typeof(CatalogMappings), typeof(AccountMappings) }
             .SelectMany(type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-            .Where(method => method.Name is not (nameof(AccountMappings.ToLanguage) or nameof(AccountMappings.ToLanguageCode)))
             .Select(method => $"{method.GetParameters()[0].ParameterType.Name} → {method.ReturnType.Name}");
         var projections = typeof(CatalogMappings).GetFields(BindingFlags.Public | BindingFlags.Static)
             .Select(field => field.FieldType.GetGenericArguments()[0].GetGenericArguments())
@@ -59,21 +58,6 @@ public class MappingCompletenessTests
         var listed = MapCases.All.Select(map => map.Name).ToHashSet();
 
         methods.Concat(projections).Where(name => !listed.Contains(name)).ShouldBeEmpty();
-    }
-
-    [Theory]
-    [InlineData("en", MODELS.ProcureAccess.Entities.Language.English)]
-    [InlineData("DE", MODELS.ProcureAccess.Entities.Language.German)]
-    [InlineData("es", MODELS.ProcureAccess.Entities.Language.Spanish)]
-    [InlineData("fr", MODELS.ProcureAccess.Entities.Language.French)]
-    [InlineData("xx", MODELS.ProcureAccess.Entities.Language.German)]
-    [InlineData(null, MODELS.ProcureAccess.Entities.Language.German)]
-    public void LanguageCode_Mapped_GivesLanguageAndBack(string? code, MODELS.ProcureAccess.Entities.Language expected)
-    {
-        var language = code.ToLanguage();
-
-        language.ShouldBe(expected);
-        language.ToLanguageCode().ShouldBe(code is "en" or "es" or "fr" ? code : "de");
     }
 
     private static object Fill(Type type) =>

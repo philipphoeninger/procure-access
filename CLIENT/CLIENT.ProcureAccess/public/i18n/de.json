@@ -102,13 +102,6 @@
     "CREATED_AT": "Erstellt am",
     "FINISHED_AT": "Abgeschlossen am"
   },
-  "SETTINGS": {
-    "LABEL": "Einstellungen",
-    "CONTRAST_MODE": "Kontrastmodus:",
-    "DARK_MODE": "Dunkelmodus:",
-    "SAVED_AS_COOKIE": "Einstellungen als Cookie gespeichert",
-    "SAVED_PERMANENTLY": "Einstellungen dauerhaft gespeichert"
-  },
   "ERROR": {
     "GENERIC": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support."
   },

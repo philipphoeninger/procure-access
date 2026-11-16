@@ -4,7 +4,6 @@
 
 import 'reflect-metadata';
 import { jsonObject, jsonMember } from 'typedjson';
-import { UICustomization } from '@app/features/settings/models/uiCustomization.model';
 
 @jsonObject
 export class User {
@@ -14,16 +13,12 @@ export class User {
   @jsonMember
   email: string;
 
-  @jsonMember
-  uiCustomization: UICustomization;
-
   // @jsonMember
   // twoFAEnabled: boolean;
 
-  constructor(pId: string, pEmail: string, pUICustomization: UICustomization) {
+  constructor(pId: string, pEmail: string) {
     this.id = pId;
     this.email = pEmail;
-    this.uiCustomization = pUICustomization;
     // this.twoFAEnabled = pTwoFAEnabled;
   }
 }

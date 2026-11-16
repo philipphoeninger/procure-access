@@ -41,7 +41,6 @@ public static class MapCases
             [.. ServerSetMembers, nameof(Criterion.CriteriaFilter), nameof(Criterion.Proposal)]),
         Case<Proposal, ProposalDto>("Proposal → ProposalDto", proposal => proposal.ToDto()),
         Case<User, UserDto>("User → UserDto", user => user.ToDto()),
-        Case<UICustomization, UICustomizationDto>("UICustomization → UICustomizationDto", settings => settings.ToDto()),
     ];
 
     public static TheoryData<MapCase> Theory() => [.. All];

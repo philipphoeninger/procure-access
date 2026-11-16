@@ -58,6 +58,7 @@ class FakeMediaQueryList {
 
 export const DARK_SCHEME = '(prefers-color-scheme: dark)';
 export const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+export const MORE_CONTRAST = '(prefers-contrast: more)';
 
 export function provideFakeMediaMatcher(matcher: FakeMediaMatcher): Provider {
   return { provide: MediaMatcher, useValue: matcher };

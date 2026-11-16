@@ -21,12 +21,5 @@ public class User : IdentityUser
     /// (SPEC §8.4 <c>account.createdAt</c>; owner decision S5-27 2a).
     /// </summary>
     public DateTimeOffset? CreatedAt { get; set; }
-
-    private UICustomization _uiCustomization = new();
-    public UICustomization UICustomization
-    {
-        get => _uiCustomization;
-        set => _uiCustomization = value ?? new UICustomization();
-    }
     #endregion
 }

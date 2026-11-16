@@ -58,19 +58,7 @@ const LEGACY_EXCEPTIONS = {
     '@typescript-eslint/no-unsafe-assignment',
     '@typescript-eslint/no-unsafe-return',
   ],
-  'src/app/features/settings/services/settings-api.service.ts': [
-    '@angular-eslint/prefer-inject',
-  ],
-  'src/app/features/settings/settings.ts': [
-    '@typescript-eslint/no-floating-promises',
-  ],
-  'src/app/features/settings/state/with-settings.ts': [
-    '@typescript-eslint/no-unsafe-argument',
-  ],
   // M5 — proposal workflow retired, withProducts / withFavorites reworked (M5.6); the store root loads them
-  'src/app/core/state/app.store.ts': [
-    '@typescript-eslint/no-floating-promises',
-  ],
   'src/app/features/criteria/proposal/criterion-proposal.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-floating-promises',
