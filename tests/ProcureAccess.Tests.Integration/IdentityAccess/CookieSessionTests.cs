@@ -96,7 +96,7 @@ public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
     {
         using var client = CreateClient(Host);
 
-        using var response = await client.PostAsync("/api/Users/revoke-sessions", content: null, TestContext.Current.CancellationToken);
+        using var response = await client.DeleteAsync("/api/Users", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         response.Headers.Location.ShouldBeNull();

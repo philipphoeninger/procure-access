@@ -95,12 +95,13 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
         var cancellationToken = TestContext.Current.CancellationToken;
         using var client = CreateClient(TestUsers.Member);
 
-        // A missing required property: the key is the property's JSON name, not the C# name "NewEmail".
+        // A missing required property: the key is the JSON path "product.name", not the C# path
+        // "Product.Name" (the legacy change-email of S2-10 went with S5-10).
         using var missing = await client.PostAsync(
-            "/api/Users/change-email", Json("{}"), cancellationToken);
+            "/api/Proposals/upsert", Json("""{"product":{}}"""), cancellationToken);
         var missingProblem = await ProblemResponse.ReadAsync(missing, cancellationToken);
         missingProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
-        missingProblem.ErrorKeys.ShouldContain("newEmail");
+        missingProblem.ErrorKeys.ShouldContain("product.name");
 
         // A value of the wrong type: the key is the path in the payload, without the JSON-path root "$.".
         using var wrongType = await client.PutAsync(

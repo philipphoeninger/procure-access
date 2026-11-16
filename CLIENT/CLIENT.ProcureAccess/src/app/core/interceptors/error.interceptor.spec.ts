@@ -110,10 +110,10 @@ describe('errorInterceptor', () => {
     );
   });
 
-  it('still maps the codes of the legacy identity endpoints', async () => {
-    await failWith({ code: 'UserNotFound' });
+  it('shows the general notice for a legacy `{ code, message }` body (none left since S5-10)', async () => {
+    await failWith({ code: 'UserNotFound', message: [] });
 
-    expect(snackbar.showError).toHaveBeenCalledWith(TestBed.inject(TranslateService).instant('ERROR.USER_NOT_FOUND'));
+    expect(snackbar.showError).toHaveBeenCalledWith(TestBed.inject(TranslateService).instant('ERROR.GENERIC'));
   });
 
   describe('system states (Handoff §6.5)', () => {

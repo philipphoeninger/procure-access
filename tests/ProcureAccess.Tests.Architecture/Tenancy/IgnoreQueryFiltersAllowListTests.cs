@@ -52,11 +52,11 @@ public class IgnoreQueryFiltersAllowListTests
         ["src/ProcureAccess.Modules.IdentityAccess/Organizations/TestOrganizationSeeder.cs"] = 1,
         // Legacy: the generic repositories bypass the legacy context's own filters (soft delete)
         // and offer raw SQL (ExecuteSqlRaw, FromSqlRaw; two calls each with IgnoreQueryFilters).
+        // UserRepo's call went with its unused RestoreUserAsync (S5-10).
         // The legacy context has no organisation-scoped entity (TEN-01 finds none), so these touch
         // no organisation filter; they go with the legacy repositories in their migration steps.
         ["DAL/DAL.ProcureAccess/Repos/Base/BaseRepo.cs"] = 2,
         ["DAL/DAL.ProcureAccess/Repos/Base/BaseViewRepo.cs"] = 2,
-        ["DAL/DAL.ProcureAccess/Repos/UserRepo.cs"] = 1,
     };
 
     [Fact(DisplayName = "INV:TEN-02 " + nameof(IgnoreQueryFilters_ProductionSources_OnlyAtAllowListedCallSites))]

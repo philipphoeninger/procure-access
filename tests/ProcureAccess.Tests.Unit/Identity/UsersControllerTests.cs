@@ -8,53 +8,53 @@ using DAL.ProcureAccess.Repos.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MODELS.ProcureAccess.Entities;
-using MODELS.ProcureAccess.Entities.Identity;
 using NSubstitute;
-using SERVICES.ProcureAccess.Logging.Interfaces;
 using Shouldly;
 using Xunit;
 
 namespace ProcureAccess.Tests.Unit.Identity;
 
 /// <summary>
-/// A principal that passes <c>[Authorize]</c> but carries no user id counts as not signed in
-/// (S4-03, #205): the action answers 401 and never reaches the repository with a null id.
+/// The legacy account deletion <c>DELETE /api/Users</c>: a principal that passes <c>[Authorize]</c>
+/// but carries no user id counts as not signed in (S4-03, #205); a failure other than a missing user
+/// throws, so the exception handler answers 500 Problem Details without the error text, never the
+/// legacy <c>{ code, message }</c> body (S5-10, API-01). The 404 of a missing user runs through the
+/// real pipeline in <c>UsersControllerAuthorizationTests</c>.
 /// </summary>
 public sealed class UsersControllerTests
 {
     private readonly IUserRepo _repo = Substitute.For<IUserRepo>();
 
-    [Theory]
-    [InlineData("change-email")]
-    [InlineData("change-password")]
-    [InlineData("revoke-sessions")]
-    [InlineData("delete")]
-    public async Task AccountAction_SignedInWithoutUserId_Returns401AndSkipsRepository(string action)
+    [Fact]
+    public async Task DeleteUser_SignedInWithoutUserId_Returns401AndSkipsRepository()
     {
         var controller = Controller(new ClaimsPrincipal(new ClaimsIdentity(
             [new Claim(ClaimTypes.Email, "no-id@example.test")], authenticationType: "Test")));
 
-        var result = action switch
-        {
-            "change-email" => await controller.ChangeEmailAsync(new ChangeEmailRequest { NewEmail = "new@example.test" }),
-            "change-password" => await controller.ChangePasswordAsync(
-                new ChangePasswordRequest { CurrentPassword = "Old-Pass1", NewPassword = "New-Pass1" }),
-            "revoke-sessions" => await controller.RevokeSessionsAsync(),
-            "delete" => await controller.DeleteUserAsync(),
-            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
-        };
+        var result = await controller.DeleteUserAsync();
 
         result.ShouldBeOfType<UnauthorizedResult>();
         _repo.ReceivedCalls().ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task DeleteUser_OtherFailure_ThrowsForThe500Problem()
+    {
+        _repo.DeleteUserAsync("user-1").Returns(IdentityResult.Failed(
+            new IdentityError { Code = "ConcurrencyFailure", Description = "Optimistic concurrency failure." }));
+
+        var failure = await Should.ThrowAsync<InvalidOperationException>(
+            () => Controller(SignedIn("user-1")).DeleteUserAsync());
+
+        failure.Message.ShouldContain("ConcurrencyFailure");
+        failure.Message.ShouldNotContain("Optimistic concurrency failure.");
+    }
+
+    private static ClaimsPrincipal SignedIn(string userId) =>
+        new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId)], authenticationType: "Test"));
+
     private UsersController Controller(ClaimsPrincipal user) =>
-        new(
-            Substitute.For<IAppLogging<UsersController>>(),
-            Substitute.For<IHttpContextAccessor>(),
-            _repo,
-            Substitute.For<UserManager<User>>(Substitute.For<IUserStore<User>>(), null, null, null, null, null, null, null, null))
+        new(_repo)
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } },
         };
