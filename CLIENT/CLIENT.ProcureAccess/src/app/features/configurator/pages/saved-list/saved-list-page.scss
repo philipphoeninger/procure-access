@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-// A saved list, read only (S5-20b): the layout of S11 (Handoff §5.1) without its controls.
+// A saved list (S5-20b, S5-21b): the layout of S11 (Handoff §5.1); the action bar is `pa-criteria-action-bar`.
 :host {
   display: flex;
   flex-direction: column;
@@ -21,9 +21,26 @@
   }
 }
 
-.pa-saved-list__counts,
-.pa-saved-list__empty {
+.pa-saved-list__counts {
   margin: 0;
+}
+
+// Empty states (Handoff §6.2): text and one action, left-aligned.
+.pa-saved-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  margin: 0;
+
+  p {
+    margin: 0;
+  }
+}
+
+// The notices hold paragraphs and, for an older release, the button of the copy.
+pa-notice p:not(:last-child) {
+  margin: 0 0 var(--pa-space-sm);
 }
 
 .pa-saved-list__items {

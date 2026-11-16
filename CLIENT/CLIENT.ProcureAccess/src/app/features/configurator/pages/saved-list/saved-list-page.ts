@@ -2,44 +2,95 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { skip } from 'rxjs';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { Notice } from '@app/shared/components/notice/notice';
-import { TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
+import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
+import { CriteriaActionBar } from '../../components/criteria-action-bar/criteria-action-bar';
+import { CriteriaListFilterRow } from '../../components/criteria-list-filter/criteria-list-filter';
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
+import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
+import { PriorityLevel } from '../../models/criteria';
+import { CriteriaListFilter } from '../../models/criteria-list';
+import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '../../models/saved-lists';
+import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { catalogNames } from '../../state/catalog-names';
-import { decisionOf, levelCounts } from '../../state/criteria-list-rules';
+import { decisionOf, filterCriteria, includedCount, levelCounts } from '../../state/criteria-list-rules';
 import { selectionNames } from '../../state/selection-names';
-import { SavedListLoad, SavedListView } from './saved-list-load';
+import { CRITERIA_SEARCH_DEBOUNCE_MS } from '../../state/with-configurator';
+import { SavedListEditor } from './saved-list-editor';
+import { SavedListArrival, SavedListLoad, SavedListNavigationState, SavedListView } from './saved-list-load';
+
+/** Handoff §3.4: counters are announced at most once per second, the newest count wins. */
+const RESULTS_THROTTLE_MS = 1000;
+const RESULTS_KEY = 'common.results.shown';
+const STATUS_KEY = 'criteria.list.status.count';
 
 /**
- * A saved list at `/kriterienlisten/:id` — S11 read only (R-SAV-02: „opening a list shows S11 with
- * its name as H1“; owner decision S5-20 5a: read only until S5-21 makes it editable). Reached from
- * S14 and after saving (S12, owner decision S5-20 4a).
+ * A saved list at `/kriterienlisten/:id` — S11 of a list of the organisation (R-SAV-02, R-SAV-03,
+ * R-LST-14). Reached from S14, after saving (S12), after „Auswahl ändern“ and after „Neue Liste mit
+ * derselben Auswahl“. Shows the list under its own release (CAT-06): H1 the list name, the summary,
+ * the priority note, the counts, the filter row (R-LST-06) and one `pa-criterion-card` per criterion.
  *
- * As S11, from its own release (CAT-06): H1 the list name, the summary of the selection, the
- * priority note, the counts by the level that applies, and one `pa-criterion-card` per criterion in
- * catalog order with `readonly` — the stored decision without checkbox, menu or note field; an
- * excluded criterion keeps „Nicht in Ihrer Liste“. No filter row, no „Auswahl ändern“, no action bar
- * (as the shared list S16 will be, R-SAV-05). The draft of S10/S11 is not touched.
+ * **Editor and Owner** of the list's organisation change it here (S5-21b): the cards decide as on
+ * S11, and {@link SavedListEditor} saves each change right away (owner decision S5-21b 1a). Below
+ * the H1, as on S11 (Figma `2020:70`), „Auswahl ändern“ opens S10 at `/kriterienlisten/:id/auswahl`
+ * (owner decision S5-21b 2a), not for a list of an older release (owner decision S5-21 5a); the
+ * action bar has the counter and „Liste exportieren“.
+ * On a list of an older release the notice `criteria.list.olderRelease` offers „Neue Liste mit
+ * derselben Auswahl“, which copies the list to the active release and opens the copy with its
+ * report (R-LST-14, CAT-22).
+ *
+ * **Readers** see the cards read only, the filter row and an action bar with „Liste exportieren“
+ * only (owner decision S5-21b 6a), and no older-release notice (owner decision S5-21b 5b).
+ *
+ * A report handed in the navigation state (`SavedListArrival`) shows once as an info notice and is
+ * announced: the copy (`criteria.list.copy.*`) or the decisions a selection change dropped
+ * (`criteria.list.selectionChanged.dropped`, owner decision S5-21 4a).
  *
  * The resolver loads the list, so the title „{{name}} – Gespeicherte Kriterienlisten“ is known at
  * the route change; a list that does not exist for the user shows „Seite nicht gefunden“ in place.
  *
- * @spec docs/SPEC_v2.md R-SAV-02, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
- * @invariants CAT-02, CAT-06, TEN-01, A11Y-09
+ * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
+ * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-LST-06, R-LST-10, R-LST-14, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
+ * @invariants CAT-02, CAT-06, CAT-22, TEN-01, A11Y-09
  */
 @Component({
   selector: 'pa-saved-list-page',
-  imports: [CriteriaListSummary, CriterionCard, ErrorPage, Notice, TranslatePipe, TranslatePluralPipe],
+  imports: [
+    CriteriaActionBar,
+    CriteriaListFilterRow,
+    CriteriaListSummary,
+    CriterionCard,
+    ErrorPage,
+    MatButtonModule,
+    Notice,
+    RouterLink,
+    TranslatePipe,
+    TranslatePluralPipe,
+  ],
   templateUrl: './saved-list-page.html',
   styleUrl: './saved-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,8 +98,16 @@ import { SavedListLoad, SavedListView } from './saved-list-load';
 export class SavedListPage {
   private readonly load = inject(SavedListLoad);
   private readonly pageTitle = inject(PageTitleStrategy);
+  private readonly store = inject(ProcureAccessStore);
+  private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly api = inject(ConfiguratorApiService);
+  private readonly announcer = inject(A11yAnnouncerService);
+  private readonly translate = inject(TranslateService);
+  private readonly filterRow = viewChild(CriteriaListFilterRow);
+  protected readonly editor = inject(SavedListEditor);
 
-  protected readonly view = signal<SavedListView>(this.load.view);
+  protected readonly view = signal<SavedListView>({ kind: 'notFound' });
   protected readonly shown = computed(() => {
     const view = this.view();
     return view.kind === 'list' ? view : null;
@@ -58,17 +117,59 @@ export class SavedListPage {
     const shown = this.shown();
     return shown === null ? null : selectionNames(shown.selection, shown.options);
   });
-  protected readonly counts = computed(() => {
+  private readonly criteria = computed(() => this.shown()?.criteria.criteria ?? []);
+  protected readonly decisions = this.editor.decisions;
+  protected readonly counts = computed(() => levelCounts(this.criteria(), this.decisions()));
+  protected readonly included = computed(() => includedCount(this.criteria(), this.decisions()));
+
+  /** Editor or Owner of the list's organisation (the header may show another one). */
+  protected readonly canEdit = computed(() => {
+    const organizationId = this.shown()?.list.organizationId;
+    const role = this.store.organizations().find((organization) => organization.id === organizationId)?.role;
+    return role === 'owner' || role === 'editor';
+  });
+  /** The list is on an older release than the active one (R-LST-14); only Editor and Owner see it (S5-21b 5b). */
+  protected readonly olderRelease = computed(() => {
     const shown = this.shown();
-    return levelCounts(shown?.criteria.criteria ?? [], shown?.decisions ?? {});
+    return shown !== null && shown.activeRelease !== null && shown.activeRelease !== shown.list.releaseVersion;
+  });
+  protected readonly changeSelectionPath = computed(() => {
+    const id = this.shown()?.list.id;
+    return id === undefined ? null : savedListSelectionPath(id);
   });
 
+  protected readonly searchInput = signal('');
+  private readonly query = signal('');
+  protected readonly levels = signal<PriorityLevel[]>([]);
+  protected readonly onlyIncluded = signal(false);
+  private readonly filter = computed<CriteriaListFilter>(() => ({
+    query: this.query(),
+    levels: this.levels(),
+    onlyIncluded: this.onlyIncluded(),
+  }));
+  protected readonly visible = computed(() => filterCriteria(this.criteria(), this.decisions(), this.filter()));
+
+  protected readonly arrival = signal<SavedListArrival | null>(null);
+  protected readonly copying = signal(false);
+
+  private searchTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The filter the last announcement counted; a change by the user announces the cards shown. */
+  private announcedFilter: CriteriaListFilter | undefined;
+  private countedView: SavedListView | null = null;
+  private countedIncluded = 0;
+
   constructor() {
-    // Angular keeps the page when only the id changes (a link from one list to another): take the
-    // view the resolver loaded again.
+    this.show();
+    // Angular keeps the page when only the id changes (a link from one list to another, a copy):
+    // take the view the resolver loaded again.
     inject(ActivatedRoute)
       .paramMap.pipe(skip(1), takeUntilDestroyed())
-      .subscribe(() => this.view.set(this.load.view));
+      .subscribe(() => this.show());
+
+    inject(DestroyRef).onDestroy(() => {
+      clearTimeout(this.searchTimer);
+      this.editor.flush();
+    });
 
     // The route change clears the title state; the name is known from the resolver.
     effect(() => {
@@ -77,9 +178,145 @@ export class SavedListPage {
         this.pageTitle.setPageTitleState({ params: { name } });
       }
     });
+
+    effect(() => {
+      const filter = this.filter();
+      untracked(() => {
+        const changed = this.announcedFilter !== undefined && filter !== this.announcedFilter;
+        this.announcedFilter = filter;
+        if (changed) this.announceResults();
+      });
+    });
+
+    // The live counter (Handoff §5.1): only an include or exclude by the user is announced.
+    effect(() => {
+      const view = this.view();
+      const included = this.included();
+      untracked(() => {
+        const changed = view === this.countedView && included !== this.countedIncluded;
+        this.countedView = view;
+        this.countedIncluded = included;
+        if (changed) {
+          void this.announcer.announce(
+            STATUS_KEY,
+            { included, total: this.criteria().length },
+            { throttleMs: RESULTS_THROTTLE_MS },
+          );
+        }
+      });
+    });
   }
 
   protected decision(key: string) {
-    return decisionOf(this.shown()?.decisions ?? {}, key);
+    return decisionOf(this.decisions(), key);
+  }
+
+  protected search(text: string): void {
+    this.searchInput.set(text);
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => this.query.set(text), CRITERIA_SEARCH_DEBOUNCE_MS);
+  }
+
+  /** „Filter zurücksetzen“: the button goes with the empty state, so the focus goes to the search. */
+  protected resetFilter(): void {
+    clearTimeout(this.searchTimer);
+    this.searchInput.set('');
+    this.query.set('');
+    this.levels.set([]);
+    this.onlyIncluded.set(false);
+    this.filterRow()?.focusSearch();
+  }
+
+  /** „Liste exportieren“: S13 for the stored list (R-LST-12), once every change is saved. */
+  protected async openExport(): Promise<void> {
+    await this.editor.settled();
+    const shown = this.shown();
+    if (shown === null) return;
+    ExportDialog.open(this.dialog, {
+      listId: shown.list.id,
+      release: shown.list.releaseVersion,
+      included: this.included(),
+    });
+  }
+
+  /**
+   * „Neue Liste mit derselben Auswahl“ (R-LST-14, CAT-22): the copy on the active release opens with
+   * its report. A failure leaves the page as it is; the error interceptor shows it.
+   */
+  protected async copyToActiveRelease(): Promise<void> {
+    const shown = this.shown();
+    if (shown === null || this.copying()) return;
+    this.copying.set(true);
+    try {
+      await this.editor.settled();
+      const copy = await this.api.copyToActiveRelease(shown.list.id);
+      const state: SavedListNavigationState = {
+        savedListArrival: {
+          kind: 'copied',
+          releaseVersion: copy.releaseVersion,
+          droppedValues: copy.droppedValues,
+          notCarried: copy.notCarried,
+        },
+      };
+      await this.router.navigateByUrl(savedListPath(copy.id), { state });
+    } catch {
+      // Shown by the error interceptor.
+    } finally {
+      this.copying.set(false);
+    }
+  }
+
+  /** The criteria of a report, joined with commas: number and title, or the title alone. */
+  protected criteriaOf(criteria: readonly SavedListCriterionName[]): string {
+    return criteria.map((criterion) => (criterion.number ? `${criterion.number} ${criterion.title}` : criterion.title)).join(', ');
+  }
+
+  private show(): void {
+    clearTimeout(this.searchTimer);
+    this.searchInput.set('');
+    this.query.set('');
+    this.levels.set([]);
+    this.onlyIncluded.set(false);
+    this.announcedFilter = undefined;
+    const view = this.load.view;
+    if (view.kind === 'list') {
+      this.editor.start(view.list.id, view.criteria.criteria, view.decisions);
+    }
+    this.view.set(view);
+    const state = this.router.currentNavigation()?.extras.state as SavedListNavigationState | undefined;
+    const arrival = view.kind === 'list' ? (state?.savedListArrival ?? null) : null;
+    this.arrival.set(arrival);
+    if (arrival !== null) void this.announceArrival(arrival);
+  }
+
+  private async announceArrival(arrival: SavedListArrival): Promise<void> {
+    if (arrival.kind === 'copied') {
+      await this.announcer.announce('criteria.list.copy.done', { release: arrival.releaseVersion });
+      if (arrival.droppedValues.length > 0) {
+        await this.announcer.announce('criteria.list.copy.dropped', { values: arrival.droppedValues.join(', ') });
+      }
+      if (arrival.notCarried.length > 0) {
+        const count = arrival.notCarried.length;
+        await this.announcer.announce(pluralKey(this.translate, 'criteria.list.copy.notCarried', count), {
+          count,
+          criteria: this.criteriaOf(arrival.notCarried),
+        });
+      }
+    } else if (arrival.droppedDecisions.length > 0) {
+      const count = arrival.droppedDecisions.length;
+      await this.announcer.announce(pluralKey(this.translate, 'criteria.list.selectionChanged.dropped', count), {
+        count,
+        criteria: this.criteriaOf(arrival.droppedDecisions),
+      });
+    }
+  }
+
+  private announceResults(): void {
+    const count = this.visible().length;
+    void this.announcer.announce(
+      pluralKey(this.translate, RESULTS_KEY, count),
+      { count },
+      { throttleMs: RESULTS_THROTTLE_MS, throttleKey: RESULTS_KEY },
+    );
   }
 }

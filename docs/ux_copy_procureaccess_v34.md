@@ -1,7 +1,7 @@
 # UX-Copy ProcureAccess (Projekt WERTE.IT)
 
-> **Status:** v32 (16. November 2026) – v32 ergänzt die Kopfzeile im angemeldeten Zustand (Sprint 05, S5-18, U138–U139; vom Product Owner bestätigt am 16. November 2026): den Eintrag „Organisation“ im Menü „Konto“ und die Form der Organisationsauswahl bei mehreren Mitgliedschaften. v31 (15. November 2026) – v31 ergänzt die Texte der Einladungen (Sprint 05, S5-17b, U133–U137; Entwurf, Bestätigung durch den Product Owner im Review): auf „Mitglieder“ S21 das Formular „Mitglied einladen“ mit der Rollenwahl, den Hinweis auf eine Adresse, die schon zu einem Mitglied gehört, die Liste „Offene Einladungen“ und die Ansage nach dem Zurücknehmen, sowie die Seite des Einladungslinks (`/organisation/einladung`) mit H1, Seitentiteln, dem Hinweis für Abgemeldete und der Ansage nach dem Annehmen. v30 (15. November 2026; vom Product Owner bestätigt am 15. November 2026) – v30 ergänzt die Texte von „Organisation anlegen“ S20 und „Mitglieder“ S21, die §5.7 noch fehlten: Seitentitel, Spaltenköpfe der Mitgliederliste, Name der Rollenauswahl, Kennzeichen der eigenen Zeile und eines gelöschten Kontos, die Ansagen nach Rollenänderung, Entfernen und Verlassen, den Bestätigungsdialog „Mitglied entfernen?“ und die Dialoge zum Verlassen (Sprint 05, S5-16b, U125–U132). v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
-> **Aktuelle Fassungen der zugehörigen Dokumente (v32):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.31), `ARCHITECTURE_v63.md`, `TESTING_v71.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.25), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
+> **Status:** v34 (16. November 2026) – v34 ergänzt die Texte zum Bearbeiten einer gespeicherten Kriterienliste (Sprint 05, S5-21b, U145–U147; vom Product Owner bestätigt am 16. November 2026, Entscheidungen S5-21b 3a und 4a): den Hinweis auf die Änderungen, die nach „Auswahl ändern“ entfallen, „Geändert“ statt „Von Ihnen geändert“ in der Prioritätsanzeige und einen genaueren Grund in `criteria.list.copy.notCarried`. v33 (16. November 2026) – v33 ergänzt die Texte zum Speichern und zu den gespeicherten Kriterienlisten (Sprint 05, S5-20b, U140–U144; **Entwurf**, Bestätigung durch den Product Owner im Review): den Eintrag „Kriterienlisten“ im Menü „Konto“, Sortierung und Angaben der Liste „Gespeicherte Kriterienlisten“ S14 und die Fehlerhinweise des Dialogs „Kriterienliste speichern“ S12. v32 (16. November 2026) – v32 ergänzt die Kopfzeile im angemeldeten Zustand (Sprint 05, S5-18, U138–U139; vom Product Owner bestätigt am 16. November 2026): den Eintrag „Organisation“ im Menü „Konto“ und die Form der Organisationsauswahl bei mehreren Mitgliedschaften. v31 (15. November 2026) – v31 ergänzt die Texte der Einladungen (Sprint 05, S5-17b, U133–U137; Entwurf, Bestätigung durch den Product Owner im Review): auf „Mitglieder“ S21 das Formular „Mitglied einladen“ mit der Rollenwahl, den Hinweis auf eine Adresse, die schon zu einem Mitglied gehört, die Liste „Offene Einladungen“ und die Ansage nach dem Zurücknehmen, sowie die Seite des Einladungslinks (`/organisation/einladung`) mit H1, Seitentiteln, dem Hinweis für Abgemeldete und der Ansage nach dem Annehmen. v30 (15. November 2026; vom Product Owner bestätigt am 15. November 2026) – v30 ergänzt die Texte von „Organisation anlegen“ S20 und „Mitglieder“ S21, die §5.7 noch fehlten: Seitentitel, Spaltenköpfe der Mitgliederliste, Name der Rollenauswahl, Kennzeichen der eigenen Zeile und eines gelöschten Kontos, die Ansagen nach Rollenänderung, Entfernen und Verlassen, den Bestätigungsdialog „Mitglied entfernen?“ und die Dialoge zum Verlassen (Sprint 05, S5-16b, U125–U132). v29 (14. November 2026) – v29 ergänzt die Texte von „Passwort zurücksetzen“ S03 (Seitentitel, Button des zweiten Schritts, Überschrift und Link nach dem Ändern, Seite „Link nicht mehr gültig“ mit „Neuen Link anfordern“), die Route `/passwort/neu` und den festen Hinweis auf die Sperre nach Fehlversuchen auf S01 statt `auth.login.locked` (Sprint 05, S5-13b, U120–U124). v28 (14. November 2026) ergänzte die Texte der Registrierung S02 und der Bestätigungsseiten (Überschrift der Erfolgsmeldung, Fehler der Datenschutz-Bestätigung, `errors.field.minLength`, die H1 und Seitentitel von `auth.confirm.done|invalid`, `pageTitle.register`), die Route der Bestätigungsseite und die Gültigkeit des Bestätigungslinks als Platzhalter `{{hours}}` in `email.confirm.body` und den Problemtyp `email-delivery` in §6.3 (Sprint 05, S5-12a, U113–U119). v27 (14. November 2026) ergänzte den Seitentitel der Anmeldeseite S01, `pageTitle.login` „Anmelden“ (§5.16; Sprint 05, S5-09, U112). v26 (12. November 2026) änderte nur die Anmerkung zu `exportFile.column.shortDescription`: Die Spalte liest jetzt das neue Katalogfeld (Sprint 04, S4-24, U111); kein angezeigter Text ändert sich. v25 (12. November 2026) ergänzte die Einzahl von `errors.rateLimit` („1 Minute“, §6; Sprint 04, S4-21b, U110).
+> **Aktuelle Fassungen der zugehörigen Dokumente (v34):** `prd_procureaccess_werteit_v5.md`, `SPEC_v2.md` (v2.38), `ARCHITECTURE_v70.md`, `TESTING_v78.md`, `design_handoff_procureaccess_v1.md` (1.25), `figma_code_mapping_procureaccess_v1.md` (1.25), `kriterienkatalog_bit_inklusiv_v1.md` (1.5). Die Liste „Grundlage“ darunter nennt die Fassungen, auf denen v14 aufbaut.
 > **Grundlage (v14):**
 > - `prd_procureaccess_werteit_v5.md` (Produktumfang, Personas)
 > - `ARCHITECTURE_v12.md` (Abläufe A–E, Domänenmodell, UI-Regel §8.4, offene Punkte §16.5)
@@ -15,6 +15,28 @@
 > **Nicht im Umfang dieser Fassung:** Moderation (P1: Eintrag melden, Stellungnahme), Upload von Konformitätsberichten (P1). Beide werden ergänzt, wenn der jeweilige Migrationsschritt ansteht.
 
 ---
+
+### Änderungen gegenüber v33
+
+Quelle: Aufgabe S5-21b (gespeicherte Kriterienliste bearbeiten, löschen, exportieren, auf die neue Katalogversion übertragen; Serverteil S5-21a; Entscheidungen S5-21 4a, 8b und S5-21b 3a, 4a vom 16. November 2026, alle vom Product Owner bestätigt).
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U145 | **Entfallene Änderungen nach „Auswahl ändern“:** neu `criteria.list.selectionChanged.dropped` „Ihre Änderungen an {{count}} Kriterien wurden entfernt, weil diese Kriterien nicht mehr zu Ihrer Auswahl gehören: {{criteria}}.“ und `.one` „Ihre Änderung an 1 Kriterium wurde entfernt, weil es nicht mehr zu Ihrer Auswahl gehört: {{criteria}}.“ (§5.5) | Hinweis (`pa-notice` Info) auf der gespeicherten Liste nach der neuen Auswahl und Ansage; nur wenn zutreffend; Kriterien als Nummer und Titel, mit Komma | S5-21 4a, S5-21b 3a |
+| U146 | **„Geändert“ statt „Von Ihnen geändert“:** `criteria.priority.overridden` „Geändert. Empfohlen war: {{recommended}}.“ und `criteria.priority.overridden.weight` „Geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}.“ (§5.5) | Eine gespeicherte Liste gehört der Organisation; wer die Priorität geändert hat, zeigt die Liste nicht (S5-20 3a). Eine Fassung für alle Listen statt zwei Schlüsseln | S5-21 8b, S5-21b 4a |
+| U147 | **Genauerer Grund für nicht übernommene Änderungen:** `criteria.list.copy.notCarried` und `.one` nennen „in der neuen Katalogversion oder mit der verbleibenden Auswahl“ (§5.5) | Ein Kriterium kann auch entfallen, weil ein Wert der Auswahl in der neuen Katalogversion ausgeschlossen ist (S5-21a, Befund R4) | S5-21b 4a |
+
+### Änderungen gegenüber v32
+
+Quelle: Aufgabe S5-20b (Speichern einer Kriterienliste, gespeicherte Kriterienlisten; Serverteil S5-20a; Entscheidungen S5-20 vom 16. November 2026: 3a – fehlende Schlüssel als Entwurf in v33, eine Liste in S14 zeigt Name, Datum und Katalogversion, nicht wer sie angelegt hat; 2a und S5-20b 2a – eine Auswahl „Sortieren nach“ in jeder Breite; S5-20b 4a – Menüeintrag „Kriterienlisten“). **Entwurf** – Wortlaut vom Product Owner im Review zu bestätigen. v32 (U138–U139) hat der Product Owner am 16. November 2026 bestätigt.
+
+| # | Änderung | Warum so | Anlass |
+|---|---|---|---|
+| U140 | **Eintrag „Kriterienlisten“:** neu `shell.nav.savedLists` „Kriterienlisten“ im Menü „Konto“ (unter 600 px in der Liste des Menüs) zwischen `shell.nav.organization` und `shell.nav.settings`, nur mit Mitgliedschaft; er öffnet „Gespeicherte Kriterienlisten“ S14 (§5.1) | S14 war nur über seine Adresse erreichbar; kurz wie die anderen Einträge, die Überschrift von S14 bleibt `criteria.saved.title` (Entscheidung S5-20b 4a) | S5-20b |
+| U141 | **Sortierung in S14:** neu `criteria.saved.sort` „Sortieren nach“ (Label der Auswahl über der Liste, in jeder Breite) mit den Optionen `criteria.saved.sort.modified` „Zuletzt geändert“ (vorausgewählt, neueste zuerst) und `criteria.saved.sort.name` „Name“ (A–Z); nach einem Wechsel die Ansage `criteria.saved.sort.updated` „Sortiert nach: {{sort}}.“ (§5.6) | Eine Bedienung für schmale und breite Ansicht (Entscheidung S5-20b 2a); Muster wie `directory.sort.*`; „geändert“ statt „gespeichert“, weil Listen ab S5-21 bearbeitet werden | S5-20b |
+| U142 | **Angaben einer Liste in S14:** neu `criteria.saved.name` „Name“, `criteria.saved.modified` „Zuletzt geändert“ und `criteria.saved.release` „Katalogversion“ – als Spaltenköpfe der Tabelle ab 600 px und als Begriffe der Angaben je Liste darunter; der Name ist der Link zur Liste (§5.6) | Ohne die Person, die die Liste angelegt hat (Entscheidung S5-20 3a); dieselben Wörter in Tabelle und Karte | S5-20b |
+| U143 | **Fehlerhinweise in S12:** neu `criteria.save.error.title` „Liste nicht gespeichert“ (Titel des Fehlerhinweises über den Buttons), darin `criteria.save.error` „Die Liste konnte nicht gespeichert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.“, `criteria.save.outdated` „Die Liste konnte nicht gespeichert werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen.“ (`release-mismatch`), `criteria.save.notAllowed` „Sie können für {{org}} keine Listen speichern. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“.“ (403 ohne `email-unconfirmed`) oder `errors.antiforgery`. Ein leerer Name zeigt `errors.field.required` mit dem Label wie auf S20 (§5.6) | Ein Fehlerhinweis braucht einen Titel (wie U132, U136); `outdated` wie `criteria.export.outdated`, nur für das Speichern; die Rolle kann sich ändern, während der Dialog offen ist | S5-20b |
+| U144 | **Notiz einer gespeicherten Liste:** neu `criteria.item.note.heading` „Notiz“ (H3 über dem Text der Notiz auf der Karte einer gespeicherten Liste, die nur gelesen wird) (§5.5) | Das Label `criteria.item.note` „Ihre Notiz zu diesem Kriterium (optional)“ beschreibt ein Eingabefeld; über einem gespeicherten Text passt es nicht (Entscheidung S5-20 5a: gespeicherte Liste nur lesend bis S5-21) | S5-20b |
 
 ### Änderungen gegenüber v31
 
@@ -579,6 +601,7 @@ Spalten: **Schlüssel** (ngx-translate, Datei `public/i18n/de.json`), **Element*
 | `shell.nav.settings` | Menü | Einstellungen | |
 | `shell.nav.account` | Menü | Konto | |
 | `shell.nav.organization` | Menü „Konto“ | Organisation | U138; öffnet S21 der gewählten Organisation, ohne Mitgliedschaft S20 |
+| `shell.nav.savedLists` | Menü „Konto“ | Kriterienlisten | U140; nur mit Mitgliedschaft; öffnet S14 |
 | `shell.nav.login` | Button | Anmelden | |
 | `shell.nav.logout` | Menü | Abmelden | |
 | `shell.userMenu.label` | `aria-label` des Buttons „Konto“ (`shell.nav.account`) | Konto, angemeldet als {{displayName}} | U95; beginnt mit dem sichtbaren Text (WCAG 2.5.3) |
@@ -790,6 +813,7 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.item.testedBy.meta` | Metazeile | Prüfverfahren · {{link}} | |
 | `criteria.item.testedBy.note` | Zusatz in den Details | Im Beschaffungsprojekt ergibt sich Ja oder Nein aus dem Prüfnachweis des Produkts. Im Abgleich mit Kriterien zählt dieses Kriterium nicht mit, weil der Prüfstatus dort schon unter „Auf Barrierefreiheit geprüft“ steht. | U34, U46 |
 | `criteria.item.note` | Label | Ihre Notiz zu diesem Kriterium (optional) | |
+| `criteria.item.note.heading` | H3 (Karte einer gespeicherten Liste, nur lesend) | Notiz | U144 |
 | `criteria.item.note.add` | Button (Disclosure) | Notiz hinzufügen | U104; solange keine Notiz da ist; `aria-expanded`, Fokus ins Feld; Kriteriumstitel per `aria-describedby` |
 | `criteria.item.note.edit` | Button (Disclosure) | Notiz bearbeiten | U104; sobald eine Notiz da ist |
 | **K5 Priorität mit Begründung** (`criteria.priority.`) | | | |
@@ -809,8 +833,8 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.priority.button` | Zugänglicher Name des Menü-Buttons (K5) | Priorität: {{level}} | sichtbar ist nur `{{level}}`; Kriteriumstitel per `aria-describedby` |
 | `criteria.priority.changed` | Ansage | Priorität geändert auf {{level}}. | U9 |
 | `criteria.priority.changeLabel` | Label Select | Priorität für dieses Kriterium | |
-| `criteria.priority.overridden` | Status | Von Ihnen geändert. Empfohlen war: {{recommended}}. | CAT-08: Empfehlung bleibt sichtbar |
-| `criteria.priority.overridden.weight` | Status (nur die Gewichtung geändert) | Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}. | U103; CAT-08 |
+| `criteria.priority.overridden` | Status | Geändert. Empfohlen war: {{recommended}}. | CAT-08: Empfehlung bleibt sichtbar; U146 |
+| `criteria.priority.overridden.weight` | Status (nur die Gewichtung geändert) | Geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}. | U103; CAT-08; U146 |
 | `criteria.priority.reset` | Button | Empfehlung wiederherstellen | |
 | **Aktionen** | | | |
 | `criteria.list.save` | Button | Liste speichern | ohne Anmeldung → S01 mit `auth.login.reasonSave` |
@@ -829,8 +853,10 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.list.olderRelease.cta` | Button | Neue Liste mit derselben Auswahl | U66; öffnet danach die neue Liste |
 | `criteria.list.copy.done` | Ansage und Hinweis (`pa-notice` Info) in der neuen Liste | Neue Liste nach Katalogversion {{release}} erstellt. Ihre bisherige Liste bleibt unverändert. | U66 |
 | `criteria.list.copy.dropped` | Teil des Hinweises (nur wenn zutreffend) | Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: {{values}}. | U66; Werte mit Komma |
-| `criteria.list.copy.notCarried` | Teil des Hinweises (nur wenn zutreffend) | Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U66 |
-| `criteria.list.copy.notCarried.one` | Teil des Hinweises (Einzahl) | Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}. | U86 |
+| `criteria.list.copy.notCarried` | Teil des Hinweises (nur wenn zutreffend) | Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion oder mit der verbleibenden Auswahl nicht mehr gibt: {{criteria}}. | U66; U147 |
+| `criteria.list.copy.notCarried.one` | Teil des Hinweises (Einzahl) | Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion oder mit der verbleibenden Auswahl nicht mehr gibt: {{criteria}}. | U86; U147 |
+| `criteria.list.selectionChanged.dropped` | Hinweis (`pa-notice` Info) und Ansage auf der gespeicherten Liste nach „Auswahl ändern“ (nur wenn zutreffend) | Ihre Änderungen an {{count}} Kriterien wurden entfernt, weil diese Kriterien nicht mehr zu Ihrer Auswahl gehören: {{criteria}}. | U145; Kriterien mit Komma |
+| `criteria.list.selectionChanged.dropped.one` | Hinweis und Ansage (Einzahl) | Ihre Änderung an 1 Kriterium wurde entfernt, weil es nicht mehr zu Ihrer Auswahl gehört: {{criteria}}. | U145 |
 
 ### 5.6 S12–S16 Speichern, Exportieren, Teilen (`criteria.save.`, `criteria.export.`, `criteria.share.`, `exportFile.`)
 
@@ -844,6 +870,10 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.save.success` | Snackbar / Ansage | Liste „{{name}}“ gespeichert. | |
 | `criteria.save.needOrg` | Dialog (ohne Organisation) | Um Kriterienlisten zu speichern, brauchen Sie eine Organisation. So können Sie die Liste mit Ihrem Team teilen. | → S20 |
 | `criteria.save.needOrg.cta` | Button | Organisation anlegen oder beitreten | |
+| `criteria.save.error.title` | Titel des Fehlerhinweises im Dialog | Liste nicht gespeichert | U143; `pa-notice` Fehler, `role="alert"` |
+| `criteria.save.error` | Fehler | Die Liste konnte nicht gespeichert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns. | U143 |
+| `criteria.save.outdated` | Fehler (`release-mismatch`) | Die Liste konnte nicht gespeichert werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen. | U143 |
+| `criteria.save.notAllowed` | Fehler (403, Rolle) | Sie können für {{org}} keine Listen speichern. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“. | U143 |
 | `criteria.export.title` | Dialog-Titel | Kriterienliste exportieren | |
 | `criteria.export.format` | `legend` | Dateiformat | |
 | `criteria.export.xlsx` | Option | Excel-Datei (.xlsx) – für Vergabeunterlagen | Vorauswahl |
@@ -875,6 +905,13 @@ Stepper mit vier Schritten in fester Reihenfolge (Filterschichten, `kriterienkat
 | `criteria.saved.title` | H1 (S14) | Gespeicherte Kriterienlisten | |
 | `criteria.saved.empty` | Leerzustand | Ihre Organisation hat noch keine Kriterienlisten gespeichert. Stellen Sie eine Liste zusammen und speichern Sie sie, um sie hier wiederzufinden. | |
 | `criteria.saved.empty.cta` | Button | Kriterien zusammenstellen | |
+| `criteria.saved.sort` | Label (Auswahl über der Liste) | Sortieren nach | U141 |
+| `criteria.saved.sort.modified` | Option (vorausgewählt) | Zuletzt geändert | U141; neueste zuerst |
+| `criteria.saved.sort.name` | Option | Name | U141; A–Z |
+| `criteria.saved.sort.updated` | Ansage | Sortiert nach: {{sort}}. | U141 |
+| `criteria.saved.name` | Spaltenkopf / Begriff | Name | U142; der Name ist der Link zur Liste |
+| `criteria.saved.modified` | Spaltenkopf / Begriff | Zuletzt geändert | U142; Datum |
+| `criteria.saved.release` | Spaltenkopf / Begriff | Katalogversion | U142 |
 | `criteria.saved.delete` | Button (je Liste, Rollen Verwalten und Bearbeiten) | Liste löschen | U75; Name der Liste per `aria-describedby` |
 | `criteria.saved.delete.title` | Dialog-Titel | Kriterienliste löschen? | |
 | `criteria.saved.delete.body` | Text | Die Liste „{{name}}“ wird gelöscht. Freigabelinks zu dieser Liste funktionieren danach nicht mehr. Beschaffungsprojekte, die eine Kopie der Liste nutzen, sind nicht betroffen. | D1 |

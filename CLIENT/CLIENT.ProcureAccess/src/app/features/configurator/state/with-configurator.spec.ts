@@ -741,6 +741,52 @@ describe('withConfigurator', () => {
     });
   });
 
+  describe('„Auswahl ändern“ of a saved list (owner decision S5-21b 2a)', () => {
+    const LIST_SELECTION = { useCase: 'citizen', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] };
+
+    it('puts the draft aside, fills S10 with the list’s selection under its release, and brings the draft back', async () => {
+      await fillAllLayers();
+      const draft = store.configurator();
+
+      const ready = store.startSavedListSelection(LIST_SELECTION, 'T.1');
+      const request = nextRequest();
+      expect(request.request.params.get('release')).toBe('T.1');
+      request.flush(filterOptionsAnswer(filterOptions(), 'T.1'));
+      expect(await ready).toBe('loaded');
+      expect(store.configurator.draft()).toEqual({
+        useCase: { kind: 'useCase', id: 'citizen' },
+        appTypeIds: ['web'],
+        productPartIds: ['base'],
+        testTypeIds: [],
+      });
+
+      store.toggleTestType('softwareTest');
+      store.endSavedListSelection();
+
+      expect(store.configurator()).toEqual(draft);
+    });
+
+    it('fills „Keiner davon passt“ for a list without a use case', async () => {
+      const ready = store.startSavedListSelection({ appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] }, 'T.1');
+      await answer();
+      await ready;
+
+      expect(store.configurator.draft().useCase).toEqual({ kind: 'none' });
+    });
+
+    it('forgets the draft put aside on sign-out (R-AUTH-08)', async () => {
+      await fillAllLayers();
+      const ready = store.startSavedListSelection(LIST_SELECTION, 'T.1');
+      await answer();
+      await ready;
+
+      store.resetConfigurator();
+      store.endSavedListSelection();
+
+      expect(store.configurator()).toEqual(initialConfiguratorState);
+    });
+  });
+
   describe('memory only (R-CON-09)', () => {
     it('writes nothing to browser storage and still works while storage is blocked', async () => {
       const blocked = () => {

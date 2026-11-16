@@ -88,3 +88,13 @@
     padding-block: var(--pa-space-xs);
   }
 }
+
+// From 600 px: the name and „Liste löschen“ share the cell, the button at the end; they wrap when
+// the name is long (S5-21b).
+.pa-saved-lists__name-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pa-space-xs) var(--pa-space-sm);
+}

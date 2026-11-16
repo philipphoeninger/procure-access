@@ -5,6 +5,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
 import { render, screen, within } from '@testing-library/angular';
@@ -21,6 +22,7 @@ import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { ExportApiService } from '../../services/api/export-api.service';
 import { withConfigurator } from '../../state/with-configurator';
+import { ExportDialog } from './export-dialog';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 
@@ -199,5 +201,40 @@ describe('ExportDialog (S13, R-LST-11)', () => {
     buttons[0].click();
     await fixture.whenStable();
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+
+describe('ExportDialog for a saved list (R-LST-12, S5-21b)', () => {
+  it('exports the stored list under its own release, with its count and without the anonymous note', async () => {
+    const exportSavedList = vi.fn().mockResolvedValue({ content: new Blob(['x']), fileName: 'ProcureAccess_Kriterien_Liste_T.1_2026-11-16.csv' });
+    const save = vi.fn();
+    const announce = vi.fn().mockResolvedValue(undefined);
+    const rendered = await render(Blank, {
+      providers: [
+        provideTestTranslations(),
+        { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
+        { provide: ExportApiService, useValue: { exportSavedList } },
+        { provide: CatalogApiService, useValue: {} },
+        { provide: ConfiguratorApiService, useValue: {} },
+        { provide: FileSaver, useValue: { save } },
+        { provide: A11yAnnouncerService, useValue: { announce } },
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
+      ],
+    });
+    ExportDialog.open(rendered.debugElement.injector.get(MatDialog), { listId: 'list-1', release: 'T.1', included: 7 });
+    await rendered.fixture.whenStable();
+    const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+
+    expect(dialog.textContent).toContain('Exportiert werden 7 Kriterien aus Ihrer Liste');
+    expect(dialog.textContent).toContain('Die Datei nennt die Katalogversion T.1.');
+    await expectNoAxeViolations();
+    within(dialog).getByRole('radio', { name: CSV }).click();
+    await rendered.fixture.whenStable();
+    within(dialog).getByRole('button', { name: 'Datei herunterladen' }).click();
+    await vi.waitFor(() => expect(save).toHaveBeenCalled());
+
+    expect(exportSavedList).toHaveBeenCalledWith('list-1', 'csv');
+    expect(save).toHaveBeenCalledWith(expect.any(Blob), 'ProcureAccess_Kriterien_Liste_T.1_2026-11-16.csv');
+    expect(announce).toHaveBeenCalledWith('criteria.export.success');
   });
 });

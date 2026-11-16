@@ -163,14 +163,14 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
     });
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     expect(within(card()).getByText('Nicht in Ihrer Liste')).toBeTruthy();
-    expect(within(card()).getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
+    expect(within(card()).getByText('Geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
     expect(within(card()).getByRole('button', { name: 'Notiz bearbeiten' })).toBeTruthy();
     await expectNoAxeViolations();
 
     await act(within(card()).getByRole('button', { name: 'Empfehlung wiederherstellen' }));
 
     expect(store.configurator.list.decisions()['11.1.1']?.overrideLevel).toBeNull();
-    expect(within(card()).queryByText(/Von Ihnen geändert/)).toBeNull();
+    expect(within(card()).queryByText(/Geändert/)).toBeNull();
   });
 
   it('sets the weight of a recommended B in the draft', async () => {
@@ -184,7 +184,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
     await fixture.whenStable();
 
     expect(store.configurator.list.decisions()['11.2.2']?.overrideWeight).toBe(6);
-    expect(within(card).getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
+    expect(within(card).getByText('Geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
   });
 
   describe('search and priority filter (R-LST-06)', () => {

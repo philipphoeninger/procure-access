@@ -9,7 +9,7 @@ import { CriteriaSelection } from '../../models/configurator-draft';
 import { CriteriaResponse } from '../../models/criteria';
 import { CriterionDecision, CriterionDecisions } from '../../models/criteria-list';
 import { FilterOptionsLayers } from '../../models/filter-options';
-import { SavedList } from '../../models/saved-lists';
+import { SavedList, SavedListCriterionName } from '../../models/saved-lists';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 
@@ -25,6 +25,8 @@ export type SavedListView =
       criteria: CriteriaResponse;
       options: FilterOptionsLayers;
       decisions: CriterionDecisions;
+      /** The release that is active now; null without one. Another one than the list's shows the older-release notice (R-LST-14). */
+      activeRelease: string | null;
     }
   | { kind: 'notFound' }
   | { kind: 'server' };
@@ -33,6 +35,20 @@ export type SavedListView =
 @Injectable()
 export class SavedListLoad {
   view: SavedListView = { kind: 'notFound' };
+}
+
+/**
+ * What a page that led to a saved list hands it in the navigation state (memory only, like the
+ * draft): the report of „Neue Liste mit derselben Auswahl“ (R-LST-14) or of „Auswahl ändern“
+ * (owner decision S5-21 4a), shown once on arrival.
+ */
+export type SavedListArrival =
+  | { kind: 'copied'; releaseVersion: string; droppedValues: string[]; notCarried: SavedListCriterionName[] }
+  | { kind: 'selectionChanged'; droppedDecisions: SavedListCriterionName[] };
+
+/** The navigation state of a link to a saved list. */
+export interface SavedListNavigationState {
+  savedListArrival?: SavedListArrival;
 }
 
 /** The selection of a saved list as the catalog endpoints read it. */
@@ -69,7 +85,8 @@ export function decisionsOf(list: SavedList, criteria: CriteriaResponse): Criter
 
 /**
  * Reads the list (SPEC §8.10) and then the criteria and filter values of its release (§8.1, §8.2,
- * `release=<version>`, also when a newer release is active, CAT-06). A 404 or a malformed id (400)
+ * `release=<version>`, also when a newer release is active, CAT-06), and which release is active
+ * (the filter values without a release; none when that answers 404). A 404 or a malformed id (400)
  * of the list is „not found“ — another organisation's list does not exist for the user (TEN-01) —,
  * every other failure a server failure.
  */
@@ -88,11 +105,23 @@ export async function loadSavedListView(
 
   const selection = selectionOf(list);
   try {
-    const [criteria, options] = await Promise.all([
+    const [criteria, options, active] = await Promise.all([
       catalog.getCriteria(selection, list.releaseVersion),
       catalog.getFilterOptions(selection, list.releaseVersion),
+      catalog.getFilterOptions({ appTypeIds: [], productPartIds: [] }).then(
+        (answer) => answer.release,
+        () => null,
+      ),
     ]);
-    return { kind: 'list', list, selection, criteria, options: options.layers, decisions: decisionsOf(list, criteria) };
+    return {
+      kind: 'list',
+      list,
+      selection,
+      criteria,
+      options: options.layers,
+      decisions: decisionsOf(list, criteria),
+      activeRelease: active,
+    };
   } catch {
     // A stored list names a stored release (CAT-05); a failure here is the server's.
     return { kind: 'server' };

@@ -2,21 +2,28 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { signal } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
 import { BehaviorSubject } from 'rxjs';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 import { PRIORITY_WEIGHT_RANGE } from '@app/features/configurator/state/priority-weight-range';
+import { OrganizationRole, OrganizationSummary } from '@app/features/organization/models/organization';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
+import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
 import { CriteriaResponse } from '../../models/criteria';
 import { SavedList } from '../../models/saved-lists';
+import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
+import { SavedListEditor } from './saved-list-editor';
 import { SavedListPage } from './saved-list-page';
-import { decisionsOf, SavedListLoad, SavedListView, selectionOf } from './saved-list-load';
+import { decisionsOf, SavedListLoad, SavedListNavigationState, SavedListView, selectionOf } from './saved-list-load';
 
 /** The fixture answer with one revision per criterion, as a release has them. */
 function answer(): CriteriaResponse {
@@ -40,7 +47,7 @@ const LIST: SavedList = {
   ],
 };
 
-function listView(): SavedListView {
+function listView(activeRelease: string | null = 'T.1'): SavedListView {
   const criteria = answer();
   return {
     kind: 'list',
@@ -49,29 +56,52 @@ function listView(): SavedListView {
     criteria,
     options: filterOptionsAnswer().layers,
     decisions: decisionsOf(LIST, criteria),
+    activeRelease,
   };
 }
 
-describe('SavedListPage (S11 read only, R-SAV-02, S5-20 5a)', () => {
-  let setPageTitleState: ReturnType<typeof vi.fn>;
+function membership(role: OrganizationRole): OrganizationSummary {
+  return { id: 'org-1', name: 'Stadt Musterhausen', type: 'publicBody', role };
+}
 
-  async function openPage(view: SavedListView = listView()) {
+describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
+  let setPageTitleState: ReturnType<typeof vi.fn>;
+  let announce: ReturnType<typeof vi.fn>;
+  let decide: ReturnType<typeof vi.fn>;
+  let copyToActiveRelease: ReturnType<typeof vi.fn>;
+  let paramMap: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+
+  async function openPage({
+    view = listView(),
+    role = 'editor',
+  }: { view?: SavedListView; role?: OrganizationRole | null } = {}) {
     setPageTitleState = vi.fn();
+    announce = vi.fn().mockResolvedValue(undefined);
+    decide = vi.fn().mockResolvedValue(null);
+    copyToActiveRelease = vi.fn().mockResolvedValue({ id: 'list-2', releaseVersion: 'T.2', droppedValues: [], notCarried: [] });
+    paramMap = new BehaviorSubject(convertToParamMap({ id: 'list-1' }));
     const load = new SavedListLoad();
     load.view = view;
     const rendered = await render(SavedListPage, {
+      routes: [{ path: 'kriterienlisten/:id', children: [] }, { path: 'kriterienlisten/:id/auswahl', children: [] }],
       providers: [
         provideTestTranslations(),
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
         { provide: SavedListLoad, useValue: load },
-        { provide: ActivatedRoute, useValue: { paramMap: new BehaviorSubject(convertToParamMap({ id: 'list-1' })), snapshot: { data: {} } } },
+        SavedListEditor,
+        { provide: ActivatedRoute, useValue: { paramMap, snapshot: { data: {} } } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
         { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 10 } },
+        { provide: A11yAnnouncerService, useValue: { announce } },
+        { provide: ConfiguratorApiService, useValue: { decide, copyToActiveRelease } },
+        { provide: ProcureAccessStore, useValue: { organizations: signal(role === null ? [] : [membership(role)]) } },
       ],
     });
     await rendered.fixture.whenStable();
     return rendered.fixture;
   }
+
+  const card = (title: string) => screen.getByRole('heading', { level: 2, name: title }).closest('pa-criterion-card') as HTMLElement;
 
   it('shows the list name as H1, titles the page with it and shows every criterion in catalog order', async () => {
     await openPage();
@@ -87,31 +117,153 @@ describe('SavedListPage (S11 read only, R-SAV-02, S5-20 5a)', () => {
     await expectNoAxeViolations();
   });
 
-  it('shows the stored decisions without a checkbox, priority menu or note field', async () => {
-    await openPage();
+  describe('Reader (owner decision S5-21b 6a)', () => {
+    it('shows the stored decisions read only, the filter row and only „Liste exportieren“', async () => {
+      await openPage({ role: 'reader' });
 
-    expect(screen.queryByRole('checkbox')).toBeNull();
-    expect(screen.queryByRole('button', { name: /^Priorität/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: /Notiz/ })).toBeNull();
-    expect(screen.queryByRole('textbox')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Empfehlung wiederherstellen' })).toBeNull();
+      expect(screen.queryByRole('checkbox', { name: /^In Liste aufnehmen/ })).toBeNull();
+      expect(screen.queryByRole('button', { name: /^Priorität/ })).toBeNull();
+      expect(screen.queryByRole('button', { name: /Notiz/ })).toBeNull();
+      expect(screen.getByRole('searchbox')).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'Auswahl ändern' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
 
-    const excluded = screen.getByRole('heading', { level: 2, name: 'Bilder haben einen Alternativtext' }).closest('pa-criterion-card')!;
-    expect(excluded.textContent).toContain('Nicht in Ihrer Liste');
+      expect(card('Bilder haben einen Alternativtext').textContent).toContain('Nicht in Ihrer Liste');
+      const weighted = card('Alles geht mit der Tastatur');
+      expect(weighted.textContent).toContain('Priorität: B – Bewertungskriterium');
+      expect(weighted.textContent).toContain('Gewichtung 9');
+      expect(within(weighted).getByRole('heading', { level: 3, name: 'Notiz' })).toBeTruthy();
+      const overridden = card('Überschriften');
+      expect(overridden.textContent).toContain('Priorität: A – Mindestanforderung');
+      expect(overridden.textContent).toContain('Geändert. Empfohlen war: Hinweis');
+      await expectNoAxeViolations();
+    });
 
-    const weighted = screen.getByRole('heading', { level: 2, name: 'Alles geht mit der Tastatur' }).closest('pa-criterion-card') as HTMLElement;
-    expect(weighted.textContent).toContain('Priorität: B – Bewertungskriterium');
-    expect(weighted.textContent).toContain('Gewichtung 9');
-    expect(within(weighted).getByRole('heading', { level: 3, name: 'Notiz' })).toBeTruthy();
-    expect(weighted.textContent).toContain('Mit Anbieter klären');
+    it('does not see the older-release notice (owner decision S5-21b 5b)', async () => {
+      await openPage({ role: 'reader', view: listView('T.2') });
 
-    const overridden = screen.getByRole('heading', { level: 2, name: 'Überschriften' }).closest('pa-criterion-card')!;
-    expect(overridden.textContent).toContain('Priorität: A – Mindestanforderung');
-    expect(overridden.textContent).toContain('Empfohlen war: Hinweis');
+      expect(screen.queryByRole('button', { name: 'Neue Liste mit derselben Auswahl' })).toBeNull();
+      expect(document.body.textContent).not.toContain('Inzwischen gibt es die Version');
+    });
+  });
+
+  describe('Editor and Owner (owner decision S5-21b 1a)', () => {
+    it('saves an exclusion right away with the whole decision of the criterion', async () => {
+      const fixture = await openPage({ role: 'owner' });
+
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+
+      expect(decide).toHaveBeenCalledWith('list-1', 202, { isIncluded: false, overrideLevel: 'A', overrideWeight: null, note: null });
+      expect(card('Überschriften').textContent).toContain('Nicht in Ihrer Liste');
+      expect(announce).toHaveBeenCalledWith('criteria.list.status.count', { included: 2, total: 4 }, { throttleMs: 1000 });
+    });
+
+    it('undoes a change the server did not save', async () => {
+      const fixture = await openPage();
+      decide.mockRejectedValueOnce(new Error('offline'));
+
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+      await new Promise((resolve) => setTimeout(resolve));
+      await fixture.whenStable();
+
+      expect(card('Überschriften').textContent).not.toContain('Nicht in Ihrer Liste');
+    });
+
+    it('links „Auswahl ändern“ to S10 of the list and exports the stored list', async () => {
+      const open = vi.spyOn(ExportDialog, 'open').mockReturnValue(undefined as never);
+      await openPage();
+
+      expect(screen.getByRole('link', { name: 'Auswahl ändern' }).getAttribute('href')).toBe('/kriterienlisten/list-1/auswahl');
+      screen.getByRole('button', { name: 'Liste exportieren' }).click();
+
+      await vi.waitFor(() =>
+        expect(open).toHaveBeenCalledWith(expect.anything(), { listId: 'list-1', release: 'T.1', included: 3 }),
+      );
+      open.mockRestore();
+    });
+
+    it('offers „Neue Liste mit derselben Auswahl“ on a list of an older release, without „Auswahl ändern“ (R-LST-14, S5-21 5a)', async () => {
+      const fixture = await openPage({ view: listView('T.2') });
+      const router = fixture.debugElement.injector.get(Router);
+      const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+
+      expect(document.body.textContent).toContain('Diese Liste beruht auf der Katalogversion T.1. Inzwischen gibt es die Version T.2.');
+      expect(screen.queryByRole('link', { name: 'Auswahl ändern' })).toBeNull();
+      // The criteria stay editable (owner decision S5-21 5a).
+      expect(within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ })).toBeTruthy();
+      await expectNoAxeViolations();
+
+      screen.getByRole('button', { name: 'Neue Liste mit derselben Auswahl' }).click();
+      await fixture.whenStable();
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(copyToActiveRelease).toHaveBeenCalledWith('list-1');
+      expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-2', {
+        state: { savedListArrival: { kind: 'copied', releaseVersion: 'T.2', droppedValues: [], notCarried: [] } },
+      });
+    });
+  });
+
+  it('INV:CAT-22 shows and announces the report of a copy on arrival', async () => {
+    const fixture = await openPage();
+    const router = fixture.debugElement.injector.get(Router);
+    const state: SavedListNavigationState = {
+      savedListArrival: {
+        kind: 'copied',
+        releaseVersion: 'T.2',
+        droppedValues: ['Audio'],
+        notCarried: [
+          { criterionRevisionId: 7, number: '99.7', title: 'Entfallenes Kriterium' },
+          { criterionRevisionId: 4, number: null, title: 'Geprüft nach App-Test' },
+        ],
+      },
+    };
+    vi.spyOn(router, 'currentNavigation').mockReturnValue({ extras: { state } } as never);
+
+    paramMap.next(convertToParamMap({ id: 'list-2' }));
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve));
+
+    const text = document.body.textContent;
+    expect(text).toContain('Neue Liste nach Katalogversion T.2 erstellt. Ihre bisherige Liste bleibt unverändert.');
+    expect(text).toContain('Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: Audio.');
+    expect(text).toContain('Ihre Änderungen an 2 Kriterien ließen sich nicht übernehmen');
+    expect(text).toContain(': 99.7 Entfallenes Kriterium, Geprüft nach App-Test.');
+    expect(announce).toHaveBeenCalledWith('criteria.list.copy.done', { release: 'T.2' });
+    expect(announce).toHaveBeenCalledWith('criteria.list.copy.notCarried', {
+      count: 2,
+      criteria: '99.7 Entfallenes Kriterium, Geprüft nach App-Test',
+    });
+  });
+
+  it('shows and announces the decisions a selection change dropped (owner decision S5-21 4a)', async () => {
+    const fixture = await openPage();
+    const router = fixture.debugElement.injector.get(Router);
+    const state: SavedListNavigationState = {
+      savedListArrival: {
+        kind: 'selectionChanged',
+        droppedDecisions: [{ criterionRevisionId: 9, number: null, title: 'Geprüft nach BIT inklusiv Software-Test' }],
+      },
+    };
+    vi.spyOn(router, 'currentNavigation').mockReturnValue({ extras: { state } } as never);
+
+    paramMap.next(convertToParamMap({ id: 'list-1' }));
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(document.body.textContent).toContain(
+      'Ihre Änderung an 1 Kriterium wurde entfernt, weil es nicht mehr zu Ihrer Auswahl gehört: Geprüft nach BIT inklusiv Software-Test.',
+    );
+    expect(announce).toHaveBeenCalledWith('criteria.list.selectionChanged.dropped.one', {
+      count: 1,
+      criteria: 'Geprüft nach BIT inklusiv Software-Test',
+    });
   });
 
   it('keeps the detail panel with „Warum diese Priorität?“ (CAT-02)', async () => {
-    const fixture = await openPage();
+    const fixture = await openPage({ role: 'reader' });
 
     screen.getAllByRole('button', { name: 'Details anzeigen' })[0].click();
     await fixture.whenStable();
@@ -120,7 +272,7 @@ describe('SavedListPage (S11 read only, R-SAV-02, S5-20 5a)', () => {
   });
 
   it('shows „Seite nicht gefunden“ for a list that does not exist for the user (TEN-01)', async () => {
-    await openPage({ kind: 'notFound' });
+    await openPage({ view: { kind: 'notFound' } });
 
     expect(screen.getByRole('heading', { level: 1, name: 'Seite nicht gefunden' })).toBeTruthy();
   });

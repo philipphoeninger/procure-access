@@ -18,7 +18,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * last-Owner notice and the confirmation dialog) since S5-16b, S21's open invitations and invite form
  * and the page of an invitation link since S5-17b, the signed-in compact menu with the organisation
  * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
- * (S11 read only) since S5-20b. The legacy screens are
+ * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
+ * the delete dialog of S14. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -213,7 +214,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });
 
-  test('S14 with lists needs no horizontal scrolling', async ({ page }) => {
+  test('S14 with lists and its delete dialog needs no horizontal scrolling', async ({ page }) => {
     // The lists are answered here: the seeded organisation stays unchanged (owner decision S5-16 7a)
     await page.route(`**/api/v1/configurations?organizationId=${E2E_ORGANIZATION.id}`, (route) =>
       route.fulfill({
@@ -236,9 +237,16 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expect(main.getByRole('heading', { level: 1, name: 'Gespeicherte Kriterienlisten' })).toBeVisible();
     await expect(main.getByRole('listitem')).toHaveCount(2);
     await expectReflow(page);
+
+    // Only opened and cancelled: nothing is deleted.
+    await main.getByRole('button', { name: 'Liste löschen' }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'Kriterienliste löschen?' });
+    await expect(dialog).toBeVisible();
+    await expectReflow(page);
+    await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });
 
-  test('a saved list, read only with an open detail panel, needs no horizontal scrolling', async ({ page }) => {
+  test('a saved list, editable for its Owner, with an open detail panel needs no horizontal scrolling', async ({ page }) => {
     // The list is answered here; its criteria come from T.1 (the seeded organisation stays unchanged)
     const id = '0e2e0000-0000-4000-8000-0000000000a1';
     await page.route(`**/api/v1/configurations/${id}`, (route) =>
@@ -260,6 +268,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.goto(`/kriterienlisten/${id}`);
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: /^Barrierefreie Beschaffung/ })).toBeVisible();
+    await expect(main.getByRole('link', { name: 'Auswahl ändern' })).toBeVisible();
     await expectReflow(page);
 
     await main.getByRole('button', { name: 'Details anzeigen' }).first().click();

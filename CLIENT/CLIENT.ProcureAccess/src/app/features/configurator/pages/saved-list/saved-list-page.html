@@ -6,6 +6,51 @@ SPDX-License-Identifier: MIT
 
 @if (shown(); as shown) {
   <h1 class="pa-saved-list__title">{{ shown.list.name }}</h1>
+  @if (canEdit() && !olderRelease() && changeSelectionPath(); as path) {
+    <div>
+      <a matButton="outlined" [routerLink]="path">{{ 'criteria.list.changeSelection' | translate }}</a>
+    </div>
+  }
+
+  @if (arrival(); as arrival) {
+    @if (arrival.kind === 'copied') {
+      <pa-notice kind="info">
+        <p>{{ 'criteria.list.copy.done' | translate: { release: arrival.releaseVersion } }}</p>
+        @if (arrival.droppedValues.length > 0) {
+          <p>{{ 'criteria.list.copy.dropped' | translate: { values: arrival.droppedValues.join(', ') } }}</p>
+        }
+        @if (arrival.notCarried.length > 0) {
+          <p>
+            {{
+              'criteria.list.copy.notCarried'
+                | translatePlural: arrival.notCarried.length : { criteria: criteriaOf(arrival.notCarried) }
+            }}
+          </p>
+        }
+      </pa-notice>
+    } @else if (arrival.droppedDecisions.length > 0) {
+      <pa-notice kind="info">
+        {{
+          'criteria.list.selectionChanged.dropped'
+            | translatePlural: arrival.droppedDecisions.length : { criteria: criteriaOf(arrival.droppedDecisions) }
+        }}
+      </pa-notice>
+    }
+  }
+
+  @if (canEdit() && olderRelease()) {
+    <pa-notice kind="info">
+      <p>{{ 'criteria.list.olderRelease' | translate: { release: shown.list.releaseVersion, latest: shown.activeRelease } }}</p>
+      <button
+        matButton="outlined"
+        type="button"
+        [attr.aria-disabled]="copying() ? 'true' : null"
+        (click)="copyToActiveRelease()"
+      >
+        {{ 'criteria.list.olderRelease.cta' | translate }}
+      </button>
+    </pa-notice>
+  }
 
   @if (selection(); as selection) {
     <pa-criteria-list-summary [count]="counts().total" [names]="selection" />
@@ -28,13 +73,50 @@ SPDX-License-Identifier: MIT
   }
 
   @if (shown.criteria.criteria.length > 0) {
-    <ul class="pa-saved-list__items">
-      @for (criterion of shown.criteria.criteria; track criterion.key) {
-        <li>
-          <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" [readonly]="true" />
-        </li>
-      }
-    </ul>
+    <pa-criteria-list-filter
+      [searchText]="searchInput()"
+      [levels]="levels()"
+      [onlyIncluded]="onlyIncluded()"
+      (searchTextChange)="search($event)"
+      (levelsChange)="levels.set($event)"
+      (onlyIncludedChange)="onlyIncluded.set($event)"
+    />
+
+    @if (visible().length > 0) {
+      <ul class="pa-saved-list__items">
+        @for (criterion of visible(); track criterion.key) {
+          <li>
+            @if (canEdit()) {
+              <pa-criterion-card
+                [criterion]="criterion"
+                [decision]="decision(criterion.key)"
+                [names]="names()"
+                (includedChange)="editor.setIncluded(criterion.key, $event)"
+                (levelChange)="editor.overridePriority(criterion.key, $event)"
+                (weightChange)="editor.setWeight(criterion.key, $event)"
+                (priorityReset)="editor.resetPriority(criterion.key)"
+                (noteChange)="editor.setNote(criterion.key, $event)"
+              />
+            } @else {
+              <pa-criterion-card [criterion]="criterion" [decision]="decision(criterion.key)" [names]="names()" [readonly]="true" />
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="pa-saved-list__empty">
+        <p>{{ 'criteria.list.emptyFilter' | translate }}</p>
+        <button matButton="outlined" type="button" (click)="resetFilter()">
+          {{ 'criteria.list.emptyFilter.reset' | translate }}
+        </button>
+      </div>
+    }
+
+    <pa-criteria-action-bar
+      [status]="'criteria.list.status.count' | translate: { included: included(), total: shown.criteria.criteria.length }"
+    >
+      <button matButton="filled" type="button" (click)="openExport()">{{ 'criteria.list.export' | translate }}</button>
+    </pa-criteria-action-bar>
   } @else {
     <p class="pa-saved-list__empty">{{ 'criteria.list.empty' | translate }}</p>
   }

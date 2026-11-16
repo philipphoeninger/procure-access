@@ -103,7 +103,7 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
     expect(screen.getByText(`Priorität: ${label}`).classList).toContain('cdk-visually-hidden');
     expect(levelButton().getAttribute('aria-haspopup')).toBe('menu');
     expect(levelButton().getAttribute('aria-describedby')).toBe('k-title');
-    expect(container.textContent).not.toContain('Von Ihnen geändert');
+    expect(container.textContent).not.toContain('Geändert');
     await expectNoAxeViolations();
   });
 
@@ -135,7 +135,7 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
     expect(document.activeElement).toBe(levelButton());
     expect(levelButton().textContent).toContain('Hinweis');
     expect(announce).toHaveBeenCalledWith('criteria.priority.changed', { level: 'Hinweis' });
-    expect(screen.getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
+    expect(screen.getByText('Geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
     await expectNoAxeViolations();
   });
 
@@ -158,7 +158,7 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
 
     expect(host.resets).toBe(1);
     expect(screen.queryByRole('button', { name: 'Empfehlung wiederherstellen' })).toBeNull();
-    expect(screen.queryByText(/Von Ihnen geändert/)).toBeNull();
+    expect(screen.queryByText(/Geändert/)).toBeNull();
     expect(document.activeElement).toBe(levelButton());
     expect(announce).toHaveBeenCalledWith('criteria.priority.changed', { level: 'A – Mindestanforderung' });
   });
@@ -186,7 +186,7 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
 
       expect(host.weight()).toBe(7);
       expect(
-        screen.getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.'),
+        screen.getByText('Geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.'),
       ).toBeTruthy();
       expect(screen.getByRole('button', { name: 'Empfehlung wiederherstellen' })).toBeTruthy();
       await expectNoAxeViolations();
@@ -195,14 +195,14 @@ describe('PriorityIndicator (K5, Handoff §4.5, R-LST-03)', () => {
     it('names no recommended weight when the recommended B has none', async () => {
       await show({ level: 'B', weight: 5, recommendedWeight: null, weightRange: RANGE });
 
-      expect(screen.getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium.')).toBeTruthy();
+      expect(screen.getByText('Geändert. Empfohlen war: B – Bewertungskriterium.')).toBeTruthy();
     });
 
     it('starts empty after an override to B from a level without weight (O-S4-27)', async () => {
       await show({ level: 'B', recommendedLevel: 'A', weightRange: RANGE });
 
       expect(screen.getByRole('combobox', { name: 'Gewichtung' }).textContent?.trim()).toBe('');
-      expect(screen.getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
+      expect(screen.getByText('Geändert. Empfohlen war: A – Mindestanforderung.')).toBeTruthy();
     });
 
     it('has no weight field for a level other than B', async () => {

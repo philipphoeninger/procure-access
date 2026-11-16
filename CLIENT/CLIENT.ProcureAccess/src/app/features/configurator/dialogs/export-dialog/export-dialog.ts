@@ -16,7 +16,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -28,7 +28,7 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { Notice } from '@app/shared/components/notice/notice';
 import { TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
-import { ExportFormat } from '../../models/export';
+import { ExportFile, ExportFormat } from '../../models/export';
 import { ExportApiService } from '../../services/api/export-api.service';
 import { includedCount } from '../../state/criteria-list-rules';
 import { toExportRequest } from '../../state/export-request';
@@ -41,13 +41,25 @@ type ExportStatus =
   | { kind: 'rateLimited'; minutes: number }
   | { kind: 'outdated' };
 
+/**
+ * A saved list to export (R-LST-12, S5-21b): the file comes from the stored list under its own
+ * release, so the dialog needs only its id, its release and how many criteria it includes.
+ */
+export interface SavedListExport {
+  listId: string;
+  release: string;
+  included: number;
+}
+
 /** Panel class of the dialog: 600 px from 600 px, full screen below (`styles/main.scss`, Handoff §2.3). */
 export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
 
 /**
  * S13 · Kriterienliste exportieren (R-LST-11; Handoff §5.1 S13 row, UX copy §5.6): file format
  * (XLSX preselected, or CSV), what is exported, the catalog release, the anonymous note while
- * nobody is signed in, the ⚖️ legal note as written, „Abbrechen“ and „Datei herunterladen“.
+ * nobody is signed in, the ⚖️ legal note as written, „Abbrechen“ and „Datei herunterladen“. Opened
+ * from S11 for the draft (`POST /exports`) or, since S5-21b, from a saved list for the stored list
+ * (`POST /configurations/{id}/exports`, R-LST-12), whose file carries its own release.
  *
  * - The first focus is the selected radio ({@link ExportDialog.open}); Esc or „Abbrechen“ close the
  *   dialog and MatDialog returns the focus to „Liste exportieren“.
@@ -78,9 +90,10 @@ export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportDialog {
-  /** Opens S13 with the first focus on the selected format. */
-  static open(dialog: MatDialog): MatDialogRef<ExportDialog> {
+  /** Opens S13 with the first focus on the selected format; for a saved list with `savedList`. */
+  static open(dialog: MatDialog, savedList?: SavedListExport): MatDialogRef<ExportDialog> {
     return dialog.open(ExportDialog, {
+      data: savedList ?? null,
       // The checked radio is the group's only tab stop; a selector also works on iOS, where the
       // CDK counts fewer elements as tabbable.
       autoFocus: 'input[type="radio"]:checked',
@@ -96,13 +109,19 @@ export class ExportDialog {
   private readonly dialogRef = inject<MatDialogRef<ExportDialog>>(MatDialogRef);
   private readonly injector = inject(Injector);
   private readonly closeButton = viewChild('closeButton', { read: ElementRef });
+  /** The saved list to export; null for the draft of S11. */
+  private readonly savedList = inject<SavedListExport | null>(MAT_DIALOG_DATA, { optional: true }) ?? null;
 
   protected readonly format = signal<ExportFormat>('xlsx');
   protected readonly status = signal<ExportStatus>({ kind: 'ready' });
-  protected readonly release = computed(() => this.store.configurator.list.answer()?.release ?? '');
+  protected readonly release = computed(
+    () => this.savedList?.release ?? this.store.configurator.list.answer()?.release ?? '',
+  );
   /** Cards in the user's list, as the action bar counts them (`criteria.list.status.count`). */
-  protected readonly included = computed(() =>
-    includedCount(this.store.configurator.list.answer()?.criteria ?? [], this.store.configurator.list.decisions()),
+  protected readonly included = computed(
+    () =>
+      this.savedList?.included ??
+      includedCount(this.store.configurator.list.answer()?.criteria ?? [], this.store.configurator.list.decisions()),
   );
   /** As on S11: from the session (S5-08). */
   protected readonly signedIn = this.store.signedIn;
@@ -133,19 +152,16 @@ export class ExportDialog {
 
   protected async download(): Promise<void> {
     if (this.busy()) return;
-    const answer = this.store.configurator.list.answer();
-    const selection = this.store.configurator.list.selection();
     this.retrying = this.failedBefore();
-    if (answer === null || selection === null) {
+    const request = this.request();
+    if (request === null) {
       this.status.set({ kind: 'failed' });
       return;
     }
 
     this.status.set({ kind: 'busy' });
     try {
-      const file = await this.api.exportList(
-        toExportRequest(this.format(), answer, selection, this.store.configurator.list.decisions()),
-      );
+      const file = await request();
       if (this.destroyed) return;
       this.files.save(file.content, file.fileName);
       void this.announcer.announce('criteria.export.success');
@@ -161,6 +177,20 @@ export class ExportDialog {
         );
       }
     }
+  }
+
+  /** The request of the file: the saved list as stored, or the draft of S11; null without a list. */
+  private request(): (() => Promise<ExportFile>) | null {
+    const format = this.format();
+    const savedList = this.savedList;
+    if (savedList !== null) {
+      return () => this.api.exportSavedList(savedList.listId, format);
+    }
+    const answer = this.store.configurator.list.answer();
+    const selection = this.store.configurator.list.selection();
+    if (answer === null || selection === null) return null;
+    const decisions = this.store.configurator.list.decisions();
+    return () => this.api.exportList(toExportRequest(format, answer, selection, decisions));
   }
 }
 

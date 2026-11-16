@@ -8,13 +8,23 @@ import { API_URL } from '@app/app.config';
 import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { lastValueFrom } from 'rxjs';
 
-import { SavedList, SavedListSummary, SaveListRequest } from '../../models/saved-lists';
+import {
+  ChangedSelection,
+  CopiedList,
+  SavedList,
+  SavedListDecisionRequest,
+  SavedListSelectionRequest,
+  SavedListSummary,
+  SaveListRequest,
+} from '../../models/saved-lists';
 
 /**
  * Client of the configurator endpoints (ARCHITECTURE §7.2): the usage event of S11 under
  * `/api/v1/configurator` and, since S5-20b, the saved lists under `/api/v1/configurations`
  * (SPEC §8.10). The saved-list requests are marked {@link CALLER_SHOWS_FAILURES}: S12, S14 and the
- * page of a saved list show every failure in place.
+ * page of a saved list show every failure in place — except the changes of a list (a decision, the
+ * selection, deleting, the copy), whose failure the error interceptor shows as everywhere (owner
+ * decision S5-21b 1a).
  */
 @Injectable({ providedIn: 'root' })
 export class ConfiguratorApiService {
@@ -61,5 +71,31 @@ export class ConfiguratorApiService {
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
       }),
     );
+  }
+
+  /** Saves the decision on one criterion of a saved list (R-SAV-03); a failure shows the general error. */
+  decide(id: string, criterionRevisionId: number, decision: SavedListDecisionRequest): Promise<unknown> {
+    return lastValueFrom(
+      this.http.patch(`${this.listUrl(id)}/criteria/${criterionRevisionId}`, decision),
+    );
+  }
+
+  /** „Auswahl ändern“ (R-SAV-03): the new selection under the list's release. */
+  changeSelection(id: string, request: SavedListSelectionRequest): Promise<ChangedSelection> {
+    return lastValueFrom(this.http.put<ChangedSelection>(`${this.listUrl(id)}/selection`, request));
+  }
+
+  /** Deletes a saved list (R-SAV-06); a failure shows the general error. */
+  delete(id: string): Promise<unknown> {
+    return lastValueFrom(this.http.delete(this.listUrl(id)));
+  }
+
+  /** „Neue Liste mit derselben Auswahl“ (R-LST-14, CAT-22): a copy on the active release. */
+  copyToActiveRelease(id: string): Promise<CopiedList> {
+    return lastValueFrom(this.http.post<CopiedList>(`${this.listUrl(id)}/copies`, { release: 'active' }));
+  }
+
+  private listUrl(id: string): string {
+    return `${this.apiUrl}/v1/configurations/${encodeURIComponent(id)}`;
   }
 }

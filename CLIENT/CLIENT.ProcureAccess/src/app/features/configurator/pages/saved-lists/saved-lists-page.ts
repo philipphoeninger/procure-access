@@ -5,6 +5,7 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -12,10 +13,12 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ORGANIZATION_PATH } from '@app/features/organization/models/organization';
 import { injectWideLayout } from '@app/layout/shell/wide-layout';
 import { ErrorPage } from '@app/pages/error/error-page';
+import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { pluralKey } from '@app/shared/pipes/translate-plural.pipe';
 
 import { CONFIGURATOR_PATH } from '../../guards/configurator-guards';
@@ -50,7 +53,11 @@ export function sortSavedLists(lists: readonly SavedListSummary[], sort: SavedLi
  *   (preselected, newest first) or „Name“; a change announces `criteria.saved.sort.updated`.
  * - Below 600 px a list of cards (name as H2 link, then „Zuletzt geändert“ and „Katalogversion“ as a
  *   description list), from 600 px a table with the same three columns, without sortable headers.
- *   The name opens the list (read only until S5-21). No creator (owner decision S5-20 3a).
+ *   The name opens the list. No creator (owner decision S5-20 3a).
+ * - Editor and Owner see „Liste löschen“ with each list (R-SAV-06, owner decision S5-21 7a), the
+ *   name of the list as its description: the confirmation `criteria.saved.delete.*` (`ConfirmDialog`),
+ *   then the list is deleted, `criteria.saved.deleted` announced, the lists loaded again and the
+ *   focus put on the H1. A failure shows the general error and the lists are loaded again.
  * - No list: `criteria.saved.empty` with „Kriterien zusammenstellen“. No membership: the text
  *   `criteria.save.needOrg` with „Organisation anlegen oder beitreten“ to S20. A failed load shows
  *   the S80 server text in place.
@@ -67,6 +74,8 @@ export function sortSavedLists(lists: readonly SavedListSummary[], sort: SavedLi
 })
 export class SavedListsPage {
   private readonly store = inject(ProcureAccessStore);
+  private readonly dialog = inject(MatDialog);
+  private readonly pageTitle = inject(PageTitleStrategy);
   private readonly api = inject(ConfiguratorApiService);
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly translate = inject(TranslateService);
@@ -85,6 +94,12 @@ export class SavedListsPage {
   private readonly lists = signal<SavedListSummary[]>([]);
   protected readonly sort = signal<SavedListSort>('modified');
   protected readonly sorted = computed(() => sortSavedLists(this.lists(), this.sort(), this.collator));
+  /** Editor or Owner of the organisation the header shows may delete its lists (R-SAV-06). */
+  protected readonly canDelete = computed(() => {
+    const role = this.store.activeOrganization()?.role;
+    return role === 'owner' || role === 'editor';
+  });
+  private readonly deleting = signal<string | null>(null);
 
   private latestLoad = 0;
   private destroyed = false;
@@ -98,6 +113,37 @@ export class SavedListsPage {
       const id = organizationId();
       untracked(() => void this.load(id));
     });
+  }
+
+  /** The id of a list's name, which describes its „Liste löschen“. */
+  protected nameId(list: SavedListSummary): string {
+    return `pa-saved-list-name-${list.id}`;
+  }
+
+  /** „Liste löschen“ (R-SAV-06): confirm, delete, announce, load again, focus the H1. */
+  protected async delete(list: SavedListSummary): Promise<void> {
+    if (this.deleting() !== null) return;
+    const confirmed = await ConfirmDialog.confirm(this.dialog, {
+      titleKey: 'criteria.saved.delete.title',
+      bodyKey: 'criteria.saved.delete.body',
+      bodyParams: { name: list.name },
+      confirmKey: 'criteria.saved.delete.confirm',
+    });
+    if (!confirmed || this.destroyed) return;
+    this.deleting.set(list.id);
+    try {
+      await this.api.delete(list.id);
+      if (this.destroyed) return;
+      void this.announcer.announce('criteria.saved.deleted', { name: list.name });
+    } catch {
+      // Shown by the error interceptor; the lists are loaded again either way.
+    } finally {
+      this.deleting.set(null);
+    }
+    if (this.destroyed) return;
+    // The deletion was announced; the number of lists left is not announced again.
+    await this.load(this.store.activeOrganization()?.id ?? null, false);
+    this.pageTitle.focusPageHeading();
   }
 
   protected path(list: SavedListSummary): string {
@@ -118,7 +164,7 @@ export class SavedListsPage {
     void this.announcer.announce('criteria.saved.sort.updated', { sort: this.translate.instant(this.sortKey(sort)) as string });
   }
 
-  private async load(organizationId: string | null): Promise<void> {
+  private async load(organizationId: string | null, announce = true): Promise<void> {
     const request = ++this.latestLoad;
     if (organizationId === null) {
       this.lists.set([]);
@@ -132,7 +178,9 @@ export class SavedListsPage {
       if (this.destroyed || request !== this.latestLoad) return;
       this.lists.set(lists);
       this.status.set('loaded');
-      void this.announcer.announce(pluralKey(this.translate, 'common.loaded', lists.length), { count: lists.length });
+      if (announce) {
+        void this.announcer.announce(pluralKey(this.translate, 'common.loaded', lists.length), { count: lists.length });
+      }
     } catch {
       if (this.destroyed || request !== this.latestLoad) return;
       this.status.set('failed');

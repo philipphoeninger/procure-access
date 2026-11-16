@@ -512,8 +512,8 @@
       "copy": {
         "done": "Neue Liste nach Katalogversion {{release}} erstellt. Ihre bisherige Liste bleibt unverändert.",
         "dropped": "Diese Auswahl gibt es in der neuen Katalogversion nicht mehr oder sie ist dort ausgeschlossen: {{values}}.",
-        "notCarried": "Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion nicht mehr gibt: {{criteria}}.",
-        "notCarried.one": "Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion nicht mehr gibt: {{criteria}}."
+        "notCarried": "Ihre Änderungen an {{count}} Kriterien ließen sich nicht übernehmen, weil es diese Kriterien in der neuen Katalogversion oder mit der verbleibenden Auswahl nicht mehr gibt: {{criteria}}.",
+        "notCarried.one": "Ihre Änderung an 1 Kriterium ließ sich nicht übernehmen, weil es dieses Kriterium in der neuen Katalogversion oder mit der verbleibenden Auswahl nicht mehr gibt: {{criteria}}."
       },
       "emptyFilter.reset": "Filter zurücksetzen",
       "counts.a": "{{count}} Mindestanforderungen",
@@ -521,7 +521,11 @@
       "counts.b": "{{count}} Bewertungskriterien",
       "counts.b.one": "1 Bewertungskriterium",
       "counts.info": "{{count}} Hinweise",
-      "counts.info.one": "1 Hinweis"
+      "counts.info.one": "1 Hinweis",
+      "selectionChanged": {
+        "dropped": "Ihre Änderungen an {{count}} Kriterien wurden entfernt, weil diese Kriterien nicht mehr zu Ihrer Auswahl gehören: {{criteria}}.",
+        "dropped.one": "Ihre Änderung an 1 Kriterium wurde entfernt, weil es nicht mehr zu Ihrer Auswahl gehört: {{criteria}}."
+      }
     },
     "item": {
       "include": "In Liste aufnehmen",
@@ -583,10 +587,10 @@
       "button": "Priorität: {{level}}",
       "changed": "Priorität geändert auf {{level}}.",
       "changeLabel": "Priorität für dieses Kriterium",
-      "overridden": "Von Ihnen geändert. Empfohlen war: {{recommended}}.",
+      "overridden": "Geändert. Empfohlen war: {{recommended}}.",
       "reset": "Empfehlung wiederherstellen",
       "weightLabel": "Gewichtung",
-      "overridden.weight": "Von Ihnen geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}."
+      "overridden.weight": "Geändert. Empfohlen war: {{recommended}}, Gewichtung {{weight}}."
     },
     "export": {
       "title": "Kriterienliste exportieren",
