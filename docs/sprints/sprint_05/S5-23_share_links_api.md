@@ -7,7 +7,7 @@
 > - TEN-09 server part tested, `active` with S16 in S5-24 (V271); SEC-10 gains creating and revoking a link (V271);
 > - SPEC R-SAV-04, R-SAV-05, R-SAV-06, SD15, §8.5, §8.10 (v2.40); ARCHITECTURE C158.
 >
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #360 open (2026-11-16)
 > **Scope:**
 > - `ShareLink` in Platform with the organisation filter and only the hash of its token;
 > - creating, listing and revoking for Editor and Owner;
