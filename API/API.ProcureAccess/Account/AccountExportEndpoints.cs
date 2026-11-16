@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
+using ProcureAccess.Modules.Catalog.Contracts;
+using ProcureAccess.Modules.Configurator.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 namespace API.ProcureAccess.Account;
@@ -15,16 +17,18 @@ namespace API.ProcureAccess.Account;
 /// ARCHITECTURE §7.2, C79; PRV-07; S5-27): the signed-in user's own data as a JSON file. In the
 /// host, because the address, its confirmation and the creation time come from the legacy
 /// <see cref="User"/>; the memberships and contributor profiles come from IdentityAccess through
-/// <see cref="IAccountDataExport"/>. It moves into IdentityAccess with the users (M3.1).
+/// <see cref="IAccountDataExport"/>, the criteria lists the user created from Configurator through
+/// <see cref="ICriteriaListDataExport"/> (S5-19). It moves into IdentityAccess with the users (M3.1).
 /// </summary>
 /// <remarks>
 /// <para><b>Only the user's own data (PRV-07).</b> No id of any kind and nothing of another user:
 /// memberships name the organisation, the role and since when; profiles their display name, kind
-/// and creation time.</para>
+/// and creation time; criteria lists their name, organisation, release, selection and criteria
+/// with the user's decisions (owner decision S5-19 4), for the organisations the user still
+/// belongs to.</para>
 /// <para><b>Sections not built yet</b> (owner decision S5-27 1a): <c>preferences</c> is
-/// <c>null</c> until S5-25 stores <c>UserPreferences</c>; <c>contributions</c> (step 6),
-/// <c>createdByMe.criteriaLists</c> (S5-19) and <c>createdByMe.projects</c> (step 5) are empty
-/// arrays. Each of these tasks fills its section and its part of PRV-07; the format stays
+/// <c>null</c> until S5-25 stores <c>UserPreferences</c>; <c>contributions</c> (step 6) and
+/// <c>createdByMe.projects</c> (step 5) are empty arrays. Each of these tasks fills its section and its part of PRV-07; the format stays
 /// <c>formatVersion</c> 1. <c>account.createdAt</c> is <c>null</c> for accounts created before
 /// S5-27 (decision 2a).</para>
 /// <para><b>Answer.</b> Generated synchronously; <c>Cache-Control: no-store</c> on every answer of
@@ -68,6 +72,7 @@ public static class AccountExportEndpoints
         ClaimsPrincipal principal,
         UserManager<User> users,
         IAccountDataExport accountData,
+        ICriteriaListDataExport criteriaLists,
         TimeProvider clock,
         HttpContext context,
         CancellationToken cancellationToken)
@@ -84,6 +89,7 @@ public static class AccountExportEndpoints
         }
 
         var part = await accountData.GetAsync(userId, cancellationToken);
+        var lists = await criteriaLists.GetCreatedByAsync(userId, cancellationToken);
         var generatedAt = clock.GetUtcNow();
         var document = new AccountExportDocument(
             generatedAt,
@@ -92,10 +98,28 @@ public static class AccountExportEndpoints
             [.. part.Memberships.Select(m => new AccountExportMembership(m.Organization, OrganizationEndpoints.NameOf(m.Role), m.Since))],
             [.. part.ContributorProfiles.Select(p => new AccountExportContributorProfile(p.DisplayName, p.Kind, p.CreatedAt))],
             Contributions: [],
-            new AccountExportCreatedByMe(CriteriaLists: [], Projects: []));
+            new AccountExportCreatedByMe([.. lists.Select(ListOf)], Projects: []));
 
         return TypedResults.File(JsonSerializer.SerializeToUtf8Bytes(document, Json), ContentType, FileNameOf(generatedAt));
     }
+
+    private static AccountExportCriteriaList ListOf(ExportedCriteriaList list) => new(
+        list.Name,
+        list.Organization,
+        list.Release,
+        list.CreatedAt,
+        new AccountExportListSelection(list.Selection.UseCase, list.Selection.AppTypes, list.Selection.ProductParts, list.Selection.TestTypes),
+        [.. list.Criteria.Select(c => new AccountExportListCriterion(
+            c.Number, c.Title, c.IsIncluded, LevelName(c.RecommendedLevel), LevelName(c.EffectiveLevel), c.Weight, c.Note))]);
+
+    /// <summary>The level names of SPEC §8.2: <c>A</c>, <c>B</c>, <c>Info</c>.</summary>
+    private static string LevelName(PriorityLevel level) => level switch
+    {
+        PriorityLevel.A => "A",
+        PriorityLevel.B => "B",
+        PriorityLevel.Info => "Info",
+        _ => throw new ArgumentOutOfRangeException(nameof(level), level, "Unknown priority level."),
+    };
 }
 
 /// <summary>The export file of SPEC §8.4, its properties in the order of the SPEC.</summary>
@@ -117,5 +141,25 @@ public sealed record AccountExportMembership(string Organization, string Role, D
 /// <summary>A contributor profile of the user.</summary>
 public sealed record AccountExportContributorProfile(string DisplayName, string Kind, DateTimeOffset CreatedAt);
 
-/// <summary>What the user created: criteria lists (S5-19) and procurement projects (step 5), empty until then.</summary>
-public sealed record AccountExportCreatedByMe(IReadOnlyList<object> CriteriaLists, IReadOnlyList<object> Projects);
+/// <summary>What the user created: criteria lists (S5-19) and procurement projects (step 5, empty until then).</summary>
+public sealed record AccountExportCreatedByMe(IReadOnlyList<AccountExportCriteriaList> CriteriaLists, IReadOnlyList<object> Projects);
+
+/// <summary>A criteria list the user created, with its current content (owner decision S5-19 4).</summary>
+public sealed record AccountExportCriteriaList(
+    string Name,
+    string Organization,
+    string Release,
+    DateTimeOffset CreatedAt,
+    AccountExportListSelection Selection,
+    IReadOnlyList<AccountExportListCriterion> Criteria);
+
+/// <summary>The selection of a list by the names of its values.</summary>
+public sealed record AccountExportListSelection(
+    string? UseCase, IReadOnlyList<string> AppTypes, IReadOnlyList<string> ProductParts, IReadOnlyList<string> TestTypes);
+
+/// <summary>
+/// A criterion of a list with the user's decision: levels as <c>A</c>, <c>B</c>, <c>Info</c>; the
+/// weight only while B applies; the number is <c>null</c> for a „Geprüft nach …“ criterion.
+/// </summary>
+public sealed record AccountExportListCriterion(
+    string? Number, string Title, bool IsIncluded, string RecommendedLevel, string EffectiveLevel, int? Weight, string? Note);

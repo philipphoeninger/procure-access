@@ -20,10 +20,15 @@ internal sealed record ModuleRow(string Name, IReadOnlyList<string> AllowedContr
     /// contracts, the listed contracts and <c>Platform.Contracts</c>, which every module may use.
     /// </summary>
     public IReadOnlySet<string> AllowedReferences =>
-        new HashSet<string>(
-            AllowedContracts.Select(module => ModuleMap.Prefix + module + ModuleMap.ContractsSuffix)
-                .Append(ContractsProject)
-                .Append(ModuleMap.PlatformContracts));
+        new HashSet<string>(AllowedContractsReferences.Append(ContractsProject).Append(ModuleMap.PlatformContracts));
+
+    /// <summary>
+    /// Every project the module's contracts project may reference, directly or through another
+    /// project: the listed contracts and nothing else — not Platform's contracts, not its own
+    /// module (ARCHITECTURE ADR-017, O-22).
+    /// </summary>
+    public IReadOnlySet<string> AllowedContractsReferences =>
+        new HashSet<string>(AllowedContracts.Select(module => ModuleMap.Prefix + module + ModuleMap.ContractsSuffix));
 
     public override string ToString() => Name;
 }

@@ -220,33 +220,7 @@ internal sealed class AdHocSelectionSource(ICatalogSelectionResolver catalog, Pr
         return [.. criteria
             .Select(c => (Criterion: c, Decision: byRevision[c.RevisionId]))
             .Where(p => p.Decision.IsIncluded)
-            .Select(p => RowOf(p.Criterion, p.Decision))];
-    }
-
-    private static ExportRow RowOf(ResolvedCatalogCriterion criterion, Decision decision)
-    {
-        var recommended = criterion.RecommendedPriority;
-        var chosen = decision.OverrideLevel == recommended.Level ? null : decision.OverrideLevel;
-        var effective = chosen ?? recommended.Level;
-        int? weight = effective != PriorityLevel.B
-            ? null
-            : decision.OverrideWeight ?? (recommended.Level == PriorityLevel.B ? recommended.Weight : null);
-
-        return new ExportRow(
-            criterion.Key,
-            criterion.Kind,
-            criterion.Number,
-            criterion.Title,
-            criterion.PlainLanguageTitle,
-            criterion.ShortDescription,
-            criterion.OriginalTitle,
-            criterion.ProductPart,
-            recommended.Level,
-            chosen,
-            weight,
-            recommended.Rationale,
-            string.IsNullOrEmpty(decision.Note) ? null : decision.Note,
-            criterion.TestStepUrl);
+            .Select(p => ExportRow.Of(p.Criterion, p.Decision.OverrideLevel, p.Decision.OverrideWeight, p.Decision.Note))];
     }
 
     private static PriorityLevel EffectiveLevel(ResolvedCatalogCriterion criterion, Decision decision) =>
