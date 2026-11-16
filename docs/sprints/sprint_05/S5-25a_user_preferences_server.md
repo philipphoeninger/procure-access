@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-25a (server part of S5-25, 3 points for S5-25 in all) · **Issues:** #234 (TD-25 part; stays open — the client part is S5-25b, TD-26 is S5-28)
 > **Requirements / invariants:** SPEC R-SET-01, R-SET-02 (server part), §8.4, §8.12 (v2.42); PRV-07 preferences part (TESTING_v82 V276); A11Y-06 server part, still `planned` (V277); ARCHITECTURE C160. No invariant changes its status
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #362 open (2026-11-16)
 > **Scope:** `UserPreferences` stored per user in IdentityAccess with `GET` / `PUT /api/v1/account/preferences`, and the settings in the personal data export. No client change: the client applies the settings, the legacy settings store and page and the legacy `UICustomization` go in S5-25b.
 > **Owner decisions (2026-11-16, before the task):** S5-25 **1a** — `UserPreferences` gets its own table in IdentityAccess (keyed by `UserId`, no foreign key, ADR-014); the legacy `UICustomization` with its column, controller, repo, DTO, mapping and `MapCases` entry is removed (legacy migration, no data migrated, O-S5-4) · **2a** — the legacy settings page `/settings`, its route, nav entries and `LEGACY_EXCEPTIONS` entries go with the store; S5-26 adds the nav entry of `/einstellungen` · **3** — contrast stored as `System` / `High`, `High` refused by the API until H2; `.contrast-more` keeps following `prefers-contrast: more`, without the snackbar (i) · **4** — the export shows the effective values (the defaults when never saved), lower case · **split (a)** — S5-25a server, S5-25b client and the legacy removal
 
