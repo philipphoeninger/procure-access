@@ -24,9 +24,9 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// ARCHITECTURE C79; PRV-07, account part). Every test starts from the Tenants fixture with the
 /// legacy accounts of its users stored. Editor A is also a Reader of organisation B and has a
 /// contributor profile; Owner B has one too, which Editor A's export must not show. The criteria
-/// lists the user created came with S5-19 (owner decision S5-19 4). The parts of PRV-07 that later
-/// tasks fill (preferences S5-25, projects step 5, contributions and purged content step 6) are
-/// empty or <c>null</c> here (owner decision S5-27 1a).
+/// lists the user created came with S5-19 (owner decision S5-19 4), the settings with S5-25a (the
+/// effective values, owner decision S5-25 4). The parts of PRV-07 that later tasks fill (projects
+/// step 5, contributions and purged content step 6) are empty here (owner decision S5-27 1a).
 /// </summary>
 public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -203,7 +203,8 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         account.EnumerateObject().Select(p => p.Name).ShouldBe(["email", "createdAt", "emailConfirmed", "preferences"]);
         account.GetProperty("email").GetString().ShouldBe(TestUsers.Member.Email);
         account.GetProperty("createdAt").ValueKind.ShouldBe(JsonValueKind.Null); // an account from before S5-27
-        account.GetProperty("preferences").ValueKind.ShouldBe(JsonValueKind.Null); // until S5-25
+        // Never saved: the defaults (owner decision S5-25 4).
+        PreferencesOf(account).ShouldBe(("de", "system", "system", "system"));
 
         root.GetProperty("memberships").GetArrayLength().ShouldBe(0);
         root.GetProperty("contributorProfiles").GetArrayLength().ShouldBe(0);
@@ -212,6 +213,30 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         createdByMe.EnumerateObject().Select(p => p.Name).ShouldBe(["criteriaLists", "projects"]);
         createdByMe.GetProperty("criteriaLists").GetArrayLength().ShouldBe(0);
         createdByMe.GetProperty("projects").GetArrayLength().ShouldBe(0);
+    }
+
+    [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWhoSavedSettings_ContainsTheUsersOwnSettings))]
+    [Trait("Invariant", "PRV-07")]
+    public async Task Export_UserWhoSavedSettings_ContainsTheUsersOwnSettings()
+    {
+        // Editor A chose dark and reduced motion; Owner B, light — Editor A's export shows only Editor A's.
+        var own = UserPreferences.Defaults(TestUsers.EditorA.Id);
+        own.Change(UserPreferences.German, AppearancePreference.Dark, MotionPreference.Reduced, ContrastPreference.System);
+        var other = UserPreferences.Defaults(TestUsers.OwnerB.Id);
+        other.Change(UserPreferences.German, AppearancePreference.Light, MotionPreference.System, ContrastPreference.System);
+        await StoreAsync(own, other);
+        using var client = CreateClient(TestUsers.EditorA);
+
+        using var response = await client.GetAsync(Export, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var text = await response.Content.ReadAsStringAsync(Cancellation);
+        using var body = JsonDocument.Parse(text);
+        var account = body.RootElement.GetProperty("account");
+        account.GetProperty("preferences").EnumerateObject().Select(p => p.Name).ShouldBe(["language", "appearance", "motion", "contrast"]);
+        PreferencesOf(account).ShouldBe(("de", "dark", "reduced", "system"));
+        text.ShouldNotContain("\"light\"");
+        text.ShouldNotContain(TestUsers.EditorA.Id, Case.Insensitive);
     }
 
     [Fact]
@@ -252,6 +277,16 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
+    }
+
+    private static (string?, string?, string?, string?) PreferencesOf(JsonElement account)
+    {
+        var preferences = account.GetProperty("preferences");
+        return (
+            preferences.GetProperty("language").GetString(),
+            preferences.GetProperty("appearance").GetString(),
+            preferences.GetProperty("motion").GetString(),
+            preferences.GetProperty("contrast").GetString());
     }
 
     private static User AccountOf(TestUser user, DateTimeOffset? createdAt, bool deleted = false) => new()

@@ -228,6 +228,36 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.ToTable("UserContributorLinks", "identity");
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserPreferences", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Appearance")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Contrast")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.Property<string>("Motion")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserPreferences", "identity");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationInvitation", b =>
                 {
                     b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.Organization", null)

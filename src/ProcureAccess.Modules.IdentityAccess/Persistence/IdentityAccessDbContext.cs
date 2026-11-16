@@ -69,6 +69,9 @@ internal sealed class IdentityAccessDbContext(
     /// </summary>
     public DbSet<OrganizationInvitation> OrganizationInvitations => Set<OrganizationInvitation>();
 
+    /// <summary>The settings of each user who saved any (S5-25a); not organisation-scoped.</summary>
+    public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -87,6 +90,7 @@ internal sealed class IdentityAccessDbContext(
         modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationMembershipConfiguration());
         modelBuilder.ApplyConfiguration(new OrganizationInvitationConfiguration());
+        modelBuilder.ApplyConfiguration(new UserPreferencesConfiguration());
 
         // The organisation filter (ADR-007, TEN-01): a row of an organisation the request's user is
         // no member of does not exist for this context. The organisation row is scoped by its own id.

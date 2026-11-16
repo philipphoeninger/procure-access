@@ -17,7 +17,8 @@ namespace API.ProcureAccess.Account;
 /// ARCHITECTURE §7.2, C79; PRV-07; S5-27): the signed-in user's own data as a JSON file. In the
 /// host, because the address, its confirmation and the creation time come from the legacy
 /// <see cref="User"/>; the memberships and contributor profiles come from IdentityAccess through
-/// <see cref="IAccountDataExport"/>, the criteria lists the user created from Configurator through
+/// <see cref="IAccountDataExport"/>, the settings through <see cref="IUserPreferences"/> (S5-25a),
+/// the criteria lists the user created from Configurator through
 /// <see cref="ICriteriaListDataExport"/> (S5-19). It moves into IdentityAccess with the users (M3.1).
 /// </summary>
 /// <remarks>
@@ -26,8 +27,9 @@ namespace API.ProcureAccess.Account;
 /// and creation time; criteria lists their name, organisation, release, selection and criteria
 /// with the user's decisions (owner decision S5-19 4), for the organisations the user still
 /// belongs to.</para>
-/// <para><b>Sections not built yet</b> (owner decision S5-27 1a): <c>preferences</c> is
-/// <c>null</c> until S5-25 stores <c>UserPreferences</c>; <c>contributions</c> (step 6) and
+/// <para><b>Settings</b> (S5-25a, owner decision S5-25 4): <c>preferences</c> holds the effective
+/// values — the defaults for a user who never saved any —, spelled as the settings API does.</para>
+/// <para><b>Sections not built yet</b> (owner decision S5-27 1a): <c>contributions</c> (step 6) and
 /// <c>createdByMe.projects</c> (step 5) are empty arrays. Each of these tasks fills its section and its part of PRV-07; the format stays
 /// <c>formatVersion</c> 1. <c>account.createdAt</c> is <c>null</c> for accounts created before
 /// S5-27 (decision 2a).</para>
@@ -72,6 +74,7 @@ public static class AccountExportEndpoints
         ClaimsPrincipal principal,
         UserManager<User> users,
         IAccountDataExport accountData,
+        IUserPreferences preferences,
         ICriteriaListDataExport criteriaLists,
         TimeProvider clock,
         HttpContext context,
@@ -89,12 +92,13 @@ public static class AccountExportEndpoints
         }
 
         var part = await accountData.GetAsync(userId, cancellationToken);
+        var settings = await preferences.GetAsync(userId, cancellationToken);
         var lists = await criteriaLists.GetCreatedByAsync(userId, cancellationToken);
         var generatedAt = clock.GetUtcNow();
         var document = new AccountExportDocument(
             generatedAt,
             FormatVersion,
-            new AccountExportAccount(user.Email, user.CreatedAt, user.EmailConfirmed, Preferences: null),
+            new AccountExportAccount(user.Email, user.CreatedAt, user.EmailConfirmed, PreferencesOf(settings)),
             [.. part.Memberships.Select(m => new AccountExportMembership(m.Organization, OrganizationEndpoints.NameOf(m.Role), m.Since))],
             [.. part.ContributorProfiles.Select(p => new AccountExportContributorProfile(p.DisplayName, p.Kind, p.CreatedAt))],
             Contributions: [],
@@ -111,6 +115,9 @@ public static class AccountExportEndpoints
         new AccountExportListSelection(list.Selection.UseCase, list.Selection.AppTypes, list.Selection.ProductParts, list.Selection.TestTypes),
         [.. list.Criteria.Select(c => new AccountExportListCriterion(
             c.Number, c.Title, c.IsIncluded, LevelName(c.RecommendedLevel), LevelName(c.EffectiveLevel), c.Weight, c.Note))]);
+
+    private static AccountExportPreferences PreferencesOf(UserPreferencesValues settings) =>
+        new(settings.Language, settings.Appearance, settings.Motion, settings.Contrast);
 
     /// <summary>The level names of SPEC §8.2: <c>A</c>, <c>B</c>, <c>Info</c>.</summary>
     private static string LevelName(PriorityLevel level) => level switch
@@ -132,8 +139,14 @@ public sealed record AccountExportDocument(
     IReadOnlyList<object> Contributions,
     AccountExportCreatedByMe CreatedByMe);
 
-/// <summary>The account: address, creation time (<c>null</c> before S5-27), confirmation, preferences (<c>null</c> until S5-25).</summary>
-public sealed record AccountExportAccount(string? Email, DateTimeOffset? CreatedAt, bool EmailConfirmed, object? Preferences);
+/// <summary>The account: address, creation time (<c>null</c> before S5-27), confirmation, settings.</summary>
+public sealed record AccountExportAccount(string? Email, DateTimeOffset? CreatedAt, bool EmailConfirmed, AccountExportPreferences Preferences);
+
+/// <summary>
+/// The settings (S5-25a): language <c>de</c>; appearance <c>system</c> / <c>light</c> / <c>dark</c>;
+/// motion <c>system</c> / <c>reduced</c>; contrast <c>system</c> / <c>high</c>.
+/// </summary>
+public sealed record AccountExportPreferences(string Language, string Appearance, string Motion, string Contrast);
 
 /// <summary>A membership: organisation name, role (<c>owner</c>, <c>editor</c>, <c>reader</c>) and since when.</summary>
 public sealed record AccountExportMembership(string Organization, string Role, DateTimeOffset Since);
