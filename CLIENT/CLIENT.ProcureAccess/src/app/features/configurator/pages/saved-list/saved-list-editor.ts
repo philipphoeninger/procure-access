@@ -18,7 +18,7 @@ import {
   setNote,
   setWeight,
 } from '../../state/criteria-list-rules';
-import { PRIORITY_WEIGHT_RANGE } from '../../state/priority-weight-range';
+import { ConfiguratorSettings } from '../../state/configurator-settings';
 
 /** A note is saved this long after the last keystroke (owner decision S5-21b 1a). */
 export const NOTE_SAVE_DELAY_MS = 800;
@@ -62,7 +62,7 @@ function sameDecision(a: CriterionDecision, b: CriterionDecision): boolean {
 @Injectable()
 export class SavedListEditor {
   private readonly api = inject(ConfiguratorApiService);
-  private readonly weightRange = inject(PRIORITY_WEIGHT_RANGE);
+  private readonly settings = inject(ConfiguratorSettings);
 
   private readonly current = signal<CriterionDecisions>({});
   /** The decisions as shown, by criterion key. */
@@ -95,7 +95,7 @@ export class SavedListEditor {
   }
 
   setWeight(key: string, weight: number): void {
-    this.change(key, (decisions, criterion) => setWeight(decisions, criterion, weight, this.weightRange));
+    this.change(key, (decisions, criterion) => setWeight(decisions, criterion, weight, this.settings.weightRange()));
   }
 
   resetPriority(key: string): void {

@@ -6,12 +6,13 @@ import { signal } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
-import { BehaviorSubject } from 'rxjs';
+import { fireEvent } from '@testing-library/dom';
+import { BehaviorSubject, of } from 'rxjs';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { PRIORITY_WEIGHT_RANGE } from '@app/features/configurator/state/priority-weight-range';
+import { provideLoadedConfiguratorSettings } from '@app/features/configurator/testing/configurator-settings-stub';
 import { OrganizationRole, OrganizationSummary } from '@app/features/organization/models/organization';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
@@ -91,7 +92,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
         SavedListEditor,
         { provide: ActivatedRoute, useValue: { paramMap, snapshot: { data: {} } } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 10 } },
+        provideLoadedConfiguratorSettings(),
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: ConfiguratorApiService, useValue: { decide, copyToActiveRelease } },
         { provide: ProcureAccessStore, useValue: { organizations: signal(role === null ? [] : [membership(role)]) } },
@@ -127,6 +128,8 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
       expect(screen.getByRole('searchbox')).toBeTruthy();
       expect(screen.queryByRole('link', { name: 'Auswahl ändern' })).toBeNull();
       expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
+      // A saved list saves each change: no „Noch nicht gespeichert“ (owner decision S5-22 4).
+      expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
 
       expect(card('Bilder haben einen Alternativtext').textContent).toContain('Nicht in Ihrer Liste');
       const weighted = card('Alles geht mit der Tastatur');
@@ -172,15 +175,36 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     });
 
     it('links „Auswahl ändern“ to S10 of the list and exports the stored list', async () => {
-      const open = vi.spyOn(ExportDialog, 'open').mockReturnValue(undefined as never);
+      const open = vi.spyOn(ExportDialog, 'open').mockReturnValue({ afterClosed: () => of(undefined) } as never);
       await openPage();
 
       expect(screen.getByRole('link', { name: 'Auswahl ändern' }).getAttribute('href')).toBe('/kriterienlisten/list-1/auswahl');
+      expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
       screen.getByRole('button', { name: 'Liste exportieren' }).click();
 
       await vi.waitFor(() =>
-        expect(open).toHaveBeenCalledWith(expect.anything(), { listId: 'list-1', release: 'T.1', included: 3 }),
+        expect(open).toHaveBeenCalledWith(expect.anything(), { listId: 'list-1', release: 'T.1', included: 3, tooLongNote: null }),
       );
+      open.mockRestore();
+    });
+
+    it('hands a too-long note, never stored, to S13 and opens it after „Zur Notiz“ (TD-40)', async () => {
+      const open = vi.spyOn(ExportDialog, 'open').mockReturnValue({ afterClosed: () => of({ toNote: '11.3.3' }) } as never);
+      const fixture = await openPage();
+      const headings = card('Überschriften');
+      within(headings).getByRole('button', { name: 'Notiz hinzufügen' }).click();
+      await fixture.whenStable();
+      const note = within(headings).getByRole<HTMLTextAreaElement>('textbox', { name: 'Ihre Notiz zu diesem Kriterium (optional)' });
+      note.value = 'x'.repeat(1001);
+      fireEvent.input(note);
+      await fixture.whenStable();
+      screen.getByRole('button', { name: 'Liste exportieren' }).focus();
+
+      screen.getByRole('button', { name: 'Liste exportieren' }).click();
+
+      await vi.waitFor(() => expect(document.activeElement).toBe(note));
+      expect(open.mock.calls[0][1]?.tooLongNote?.key).toBe('11.3.3');
+      expect(within(headings).getByText('Bitte kürzen Sie den Text auf höchstens 1000 Zeichen. Derzeit sind es 1001.')).toBeTruthy();
       open.mockRestore();
     });
 

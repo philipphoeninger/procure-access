@@ -9,7 +9,8 @@ import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input }
 export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.5em)';
 
 /**
- * The action bar of a criteria list (R-LST-10; Handoff §2.1, §5.1): the status text, then the
+ * The action bar of a criteria list (R-LST-10; Handoff §2.1, §5.1): the status text — on S11 with
+ * „Noch nicht gespeichert“ under it (`criteria.list.unsaved`, S5-22) —, then the
  * buttons the page projects, in DOM order. In the flow below 600 px width or height, sticky at the
  * bottom from there. Used by S11 and the page of a saved list (S5-21b), so both keep the same
  * rule for the focus:
@@ -26,7 +27,12 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
 @Component({
   selector: 'pa-criteria-action-bar',
   template: `
-    <p class="pa-criteria-action-bar__status">{{ status() }}</p>
+    <div class="pa-criteria-action-bar__status">
+      <p class="pa-criteria-action-bar__text">{{ status() }}</p>
+      @if (saveState(); as saveState) {
+        <p class="pa-criteria-action-bar__text">{{ saveState }}</p>
+      }
+    </div>
     <ng-content />
   `,
   styleUrl: './criteria-action-bar.scss',
@@ -35,6 +41,8 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
 export class CriteriaActionBar {
   /** The status text, already translated (`criteria.list.status.count`). */
   readonly status = input.required<string>();
+  /** A second line under the status, already translated: `criteria.list.unsaved` on S11 (S5-22). */
+  readonly saveState = input<string | null>(null);
 
   constructor() {
     const document = inject(DOCUMENT);

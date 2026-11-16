@@ -17,7 +17,7 @@ import { CriteriaResponse } from '../models/criteria';
 import { FilterOptionsLayers } from '../models/filter-options';
 import { criteriaAnswer } from '../testing/criteria-fixture';
 import { excluded, filterOptions, filterOptionsAnswer } from '../testing/filter-options-fixture';
-import { PRIORITY_WEIGHT_RANGE } from './priority-weight-range';
+import { provideLoadedConfiguratorSettings } from '../testing/configurator-settings-stub';
 import { CRITERIA_SEARCH_DEBOUNCE_MS, initialConfiguratorState, withConfigurator } from './with-configurator';
 
 const ConfiguratorTestStore = signalStore(withConfigurator());
@@ -34,6 +34,7 @@ describe('withConfigurator', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_URL, useValue: '/api' },
+        provideLoadedConfiguratorSettings(),
       ],
     });
     store = TestBed.inject(ConfiguratorTestStore);
@@ -506,7 +507,7 @@ describe('withConfigurator', () => {
       });
     });
 
-    it('reads the weight range from the environment setting (🔧)', async () => {
+    it('reads the weight range the server serves (🔧, SPEC §8.11)', async () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         providers: [
@@ -514,7 +515,7 @@ describe('withConfigurator', () => {
           provideHttpClient(),
           provideHttpClientTesting(),
           { provide: API_URL, useValue: '/api' },
-          { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 12 } },
+          provideLoadedConfiguratorSettings({ min: 1, max: 12 }),
         ],
       });
       store = TestBed.inject(ConfiguratorTestStore);

@@ -123,6 +123,15 @@ export function noteLengthError(note: string): NoteLengthError | null {
 }
 
 /**
+ * The first criterion, in list order, whose note is too long (SPEC §7.2; TD-40), or null. Every
+ * criterion counts, an excluded one too: the export refuses a too-long note on any of them, and a
+ * saved list never stores one (S5-21b R4).
+ */
+export function firstTooLongNote(criteria: readonly Criterion[], decisions: CriterionDecisions): Criterion | null {
+  return criteria.find((criterion) => noteLengthError(decisionOf(decisions, criterion.key).note) !== null) ?? null;
+}
+
+/**
  * Search over what the compact card shows (owner decision O-S4-26 (a)): key and number, title,
  * plain-language title and the original titles of the procedure texts. Case-insensitive substring
  * of the whole trimmed query; umlauts are not folded. An empty query matches every criterion.

@@ -19,7 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { problemDetails, problemTypeName } from '@app/core/errors/problem-details';
@@ -28,9 +28,12 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { Notice } from '@app/shared/components/notice/notice';
 import { TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
+import { Criterion } from '../../models/criteria';
+import { NOTE_MAX_LENGTH } from '../../models/criteria-list';
 import { ExportFile, ExportFormat } from '../../models/export';
 import { ExportApiService } from '../../services/api/export-api.service';
-import { includedCount } from '../../state/criteria-list-rules';
+import { firstTooLongNote, includedCount } from '../../state/criteria-list-rules';
+import { procedureTestType, requirementTitle } from '../../state/criterion-card-rules';
 import { toExportRequest } from '../../state/export-request';
 
 /** What the dialog shows below the notes; the error states keep the form (Handoff §5.1 S13-E). */
@@ -39,16 +42,24 @@ type ExportStatus =
   | { kind: 'busy' }
   | { kind: 'failed' }
   | { kind: 'rateLimited'; minutes: number }
-  | { kind: 'outdated' };
+  | { kind: 'outdated' }
+  | { kind: 'noteTooLong'; key: string; criterion: string };
 
 /**
  * A saved list to export (R-LST-12, S5-21b): the file comes from the stored list under its own
- * release, so the dialog needs only its id, its release and how many criteria it includes.
+ * release, so the dialog needs its id, its release, how many criteria it includes and, since S5-22,
+ * the first criterion whose note is too long in the editor (never stored, S5-21b R4; TD-40).
  */
 export interface SavedListExport {
   listId: string;
   release: string;
   included: number;
+  tooLongNote: Criterion | null;
+}
+
+/** What S13 closes with: „Zur Notiz“ names the criterion whose note the page opens (TD-40). */
+export interface ExportDialogResult {
+  toNote: string;
 }
 
 /** Panel class of the dialog: 600 px from 600 px, full screen below (`styles/main.scss`, Handoff §2.3). */
@@ -66,6 +77,10 @@ export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
  * - While the file is requested the button keeps its label, shows the 20 px spinner and is
  *   `aria-disabled` (Handoff §6.2). Success: the browser downloads the file, `criteria.export.success`
  *   is announced and the dialog closes.
+ * - A note that is too long (SPEC §7.2; TD-40, owner decision S5-22 2a) is found before any request:
+ *   the error notice names its criterion (`criteria.export.noteTooLong`) and the primary button —
+ *   the same element, so the focus stays — becomes „Zur Notiz“ (`criteria.export.toNote`). It closes
+ *   the dialog with {@link ExportDialogResult}; the page opens that note and moves the focus into it.
  * - A failure shows an error notice above the actions (`role="alert"`, S13-E): `criteria.export.error`
  *   with „Erneut versuchen“ in place of „Datei herunterladen“; a 429 the same with `errors.rateLimit`
  *   and its minutes; `release-mismatch` `criteria.export.outdated` with „Schließen“ only, which takes
@@ -91,8 +106,8 @@ export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
 })
 export class ExportDialog {
   /** Opens S13 with the first focus on the selected format; for a saved list with `savedList`. */
-  static open(dialog: MatDialog, savedList?: SavedListExport): MatDialogRef<ExportDialog> {
-    return dialog.open(ExportDialog, {
+  static open(dialog: MatDialog, savedList?: SavedListExport): MatDialogRef<ExportDialog, ExportDialogResult> {
+    return dialog.open<ExportDialog, SavedListExport | null, ExportDialogResult>(ExportDialog, {
       data: savedList ?? null,
       // The checked radio is the group's only tab stop; a selector also works on iOS, where the
       // CDK counts fewer elements as tabbable.
@@ -106,7 +121,8 @@ export class ExportDialog {
   private readonly api = inject(ExportApiService);
   private readonly files = inject(FileSaver);
   private readonly announcer = inject(A11yAnnouncerService);
-  private readonly dialogRef = inject<MatDialogRef<ExportDialog>>(MatDialogRef);
+  private readonly dialogRef = inject<MatDialogRef<ExportDialog, ExportDialogResult>>(MatDialogRef);
+  private readonly translate = inject(TranslateService);
   private readonly injector = inject(Injector);
   private readonly closeButton = viewChild('closeButton', { read: ElementRef });
   /** The saved list to export; null for the draft of S11. */
@@ -131,6 +147,8 @@ export class ExportDialog {
     const status = this.status();
     return status.kind === 'rateLimited' ? status.minutes : 0;
   });
+  /** The limit `criteria.export.noteTooLong` names. */
+  protected readonly noteMaxLength = NOTE_MAX_LENGTH;
   /** After a failure the primary button retries (S13-E). */
   protected readonly failedBefore = computed(() => ['failed', 'rateLimited'].includes(this.status().kind));
 
@@ -143,15 +161,31 @@ export class ExportDialog {
   }
 
   protected primaryLabelKey(): string {
+    if (this.status().kind === 'noteTooLong') return 'criteria.export.toNote';
     return this.failedBefore() || (this.busy() && this.retrying) ? 'common.actions.retry' : 'criteria.export.submit';
+  }
+
+  /** The primary button: „Zur Notiz“ while a note is too long, else the download. */
+  protected primary(): void {
+    const status = this.status();
+    if (status.kind === 'noteTooLong') {
+      this.dialogRef.close({ toNote: status.key });
+      return;
+    }
+    void this.download();
   }
 
   protected chooseFormat(format: ExportFormat): void {
     this.format.set(format);
   }
 
-  protected async download(): Promise<void> {
+  private async download(): Promise<void> {
     if (this.busy()) return;
+    const tooLong = this.tooLongNote();
+    if (tooLong !== null) {
+      this.status.set({ kind: 'noteTooLong', key: tooLong.key, criterion: this.titleOf(tooLong) });
+      return;
+    }
     this.retrying = this.failedBefore();
     const request = this.request();
     if (request === null) {
@@ -177,6 +211,23 @@ export class ExportDialog {
         );
       }
     }
+  }
+
+  /** The first criterion whose note is too long: of the saved list's editor, or of the draft. */
+  private tooLongNote(): Criterion | null {
+    if (this.savedList !== null) return this.savedList.tooLongNote;
+    const answer = this.store.configurator.list.answer();
+    return answer === null ? null : firstTooLongNote(answer.criteria, this.store.configurator.list.decisions());
+  }
+
+  /** The criterion as its card's H2 names it. */
+  private titleOf(criterion: Criterion): string {
+    const testType = procedureTestType(criterion);
+    return testType === null
+      ? requirementTitle(criterion)
+      : (this.translate.instant('criteria.item.testedBy.title', {
+          testType: this.translate.instant(`testType.${testType}`) as string,
+        }) as string);
   }
 
   /** The request of the file: the saved list as stored, or the draft of S11; null without a list. */

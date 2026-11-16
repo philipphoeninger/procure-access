@@ -12,8 +12,6 @@ export const environment = {
   // or an https URL. 🔧 Placeholder until O-6 is decided: an address on the reserved domain
   // `.invalid`, which scripts/check-release-config.mjs refuses for a production release.
   criteriaSuggestion: 'mailto:kriterium-vorschlagen@example.invalid',
-  // Range of a user weight for a B criterion (R-LST-03). 🔧 Confirmed default (SPEC SD23).
-  priorityWeight: { min: 1, max: 10 },
   // Shortest password of the registration (R-AUTH-01). 🔧 Confirmed default (SPEC SD23); keep it in
   // step with the server's Account:Password:MinLength, which decides.
   passwordMinLength: 12,

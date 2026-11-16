@@ -8,6 +8,7 @@ import { API_URL } from '@app/app.config';
 import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { lastValueFrom } from 'rxjs';
 
+import { ConfiguratorSettingsResponse } from '../../models/configurator-settings';
 import {
   ChangedSelection,
   CopiedList,
@@ -19,8 +20,8 @@ import {
 } from '../../models/saved-lists';
 
 /**
- * Client of the configurator endpoints (ARCHITECTURE §7.2): the usage event of S11 under
- * `/api/v1/configurator` and, since S5-20b, the saved lists under `/api/v1/configurations`
+ * Client of the configurator endpoints (ARCHITECTURE §7.2): the usage event of S11 and, since
+ * S5-22, the settings (SPEC §8.11) under `/api/v1/configurator` and, since S5-20b, the saved lists under `/api/v1/configurations`
  * (SPEC §8.10). The saved-list requests are marked {@link CALLER_SHOWS_FAILURES}: S12, S14 and the
  * page of a saved list show every failure in place — except the changes of a list (a decision, the
  * selection, deleting, the copy), whose failure the error interceptor shows as everywhere (owner
@@ -42,6 +43,14 @@ export class ConfiguratorApiService {
         context: new HttpContext().set(BACKGROUND_REQUEST, true),
       }),
     );
+  }
+
+  /**
+   * The settings the server decides (SPEC §8.11): the range of a user weight. Not marked, so a
+   * failure shows the system state (offline notice or server page) like any request.
+   */
+  settings(): Promise<ConfiguratorSettingsResponse> {
+    return lastValueFrom(this.http.get<ConfiguratorSettingsResponse>(`${this.apiUrl}/v1/configurator/settings`));
   }
 
   /** Saves the draft as a list of the organisation (R-SAV-01); resolves to its id. */

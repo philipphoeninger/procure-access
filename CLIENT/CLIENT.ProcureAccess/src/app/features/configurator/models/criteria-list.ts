@@ -45,7 +45,7 @@ export interface NoteLengthError {
   current: number;
 }
 
-/** The range of a user weight (R-LST-03: 1–10, a 🔧 value read from the environment). */
+/** The range of a user weight (R-LST-03: 1–10, a 🔧 value the server serves, SPEC §8.11). */
 export interface WeightRange {
   min: number;
   max: number;

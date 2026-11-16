@@ -7,16 +7,19 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { ConfiguratorSettings } from '../state/configurator-settings';
 import { FilterOptionsStatus } from '../state/with-configurator';
 import { completeSelectionGuard, configuratorReleaseGuard } from './configurator-guards';
 
 describe('configurator guards', () => {
   const complete = signal(false);
   let status: FilterOptionsStatus;
+  let settingsReady: boolean;
 
   beforeEach(() => {
     complete.set(false);
     status = 'loaded';
+    settingsReady = true;
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -27,6 +30,7 @@ describe('configurator guards', () => {
             configuratorComplete: complete,
           },
         },
+        { provide: ConfiguratorSettings, useValue: { ready: () => Promise.resolve(settingsReady) } },
       ],
     });
   });
@@ -64,6 +68,13 @@ describe('configurator guards', () => {
 
     it('leads back to S10 when the selection is gone, e.g. after a reload (R-CON-09)', async () => {
       expect(url(await run(completeSelectionGuard))).toBe('/kriterien');
+    });
+
+    it('stays where it is when the settings fail; the error interceptor shows the system state (SPEC §8.11)', async () => {
+      complete.set(true);
+      settingsReady = false;
+
+      expect(url(await run(completeSelectionGuard))).toBe(false);
     });
   });
 });
