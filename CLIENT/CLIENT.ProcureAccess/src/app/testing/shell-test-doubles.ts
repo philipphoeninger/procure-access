@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, Provider, signal } from '@angular/core';
+import { Component, computed, Provider, signal } from '@angular/core';
 import { Routes } from '@angular/router';
 import { of } from 'rxjs';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@features/identity/services/auth.service';
+import { OrganizationSummary } from '@app/features/organization/models/organization';
 
 // Test doubles for the shell components (header, main nav, footer, app shell): only what is
 // outside the component is replaced — the layout breakpoint, the store (with the session state of
@@ -26,6 +27,8 @@ export const SHELL_TEST_ROUTES: Routes = [
   'product-proposal/:id',
   'profile',
   'settings',
+  'organisation',
+  'organisation/:id/mitglieder',
   'impressum',
   'datenschutz',
   'barrierefreiheit',
@@ -41,11 +44,30 @@ export function provideLayout(wide: boolean): Provider {
   };
 }
 
-export function createShellDoubles(signedIn = false) {
+/** Two organisations of the signed-in test user, by name (`GET /api/v1/organizations`). */
+export const TEST_ORGANIZATIONS: OrganizationSummary[] = [
+  { id: 'org-a', name: 'Ämter Musterhausen', type: 'publicBody', role: 'owner' },
+  { id: 'org-v', name: 'Verein Beispiel', type: 'association', role: 'reader' },
+];
+
+/**
+ * The store as the shell reads it. `organizations` and the active one behave like `withIdentity()`
+ * (S5-18): the choice of the switch while it is one of the list, otherwise the first by name.
+ */
+export function createShellDoubles(signedIn = false, organizations: OrganizationSummary[] = []) {
+  const signedInState = signal(signedIn);
+  const organizationsState = signal(organizations);
+  const activeOrganizationId = signal<string | null>(null);
   const store = {
     user: signal<object | null>(signedIn ? { id: 'u1' } : null),
     isLoading: signal(false),
-    signedIn: signal(signedIn),
+    signedIn: signedInState,
+    session: computed(() => (signedInState() ? { id: 'u1', email: 'ada@example.test', roles: [], permissions: [] } : null)),
+    organizations: organizationsState,
+    activeOrganization: computed(
+      () => organizationsState().find((o) => o.id === activeOrganizationId()) ?? organizationsState()[0] ?? null,
+    ),
+    switchOrganization: vi.fn((id: string) => activeOrganizationId.set(id)),
     endSession: vi.fn().mockResolvedValue(undefined),
   };
   const authService = { showLogin: vi.fn().mockResolvedValue(true) };

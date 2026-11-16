@@ -5,6 +5,7 @@
 import { expect, test, type APIRequestContext, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
+import { accountMenuButton } from '../support/session';
 
 /**
  * Password reset S03 and the lockout note of S01 (S5-13b; R-AUTH-03, R-AUTH-04) on the real E2E
@@ -17,7 +18,6 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 const NEW_PASSWORD = 'e2e-neues-Passwort-2026';
 
 const main = (page: Page) => page.getByRole('main');
-const header = (page: Page) => page.getByRole('banner');
 
 /** A new address per test and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
@@ -102,7 +102,7 @@ test.describe('S03 „Passwort zurücksetzen“', () => {
     await main(page).getByLabel('E-Mail-Adresse').fill(address);
     await main(page).getByLabel('Passwort', { exact: true }).fill(NEW_PASSWORD);
     await press(main(page).getByRole('button', { name: 'Anmelden' }));
-    await expect(header(page).getByRole('button', { name: 'Abmelden' })).toBeVisible();
+    await expect(accountMenuButton(page)).toBeVisible();
 
     // The link is single use: opened again it shows the form, and saving shows „Link nicht mehr gültig“
     await page.goto(link.href);

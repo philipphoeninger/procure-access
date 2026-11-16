@@ -167,7 +167,8 @@
       "settings": "Einstellungen",
       "account": "Konto",
       "login": "Anmelden",
-      "logout": "Abmelden"
+      "logout": "Abmelden",
+      "organization": "Organisation"
     },
     "skipLink": "Zum Inhalt springen",
     "appName": "ProcureAccess",

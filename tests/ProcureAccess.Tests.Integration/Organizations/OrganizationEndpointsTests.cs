@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using MODELS.ProcureAccess.Entities;
 using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
@@ -336,6 +337,74 @@ public sealed class OrganizationEndpointsTests(ApiFixture api) : IntegrationTest
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         (await RoleOfAsync(Fixture.A.Id, user)).ShouldBeNull();
         after.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact(DisplayName = "INV:TEN-01 " + nameof(List_MemberOfTwoOrganizations_ListsBothByNameWithItsRoles))]
+    [Trait("Invariant", "TEN-01")]
+    public async Task List_MemberOfTwoOrganizations_ListsBothByNameWithItsRoles()
+    {
+        // Reader of A also becomes Editor of B and of a third organisation whose name sorts first
+        // only under German collation (Ä before B); the header's switch lists all three (R-SHL-03).
+        var now = Clock.GetUtcNow();
+        var third = Organization.Create("Ämter Musterhausen", OrganizationType.PublicBody, TestUsers.Member.Id, now);
+        await StoreAsync(
+        [
+            third,
+            OrganizationMembership.Founder(third, now),
+            OrganizationMembership.Create(third.Id, TestUsers.ReaderA.Id, OrganizationRole.Editor, now, now),
+            OrganizationMembership.Create(Fixture.B.Id, TestUsers.ReaderA.Id, OrganizationRole.Editor, now, now),
+        ]);
+        using var client = CreateClient(TestUsers.ReaderA);
+
+        var answer = await client.GetFromJsonAsync<List<OrganizationSummaryResponse>>(Organizations, Cancellation);
+
+        answer.ShouldBe(
+        [
+            new OrganizationSummaryResponse(third.Id, "Ämter Musterhausen", "publicBody", "editor"),
+            new OrganizationSummaryResponse(Fixture.A.Id, "Organisation A", "publicBody", "reader"),
+            new OrganizationSummaryResponse(Fixture.B.Id, "Organisation B", "company", "editor"),
+        ]);
+    }
+
+    [Theory(DisplayName = "INV:TEN-01 " + nameof(List_Request_ListsOnlyTheUsersOwnOrganizations))]
+    [Trait("Invariant", "TEN-01")]
+    [InlineData("owner-a", "A", "owner")]
+    [InlineData("reader-b", "B", "reader")]
+    public async Task List_Request_ListsOnlyTheUsersOwnOrganizations(string userName, string organization, string role)
+    {
+        using var client = CreateClient(TestUsers.ByName[userName]);
+        var own = organization == "A" ? Fixture.A : Fixture.B;
+        var other = organization == "A" ? Fixture.B : Fixture.A;
+        // Naming the other organisation changes nothing: the list follows the memberships.
+        client.DefaultRequestHeaders.Add("X-Organization-Id", other.Id.ToString());
+
+        var answer = await client.GetFromJsonAsync<List<OrganizationSummaryResponse>>(Organizations, Cancellation);
+
+        answer.ShouldNotBeNull().ShouldHaveSingleItem().ShouldBe(
+            new OrganizationSummaryResponse(own.Id, own.Name, organization == "A" ? "publicBody" : "company", role));
+    }
+
+    [Fact(DisplayName = "INV:TEN-01 " + nameof(List_UserWithoutOrganization_ReturnsAnEmptyList))]
+    [Trait("Invariant", "TEN-01")]
+    public async Task List_UserWithoutOrganization_ReturnsAnEmptyList()
+    {
+        using var client = CreateClient(TestUsers.Member);
+
+        var answer = await client.GetFromJsonAsync<List<OrganizationSummaryResponse>>(Organizations, Cancellation);
+
+        answer.ShouldNotBeNull().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task List_AfterLeaving_NoLongerListsTheOrganization()
+    {
+        using var client = CreateClient(TestUsers.EditorA);
+        using var left = await client.DeleteAsync(MemberPath(Fixture.A.Id, TestUsers.EditorA.Id), Cancellation);
+        left.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        var answer = await client.GetFromJsonAsync<List<OrganizationSummaryResponse>>(Organizations, Cancellation);
+
+        answer.ShouldNotBeNull().ShouldBeEmpty();
     }
 
     private static string MembersPath(Guid organizationId) => $"{Organizations}/{organizationId}/members";

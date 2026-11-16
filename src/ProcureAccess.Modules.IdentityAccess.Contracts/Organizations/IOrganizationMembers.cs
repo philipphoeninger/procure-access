@@ -28,6 +28,13 @@ public interface IOrganizationMembers
     /// </summary>
     Task<OrganizationMembers?> GetAsync(Guid organizationId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The organisations of <paramref name="userId"/> with the user's role in each, by name (German
+    /// collation, then id): the header's organisation display and switch (R-SHL-02, R-SHL-03; S5-18).
+    /// Empty for a user without membership.
+    /// </summary>
+    Task<IReadOnlyList<OrganizationSummary>> ListOfAsync(string userId, CancellationToken cancellationToken);
+
     /// <summary>Gives the member <paramref name="userId"/> the role <paramref name="role"/> (R-ORG-03).</summary>
     Task<MembershipChangeResult> ChangeRoleAsync(
         Guid organizationId, string userId, OrganizationRole role, CancellationToken cancellationToken);
@@ -45,6 +52,9 @@ public static class OrganizationLimits
 
 /// <summary>An organisation with its members, as the members page S21 shows it.</summary>
 public sealed record OrganizationMembers(Guid Id, string Name, OrganizationType Type, IReadOnlyList<OrganizationMember> Members);
+
+/// <summary>An organisation of the signed-in user with the user's role in it, as the header lists it.</summary>
+public sealed record OrganizationSummary(Guid Id, string Name, OrganizationType Type, OrganizationRole Role);
 
 /// <summary>One member: the ASP.NET Core Identity user id and the role.</summary>
 public sealed record OrganizationMember(string UserId, OrganizationRole Role);

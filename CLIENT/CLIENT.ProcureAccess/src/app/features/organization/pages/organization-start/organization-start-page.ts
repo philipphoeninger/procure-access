@@ -23,6 +23,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
+import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
 import { applyServerErrors, problemTypeName, ServerErrorField } from '@app/core/errors/problem-details';
 import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm-required-notice/confirm-required-notice';
@@ -86,6 +87,7 @@ type Field = ServerErrorField & { path: string; message: () => TextKey | null };
 })
 export class OrganizationStartPage {
   private readonly api = inject(OrganizationApiService);
+  private readonly store = inject(ProcureAccessStore);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly pageTitle = inject(PageTitleStrategy);
@@ -172,6 +174,8 @@ export class OrganizationStartPage {
       this.busy.set(false);
     }
     this.showErrors([]);
+    // The header shows the new organisation (R-SHL-02) before S21 opens.
+    await this.store.organizationJoined(id);
     await this.router.navigate([ORGANIZATION_PATH, id, MEMBERS_SEGMENT]);
   }
 

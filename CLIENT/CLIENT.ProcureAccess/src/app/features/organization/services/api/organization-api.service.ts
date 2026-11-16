@@ -7,7 +7,7 @@ import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
-import { CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import {
   AcceptedInvitation,
   CreatedInvitation,
@@ -17,6 +17,7 @@ import {
   InviteRequest,
   OrganizationMembers,
   OrganizationRole,
+  OrganizationSummary,
   PendingInvitation,
 } from '../../models/organization';
 
@@ -43,6 +44,19 @@ export const ACCEPT_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 
 export class OrganizationApiService {
   private readonly apiUrl = inject(API_URL);
   private readonly http = inject(HttpClient);
+
+  /**
+   * The signed-in user's organisations by name (R-SHL-02, R-SHL-03). The header loads them after the
+   * session, not because the user asked: marked {@link BACKGROUND_REQUEST}, so a failure shows
+   * nothing and the header stays without organisation display.
+   */
+  mine(): Promise<OrganizationSummary[]> {
+    return lastValueFrom(
+      this.http.get<OrganizationSummary[]>(`${this.apiUrl}/v1/organizations`, {
+        context: new HttpContext().set(BACKGROUND_REQUEST, true),
+      }),
+    );
+  }
 
   /** Creates an organisation; the signed-in user becomes its Owner (R-ORG-01). */
   create(request: CreateOrganizationRequest): Promise<CreatedOrganization> {

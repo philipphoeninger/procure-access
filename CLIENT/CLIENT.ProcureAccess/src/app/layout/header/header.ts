@@ -12,15 +12,16 @@ import { injectWideLayout } from '@layout/shell/wide-layout';
 /**
  * pa-app-header · Kopfzeile — one component with two layouts (Handoff §3.1): below 600 px the
  * compact header (app name + „Menü“, Figma `pa-app-header-compact` 2039:2131), from 600 px the
- * full header with the main navigation. State Anonymous only; SignedIn and SignedInNoOrg come
- * with step 3.
+ * full header with the main navigation. The states Anonymous, SignedIn and SignedInNoOrg
+ * (R-SHL-02, S5-18) and the organisation switch (R-SHL-03) live in `pa-main-nav`, which both
+ * layouts show.
  *
  * The compact menu itself is the shell's `mat-sidenav` (it must be a child of the sidenav
  * container), so this component only reports the toggle and shows its state.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2017-650
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2131 (compact)
- * @spec docs/design_handoff_procureaccess_v1.md §3.1, §2.2
+ * @spec docs/design_handoff_procureaccess_v1.md §3.1, §2.2; docs/SPEC_v2.md R-SHL-02, R-SHL-03
  */
 @Component({
   selector: 'pa-header',

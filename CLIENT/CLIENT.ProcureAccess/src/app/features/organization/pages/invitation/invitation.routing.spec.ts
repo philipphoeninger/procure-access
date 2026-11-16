@@ -54,6 +54,7 @@ describe('Page of an invitation link (R-ORG-02, /organisation/einladung)', () =>
   let viewInvitation: ReturnType<typeof vi.fn>;
   let acceptInvitation: ReturnType<typeof vi.fn>;
   let announce: ReturnType<typeof vi.fn>;
+  let organizationJoined: ReturnType<typeof vi.fn>;
   let announcePageTitle: ReturnType<typeof vi.fn>;
   let showLogin: ReturnType<typeof vi.fn>;
   let showRegister: ReturnType<typeof vi.fn>;
@@ -64,6 +65,7 @@ describe('Page of an invitation link (R-ORG-02, /organisation/einladung)', () =>
     viewInvitation = 'rejectWith' in view ? vi.fn().mockRejectedValue(view.rejectWith) : vi.fn().mockResolvedValue(view);
     acceptInvitation = vi.fn().mockResolvedValue({ organizationId: 'org-1' });
     announce = vi.fn().mockResolvedValue(undefined);
+    organizationJoined = vi.fn().mockResolvedValue(undefined);
     announcePageTitle = vi.fn().mockResolvedValue(undefined);
     showLogin = vi.fn().mockResolvedValue(true);
     showRegister = vi.fn();
@@ -89,6 +91,7 @@ describe('Page of an invitation link (R-ORG-02, /organisation/einladung)', () =>
             incrementLoadingCount: vi.fn(),
             decrementLoadingCount: vi.fn(),
             resendConfirmation: vi.fn(),
+            organizationJoined,
           },
         },
       ],
@@ -159,6 +162,7 @@ describe('Page of an invitation link (R-ORG-02, /organisation/einladung)', () =>
     await settle(fixture);
 
     expect(acceptInvitation).toHaveBeenCalledExactlyOnceWith('t1');
+    expect(organizationJoined).toHaveBeenCalledExactlyOnceWith('org-1');
     expect(announce).toHaveBeenCalledWith('org.invite.accepted', { org: 'Stadt Musterhausen' });
     expect(router.url).toBe('/organisation/org-1/mitglieder');
     expect(TestBed.inject(InvitationPageState).token).toBeNull();

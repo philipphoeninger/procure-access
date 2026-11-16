@@ -16,7 +16,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * overlay since S5-09, the registration S02 and its confirmation pages since S5-12b, the password reset
  * S03 with both steps since S5-13b, the organisation pages S20 and S21 (with the error summary, the
  * last-Owner notice and the confirmation dialog) since S5-16b, S21's open invitations and invite form
- * and the page of an invitation link since S5-17b. The legacy screens are
+ * and the page of an invitation link since S5-17b, the signed-in compact menu with the organisation
+ * switch since S5-18. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -110,6 +111,37 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
       nav.getByRole('link', { name: 'Beitragen' }),
       // „Anmelden“ follows the navigation in the menu, outside the nav landmark.
       page.getByRole('button', { name: 'Anmelden' }),
+    ]) {
+      await item.scrollIntoViewIfNeeded();
+      await expect(item).toBeInViewport();
+    }
+  });
+
+  test('the open compact menu signed in, with the organisation switch, needs no horizontal scrolling and reaches every item', async ({ page }) => {
+    // Two memberships with long names, answered here: the seeded organisation stays as it is (S5-16 7a)
+    await page.route('**/api/v1/organizations', (route) =>
+      route.fulfill({
+        status: 200,
+        json: [
+          { id: E2E_ORGANIZATION.id, name: E2E_ORGANIZATION.name, type: 'publicBody', role: 'owner' },
+          { id: 'reflow', name: 'Landesamt für Informationstechnik und Barrierefreiheitsüberwachung', type: 'publicBody', role: 'reader' },
+        ],
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Menü', exact: true }).click();
+
+    const drawer = page.getByRole('dialog', { name: 'Menü' });
+    const switchList = drawer.getByRole('list', { name: 'Organisation wechseln' });
+    await expect(switchList.getByRole('button')).toHaveCount(2);
+    await expectReflow(page);
+    for (const item of [
+      ...(await switchList.getByRole('button').all()),
+      drawer.getByRole('link', { name: 'Konto' }),
+      drawer.getByRole('link', { name: 'Organisation', exact: true }),
+      drawer.getByRole('link', { name: 'Einstellungen' }),
+      drawer.getByRole('button', { name: 'Abmelden' }),
     ]) {
       await item.scrollIntoViewIfNeeded();
       await expect(item).toBeInViewport();

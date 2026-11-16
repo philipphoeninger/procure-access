@@ -46,6 +46,43 @@
   border-bottom-color: var(--mat-sys-primary);
 }
 
+// The organisation display (Figma: body-small, on-surface-variant, next to „Konto“).
+.pa-main-nav__org {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+
+// The drawer lists the account actions under the organisation: the display stays readable size there.
+:host(.pa-main-nav--drawer) .pa-main-nav__org {
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-main-nav__org-switch {
+  font: var(--mat-sys-body-small);
+  // A long organisation name wraps instead of widening the header (Handoff §2.2).
+  white-space: normal;
+  text-align: start;
+  height: auto;
+  min-height: var(--pa-space-xxl);
+}
+
+// Keeps the names of the switch aligned: the check shows only on the active organisation.
+.pa-main-nav__unchecked {
+  visibility: hidden;
+}
+
+.pa-main-nav__account-menu {
+  --mat-button-tonal-container-height: var(--pa-space-xxl);
+}
+
+// Current item in the menu „Konto“: as in the bar, the background alone is not enough.
+.pa-main-nav__menu-item--active {
+  background-color: var(--mat-sys-secondary-container);
+  box-shadow: inset 0 -3px 0 var(--mat-sys-primary);
+}
+
 .pa-main-nav__login {
   --mat-button-filled-container-height: var(--pa-space-xxl);
 }

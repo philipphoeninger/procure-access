@@ -29,13 +29,66 @@ SPDX-License-Identifier: MIT
 
 <div class="pa-main-nav__account">
   @if (signedIn()) {
-    <a matButton class="pa-main-nav__item" routerLink="/profile"
-      routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
-      (click)="navigated.emit()">{{ 'shell.nav.account' | translate }}</a>
-    <a matButton class="pa-main-nav__item" routerLink="/settings"
-      routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
-      (click)="navigated.emit()">{{ 'shell.nav.settings' | translate }}</a>
-    <button matButton class="pa-main-nav__item" type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
+    <!-- State SignedIn: the organisation display, or the switch with more than one membership (R-SHL-02, R-SHL-03).
+         State SignedInNoOrg: nothing here. -->
+    @if (activeOrganization(); as active) {
+      @if (organizations().length > 1) {
+        @if (layout() === 'bar') {
+          <!-- The button's name is its visible text (WCAG 2.5.3); the menu carries „Organisation wechseln“ -->
+          <button matButton class="pa-main-nav__item pa-main-nav__org-switch" type="button" [matMenuTriggerFor]="organizationMenu">
+            {{ 'shell.org.active' | translate: { name: active.name } }}
+            <mat-icon iconPositionEnd aria-hidden="true">arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #organizationMenu="matMenu" [aria-label]="'shell.org.switch' | translate">
+            @for (organization of organizations(); track organization.id) {
+              <button mat-menu-item type="button" role="menuitemradio"
+                [attr.aria-checked]="organization.id === active.id" (click)="switchTo(organization.id)">
+                <mat-icon aria-hidden="true" [class.pa-main-nav__unchecked]="organization.id !== active.id">check</mat-icon>
+                <span>{{ organization.name }}</span>
+              </button>
+            }
+          </mat-menu>
+        } @else {
+          <p class="pa-main-nav__org">{{ 'shell.org.active' | translate: { name: active.name } }}</p>
+          <ul class="pa-main-nav__list" [attr.aria-label]="'shell.org.switch' | translate">
+            @for (organization of organizations(); track organization.id) {
+              <li>
+                <button matButton class="pa-main-nav__item" type="button"
+                  [class.pa-main-nav__item--active]="organization.id === active.id"
+                  [attr.aria-current]="organization.id === active.id ? 'true' : null"
+                  (click)="switchTo(organization.id)">{{ organization.name }}</button>
+              </li>
+            }
+          </ul>
+        }
+      } @else {
+        <p class="pa-main-nav__org">{{ 'shell.org.active' | translate: { name: active.name } }}</p>
+      }
+    }
+
+    @if (layout() === 'bar') {
+      <button matButton="tonal" class="pa-main-nav__account-menu" type="button" [matMenuTriggerFor]="accountMenu"
+        [attr.aria-label]="'shell.userMenu.label' | translate: { displayName: displayName() }">{{ 'shell.nav.account' | translate }}</button>
+      <mat-menu #accountMenu="matMenu">
+        <a mat-menu-item routerLink="/profile" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.account' | translate }}</a>
+        <a mat-menu-item [routerLink]="organizationLink()" [class.pa-main-nav__menu-item--active]="organizationCurrent()"
+          [attr.aria-current]="organizationCurrent() ? 'page' : null">{{ 'shell.nav.organization' | translate }}</a>
+        <a mat-menu-item routerLink="/settings" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.settings' | translate }}</a>
+        <button mat-menu-item type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
+      </mat-menu>
+    } @else {
+      <!-- The compact menu is a modal drawer already: its account actions stay a flat list (Handoff §3.1) -->
+      <a matButton class="pa-main-nav__item" routerLink="/profile"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        (click)="navigated.emit()">{{ 'shell.nav.account' | translate }}</a>
+      <a matButton class="pa-main-nav__item" [routerLink]="organizationLink()"
+        [class.pa-main-nav__item--active]="organizationCurrent()" [attr.aria-current]="organizationCurrent() ? 'page' : null"
+        (click)="navigated.emit()">{{ 'shell.nav.organization' | translate }}</a>
+      <a matButton class="pa-main-nav__item" routerLink="/settings"
+        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+        (click)="navigated.emit()">{{ 'shell.nav.settings' | translate }}</a>
+      <button matButton class="pa-main-nav__item" type="button" (click)="logout()">{{ 'shell.nav.logout' | translate }}</button>
+    }
   } @else {
     <button matButton="filled" class="pa-main-nav__login" type="button" (click)="login()">{{ 'shell.nav.login' | translate }}</button>
   }

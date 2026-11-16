@@ -13,7 +13,8 @@ namespace API.ProcureAccess.Organizations;
 
 /// <summary>
 /// Organisations and members (SPEC R-ORG-01, R-ORG-03, R-ORG-04, §8.9 v2.27; ARCHITECTURE §7.1,
-/// C80, C145; S5-16a). In the host, because the members' e-mail addresses come from the legacy
+/// C80, C145; S5-16a) and the signed-in user's organisations for the header (R-SHL-02, R-SHL-03;
+/// S5-18). In the host, because the members' e-mail addresses come from the legacy
 /// <see cref="User"/> (owner decision S5-16 4a); the rules live in the IdentityAccess module behind
 /// <see cref="IOrganizationMembers"/>, and the endpoints move into it with the users (M3.1).
 /// </summary>
@@ -64,6 +65,12 @@ public static class OrganizationEndpoints
                      .Accepts<CreateOrganizationBody>("application/json")
                      .Produces<CreatedOrganization>(StatusCodes.Status201Created)
                      .ProducesValidationProblem();
+
+        organizations.MapGet("", ListMineAsync)
+                     .WithName("GetOrganizations")
+                     .WithSummary("The signed-in user's organisations with the user's role in each")
+                     .WithDescription("200 [ { id, name, type, role } ] by name; an empty list without membership; 401.")
+                     .Produces<IReadOnlyList<OrganizationSummaryResponse>>();
 
         organizations.MapGet("/{orgId}/members", GetMembersAsync)
                      .WithName("GetOrganizationMembers")
@@ -125,6 +132,15 @@ public static class OrganizationEndpoints
 
         var id = await organizations.CreateAsync(UserIdOf(user), name!, type, cancellationToken);
         return TypedResults.Created($"/api/v1{GroupPath}/{id}/members", new CreatedOrganization(id));
+    }
+
+    private static async Task<Ok<List<OrganizationSummaryResponse>>> ListMineAsync(
+        ClaimsPrincipal user,
+        IOrganizationMembers organizations,
+        CancellationToken cancellationToken)
+    {
+        var mine = await organizations.ListOfAsync(UserIdOf(user), cancellationToken);
+        return TypedResults.Ok(mine.Select(o => new OrganizationSummaryResponse(o.Id, o.Name, NameOf(o.Type), NameOf(o.Role))).ToList());
     }
 
     private static async Task<Results<Ok<OrganizationMembersResponse>, ProblemHttpResult>> GetMembersAsync(
@@ -249,6 +265,13 @@ public sealed record CreatedOrganization(Guid Id);
 /// <summary>Body of <c>PATCH /api/v1/organizations/{orgId}/members/{userId}</c>.</summary>
 /// <param name="Role"><c>owner</c>, <c>editor</c> or <c>reader</c>.</param>
 public sealed record ChangeMemberRoleBody(string? Role);
+
+/// <summary>One organisation of <c>GET /api/v1/organizations</c>: the header's display and switch (R-SHL-02, R-SHL-03).</summary>
+/// <param name="Id">The organisation's id, for S21 and the active organisation.</param>
+/// <param name="Name">The name the header shows as „Organisation: {{name}}“.</param>
+/// <param name="Type"><c>publicBody</c>, <c>company</c> or <c>association</c>.</param>
+/// <param name="Role">The signed-in user's role: <c>owner</c>, <c>editor</c> or <c>reader</c>.</param>
+public sealed record OrganizationSummaryResponse(Guid Id, string Name, string Type, string Role);
 
 /// <summary>Answer of <c>GET /api/v1/organizations/{orgId}/members</c>.</summary>
 public sealed record OrganizationMembersResponse(OrganizationResponse Organization, IReadOnlyList<OrganizationMemberResponse> Members);

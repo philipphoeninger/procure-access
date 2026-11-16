@@ -4,7 +4,8 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { render, screen, within } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 
@@ -43,6 +44,10 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
   };
   let announce: ReturnType<typeof vi.fn>;
   let setPageTitleState: ReturnType<typeof vi.fn>;
+  let loadOrganizations: ReturnType<typeof vi.fn>;
+
+  let load: MembersPageLoad;
+  let paramMap: BehaviorSubject<ParamMap>;
 
   async function openPage(options: { userId?: string; wide?: boolean; view?: MembersPageView; invitations?: PendingInvitation[] } = {}) {
     const userId = options.userId ?? 'u-owner';
@@ -57,7 +62,9 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
     };
     announce = vi.fn().mockResolvedValue(undefined);
     setPageTitleState = vi.fn();
-    const load = new MembersPageLoad();
+    loadOrganizations = vi.fn().mockResolvedValue(undefined);
+    load = new MembersPageLoad();
+    paramMap = new BehaviorSubject(convertToParamMap({ id: 'org-1' }));
     load.view = options.view ?? { kind: 'members', data: ORG, invitations };
     return render(MembersPage, {
       routes: [{ path: 'organisation', children: [] }],
@@ -66,10 +73,11 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
         provideLayout(options.wide ?? false),
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
         { provide: MembersPageLoad, useValue: load },
+        { provide: ActivatedRoute, useValue: { paramMap, snapshot: { data: {} } } },
         { provide: OrganizationApiService, useValue: api },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: ProcureAccessStore, useValue: { session: () => ({ id: userId, email: 'x@example.test' }) } },
+        { provide: ProcureAccessStore, useValue: { session: () => ({ id: userId, email: 'x@example.test' }), loadOrganizations } },
       ],
     });
   }
@@ -168,7 +176,7 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
     expect(api.remove).not.toHaveBeenCalled();
   });
 
-  it('leaves after the confirmation, announces it and opens S20 (R-ORG-04)', async () => {
+  it('leaves after the confirmation, reads the header\'s organisations again, announces it and opens S20 (R-ORG-04)', async () => {
     const { fixture } = await openPage({ userId: 'u-editor' });
     const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigate');
 
@@ -180,6 +188,7 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
     await settle(fixture);
 
     expect(api.remove).toHaveBeenCalledWith('org-1', 'u-editor');
+    expect(loadOrganizations).toHaveBeenCalledOnce();
     expect(announce).toHaveBeenCalledWith('org.left', { org: 'Stadt Musterhausen' });
     expect(navigate).toHaveBeenCalledWith(['organisation']);
   });
@@ -236,6 +245,22 @@ describe('MembersPage (S21, R-ORG-02, R-ORG-03, R-ORG-04)', () => {
 
     expect(api.invite).toHaveBeenCalledWith('org-1', { email: 'neu@example.test', role: 'reader' });
     expect(screen.getByRole('heading', { level: 2, name: 'Offene Einladungen' })).toBeTruthy();
+  });
+
+  it('shows the other organisation when the router keeps the page for another id (organisation switch, R-SHL-03)', async () => {
+    const { fixture } = await openPage({ wide: true });
+    const other: OrganizationMembers = {
+      organization: { id: 'org-2', name: 'Verein Beispiel', type: 'association' },
+      members: [{ userId: 'u-owner', email: 'owner@example.test', role: 'reader' }],
+    };
+
+    load.view = { kind: 'members', data: other, invitations: null };
+    paramMap.next(convertToParamMap({ id: 'org-2' }));
+    await settle(fixture);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Mitglieder von Verein Beispiel' })).toBeTruthy();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { org: 'Verein Beispiel' } });
   });
 
   it('shows „Seite nicht gefunden“ in place for an organisation the user cannot see (TEN-05)', async () => {

@@ -136,6 +136,7 @@ export class InvitationPage {
       this.busy.set(false);
     }
     this.state.token = null;
+    await this.store.organizationJoined(organizationId);
     // Announced first, so it is read before the title of S21 (as `org.left`, U130).
     void this.announcer.announce('org.invite.accepted', { org: view.details.organizationName });
     await this.router.navigate([ORGANIZATION_PATH, organizationId, MEMBERS_SEGMENT]);
