@@ -82,6 +82,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         var user = await FindUserAsync(Address);
         user.ShouldNotBeNull().EmailConfirmed.ShouldBeFalse();
+        user.CreatedAt.ShouldBe(_clock.GetUtcNow()); // the export's account.createdAt (S5-27)
         (await RolesOfAsync(user)).ShouldBeEmpty(); // #301: no Member role, so no failure without its row
 
         var mail = Host.Emails.Sent.ShouldHaveSingleItem().ShouldBeOfType<AddressConfirmationEmail>();

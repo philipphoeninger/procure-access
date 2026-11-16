@@ -92,6 +92,9 @@ public static class IdentityAccessModule
         services.AddSingleton(AccountTokenSettings.From(configuration));
         services.AddScoped<IAccountTokens, AccountTokenService>();
 
+        // The memberships and contributor profiles of the personal data export (S5-27, SPEC §8.4).
+        services.AddScoped<IAccountDataExport, AccountDataExportService>();
+
         // Tenancy (S5-15, ARCHITECTURE §5.4, ADR-007): the memberships of the request's user, filled
         // by UseIdentityAccessOrganizationContext, read by every module's organisation query filter
         // through IOrganizationContext and by the resource-based role requirement (§9.1, TEN-05).
