@@ -19,7 +19,7 @@ import { chooseFirstOption } from '../support/combobox';
 const WIDE = { width: 1280, height: 800 };
 
 const combobox = (page: Page) => page.getByRole('combobox', { name: 'Verwendungszweck' });
-const actionBar = (page: Page) => page.locator('.pa-criteria-list__actions');
+const actionBar = (page: Page) => page.locator('pa-criteria-action-bar');
 
 /** Waits until Material's animations are over, so axe sees the final colours. */
 async function settled(locator: Locator): Promise<void> {
@@ -104,7 +104,7 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
       expect(++steps, 'Tab reaches „Liste exportieren“').toBeLessThan(200);
       const covered = await page.evaluate(() => {
         const focused = document.activeElement;
-        const bar = document.querySelector('.pa-criteria-list__actions');
+        const bar = document.querySelector('pa-criteria-action-bar');
         if (!(focused instanceof HTMLElement) || !bar || bar.contains(focused)) return null;
         const box = focused.getBoundingClientRect();
         const barBox = bar.getBoundingClientRect();

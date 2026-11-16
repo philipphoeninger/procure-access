@@ -65,5 +65,50 @@ export interface SavedList {
   criteria: SavedListCriterion[];
 }
 
+/**
+ * Body of `PATCH /api/v1/configurations/{id}/criteria/{criterionRevisionId}` (R-SAV-03): the whole
+ * decision on one criterion, as a row of the save request names it.
+ */
+export interface SavedListDecisionRequest {
+  isIncluded: boolean;
+  overrideLevel: PriorityLevel | null;
+  overrideWeight: number | null;
+  note: string | null;
+}
+
+/** Body of `PUT /api/v1/configurations/{id}/selection` („Auswahl ändern“, owner decision S5-21 3a). */
+export interface SavedListSelectionRequest {
+  selection: ExportRequest['selection'];
+}
+
+/** A criterion as a report of the server names it: number (null for „Geprüft nach …“) and title. */
+export interface SavedListCriterionName {
+  criterionRevisionId: number;
+  number: string | null;
+  title: string;
+}
+
+/** Answer of „Auswahl ändern“: the criteria whose decisions left with the old selection (S5-21 4a). */
+export interface ChangedSelection {
+  droppedDecisions: SavedListCriterionName[];
+}
+
+/**
+ * Answer of „Neue Liste mit derselben Auswahl“ (`POST …/copies`, R-LST-14, CAT-22): the new list,
+ * its release, the values the new release no longer allows and the criteria whose decisions found
+ * no place.
+ */
+export interface CopiedList {
+  id: string;
+  releaseVersion: string;
+  droppedValues: string[];
+  notCarried: SavedListCriterionName[];
+}
+
+/** The address of „Auswahl ändern“ of a saved list (owner decision S5-21b 2a). */
+export function savedListSelectionPath(id: string): string {
+  return `${savedListPath(id)}/auswahl`;
+}
+
 /** The order of S14 (owner decision S5-20b 2a): the most recently changed first, or by name. */
 export type SavedListSort = 'modified' | 'name';

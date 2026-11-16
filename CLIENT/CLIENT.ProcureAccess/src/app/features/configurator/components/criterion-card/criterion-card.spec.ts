@@ -219,7 +219,7 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
 
       expect(screen.getByText('Priorität: B – Bewertungskriterium')).toBeTruthy();
       expect(
-        screen.getByText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.'),
+        screen.getByText('Geändert. Empfohlen war: A – Mindestanforderung.'),
       ).toBeTruthy();
     });
 
@@ -513,7 +513,7 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
     it('reports a chosen weight and „Empfehlung wiederherstellen“', async () => {
       const { events, act } = await show(criterion('11.2.2', 'B', 3), { ...DEFAULT_DECISION, overrideWeight: 5 });
 
-      expect(screen.getByText('Von Ihnen geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
+      expect(screen.getByText('Geändert. Empfohlen war: B – Bewertungskriterium, Gewichtung 3.')).toBeTruthy();
       await act(screen.getByRole('combobox', { name: 'Gewichtung' }));
       await act(screen.getByRole('option', { name: '8' }));
       expect(events.weightChange).toHaveBeenCalledWith(8);

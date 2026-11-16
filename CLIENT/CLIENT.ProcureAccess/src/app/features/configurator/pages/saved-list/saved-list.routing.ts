@@ -12,7 +12,9 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { SavedListPage } from './saved-list-page';
+import { SavedListEditor } from './saved-list-editor';
 import { loadSavedListView, SavedListLoad } from './saved-list-load';
+import { SavedListSelection, savedListSelectionGuard } from './saved-list-selection';
 
 /**
  * Loads the saved list before its page shows (SPEC §8.10), so the route change titles, focuses and
@@ -39,13 +41,23 @@ export const savedListResolver: ResolveFn<string> = async (route) => {
   }
 };
 
-/** A saved list at `/kriterienlisten/:id`, lazy; signed in only (R-SAV-02; read only until S5-21, owner decision S5-20 5a). */
+/** A saved list at `/kriterienlisten/:id`, lazy; signed in only (R-SAV-02, R-SAV-03; editable for Editor and Owner since S5-21b). */
 export const SAVED_LIST_ROUTES: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     component: SavedListPage,
     canActivate: [authGuard],
-    providers: [SavedListLoad],
+    providers: [SavedListLoad, SavedListEditor],
     resolve: { [PAGE_TITLE_KEY]: savedListResolver },
+  },
+  // „Auswahl ändern“ of the list (R-SAV-03; owner decision S5-21b 2a): S10 on the list's selection,
+  // apart from the draft; the page fills the step number of its title, as on `/kriterien`.
+  {
+    path: 'auswahl',
+    loadComponent: () => import('../criteria-select/criteria-select').then((m) => m.CriteriaSelect),
+    canActivate: [authGuard, savedListSelectionGuard],
+    providers: [SavedListSelection],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.step' },
   },
 ];

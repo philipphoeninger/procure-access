@@ -9,7 +9,6 @@ import {
   computed,
   DestroyRef,
   effect,
-  ElementRef,
   inject,
   untracked,
   viewChild,
@@ -28,6 +27,7 @@ import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dia
 import { Notice } from '@app/shared/components/notice/notice';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
+import { CriteriaActionBar } from '../../components/criteria-action-bar/criteria-action-bar';
 import { CriteriaListFilterRow } from '../../components/criteria-list-filter/criteria-list-filter';
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
@@ -44,8 +44,6 @@ import { selectionNames } from '../../state/selection-names';
 const RESULTS_THROTTLE_MS = 1000;
 const RESULTS_KEY = 'common.results.shown';
 const STATUS_KEY = 'criteria.list.status.count';
-/** Handoff §2.1: the action bar is sticky from 600 px width AND 600 px height (same query as the SCSS). */
-export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.5em)';
 
 /**
  * S11 Kriterienliste at `/kriterien/ergebnis` (R-LST-01 – R-LST-05). S10 opens it after the server
@@ -79,9 +77,9 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
  * „Kriterium vorschlagen“ to the configured channel (R-LST-13). Last the action bar (R-LST-10): the
  * live counter `criteria.list.status.count` — announced, throttled, only when the user includes or
  * excludes a criterion — „Liste speichern“ (S5-20b) and „Liste exportieren“, which opens the export
- * dialog S13; `criteria.list.unsaved` comes with S5-22. The bar is in
- * the flow below 600 px width or height and sticky from there; while it is sticky its height is the
- * page's `scroll-padding-bottom`, so it never covers the focused element (WCAG 2.4.11). Not
+ * dialog S13; `criteria.list.unsaved` comes with S5-22. The bar (`pa-criteria-action-bar`, shared
+ * with a saved list since S5-21b) is in the flow below 600 px width or height and sticky from
+ * there, and never covers the focused element (WCAG 2.4.11). Not
  * `pa-criteria-list`: the legacy list has that selector.
  *
  * „Liste speichern“ (R-SAV-01, S5-20b): signed out it opens S01 with `auth.login.reasonSave`; after
@@ -98,6 +96,7 @@ export const STICKY_ACTION_BAR_QUERY = '(min-width: 37.5em) and (min-height: 37.
 @Component({
   selector: 'pa-criteria-list-page',
   imports: [
+    CriteriaActionBar,
     CriteriaListFilterRow,
     CriteriaListSummary,
     CriterionCard,
@@ -124,9 +123,7 @@ export class CriteriaListPage {
   });
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly filterRow = viewChild(CriteriaListFilterRow);
-  private readonly actionBar = viewChild<ElementRef<HTMLElement>>('actionBar');
 
   protected readonly configuratorPath = CONFIGURATOR_PATH;
   protected readonly appTypeStepState = APP_TYPE_STEP_STATE;
@@ -214,7 +211,6 @@ export class CriteriaListPage {
       });
     });
 
-    this.keepFocusAboveActionBar();
   }
 
   /** „Liste exportieren“: the export dialog S13 (R-LST-11). */
@@ -265,49 +261,6 @@ export class CriteriaListPage {
       { count },
       { throttleMs: RESULTS_THROTTLE_MS, throttleKey: RESULTS_KEY },
     );
-  }
-
-  /**
-   * While the action bar is sticky, its height is the page's `scroll-padding-bottom` (Handoff §2.1,
-   * WCAG 2.4.11), so the browser scrolls a focused element above it. The page scrolls, not the
-   * sidenav content, so the padding goes on `<html>`; the height follows the bar (it wraps when
-   * the window narrows) and the query (it is in the flow below 600 px width or height).
-   *
-   * Firefox ignores the padding when focus moves: it scrolls only an element outside the viewport,
-   * so a control just above the bottom edge would stay behind the bar. When the focus lands on an
-   * element the bar overlaps, the page scrolls it above the bar, as far as its top stays in view.
-   */
-  private keepFocusAboveActionBar(): void {
-    const window = this.document.defaultView;
-    const root = this.document.documentElement;
-    const host = this.host.nativeElement;
-    if (!window?.ResizeObserver || !window.matchMedia) return;
-    const sticky = window.matchMedia(STICKY_ACTION_BAR_QUERY);
-    effect((onCleanup) => {
-      const bar = this.actionBar()?.nativeElement;
-      if (!bar) return;
-      const update = () => {
-        root.style.scrollPaddingBottom = sticky.matches ? `${bar.getBoundingClientRect().height}px` : '';
-      };
-      const reveal = (event: FocusEvent) => {
-        const focused = event.target;
-        if (!sticky.matches || !(focused instanceof HTMLElement) || bar.contains(focused)) return;
-        const box = focused.getBoundingClientRect();
-        // An element taller than the space above the bar keeps its top in view.
-        const distance = Math.min(box.bottom - bar.getBoundingClientRect().top, box.top);
-        if (distance > 0) window.scrollBy({ top: distance });
-      };
-      const observer = new window.ResizeObserver(update);
-      observer.observe(bar);
-      sticky.addEventListener('change', update);
-      host.addEventListener('focusin', reveal);
-      onCleanup(() => {
-        observer.disconnect();
-        sticky.removeEventListener('change', update);
-        host.removeEventListener('focusin', reveal);
-        root.style.scrollPaddingBottom = '';
-      });
-    });
   }
 
   private async load(): Promise<void> {

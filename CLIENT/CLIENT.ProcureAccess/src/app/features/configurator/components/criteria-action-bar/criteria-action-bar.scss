@@ -1,0 +1,42 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Action bar (Handoff §2.1, §5.1): in the flow after the list; sticky at the bottom from 600 px
+// width AND 600 px height (keep the query in step with STICKY_ACTION_BAR_QUERY). Status and buttons
+// stack below 600 px and share a row from there; DOM order = visual order.
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border-radius: var(--mat-sys-corner-medium);
+  background-color: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @media (min-width: 37.5em) and (min-height: 37.5em) {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 1;
+  }
+}
+
+.pa-criteria-action-bar__status {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+
+  // From 600 px the counter keeps the start and the buttons share the end of the row.
+  @media (min-width: 37.5em) {
+    margin-inline-end: auto;
+  }
+}

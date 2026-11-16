@@ -169,6 +169,8 @@ export const withConfigurator = () =>
       let latestLoad: Promise<void> = Promise.resolve();
       let latestListRequest = 0;
       let searchTimer: ReturnType<typeof setTimeout> | undefined;
+      /** The anonymous draft put aside while S10 changes the selection of a saved list (S5-21b 2a). */
+      let parked: ConfiguratorState | null = null;
 
       const patch = (changes: Partial<ConfiguratorState>) =>
         patchState(store, (state) => ({ configurator: { ...state.configurator, ...changes } }));
@@ -409,11 +411,6 @@ export const withConfigurator = () =>
         },
         /** „Filter zurücksetzen“ of `criteria.list.emptyFilter`: search, levels and inclusion at once. */
         clearCriteriaFilter: clearFilter,
-        /**
-         * Forgets the draft, the options and the list with every decision (R-AUTH-08: sign-out
-         * clears the in-memory state, the anonymous draft included). Answers of requests still
-         * running are dropped; S10 loads the options again when it opens.
-         */
         /** S01 signed the user in from „Liste speichern“ while S11 had a list (owner decision S5-20b 1a). */
         keepDraftAfterSignIn(): void {
           patch({ draftKept: true });
@@ -422,11 +419,51 @@ export const withConfigurator = () =>
         forgetDraftKept(): void {
           patch({ draftKept: false });
         },
+        /**
+         * Forgets the draft, the options and the list with every decision (R-AUTH-08: sign-out
+         * clears the in-memory state, the anonymous draft included — also one put aside for a saved
+         * list). Answers of requests still running are dropped; S10 loads the options again when it
+         * opens.
+         */
         resetConfigurator(): void {
           latestRequest++;
           latestListRequest++;
           cancelSearchTimer();
+          parked = null;
           patchState(store, { configurator: initialConfiguratorState });
+        },
+        /**
+         * „Auswahl ändern“ of a saved list (R-SAV-03; owner decision S5-21b 2a): puts the draft of
+         * S10/S11 aside and fills S10 with the list's selection under its release, then loads the
+         * options. {@link endSavedListSelection} brings the draft back, so the two never mix. A second
+         * call while one is open keeps the draft put aside first.
+         */
+        startSavedListSelection(selection: CriteriaSelection, release: string): Promise<FilterOptionsStatus> {
+          latestRequest++;
+          latestListRequest++;
+          cancelSearchTimer();
+          parked ??= store.configurator();
+          patchState(store, {
+            configurator: { ...initialConfiguratorState, release, draft: draftOf(selection) },
+          });
+          return filterOptionsReady();
+        },
+        /** S10 of a saved list is left, saved or not: the draft put aside comes back as it was. */
+        endSavedListSelection(): void {
+          if (parked === null) return;
+          latestRequest++;
+          latestListRequest++;
+          cancelSearchTimer();
+          // A request that ran when the draft was put aside was dropped: load again when asked.
+          const back = parked;
+          patchState(store, {
+            configurator: {
+              ...back,
+              optionsStatus: back.optionsStatus === 'loading' ? 'notLoaded' : back.optionsStatus,
+              list: back.list.status === 'loading' ? { ...back.list, status: 'notLoaded' } : back.list,
+            },
+          });
+          parked = null;
         },
         optionsCurrent,
         filterOptionsReady,
@@ -472,4 +509,14 @@ function higherOf(
   return other !== null && CONFIGURATOR_LAYERS.indexOf(other) < CONFIGURATOR_LAYERS.indexOf(layer)
     ? other
     : layer;
+}
+
+/** The draft of S10 for a stored selection: its use case, or „Keiner davon passt“ without one. */
+export function draftOf(selection: CriteriaSelection): ConfiguratorDraft {
+  return {
+    useCase: selection.useCase === undefined ? { kind: 'none' } : { kind: 'useCase', id: selection.useCase },
+    appTypeIds: [...selection.appTypeIds],
+    productPartIds: [...selection.productPartIds],
+    testTypeIds: [...selection.testTypeIds],
+  };
 }

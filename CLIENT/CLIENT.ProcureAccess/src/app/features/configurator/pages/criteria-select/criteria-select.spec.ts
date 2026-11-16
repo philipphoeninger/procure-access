@@ -20,6 +20,7 @@ import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { withConfigurator } from '../../state/with-configurator';
 import { excluded, filterOptions, filterOptionsAnswer } from '../../testing/filter-options-fixture';
+import { SavedListSelection } from '../saved-list/saved-list-selection';
 import { CriteriaSelect } from './criteria-select';
 
 // The real configurator slice stands in for the root store, so the page runs the S4-09 rules.
@@ -78,7 +79,14 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
   let api: { getFilterOptions: ReturnType<typeof vi.fn>; getCriteria: ReturnType<typeof vi.fn> };
   let setPageTitleState: ReturnType<typeof vi.fn>;
 
-  async function setUp({ wide = true, layers = options() } = {}) {
+  let changeSelection: ReturnType<typeof vi.fn>;
+
+  async function setUp({
+    wide = true,
+    layers = options(),
+    savedList = null,
+  }: { wide?: boolean; layers?: FilterOptionsLayers; savedList?: { id: string; release: string } | null } = {}) {
+    changeSelection = vi.fn().mockResolvedValue({ droppedDecisions: [] });
     announce = vi.fn().mockResolvedValue(undefined);
     setPageTitleState = vi.fn();
     api = {
@@ -91,9 +99,10 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         provideLayout(wide),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: CatalogApiService, useValue: api },
-        { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
+        { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null), changeSelection } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
+        ...(savedList === null ? [] : [{ provide: SavedListSelection, useValue: { list: savedList } }]),
       ],
     });
     fixture = rendered.fixture;
@@ -677,6 +686,56 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         error: { type: `https://procureaccess.de/problems/${type}`, errors },
       });
     }
+
+    describe('„Auswahl ändern“ of a saved list (R-SAV-03; owner decision S5-21b 2a)', () => {
+      const SAVED = { id: 'list-1', release: 'T.1' };
+
+      it('offers „Abbrechen“ back to the list; S10 of the draft does not', async () => {
+        await setUp({ savedList: SAVED });
+
+        expect(screen.getByRole('link', { name: 'Abbrechen' }).getAttribute('href')).toBe('/kriterienlisten/list-1');
+        await expectNoAxeViolations();
+      });
+
+      it('has no „Abbrechen“ on S10 of the draft', async () => {
+        await setUp();
+
+        expect(screen.queryByRole('link', { name: 'Abbrechen' })).toBeNull();
+      });
+
+      it('saves the checked selection on the list and opens it with the dropped decisions', async () => {
+        await setUp({ layers: catalog(), savedList: SAVED });
+        const dropped = [{ criterionRevisionId: 9, number: null, title: 'Geprüft nach BIT inklusiv Software-Test' }];
+        changeSelection.mockResolvedValue({ droppedDecisions: dropped });
+        const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+        await choose('HR-Anwendung');
+        await next();
+        checkbox('Website oder Webanwendung').click();
+        await fixture.whenStable();
+        await next();
+        await next();
+
+        submitButton().click();
+        await vi.waitFor(() => expect(navigate).toHaveBeenCalled());
+
+        expect(api.getCriteria).toHaveBeenCalled();
+        expect(changeSelection).toHaveBeenCalledWith('list-1', {
+          selection: { releaseVersion: 'T.1', useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
+        });
+        expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-1', {
+          state: { savedListArrival: { kind: 'selectionChanged', droppedDecisions: dropped } },
+        });
+      });
+
+      it('brings the draft back when the page is left', async () => {
+        await setUp({ savedList: SAVED });
+        const end = vi.spyOn(store, 'endSavedListSelection');
+
+        fixture.destroy();
+
+        expect(end).toHaveBeenCalledOnce();
+      });
+    });
 
     describe('reset notice (R-CON-07)', () => {
       it('INV:CFG-01 clears steps 2–4 except Basisfunktionalität and shows the notice in a status region, without moving the focus', async () => {

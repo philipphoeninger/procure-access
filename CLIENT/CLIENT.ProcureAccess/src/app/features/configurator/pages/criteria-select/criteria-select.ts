@@ -28,7 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -50,7 +50,12 @@ import {
   selectedNames,
   stepError,
 } from '../../state/selection-rules';
+import { savedListPath } from '../../models/saved-lists';
+import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
+import { toCriteriaSelection } from '../../state/selection-rules';
 import { SubmitResult } from '../../state/with-configurator';
+import { SavedListNavigationState } from '../saved-list/saved-list-load';
+import { SavedListSelection } from '../saved-list/saved-list-selection';
 
 /** „Keiner davon passt“: its own answer of step 1, not a use case (R-CON-02). */
 interface NoneEntry {
@@ -148,6 +153,13 @@ function normalize(text: string): string {
  * (R-CON-10). The page title names the step and gets „Fehler:“ while an error is shown.
  * The selection lives in `withConfigurator()` (R-CON-09).
  *
+ * **„Auswahl ändern“ of a saved list** (`/kriterienlisten/:id/auswahl`, R-SAV-03; owner decision
+ * S5-21b 2a): the same page on the list's selection, which `savedListSelectionGuard` put in place of
+ * the draft. „Abbrechen“ under the intro leads back to the list without a change; „Kriterienliste
+ * anzeigen“ lets the server check the selection, then saves it with `PUT …/selection` and opens the
+ * list with the decisions that were dropped (owner decision S5-21 4a). Leaving the page in any way
+ * brings the draft back (`endSavedListSelection`).
+ *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2134-3174
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2019-407
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2139-3332 (error)
@@ -174,6 +186,7 @@ function normalize(text: string): string {
     MatSlideToggleModule,
     Notice,
     ReactiveFormsModule,
+    RouterLink,
     Stepper,
     TranslatePipe,
   ],
@@ -187,6 +200,10 @@ export class CriteriaSelect {
   private readonly translate = inject(TranslateService);
   private readonly pageTitle = inject(PageTitleStrategy);
   private readonly router = inject(Router);
+  private readonly configurator = inject(ConfiguratorApiService);
+  /** The saved list whose selection this page changes; null for the draft. */
+  protected readonly savedList = inject(SavedListSelection, { optional: true })?.list ?? null;
+  protected readonly savedListPath = this.savedList === null ? null : savedListPath(this.savedList.id);
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
   private readonly window = this.document.defaultView;
@@ -330,6 +347,9 @@ export class CriteriaSelect {
   };
 
   constructor() {
+    if (this.savedList !== null) {
+      inject(DestroyRef).onDestroy(() => this.store.endSavedListSelection());
+    }
     const status = this.store.configurator.optionsStatus();
     if (status === 'notLoaded' || status === 'failed') void this.store.loadFilterOptions();
 
@@ -502,8 +522,12 @@ export class CriteriaSelect {
     this.submitting.set(true);
     try {
       const result = await this.store.submitSelection();
-      if (result.kind === 'accepted') {
+      if (result.kind === 'accepted' && this.savedList !== null) {
+        await this.saveSelectionOfSavedList(this.savedList);
+      } else if (result.kind === 'accepted') {
         await this.router.navigateByUrl(CRITERIA_LIST_PATH);
+      } else if (result.kind === 'noRelease' && this.savedListPath !== null) {
+        await this.router.navigateByUrl(this.savedListPath);
       } else if (result.kind === 'noRelease') {
         await this.router.navigateByUrl(LEGACY_FILTER_PATH);
       } else if (result.kind === 'rejected') {
@@ -511,6 +535,31 @@ export class CriteriaSelect {
       }
     } finally {
       this.submitting.set(false);
+    }
+  }
+
+  /**
+   * Saves the checked selection on the saved list (R-SAV-03) and opens the list with the decisions
+   * that were dropped. A failure keeps the page; the error interceptor shows it.
+   */
+  private async saveSelectionOfSavedList(list: { id: string; release: string }): Promise<void> {
+    const selection = toCriteriaSelection(this.store.configurator.draft());
+    try {
+      const changed = await this.configurator.changeSelection(list.id, {
+        selection: {
+          releaseVersion: list.release,
+          ...(selection.useCase === undefined ? {} : { useCaseTemplateId: selection.useCase }),
+          appTypeIds: [...selection.appTypeIds],
+          productPartIds: [...selection.productPartIds],
+          testTypeIds: [...selection.testTypeIds],
+        },
+      });
+      const state: SavedListNavigationState = {
+        savedListArrival: { kind: 'selectionChanged', droppedDecisions: changed.droppedDecisions },
+      };
+      await this.router.navigateByUrl(savedListPath(list.id), { state });
+    } catch {
+      // Shown by the error interceptor.
     }
   }
 

@@ -6,6 +6,11 @@ SPDX-License-Identifier: MIT
 
 <h1 class="pa-criteria-select__title">{{ 'criteria.select.title' | translate }}</h1>
 <p class="pa-criteria-select__intro">{{ 'criteria.select.intro' | translate }}</p>
+@if (savedListPath; as path) {
+  <div>
+    <a matButton="outlined" [routerLink]="path">{{ 'common.actions.cancel' | translate }}</a>
+  </div>
+}
 
 <pa-stepper
   linear

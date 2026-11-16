@@ -9,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 import { API_URL } from '@app/app.config';
 import { CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
-import { ExportFile, ExportRequest } from '../../models/export';
+import { ExportFile, ExportFormat, ExportRequest } from '../../models/export';
 import { fileNameOf } from '../../state/export-request';
 
 /** Name used when the answer names no file (never expected: the server always sends one). */
@@ -25,9 +25,21 @@ export class ExportApiService {
    * {@link CALLER_SHOWS_FAILURES}: the export dialog S13 shows every failure itself (O-S4-74).
    * The file name comes from `Content-Disposition` (SPEC §8.3), which the API exposes to CORS.
    */
-  async exportList(request: ExportRequest): Promise<ExportFile> {
+  exportList(request: ExportRequest): Promise<ExportFile> {
+    return this.fileOf(`${this.apiUrl}/v1/exports`, request, request.format);
+  }
+
+  /**
+   * Asks `POST /api/v1/configurations/{id}/exports` for the file of a saved list (R-LST-12, S5-21):
+   * the list as stored, under its own release, named with the slug of its name (SPEC §8.3).
+   */
+  exportSavedList(id: string, format: ExportFormat): Promise<ExportFile> {
+    return this.fileOf(`${this.apiUrl}/v1/configurations/${encodeURIComponent(id)}/exports`, { format }, format);
+  }
+
+  private async fileOf(url: string, body: unknown, format: ExportFormat): Promise<ExportFile> {
     const response = await lastValueFrom(
-      this.http.post(`${this.apiUrl}/v1/exports`, request, {
+      this.http.post(url, body, {
         observe: 'response',
         responseType: 'blob',
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
@@ -35,8 +47,7 @@ export class ExportApiService {
     );
     return {
       content: response.body ?? new Blob(),
-      fileName:
-        fileNameOf(response.headers.get('Content-Disposition')) ?? `${FALLBACK_FILE_NAME}.${request.format}`,
+      fileName: fileNameOf(response.headers.get('Content-Disposition')) ?? `${FALLBACK_FILE_NAME}.${format}`,
     };
   }
 }

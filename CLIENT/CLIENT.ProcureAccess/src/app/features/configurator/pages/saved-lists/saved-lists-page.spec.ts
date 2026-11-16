@@ -7,8 +7,10 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
+import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { provideLayout } from '@app/testing/shell-test-doubles';
@@ -32,10 +34,14 @@ describe('SavedListsPage (S14, R-SAV-02)', () => {
   let list: ReturnType<typeof vi.fn>;
   let announce: ReturnType<typeof vi.fn>;
   let active: ReturnType<typeof signal<OrganizationSummary | null>>;
+  let remove: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
 
   async function openPage({ wide = false, organization = A, api }: { wide?: boolean; organization?: OrganizationSummary | null; api?: ReturnType<typeof vi.fn> } = {}) {
     list = api ?? vi.fn((id: string) => Promise.resolve(id === 'org-b' ? LISTS_B : LISTS_A));
     announce = vi.fn().mockResolvedValue(undefined);
+    remove = vi.fn().mockResolvedValue(null);
+    focusPageHeading = vi.fn();
     active = signal(organization);
     const rendered = await render(SavedListsPage, {
       routes: [
@@ -47,7 +53,8 @@ describe('SavedListsPage (S14, R-SAV-02)', () => {
         provideTestTranslations(),
         provideLayout(wide),
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
-        { provide: ConfiguratorApiService, useValue: { list } },
+        { provide: ConfiguratorApiService, useValue: { list, delete: remove } },
+        { provide: PageTitleStrategy, useValue: { focusPageHeading } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         {
           provide: ProcureAccessStore,
@@ -141,7 +148,66 @@ describe('SavedListsPage (S14, R-SAV-02)', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Etwas ist schiefgelaufen' })).toBeTruthy();
   });
+
+  describe('„Liste löschen“ (R-SAV-06, owner decision S5-21 7a)', () => {
+    const EDITOR: OrganizationSummary = { ...A, role: 'editor' };
+
+    it('is not offered to a Reader', async () => {
+      await openPage();
+
+      expect(screen.queryByRole('button', { name: 'Liste löschen' })).toBeNull();
+    });
+
+    it('is offered with each list as cards, described by the name of the list', async () => {
+      await openPage({ organization: EDITOR });
+
+      const buttons = screen.getAllByRole('button', { name: 'Liste löschen' });
+      expect(buttons).toHaveLength(3);
+      expect(buttons[0].getAttribute('aria-describedby')).toBe('pa-saved-list-name-l-1');
+      expect(document.getElementById('pa-saved-list-name-l-1')?.textContent.trim()).toBe('Zeiterfassung');
+      await expectNoAxeViolations();
+    });
+
+    it('is offered with each list in the table from 600 px', async () => {
+      await openPage({ organization: EDITOR, wide: true });
+      expect(within(screen.getByRole('table')).getAllByRole('button', { name: 'Liste löschen' })).toHaveLength(3);
+      await expectNoAxeViolations();
+    });
+
+    it('asks first, deletes, announces it, loads the lists again and focuses the H1', async () => {
+      const confirm = vi.spyOn(ConfirmDialog, 'confirm').mockResolvedValue(true);
+      const fixture = await openPage({ organization: EDITOR });
+      list.mockResolvedValueOnce(LISTS_A.slice(1));
+
+      screen.getAllByRole('button', { name: 'Liste löschen' })[0].click();
+      await vi.waitFor(() => expect(focusPageHeading).toHaveBeenCalled());
+      await settle(fixture);
+
+      expect(confirm).toHaveBeenCalledWith(expect.anything(), {
+        titleKey: 'criteria.saved.delete.title',
+        bodyKey: 'criteria.saved.delete.body',
+        bodyParams: { name: 'Zeiterfassung' },
+        confirmKey: 'criteria.saved.delete.confirm',
+      });
+      expect(remove).toHaveBeenCalledWith('l-1');
+      expect(announce).toHaveBeenCalledWith('criteria.saved.deleted', { name: 'Zeiterfassung' });
+      expect(names()).toEqual(['Ärztliche Software', 'Bürgerportal']);
+      confirm.mockRestore();
+    });
+
+    it('deletes nothing when the user cancels', async () => {
+      const confirm = vi.spyOn(ConfirmDialog, 'confirm').mockResolvedValue(false);
+      const fixture = await openPage({ organization: EDITOR });
+
+      screen.getAllByRole('button', { name: 'Liste löschen' })[0].click();
+      await settle(fixture);
+
+      expect(remove).not.toHaveBeenCalled();
+      confirm.mockRestore();
+    });
+  });
 });
+
 
 describe('sortSavedLists', () => {
   const collator = new Intl.Collator('de');

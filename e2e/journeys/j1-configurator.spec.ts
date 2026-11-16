@@ -20,11 +20,13 @@ import { accountMenuButton } from '../support/session';
  * card — and exports the list as XLSX through S13, then opens the downloaded file and checks it
  * (S4-22). The second part (S5-20b) is a test of its own on a fresh page: a draft of the same
  * selection, built by keyboard and still signed out, goes to „Liste speichern“, which opens S01 with
- * the reason; after the sign-in S11 shows the draft unchanged and says so, S12
- * saves it under a name, the page becomes the saved list (read only until S5-21), and „Kriterienlisten“
- * in the account menu opens S14 with it. The account and its organisation are the test's own, built
- * through the API (owner decision S5-20 6a). Exporting the saved list again and comparing both files
- * come with S5-21 (owner decision S5-20 7a).
+ * the reason; before that the draft is exported once. After the sign-in S11 shows the draft
+ * unchanged and says so, S12 saves it under a name, the page becomes the saved list (editable for
+ * its Owner, S5-21b), whose export through S13 holds the same file as the draft's but for the
+ * moment it was made (EXP-06; with it J1's second part and the M3 exit criterion, owner decision
+ * S5-20 7a), „Kriterienlisten“ in the account menu opens S14 with it, and „Liste löschen“ deletes it
+ * after asking. The account and its organisation are the test's own, built through the API (owner
+ * decision S5-20 6a).
  *
  * The selection meets an exclusion by each higher layer of T.1
  * (`tests/ProcureAccess.Tests.Shared/Fixtures/Releases/T.1/exclusions.json`): HR-Anwendung excludes
@@ -167,6 +169,24 @@ function card(page: Page, title: string): Locator {
     .filter({ has: page.getByRole('heading', { level: 2, name: title, exact: true }) });
 }
 
+/**
+ * „Liste exportieren“ → S13 → „Datei herunterladen“ by keyboard, on S11 or a saved list; returns
+ * the XLSX after checking its name (by default the name of a draft, SPEC §8.3).
+ */
+async function exportThroughS13(page: Page, fileName = /^ProcureAccess_Kriterien_T\.1_\d{4}-\d{2}-\d{2}\.xlsx$/): Promise<Buffer> {
+  await tabTo(page, page.getByRole('button', { name: 'Liste exportieren' }));
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+  await expect(dialog.getByRole('radio', { name: 'Excel-Datei (.xlsx) – für Vergabeunterlagen' })).toBeChecked();
+  await tabTo(page, dialog.getByRole('button', { name: 'Datei herunterladen' }));
+  const downloaded = page.waitForEvent('download');
+  await page.keyboard.press('Enter');
+  const download = await downloaded;
+  await expect(dialog).toHaveCount(0);
+  expect(download.suggestedFilename()).toMatch(fileName);
+  return readFile(await download.path());
+}
+
 test.describe('J1 configurator without account', () => {
   test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 anonymous visitor chooses a selection on S10 by keyboard and gets the criteria of T.1', async ({ page, baseURL }, testInfo) => {
     // Twelve states, each checked by axe in two appearances, take far longer than the default 30 s.
@@ -289,7 +309,7 @@ test.describe('J1 configurator without account', () => {
       // The menu closes, the focus returns to the level button, and the card names the recommendation.
       await expect(menu).toHaveCount(0);
       await expect(priority.getByRole('button', { name: 'Priorität: Hinweis' })).toBeFocused();
-      await expect(priority).toContainText('Von Ihnen geändert. Empfohlen war: A – Mindestanforderung.');
+      await expect(priority).toContainText('Geändert. Empfohlen war: A – Mindestanforderung.');
       await expect(priority.getByRole('button', { name: 'Empfehlung wiederherstellen' })).toBeVisible();
     });
 
@@ -392,12 +412,14 @@ test.describe('J1 configurator without account', () => {
     });
   });
 
-  test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 second part: the draft survives the sign-in from „Liste speichern“ and is saved, opened and listed (S5-20b)', async ({ page, request, browserName }, testInfo) => {
+  test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 INV:EXP-06 second part: the draft survives the sign-in from „Liste speichern“, is saved, opened, exported again with the same file, listed and deleted (S5-20b, S5-21b)', async ({ page, request, browserName }, testInfo) => {
     // Firefox's page process crashes right after the save is answered when Playwright runs two or
     // more workers (TESTING V254; owner decision S5-20b: skipped on Firefox until the issue finds why).
     test.fixme(browserName === 'firefox', 'Firefox page crash after saving (TESTING V254)');
-    // Seven states, each checked by axe in two appearances, after S10 and S11 by keyboard.
-    test.setTimeout(240_000);
+    // Nine states, each checked by axe in two appearances, after S10 and S11 by keyboard.
+    test.setTimeout(300_000);
+    /** The file of the draft, exported before saving; the saved list's file must hold the same. */
+    let draftFile: Buffer | undefined;
     const checkbox = (name: string) => page.getByRole('checkbox', { name, exact: true });
     const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
     const address = `j1-${suffix}@example.test`;
@@ -444,6 +466,10 @@ test.describe('J1 configurator without account', () => {
       await tabTo(page, include);
       await page.keyboard.press('Space');
       await expect(include).not.toBeChecked();
+    });
+
+    await test.step('S13: the draft exported as XLSX before saving (EXP-06, the file to compare)', async () => {
+      draftFile = await exportThroughS13(page);
     });
 
     await test.step('S11 „Liste speichern“, signed out, opens S01 with the reason (R-SAV-01, R-AUTH-03)', async () => {
@@ -493,18 +519,27 @@ test.describe('J1 configurator without account', () => {
       expect((await saved).status()).toBe(201);
     });
 
-    await test.step('the saved list: S11 read only with its name as H1 and the decisions as saved (S5-20 4a, 5a)', async () => {
+    await test.step('the saved list: S11 with its name as H1, the decisions as saved, editable for its Owner (S5-20 4a, S5-21b)', async () => {
       await expect(page).toHaveURL(/\/kriterienlisten\/[0-9a-f-]{36}$/);
       await expect(page.getByRole('heading', { level: 1, name: LIST_NAME })).toBeFocused();
       await expect(page).toHaveTitle(`${LIST_NAME} – Gespeicherte Kriterienlisten – ProcureAccess`);
       const main = page.getByRole('main');
       await expect(main.getByRole('heading', { level: 2 })).toHaveCount(EXPECTED_KEYS.length);
-      await expect(main.getByRole('checkbox')).toHaveCount(0);
-      await expect(card(page, CHANGED.priority.title)).toContainText('Priorität: Hinweis');
-      await expect(card(page, CHANGED.priority.title)).toContainText('Empfohlen war: A – Mindestanforderung');
+      await expect(card(page, CHANGED.priority.title).getByRole('button', { name: 'Priorität: Hinweis' })).toBeVisible();
+      await expect(card(page, CHANGED.priority.title)).toContainText('Geändert. Empfohlen war: A – Mindestanforderung');
       await expect(card(page, CHANGED.excluded.title)).toContainText('Nicht in Ihrer Liste');
+      await expect(card(page, CHANGED.excluded.title).getByRole('checkbox')).not.toBeChecked();
+      await expect(main.getByRole('link', { name: 'Auswahl ändern' })).toBeVisible();
       await settled(main);
       await expectNoAxeViolations(page, testInfo, 'j1 saved list');
+    });
+
+    await test.step('S13 of the saved list: the same file as the draft before saving (EXP-06, M3 exit criterion)', async () => {
+      const savedFile = await exportThroughS13(page, /^ProcureAccess_Kriterien_Vergabe-Personalsoftware-2027_T\.1_\d{4}-\d{2}-\d{2}\.xlsx$/);
+      expect(readXlsxSheet(savedFile, 'Kriterien')).toEqual(readXlsxSheet(draftFile!, 'Kriterien'));
+      // „Info“ alike but for the moment the file was made.
+      const info = (file: Buffer) => readXlsxSheet(file, 'Info').filter((row) => row[0] !== 'Erstellt am');
+      expect(info(savedFile)).toEqual(info(draftFile!));
     });
 
     await test.step('S14 through „Kriterienlisten“ of the account menu, sorted by name (R-SAV-02)', async () => {
@@ -541,6 +576,25 @@ test.describe('J1 configurator without account', () => {
       await page.keyboard.press('Enter');
       await expect(sort).toContainText('Name');
       await expect(page.getByRole('listbox')).toHaveCount(0);
+    });
+
+    await test.step('S14: „Liste löschen“ asks first, then deletes the list (R-SAV-06, S5-21 7a)', async () => {
+      const main = page.getByRole('main');
+      await tabTo(page, main.getByRole('button', { name: 'Liste löschen' }));
+      await page.keyboard.press('Enter');
+
+      const dialog = page.getByRole('dialog', { name: 'Kriterienliste löschen?' });
+      await expect(dialog).toContainText(`Die Liste „${LIST_NAME}“ wird gelöscht.`);
+      await settled(dialog);
+      await expectNoAxeViolations(page, testInfo, 'j1 s14 delete');
+      const deleted = page.waitForResponse((response) => response.request().method() === 'DELETE');
+      await tabTo(page, dialog.getByRole('button', { name: 'Liste löschen' }));
+      await page.keyboard.press('Enter');
+      expect((await deleted).status()).toBe(204);
+
+      await expect(dialog).toHaveCount(0);
+      await expect(page.getByRole('heading', { level: 1, name: 'Gespeicherte Kriterienlisten' })).toBeFocused();
+      await expect(main).toContainText('Ihre Organisation hat noch keine Kriterienlisten gespeichert.');
     });
 
   });

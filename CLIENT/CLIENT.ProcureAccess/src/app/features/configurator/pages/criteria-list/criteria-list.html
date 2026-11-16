@@ -97,14 +97,13 @@ SPDX-License-Identifier: MIT
   </p>
 
   @if (answer.criteria.length > 0) {
-    <div class="pa-criteria-list__actions" #actionBar>
-      <p class="pa-criteria-list__status">
-        {{ 'criteria.list.status.count' | translate: { included: included(), total: answer.criteria.length } }}
-      </p>
+    <pa-criteria-action-bar
+      [status]="'criteria.list.status.count' | translate: { included: included(), total: answer.criteria.length }"
+    >
       @if (saveAction()) {
         <button matButton="outlined" type="button" (click)="save()">{{ 'criteria.list.save' | translate }}</button>
       }
       <button matButton="filled" type="button" (click)="openExport()">{{ 'criteria.list.export' | translate }}</button>
-    </div>
+    </pa-criteria-action-bar>
   }
 }
