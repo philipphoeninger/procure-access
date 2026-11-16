@@ -12,6 +12,8 @@ using ProcureAccess.Modules.Configurator.Accounts;
 using ProcureAccess.Modules.Configurator.Configurations;
 using ProcureAccess.Modules.Configurator.Contracts.Accounts;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Configurator.Contracts.Drafts;
+using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.Configurator.Usage;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
@@ -24,7 +26,9 @@ namespace ProcureAccess.Modules.Configurator;
 /// Since S4-18b it maps <c>POST /api/v1/configurator/criteria-list-shown</c>, the usage event of
 /// S11 (<see cref="MapConfiguratorEndpoints"/>). Since S5-19 it owns the saved lists
 /// (<see cref="ConfiguratorDbContext"/>) and answers <see cref="IConfigurationReader"/> and
-/// <see cref="ICriteriaListDataExport"/>; the endpoints of the saved lists follow with S5-20.
+/// <see cref="ICriteriaListDataExport"/>. Since S5-20a it maps the saved-list endpoints below
+/// <c>/configurations</c> (<see cref="ConfigurationEndpoints"/>: save, read, list) and answers
+/// <see cref="IConfigurationDraftCheck"/>, the draft check of the anonymous export and of saving.
 /// </summary>
 public static class ConfiguratorModule
 {
@@ -57,19 +61,26 @@ public static class ConfiguratorModule
         services.AddScoped<IModuleDatabaseMigrator, ConfiguratorDatabaseMigrator>();
         services.AddScoped<IConfigurationReader, ConfigurationReader>();
         services.AddScoped<ICriteriaListDataExport, CriteriaListDataExportService>();
+
+        // Read once here, so an impossible 🔧 weight range stops the start (SPEC SD23).
+        services.AddSingleton(PriorityWeightRange.From(configuration));
+        services.AddScoped<IConfigurationDraftCheck, ConfigurationDraftCheck>();
+        services.AddScoped<ConfigurationService>();
         return services;
     }
 
     /// <summary>
-    /// Maps the configurator endpoints as minimal APIs below <c>/configurator</c> of
-    /// <paramref name="routes"/>, the host's versioned group <c>/api/v{version}</c>, as
-    /// <c>MapCatalogEndpoints</c> does. Map it before the Swagger set-up (#176).
+    /// Maps the configurator endpoints as minimal APIs below <c>/configurator</c> (the usage event)
+    /// and <c>/configurations</c> (the saved lists, ARCHITECTURE §7.2) of <paramref name="routes"/>,
+    /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
+    /// before the Swagger set-up (#176).
     /// </summary>
     public static IEndpointRouteBuilder MapConfiguratorEndpoints(this IEndpointRouteBuilder routes)
     {
         ArgumentNullException.ThrowIfNull(routes);
         var configurator = routes.MapGroup("/configurator").WithTags("Configurator");
         CriteriaListShownEndpoint.Map(configurator);
+        ConfigurationEndpoints.Map(routes);
         return routes;
     }
 }

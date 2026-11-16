@@ -5,6 +5,7 @@
 using NSubstitute;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Export.Documents;
 using ProcureAccess.Modules.Export.Requests;
 using ProcureAccess.Modules.Export.Sources;
@@ -68,7 +69,7 @@ public class PersistedConfigurationSourceTests
             [.. Decisions.Select(d => new ExportCriterionRequest(
                 d.CriterionRevisionId, d.IsIncluded, LevelName(d.OverrideLevel), d.OverrideWeight, d.Note))]);
 
-        var adHoc = await new AdHocSelectionSource(_catalog, new PriorityWeightRange(1, 10))
+        var adHoc = await new AdHocSelectionSource(new ConfigurationDraftCheck(_catalog, new PriorityWeightRange(1, 10)))
             .LoadAsync(request, TestContext.Current.CancellationToken);
         var persisted = await LoadAsync();
 

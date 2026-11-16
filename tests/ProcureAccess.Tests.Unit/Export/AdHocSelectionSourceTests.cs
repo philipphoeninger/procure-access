@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using ProcureAccess.Modules.Catalog.Contracts;
+using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Export.Documents;
 using ProcureAccess.Modules.Export.Requests;
 using ProcureAccess.Modules.Export.Sources;
@@ -17,7 +17,9 @@ namespace ProcureAccess.Tests.Unit.Export;
 /// <summary>
 /// The request check and re-resolution of the anonymous export (EXP-07; owner decisions O-S4-57,
 /// O-S4-58, O-S4-60 (a)), on a catalog double that answers like <c>ICatalogSelectionResolver</c>.
-/// The real resolution of the catalog runs in the integration tests.
+/// Since S5-20a the check is <see cref="ConfigurationDraftCheck"/> of the Configurator module (C153),
+/// shared with saving a list; these tests, unchanged, show that the export answers as before. The
+/// real resolution of the catalog runs in the integration tests.
 /// </summary>
 public class AdHocSelectionSourceTests
 {
@@ -185,8 +187,8 @@ public class AdHocSelectionSourceTests
     [Trait("Invariant", "EXP-07")]
     public async Task Load_NoteAboveTheLimit_IsRefusedWithoutRepeatingIt()
     {
-        var tooLong = Sentinel + new string('x', AdHocSelectionSource.NoteMaxLength + 1 - Sentinel.Length);
-        var exact = new string('x', AdHocSelectionSource.NoteMaxLength);
+        var tooLong = Sentinel + new string('x', ConfigurationDraftCheck.NoteMaxLength + 1 - Sentinel.Length);
+        var exact = new string('x', ConfigurationDraftCheck.NoteMaxLength);
 
         var result = await LoadAsync(Request(Entry(11, note: tooLong), Entry(12, note: exact), Entry(13), Entry(14)));
 
@@ -272,17 +274,8 @@ public class AdHocSelectionSourceTests
         ShouldBeValidation(result, "criteria[0].overrideLevel");
     }
 
-    [Fact]
-    public void WeightRange_FromConfiguration_RefusesAnImpossibleRange()
-    {
-        Should.Throw<InvalidOperationException>(() => PriorityWeightRange.From(Configuration(("Min", "5"), ("Max", "4"))));
-        Should.Throw<InvalidOperationException>(() => PriorityWeightRange.From(Configuration(("Min", "0"), ("Max", "4"))));
-        Should.Throw<InvalidOperationException>(() => PriorityWeightRange.From(Configuration(("Max", "4"))));
-        PriorityWeightRange.From(Configuration(("Min", "1"), ("Max", "10"))).ShouldBe(new PriorityWeightRange(1, 10));
-    }
-
     private Task<ExportSourceResult> LoadAsync(ExportRequest request) =>
-        new AdHocSelectionSource(_catalog, new PriorityWeightRange(1, 10)).LoadAsync(request, TestContext.Current.CancellationToken);
+        new AdHocSelectionSource(new ConfigurationDraftCheck(_catalog, new PriorityWeightRange(1, 10))).LoadAsync(request, TestContext.Current.CancellationToken);
 
     private void Answer(CatalogSelectionResult result) =>
         _catalog.ResolveAsync(default!, default!, TestContext.Current.CancellationToken).ReturnsForAnyArgs(result);
@@ -327,9 +320,4 @@ public class AdHocSelectionSourceTests
     private static ExportCriterionRequest Entry(
         int revisionId, bool included = true, string? overrideLevel = null, int? overrideWeight = null, string? note = null) =>
         new(revisionId, included, overrideLevel, overrideWeight, note);
-
-    private static IConfiguration Configuration(params (string Key, string Value)[] values) =>
-        new ConfigurationBuilder()
-            .AddInMemoryCollection(values.Select(v => new KeyValuePair<string, string?>($"{PriorityWeightRange.SectionName}:{v.Key}", v.Value)))
-            .Build();
 }

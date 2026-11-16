@@ -27,12 +27,12 @@ public static class ExportModule
     /// Registers the services of the Export module. Called once from <c>Program.cs</c>, after the
     /// Platform module (<see cref="TimeProvider"/>), the Catalog module, whose
     /// <c>ICatalogSelectionResolver</c> both sources use, and the Configurator module, whose
-    /// <c>IConfigurationReader</c> the source of saved lists uses.
+    /// <c>IConfigurationReader</c> the source of saved lists and whose <c>IConfigurationDraftCheck</c>
+    /// the ad-hoc source uses (C153).
     /// </summary>
     public static IServiceCollection AddExportModule(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        services.AddSingleton(PriorityWeightRange.From(configuration));
         services.AddScoped<AdHocSelectionSource>();
         services.AddScoped<PersistedConfigurationSource>();
         services.AddScoped<ExportFileWriter>();

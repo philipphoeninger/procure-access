@@ -54,9 +54,8 @@ internal sealed class CatalogSelectionResolver(CatalogReader reader) : ICatalogS
         var appTypes = values.AppTypes.ToDictionary(v => v.Key, v => v.NameDe, StringComparer.Ordinal);
         var productParts = values.ProductParts.ToDictionary(v => v.Key, v => v.NameDe, StringComparer.Ordinal);
         var testTypes = values.TestTypes.ToDictionary(v => v.Key, v => v, StringComparer.Ordinal);
-        var useCase = valid.UseCase is null
-            ? null
-            : new CatalogValueName(valid.UseCase, values.UseCases.Single(u => u.Key == valid.UseCase).NameDe);
+        var useCaseTemplate = valid.UseCase is null ? null : values.UseCases.Single(u => u.Key == valid.UseCase);
+        var useCase = useCaseTemplate is null ? null : new CatalogValueName(useCaseTemplate.Key, useCaseTemplate.NameDe);
 
         var criteria = CriteriaResolver.ResolveCriteria(values, snapshot, valid)
             .Select(r => new ResolvedCatalogCriterion(
@@ -81,7 +80,8 @@ internal sealed class CatalogSelectionResolver(CatalogReader reader) : ICatalogS
                 InOrder(valid.AppTypes, values.AppTypes, a => a.SortOrder),
                 InOrder(valid.ProductParts, values.ProductParts, p => p.SortOrder),
                 InOrder(valid.TestTypes, values.TestTypes, t => t.SortOrder),
-                criteria),
+                criteria,
+                UseCaseIsActive: useCaseTemplate?.IsActive ?? true),
             noErrors);
     }
 

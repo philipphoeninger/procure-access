@@ -71,12 +71,18 @@ public sealed record CatalogReleaseSummary(string Version, bool IsActive, int Cr
 /// the export, SPEC §8.3) and its criteria in list order.
 /// </summary>
 /// <param name="UseCase">Null for „Keiner davon passt“.</param>
+/// <param name="UseCaseIsActive">
+/// False when <paramref name="UseCase"/> is a use case the catalog no longer offers. It still
+/// resolves (CAT-18); whether a caller accepts it for a new selection is the caller's rule (S5-20a:
+/// a new saved list refuses it, the anonymous export accepts it). True without a use case.
+/// </param>
 public sealed record ResolvedCatalogSelection(
     CatalogValueName? UseCase,
     IReadOnlyList<CatalogValueName> AppTypes,
     IReadOnlyList<CatalogValueName> ProductParts,
     IReadOnlyList<CatalogValueName> TestTypes,
-    IReadOnlyList<ResolvedCatalogCriterion> Criteria);
+    IReadOnlyList<ResolvedCatalogCriterion> Criteria,
+    bool UseCaseIsActive = true);
 
 /// <summary>A filter value by key and German name.</summary>
 public sealed record CatalogValueName(string Key, string Name);

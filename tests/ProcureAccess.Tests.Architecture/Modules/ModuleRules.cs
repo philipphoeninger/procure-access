@@ -27,9 +27,17 @@ internal static class ModuleRules
     /// dependencies by name prefix, so <c>ProcureAccess.Modules.Directory</c> would also forbid the
     /// allowed <c>ProcureAccess.Modules.Directory.Contracts</c> (S2-05 L2).
     /// </remarks>
-    public static IReadOnlyList<string> TypesUsingAny(Assembly subject, string subjectNamespace, IEnumerable<Assembly> forbidden)
+    public static IReadOnlyList<string> TypesUsingAny(Assembly subject, string subjectNamespace, IEnumerable<Assembly> forbidden) =>
+        TypesUsingAny(subject, subjectNamespace, forbidden.SelectMany(TopLevelTypeNames));
+
+    /// <summary>
+    /// As <see cref="TypesUsingAny(Assembly, string, IEnumerable{Assembly})"/>, with the forbidden
+    /// types named one by one — for a rule that forbids only a part of an assembly, e.g. the types of
+    /// <c>Configurator.Contracts</c> outside its draft check (S5-20a).
+    /// </summary>
+    public static IReadOnlyList<string> TypesUsingAny(Assembly subject, string subjectNamespace, IEnumerable<string> forbiddenTypeNames)
     {
-        var forbiddenTypes = forbidden.SelectMany(OwnTopLevelTypeNames).ToArray();
+        var forbiddenTypes = forbiddenTypeNames.ToArray();
         if (forbiddenTypes.Length == 0)
         {
             return [];
@@ -48,10 +56,14 @@ internal static class ModuleRules
     /// <paramref name="forbidden"/> assemblies; empty when the rule holds. For a rule on one type,
     /// e.g. <c>AdHocSelectionSource</c> (ARC-03).
     /// </summary>
-    public static IReadOnlyList<string> TypeUsingAny(Type subject, IEnumerable<Assembly> forbidden)
+    public static IReadOnlyList<string> TypeUsingAny(Type subject, IEnumerable<Assembly> forbidden) =>
+        TypeUsingAny(subject, forbidden.SelectMany(TopLevelTypeNames));
+
+    /// <summary>As <see cref="TypeUsingAny(Type, IEnumerable{Assembly})"/>, with the forbidden types named one by one.</summary>
+    public static IReadOnlyList<string> TypeUsingAny(Type subject, IEnumerable<string> forbiddenTypeNames)
     {
         ArgumentNullException.ThrowIfNull(subject);
-        var forbiddenTypes = forbidden.SelectMany(OwnTopLevelTypeNames).ToArray();
+        var forbiddenTypes = forbiddenTypeNames.ToArray();
         if (forbiddenTypes.Length == 0)
         {
             return [];
@@ -88,7 +100,7 @@ internal static class ModuleRules
     /// compiler embeds into every assembly (e.g. <c>System.Runtime.CompilerServices.NullableAttribute</c>),
     /// which have the same names everywhere, and coverlet's tracker types.
     /// </summary>
-    private static IEnumerable<string> OwnTopLevelTypeNames(Assembly assembly)
+    public static IEnumerable<string> TopLevelTypeNames(Assembly assembly)
     {
         var root = assembly.GetName().Name!;
         return assembly.GetTypes()
