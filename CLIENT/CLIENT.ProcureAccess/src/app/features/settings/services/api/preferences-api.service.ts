@@ -7,7 +7,7 @@ import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
-import { BACKGROUND_REQUEST } from '@app/core/errors/problem-details';
+import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { UserPreferences } from '../../models/user-preferences';
 
 /** HTTP calls of the user's settings (SPEC §8.12; ARCHITECTURE C160). */
@@ -27,5 +27,27 @@ export class PreferencesApiService {
         context: new HttpContext().set(BACKGROUND_REQUEST, true),
       }),
     );
+  }
+
+  /**
+   * The settings for S60, read when the page opens: the user asked for the page, so a request
+   * without an answer turns the offline notice on; every other failure the page shows in place
+   * ({@link CALLER_SHOWS_FAILURES}).
+   */
+  read(): Promise<UserPreferences> {
+    return lastValueFrom(
+      this.http.get<UserPreferences>(`${this.apiUrl}/v1/account/preferences`, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+      }),
+    );
+  }
+
+  /**
+   * Replaces all four settings (`PUT`, SPEC §8.12). Unmarked: a failure shows the system states of
+   * the error interceptor — the offline notice, the S80 page or the snackbar of its problem type
+   * (owner decision S5-26 D2 (a)).
+   */
+  save(preferences: UserPreferences): Promise<UserPreferences> {
+    return lastValueFrom(this.http.put<UserPreferences>(`${this.apiUrl}/v1/account/preferences`, preferences));
   }
 }

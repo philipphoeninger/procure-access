@@ -19,7 +19,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * and the page of an invitation link since S5-17b, the signed-in compact menu with the organisation
  * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
- * the delete dialog of S14. The legacy screens are
+ * the delete dialog of S14; the settings page S60 since S5-26. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -142,6 +142,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
       ...(await switchList.getByRole('button').all()),
       drawer.getByRole('link', { name: 'Konto' }),
       drawer.getByRole('link', { name: 'Organisation', exact: true }),
+      drawer.getByRole('link', { name: 'Einstellungen' }),
       drawer.getByRole('button', { name: 'Abmelden' }),
     ]) {
       await item.scrollIntoViewIfNeeded();
@@ -418,6 +419,15 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await page.getByRole('main').getByRole('button', { name: 'Organisation anlegen' }).click();
     await expect(page.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+  });
+
+  test('S60 needs no horizontal scrolling', async ({ page }) => {
+    // Only read: the seeded user's settings stay unchanged
+    await signInThroughApi(page, CONFIRMED_USER, TEST_USER_PASSWORD);
+    await page.goto('/einstellungen');
+    await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Deutsch' })).toBeChecked();
     await expectReflow(page);
   });
 

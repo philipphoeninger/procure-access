@@ -770,5 +770,23 @@
       "pendingTitle": "Offene Einladungen",
       "revoked": "Einladung an {{email}} zurückgenommen."
     }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "intro": "Passen Sie ProcureAccess an Ihre Bedürfnisse an. Die Einstellungen werden in Ihrem Konto gespeichert und gelten auf allen Geräten.",
+    "language": "Sprache",
+    "language.hint": "Die Oberfläche gibt es vorerst nur auf Deutsch.",
+    "language.de": "Deutsch",
+    "appearance": "Erscheinungsbild",
+    "appearance.system": "Wie im Betriebssystem eingestellt",
+    "appearance.light": "Hell",
+    "appearance.dark": "Dunkel",
+    "contrast": "Kontrast",
+    "contrast.system": "Wie im Betriebssystem eingestellt",
+    "contrast.high": "Hoher Kontrast",
+    "motion": "Bewegung und Animationen",
+    "motion.system": "Wie im Betriebssystem eingestellt",
+    "motion.reduced": "Bewegungen reduzieren",
+    "saved": "Einstellungen gespeichert."
   }
 }

@@ -11,8 +11,9 @@ import { accountMenuButton, signInThroughApi, signOutThroughHeader } from '../su
  * A signed-in user's settings (S5-25b; SPEC R-SET-01, R-SET-02, §8.12; TESTING A11Y-06, A11Y-08):
  * the stored choice overrides the system after the sign-in, on every device, and ends with the
  * sign-out; nothing is kept in browser storage, and blocked storage breaks nothing (TD-25, #234).
- * The settings page S60 that changes them comes with S5-26, so the test saves them through the API.
- * It builds its own account, so the seeded users stay unchanged.
+ * The first test saves them through the API; since S5-26 the second changes them on the settings
+ * page S60: applied at once without reload, saved, and shown again on the next visit. Each test
+ * builds its own account, so the seeded users stay unchanged.
  */
 
 const PASSWORD = 'e2e-Einstellungen-Passwort-1';
@@ -44,6 +45,18 @@ async function signOut(page: Page): Promise<void> {
   }
   await page.getByRole('button', { name: 'Menü', exact: true }).click();
   await page.getByRole('dialog', { name: 'Menü' }).getByRole('button', { name: 'Abmelden' }).click();
+}
+
+/** Opens S60 through „Einstellungen“ in the menu „Konto“, or in the compact menu on a narrow screen. */
+async function openSettings(page: Page): Promise<void> {
+  if (await accountMenuButton(page).isVisible()) {
+    await accountMenuButton(page).click();
+    await page.getByRole('menuitem', { name: 'Einstellungen' }).click();
+  } else {
+    await page.getByRole('button', { name: 'Menü', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Menü' }).getByRole('link', { name: 'Einstellungen' }).click();
+  }
+  await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
 }
 
 test.describe('User preferences (R-SET-01, R-SET-02)', () => {
@@ -83,6 +96,50 @@ test.describe('User preferences (R-SET-01, R-SET-02)', () => {
     await test.step('signed out: the system again, without a reload', async () => {
       await signOut(page);
       await expect.poll(() => htmlClasses(page)).toEqual(['theme-light']);
+      expect(await storageEntries(page), 'local and session storage').toBe(0);
+    });
+  });
+
+  test('INV:A11Y-08 INV:A11Y-06 INV:A11Y-01 S60 applies a change at once without reload, saves it and shows it on the next visit', async ({
+    page,
+    request,
+  }, testInfo) => {
+    const address = `s60-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
+    await registerConfirmedAccount(request, address, PASSWORD);
+    await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'no-preference' });
+    await signInThroughApi(page, address, PASSWORD);
+    await page.goto('/');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+
+    await test.step('S60 through the menu: the stored defaults, checked by axe', async () => {
+      await openSettings(page);
+      await expect(page).toHaveURL(/\/einstellungen$/);
+      await expect(page.getByRole('radio', { name: 'Deutsch' })).toBeChecked();
+      await expect(page.getByRole('group', { name: 'Erscheinungsbild' }).getByRole('radio', { name: 'Wie im Betriebssystem eingestellt' })).toBeChecked();
+      await expect(page.getByRole('radio', { name: 'Hoher Kontrast' })).toHaveCount(0);
+      await expectNoAxeViolations(page, testInfo, 'S60 with the system settings');
+    });
+
+    await test.step('„Dunkel“ and „Bewegungen reduzieren“ apply at once, without reload, and are announced', async () => {
+      // A reload would drop this marker.
+      await page.evaluate(() => ((window as unknown as { paNoReload: boolean }).paNoReload = true));
+      await page.getByRole('radio', { name: 'Dunkel' }).check();
+      await expect.poll(() => htmlClasses(page)).toEqual(['theme-dark']);
+      await page.getByRole('radio', { name: 'Bewegungen reduzieren' }).check();
+      await expect.poll(() => htmlClasses(page)).toEqual(['motion-reduced', 'theme-dark']);
+      await expect(page.locator('.cdk-live-announcer-element')).toHaveText('Einstellungen gespeichert.');
+      expect(await page.evaluate(() => (window as unknown as { paNoReload?: boolean }).paNoReload)).toBe(true);
+      await expectNoAxeViolations(page, testInfo, 'S60 with the explicit dark appearance', { explicitAppearance: true });
+    });
+
+    await test.step('saved: the server answers them, and S60 shows them after a reload', async () => {
+      const stored = await page.request.get('/api/v1/account/preferences');
+      expect(await stored.json()).toEqual({ language: 'de', appearance: 'dark', motion: 'reduced', contrast: 'system' });
+      await page.reload();
+      await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
+      await expect(page.getByRole('radio', { name: 'Dunkel' })).toBeChecked();
+      await expect(page.getByRole('radio', { name: 'Bewegungen reduzieren' })).toBeChecked();
+      await expect.poll(() => htmlClasses(page)).toEqual(['motion-reduced', 'theme-dark']);
       expect(await storageEntries(page), 'local and session storage').toBe(0);
     });
   });
