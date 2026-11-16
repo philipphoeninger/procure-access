@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-10 (M3.1d, 2 points) · **Issues:** #158 (auth entries; stays open for the profile, settings and M5 entries)
 > **Requirements / invariants:** API-01 stays green for the identity endpoints (TESTING_v72 V235); TEN-02 allow-list one entry shorter (V236); ARCHITECTURE C150; SPEC v2.32 (current-versions line only); no invariant changes its status
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #351 open (2026-11-16)
 > **Scope:** the remaining legacy auth code after S5-09, S5-12 and S5-13: `Microsoft.AspNetCore.Identity.UI`, the `{ code, message }` failures of `UsersController`, `DateTime.UtcNow` in `UserRepo`, `ERROR_TRANSLATIONS` and the dead legacy client keys, the unused `RefreshTokens` table.
 > **Owner decisions (2026-11-16):** O-S5-4 — yes: S01 – S03, S60 and S61 replace the legacy account pages, which go once their replacement is merged; existing users sign in again · S5-10 2a — delete the three legacy account actions no screen calls (`change-email`, `change-password`, `revoke-sessions`) with their repository methods, turn `DELETE /api/Users` into Problem Details · S5-10 3a — drop the `RefreshTokens` table in this task (legacy migration)
 
