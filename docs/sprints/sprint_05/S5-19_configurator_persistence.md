@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-19 (M3.5 part, 4.5 points) · **Issues:** none
 > **Requirements / invariants:** **CAT-08, EXP-06 `active`** (TESTING_v74 V239, V240); ARC-03 restated with its `IConfigurationReader` part written (V241); CAT-06 stored part, TEN-01 sample, OPS-03 for the new context (V242); PRV-07 criteria lists (V243); ARCHITECTURE C152, ADR-017; SPEC §8.4 (v2.34); groundwork for R-SAV-01 – R-SAV-03, R-LST-12
-> **Status:** done — pull request open (2026-11-16)
+> **Status:** done — pull request #353 open (2026-11-16)
 > **Scope:** the saved criteria lists as tables of the Configurator module, `IConfigurationReader`, `PersistedConfigurationSource` in Export, the criteria lists of the personal data export. No endpoint and no screen: save, read and list are S5-20, edit, delete and the saved export S5-21.
 > **Owner decisions (2026-11-16, before the task):** S5-19 **1a** (= O-S5-5, O-22) — a `Contracts` project may reference the contracts of the modules its row of ARCHITECTURE §4.3 lists, without cycles, with an ADR and ARC-03 adjusted · **2a** — the lists store the release version, the value keys and `CriterionRevisionId`, not database ids of the catalog; §5.3 follows · **3a** — no endpoint in S5-19; S5-20 builds save, read and list · **4** — `createdByMe.criteriaLists`: name, organisation name, release, creation time, selection by name, per criterion number, title, included, recommended level, effective level, weight, note; read through the organisation filter (only organisations the user still belongs to) · **note** — `CreatedAt` and `ModifiedAt` on the list now
 
