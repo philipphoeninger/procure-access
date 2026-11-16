@@ -11,23 +11,30 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
+import { ConfiguratorSettings } from '../../state/configurator-settings';
 import { SavedListPage } from './saved-list-page';
 import { SavedListEditor } from './saved-list-editor';
 import { loadSavedListView, SavedListLoad } from './saved-list-load';
 import { SavedListSelection, savedListSelectionGuard } from './saved-list-selection';
 
 /**
- * Loads the saved list before its page shows (SPEC §8.10), so the route change titles, focuses and
+ * Loads the saved list and the configurator settings its cards need (the weight range, SPEC §8.11)
+ * before its page shows (SPEC §8.10), so the route change titles, focuses and
  * announces „{{name}} – Gespeicherte Kriterienlisten“ with the name already known (A11Y-03). A list
  * that does not exist for the user shows „Seite nicht gefunden“ in place, any other failure the S80
- * server text, as S21 does. The loading bar shows meanwhile.
+ * server text, as S21 does; so do settings that fail. The loading bar shows meanwhile.
  */
 export const savedListResolver: ResolveFn<string> = async (route) => {
   const load = inject(SavedListLoad);
   const store = inject(ProcureAccessStore);
+  const settings = inject(ConfiguratorSettings);
   store.incrementLoadingCount();
   try {
-    load.view = await loadSavedListView(inject(ConfiguratorApiService), inject(CatalogApiService), route.paramMap.get('id') ?? '');
+    const [view, settingsReady] = await Promise.all([
+      loadSavedListView(inject(ConfiguratorApiService), inject(CatalogApiService), route.paramMap.get('id') ?? ''),
+      settings.ready(),
+    ]);
+    load.view = view.kind === 'list' && !settingsReady ? { kind: 'server' } : view;
   } finally {
     store.decrementLoadingCount();
   }

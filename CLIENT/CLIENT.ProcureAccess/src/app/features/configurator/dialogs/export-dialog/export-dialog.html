@@ -39,6 +39,14 @@ SPDX-License-Identifier: MIT
         <p>{{ 'errors.rateLimit' | translatePlural: retryAfterMinutes() : { minutes: retryAfterMinutes() } }}</p>
       </pa-notice>
     }
+    @case ('noteTooLong') {
+      @let tooLong = status();
+      @if (tooLong.kind === 'noteTooLong') {
+        <pa-notice kind="error" live="assertive" [title]="'criteria.export.error.title' | translate">
+          <p>{{ 'criteria.export.noteTooLong' | translate: { criterion: tooLong.criterion, max: noteMaxLength } }}</p>
+        </pa-notice>
+      }
+    }
     @case ('outdated') {
       <pa-notice kind="error" live="assertive" [title]="'criteria.export.error.title' | translate">
         <p>{{ 'criteria.export.outdated' | translate }}</p>
@@ -57,7 +65,7 @@ SPDX-License-Identifier: MIT
       matButton="filled"
       type="button"
       [attr.aria-disabled]="busy() ? 'true' : null"
-      (click)="download()"
+      (click)="primary()"
     >
       @if (busy()) {
         <mat-progress-spinner class="pa-export__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />

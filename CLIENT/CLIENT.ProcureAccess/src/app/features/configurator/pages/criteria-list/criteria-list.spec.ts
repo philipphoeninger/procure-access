@@ -23,6 +23,7 @@ import { CRITERIA_SEARCH_DEBOUNCE_MS, withConfigurator } from '../../state/with-
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { CriteriaListPage } from './criteria-list';
+import { provideLoadedConfiguratorSettings } from '../../testing/configurator-settings-stub';
 
 // The real configurator slice stands in for the root store, so the page runs the S4-14 rules; the
 // sign-in state (`signedIn` of withIdentity(), from the session probe) is a flag here.
@@ -48,6 +49,7 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
     announce = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(CriteriaListPage, {
       providers: [
+        provideLoadedConfiguratorSettings(),
         provideTestTranslations(),
         provideRouter([
           { path: 'filters', component: Blank },
@@ -359,15 +361,14 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
       const filter = screen.getByRole('group', { name: 'Liste filtern' });
       const suggest = screen.getByRole('link', { name: /^Fehlt ein Kriterium oder ist eine Formulierung unklar\?/ });
       const status = screen.getByText('4 von 4 Kriterien in Ihrer Liste');
+      const unsaved = screen.getByText('Noch nicht gespeichert');
       const saveButton = screen.getByRole('button', { name: 'Liste speichern' });
       const exportButton = screen.getByRole('button', { name: 'Liste exportieren' });
 
       expect(priorityNote.textContent).toContain('Die Prioritäten sind eine Empfehlung des Projektteams');
       expect(
-        order(summary, priorityNote, draftNote, counts, filter, screen.getByRole('list'), suggest, status, saveButton, exportButton),
+        order(summary, priorityNote, draftNote, counts, filter, screen.getByRole('list'), suggest, status, unsaved, saveButton, exportButton),
       ).toBe(true);
-      // „Liste speichern“ since S5-20b; `criteria.list.unsaved` comes with S5-22.
-      expect(screen.queryByText('Noch nicht gespeichert')).toBeNull();
       expect(screen.queryByRole('button', { name: /schließen|ausblenden/i })).toBeNull();
       await expectNoAxeViolations();
     });

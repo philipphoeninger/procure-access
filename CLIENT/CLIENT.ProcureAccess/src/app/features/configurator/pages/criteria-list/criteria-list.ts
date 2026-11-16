@@ -4,14 +4,17 @@
 
 import { DOCUMENT } from '@angular/common';
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
   effect,
   inject,
+  Injector,
   untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -77,9 +80,11 @@ const STATUS_KEY = 'criteria.list.status.count';
  * „Kriterium vorschlagen“ to the configured channel (R-LST-13). Last the action bar (R-LST-10): the
  * live counter `criteria.list.status.count` — announced, throttled, only when the user includes or
  * excludes a criterion — „Liste speichern“ (S5-20b) and „Liste exportieren“, which opens the export
- * dialog S13; `criteria.list.unsaved` comes with S5-22. The bar (`pa-criteria-action-bar`, shared
- * with a saved list since S5-21b) is in the flow below 600 px width or height and sticky from
- * there, and never covers the focused element (WCAG 2.4.11). Not
+ * dialog S13; under the counter `criteria.list.unsaved`, because the draft of S11 is never saved
+ * itself — saving makes a list of the organisation (S5-22, owner decision S5-22 4). „Zur Notiz“ of
+ * S13 (TD-40) opens the note of its criterion, after clearing a filter that hides its card. The
+ * bar (`pa-criteria-action-bar`, shared with a saved list since S5-21b) is in the flow below 600 px
+ * width or height and sticky from there, and never covers the focused element (WCAG 2.4.11). Not
  * `pa-criteria-list`: the legacy list has that selector.
  *
  * „Liste speichern“ (R-SAV-01, S5-20b): signed out it opens S01 with `auth.login.reasonSave`; after
@@ -124,6 +129,8 @@ export class CriteriaListPage {
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
   private readonly filterRow = viewChild(CriteriaListFilterRow);
+  private readonly cards = viewChildren(CriterionCard);
+  private readonly injector = inject(Injector);
 
   protected readonly configuratorPath = CONFIGURATOR_PATH;
   protected readonly appTypeStepState = APP_TYPE_STEP_STATE;
@@ -215,7 +222,21 @@ export class CriteriaListPage {
 
   /** „Liste exportieren“: the export dialog S13 (R-LST-11). */
   protected openExport(): void {
-    ExportDialog.open(this.dialog);
+    ExportDialog.open(this.dialog)
+      .afterClosed()
+      .subscribe((result) => {
+        if (result !== undefined) this.showNote(result.toNote);
+      });
+  }
+
+  /** „Zur Notiz“ of S13 (TD-40): the card opens its note; a filter that hides the card is cleared first. */
+  private showNote(key: string): void {
+    if (!this.criteria().some((criterion) => criterion.key === key)) {
+      this.store.clearCriteriaFilter();
+    }
+    afterNextRender(() => this.cards().find((card) => card.criterion().key === key)?.showNote(), {
+      injector: this.injector,
+    });
   }
 
   /** „Liste speichern“ (R-SAV-01): see {@link saveAction}. */

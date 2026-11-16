@@ -31,7 +31,8 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// organisations (every signed-in user; which ones it lists is TEN-01 in <c>OrganizationEndpointsTests</c>), since S5-20a
 /// with the saved criteria lists (save: Editor; read one, list: Reader; the organisation named in the body or query, or taken
 /// from the stored list), since S5-21a with changing, deleting and copying a list (Editor, the organisation taken from the stored
-/// list) and its export (every member). Every user has a confirmed legacy account, so the gate of saving (SEC-10) passes; the workspace
+/// list) and its export (every member); since S5-22 every answer of the matrix also carries <c>no-store</c>
+/// (TEN-04 workspace part). Every user has a confirmed legacy account, so the gate of saving (SEC-10) passes; the workspace
 /// endpoints add their rows with their step.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -225,6 +226,24 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         using var response = await SendAsync(client, action, user);
 
         response.StatusCode.ShouldBe(expected);
+    }
+
+    /// <summary>
+    /// TEN-04 workspace part (S5-22): every answer of the matrix — success, 401, 403 and 404 alike —
+    /// carries <c>no-store</c>, from the platform default or, for the export, its own header.
+    /// </summary>
+    [Theory(DisplayName = "INV:TEN-04 " + nameof(Endpoint_UserAndAction_AnswerCarriesNoStore))]
+    [Trait("Invariant", "TEN-04")]
+    [MemberData(nameof(Matrix))]
+    public async Task Endpoint_UserAndAction_AnswerCarriesNoStore(string userName, string action, HttpStatusCode expected)
+    {
+        var user = userName == Anonymous ? null : TestUsers.ByName[userName];
+        using var client = CreateClient(user);
+
+        using var response = await SendAsync(client, action, user);
+
+        response.StatusCode.ShouldBe(expected);
+        response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
     }
 
     [Fact(DisplayName = "INV:TEN-05 " + nameof(Read_MemberOfA_SeesTheOrganizationName))]

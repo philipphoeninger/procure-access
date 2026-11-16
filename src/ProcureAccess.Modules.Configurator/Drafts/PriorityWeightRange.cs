@@ -9,7 +9,7 @@ namespace ProcureAccess.Modules.Configurator.Drafts;
 /// <summary>
 /// 🔧 The weights a user may give a B criterion (R-LST-03, SPEC SD23: 1–10), from
 /// <c>Configurator:PriorityWeight</c> of <c>appsettings.json</c> (owner decision O-S4-58 (a)). The
-/// client has the same range as its setting <c>priorityWeight</c>; keep both in step. The server is
+/// client reads it from <c>GET /api/v1/configurator/settings</c> (S5-22, TD-45); the server is
 /// authoritative (SPEC §7.1).
 /// </summary>
 internal sealed record PriorityWeightRange(int Min, int Max)

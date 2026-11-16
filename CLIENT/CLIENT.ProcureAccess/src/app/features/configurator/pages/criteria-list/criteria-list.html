@@ -99,6 +99,7 @@ SPDX-License-Identifier: MIT
   @if (answer.criteria.length > 0) {
     <pa-criteria-action-bar
       [status]="'criteria.list.status.count' | translate: { included: included(), total: answer.criteria.length }"
+      [saveState]="'criteria.list.unsaved' | translate"
     >
       @if (saveAction()) {
         <button matButton="outlined" type="button" (click)="save()">{{ 'criteria.list.save' | translate }}</button>

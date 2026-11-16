@@ -77,6 +77,8 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
     const suggest = main.getByRole('link', { name: /^Fehlt ein Kriterium oder ist eine Formulierung unklar\?/ });
     await expect(suggest).toHaveAttribute('href', /^(mailto:[^?]+\?subject=Vorschlag%20f%C3%BCr%20den%20Kriterienkatalog|https:)/);
     await expect(actionBar(page)).toContainText(/^\s*(\d+) von \1 Kriterien in Ihrer Liste/);
+    // The draft of S11 is never saved itself (S5-22, owner decision S5-22 4).
+    await expect(actionBar(page).getByText('Noch nicht gespeichert', { exact: true })).toBeVisible();
     // „Liste speichern“ since S5-20b, before „Liste exportieren“; signed out it opens S01 (R-SAV-01).
     await expect(actionBar(page).getByRole('button')).toHaveText(['Liste speichern', 'Liste exportieren']);
   });

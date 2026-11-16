@@ -8,6 +8,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
+import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -16,6 +17,7 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@app/features/identity/services/auth.service';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
+import { NOTE_MAX_LENGTH } from '../../models/criteria-list';
 import { ExportRequest } from '../../models/export';
 import { CriteriaListPage } from '../../pages/criteria-list/criteria-list';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
@@ -25,6 +27,7 @@ import { withConfigurator } from '../../state/with-configurator';
 import { ExportDialog } from './export-dialog';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
+import { provideLoadedConfiguratorSettings } from '../../testing/configurator-settings-stub';
 
 // The dialog reads the list S11 shows, so it runs on the S11 page with the real configurator slice.
 let signedIn = false;
@@ -61,6 +64,7 @@ describe('ExportDialog (S13, R-LST-11)', () => {
     announce = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(CriteriaListPage, {
       providers: [
+        provideLoadedConfiguratorSettings(),
         provideTestTranslations(),
         provideRouter([
           { path: 'filters', component: Blank },
@@ -204,6 +208,109 @@ describe('ExportDialog (S13, R-LST-11)', () => {
   });
 });
 
+describe('ExportDialog with a note that is too long (TD-40, S5-22)', () => {
+  const keyboardCard = () =>
+    screen.getByRole('heading', { level: 2, name: 'Alles geht mit der Tastatur' }).closest('pa-criterion-card') as HTMLElement;
+  const noteOf = (card: HTMLElement) =>
+    within(card).getByRole<HTMLTextAreaElement>('textbox', { name: 'Ihre Notiz zu diesem Kriterium (optional)' });
+
+  /** Types a note one character too long into the card „Alles geht mit der Tastatur“; `exclude` removes the card from the list. */
+  async function writeTooLongNote(fixture: { whenStable(): Promise<unknown> }, exclude: boolean): Promise<void> {
+    within(keyboardCard()).getByRole('button', { name: 'Notiz hinzufügen' }).click();
+    await fixture.whenStable();
+    const note = noteOf(keyboardCard());
+    note.value = 'x'.repeat(NOTE_MAX_LENGTH + 1);
+    fireEvent.input(note);
+    await fixture.whenStable();
+    if (exclude) {
+      within(keyboardCard()).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+    }
+  }
+
+  async function openWithTooLongNote(exclude = false) {
+    signedIn = false;
+    const exportList = vi.fn();
+    const announce = vi.fn().mockResolvedValue(undefined);
+    const rendered = await render(CriteriaListPage, {
+      providers: [
+        provideLoadedConfiguratorSettings(),
+        provideTestTranslations(),
+        provideRouter([{ path: 'kriterien', component: Blank }]),
+        { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
+        {
+          provide: CatalogApiService,
+          useValue: {
+            getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer()),
+            getCriteria: vi.fn().mockResolvedValue(criteriaAnswer()),
+          },
+        },
+        { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
+        { provide: ExportApiService, useValue: { exportList } },
+        { provide: FileSaver, useValue: { save: vi.fn() } },
+        { provide: AuthService, useValue: { showLogin: vi.fn() } },
+        { provide: A11yAnnouncerService, useValue: { announce } },
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
+      ],
+    });
+    const { fixture } = rendered;
+    await fixture.whenStable();
+    await writeTooLongNote(fixture, exclude);
+    const store = fixture.debugElement.injector.get<InstanceType<typeof ConfiguratorTestStore>>(ProcureAccessStore);
+    if (exclude) {
+      store.showOnlyIncludedCriteria(true);
+      await fixture.whenStable();
+    }
+    screen.getByRole('button', { name: 'Liste exportieren' }).click();
+    await fixture.whenStable();
+    const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
+    const download = within(dialog).getByRole('button', { name: 'Datei herunterladen' });
+    download.focus();
+    download.click();
+    await fixture.whenStable();
+    return { fixture, dialog, download, exportList, store };
+  }
+
+  it('names the criterion instead of requesting the file, and „Zur Notiz“ replaces the download in place', async () => {
+    const { dialog, download, exportList } = await openWithTooLongNote();
+
+    expect(exportList).not.toHaveBeenCalled();
+    const alert = within(dialog).getByRole('alert');
+    expect(alert.textContent).toContain('Export fehlgeschlagen');
+    expect(alert.textContent).toContain(
+      'Die Notiz zum Kriterium „Alles geht mit der Tastatur“ ist länger als 1000 Zeichen. Bitte kürzen Sie sie, dann können Sie die Datei herunterladen.',
+    );
+    expect(within(dialog).getAllByRole('button').map((b) => b.textContent?.trim())).toEqual(['Abbrechen', 'Zur Notiz']);
+    // The same button changed its label, so the focus stays on it.
+    expect(download.textContent?.trim()).toBe('Zur Notiz');
+    expect(document.activeElement).toBe(download);
+    await expectNoAxeViolations();
+  });
+
+  it('„Zur Notiz“ closes the dialog, opens the note with its error and moves the focus into it', async () => {
+    const { fixture, download } = await openWithTooLongNote();
+
+    download.click();
+    await fixture.whenStable();
+    await vi.waitFor(() => expect(document.activeElement).toBe(noteOf(keyboardCard())));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(within(keyboardCard()).getByText('Bitte kürzen Sie den Text auf höchstens 1000 Zeichen. Derzeit sind es 1001.')).toBeTruthy();
+    expect(noteOf(keyboardCard()).getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('clears a filter that hides the card first: an excluded card counts too', async () => {
+    const { fixture, download, store } = await openWithTooLongNote(true);
+    expect(screen.queryByRole('heading', { level: 2, name: 'Alles geht mit der Tastatur' })).toBeNull();
+
+    download.click();
+    await fixture.whenStable();
+    await vi.waitFor(() => expect(document.activeElement).toBe(noteOf(keyboardCard())));
+
+    expect(store.configurator.list.filter().onlyIncluded).toBe(false);
+  });
+});
+
 describe('ExportDialog for a saved list (R-LST-12, S5-21b)', () => {
   it('exports the stored list under its own release, with its count and without the anonymous note', async () => {
     const exportSavedList = vi.fn().mockResolvedValue({ content: new Blob(['x']), fileName: 'ProcureAccess_Kriterien_Liste_T.1_2026-11-16.csv' });
@@ -211,6 +318,7 @@ describe('ExportDialog for a saved list (R-LST-12, S5-21b)', () => {
     const announce = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(Blank, {
       providers: [
+        provideLoadedConfiguratorSettings(),
         provideTestTranslations(),
         { provide: ProcureAccessStore, useClass: ConfiguratorTestStore },
         { provide: ExportApiService, useValue: { exportSavedList } },
@@ -221,7 +329,7 @@ describe('ExportDialog for a saved list (R-LST-12, S5-21b)', () => {
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
     });
-    ExportDialog.open(rendered.debugElement.injector.get(MatDialog), { listId: 'list-1', release: 'T.1', included: 7 });
+    ExportDialog.open(rendered.debugElement.injector.get(MatDialog), { listId: 'list-1', release: 'T.1', included: 7, tooLongNote: null });
     await rendered.fixture.whenStable();
     const dialog = screen.getByRole('dialog', { name: 'Kriterienliste exportieren' });
 

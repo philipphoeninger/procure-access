@@ -15,6 +15,7 @@ using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Configurator.Persistence;
+using ProcureAccess.Modules.Configurator.Settings;
 using ProcureAccess.Modules.Configurator.Usage;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 
@@ -29,6 +30,8 @@ namespace ProcureAccess.Modules.Configurator;
 /// <see cref="ICriteriaListDataExport"/>. Since S5-20a it maps the saved-list endpoints below
 /// <c>/configurations</c> (<see cref="ConfigurationEndpoints"/>: save, read, list) and answers
 /// <see cref="IConfigurationDraftCheck"/>, the draft check of the anonymous export and of saving.
+/// Since S5-22 it serves its 🔧 weight range at <c>GET /configurator/settings</c>
+/// (<see cref="ConfiguratorSettingsEndpoint"/>).
 /// </summary>
 public static class ConfiguratorModule
 {
@@ -70,7 +73,7 @@ public static class ConfiguratorModule
     }
 
     /// <summary>
-    /// Maps the configurator endpoints as minimal APIs below <c>/configurator</c> (the usage event)
+    /// Maps the configurator endpoints as minimal APIs below <c>/configurator</c> (the usage event, the settings)
     /// and <c>/configurations</c> (the saved lists, ARCHITECTURE §7.2) of <paramref name="routes"/>,
     /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
     /// before the Swagger set-up (#176).
@@ -80,6 +83,7 @@ public static class ConfiguratorModule
         ArgumentNullException.ThrowIfNull(routes);
         var configurator = routes.MapGroup("/configurator").WithTags("Configurator");
         CriteriaListShownEndpoint.Map(configurator);
+        ConfiguratorSettingsEndpoint.Map(configurator);
         ConfigurationEndpoints.Map(routes);
         return routes;
     }

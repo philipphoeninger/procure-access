@@ -14,6 +14,7 @@ import { CatalogNames, catalogNames } from '../../state/catalog-names';
 import { criterion, procedureText } from '../../testing/criteria-fixture';
 import { filterOptions } from '../../testing/filter-options-fixture';
 import { CriterionCard } from './criterion-card';
+import { provideLoadedConfiguratorSettings } from '../../testing/configurator-settings-stub';
 
 const SOURCE_LINE =
   'Grundlage: Empfehlung des Projektteams WERTE.IT (fachliche Einschätzung, keine Vorgabe aus einer Norm).';
@@ -115,6 +116,7 @@ async function show(
   };
   const rendered = await render(CriterionCard, {
     providers: [
+      provideLoadedConfiguratorSettings(),
       provideTestTranslations(),
       // jsdom never ends a CSS transition, so the tab body would wait for it forever.
       { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
@@ -567,6 +569,25 @@ describe('CriterionCard (S11, R-LST-01, R-LST-02, Handoff §5.5)', () => {
       const button = screen.getByRole('button', { name: 'Notiz bearbeiten' });
       expect(button.getAttribute('aria-expanded')).toBe('true');
       expect(noteField().value).toBe('Schon notiert.');
+    });
+
+    it('keeps a too-long note open: its button shows the error and moves the focus into the field (TD-40)', async () => {
+      const { act, fixture } = await show(keyboardCriterion());
+      const button = screen.getByRole('button', { name: 'Notiz hinzufügen' });
+      await act(button);
+      await type('x'.repeat(NOTE_MAX_LENGTH + 1), fixture);
+      button.focus();
+
+      await act(button);
+
+      expect(button.getAttribute('aria-expanded')).toBe('true');
+      expect(document.activeElement).toBe(noteField());
+      expect(screen.getByText('Bitte kürzen Sie den Text auf höchstens 1000 Zeichen. Derzeit sind es 1001.')).toBeTruthy();
+
+      await type('x'.repeat(NOTE_MAX_LENGTH), fixture);
+      await act(button);
+
+      expect(button.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('shows the length error only after the field was left, keeps the text, and clears it once it fits', async () => {

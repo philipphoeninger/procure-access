@@ -7,7 +7,7 @@ import { TestBed } from '@angular/core/testing';
 import { Criterion } from '../../models/criteria';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { decisionOf } from '../../state/criteria-list-rules';
-import { PRIORITY_WEIGHT_RANGE } from '../../state/priority-weight-range';
+import { provideLoadedConfiguratorSettings } from '../../testing/configurator-settings-stub';
 import { criterion } from '../../testing/criteria-fixture';
 import { NOTE_SAVE_DELAY_MS, SavedListEditor, toDecisionRequest } from './saved-list-editor';
 
@@ -24,7 +24,7 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
       providers: [
         SavedListEditor,
         { provide: ConfiguratorApiService, useValue: { decide } },
-        { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 10 } },
+        provideLoadedConfiguratorSettings(),
       ],
     });
     editor = TestBed.inject(SavedListEditor);
@@ -126,7 +126,7 @@ describe('SavedListEditor.settled', () => {
       providers: [
         SavedListEditor,
         { provide: ConfiguratorApiService, useValue: { decide } },
-        { provide: PRIORITY_WEIGHT_RANGE, useValue: { min: 1, max: 10 } },
+        provideLoadedConfiguratorSettings(),
       ],
     });
     const editor = TestBed.inject(SavedListEditor);

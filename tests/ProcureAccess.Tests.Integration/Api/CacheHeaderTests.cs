@@ -5,7 +5,14 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Configurator.Drafts;
+using ProcureAccess.Modules.Configurator.Settings;
 using ProcureAccess.Tests.Integration.Infrastructure;
+using ProcureAccess.Tests.Shared.Auth;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
 using Xunit;
@@ -14,12 +21,14 @@ using static ProcureAccess.Tests.Integration.Export.ExportTestCatalog;
 namespace ProcureAccess.Tests.Integration.Api;
 
 /// <summary>
-/// TEN-04 as ARCHITECTURE §9.6 says (catalog and export parts; the directory part follows in
-/// step 6): both catalog endpoints answer with an <c>ETag</c>, <c>public, max-age=3600,
-/// must-revalidate</c> for a named release and <c>public, no-cache</c> for the active one; every
-/// answer of the export carries <c>no-store</c>.
+/// TEN-04 as ARCHITECTURE §9.6 says (catalog, export and, since S5-22, workspace parts; the
+/// directory part follows in step 6): both catalog endpoints answer with an <c>ETag</c>,
+/// <c>public, max-age=3600, must-revalidate</c> for a named release and <c>public, no-cache</c>
+/// for the active one; every answer of the export carries <c>no-store</c>, and so does every other
+/// answer below <c>/api/v1</c> (the platform default). The workspace endpoints with every user and
+/// status are in <c>AuthorizationMatrixTests</c>.
 /// </summary>
-public sealed class CacheHeaderTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
+public sealed partial class CacheHeaderTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
     private const string Selection = "useCase=hr&appTypeIds[]=web&productPartIds[]=base";
 
@@ -79,6 +88,74 @@ public sealed class CacheHeaderTests(ApiFixture api) : IntegrationTest(api), IAs
             response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue($"{(int)response.StatusCode} without no-store");
         }
     }
+
+    [Fact(DisplayName = "INV:TEN-04 " + nameof(Settings_Anonymous_AnswersTheConfiguredWeightRangeWithNoStore))]
+    [Trait("Invariant", "TEN-04")]
+    public async Task Settings_Anonymous_AnswersTheConfiguredWeightRangeWithNoStore()
+    {
+        using var client = CreateClient();
+        var configured = Api.Factory.Services.GetRequiredService<PriorityWeightRange>();
+
+        using var response = await client.GetAsync("/api/v1/configurator/settings", Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
+        var settings = await response.Content.ReadFromJsonAsync<ConfiguratorSettingsResponse>(Cancellation);
+        settings.ShouldNotBeNull().PriorityWeight.ShouldBe(new WeightRangeResponse(configured.Min, configured.Max));
+    }
+
+    /// <summary>
+    /// The default covers every GET below <c>/api/v1</c> except the catalog, signed in and anonymous,
+    /// whatever the status, with a random id in each route parameter. State-changing endpoints are
+    /// not swept blindly (one would sign the client out); the matrix covers the workspace ones.
+    /// </summary>
+    [Theory(DisplayName = "INV:TEN-04 " + nameof(EveryGet_SignedInOrAnonymous_CarriesNoStore))]
+    [Trait("Invariant", "TEN-04")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EveryGet_SignedInOrAnonymous_CarriesNoStore(bool signedIn)
+    {
+        var paths = Api.Factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
+            .OfType<RouteEndpoint>()
+            .Where(e => e.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Contains(HttpMethods.Get) == true)
+            .Select(e => e.RoutePattern.RawText ?? string.Empty)
+            .Where(p => p.TrimStart('/').StartsWith("api/v{version", StringComparison.Ordinal))
+            .Where(p => !p.Contains("/catalog/", StringComparison.Ordinal))
+            .Select(ToPath)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        paths.ShouldContain("/api/v1/configurations");
+        paths.ShouldContain("/api/v1/auth/session");
+        using var client = CreateClient(signedIn ? TestUsers.OwnerA : null);
+
+        foreach (var path in paths)
+        {
+            using var response = await client.GetAsync(path, Cancellation);
+
+            ((int)response.StatusCode).ShouldBeLessThan(500, path);
+            response.Headers.CacheControl.ShouldNotBeNull(path).NoStore.ShouldBeTrue($"{path} {(int)response.StatusCode} without no-store");
+        }
+    }
+
+    [Fact(DisplayName = "INV:TEN-04 " + nameof(UnknownPath_BelowTheVersionedApi_CarriesNoStore))]
+    [Trait("Invariant", "TEN-04")]
+    public async Task UnknownPath_BelowTheVersionedApi_CarriesNoStore()
+    {
+        using var client = CreateClient(TestUsers.OwnerA);
+
+        using var response = await client.GetAsync("/api/v1/gibt-es-nicht", Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
+    }
+
+    /// <summary>The route pattern with version 1 and a random id for every other parameter.</summary>
+    private static string ToPath(string pattern) =>
+        "/" + RouteParameter().Replace(pattern.Trim('/'), m =>
+            m.Value.StartsWith("{version", StringComparison.Ordinal) ? "1" : Guid.NewGuid().ToString());
+
+    [GeneratedRegex(@"\{[^}]+\}")]
+    private static partial Regex RouteParameter();
 
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
 }

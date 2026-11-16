@@ -44,7 +44,7 @@ import {
   sourceTitle,
 } from '../../state/criterion-card-rules';
 import { detailLayout, tabLabelKey } from '../../state/criterion-detail-rules';
-import { PRIORITY_WEIGHT_RANGE } from '../../state/priority-weight-range';
+import { ConfiguratorSettings } from '../../state/configurator-settings';
 import { ProcedureSections } from '../procedure-sections/procedure-sections';
 
 /** Stands for the link inside `criteria.item.testedBy.meta`; a private-use character no text holds. */
@@ -73,12 +73,14 @@ function noteLength(control: AbstractControl<string>): ValidationErrors | null {
  * - Title row: a checkbox `criteria.item.include` (named „In Liste aufnehmen“ + the title, no visible
  *   text of its own, Figma S11) and, for an excluded criterion, `criteria.item.excluded`. An excluded
  *   card stays in the list on `surface-container-low` and keeps every control (R-LST-04).
- * - K5 with the level menu, the weight field of B (range 🔧 `PRIORITY_WEIGHT_RANGE`) and
+ * - K5 with the level menu, the weight field of B (range 🔧 `ConfiguratorSettings`, SPEC §8.11) and
  *   „Empfehlung wiederherstellen“ (R-LST-03).
  * - „Notiz hinzufügen“ / „Notiz bearbeiten“ opens the note field `criteria.item.note` and moves the
  *   focus into it (O-S4-42 (a)); the field starts open when a note exists. Its length error
  *   (`errors.field.maxLength`, SPEC §7.1, §7.2) shows once the field was left and then follows the
- *   text until it fits (O-S4-43 (a)); the text is kept as typed, without `maxlength` (R-LST-05).
+ *   text until it fits (O-S4-43 (a)); the text is kept as typed, without `maxlength` (R-LST-05). While it is too long
+ *   the field does not close, and {@link CriterionCard.showNote} opens it for „Zur Notiz“ of S13
+ *   (TD-40, S5-22).
  *
  * The card holds no list state: every change is an output, which the page hands to the in-memory
  * draft of `withConfigurator()`.
@@ -143,7 +145,8 @@ export class CriterionCard implements OnInit {
 
   protected readonly linkMark = LINK_MARK;
   protected readonly expanded = signal(false);
-  protected readonly weightRange = inject(PRIORITY_WEIGHT_RANGE);
+  /** Loaded before any page with cards opens (S11 guard, saved-list resolver). */
+  protected readonly weightRange = inject(ConfiguratorSettings).weightRange();
 
   protected readonly noteOpen = signal(false);
   protected readonly noteControl = new FormControl('', { nonNullable: true, validators: [noteLength] });
@@ -218,12 +221,30 @@ export class CriterionCard implements OnInit {
     }
   }
 
-  /** Opens or closes the note field; opening moves the focus into it. */
+  /**
+   * Opens or closes the note field; opening moves the focus into it. A note that is too long stays
+   * open (TD-40): „Notiz bearbeiten“ then shows its length error and moves the focus into the field,
+   * so the error cannot be hidden.
+   */
   protected toggleNote(): void {
+    if (this.noteOpen() && noteLengthError(this.noteControl.value) !== null) {
+      this.showNote();
+      return;
+    }
     this.noteOpen.update((open) => !open);
     if (this.noteOpen()) {
       afterNextRender(() => this.noteField().nativeElement.focus(), { injector: this.injector });
     }
+  }
+
+  /**
+   * Opens the note with its length error shown and moves the focus into it: „Zur Notiz“ of the
+   * export dialog S13 (TD-40, owner decision S5-22 2a) and a too-long note in {@link toggleNote}.
+   */
+  showNote(): void {
+    this.noteOpen.set(true);
+    this.noteControl.markAsTouched();
+    afterNextRender(() => this.noteField().nativeElement.focus(), { injector: this.injector });
   }
 
   /** The values of `errors.field.maxLength`, while the note is too long. */

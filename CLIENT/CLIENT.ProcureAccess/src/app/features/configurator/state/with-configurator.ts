@@ -31,7 +31,7 @@ import {
   setNote,
   setWeight,
 } from './criteria-list-rules';
-import { PRIORITY_WEIGHT_RANGE } from './priority-weight-range';
+import { ConfiguratorSettings } from './configurator-settings';
 import {
   chooseUseCase,
   isComplete,
@@ -162,7 +162,7 @@ export const withConfigurator = () =>
     withMethods((
       store,
       api = inject(CatalogApiService),
-      weightRange = inject(PRIORITY_WEIGHT_RANGE),
+      settings = inject(ConfiguratorSettings),
       usage = inject(ConfiguratorApiService),
     ) => {
       let latestRequest = 0;
@@ -382,7 +382,7 @@ export const withConfigurator = () =>
         },
         /** Sets the weight of a criterion whose level is B, inside the 🔧 range (R-LST-03). */
         setCriterionWeight(key: string, weight: number): void {
-          decide(key, (decisions, criterion) => setWeight(decisions, criterion, weight, weightRange));
+          decide(key, (decisions, criterion) => setWeight(decisions, criterion, weight, settings.weightRange()));
         },
         /** „Empfehlung wiederherstellen“ (R-LST-03). */
         resetCriterionPriority(key: string): void {

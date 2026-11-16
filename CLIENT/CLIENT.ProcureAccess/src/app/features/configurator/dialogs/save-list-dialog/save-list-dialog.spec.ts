@@ -24,6 +24,7 @@ import { ConfiguratorApiService } from '../../services/api/configurator-api.serv
 import { withConfigurator } from '../../state/with-configurator';
 import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
+import { provideLoadedConfiguratorSettings } from '../../testing/configurator-settings-stub';
 
 // The dialog reads the list S11 shows, so it runs on the S11 page with the real configurator slice;
 // sign-in and organisation come from the test double.
@@ -61,6 +62,7 @@ describe('„Liste speichern“ on S11 and the save dialog S12 (R-SAV-01)', () =
     announce = vi.fn().mockResolvedValue(undefined);
     const rendered = await render(CriteriaListPage, {
       providers: [
+        provideLoadedConfiguratorSettings(),
         provideTestTranslations(),
         provideRouter([
           { path: 'filters', component: Blank },

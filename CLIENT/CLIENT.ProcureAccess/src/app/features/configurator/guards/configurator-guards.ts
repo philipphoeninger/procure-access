@@ -8,6 +8,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 
 import { ConfiguratorLayer } from '../models/configurator-draft';
+import { ConfiguratorSettings } from '../state/configurator-settings';
 
 /** Where the criteria lead while no catalog release is active: the legacy filter (O-S4-3). */
 export const LEGACY_FILTER_PATH = '/filters';
@@ -45,9 +46,15 @@ export const configuratorReleaseGuard: CanActivateFn = async () => {
 
 /**
  * S11 shows only a complete selection from S10 (R-CON-10). The draft lives in memory only
- * (R-CON-09), so after a reload it is gone and the page leads back to S10.
+ * (R-CON-09), so after a reload it is gone and the page leads back to S10. With a complete
+ * selection the guard waits for the configurator settings its cards need (the weight range, SPEC
+ * §8.11); if they fail, S11 does not open and the error interceptor shows the system state.
  */
-export const completeSelectionGuard: CanActivateFn = () => {
+export const completeSelectionGuard: CanActivateFn = async () => {
   const store = inject(ProcureAccessStore);
-  return store.configuratorComplete() ? true : inject(Router).parseUrl(CONFIGURATOR_PATH);
+  const settings = inject(ConfiguratorSettings);
+  if (!store.configuratorComplete()) {
+    return inject(Router).parseUrl(CONFIGURATOR_PATH);
+  }
+  return settings.ready();
 };

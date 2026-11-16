@@ -16,6 +16,7 @@ import {
   isWeightInRange,
   levelCounts,
   matchesSearch,
+  firstTooLongNote,
   noteLengthError,
   overridePriority,
   resetPriority,
@@ -143,6 +144,18 @@ describe('criteria list rules', () => {
 
     it('counts UTF-16 code units, as the server does', () => {
       expect(noteLengthError('😀'.repeat(501))).toEqual({ max: 1000, current: 1002 });
+    });
+
+    it('finds the first too-long note in list order, of an excluded criterion too (TD-40)', () => {
+      const criteria = criteriaAnswer().criteria;
+      const long = 'x'.repeat(1001);
+      let decisions = setNote(none, '11.3.3', long);
+      decisions = setNote(decisions, '11.2.2', long);
+      decisions = setIncluded(decisions, '11.2.2', false);
+
+      expect(firstTooLongNote(criteria, none)).toBeNull();
+      expect(firstTooLongNote(criteria, setNote(none, '11.1.1', 'x'.repeat(1000)))).toBeNull();
+      expect(firstTooLongNote(criteria, decisions)?.key).toBe('11.2.2');
     });
   });
 

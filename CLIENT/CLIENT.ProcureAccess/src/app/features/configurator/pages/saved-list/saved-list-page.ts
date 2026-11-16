@@ -3,15 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
   effect,
   inject,
+  Injector,
   signal,
   untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,7 +40,7 @@ import { CriteriaListFilter } from '../../models/criteria-list';
 import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '../../models/saved-lists';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { catalogNames } from '../../state/catalog-names';
-import { decisionOf, filterCriteria, includedCount, levelCounts } from '../../state/criteria-list-rules';
+import { decisionOf, filterCriteria, firstTooLongNote, includedCount, levelCounts } from '../../state/criteria-list-rules';
 import { selectionNames } from '../../state/selection-names';
 import { CRITERIA_SEARCH_DEBOUNCE_MS } from '../../state/with-configurator';
 import { SavedListEditor } from './saved-list-editor';
@@ -105,6 +108,8 @@ export class SavedListPage {
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly translate = inject(TranslateService);
   private readonly filterRow = viewChild(CriteriaListFilterRow);
+  private readonly cards = viewChildren(CriterionCard);
+  private readonly injector = inject(Injector);
   protected readonly editor = inject(SavedListEditor);
 
   protected readonly view = signal<SavedListView>({ kind: 'notFound' });
@@ -219,12 +224,16 @@ export class SavedListPage {
 
   /** „Filter zurücksetzen“: the button goes with the empty state, so the focus goes to the search. */
   protected resetFilter(): void {
+    this.clearFilter();
+    this.filterRow()?.focusSearch();
+  }
+
+  private clearFilter(): void {
     clearTimeout(this.searchTimer);
     this.searchInput.set('');
     this.query.set('');
     this.levels.set([]);
     this.onlyIncluded.set(false);
-    this.filterRow()?.focusSearch();
   }
 
   /** „Liste exportieren“: S13 for the stored list (R-LST-12), once every change is saved. */
@@ -236,6 +245,22 @@ export class SavedListPage {
       listId: shown.list.id,
       release: shown.list.releaseVersion,
       included: this.included(),
+      // A too-long note is never stored (S5-21b R4): S13 leads to it instead (TD-40).
+      tooLongNote: firstTooLongNote(this.criteria(), this.decisions()),
+    })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result !== undefined) this.showNote(result.toNote);
+      });
+  }
+
+  /** „Zur Notiz“ of S13 (TD-40): the card opens its note; a filter that hides the card is cleared first. */
+  private showNote(key: string): void {
+    if (!this.visible().some((criterion) => criterion.key === key)) {
+      this.clearFilter();
+    }
+    afterNextRender(() => this.cards().find((card) => card.criterion().key === key)?.showNote(), {
+      injector: this.injector,
     });
   }
 

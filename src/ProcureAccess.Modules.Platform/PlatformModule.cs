@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.Platform.Analytics;
+using ProcureAccess.Modules.Platform.Caching;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 using ProcureAccess.Modules.Platform.Email;
 using ProcureAccess.Modules.Platform.Errors;
@@ -89,12 +90,14 @@ public static class PlatformModule
         services.AddEmailSender(configuration, environment);
 
     /// <summary>
-    /// Adds the middleware of the Platform module: the client address from the trusted proxies,
-    /// then Problem Details for unhandled exceptions and for error responses without a body. Call
-    /// it first, before any other middleware of the pipeline.
+    /// Adds the middleware of the Platform module: <c>Cache-Control: no-store</c> on every answer
+    /// below <c>/api/v1</c> without a header of its own (TEN-04, S5-22), the client address from
+    /// the trusted proxies, then Problem Details for unhandled exceptions and for error responses
+    /// without a body. Call it first, before any other middleware of the pipeline.
     /// </summary>
     public static IApplicationBuilder UsePlatformMiddleware(this IApplicationBuilder app) =>
-        app.UseClientAddress()
+        app.UseNoStoreDefault()
+           .UseClientAddress()
            .UsePlatformProblemDetails();
 
     /// <summary>
