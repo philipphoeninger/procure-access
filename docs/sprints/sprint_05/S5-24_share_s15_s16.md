@@ -25,6 +25,8 @@
 > - **A (a)** — the dates in the answer of `GET /configurations/{id}/share-links`, loaded each time S15 opens.
 > - **B (a)** — „Gültig bis“ is the browser's date field (Material's datepicker has English texts and the UX copy none).
 > - **Copy** — the seven proposed keys (UX copy v36 U150 – U155) as proposed.
+>
+> **Owner decision (2026-11-16, after the pull request):** the malformed-token fix of S5-23's server code (finding 7, R1) stays in this pull request.
 
 ## 1. Starting point
 
@@ -120,7 +122,7 @@ Checklist of CLAUDE §6.7 and `/engineering:code-review` on the staged diff.
 
 ## 5. Open points
 
-1. **Deviation:** the malformed-token fix (R1) is server code of S5-23, done here because S16's „Link nicht mehr gültig“ depends on it (R-SAV-05).
+1. **Deviation, accepted:** the malformed-token fix (R1) is server code of S5-23, done here because S16's „Link nicht mehr gültig“ depends on it (R-SAV-05); the owner kept it in this pull request (2026-11-16).
 2. **UX copy:** `criteria.share.expiry.hint` writes the 🔧 values into its text. If `ShareLinks:DefaultExpiryDays` or `MaxExpiryMonths` ever change, the text needs placeholders; proposal for a later UX copy version.
 3. **UX copy:** on S16 an excluded card says „Nicht in Ihrer Liste“ to someone who does not own the list; a reader-neutral variant would need a new key.
 4. **Migration step 5:** no share action for a project copy (409, C59) — unchanged from S5-23.
