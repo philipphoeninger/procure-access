@@ -137,6 +137,60 @@ public class CriteriaConfigurationTests
                 organization ?? Organization, name, user, CreatedAt, release, "hr", appTypes ?? ["web"], ["base"], [], criteria ?? one);
     }
 
+    [Fact]
+    public void ChangeSelection_NewSelection_KeepsStayingRowsDropsLeavingOnesAndAddsNewOnes()
+    {
+        var list = List(new ConfigurationCriterionDraft(11, PriorityLevel.A, Note: "bleibt"), new ConfigurationCriterionDraft(12, PriorityLevel.B));
+        var staying = Criterion(list, 11);
+        var later = CreatedAt.AddHours(1);
+
+        list.ChangeSelection(
+            null,
+            ["web", "softwareOpen"],
+            ["base", "audio"],
+            ["softwareTest"],
+            [new ConfigurationCriterionDraft(11, PriorityLevel.B, Note: "bleibt"), new ConfigurationCriterionDraft(13, PriorityLevel.Info)],
+            later);
+
+        list.ShouldSatisfyAllConditions(
+            l => l.UseCaseKey.ShouldBeNull(),
+            l => l.AppTypes.Select(v => v.AppTypeKey).ShouldBe(["web", "softwareOpen"]),
+            l => l.ProductParts.Select(v => v.ProductPartKey).ShouldBe(["base", "audio"]),
+            l => l.TestTypes.Select(v => v.TestTypeKey).ShouldBe(["softwareTest"]),
+            l => l.Criteria.Select(c => c.CriterionRevisionId).ShouldBe([11, 13]),
+            l => l.ModifiedAt.ShouldBe(later),
+            l => l.CreatedAt.ShouldBe(CreatedAt));
+        // The same row object: EF updates it instead of deleting and inserting the same key.
+        Criterion(list, 11).ShouldBeSameAs(staying);
+        staying.ShouldSatisfyAllConditions(c => c.ResolvedLevel.ShouldBe(PriorityLevel.B), c => c.NoteDe.ShouldBe("bleibt"));
+    }
+
+    [Fact]
+    public void ChangeSelection_ImpossibleDecision_ThrowsAndKeepsTheRecommendation()
+    {
+        var list = List(new ConfigurationCriterionDraft(11, PriorityLevel.B, OverrideWeight: 4));
+
+        Should.Throw<ArgumentException>(() => list.ChangeSelection(
+            "hr", ["web"], ["base"], [], [new ConfigurationCriterionDraft(11, PriorityLevel.A, OverrideWeight: 4)], CreatedAt));
+        Should.Throw<ArgumentException>(() => list.ChangeSelection("hr", [], ["base"], [], [], CreatedAt));
+
+        Criterion(list, 11).ShouldSatisfyAllConditions(c => c.ResolvedLevel.ShouldBe(PriorityLevel.B), c => c.OverrideWeight.ShouldBe(4));
+    }
+
+    [Theory]
+    [InlineData(true, null, null, null, false)]
+    [InlineData(false, null, null, null, true)]
+    [InlineData(true, PriorityLevel.Info, null, null, true)]
+    [InlineData(true, null, 3, null, true)]
+    [InlineData(true, null, null, "Notiz", true)]
+    public void HasDecision_RowWithoutOrWithAChange_SaysWhetherTheUserChangedIt(
+        bool isIncluded, PriorityLevel? level, int? weight, string? note, bool expected)
+    {
+        var list = List(new ConfigurationCriterionDraft(12, PriorityLevel.B, isIncluded, level, weight, note));
+
+        Criterion(list, 12).HasDecision.ShouldBe(expected);
+    }
+
     private static CriteriaConfiguration List(params ConfigurationCriterionDraft[] criteria) =>
         CriteriaConfiguration.Create(Organization, "Vergabe 2027", "user-1", CreatedAt, "T.1", "hr", ["web"], ["base"], [], criteria);
 

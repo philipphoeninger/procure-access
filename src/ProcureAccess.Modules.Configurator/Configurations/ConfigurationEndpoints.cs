@@ -18,8 +18,10 @@ using ProcureAccess.Modules.Platform.Contracts.Errors;
 namespace ProcureAccess.Modules.Configurator.Configurations;
 
 /// <summary>
-/// The organisation's saved criteria lists (SPEC R-SAV-01, R-SAV-02, §8.10; ARCHITECTURE §7.2,
-/// C153; S5-20a): save a draft in one call, read a list, list the organisation's lists for S14.
+/// The organisation's saved criteria lists (SPEC R-SAV-01 – R-SAV-03, R-SAV-06, R-LST-14, §8.10;
+/// ARCHITECTURE §7.2, C153, C155): save a draft in one call, read a list, list the organisation's
+/// lists for S14 (S5-20a); change a decision or the selection, delete a list, copy it to the active
+/// release (S5-21a). The saved export is the Export module's (<c>POST …/{id}/exports</c>).
 /// </summary>
 /// <remarks>
 /// <para><b>Sign-in and organisation.</b> Every endpoint needs a sign-in (401). Saving and listing
@@ -34,6 +36,10 @@ namespace ProcureAccess.Modules.Configurator.Configurations;
 /// recommendations (EXP-07), only the active release is accepted (400 <c>release-mismatch</c>), and
 /// an inactive use case is refused (CAT-18). The body is at most <see cref="MaxRequestBodySize"/>
 /// bytes, like the export's (SPEC §7.2). SPEC §7.3 sets no rate limit.</para>
+/// <para><b>Changes (S5-21a).</b> Changing, deleting and copying a list take the organisation from
+/// the stored list and need Editor on it (404 non-member, 403 Reader), a confirmed address (SEC-10)
+/// and antiforgery. No <c>ETag</c>/<c>If-Match</c> yet: the concurrency of shared resources comes
+/// with API-03 in migration step 5 (owner decision S5-21 2a); until then the last change wins.</para>
 /// <para><b>Ids.</b> No route constraint on <c>{id}</c>, so a malformed id answers 400
 /// <c>validation</c> like every other bad input (API-01), as the organisation endpoints do.</para>
 /// </remarks>
@@ -46,6 +52,9 @@ internal static class ConfigurationEndpoints
 
     private const string OrganizationField = "organizationId";
     private const string NameField = "name";
+
+    /// <summary>The one release a copy can go to (ARCHITECTURE C58).</summary>
+    private const string ActiveRelease = "active";
 
     public static IEndpointRouteBuilder Map(IEndpointRouteBuilder routes)
     {
@@ -86,6 +95,68 @@ internal static class ConfigurationEndpoints
                           "400 validation at 'organizationId' without it; 401; 404 for a non-member.")
                       .Produces<IReadOnlyList<ConfigurationSummaryResponse>>()
                       .ProducesValidationProblem()
+                      .ProducesProblem(StatusCodes.Status404NotFound);
+
+        configurations.MapPatch("/{id}/criteria/{criterionRevisionId}", DecideAsync)
+                      .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                      .WithMetadata(new RequestSizeLimitAttribute(MaxRequestBodySize))
+                      .WithName("PatchConfigurationCriterion")
+                      .WithSummary("Changes the decision on one criterion of a saved list (Editor or Owner)")
+                      .WithDescription(
+                          "204. The body is the whole decision { isIncluded, overrideLevel, overrideWeight, note }, keyed as a " +
+                          "row of the save request; also on a list of an older release. 400 validation; 400 antiforgery; 401; " +
+                          "403 email-unconfirmed or below Editor; 404 for an unknown list, one of another organisation or a " +
+                          "criterion that is not on the list.")
+                      .Accepts<ConfigurationDecisionBody>("application/json")
+                      .Produces(StatusCodes.Status204NoContent)
+                      .ProducesValidationProblem()
+                      .ProducesProblem(StatusCodes.Status403Forbidden)
+                      .ProducesProblem(StatusCodes.Status404NotFound);
+
+        configurations.MapPut("/{id}/selection", ChangeSelectionAsync)
+                      .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                      .WithMetadata(new RequestSizeLimitAttribute(MaxRequestBodySize))
+                      .WithName("PutConfigurationSelection")
+                      .WithSummary("Replaces the selection of a saved list under its release (Editor or Owner)")
+                      .WithDescription(
+                          "200 { droppedDecisions: [ { criterionRevisionId, number, title } ] }: the criteria whose decisions " +
+                          "left with the old selection; decisions of criteria that stay are kept. Only while the list's release " +
+                          "is active. 400 validation (also an inactive use case), selection-excluded or release-mismatch (another " +
+                          "release, or the list's release is no longer active); 400 antiforgery; 401; 403 email-unconfirmed or " +
+                          "below Editor; 404 for an unknown list or one of another organisation.")
+                      .Accepts<ChangeSelectionBody>("application/json")
+                      .Produces<ChangedSelection>()
+                      .ProducesValidationProblem()
+                      .ProducesProblem(StatusCodes.Status403Forbidden)
+                      .ProducesProblem(StatusCodes.Status404NotFound);
+
+        configurations.MapDelete("/{id}", DeleteAsync)
+                      .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                      .WithName("DeleteConfiguration")
+                      .WithSummary("Deletes a saved list (Editor or Owner)")
+                      .WithDescription(
+                          "204. Project copies are not affected. 400 antiforgery; 401; 403 email-unconfirmed or below Editor; " +
+                          "404 for an unknown list or one of another organisation.")
+                      .Produces(StatusCodes.Status204NoContent)
+                      .ProducesProblem(StatusCodes.Status403Forbidden)
+                      .ProducesProblem(StatusCodes.Status404NotFound);
+
+        configurations.MapPost("/{id}/copies", CopyAsync)
+                      .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                      .WithMetadata(new RequestSizeLimitAttribute(MaxRequestBodySize))
+                      .WithName("PostConfigurationCopy")
+                      .WithSummary("Copies a saved list to the active catalog release (Editor or Owner)")
+                      .WithDescription(
+                          "201 { id, releaseVersion, droppedValues, notCarried }, Location of the new list. Body { release: " +
+                          "\"active\" }. The new list has the same organisation and name; values the active release no longer " +
+                          "allows are dropped and named, decisions move by criterion key or successor key, the others are named. " +
+                          "The source list is unchanged. 400 validation (another release, or the list is already on the active " +
+                          "release) or selection-excluded (nothing complete is left); 400 antiforgery; 401; 403 email-unconfirmed " +
+                          "or below Editor; 404 for an unknown list, one of another organisation, or without an active release.")
+                      .Accepts<CopyConfigurationBody>("application/json")
+                      .Produces<CopiedConfiguration>(StatusCodes.Status201Created)
+                      .ProducesValidationProblem()
+                      .ProducesProblem(StatusCodes.Status403Forbidden)
                       .ProducesProblem(StatusCodes.Status404NotFound);
 
         return routes;
@@ -172,6 +243,111 @@ internal static class ConfigurationEndpoints
 
         return TypedResults.Ok(await configurations.ListAsync(id, cancellationToken));
     }
+
+    private static async Task<IResult> DecideAsync(
+        Guid id,
+        int criterionRevisionId,
+        ConfigurationDecisionBody body,
+        ClaimsPrincipal user,
+        IAuthorizationService authorization,
+        ConfigurationService configurations,
+        CancellationToken cancellationToken)
+    {
+        if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
+        {
+            return refused;
+        }
+
+        var result = await configurations.DecideAsync(id, criterionRevisionId, body, cancellationToken);
+        return result.Outcome == EditOutcome.Done ? TypedResults.NoContent() : ProblemOf(result);
+    }
+
+    private static async Task<IResult> ChangeSelectionAsync(
+        Guid id,
+        ChangeSelectionBody body,
+        ClaimsPrincipal user,
+        IAuthorizationService authorization,
+        ConfigurationService configurations,
+        CancellationToken cancellationToken)
+    {
+        if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
+        {
+            return refused;
+        }
+
+        var result = await configurations.ChangeSelectionAsync(id, body.Selection, cancellationToken);
+        return result.Outcome == EditOutcome.Done ? TypedResults.Ok(result.Value) : ProblemOf(result);
+    }
+
+    private static async Task<IResult> DeleteAsync(
+        Guid id,
+        ClaimsPrincipal user,
+        IAuthorizationService authorization,
+        ConfigurationService configurations,
+        CancellationToken cancellationToken)
+    {
+        if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
+        {
+            return refused;
+        }
+
+        return await configurations.DeleteAsync(id, cancellationToken)
+            ? TypedResults.NoContent()
+            : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+    }
+
+    private static async Task<IResult> CopyAsync(
+        Guid id,
+        CopyConfigurationBody body,
+        ClaimsPrincipal user,
+        IAuthorizationService authorization,
+        ConfigurationService configurations,
+        CancellationToken cancellationToken)
+    {
+        if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
+        {
+            return refused;
+        }
+
+        if (body.Release != ActiveRelease)
+        {
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]>(StringComparer.Ordinal) { ["release"] = [$"The release must be '{ActiveRelease}'."] },
+                type: ProblemTypes.Validation);
+        }
+
+        var result = await configurations.CopyToActiveReleaseAsync(id, UserIdOf(user), cancellationToken);
+        return result.Outcome == EditOutcome.Done
+            ? TypedResults.Created($"/api/v1{GroupPath}/{result.Value!.Id}", result.Value)
+            : ProblemOf(result);
+    }
+
+    /// <summary>
+    /// The role check of a change to a stored list (TEN-05): the organisation is the list's, read
+    /// through the filter — 404 for an unknown list or one of another organisation (TEN-01) —, then
+    /// Editor on it — 403 for a Reader. <c>null</c> when it passed.
+    /// </summary>
+    private static async Task<IResult?> RefusedForListAsync(
+        IAuthorizationService authorization,
+        ClaimsPrincipal user,
+        ConfigurationService configurations,
+        Guid id,
+        CancellationToken cancellationToken) =>
+        await configurations.OrganizationOfAsync(id, cancellationToken) is { } organizationId
+            ? await RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor)
+            : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+
+    private static IResult ProblemOf<T>(EditResult<T> result) => result.Outcome switch
+    {
+        EditOutcome.NotFound => TypedResults.Problem(
+            detail: result.Detail, statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound),
+        EditOutcome.Invalid => TypedResults.ValidationProblem(result.Errors, detail: result.Detail, type: ProblemTypes.Validation),
+        EditOutcome.SelectionExcluded => TypedResults.ValidationProblem(
+            result.Errors, detail: result.Detail, type: ProblemTypes.SelectionExcluded),
+        EditOutcome.ReleaseMismatch => TypedResults.ValidationProblem(
+            result.Errors, detail: result.Detail, type: ProblemTypes.ReleaseMismatch),
+        _ => throw new InvalidOperationException($"No problem for outcome {result.Outcome}."),
+    };
 
     /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
     private static async Task<ProblemHttpResult?> RefusedAsync(

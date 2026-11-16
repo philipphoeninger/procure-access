@@ -62,7 +62,8 @@ internal sealed class PersistedConfigurationSource(IConfigurationReader configur
             .Where(p => p.Decision.IsIncluded)
             .Select(p => ExportRow.Of(p.Criterion, p.Decision.OverrideLevel, p.Decision.OverrideWeight, p.Decision.Note))
             .ToList();
-        return ExportSourceResult.Of(new ExportContent(
-            list.ReleaseVersion, selection.UseCase, selection.AppTypes, selection.ProductParts, selection.TestTypes, rows));
+        return ExportSourceResult.Of(
+            new ExportContent(list.ReleaseVersion, selection.UseCase, selection.AppTypes, selection.ProductParts, selection.TestTypes, rows),
+            list.Name);
     }
 }

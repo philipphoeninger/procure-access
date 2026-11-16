@@ -43,4 +43,10 @@ public static class RateLimitPolicies
     /// <see cref="ConfirmationResend"/>).
     /// </summary>
     public const string Invitation = "Invitation";
+
+    /// <summary>
+    /// <c>POST /api/v1/configurations/{id}/exports</c>: per signed-in user, 60 per 10 minutes 🔧
+    /// (SPEC §7.3 „Saved export“; S5-21a).
+    /// </summary>
+    public const string SavedExport = "SavedExport";
 }

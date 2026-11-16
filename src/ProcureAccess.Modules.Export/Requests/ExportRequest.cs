@@ -39,3 +39,10 @@ internal sealed record ExportCriterionRequest(
     string? OverrideLevel,
     int? OverrideWeight,
     string? Note);
+
+/// <summary>
+/// Body of <c>POST /api/v1/configurations/{id}/exports</c> (R-LST-12, S5-21a): only the format; the
+/// content is the stored list's. Unknown members are refused.
+/// </summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record SavedExportRequest(string? Format);

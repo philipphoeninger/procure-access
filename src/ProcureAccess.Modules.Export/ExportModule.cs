@@ -18,8 +18,8 @@ namespace ProcureAccess.Modules.Export;
 /// export sources. Since S4-19 it holds the export pipeline — <see cref="AdHocSelectionSource"/>
 /// behind <c>POST /api/v1/exports</c> (<see cref="MapExportEndpoints"/>). The CSV renderer and the
 /// texts of the files came with S4-20a, the XLSX renderer with S4-20b. Since S5-19 it holds
-/// <see cref="PersistedConfigurationSource"/>, the source of saved lists; its endpoint
-/// <c>POST /api/v1/configurations/{id}/exports</c> follows with S5-21.
+/// <see cref="PersistedConfigurationSource"/>, the source of saved lists, behind
+/// <c>POST /api/v1/configurations/{id}/exports</c> since S5-21a.
 /// </summary>
 public static class ExportModule
 {
@@ -54,6 +54,7 @@ public static class ExportModule
     {
         ArgumentNullException.ThrowIfNull(routes);
         ExportEndpoint.Map(routes).WithTags("Export");
+        SavedExportEndpoint.Map(routes).WithTags("Export");
         return routes;
     }
 }

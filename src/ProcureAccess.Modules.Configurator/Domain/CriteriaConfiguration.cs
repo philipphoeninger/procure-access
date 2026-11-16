@@ -103,24 +103,7 @@ internal sealed class CriteriaConfiguration
             throw new ArgumentException($"A release version has at most {ReleaseVersionMaxLength} characters.", nameof(releaseVersion));
         }
 
-        if (useCaseKey is not null)
-        {
-            CheckKeys([useCaseKey], nameof(useCaseKey));
-        }
-
-        CheckKeys(appTypeKeys, nameof(appTypeKeys));
-        CheckKeys(productPartKeys, nameof(productPartKeys));
-        CheckKeys(testTypeKeys, nameof(testTypeKeys));
-        if (appTypeKeys.Count == 0)
-        {
-            throw new ArgumentException("A selection has at least one app type.", nameof(appTypeKeys));
-        }
-
-        ArgumentNullException.ThrowIfNull(criteria);
-        if (criteria.Select(c => c.CriterionRevisionId).Distinct().Count() != criteria.Count)
-        {
-            throw new ArgumentException("A criterion is named more than once.", nameof(criteria));
-        }
+        CheckSelection(useCaseKey, appTypeKeys, productPartKeys, testTypeKeys, criteria);
 
         var configuration = new CriteriaConfiguration
         {
@@ -158,6 +141,76 @@ internal sealed class CriteriaConfiguration
             ?? throw new ArgumentException($"Revision {criterionRevisionId} is not a criterion of this list.", nameof(criterionRevisionId));
         criterion.Decide(isIncluded, overrideLevel, overrideWeight, note);
         ModifiedAt = now;
+    }
+
+    /// <summary>
+    /// Replaces the selection of the list under its pinned release („Auswahl ändern“, R-SAV-03; owner
+    /// decision S5-21 3a) and stamps <see cref="ModifiedAt"/>. <paramref name="criteria"/> names every
+    /// criterion of the new selection once, with the recommendation the catalog resolved for it and
+    /// the decision the caller carried over. Value rows and criterion rows that stay are kept, so the
+    /// change touches only what changed. Throws as <see cref="Create"/> does.
+    /// </summary>
+    public void ChangeSelection(
+        string? useCaseKey,
+        IReadOnlyCollection<string> appTypeKeys,
+        IReadOnlyCollection<string> productPartKeys,
+        IReadOnlyCollection<string> testTypeKeys,
+        IReadOnlyCollection<ConfigurationCriterionDraft> criteria,
+        DateTimeOffset now)
+    {
+        CheckSelection(useCaseKey, appTypeKeys, productPartKeys, testTypeKeys, criteria);
+
+        UseCaseKey = useCaseKey;
+        Replace(_appTypes, appTypeKeys, v => v.AppTypeKey, key => new ConfigurationAppType(key));
+        Replace(_productParts, productPartKeys, v => v.ProductPartKey, key => new ConfigurationProductPart(key));
+        Replace(_testTypes, testTypeKeys, v => v.TestTypeKey, key => new ConfigurationTestType(key));
+
+        var drafts = criteria.ToDictionary(c => c.CriterionRevisionId);
+        _criteria.RemoveAll(c => !drafts.ContainsKey(c.CriterionRevisionId));
+        foreach (var row in _criteria)
+        {
+            row.Reset(drafts[row.CriterionRevisionId]);
+        }
+
+        var present = _criteria.Select(c => c.CriterionRevisionId).ToHashSet();
+        _criteria.AddRange(criteria.Where(c => !present.Contains(c.CriterionRevisionId)).Select(ConfigurationCriterion.Create));
+        ModifiedAt = now;
+    }
+
+    private static void CheckSelection(
+        string? useCaseKey,
+        IReadOnlyCollection<string> appTypeKeys,
+        IReadOnlyCollection<string> productPartKeys,
+        IReadOnlyCollection<string> testTypeKeys,
+        IReadOnlyCollection<ConfigurationCriterionDraft> criteria)
+    {
+        if (useCaseKey is not null)
+        {
+            CheckKeys([useCaseKey], nameof(useCaseKey));
+        }
+
+        CheckKeys(appTypeKeys, nameof(appTypeKeys));
+        CheckKeys(productPartKeys, nameof(productPartKeys));
+        CheckKeys(testTypeKeys, nameof(testTypeKeys));
+        if (appTypeKeys.Count == 0)
+        {
+            throw new ArgumentException("A selection has at least one app type.", nameof(appTypeKeys));
+        }
+
+        ArgumentNullException.ThrowIfNull(criteria);
+        if (criteria.Select(c => c.CriterionRevisionId).Distinct().Count() != criteria.Count)
+        {
+            throw new ArgumentException("A criterion is named more than once.", nameof(criteria));
+        }
+    }
+
+    /// <summary>Keeps the rows whose key stays, removes the others and adds the new keys.</summary>
+    private static void Replace<T>(List<T> rows, IReadOnlyCollection<string> keys, Func<T, string> keyOf, Func<string, T> create)
+    {
+        var wanted = keys.ToHashSet(StringComparer.Ordinal);
+        rows.RemoveAll(row => !wanted.Contains(keyOf(row)));
+        var present = rows.Select(keyOf).ToHashSet(StringComparer.Ordinal);
+        rows.AddRange(keys.Where(key => !present.Contains(key)).Select(create));
     }
 
     private static void CheckKeys(IReadOnlyCollection<string> keys, string parameter)

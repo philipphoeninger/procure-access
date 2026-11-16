@@ -18,10 +18,13 @@ internal interface IExportSource<in TInput>
     Task<ExportSourceResult> LoadAsync(TInput input, CancellationToken cancellationToken);
 }
 
-/// <summary>Either the content or the problem that keeps the source from giving it.</summary>
-internal sealed record ExportSourceResult(ExportContent? Content, ExportProblem? Problem)
+/// <summary>
+/// Either the content or the problem that keeps the source from giving it. <see cref="ListName"/>
+/// is the name of a saved list, for the file name (SPEC §8.3); <c>null</c> for a draft.
+/// </summary>
+internal sealed record ExportSourceResult(ExportContent? Content, ExportProblem? Problem, string? ListName = null)
 {
-    public static ExportSourceResult Of(ExportContent content) => new(content, null);
+    public static ExportSourceResult Of(ExportContent content, string? listName = null) => new(content, null, listName);
 
     public static ExportSourceResult Refused(ExportProblem problem) => new(null, problem);
 }

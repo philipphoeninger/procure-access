@@ -77,6 +77,7 @@ services:
       RateLimits__PasswordReset__PermitLimit: "10000"
       RateLimits__PasswordResetAddress__PermitLimit: "10000"
       RateLimits__Invitation__PermitLimit: "10000"
+      RateLimits__SavedExport__PermitLimit: "10000"
     volumes:
       - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
 

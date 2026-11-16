@@ -62,6 +62,43 @@ internal sealed class ConfigurationCriterion
     }
 
     /// <summary>
+    /// Sets the row anew for a changed selection of its list (R-SAV-03): the recommendation the
+    /// catalog resolved for the new selection and the decision carried over. The only path that
+    /// changes <see cref="ResolvedLevel"/> — a decision never does (CAT-08).
+    /// </summary>
+    internal void Reset(ConfigurationCriterionDraft draft)
+    {
+        ArgumentNullException.ThrowIfNull(draft);
+        if (draft.CriterionRevisionId != CriterionRevisionId)
+        {
+            throw new ArgumentException($"The draft names revision {draft.CriterionRevisionId}, not {CriterionRevisionId}.", nameof(draft));
+        }
+
+        if (!Enum.IsDefined(draft.ResolvedLevel))
+        {
+            throw new ArgumentOutOfRangeException(nameof(draft), draft.ResolvedLevel, "Unknown recommended level.");
+        }
+
+        var previous = ResolvedLevel;
+        ResolvedLevel = draft.ResolvedLevel;
+        try
+        {
+            Decide(draft.IsIncluded, draft.OverrideLevel, draft.OverrideWeight, draft.Note);
+        }
+        catch
+        {
+            ResolvedLevel = previous;
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Whether the user changed anything on this criterion: excluded it, chose a level or weight, or
+    /// wrote a note. Only such a row is reported when a selection change or a copy cannot keep it.
+    /// </summary>
+    public bool HasDecision => !IsIncluded || OverrideLevel is not null || OverrideWeight is not null || NoteDe is not null;
+
+    /// <summary>
     /// Stores the user's decision. A level equal to the recommendation counts as no choice, an
     /// empty note as none. Throws for an unknown level, a weight below 1 or without B, and a note
     /// longer than <see cref="NoteMaxLength"/>; the configured weight range is the caller's check.

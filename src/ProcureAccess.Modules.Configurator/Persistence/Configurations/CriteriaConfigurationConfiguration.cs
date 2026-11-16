@@ -72,6 +72,7 @@ internal sealed class CriteriaConfigurationConfiguration : IEntityTypeConfigurat
             rows.Property(x => x.OverrideLevel).HasConversion<string>().HasMaxLength(16);
             rows.Property(x => x.NoteDe).HasMaxLength(ConfigurationCriterion.NoteMaxLength);
             rows.Ignore(x => x.EffectiveLevel);
+            rows.Ignore(x => x.HasDecision);
         });
     }
 }

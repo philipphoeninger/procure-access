@@ -6,6 +6,9 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using API.ProcureAccess.Organizations;
+using ProcureAccess.Modules.Catalog;
+using ProcureAccess.Modules.Catalog.Contracts;
+using ProcureAccess.Modules.Configurator.Configurations;
 using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
@@ -27,7 +30,8 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// since S5-17a with the invitation endpoints, since S5-18 with the list of the user's own
 /// organisations (every signed-in user; which ones it lists is TEN-01 in <c>OrganizationEndpointsTests</c>), since S5-20a
 /// with the saved criteria lists (save: Editor; read one, list: Reader; the organisation named in the body or query, or taken
-/// from the stored list). Every user has a confirmed legacy account, so the gate of saving (SEC-10) passes; the workspace
+/// from the stored list), since S5-21a with changing, deleting and copying a list (Editor, the organisation taken from the stored
+/// list) and its export (every member). Every user has a confirmed legacy account, so the gate of saving (SEC-10) passes; the workspace
 /// endpoints add their rows with their step.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -66,6 +70,24 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     /// <summary><c>GET /configurations?organizationId=A</c> (S5-20a): Reader and up.</summary>
     private const string ListLists = "list-lists";
+
+    /// <summary><c>PATCH /configurations/{id}/criteria/{revision}</c> of a list of A (S5-21a): Editor and Owner.</summary>
+    private const string DecideInList = "decide-in-list";
+
+    /// <summary><c>PUT /configurations/{id}/selection</c> of a list of A (S5-21a): Editor and Owner.</summary>
+    private const string ChangeSelection = "change-selection";
+
+    /// <summary><c>DELETE /configurations/{id}</c> of a list of A (S5-21a): Editor and Owner.</summary>
+    private const string DeleteList = "delete-list";
+
+    /// <summary><c>POST /configurations/{id}/copies</c> of a list of A on <c>T.1</c> with <c>T.2</c> active (S5-21a): Editor and Owner.</summary>
+    private const string CopyList = "copy-list";
+
+    /// <summary><c>POST /configurations/{id}/exports</c> of a list of A (S5-21a): every member of A.</summary>
+    private const string ExportList = "export-list";
+
+    /// <summary>The revision of the one criterion of <see cref="_listOfA"/>; the domain needs no catalog for it.</summary>
+    private const int RevisionOfListOfA = 1;
 
     private OrganizationInvitation? _invitation;
 
@@ -144,6 +166,36 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, ListLists, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, ListLists, HttpStatusCode.NotFound },
         { Anonymous, ListLists, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, DecideInList, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, DecideInList, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, DecideInList, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, DecideInList, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, DecideInList, HttpStatusCode.NotFound },
+        { Anonymous, DecideInList, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ChangeSelection, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ChangeSelection, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ChangeSelection, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ChangeSelection, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ChangeSelection, HttpStatusCode.NotFound },
+        { Anonymous, ChangeSelection, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, DeleteList, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, DeleteList, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, DeleteList, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, DeleteList, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, DeleteList, HttpStatusCode.NotFound },
+        { Anonymous, DeleteList, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, CopyList, HttpStatusCode.Created },
+        { TestUsers.EditorA.Name, CopyList, HttpStatusCode.Created },
+        { TestUsers.ReaderA.Name, CopyList, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, CopyList, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, CopyList, HttpStatusCode.NotFound },
+        { Anonymous, CopyList, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ExportList, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ExportList, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ExportList, HttpStatusCode.OK },
+        { TestUsers.OwnerB.Name, ExportList, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ExportList, HttpStatusCode.NotFound },
+        { Anonymous, ExportList, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
@@ -154,7 +206,8 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             _tenants.A.Id, "eingeladen@example.test", OrganizationRole.Reader, new byte[32], Clock.GetUtcNow(), TimeSpan.FromDays(14));
         // A list of A to read; the domain needs no catalog for it, the save rows import one when they run.
         _listOfA = CriteriaConfiguration.Create(
-            _tenants.A.Id, "Liste von A", TestUsers.OwnerA.Id, Clock.GetUtcNow(), MiniCatalog.T1Version, null, ["web"], [], [], []);
+            _tenants.A.Id, "Liste von A", TestUsers.OwnerA.Id, Clock.GetUtcNow(), MiniCatalog.T1Version, null, ["web"], [], [],
+            [new ConfigurationCriterionDraft(RevisionOfListOfA, PriorityLevel.B)]);
         await StoreAsync([.. _tenants.Entities, _invitation, _listOfA]);
         await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: true))]);
     }
@@ -281,6 +334,41 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         return body;
     }
 
+    /// <summary>
+    /// A list of A saved through the API with the whole <c>T.1</c> draft — a list the catalog resolves,
+    /// which a selection change, a copy and an export need —, with <paramref name="activeVersion"/>
+    /// active afterwards.
+    /// </summary>
+    private async Task<Guid> SavedListOfAAsync(string activeVersion)
+    {
+        using var owner = CreateClient(TestUsers.OwnerA);
+        using var response = await owner.PostAsJsonAsync(ConfigurationsPath, await SaveBodyAsync(owner), Cancellation);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created, await response.Content.ReadAsStringAsync(Cancellation));
+        var id = (await response.Content.ReadFromJsonAsync<CreatedConfiguration>(Cancellation)).ShouldNotBeNull().Id;
+        if (activeVersion != MiniCatalog.T1Version)
+        {
+            var error = new StringWriter();
+            var exitCode = await CatalogModule.RunCommandAsync(
+                Api.Factory.Services, ["catalog", "activate", activeVersion], TextWriter.Null, error, Cancellation);
+            exitCode.ShouldBe(0, error.ToString());
+        }
+
+        return id;
+    }
+
+    /// <summary>The body of a selection change of a <c>T.1</c> list: the web selection without a test type.</summary>
+    private static JsonObject ChangeSelectionBody() => new()
+    {
+        ["selection"] = new JsonObject
+        {
+            ["releaseVersion"] = MiniCatalog.T1Version,
+            ["useCaseTemplateId"] = "hr",
+            ["appTypeIds"] = new JsonArray("web"),
+            ["productPartIds"] = new JsonArray("base"),
+            ["testTypeIds"] = new JsonArray(),
+        },
+    };
+
     /// <summary>The request of <paramref name="action"/> on organisation A for <paramref name="user"/>.</summary>
     private async Task<HttpResponseMessage> SendAsync(HttpClient client, string action, TestUser? user)
     {
@@ -290,6 +378,15 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             SaveList => await client.PostAsJsonAsync(ConfigurationsPath, await SaveBodyAsync(client), Cancellation),
             ReadList => await client.GetAsync($"{ConfigurationsPath}/{_listOfA!.Id}", Cancellation),
             ListLists => await client.GetAsync($"{ConfigurationsPath}?organizationId={a}", Cancellation),
+            DecideInList => await client.PatchAsJsonAsync(
+                $"{ConfigurationsPath}/{_listOfA!.Id}/criteria/{RevisionOfListOfA}", new { isIncluded = false }, Cancellation),
+            ChangeSelection => await client.PutAsJsonAsync(
+                $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T1Version)}/selection", ChangeSelectionBody(), Cancellation),
+            DeleteList => await client.DeleteAsync($"{ConfigurationsPath}/{_listOfA!.Id}", Cancellation),
+            CopyList => await client.PostAsJsonAsync(
+                $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T2Version)}/copies", new { release = "active" }, Cancellation),
+            ExportList => await client.PostAsJsonAsync(
+                $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T1Version)}/exports", new { format = "csv" }, Cancellation),
             _ => await SendOrganizationRequestAsync(client, action, user),
         };
     }

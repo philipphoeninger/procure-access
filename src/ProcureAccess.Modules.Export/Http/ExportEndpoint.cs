@@ -107,7 +107,7 @@ internal static class ExportEndpoint
         return TypedResults.File(file.Content, file.ContentType, file.FileName);
     }
 
-    private static UsageExportFormat UsageFormatOf(ExportFormat format) => format switch
+    internal static UsageExportFormat UsageFormatOf(ExportFormat format) => format switch
     {
         ExportFormat.Xlsx => UsageExportFormat.Xlsx,
         ExportFormat.Csv => UsageExportFormat.Csv,
