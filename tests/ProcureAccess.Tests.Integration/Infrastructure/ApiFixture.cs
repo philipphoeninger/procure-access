@@ -236,7 +236,8 @@ public sealed class ApiFixture : IAsyncLifetime
     private PlatformDbContext CreatePlatformDbContext() =>
         new(new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(_database.GetConnectionString())
-            .Options);
+            .Options,
+            FixedOrganizationContext.None);
 
     private IdentityAccessDbContext CreateIdentityAccessDbContext() =>
         new(new DbContextOptionsBuilder<IdentityAccessDbContext>()

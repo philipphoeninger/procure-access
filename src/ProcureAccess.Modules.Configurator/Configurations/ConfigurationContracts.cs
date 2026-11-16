@@ -117,3 +117,24 @@ internal sealed record CopiedConfiguration(
 /// catalog title, as the export's „Titel“, SPEC §8.3).
 /// </summary>
 internal sealed record ConfigurationCriterionName(int CriterionRevisionId, string? Number, string Title);
+
+/// <summary>
+/// Body of <c>POST /api/v1/configurations/{id}/share-links</c> (R-SAV-04, S5-23): the last day the
+/// link works, as an ISO date (<c>2027-02-14</c>); required, between tomorrow and the 🔧 maximum
+/// (TEN-12). Unknown members are refused.
+/// </summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record CreateShareLinkBody(DateOnly? ExpiresOn);
+
+/// <summary>
+/// A shared list for someone without an account (R-SAV-05, SPEC §8.5; owner decision S5-23 a): the
+/// shape of <see cref="ConfigurationResponse"/> without the list's id, its organisation and its
+/// dates, plus the end of the link. No organisation, user or project data (TEN-08); the texts come
+/// from the criteria endpoint of <paramref name="ReleaseVersion"/>, as for S11.
+/// </summary>
+internal sealed record SharedConfigurationResponse(
+    string Name,
+    string ReleaseVersion,
+    DateTimeOffset ExpiresAt,
+    ConfigurationSelectionResponse Selection,
+    IReadOnlyList<ConfigurationCriterionResponse> Criteria);

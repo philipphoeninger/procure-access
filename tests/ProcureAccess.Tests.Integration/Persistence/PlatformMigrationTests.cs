@@ -5,6 +5,7 @@
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
@@ -125,7 +126,7 @@ public sealed class PlatformMigrationTests(ApiFixture api) : IAsyncDisposable
         new(new DbContextOptionsBuilder<ApplicationDBContext>().UseNpgsql(connectionString).Options);
 
     private static PlatformDbContext Platform(string connectionString) =>
-        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options);
+        new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
 
     /// <summary>
     /// Columns (type, length, nullability, default, identity) and index definitions of the Platform

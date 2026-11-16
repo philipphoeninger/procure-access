@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using ProcureAccess.Tests.Integration.Infrastructure;
@@ -116,5 +117,6 @@ public sealed class MigrationStartupTests(ApiFixture api) : IAsyncDisposable
     private static PlatformDbContext CreatePlatformDbContext(string connectionString) =>
         new(new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(connectionString)
-            .Options);
+            .Options,
+            FixedOrganizationContext.None);
 }

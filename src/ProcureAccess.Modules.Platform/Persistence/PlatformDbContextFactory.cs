@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 
 namespace ProcureAccess.Modules.Platform.Persistence;
 
@@ -32,6 +33,6 @@ internal sealed class PlatformDbContextFactory : IDesignTimeDbContextFactory<Pla
         var options = new DbContextOptionsBuilder<PlatformDbContext>()
             .UseNpgsql(connectionString)
             .Options;
-        return new PlatformDbContext(options);
+        return new PlatformDbContext(options, FixedOrganizationContext.None);
     }
 }

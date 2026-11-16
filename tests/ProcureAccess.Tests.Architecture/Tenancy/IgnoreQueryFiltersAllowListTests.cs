@@ -50,6 +50,11 @@ public class IgnoreQueryFiltersAllowListTests
         // The E2E seeder runs outside a request, where the filter shows nothing: its check whether
         // the test organisation exists reads past it (Development and E2E only, S5-16b).
         ["src/ProcureAccess.Modules.IdentityAccess/Organizations/TestOrganizationSeeder.cs"] = 1,
+        // The anonymous read of a share link (S5-23, ARCHITECTURE C59): the reader has no account and
+        // so no organisation; the token, stored only as a hash, is the credential. Platform finds the
+        // link by the token's hash, then the provider of the owning module reads the one list it names.
+        ["src/ProcureAccess.Modules.Platform/Sharing/ShareLinkService.cs"] = 1,
+        ["src/ProcureAccess.Modules.Configurator/Sharing/ConfigurationShareProvider.cs"] = 1,
         // Legacy: the generic repositories bypass the legacy context's own filters (soft delete)
         // and offer raw SQL (ExecuteSqlRaw, FromSqlRaw; two calls each with IgnoreQueryFilters).
         // UserRepo's call went with its unused RestoreUserAsync (S5-10).

@@ -62,6 +62,34 @@ public sealed class LogSinkTests(ApiFixture api) : IntegrationTest(api)
         entry.ApplicationName.ShouldBe(appName);
     }
 
+    /// <summary>
+    /// TEN-08 (S5-23, owner decision 1a): the token of a share link travels in the read's path, which
+    /// ASP.NET Core puts into the request scope of every event (<c>RequestPath</c>) and into its
+    /// hosting events (<c>Path</c>). The stored event keeps the path with the token masked, in the
+    /// properties and in the rendered message, whatever the case of the path.
+    /// </summary>
+    [Fact(DisplayName = "INV:TEN-08 " + nameof(LogWarning_ShareLinkPathInScopeAndMessage_StoresTheTokenMasked))]
+    [Trait("Invariant", "TEN-08")]
+    public async Task LogWarning_ShareLinkPathInScopeAndMessage_StoresTheTokenMasked()
+    {
+        const string token = "Tok3n-of_a-shAre-link-0123456789abcdefghijk";
+        var marker = $"sink-test-{Guid.NewGuid():N}";
+        var logger = Api.Factory.Services.GetRequiredService<ILogger<LogSinkTests>>();
+
+        using (logger.BeginScope(new Dictionary<string, object> { ["RequestPath"] = $"/api/v1/shared/{token}" }))
+        {
+            logger.LogWarning("Log sink test {Marker} at {Path}", marker, $"/API/V1/Shared/{token}");
+        }
+
+        var entry = await WaitForEntryAsync(Api.Factory.Services, marker);
+        entry.Message.ShouldNotContain(token);
+        entry.Message.ShouldContain("/API/V1/Shared/***");
+        entry.Properties.ShouldNotBeNull().ShouldNotContain(token);
+        using var properties = JsonDocument.Parse(entry.Properties!);
+        properties.RootElement.GetProperty("RequestPath").GetString().ShouldBe("/api/v1/shared/***");
+        properties.RootElement.GetProperty("Path").GetString().ShouldBe("/API/V1/Shared/***");
+    }
+
     /// <summary>The sink writes in batches on a background thread, so the row arrives later.</summary>
     private static async Task<SeriLogEntry> WaitForEntryAsync(IServiceProvider services, string marker)
     {

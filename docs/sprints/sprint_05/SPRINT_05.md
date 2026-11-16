@@ -170,7 +170,7 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 | S5-27 | S5-15 | internal |
 | S5-28 | S5-16, S5-21, S5-23, S5-27 | internal |
 | S5-29, S5-30 | S5-07 – S5-09; S5-28 for the security stamp on deletion | internal |
-| **EF migrations** | IdentityAccess (S5-07 if it adds tables, S5-12, S5-13, S5-15, S5-17, S5-25), Configurator (S5-19, S5-23): one open migration branch per module at a time | internal |
+| **EF migrations** | IdentityAccess (S5-07 if it adds tables, S5-12, S5-13, S5-15, S5-17, S5-25), Configurator (S5-19), Platform (S5-23; the share links live in Platform's context, ARCHITECTURE §5.3, owner decision S5-23 5): one open migration branch per module at a time | internal |
 | **Invariant flips** | almost every task: preferably one at a time; otherwise the later PR rebases and renumbers its TESTING version | internal |
 | Outside the sprint | Staging deployment per the checklist on #236 (key-ring certificate, plain key rows, log search, API port, environment variable); Lettermint sending domain with SPF/DKIM for staging; O-1/K-1 and O-6 from the project team; the tester's M2 pass (#311) | Philipp, project team, tester |
 
