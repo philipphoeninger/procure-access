@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 <h1 class="pa-register-page__title">{{ 'auth.register.title' | translate }}</h1>
 
 @if (registeredEmail(); as registered) {
-  <!-- Replaces the form after the submit and takes the focus (UX copy U115) -->
-  <section class="pa-register-page__success" aria-labelledby="pa-register-success-title">
+  <!-- Replaces the form after the submit and takes the focus (UX copy U115); no aria-labelledby: a named region here crashed Firefox in axe runs (TESTING V229, #337) -->
+  <section class="pa-register-page__success">
     <h2 #successHeading id="pa-register-success-title" class="pa-register-page__success-title" tabindex="-1">
       {{ 'auth.register.success.title' | translate }}
     </h2>
