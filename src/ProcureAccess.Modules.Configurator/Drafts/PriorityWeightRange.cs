@@ -4,7 +4,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace ProcureAccess.Modules.Export.Sources;
+namespace ProcureAccess.Modules.Configurator.Drafts;
 
 /// <summary>
 /// 🔧 The weights a user may give a B criterion (R-LST-03, SPEC SD23: 1–10), from

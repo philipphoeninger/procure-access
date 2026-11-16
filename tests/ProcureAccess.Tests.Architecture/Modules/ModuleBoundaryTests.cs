@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Export.Sources;
 using Shouldly;
 using Xunit;
@@ -67,28 +68,36 @@ public class ModuleBoundaryTests
     }
 
     /// <summary>
-    /// ARC-03, the part deferred to step 2 (TESTING V74): the ad-hoc export source reads the catalog
-    /// only through <c>Catalog.Contracts</c> (ARCHITECTURE §4.4, C62) — no saved configuration, no
-    /// other module, no legacy project. Its own module and Platform's contracts are allowed.
+    /// ARC-03, the part deferred to step 2 (TESTING V74), narrowed in S5-20a (C153): the ad-hoc
+    /// export source reads the catalog only through <c>Catalog.Contracts</c> and uses of
+    /// <c>Configurator.Contracts</c> only the draft check it shares with saving a list
+    /// (ARCHITECTURE §4.4) — no saved configuration (C62), no other module, no legacy project. Its own
+    /// module and Platform's contracts are allowed.
     /// </summary>
-    [Fact(DisplayName = "INV:ARC-03 " + nameof(AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContracts))]
+    [Fact(DisplayName = "INV:ARC-03 " + nameof(AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContractsAndTheDraftCheck))]
     [Trait("Invariant", "ARC-03")]
-    public void AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContracts()
+    public void AdHocSelectionSource_Types_UseOfOtherModulesOnlyCatalogContractsAndTheDraftCheck()
     {
-        string[] allowed = [Export, Export + Contracts, Catalog + Contracts, ModuleMap.PlatformContracts];
+        string[] allowed = [Export, Export + Contracts, Catalog + Contracts, Configurator + Contracts, ModuleMap.PlatformContracts];
         var forbidden = ModuleMap.AllModuleProjects
             .Except(allowed)
             .Concat(ModuleMap.LegacyProjects)
-            .Select(ModuleRules.Load);
+            .Select(ModuleRules.Load)
+            .SelectMany(ModuleRules.TopLevelTypeNames)
+            .Concat(ConfiguratorContractsOutsideTheDraftCheck());
 
         ModuleRules.TypeUsingAny(typeof(AdHocSelectionSource), forbidden).ShouldBeEmpty();
+        typeof(AdHocSelectionSource).GetConstructors().Single().GetParameters()
+            .ShouldContain(parameter => parameter.ParameterType == typeof(IConfigurationDraftCheck));
     }
 
     /// <summary>
-    /// ARC-03, the <c>IConfigurationReader</c> part (ARCHITECTURE §4.3, C62; S5-19): Export reads a
-    /// saved list only through the reader of <c>Configurator.Contracts</c>. The Export project
-    /// cannot see the Configurator module at all, the source of saved lists takes the reader, and
-    /// no other type of Export uses a type of <c>Configurator.Contracts</c>.
+    /// ARC-03, the <c>IConfigurationReader</c> part (ARCHITECTURE §4.3, C62; S5-19; narrowed in
+    /// S5-20a, C153): Export reads a saved list only through the reader of
+    /// <c>Configurator.Contracts</c>. The Export project cannot see the Configurator module at all,
+    /// the source of saved lists takes the reader, no other type of Export uses a type of
+    /// <c>Configurator.Contracts</c> outside its draft check, and of Export only the ad-hoc source
+    /// uses the draft check.
     /// </summary>
     [Fact(DisplayName = "INV:ARC-03 " + nameof(Export_SavedLists_AreReadOnlyThroughIConfigurationReader))]
     [Trait("Invariant", "ARC-03")]
@@ -107,7 +116,19 @@ public class ModuleBoundaryTests
             .Select(ModuleRules.Load);
         ModuleRules.TypeUsingAny(typeof(PersistedConfigurationSource), forbidden).ShouldBeEmpty();
 
-        ModuleRules.TypesUsingAny(ModuleRules.Load(Export), Export, [ModuleRules.Load(Configurator + Contracts)])
+        var export = ModuleRules.Load(Export);
+        ModuleRules.TypesUsingAny(export, Export, ConfiguratorContractsOutsideTheDraftCheck())
             .ShouldAllBe(type => type.StartsWith(typeof(PersistedConfigurationSource).FullName!, StringComparison.Ordinal));
+        ModuleRules.TypesUsingAny(export, Export, DraftCheckTypes())
+            .ShouldAllBe(type => type.StartsWith(typeof(AdHocSelectionSource).FullName!, StringComparison.Ordinal));
     }
+
+    private static IEnumerable<string> DraftCheckTypes() =>
+        ModuleRules.TopLevelTypeNames(ModuleRules.Load(Configurator + Contracts)).Where(IsDraftCheckType);
+
+    private static IEnumerable<string> ConfiguratorContractsOutsideTheDraftCheck() =>
+        ModuleRules.TopLevelTypeNames(ModuleRules.Load(Configurator + Contracts)).Where(name => !IsDraftCheckType(name));
+
+    private static bool IsDraftCheckType(string typeName) =>
+        typeName.StartsWith(typeof(IConfigurationDraftCheck).Namespace + ".", StringComparison.Ordinal);
 }
