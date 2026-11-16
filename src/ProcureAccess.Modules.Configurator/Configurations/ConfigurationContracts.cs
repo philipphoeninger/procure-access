@@ -68,3 +68,52 @@ internal sealed record ConfigurationSummaryResponse(
     string ReleaseVersion,
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt);
+
+/// <summary>
+/// Body of <c>PATCH /api/v1/configurations/{id}/criteria/{criterionRevisionId}</c> (R-SAV-03): the
+/// whole decision on one criterion, as a row of the save request names it. Unknown members are refused.
+/// </summary>
+/// <param name="IsIncluded">Required.</param>
+/// <param name="OverrideLevel"><c>A</c>, <c>B</c> or <c>Info</c>; <c>null</c> for the recommendation.</param>
+/// <param name="OverrideWeight">Within 🔧 <c>Configurator:PriorityWeight</c>, only while B applies.</param>
+/// <param name="Note">At most 1 000 characters; empty or <c>null</c> for none.</param>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record ConfigurationDecisionBody(bool? IsIncluded, string? OverrideLevel, int? OverrideWeight, string? Note);
+
+/// <summary>
+/// Body of <c>PUT /api/v1/configurations/{id}/selection</c> („Auswahl ändern“, R-SAV-03; owner
+/// decision S5-21 3a): the new selection in the shape of the save request, under the list's release.
+/// </summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record ChangeSelectionBody(DraftSelection? Selection);
+
+/// <summary>
+/// Answer of a selection change: the criteria whose decisions the new selection could not keep,
+/// because they are no longer part of it (owner decision S5-21 4a).
+/// </summary>
+internal sealed record ChangedSelection(IReadOnlyList<ConfigurationCriterionName> DroppedDecisions);
+
+/// <summary>
+/// Body of <c>POST /api/v1/configurations/{id}/copies</c> (R-LST-14, ARCHITECTURE C58): the release
+/// of the copy; only <c>active</c> exists.
+/// </summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record CopyConfigurationBody(string? Release);
+
+/// <summary>
+/// Answer of a copy (CAT-22): the new list, its release, the selection values the active release
+/// no longer allows (German names, layer order; <c>criteria.list.copy.dropped</c>) and the criteria
+/// whose decisions could not be carried over (<c>criteria.list.copy.notCarried</c>).
+/// </summary>
+internal sealed record CopiedConfiguration(
+    Guid Id,
+    string ReleaseVersion,
+    IReadOnlyList<string> DroppedValues,
+    IReadOnlyList<ConfigurationCriterionName> NotCarried);
+
+/// <summary>
+/// A criterion of a list as a report names it, under the release the decision was made in: its
+/// number (<c>null</c> for „Geprüft nach …“) and its title (the plain-language title, else the
+/// catalog title, as the export's „Titel“, SPEC §8.3).
+/// </summary>
+internal sealed record ConfigurationCriterionName(int CriterionRevisionId, string? Number, string Title);

@@ -231,7 +231,7 @@ internal sealed class ConfigurationDraftCheck(ICatalogSelectionResolver catalog,
         decision.OverrideLevel ?? criterion.RecommendedPriority.Level;
 
     /// <summary>The level names of SPEC §8.2 and the UX keys: <c>A</c>, <c>B</c>, <c>Info</c>, exactly.</summary>
-    private static PriorityLevel? LevelOf(string name) => name switch
+    internal static PriorityLevel? LevelOf(string name) => name switch
     {
         "A" => PriorityLevel.A,
         "B" => PriorityLevel.B,
@@ -240,7 +240,7 @@ internal sealed class ConfigurationDraftCheck(ICatalogSelectionResolver catalog,
     };
 
     /// <summary>The catalog keys its errors as the query of the criteria endpoint; the body nests them below <c>selection</c>.</summary>
-    private static string SelectionKey(string catalogKey) =>
+    internal static string SelectionKey(string catalogKey) =>
         catalogKey == "useCase" ? UseCaseField : $"{SelectionField}.{catalogKey}";
 
     private static DraftCheckResult Invalid(Dictionary<string, string[]> errors) =>

@@ -298,8 +298,7 @@ public sealed class ExportEndpointTests(ApiFixture api) : IntegrationTest(api), 
     {
         var endpoint = Api.Factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
             .OfType<RouteEndpoint>()
-            .Single(e => e.RoutePattern.RawText?.EndsWith("/exports", StringComparison.Ordinal) == true
-                && e.Metadata.GetMetadata<IHttpMethodMetadata>()?.HttpMethods.Contains("POST") == true);
+            .Single(e => e.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName == "PostExport");
 
         endpoint.Metadata.GetMetadata<IRequestSizeLimitMetadata>().ShouldNotBeNull().MaxRequestBodySize.ShouldBe(1024 * 1024);
     }

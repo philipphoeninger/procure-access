@@ -56,6 +56,7 @@ internal static class RateLimitingRegistration
     [
         RateLimitPolicies.ConfirmationResend,
         RateLimitPolicies.Invitation,
+        RateLimitPolicies.SavedExport,
     ];
 
     /// <summary>

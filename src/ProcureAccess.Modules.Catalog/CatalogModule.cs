@@ -63,6 +63,9 @@ public static class CatalogModule
         // Server-side resolution of a selection for other modules, e.g. the ad-hoc export (EXP-07, S4-19).
         services.AddScoped<ICatalogSelectionResolver, CatalogSelectionResolver>();
 
+        // A saved selection carried over to the active release, for „Neue Liste mit derselben Auswahl“ (CAT-22, S5-21a).
+        services.AddScoped<ICatalogReleaseCarryOver, CatalogReleaseCarryOver>();
+
         return services;
     }
 
