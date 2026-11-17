@@ -56,6 +56,10 @@ SPDX-License-Identifier: MIT
       (onlyIncludedChange)="store.showOnlyIncludedCriteria($event)"
     />
 
+    @if (ratings().length > 0) {
+      <pa-rating-legend [values]="ratings()" />
+    }
+
     @if (criteria().length > 0) {
       <ul class="pa-criteria-list__items">
         @for (criterion of criteria(); track criterion.key) {

@@ -11,6 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { Notice } from '@app/shared/components/notice/notice';
+import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
 import { CriteriaListSummary } from '../../components/criteria-list-summary/criteria-list-summary';
@@ -18,6 +19,7 @@ import { CriterionCard } from '../../components/criterion-card/criterion-card';
 import { CONFIGURATOR_PATH } from '../../guards/configurator-guards';
 import { catalogNames } from '../../state/catalog-names';
 import { decisionOf, levelCounts } from '../../state/criteria-list-rules';
+import { ratingsOfList } from '../../state/criterion-detail-rules';
 import { selectionNames } from '../../state/selection-names';
 import { SharedListLoad, SharedListView } from './shared-list-load';
 
@@ -29,7 +31,9 @@ import { SharedListLoad, SharedListView } from './shared-list-load';
  * Shows the list under its own release (CAT-06), in the read-only mode of a saved list (Handoff
  * 1.26; owner decision S5-24 6a): H1 `criteria.shared.title` with the list name, the note
  * `criteria.shared.note` with „Kriterien zusammenstellen“ to S10, the summary, the priority note,
- * the counts and one read-only `pa-criterion-card` per criterion — no checkbox, no K5 menu, no
+ * the counts, the rating legend `pa-rating-legend` as on S11 (S5-31; collapsed, left out when the
+ * criteria allow no level; owner decisions #279 (b), O-S5-31-1, O-S5-31-2) and one read-only
+ * `pa-criterion-card` per criterion — no checkbox, no K5 menu, no
  * note field, no filter row and no action bar. A link that does not work (malformed, unknown,
  * revoked, expired, its list deleted: one 404, TEN-08) shows „Link nicht mehr gültig“ with
  * `criteria.shared.invalid`; any other failure the S80 server text.
@@ -40,7 +44,17 @@ import { SharedListLoad, SharedListView } from './shared-list-load';
  */
 @Component({
   selector: 'pa-shared-list-page',
-  imports: [CriteriaListSummary, CriterionCard, ErrorPage, MatButtonModule, Notice, RouterLink, TranslatePipe, TranslatePluralPipe],
+  imports: [
+    CriteriaListSummary,
+    CriterionCard,
+    ErrorPage,
+    MatButtonModule,
+    Notice,
+    RatingLegend,
+    RouterLink,
+    TranslatePipe,
+    TranslatePluralPipe,
+  ],
   templateUrl: './shared-list-page.html',
   styleUrl: './shared-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +78,8 @@ export class SharedListPage {
     const shown = this.shown();
     return levelCounts(shown?.criteria.criteria ?? [], shown?.decisions ?? {});
   });
+  /** The levels the rating legend above the list explains (O-S5-31-1). */
+  protected readonly ratings = computed(() => ratingsOfList(this.shown()?.criteria.criteria ?? []));
 
   constructor() {
     // Angular keeps the page when only the token changes: take the view the resolver loaded again.

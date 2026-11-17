@@ -85,6 +85,10 @@ SPDX-License-Identifier: MIT
       (onlyIncludedChange)="onlyIncluded.set($event)"
     />
 
+    @if (ratings().length > 0) {
+      <pa-rating-legend [values]="ratings()" />
+    }
+
     @if (visible().length > 0) {
       <ul class="pa-saved-list__items">
         @for (criterion of visible(); track criterion.key) {

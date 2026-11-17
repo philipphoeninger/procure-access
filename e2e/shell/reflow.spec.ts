@@ -21,7 +21,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
- * S5-28b; the session warning since S5-30. The legacy screens are
+ * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
+ * S5-31. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -187,7 +188,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
   });
 
-  test('S11 with summary, notices, an open detail panel and the action bar needs no horizontal scrolling', async ({ page }) => {
+  test('S11 with summary, notices, an open detail panel, the open rating legend and the action bar needs no horizontal scrolling', async ({ page }) => {
     await toStep4(page);
     await page.getByRole('button', { name: 'Kriterienliste anzeigen' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeFocused();
@@ -196,6 +197,10 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await page.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(page.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
+    await expectReflow(page);
+
+    await page.locator('pa-rating-legend button').click();
+    await expect(page.locator('pa-rating-legend dl')).toBeVisible();
     await expectReflow(page);
   });
 
@@ -248,7 +253,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });
 
-  test('a saved list, editable for its Owner, with an open detail panel needs no horizontal scrolling', async ({ page }) => {
+  test('a saved list, editable for its Owner, with an open detail panel and the open rating legend needs no horizontal scrolling', async ({ page }) => {
     // The list is answered here; its criteria come from T.1 (the seeded organisation stays unchanged)
     const id = '0e2e0000-0000-4000-8000-0000000000a1';
     await page.route(`**/api/v1/configurations/${id}`, (route) =>
@@ -275,6 +280,10 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await main.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(main.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
+    await expectReflow(page);
+
+    await page.locator('pa-rating-legend button').click();
+    await expect(page.locator('pa-rating-legend dl')).toBeVisible();
     await expectReflow(page);
   });
 
@@ -321,7 +330,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await dialog.getByRole('button', { name: 'Schließen' }).click();
   });
 
-  test('S16, a shared list without an account, and its „Link nicht mehr gültig“ need no horizontal scrolling', async ({ page }) => {
+  test('S16, a shared list without an account, with the open rating legend, and its „Link nicht mehr gültig“ need no horizontal scrolling', async ({ page }) => {
     // The shared list is answered here; its criteria come from T.1
     const token = 'B'.repeat(43);
     await page.route(`**/api/v1/shared/${token}`, (route) =>
@@ -343,6 +352,10 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await main.getByRole('button', { name: 'Details anzeigen' }).first().click();
     await expect(main.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' }).first()).toBeVisible();
+    await expectReflow(page);
+
+    await page.locator('pa-rating-legend button').click();
+    await expect(page.locator('pa-rating-legend dl')).toBeVisible();
     await expectReflow(page);
 
     await page.goto(`/geteilt/${'C'.repeat(43)}`);

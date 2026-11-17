@@ -28,6 +28,7 @@ import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { Notice } from '@app/shared/components/notice/notice';
+import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
 import { CriteriaActionBar } from '../../components/criteria-action-bar/criteria-action-bar';
@@ -42,6 +43,7 @@ import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '.
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { catalogNames } from '../../state/catalog-names';
 import { decisionOf, filterCriteria, firstTooLongNote, includedCount, levelCounts } from '../../state/criteria-list-rules';
+import { ratingsOfList } from '../../state/criterion-detail-rules';
 import { selectionNames } from '../../state/selection-names';
 import { CRITERIA_SEARCH_DEBOUNCE_MS } from '../../state/with-configurator';
 import { SavedListEditor } from './saved-list-editor';
@@ -56,7 +58,9 @@ const STATUS_KEY = 'criteria.list.status.count';
  * A saved list at `/kriterienlisten/:id` — S11 of a list of the organisation (R-SAV-02, R-SAV-03,
  * R-LST-14). Reached from S14, after saving (S12), after „Auswahl ändern“ and after „Neue Liste mit
  * derselben Auswahl“. Shows the list under its own release (CAT-06): H1 the list name, the summary,
- * the priority note, the counts, the filter row (R-LST-06) and one `pa-criterion-card` per criterion.
+ * the priority note, the counts, the filter row (R-LST-06), the rating legend `pa-rating-legend` as on
+ * S11 (S5-31; collapsed, the levels of the whole list, left out when they allow none; owner decisions
+ * #279 (b), O-S5-31-1, O-S5-31-2) and one `pa-criterion-card` per criterion.
  *
  * **Editor and Owner** of the list's organisation change it here (S5-21b): the cards decide as on
  * S11, and {@link SavedListEditor} saves each change right away (owner decision S5-21b 1a). Below
@@ -94,6 +98,7 @@ const STATUS_KEY = 'criteria.list.status.count';
     ErrorPage,
     MatButtonModule,
     Notice,
+    RatingLegend,
     RouterLink,
     TranslatePipe,
     TranslatePluralPipe,
@@ -130,6 +135,8 @@ export class SavedListPage {
   protected readonly decisions = this.editor.decisions;
   protected readonly counts = computed(() => levelCounts(this.criteria(), this.decisions()));
   protected readonly included = computed(() => includedCount(this.criteria(), this.decisions()));
+  /** The levels the rating legend above the list explains, from the whole list (O-S5-31-1). */
+  protected readonly ratings = computed(() => ratingsOfList(this.criteria()));
 
   /** Editor or Owner of the list's organisation (the header may show another one). */
   protected readonly canEdit = computed(() => {

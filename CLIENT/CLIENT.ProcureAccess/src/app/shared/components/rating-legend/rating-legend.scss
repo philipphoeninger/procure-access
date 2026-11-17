@@ -1,0 +1,59 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// pa-rating-legend (Figma `2099:760`, Handoff §4.11): the text button, then the panel on
+// surface-container-low, corner-small, padding md. Below 600 px each level stands above its
+// explanation; from 600 px the levels form a column of 168 px (10.5rem).
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-xs);
+}
+
+.pa-rating-legend__panel {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: var(--pa-space-md);
+  padding: var(--pa-space-md);
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--mat-sys-surface-container-low);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.pa-rating-legend__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  margin: 0;
+}
+
+.pa-rating-legend__row {
+  @media (min-width: 37.5em) {
+    display: grid;
+    grid-template-columns: 10.5rem 1fr;
+    column-gap: var(--pa-space-md);
+  }
+
+  dt {
+    font: var(--mat-sys-label-medium);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+  }
+}
+
+.pa-rating-legend__footnote {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
