@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-// The page scrolls, not the sidenav content: the container grows with the page.
+// The page scrolls, not the sidenav content: the container grows with the page. Nothing clips either,
+// so the sticky action bar of the criteria lists can paint its background across the viewport (S5-32).
 .pa-shell,
 .pa-shell__content {
   overflow: visible;

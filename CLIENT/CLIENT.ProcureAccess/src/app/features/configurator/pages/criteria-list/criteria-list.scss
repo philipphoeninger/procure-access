@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-// S11 (Handoff §5.1, §5.5; Figma `2020:70`): H1, „Auswahl ändern“, summary, notices, counts, the
+// S11 (Handoff §5.1, §5.5; Figma `2020:70`): the title row, summary, notices, counts, the
 // filter row, the cards and the empty states, the suggestion link and the action bar.
 :host {
   display: flex;
@@ -13,8 +13,30 @@
   inline-size: 100%;
 }
 
+// Title row (Handoff §2.2; Figma `2020:102`): H1, then „Auswahl ändern“ below it, left-aligned;
+// from 600 px on one line, the H1 at the start and the button at the end, centred on the cross
+// axis. DOM order = visual order on both.
+.pa-criteria-list__title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-lg);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pa-space-md);
+  }
+
+  a {
+    flex: none;
+  }
+}
+
 // H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
 .pa-criteria-list__title {
+  min-inline-size: 0;
   margin: 0;
   font: var(--mat-sys-headline-small);
 

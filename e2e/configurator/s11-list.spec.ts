@@ -11,7 +11,8 @@ import { chooseFirstOption } from '../support/combobox';
  * E2E stack: summary, notices, counts, „Kriterium vorschlagen“ and the action bar, which is in the
  * flow below 600 px width or height and sticky from there without covering the focused element
  * (WCAG 2.4.11). Axe in both appearances (A11Y-01, A11Y-08). Since S4-18b also the usage event
- * `CriteriaListShown`: one report per new selection. Since S5-31 the rating legend above the list.
+ * `CriteriaListShown`: one report per new selection. Since S5-31 the rating legend above the list;
+ * since S5-32 the title row and the sticky bar across the viewport (Figma `2020:102`, `2034:1193`).
  *
  * Axe runs before any name-based locator on S11: in Firefox such locators followed by axe crashed
  * the page process (S4-16 P5, the class of TESTING_v43 V129).
@@ -59,7 +60,56 @@ function barPlacement(page: Page) {
   }));
 }
 
+/**
+ * The colours at the given x of a one-pixel-high screenshot, as `[r, g, b]`. The PNG is decoded in
+ * the page through a canvas, so the spec needs no image library.
+ */
+function pixelsAt(page: Page, png: Buffer, xs: number[]): Promise<number[][]> {
+  return page.evaluate(
+    async ({ data, xs }) => {
+      const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${data}`)).blob());
+      const canvas = new OffscreenCanvas(image.width, image.height);
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      context.drawImage(image, 0, 0);
+      return xs.map((x) => [...context.getImageData(x, 0, 1, 1).data.slice(0, 3)]);
+    },
+    { data: png.toString('base64'), xs },
+  );
+}
+
+/** `rgb(r, g, b)` as `[r, g, b]`. */
+const channels = (colour: string): number[] => (colour.match(/\d+/g) ?? []).slice(0, 3).map(Number);
+
+/** Whether two colours differ by at most 2 per channel (colour management of the screenshot). */
+const sameColour = (a: number[], b: number[]): boolean => a.length === 3 && a.every((value, i) => Math.abs(value - b[i]) <= 2);
+
 test.describe('S11 summary, notices, suggestion link and action bar', () => {
+  test('„Auswahl ändern“ is on the H1 line from 600 px and below it on narrow screens, after it in the DOM (S5-32, #278)', async ({ page }) => {
+    await toList(page);
+    const place = () =>
+      page.evaluate(() => {
+        const h1 = document.querySelector('main h1');
+        const link = h1?.parentElement?.querySelector('a');
+        if (!h1 || !link) return null;
+        const heading = h1.getBoundingClientRect();
+        const button = link.getBoundingClientRect();
+        const row = h1.parentElement!.getBoundingClientRect();
+        return {
+          domOrder: !!(h1.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING),
+          sameLine: button.top < heading.bottom && button.bottom > heading.top,
+          below: button.top >= heading.bottom,
+          atStart: Math.round(button.left) === Math.round(heading.left),
+          atEnd: Math.round(button.right) === Math.round(row.right),
+        };
+      });
+
+    expect(await place()).toEqual({ domOrder: true, sameLine: true, below: false, atStart: false, atEnd: true });
+
+    await page.setViewportSize({ width: 360, height: 800 });
+    expect(await place()).toEqual({ domOrder: true, sameLine: false, below: true, atStart: true, atEnd: false });
+  });
+
   test('INV:A11Y-01 INV:A11Y-08 shows summary, notices and counts above the list and the link and action bar after it', async ({ page }, testInfo) => {
     await toList(page);
     await settled(page.getByRole('main'));
@@ -126,6 +176,41 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
     await page.setViewportSize({ width: 560, height: 800 });
     await page.evaluate(() => window.scrollTo(0, 0));
     expect((await barPlacement(page)).position).toBe('static');
+  });
+
+  test('while sticky the action bar spans the viewport without corners, its content in the column (S5-32, #281)', async ({ page }) => {
+    await toList(page);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const bar = await actionBar(page).evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const main = document.querySelector('main')?.getBoundingClientRect();
+      return {
+        radius: getComputedStyle(element).borderTopLeftRadius,
+        colour: getComputedStyle(element).backgroundColor,
+        left: Math.round(box.left),
+        right: Math.round(box.right),
+        mainLeft: Math.round(main?.left ?? 0),
+        y: Math.round(box.top + box.height / 2),
+        width: document.documentElement.clientWidth,
+      };
+    });
+    expect(bar.radius).toBe('0px');
+    // The box stays in the content column, away from both edges of the 1280 px viewport.
+    expect(bar.left).toBeGreaterThan(bar.mainLeft);
+    expect(bar.right).toBeLessThan(bar.width);
+    // Its colour reaches both edges of the viewport, on the bar's line.
+    // In CSS pixels, so x is the same on the mobile projects (device scale > 1).
+    const shot = await page.screenshot({ clip: { x: 0, y: bar.y, width: bar.width, height: 1 }, scale: 'css' });
+    const edges = await pixelsAt(page, shot, [2, bar.width - 3]);
+    for (const edge of edges) {
+      expect(sameColour(edge, channels(bar.colour)), `rgb(${edge.join(', ')}) at the edge, bar ${bar.colour}`).toBe(true);
+    }
+    // Nothing to scroll to sideways.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(bar.width);
+
+    // In the flow (below 600 px height) it keeps its corners.
+    await page.setViewportSize({ width: 1280, height: 560 });
+    await expect(actionBar(page)).not.toHaveCSS('border-top-left-radius', '0px');
   });
 
   test('the sticky action bar never covers the element with the keyboard focus (WCAG 2.4.11)', async ({ page }) => {
