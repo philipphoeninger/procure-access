@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-29 (stretch, 5 points) · **Issues:** none
 > **Requirements / invariants:** SPEC R-AUTH-05 (completion), §8.8 (v2.47); **SEC-07**, **SEC-08** → `active` (TESTING_v87 V293 – V296); ARCHITECTURE C165; ROADMAP M4.1. R-AUTH-06, A11Y-04 and J5 are S5-30
-> **Status:** done — pull request #PR open (2026-11-17)
+> **Status:** done — pull request #372 open (2026-11-17)
 > **Scope:** the server session of migration step 4: renewal of the idle limit on every request, capped at the absolute limit; the expiry headers; `POST /api/v1/auth/session/extend`; the security stamp checked on every request, so a password reset and an account deletion end the other sessions at once; the 🔧 warning lead time served by the probe. On the client only the reading of the expiry headers into the session state — no screen.
 > **Owner decisions (2026-11-17, before the task):** **1a** — the client part of the expiry headers (ARCHITECTURE §8.3 job 2) belongs to this task; S5-30 is only the dialog · **2a** — `Session:WarningLead` is a 🔧 server setting, validated at start and served by the probe (`warningLeadSeconds`), no client copy · **3a** — a signed-in read of the catalog is answered `no-store`, because the answer renews the cookie; anonymous reads unchanged · **4a** — Identity's security-stamp validator with a 🔧 interval of zero (`Session:SecurityStampValidationInterval`), no check of our own · **Assumptions confirmed:** „password change“ is the reset of S03 (S61 has none, S5-28 1a); the extend endpoint answers 204 with the two headers, needs the antiforgery token, has no rate limit and is never refused near the absolute limit; J5 and A11Y-04 stay with S5-30.
 
