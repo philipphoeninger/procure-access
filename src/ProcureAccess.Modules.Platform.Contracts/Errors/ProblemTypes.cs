@@ -58,11 +58,19 @@ public static class ProblemTypes
     /// </summary>
     public const string InvitationMismatch = "invitation-mismatch";
 
+    /// <summary>
+    /// 409: the account cannot be deleted while the user is the only Owner of an organisation with
+    /// other members (SPEC §8.6 v2.45, R-AUTH-10; TEN-11; S5-28a); carries the extension
+    /// <c>organizations</c>, the names of these organisations, which the client shows in
+    /// <c>account.delete.soleOwner</c>.
+    /// </summary>
+    public const string SoleOwner = "sole-owner";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
-        EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch,
+        EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
     ];
 }

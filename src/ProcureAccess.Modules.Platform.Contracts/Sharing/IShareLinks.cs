@@ -44,6 +44,18 @@ public interface IShareLinks
     /// when it does not exist for the request.
     /// </summary>
     Task<bool> RevokeAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes every link to the resource, also the revoked and expired ones: the resource is being
+    /// deleted (S5-28a).
+    /// </summary>
+    Task DeleteOfResourceAsync(ShareableResourceType resourceType, Guid resourceId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes every link of these organisations: they end with the account of their last member
+    /// (SPEC R-AUTH-10, TEN-11; S5-28a).
+    /// </summary>
+    Task DeleteOfOrganizationsAsync(IReadOnlyCollection<Guid> organizationIds, CancellationToken cancellationToken);
 }
 
 /// <summary>The result of <see cref="IShareLinks.CreateAsync"/>: the new link, or why the expiry date was refused.</summary>

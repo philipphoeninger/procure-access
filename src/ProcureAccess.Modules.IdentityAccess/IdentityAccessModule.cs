@@ -95,6 +95,9 @@ public static class IdentityAccessModule
         // The memberships and contributor profiles of the personal data export (S5-27, SPEC §8.4).
         services.AddScoped<IAccountDataExport, AccountDataExportService>();
 
+        // The organisation rules and the module's rows of the account deletion (S5-28a, TEN-11).
+        services.AddScoped<IAccountDeletion, AccountDeletionService>();
+
         // The user's settings (S5-25a, SPEC R-SET-01): the endpoints and the export's section.
         services.AddScoped<UserPreferencesService>();
         services.AddScoped<IUserPreferences>(provider => provider.GetRequiredService<UserPreferencesService>());
