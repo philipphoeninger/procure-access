@@ -131,7 +131,9 @@
         "body": "Aus Sicherheitsgründen werden Sie in {{minutes}} Minuten abgemeldet. Danach melden Sie sich erneut an, bevor Sie weiterarbeiten. Ihre Eingaben auf dieser Seite bleiben erhalten.",
         "stay": "Angemeldet bleiben",
         "logout": "Jetzt abmelden",
-        "absolute": "Ihre Sitzung endet in {{minutes}} Minuten und kann nicht mehr verlängert werden. Speichern Sie Ihre Eingaben und melden Sie sich danach erneut an."
+        "absolute": "Ihre Sitzung endet in {{minutes}} Minuten und kann nicht mehr verlängert werden. Speichern Sie Ihre Eingaben und melden Sie sich danach erneut an.",
+        "body.one": "Aus Sicherheitsgründen werden Sie in 1 Minute abgemeldet. Danach melden Sie sich erneut an, bevor Sie weiterarbeiten. Ihre Eingaben auf dieser Seite bleiben erhalten.",
+        "absolute.one": "Ihre Sitzung endet in 1 Minute und kann nicht mehr verlängert werden. Speichern Sie Ihre Eingaben und melden Sie sich danach erneut an."
       },
       "extended": "Ihre Sitzung wurde verlängert.",
       "expired": {

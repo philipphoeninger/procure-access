@@ -85,6 +85,15 @@ export class AuthService {
     );
   }
 
+  /**
+   * „Angemeldet bleiben“ of the session warning (R-AUTH-06; SPEC §8.8): 204 with the renewed limits
+   * in the expiry headers, which the session interceptor reads. A failure keeps the system states of
+   * the error interceptor; a 401 opens the login overlay like any other request.
+   */
+  extendSession(): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.apiUrl}/v1/auth/session/extend`, null));
+  }
+
   /** Ends the session: the cookie is deleted and a new antiforgery token issued, also without a session. */
   logout(): Promise<void> {
     return lastValueFrom(this.http.post<void>(`${this.apiUrl}/v1/auth/logout`, null));

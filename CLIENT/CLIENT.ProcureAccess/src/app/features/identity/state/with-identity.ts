@@ -16,6 +16,12 @@ import { AuthService } from '../services/auth.service';
 /** `unknown` until the first probe answered or failed; `ready` from then on. */
 export type SessionStatus = 'unknown' | 'ready';
 
+/**
+ * What a later probe found ({@link withIdentity} `refreshSession`): somebody is signed in, nobody
+ * is, or the probe failed and the state stayed as it was.
+ */
+export type SessionCheck = 'signedIn' | 'signedOut' | 'unknown';
+
 export interface IdentityState {
   /** The legacy user with the UI settings (`GET /api/me`), read while the legacy screens need it. */
   user: User | null;
@@ -145,6 +151,11 @@ export const withIdentity = () =>
             clearSession();
             return null;
           }
+          return applySession(response);
+        }
+
+        /** Takes the probe's answer into the state; for a new signed-in user also the user and organisations. */
+        async function applySession(response: SessionResponse): Promise<User | null> {
           setSession(response);
           if (response.user === null) {
             patchState(state, { user: null, organizations: [], activeOrganizationId: null });
@@ -162,6 +173,23 @@ export const withIdentity = () =>
 
         return {
           loadSession,
+
+          /**
+           * Asks the probe again whether the session is still there, without renewing it (the
+           * session warning, R-AUTH-06; S5-30): before the warning and at the limit, so a session
+           * another tab extended or ended is seen. Unlike {@link loadSession} a failed probe changes
+           * nothing — offline is not signed out — and answers `unknown`.
+           */
+          async refreshSession(): Promise<SessionCheck> {
+            let response: SessionResponse;
+            try {
+              response = await authService.session();
+            } catch {
+              return 'unknown';
+            }
+            await applySession(response);
+            return response.user === null ? 'signedOut' : 'signedIn';
+          },
 
           /**
            * Reads the organisations again after a membership changed here: an organisation created

@@ -1,0 +1,30 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'shell.session.warning.title' | translate }}</h2>
+
+<mat-dialog-content>
+  <p class="pa-session-warning__text" [id]="textId">
+    @if (kind() === 'idle') {
+      {{ 'shell.session.warning.body' | translatePlural: minutes() : { minutes: minutes() } }}
+    } @else {
+      {{ 'shell.session.warning.absolute' | translatePlural: minutes() : { minutes: minutes() } }}
+    }
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions class="pa-session-warning__actions">
+  <button matButton type="button" (click)="logout()">{{ 'shell.session.warning.logout' | translate }}</button>
+  @if (kind() === 'idle') {
+    <button matButton="filled" type="button" class="pa-session-warning__stay" (click)="stay()">
+      {{ 'shell.session.warning.stay' | translate }}
+    </button>
+  } @else {
+    <button matButton="filled" type="button" class="pa-session-warning__close" mat-dialog-close>
+      {{ 'common.actions.close' | translate }}
+    </button>
+  }
+</mat-dialog-actions>
