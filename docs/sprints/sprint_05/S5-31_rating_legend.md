@@ -50,7 +50,7 @@ CLAUDE §6.7 checklist and `/engineering:code-review` over the diff; findings so
 | # | Finding | Sorting |
 |---|---|---|
 | R1 | On a saved list the page stays when only the list id changes (S5-21b); an open legend then stays open on the next list | **won't fix** — harmless, the levels follow the new list; nothing is stored |
-| R2 | S16 shows `criteria.list.empty` for a list of only „Geprüft nach …“ criteria, because its list sits inside `counts().total > 0`, and the counts leave those criteria out (O-S4-51). Existed before S5-31; the legend inherits the gate, which is right here (no level) | **follow-up issue** — open point 1 |
+| R2 | S16 shows `criteria.list.empty` for a list of only „Geprüft nach …“ criteria, because its list sits inside `counts().total > 0`, and the counts leave those criteria out (O-S4-51). Existed before S5-31; the legend inherits the gate, which is right here (no level) | **follow-up issue** #375 — open point 1 |
 | R3 | The union uses the criterion-level `allowedRatings`, which the server sets to all six for a requirement without a procedure text of the selection; such a card's „Wie wird bewertet?“ lists nothing, the legend all six | **won't fix** — `allowedRatings` is the SPEC §8.2 contract and the base of K6 later; with T.1 and 2026.1 every requirement has a text for the app types that select it |
 | R4 | Security: new input, injection, data | **ok** — static texts by key, no request, no storage |
 | R5 | Performance | **ok** — one `computed` per page over the list (≤ a few hundred criteria × six levels) |
@@ -75,6 +75,6 @@ CLAUDE §6.7 checklist and `/engineering:code-review` over the diff; findings so
 
 ## 5. Open points
 
-1. **S16 with „Geprüft nach …“ criteria only (R2)** — proposed issue: S16 shows `criteria.list.empty` although the list has cards, because its list sits inside `counts().total > 0`; S11 and the saved list show them. Gate the S16 list by the number of criteria instead.
+1. **S16 with „Geprüft nach …“ criteria only (R2)** — issue #375 (M3): S16 shows `criteria.list.empty` although the list has cards, because its list sits inside `counts().total > 0`; S11 and the saved list show them. Gate the S16 list by the number of criteria instead.
 2. **UX copy U24** names „S11 (Details)“ among the places of the legend; with #279 (b) it is above the list on S11, a saved list and S16. For the next UX copy version, if the owner wants the row to follow (Handoff 1.31 already does).
 3. The task fitted one session.
