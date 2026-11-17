@@ -58,8 +58,9 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
+  // 32 px circles (Figma S10 stepper `2019:457`, S5-32).
+  inline-size: 2rem;
+  block-size: 2rem;
   border-radius: 50%;
   font: var(--mat-sys-label-medium);
   color: var(--mat-sys-on-surface);

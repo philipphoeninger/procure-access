@@ -24,10 +24,18 @@
     justify-content: space-between;
   }
 
+  // While sticky the bar spans the viewport, without corners (Figma `2034:1193`, S5-32): the shadow
+  // paints its colour beyond both sides and the clip keeps that to the bar's height. Only the paint
+  // overflows (nothing to scroll to sideways) and the box stays in the content column, so the
+  // status and the buttons stay aligned with the list and the focus rule of the class measures the
+  // same box.
   @media (min-width: 37.5em) and (min-height: 37.5em) {
     position: sticky;
     inset-block-end: 0;
     z-index: 1;
+    border-radius: 0;
+    box-shadow: 0 0 0 100vmax var(--mat-sys-surface-container-high);
+    clip-path: inset(0 -100vmax);
   }
 }
 
