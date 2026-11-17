@@ -313,7 +313,7 @@ CLAUDE §6.6: Claude Code must not decide these. Decided in sprint 05 (see `SPRI
 - **CI:** two failed runs on `main` without a named cause, now #379 (TD-55) and #380 (TD-56). Run 43098373045 is still `queued` (TD-52).
 - **Open Dependabot PRs** for the weekly review: #363, #364, #365, #366 (TD-76).
 - **Alerts:** CodeQL has no open alert. Dependabot has only 12 and 13 (TD-17).
-- **Labels:** #355 got `bug` and `tech-debt` (2026-11-17). All open debt issues carry `tech-debt`, except #4 and #259 (`documentation`), #52 (`bug`, `a11y`), #102 (`question`, `a11y`), #375, #377 and #386 (found in the sprint as bugs or questions), which is correct.
+- **Labels:** #355 got `bug` and `tech-debt` (2026-11-17).
 
 ## 8. New issues
 
