@@ -52,7 +52,7 @@ CLAUDE §6.7 checklist and `/engineering:code-review` over the diff; findings so
 | # | Finding | Sorting |
 |---|---|---|
 | R1 | The mobile projects in CI (Pixel 7, iPhone 15) take screenshots at their device scale, so the right-edge sample would have landed in the middle of the screen and tested less | **fix** — `scale: 'css'`; the S11 spec passes on Chromium, Firefox and mobile Chrome (30 / 30) |
-| R2 | In forced-colours mode (Windows contrast themes) the browser drops the `box-shadow`, so the bar is only as wide as the column there; it has no border in either mode, so the content scrolling under it has no visible edge. The missing edge existed before S5-32 | **follow-up issue** (proposed, open point 4) |
+| R2 | In forced-colours mode (Windows contrast themes) the browser drops the `box-shadow`, so the bar is only as wide as the column there; it has no border in either mode, so the content scrolling under it has no visible edge. The missing edge existed before S5-32 | **follow-up issue** #378 — open point 4 |
 | R3 | `pixelsAt` loads the screenshot from a `data:` URL in the page; a later Content-Security-Policy with a strict `connect-src` would block it. The client sends no CSP today (checked against the nginx image) | **won't fix** — if a CSP comes, the test adds `data:` to its exceptions or decodes in Node |
 | R4 | Prettier reports `criteria-list.html` and `s11-list.spec.ts`; the versions on `main` are reported too, as are 69 other files, and CI does not run Prettier | **won't fix** — no formatting churn in a design slice |
 | R5 | Security: input, injection, data | **ok** — styles, one wrapper element and tests; no request, no text |
@@ -79,8 +79,8 @@ CLAUDE §6.7 checklist and `/engineering:code-review` over the diff; findings so
 
 ## 5. Open points
 
-1. **Title row on a saved list** (decision 2 (a)) — `/kriterienlisten/:id` still shows its H1 above „Auswahl ändern“ and „Teilen“ on every width. Handoff §2.2 names the title-row pattern for S11 and S34 only. Proposed follow-up issue: decide whether a saved list takes the title row (then as a shared style with S34), and add it to the Handoff.
+1. **Title row on a saved list** (decision 2 (a)) — `/kriterienlisten/:id` still shows its H1 above „Auswahl ändern“ and „Freigabelink erstellen“ on every width. Handoff §2.2 names the title-row pattern for S11 and S34 only. Follow-up issue #377 (M3): decide whether a saved list takes the title row (then as a shared style with S11 and S34), and add the decision to the Handoff.
 2. **Figma action bar** (decision 3 (a)) — `2034:1193` places status and button 32 px from the viewport edges; the code keeps them in the content column. Proposed Figma update: the bar's content on the column grid. The same frame shows the status in `label/large` and 12 px vertical padding, the code `body-medium` (Handoff §1.3: counts are body/medium) and 16 px. Both are outside this row and unchanged; for the owner to decide, with the frame update.
 3. **Figma stepper** — the S10 frames show the number in a finished step; Handoff §5.1 and the code show the `check` icon with `common.stepper.done`. Proposed Figma update.
-4. **Sticky bar in forced-colours mode (R2)** — proposed follow-up issue: give the sticky bar a visible top edge that survives forced colours (e.g. a `border-block-start` in `CanvasText` under `@media (forced-colors: active)`), so the content scrolling under it stays apart from it.
+4. **Sticky bar in forced-colours mode (R2)** — follow-up issue #378 (M2): give the sticky bar a visible top edge that survives forced colours (e.g. a `border-block-start` in `CanvasText` under `@media (forced-colors: active)`), so the content scrolling under it stays apart from it.
 5. The task fitted one session.
