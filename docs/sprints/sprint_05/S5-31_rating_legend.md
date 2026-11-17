@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-31 (stretch, 1 point) · **Issues:** #279
 > **Requirements / invariants:** SPEC R-LST-01 (detail panel per Handoff); A11Y-01 stays green (no invariant flipped, no new TESTING version); UX copy U24; Handoff 1.31 §4.11, §5.5; Figma mapping v1.26
-> **Status:** done — pull request open (2026-11-17)
+> **Status:** done — pull request #374 open (2026-11-17)
 > **Scope:** the component `pa-rating-legend` (Handoff §4.11, Figma `2099:760`) and its one collapsed instance above the list on S11, a saved list and S16; the levels it explains; the texts of `assessment.legend`. Client only: no server change, no EF migration, no new dependency.
 > **Owner decisions:** **#279 (b)** (2026-11-12, in the issue) — the legend appears once per page, above the list, not in each detail panel; „Wie wird bewertet?“ keeps listing the card's levels and gets no legend of its own · **O-S5-31-1** (2026-11-17) — the legend explains every level at least one criterion of the *whole* list allows, in scale order, so the filters never change it; „Nicht eingeschätzt“ never appears there · **O-S5-31-2** (2026-11-17) — the same legend on S11, a saved list (`/kriterienlisten/:id`) and S16 · confirmed with the plan (2026-11-17): a list whose criteria allow no level („Geprüft nach …“ only) shows no legend; „Wie wird bewertet?“ does not link to the legend; the open state is not kept; the U24 texts are built as written (proposals, K-8 / O19).
 >
