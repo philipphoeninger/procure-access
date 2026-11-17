@@ -1,6 +1,6 @@
 # Sprint 05 — Accounts, organisations and saved lists (M3)
 
-> **Status:** plan (2026-11-13) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
+> **Status:** done (2026-11-17; plan of 2026-11-13) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
 > **Based on:** `ROADMAP_v5.md` (M3), `TECH_DEBT_v4.md` (§3, §5, §6, §9.1, §9.2), the highest versions of TESTING (§4.5, §4.7, §4.10, §4.11, §6, §9 step 3), ARCHITECTURE (§4.3, §5.2, §5.3, §7.2, §8, §9.1, §12 step 3, ADR-014 – ADR-016), SPEC (§7.1 – §7.3, §7.6, §8.4, R-AUTH-*, R-ORG-*, R-SAV-*, R-SET-01, R-SHL-02/03, R-LST-14), the Design handoff (§5.3 screens without a Figma design), UX copy (§5.2, §5.6, §5.7, §5.14, §5.17), `CLAUDE.md`, the sprint-04 close-out and protocols in `docs/sprints/sprint_04/`, and the GitHub issues and pull requests as of 2026-11-13.
 > **Language:** English. **Dates:** none by design — the sprint is described in working days (D1 … D8) and halves, not calendar dates.
 > **Task prompts:** `TASK_PROMPTS.md` in this folder (one ready-to-paste prompt per task).
@@ -230,11 +230,11 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 
 | Item | Value |
 |---|---|
-| Points done (P0 / stretch) | |
-| Development days used | |
-| Velocity for forecasting | |
-| Carried over to sprint 06 (with reason) | |
-| Issues created / closed | |
-| Changes needed in roadmap or documents | |
+| Points done (P0 / stretch) | **68.5 / 10** — every P0 and stretch task; S5-12, S5-13, S5-16, S5-17, S5-20, S5-21, S5-25 and S5-28 were split into a/b; 40 protocols in this folder. M3 and M4 are done (milestones M1 and M4 closed on GitHub, 2026-11-17) |
+| Development days used | **about 5** — commits on five calendar days, 2026-11-13 – 2026-11-17 (estimate from the git history; owner to confirm) |
+| Velocity for forecasting | ≈ **16 points per development day** (sprint 04 ≈ 19, sprint 03 ≈ 16, sprint 02 ≈ 8), although this sprint replaced the authentication. Sprint 06 is planned with ~90 points again (`ROADMAP_v6.md` §6) |
+| Carried over to sprint 06 (with reason) | No task. As follow-ups: `main` is red after S5-30 (J5 on WebKit and Chromium, TD-55 #379) and J1 has a mobile-Chrome download flake (TD-56 #380) — S6-01; #368 (legacy UI languages) and #375 (S16 gate) — S6-04, S6-02; the users are still in the legacy context (TD-72 #387) — M5.0d. Outside the sprint: the staging deployment (TD-28, #236; it grew with M3), the M2 tester's pass (#311), O-1/K-1 |
+| Issues created / closed | **20 closed** since 2026-11-13: #87, #88, #89, #234, #264, #278, #279, #281, #282, #301, #302, #306, #308, #309, #312, #313, #317, #319, #320, #337. **23 created** during the sprint: #317 – #320, #337, #339, #350, #355, #368, #375, #377, #378 from the protocols, #379 – #389 at the register review (`TECH_DEBT_v5.md` §8); 33 issues and 4 Dependabot PRs (#363 – #366) open |
+| Changes needed in roadmap or documents | `ROADMAP_v6.md` (M3 and M4 done, M5 re-estimated 40 → 50 with debt rows, G-P 21 → 25, velocity, forecast). Written during the sprint: ARCHITECTURE up to v80, TESTING up to v88, UX copy up to v39, CLAUDE.md v4 with the code state moved to `CODEBASE_v1.md` (#346), `TECH_DEBT_v5.md` (#390). Still open: the documentation drift of sprint 05 (#389, task S6-09); UX copy drafts v31 and v33 and the owner documents (TD-79, #259); Figma frames for the M3/M4 screens (TD-80) |
 
 **Next sprint (preview):** M4 (session warning and hardening, if not done as stretch) and M5 — workspace: projects S30 – S32, candidates S33/S34, assessment S34b, concurrency (S37); release 2026.1 activated and the legacy filter removed as soon as O-1/K-1 arrive.
