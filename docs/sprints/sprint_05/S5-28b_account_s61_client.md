@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-28b (client part of S5-28, 3 points for S5-28 in all) · **Issues:** #234 (TD-26 — closed with this task; TD-25 went in S5-25b)
 > **Requirements / invariants:** SPEC R-AUTH-09, R-AUTH-10 (met for what is built), §8.13 (v2.46); **TEN-11** client part (TESTING_v86 V289), **A11Y-09** with S61 (V290), A11Y-01, A11Y-08; ARCHITECTURE C164. No invariant changes its status
-> **Status:** done — pull request open (2026-11-17)
+> **Status:** done — pull request #371 open (2026-11-17)
 > **Scope:** S61 at `/konto` with the download of the personal data export and the account deletion through the dialog „Konto endgültig löschen?“; `GET /api/v1/account` for the notice of an unconfirmed address; the legacy profile page, its two dialogs, `identity-api.service.ts`, `DELETE /api/Users` with `UsersController` and `UserRepo`, their texts, icons, tests and `LEGACY_EXCEPTIONS` entries removed.
 > **Owner decisions (2026-11-17):** from S5-28: **1a** — no change of e-mail address or password on S61 · **5a** — the proposal lists of the legacy profile go with the page · **P2 (a)** — the deletion request has no body; confirmed again after ARCHITECTURE §7.2's planned `{ emailConfirmation }` was named (S5-28a open point 1) · **P3 (a)** — no message after the deletion, as the sign-out. In this task: **S5-28b 1** — a new `GET /api/v1/account` (`{ email, emailConfirmed }`) tells S61 whether the address is confirmed; the session probe stays as it is · **2** — new UX key `account.delete.error.title` „Konto nicht gelöscht“ for the title of the refusal notice · **3** — the dialog's address field is labelled with `auth.login.email`
 
