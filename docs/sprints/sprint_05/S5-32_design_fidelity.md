@@ -2,7 +2,7 @@
 
 > **Sprint:** 05 · **Task:** S5-32 (stretch, 1 point) · **Issues:** #278, #281, #282
 > **Requirements / invariants:** SPEC R-LST-01 (S11 per Handoff), R-LST-10 (action bar), R-SHL-10; A11Y-01 and A11Y-09 stay green (no invariant flipped, no new TESTING version); Handoff 1.32 §2.2, §5.1; Figma mapping v1.27
-> **Status:** done — pull request open (2026-11-17)
+> **Status:** done — pull request #376 open (2026-11-17)
 > **Scope:** styles of the S10 stepper and of S11 — the title row, the sticky action bar, the summary terms — compared with their Figma frames before and after; no behaviour change. Client only: no server change, no EF migration, no new dependency, no new UX copy key.
 > **Owner decisions (2026-11-17):** **1 (a)** — the full-width sticky bar applies to S11 and a saved list, which share `pa-criteria-action-bar` · **2 (a)** — the title row on S11 only; a saved list keeps its title and actions stacked for now (open point 1) · **3 (a)** — the bar's background spans the viewport while its status and buttons stay in the content column, although the frame places them 32 px from the viewport edges (open point 2).
 
