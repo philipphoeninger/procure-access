@@ -18,8 +18,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Session;
 /// without session limits (the test scheme of the integration host).
 /// </param>
 /// <param name="AbsoluteExpiresAt">
-/// The absolute limit: sign-in time plus <c>Session:AbsoluteTimeout</c>. Left out like
-/// <paramref name="ExpiresAt"/>.
+/// The absolute limit: sign-in time plus <c>Session:AbsoluteTimeout</c>, in whole seconds like
+/// <paramref name="ExpiresAt"/> (S6-01). Left out like <paramref name="ExpiresAt"/>.
 /// </param>
 /// <param name="WarningLeadSeconds">
 /// How many seconds before the earlier of the two limits the shell warns (🔧

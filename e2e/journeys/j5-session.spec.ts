@@ -200,7 +200,9 @@ test.describe('J5 session (R-AUTH-06, R-AUTH-07)', () => {
     await openSettings(page);
 
     await clock.move(30);
-    await expect(overlay(page)).toBeVisible();
+    // The first focus comes when the overlay has opened; pressing „Schließen“ before it lost the
+    // focus to the e-mail field, and Enter sent the empty form (#379, S6-01).
+    await expect(overlay(page).getByLabel('E-Mail-Adresse')).toBeFocused();
     await overlay(page).getByRole('button', { name: 'Schließen' }).press('Enter');
 
     await expect(overlay(page)).toHaveCount(0);
