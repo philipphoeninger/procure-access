@@ -138,12 +138,23 @@ internal sealed class SessionCookieEvents(TimeProvider clock, SessionSettings se
         }
     }
 
-    /// <summary>The absolute limit of a ticket, or null for a ticket without a stored sign-in time.</summary>
-    public static DateTimeOffset? AbsoluteExpiry(AuthenticationProperties properties, SessionSettings settings) =>
-        properties.Items.TryGetValue(SignedInUtcKey, out var signedIn)
-        && DateTimeOffset.TryParseExact(signedIn, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var signedInUtc)
-            ? signedInUtc + settings.AbsoluteTimeout
-            : null;
+    /// <summary>
+    /// The absolute limit of a ticket in whole seconds, or null for a ticket without a stored
+    /// sign-in time. Whole seconds as the ticket's idle limit and the headers: the probe reports
+    /// both limits, and the idle limit capped at this one must come out equal to it, or the
+    /// client takes the idle limit for the next one (#379, S6-01).
+    /// </summary>
+    public static DateTimeOffset? AbsoluteExpiry(AuthenticationProperties properties, SessionSettings settings)
+    {
+        if (!properties.Items.TryGetValue(SignedInUtcKey, out var signedIn)
+            || !DateTimeOffset.TryParseExact(signedIn, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var signedInUtc))
+        {
+            return null;
+        }
+
+        var limit = signedInUtc + settings.AbsoluteTimeout;
+        return limit.AddTicks(-(limit.Ticks % TimeSpan.TicksPerSecond));
+    }
 }
 
 /// <summary>Marks the session probe, which must not renew the session (<see cref="SessionCookieEvents"/>).</summary>

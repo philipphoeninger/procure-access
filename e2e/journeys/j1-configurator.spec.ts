@@ -77,6 +77,13 @@ const XLSX_HEADERS = [
 // S11 with an open detail panel has more tab stops than S10.
 const MAX_TABS = 80;
 
+/**
+ * The longest wait for an export's download. The export answers in about a second; without a
+ * bound, a download that never starts (Enter on the wrong element) held the test for its whole
+ * 5 minutes (#380, S6-01).
+ */
+const DOWNLOAD_TIMEOUT = 30_000;
+
 interface CriteriaAnswer {
   readonly release: string;
   readonly criteria: readonly {
@@ -184,7 +191,7 @@ async function exportThroughS13(page: Page, fileName = /^ProcureAccess_Kriterien
   // nothing (CI of #362, S5-25b).
   await expect(xlsx).toBeFocused();
   await tabTo(page, dialog.getByRole('button', { name: 'Datei herunterladen' }));
-  const downloaded = page.waitForEvent('download');
+  const downloaded = page.waitForEvent('download', { timeout: DOWNLOAD_TIMEOUT });
   await page.keyboard.press('Enter');
   const download = await downloaded;
   await expect(dialog).toHaveCount(0);
@@ -385,7 +392,7 @@ test.describe('J1 configurator without account', () => {
     await test.step('S13: „Datei herunterladen“ downloads the XLSX, which holds the list as changed on S11 (EXP-01)', async () => {
       const dialog = page.getByRole('dialog', { name: 'Kriterienliste exportieren' });
       await tabTo(page, dialog.getByRole('button', { name: 'Datei herunterladen' }));
-      const downloaded = page.waitForEvent('download');
+      const downloaded = page.waitForEvent('download', { timeout: DOWNLOAD_TIMEOUT });
       await page.keyboard.press('Enter');
       const download = await downloaded;
 

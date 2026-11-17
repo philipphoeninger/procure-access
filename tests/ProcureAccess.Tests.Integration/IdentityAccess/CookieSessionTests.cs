@@ -397,6 +397,38 @@ public sealed class CookieSessionTests(ApiFixture api) : IAsyncLifetime
         (await SessionUserAsync(client)).ShouldBeNull();
     }
 
+    [Fact(DisplayName = "INV:SEC-07 " + nameof(SessionProbe_SignInWithinASecond_ReportsTheAbsoluteLimitAsTheHeaderDoes))]
+    [Trait("Invariant", "SEC-07")]
+    public async Task SessionProbe_SignInWithinASecond_ReportsTheAbsoluteLimitAsTheHeaderDoes()
+    {
+        // A sign-in at a fraction of a second, as every real one (#379, S6-01).
+        _clock.Advance(TimeSpan.FromMilliseconds(820));
+        using var client = CreateClient(Host);
+        await LoginAsync(client);
+
+        // Extended every 25 minutes up to 7 h 55 min (as J5): the idle limit is capped at the
+        // absolute limit, and the warning is due.
+        HttpResponseMessage? extended = null;
+        for (var i = 0; i < 19; i++)
+        {
+            extended?.Dispose();
+            _clock.Advance(TimeSpan.FromMinutes(25));
+            extended = await client.PostAsync(Extend, null, Cancellation);
+            extended.StatusCode.ShouldBe(HttpStatusCode.NoContent, $"extension after {(i + 1) * 25} minutes");
+        }
+
+        using var lastExtension = extended!;
+        using var probe = await client.GetAsync(Probe, Cancellation);
+
+        using var body = JsonDocument.Parse(await probe.Content.ReadAsStringAsync(Cancellation));
+        var idle = body.RootElement.GetProperty("expiresAt").GetDateTimeOffset();
+        var absolute = body.RootElement.GetProperty("absoluteExpiresAt").GetDateTimeOffset();
+        absolute.ShouldBe(ExpiryHeader(probe, AbsoluteExpiresAtHeader));
+        absolute.ShouldBe(ExpiryHeader(lastExtension, AbsoluteExpiresAtHeader));
+        // Equal, so the client's warning names the absolute limit from the first answer on.
+        idle.ShouldBe(absolute);
+    }
+
     [Fact(DisplayName = "INV:SEC-08 " + nameof(PasswordReset_Completed_EndsTheOtherSessionsWithTheirNextRequest))]
     [Trait("Invariant", "SEC-08")]
     public async Task PasswordReset_Completed_EndsTheOtherSessionsWithTheirNextRequest()
