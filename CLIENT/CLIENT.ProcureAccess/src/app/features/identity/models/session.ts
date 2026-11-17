@@ -18,9 +18,12 @@ export interface SessionUser {
 /**
  * Answer of the session probe: `user` is null without a session. The expiry times (ISO 8601) are
  * left out for a sign-in without session limits (the test scheme of the integration host).
+ * `warningLeadSeconds` is the server's 🔧 `Session:WarningLead`: how long before the earlier limit
+ * the shell warns (SPEC R-AUTH-06); left out without a session.
  */
 export interface SessionResponse {
   user: SessionUser | null;
   expiresAt?: string;
   absoluteExpiresAt?: string;
+  warningLeadSeconds?: number;
 }

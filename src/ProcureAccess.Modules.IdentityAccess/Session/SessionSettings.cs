@@ -9,12 +9,9 @@ namespace ProcureAccess.Modules.IdentityAccess.Session;
 /// <summary>
 /// The lifetimes of the cookie session (ARCHITECTURE §9.1, C52, C60; SPEC R-AUTH-05). 🔧 Confirmed
 /// defaults, read from the section <see cref="SectionName"/> of the configuration: 30 minutes
-/// idle and 8 hours absolute from sign-in. Never hard-code them (CLAUDE §6.6).
+/// idle, 8 hours absolute from sign-in, a warning 5 minutes before the earlier of the two, and
+/// the security stamp checked on every request. Never hard-code them (CLAUDE §6.6).
 /// </summary>
-/// <remarks>
-/// The warning lead time (<c>Session:WarningLead</c>) belongs to the expiry warning of the shell
-/// and arrives with it (S5-29/S5-30, step 4).
-/// </remarks>
 internal sealed class SessionSettings
 {
     public const string SectionName = "Session";
@@ -26,6 +23,19 @@ internal sealed class SessionSettings
     public TimeSpan AbsoluteTimeout { get; init; }
 
     /// <summary>
+    /// How long before the earlier limit the shell warns (SPEC R-AUTH-06). The server only serves
+    /// it with the session probe, so the client keeps no copy (owner decision S5-29 2a).
+    /// </summary>
+    public TimeSpan WarningLead { get; init; }
+
+    /// <summary>
+    /// How old a session's last check of the security stamp may be before the next request checks
+    /// it again. Zero checks on every request, so a password reset or an account deletion ends the
+    /// user's other sessions with their next request (SEC-08; owner decision S5-29 4a).
+    /// </summary>
+    public TimeSpan SecurityStampValidationInterval { get; init; }
+
+    /// <summary>
     /// Reads and checks the section. A missing or unusable value stops the start, like the other
     /// 🔧 settings of the API (rate limits, problem-type base URI).
     /// </summary>
@@ -34,24 +44,41 @@ internal sealed class SessionSettings
         var section = configuration.GetSection(SectionName);
         var idle = Read(section, nameof(IdleTimeout));
         var absolute = Read(section, nameof(AbsoluteTimeout));
+        var warningLead = Read(section, nameof(WarningLead));
+        var stampInterval = Read(section, nameof(SecurityStampValidationInterval), zeroAllowed: true);
         if (absolute < idle)
         {
             throw new InvalidOperationException(
                 $"{SectionName}:{nameof(AbsoluteTimeout)} must not be shorter than {SectionName}:{nameof(IdleTimeout)}.");
         }
 
-        return new SessionSettings { IdleTimeout = idle, AbsoluteTimeout = absolute };
-    }
-
-    private static TimeSpan Read(IConfigurationSection section, string name)
-    {
-        var value = section[name];
-        if (!TimeSpan.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, out var timeout) || timeout <= TimeSpan.Zero)
+        if (warningLead >= idle)
         {
             throw new InvalidOperationException(
-                $"{SectionName}:{name} must be a positive duration such as 00:30:00 (ARCHITECTURE §9.1); it is '{value}'.");
+                $"{SectionName}:{nameof(WarningLead)} must be shorter than {SectionName}:{nameof(IdleTimeout)}.");
         }
 
-        return timeout;
+        return new SessionSettings
+        {
+            IdleTimeout = idle,
+            AbsoluteTimeout = absolute,
+            WarningLead = warningLead,
+            SecurityStampValidationInterval = stampInterval,
+        };
+    }
+
+    private static TimeSpan Read(IConfigurationSection section, string name, bool zeroAllowed = false)
+    {
+        var value = section[name];
+        if (!TimeSpan.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, out var duration)
+            || duration < TimeSpan.Zero
+            || (duration == TimeSpan.Zero && !zeroAllowed))
+        {
+            var expected = zeroAllowed ? "a duration of zero or more such as 00:00:00" : "a positive duration such as 00:30:00";
+            throw new InvalidOperationException(
+                $"{SectionName}:{name} must be {expected} (ARCHITECTURE §9.1); it is '{value}'.");
+        }
+
+        return duration;
     }
 }

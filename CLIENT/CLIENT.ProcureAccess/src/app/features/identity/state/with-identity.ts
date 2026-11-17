@@ -5,6 +5,7 @@
 import { computed, inject } from '@angular/core';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
 
+import { SessionLimits } from '@app/core/session/session-limits';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
 import { withLoading } from '@app/shared/state/with-loading';
@@ -20,10 +21,11 @@ export interface IdentityState {
   user: User | null;
   /** The session as the probe reports it; null while nobody is signed in (SEC-01). */
   session: SessionUser | null;
-  /** Idle limit of the session (ISO 8601), for the warning of step 4; null without a session. */
-  sessionExpiresAt: string | null;
-  /** Absolute limit of the session (ISO 8601); null without a session. */
-  sessionAbsoluteExpiresAt: string | null;
+  /**
+   * How many seconds before the earlier limit the shell warns (the server's 🔧 `Session:WarningLead`,
+   * from the probe; SPEC R-AUTH-06); null without a session.
+   */
+  sessionWarningLeadSeconds: number | null;
   sessionStatus: SessionStatus;
   /** The signed-in user's organisations by name (`GET /api/v1/organizations`); empty without a membership. */
   organizations: OrganizationSummary[];
@@ -37,8 +39,7 @@ export interface IdentityState {
 export const initialIdentityState: IdentityState = {
   user: null,
   session: null,
-  sessionExpiresAt: null,
-  sessionAbsoluteExpiresAt: null,
+  sessionWarningLeadSeconds: null,
   sessionStatus: 'unknown',
   organizations: [],
   activeOrganizationId: null,
@@ -52,12 +53,19 @@ export const initialIdentityState: IdentityState = {
  * and a sign-out; guards wait for it through {@link sessionReady}. For a new signed-in user it also
  * reads the user's organisations, which decide the header state (SignedIn or SignedInNoOrg,
  * R-SHL-02) and the organisation of the switch (R-SHL-03; S5-18).
+ *
+ * The two limits of the session live in {@link SessionLimits}: the probe sets them here, and the
+ * session interceptor moves them with the expiry headers of every later answer (SEC-07; S5-29).
  */
 export const withIdentity = () =>
   signalStoreFeature(
     withState<IdentityState>(initialIdentityState),
     withLoading(),
-    withComputed((state) => ({
+    withComputed((state, limits = inject(SessionLimits)) => ({
+      /** Idle limit of the session (ISO 8601) as the server last told it; null without a session. */
+      sessionExpiresAt: computed(() => (state.session() === null ? null : limits.expiresAt())),
+      /** Absolute limit of the session (ISO 8601); null without a session. */
+      sessionAbsoluteExpiresAt: computed(() => (state.session() === null ? null : limits.absoluteExpiresAt())),
       /** Somebody is signed in. Replaces the legacy `isAuthenticated()`, which read the JWT. */
       signedIn: computed(() => state.session() !== null),
       /** The permissions of the signed-in user's roles (e.g. `moderation:review`); empty when signed out. */
@@ -78,24 +86,25 @@ export const withIdentity = () =>
         state,
         authService = inject(AuthService),
         organizationApiService = inject(OrganizationApiService),
+        limits = inject(SessionLimits),
       ) => {
         let firstProbe: Promise<User | null> | null = null;
 
         function setSession(response: SessionResponse): void {
+          limits.set(response.expiresAt ?? null, response.absoluteExpiresAt ?? null);
           patchState(state, {
             session: response.user,
-            sessionExpiresAt: response.expiresAt ?? null,
-            sessionAbsoluteExpiresAt: response.absoluteExpiresAt ?? null,
+            sessionWarningLeadSeconds: response.warningLeadSeconds ?? null,
             sessionStatus: 'ready',
           });
         }
 
         function clearSession(): void {
+          limits.clear();
           patchState(state, {
             user: null,
             session: null,
-            sessionExpiresAt: null,
-            sessionAbsoluteExpiresAt: null,
+            sessionWarningLeadSeconds: null,
             sessionStatus: 'ready',
             organizations: [],
             activeOrganizationId: null,

@@ -15,10 +15,10 @@ namespace ProcureAccess.Modules.IdentityAccess.Session;
 /// <summary>
 /// <c>GET /api/v1/auth/session</c>, the session probe (ARCHITECTURE §7.1, §8.3, C60): always 200,
 /// <c>{ user: null }</c> for an anonymous request, otherwise the signed-in user with the two
-/// expiry times of the session. Every answer (re)issues the antiforgery token cookie, so the
+/// expiry times of the session and the 🔧 lead time of the expiry warning. Every answer (re)issues the antiforgery token cookie, so the
 /// shell calls it once at start and a sign-in, registration or password reset carries a valid
-/// token. It reads the principal only: it never signs in, never renews the session
-/// (<see cref="SessionProbeMetadata"/>), never touches the database.
+/// token. It reads the principal only: it never signs in and never renews the session
+/// (<see cref="SessionProbeMetadata"/>).
 /// </summary>
 /// <remarks>
 /// The answer is the contract record <see cref="SessionResponse"/> (#320): <c>expiresAt</c> is the
@@ -69,6 +69,7 @@ internal static class SessionProbeEndpoint
                 [.. user.FindAll(ClaimTypes.Role).Select(c => c.Value)],
                 [.. user.FindAll(PermissionClaimType).Select(c => c.Value).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]),
             properties?.ExpiresUtc,
-            properties is null ? null : SessionCookieEvents.AbsoluteExpiry(properties, settings)));
+            properties is null ? null : SessionCookieEvents.AbsoluteExpiry(properties, settings),
+            (int)settings.WarningLead.TotalSeconds));
     }
 }

@@ -57,8 +57,14 @@ internal static class SessionRegistration
         // renewal) and the security-stamp validator (its validation interval) take the API's clock.
         services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
                 .Configure<TimeProvider>((options, clock) => options.TimeProvider = clock);
+        // The security stamp is checked when the last check is older than the 🔧 interval: zero, so
+        // on every request (SEC-08).
         services.AddOptions<SecurityStampValidatorOptions>()
-                .Configure<TimeProvider>((options, clock) => options.TimeProvider = clock);
+                .Configure<TimeProvider>((options, clock) =>
+                {
+                    options.TimeProvider = clock;
+                    options.ValidationInterval = settings.SecurityStampValidationInterval;
+                });
 
         services.AddAntiforgery(options =>
         {

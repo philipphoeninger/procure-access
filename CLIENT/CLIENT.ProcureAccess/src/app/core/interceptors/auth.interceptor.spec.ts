@@ -10,9 +10,10 @@ import { firstValueFrom } from 'rxjs';
 import { API_URL } from '@app/app.config';
 import { BACKGROUND_REQUEST } from '@app/core/errors/problem-details';
 import { LoginOverlayService } from '@app/core/session/login-overlay.service';
+import { SessionLimits } from '@app/core/session/session-limits';
 import { authInterceptor, RETRIED_AFTER_SIGN_IN } from './auth.interceptor';
 
-describe('authInterceptor (401 → login overlay and retry, ARCHITECTURE §8.3)', () => {
+describe('authInterceptor (expiry headers, 401 → login overlay and retry, ARCHITECTURE §8.3)', () => {
   let http: HttpClient;
   let backend: HttpTestingController;
   let requestSignIn: ReturnType<typeof vi.fn>;
@@ -104,5 +105,49 @@ describe('authInterceptor (401 → login overlay and retry, ARCHITECTURE §8.3)'
 
     await expect(request).rejects.toMatchObject({ status });
     expect(requestSignIn).not.toHaveBeenCalled();
+  });
+
+  describe('expiry headers (job 2, SEC-07)', () => {
+    const renewed = {
+      'X-Session-Expires-At': '2026-11-17T10:50:00Z',
+      'X-Session-Absolute-Expires-At': '2026-11-17T18:00:00Z',
+    };
+
+    it('Response_WithExpiryHeaders_MovesTheSessionLimits INV:SEC-07', async () => {
+      const limits = TestBed.inject(SessionLimits);
+      limits.set('2026-11-17T10:30:00Z', '2026-11-17T18:00:00Z');
+
+      const request = firstValueFrom(http.get('/api/v1/account'));
+      backend.expectOne('/api/v1/account').flush({}, { headers: renewed });
+      await request;
+
+      expect(limits.expiresAt()).toBe('2026-11-17T10:50:00Z');
+      expect(limits.absoluteExpiresAt()).toBe('2026-11-17T18:00:00Z');
+    });
+
+    it('FailedResponse_WithExpiryHeaders_MovesTheSessionLimitsToo INV:SEC-07', async () => {
+      const limits = TestBed.inject(SessionLimits);
+
+      const request = firstValueFrom(http.get('/api/v1/organizations/x/members'));
+      backend
+        .expectOne('/api/v1/organizations/x/members')
+        .flush('', { status: 404, statusText: 'Not Found', headers: renewed });
+      await expect(request).rejects.toMatchObject({ status: 404 });
+
+      expect(limits.expiresAt()).toBe('2026-11-17T10:50:00Z');
+      expect(limits.absoluteExpiresAt()).toBe('2026-11-17T18:00:00Z');
+    });
+
+    it('keeps the limits when an answer carries no expiry headers', async () => {
+      const limits = TestBed.inject(SessionLimits);
+      limits.set('2026-11-17T10:30:00Z', '2026-11-17T18:00:00Z');
+
+      const request = firstValueFrom(http.get('/api/v1/catalog/filter-options'));
+      backend.expectOne('/api/v1/catalog/filter-options').flush({});
+      await request;
+
+      expect(limits.expiresAt()).toBe('2026-11-17T10:30:00Z');
+      expect(limits.absoluteExpiresAt()).toBe('2026-11-17T18:00:00Z');
+    });
   });
 });

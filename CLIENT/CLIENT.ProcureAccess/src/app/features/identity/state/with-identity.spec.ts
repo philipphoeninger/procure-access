@@ -9,6 +9,7 @@ import { signalStore } from '@ngrx/signals';
 
 import { API_URL } from '@app/app.config';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
+import { SessionLimits } from '@app/core/session/session-limits';
 import { SessionResponse } from '../models/session';
 import { withIdentity } from './with-identity';
 
@@ -24,6 +25,7 @@ const moderator: SessionResponse = {
   user: { id: 'u1', email: 'mod@example.test', roles: ['Moderator'], permissions: ['moderation:review'] },
   expiresAt: '2026-11-13T10:30:00+00:00',
   absoluteExpiresAt: '2026-11-13T18:00:00+00:00',
+  warningLeadSeconds: 300,
 };
 const anonymous: SessionResponse = { user: null };
 const legacyUser = { id: 'u1', email: 'mod@example.test' };
@@ -81,10 +83,36 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
     expect(store.session()).toEqual(moderator.user);
     expect(store.sessionExpiresAt()).toBe(moderator.expiresAt);
     expect(store.sessionAbsoluteExpiresAt()).toBe(moderator.absoluteExpiresAt);
+    expect(store.sessionWarningLeadSeconds()).toBe(300);
     expect(store.hasPermission('moderation:review')).toBe(true);
     expect(store.hasPermission('catalog:edit')).toBe(false);
     expect(store.user()).toEqual(legacyUser);
     expect(store.sessionStatus()).toBe('ready');
+  });
+
+  it('shows the limits the expiry headers moved, and none once nobody is signed in (SEC-07)', async () => {
+    const store = setUp();
+    const limits = TestBed.inject(SessionLimits);
+    const loading = store.loadSession();
+    await answerProbe(moderator);
+    await loading;
+
+    // What the session interceptor does with the headers of a later answer.
+    limits.set('2026-11-13T10:50:00Z', '2026-11-13T18:00:00Z');
+    expect(store.sessionExpiresAt()).toBe('2026-11-13T10:50:00Z');
+    expect(store.sessionAbsoluteExpiresAt()).toBe('2026-11-13T18:00:00Z');
+
+    const signingOut = store.signOut();
+    (await expectRequest(LOGOUT)).flush(null, { status: 204, statusText: 'No Content' });
+    await signingOut;
+    expect(store.sessionExpiresAt()).toBeNull();
+    expect(store.sessionAbsoluteExpiresAt()).toBeNull();
+    expect(store.sessionWarningLeadSeconds()).toBeNull();
+
+    // A late answer to a request sent before the sign-out.
+    limits.set('2026-11-13T10:55:00Z', '2026-11-13T18:00:00Z');
+    expect(store.sessionExpiresAt()).toBeNull();
+    expect(store.sessionAbsoluteExpiresAt()).toBeNull();
   });
 
   it('is signed out after an anonymous probe and loads no legacy user', async () => {
