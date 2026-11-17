@@ -1,0 +1,48 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (account; as account) {
+  <h1 class="pa-account__title">{{ 'account.title' | translate }}</h1>
+
+  @if (!account.emailConfirmed) {
+    <pa-confirm-required-notice class="pa-account__notice" />
+  }
+
+  <div class="pa-account__card">
+    <h2 class="pa-account__heading">{{ 'account.export.title' | translate }}</h2>
+    <p class="pa-account__text">{{ 'account.export.text' | translate }}</p>
+    <div class="pa-account__actions">
+      <button matButton="outlined" type="button" [attr.aria-disabled]="exporting() || null" (click)="download()">
+        @if (exporting()) {
+          <mat-progress-spinner class="pa-account__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'account.export.cta' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="pa-account__card">
+    <h2 class="pa-account__heading">{{ 'account.delete.title' | translate }}</h2>
+    @if (refusedBy().length > 0) {
+      <pa-notice kind="error" live="assertive" [title]="'account.delete.error.title' | translate">
+        @for (organization of refusedBy(); track organization) {
+          <p>{{ 'account.delete.soleOwner' | translate: { org: organization } }}</p>
+        }
+      </pa-notice>
+    }
+    <p class="pa-account__text">{{ 'account.delete.text' | translate }}</p>
+    <div class="pa-account__actions">
+      <button matButton="outlined" type="button" [attr.aria-disabled]="deleting() || null" (click)="delete()">
+        @if (deleting()) {
+          <mat-progress-spinner class="pa-account__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'account.delete.cta' | translate }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <pa-error-page kind="server" />
+}

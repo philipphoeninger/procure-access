@@ -47,10 +47,20 @@ export const ProcureAccessStore = signalStore(
                 try {
                     await state.signOut();
                 } finally {
-                    state.resetConfigurator();
-                    state.setProposals([]);
-                    patchState(state, { productSaves: [], filterSets: [] });
+                    this.forgetUser();
                 }
+            },
+
+            /**
+             * Forgets the user without a sign-out request: every in-memory state goes, as after the
+             * sign-out. For the deleted account, whose session the server ended with the deletion
+             * (R-AUTH-10, S61).
+             */
+            forgetUser(): void {
+                state.forgetSession();
+                state.resetConfigurator();
+                state.setProposals([]);
+                patchState(state, { productSaves: [], filterSets: [] });
             },
 
             async init() {

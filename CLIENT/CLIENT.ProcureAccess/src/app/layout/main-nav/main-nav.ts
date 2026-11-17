@@ -16,6 +16,7 @@ import { AuthService } from '@features/identity/services/auth.service';
 import { CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '@app/features/configurator/guards/configurator-guards';
 import { SAVED_LISTS_PATH } from '@app/features/configurator/models/saved-lists';
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from '@app/features/organization/models/organization';
+import { ACCOUNT_PATH } from '@app/features/identity/models/account';
 import { SETTINGS_PATH } from '@app/features/settings/models/user-preferences';
 
 /**
@@ -89,6 +90,7 @@ export class MainNav {
   protected readonly savedListsLink = `/${SAVED_LISTS_PATH}`;
 
   /** „Einstellungen“ (U138, U140): S60, the last entry before „Abmelden“. */
+  protected readonly accountLink = `/${ACCOUNT_PATH}`;
   protected readonly settingsLink = `/${SETTINGS_PATH}`;
 
   /** S20, S21 and the page of the invitation link count as „Organisation“. */

@@ -108,7 +108,7 @@ describe('MainNav', () => {
 
       const items = within(menu).getAllByRole('menuitem');
       expect(items.map((item) => item.textContent?.trim())).toEqual(['Konto', 'Organisation', 'Kriterienlisten', 'Einstellungen', 'Abmelden']);
-      expect(items[0].getAttribute('href')).toBe('/profile');
+      expect(items[0].getAttribute('href')).toBe('/konto');
       expect(items[1].getAttribute('href')).toBe('/organisation/org-a/mitglieder');
       // S14 (U140, owner decision S5-20b 4a)
       expect(items[2].getAttribute('href')).toBe('/kriterienlisten');
@@ -139,7 +139,7 @@ describe('MainNav', () => {
       await renderNav('drawer', true, ONE_ORGANIZATION);
 
       expect(screen.getByText('Organisation: Ämter Musterhausen')).toBeTruthy();
-      expect(screen.getByRole('link', { name: 'Konto' }).getAttribute('href')).toBe('/profile');
+      expect(screen.getByRole('link', { name: 'Konto' }).getAttribute('href')).toBe('/konto');
       expect(screen.getByRole('link', { name: 'Organisation' }).getAttribute('href')).toBe('/organisation/org-a/mitglieder');
       expect(screen.getByRole('link', { name: 'Kriterienlisten' }).getAttribute('href')).toBe('/kriterienlisten');
       expect(screen.getByRole('link', { name: 'Einstellungen' }).getAttribute('href')).toBe('/einstellungen');

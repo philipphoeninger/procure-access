@@ -6,15 +6,11 @@
     "add_2",
     "arrow_downward",
     "arrow_drop_down",
-    "box",
     "cancel",
     "check",
     "checklist",
     "create",
-    "delete",
     "done",
-    "done_all",
-    "draft",
     "edit",
     "error",
     "format_bold",
@@ -28,11 +24,10 @@
     "info",
     "link",
     "remove",
-    "rule",
     "title",
     "vertical_split",
     "visibility",
     "warning"
   ],
-  "sha256": "88555e385f488f0519dad481e6b245bc7790b45ca039566a823e3133a1719783"
+  "sha256": "7cad345b5b4efd419f468da0e09e40930f29213a940f5106a039ff181e22360b"
 }

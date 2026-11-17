@@ -19,7 +19,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * and the page of an invitation link since S5-17b, the signed-in compact menu with the organisation
  * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
- * the delete dialog of S14; the settings page S60 since S5-26. The legacy screens are
+ * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
+ * S5-28b. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -428,6 +429,25 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.goto('/einstellungen');
     await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
     await expect(page.getByRole('radio', { name: 'Deutsch' })).toBeChecked();
+    await expectReflow(page);
+  });
+
+  test('S61 with its dialog and the refusal notice needs no horizontal scrolling', async ({ page }) => {
+    // The seeded Owner is only read: the deletion is refused (the only Owner of the seeded organisation)
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto('/konto');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: 'Konto' })).toBeVisible();
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Konto löschen' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('heading', { name: 'Konto endgültig löschen?' })).toBeFocused();
+    await expectReflow(page);
+
+    await dialog.getByRole('textbox', { name: 'E-Mail-Adresse' }).fill(ORG_OWNER);
+    await dialog.getByRole('button', { name: 'Konto endgültig löschen' }).click();
+    await expect(main.getByRole('alert')).toContainText('Konto nicht gelöscht');
     await expectReflow(page);
   });
 

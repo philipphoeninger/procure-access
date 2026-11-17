@@ -19,6 +19,8 @@ export interface ProblemDetails {
   retryAfterMinutes?: number;
   /** Of an `invitation-mismatch` problem (403): the invited address for `org.invite.mismatch` (SPEC §8.6 v2.29). */
   invitedEmail?: string;
+  /** Of a `sole-owner` problem (409): the organisations for `account.delete.soleOwner` (SPEC §8.6 v2.45). */
+  organizations?: string[];
 }
 
 /**
@@ -30,6 +32,7 @@ export const PROBLEM_TYPE_KEYS: Readonly<Record<string, string>> = {
   'email-unconfirmed': 'auth.confirm.required',
   'last-owner': 'org.members.lastOwner',
   'invitation-mismatch': 'org.invite.mismatch',
+  'sole-owner': 'account.delete.soleOwner',
 };
 
 /**

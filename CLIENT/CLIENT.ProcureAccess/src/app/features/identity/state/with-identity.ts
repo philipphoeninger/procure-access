@@ -3,17 +3,14 @@
 // SPDX-License-Identifier: MIT
 
 import { computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
 
-import { SnackbarService } from '@app/core/services/snackbar.service';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
 import { withLoading } from '@app/shared/state/with-loading';
 import { SessionResponse, SessionUser } from '../models/session';
 import { User } from '../models/user.model';
 import { AuthService } from '../services/auth.service';
-import { IdentityApiService } from '../services/identity-api.service';
 
 /** `unknown` until the first probe answered or failed; `ready` from then on. */
 export type SessionStatus = 'unknown' | 'ready';
@@ -80,10 +77,7 @@ export const withIdentity = () =>
       (
         state,
         authService = inject(AuthService),
-        identityApiService = inject(IdentityApiService),
         organizationApiService = inject(OrganizationApiService),
-        snackbarService = inject(SnackbarService),
-        router = inject(Router),
       ) => {
         let firstProbe: Promise<User | null> | null = null;
 
@@ -213,6 +207,14 @@ export const withIdentity = () =>
           },
 
           /**
+           * Forgets the session without asking the server: the account was deleted, and the answer
+           * of the deletion already ended the session there (R-AUTH-10, SPEC §8.13).
+           */
+          forgetSession(): void {
+            clearSession();
+          },
+
+          /**
            * Sends the confirmation e-mail again to the signed-in user's address (R-AUTH-02). Rejects
            * with the `HttpErrorResponse`: 503 `email-delivery` and 429 `rate-limit` for the notice
            * `auth.confirm.required` to show.
@@ -227,20 +229,6 @@ export const withIdentity = () =>
 
           hasPermission(permission: string): boolean {
             return state.permissions().includes(permission);
-          },
-
-          async deleteAccount() {
-            state.incrementLoadingCount();
-            try {
-              const error = await identityApiService.deleteAccount();
-              if (!error) {
-                await this.signOut();
-                void router.navigateByUrl('/');
-              }
-              snackbarService.showInfo(error ? 'Something went wrong.\nPlease try again.' : 'Account deleted');
-            } finally {
-              state.decrementLoadingCount();
-            }
           },
         };
       },

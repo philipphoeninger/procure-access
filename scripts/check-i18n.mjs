@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 // UX copy areas that de.json carries in full: a key root (`shell`) or a deeper prefix
 // (`criteria.select`), when only part of a root has its screen yet. Add an area with the step that
 // builds its screens.
-export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'auth.login', 'auth.register', 'auth.confirm', 'auth.reset', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.save', 'criteria.saved', 'criteria.share', 'criteria.shared', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle', 'org.start', 'org.create', 'org.join', 'org.members', 'org.leave', 'org.left', 'org.invite', 'settings'];
+export const AREAS = ['common', 'shell', 'errors', 'legal', 'home', 'suggest', 'auth.login', 'auth.register', 'auth.confirm', 'auth.reset', 'criteria.select', 'criteria.list', 'criteria.export', 'criteria.save', 'criteria.saved', 'criteria.share', 'criteria.shared', 'criteria.item', 'criteria.priority', 'testType', 'assessment.value', 'pageTitle', 'org.start', 'org.create', 'org.join', 'org.members', 'org.leave', 'org.left', 'org.invite', 'settings', 'account'];
 
 // UX copy keys of the export files (XLSX, CSV; UX copy §5.6 „Exportdatei“), in the Export module.
 // Areas can be whole keys: the files reuse single texts of the screens. A whole key also takes its
@@ -153,7 +153,9 @@ export function parseUxCopy(markdown) {
       continue;
     }
     const text = row[textCol] ?? '';
-    const values = keys.length > 1 ? text.split(' / ') : [text];
+    // "⚖️" in front of a text marks it as preliminary until the legal review (UX copy §5.13); it
+    // is a note for the reader, not part of the text.
+    const values = (keys.length > 1 ? text.split(' / ') : [text]).map((v) => v.replace(/^⚖️\s*/u, ''));
     for (const [n, key] of keys.entries()) {
       const value = values[n];
       if (values.length !== keys.length) problem(key, `${where}: ${keys.length} keys but ${values.length} texts`);

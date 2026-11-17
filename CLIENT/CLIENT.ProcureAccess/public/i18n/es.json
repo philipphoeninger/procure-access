@@ -2,8 +2,6 @@
   "COMMON": {
     "SAVE": "Guardar",
     "CANCEL": "Cancelar",
-    "DELETE": "Eliminar",
-    "CHANGE": "Cambiar",
     "SEND": "Enviar",
     "RESET": "Restablecer",
     "UPDATE": "Actualizar",
@@ -27,12 +25,10 @@
     "EXPAND_ALL": "Expandir todo",
     "COLLAPSE_ALL": "Contraer todo",
     "SELECTED": "seleccionado",
-    "CANNOT_UNDO_WARNING": "Atención: ¡esto no se puede deshacer!",
     "TYPE_IN_YOUR_NEW": "Introduzca su nuevo",
     "LANGUAGE": "Idioma",
     "PLEASE_WAIT": "Por favor espere...",
     "NUMBER": "N.º",
-    "VALUE": "Valor",
     "ACTIONS": "Acciones",
     "TYPE": "Tipo",
     "WEBSITE": "Sitio web",
@@ -42,14 +38,6 @@
   },
   "MENU": {
     "HOME_LABEL": "Inicio"
-  },
-  "AUTH": {
-    "PROFILE": "Perfil",
-    "EMAIL": "Correo electrónico",
-    "DELETE_ACCOUNT": "Eliminar cuenta",
-    "DELETE_ACCOUNT_WARNING": "Estás a punto de eliminar tu cuenta.",
-    "DELETE_ACCOUNT_VERIFICATION_MSG": "Para confirmar, introduce tu correo electrónico y haz clic en \"Eliminar\".",
-    "YOUR_EMAIL": "Tu correo electrónico"
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Criterio",
@@ -90,14 +78,8 @@
   },
   "PROPOSALS": {
     "LABEL": "Propuestas",
-    "OPEN_HEADER": "Propuestas abiertas",
-    "CLOSED_HEADER": "Propuestas cerradas",
-    "CREATE": "Crear propuesta",
     "STATUS": "Estado",
-    "PENDING": "pendiente",
-    "NON_OPEN": "Sin propuestas abiertas",
     "NON_OPEN_FOUND": "No se encontraron propuestas abiertas",
-    "NON_CLOSED": "Sin propuestas cerradas",
     "NOT_ALL_FIELDS_MSG": "No todos los campos son obligatorios. Cuanta más información nos facilites, más fácil le resultará a nuestro administrador volver a comprobarlo todo.",
     "PROPOSER": "Proponente",
     "APPROVER": "Aprobador",

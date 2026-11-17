@@ -4,7 +4,8 @@
 
 import { DEFAULT_DECISION } from '../models/criteria-list';
 import { criteriaAnswer } from '../testing/criteria-fixture';
-import { fileNameOf, toExportRequest } from './export-request';
+import { fileNameOf } from '@app/core/files/content-disposition';
+import { toExportRequest } from './export-request';
 
 describe('toExportRequest (POST /api/v1/exports, S4-19 C123)', () => {
   const answer = criteriaAnswer();

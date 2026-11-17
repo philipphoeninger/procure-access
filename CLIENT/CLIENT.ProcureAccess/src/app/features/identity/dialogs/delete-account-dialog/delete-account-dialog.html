@@ -1,26 +1,35 @@
 <!--
-SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 
 SPDX-License-Identifier: MIT
 -->
 
-<h2 mat-dialog-title class="text-error">{{ 'AUTH.DELETE_ACCOUNT' | translate }}</h2>
-<mat-dialog-content>
-  <p>{{ 'AUTH.DELETE_ACCOUNT_WARNING' | translate }}</p>
-  <p>{{ 'AUTH.DELETE_ACCOUNT_VERIFICATION_MSG' | translate }}</p>
-  <p>{{ 'AUTH.YOUR_EMAIL' | translate }}: {{ email() }}</p>
-  <p>{{ 'COMMON.CANNOT_UNDO_WARNING' | translate }}</p>
-  <mat-form-field id="property-input">
-    <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
-    <input matInput [(ngModel)]="inputEmail" />
-  </mat-form-field>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button matButton [mat-dialog-close]="false">{{ 'COMMON.CANCEL' | translate }}</button>
-  <button
-    mat-flat-button
-    class="error"
-    [disabled]="deletionDisabled()"
-    [mat-dialog-close]="true"
-    cdkFocusInitial>{{ 'COMMON.DELETE' | translate }}</button>
-</mat-dialog-actions>
+<h2 mat-dialog-title>{{ 'account.delete.confirm.title' | translate }}</h2>
+
+<form class="pa-delete-account" novalidate (submit)="confirm($event)">
+  <mat-dialog-content class="pa-delete-account__content">
+    <p class="pa-delete-account__text">{{ 'account.delete.confirm.body' | translate }}</p>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auth.login.email' | translate }}</mat-label>
+      <input matInput type="email" name="email" autocomplete="email" [id]="inputId" [value]="typed()" (input)="input($event)" />
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="pa-delete-account__actions">
+    <button matButton type="button" [mat-dialog-close]="false">{{ 'account.delete.confirm.keep' | translate }}</button>
+    <!-- aria-disabled, not disabled: the button stays focusable and its reason is read (CLAUDE §9).
+         Through the button's own input: its host binding would overwrite an attribute binding that
+         starts as "true". -->
+    <button
+      matButton="filled"
+      type="submit"
+      [aria-disabled]="!matches()"
+      [attr.aria-describedby]="matches() ? null : reasonId"
+    >
+      {{ 'account.delete.confirm.cta' | translate }}
+    </button>
+    @if (!matches()) {
+      <p class="pa-delete-account__reason" [id]="reasonId">{{ 'account.delete.confirm.unavailable' | translate }}</p>
+    }
+  </mat-dialog-actions>
+</form>
