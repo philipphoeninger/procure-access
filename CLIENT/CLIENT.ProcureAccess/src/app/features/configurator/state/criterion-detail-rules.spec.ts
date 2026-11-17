@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ProcedureText } from '../models/criteria';
 import { criterion, procedureText } from '../testing/criteria-fixture';
-import { detailLayout, ratingsOf, tabLabelKey } from './criterion-detail-rules';
+import { detailLayout, ratingsOf, ratingsOfList, tabLabelKey } from './criterion-detail-rules';
 
 function text(overrides: Partial<ProcedureText>): ProcedureText {
   return {
@@ -95,6 +95,24 @@ describe('ratingsOf', () => {
         text({ allowedRatings: ['notApplicable', 'blockade', 'fulfilled', 'slightRestriction'] }),
       ),
     ).toEqual(['fulfilled', 'slightRestriction', 'blockade', 'notApplicable']);
+  });
+});
+
+describe('ratingsOfList (rating legend, O-S5-31-1)', () => {
+  it('joins the allowed ratings of every criterion once, in scale order', () => {
+    expect(
+      ratingsOfList([
+        criterion('1.1', 'A', null, { allowedRatings: ['notApplicable', 'fulfilled'] }),
+        criterion('1.2', 'B', 3, { allowedRatings: ['blockade', 'fulfilled', 'slightRestriction'] }),
+      ]),
+    ).toEqual(['fulfilled', 'slightRestriction', 'blockade', 'notApplicable']);
+  });
+
+  it('is empty for no criteria and for „Geprüft nach …“ criteria only', () => {
+    expect(ratingsOfList([])).toEqual([]);
+    expect(ratingsOfList([criterion('PROC-softwareTest', 'B', null, { kind: 'testProcedure', allowedRatings: [] })])).toEqual(
+      [],
+    );
   });
 });
 

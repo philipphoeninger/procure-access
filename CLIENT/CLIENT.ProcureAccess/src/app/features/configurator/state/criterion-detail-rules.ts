@@ -56,6 +56,16 @@ export function ratingsOf(text: ProcedureText): RatingName[] {
   return RATING_ORDER.filter((rating) => text.allowedRatings.includes(rating));
 }
 
+/**
+ * The levels the rating legend of a list explains (owner decisions #279 (b), O-S5-31-1): every level
+ * at least one criterion of the list allows, in scale order. Taken from the whole list, so the
+ * filters never change it; empty for a list of „Geprüft nach …“ criteria only, which hides the legend.
+ */
+export function ratingsOfList(criteria: readonly Criterion[]): RatingName[] {
+  const allowed = new Set(criteria.flatMap((criterion) => criterion.allowedRatings));
+  return RATING_ORDER.filter((rating) => allowed.has(rating));
+}
+
 /** The content of a section in one procedure text, as a comparable value; null when the text has none. */
 function sectionValue(text: ProcedureText, kind: DetailSectionKind): string | null {
   switch (kind) {

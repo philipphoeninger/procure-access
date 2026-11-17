@@ -28,6 +28,7 @@ import { AuthService } from '@app/features/identity/services/auth.service';
 import { ORGANIZATION_PATH } from '@app/features/organization/models/organization';
 import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { Notice } from '@app/shared/components/notice/notice';
+import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
 import { CriteriaActionBar } from '../../components/criteria-action-bar/criteria-action-bar';
@@ -41,6 +42,7 @@ import { CriteriaListFilter } from '../../models/criteria-list';
 import { CriteriaResponse } from '../../models/criteria';
 import { catalogNames } from '../../state/catalog-names';
 import { decisionOf, includedCount, levelCounts } from '../../state/criteria-list-rules';
+import { ratingsOfList } from '../../state/criterion-detail-rules';
 import { selectionNames } from '../../state/selection-names';
 
 /** Handoff §3.4: counters are announced at most once per second, the newest count wins. */
@@ -67,6 +69,10 @@ const STATUS_KEY = 'criteria.list.status.count';
  * wins); the search counts 300 ms after the last keystroke, when it applies. With no card left the
  * page shows `criteria.list.emptyFilter` and „Filter zurücksetzen“, which clears the filter and puts
  * the focus into the search field.
+ *
+ * Between the filter row and the cards the rating legend `pa-rating-legend` (S5-31, Figma `2099:3165`),
+ * collapsed, once per page (owner decision #279 (b)): it explains the levels the criteria of the
+ * whole list allow, whatever the filter shows, and is left out when they allow none (O-S5-31-1).
  *
  * App types without criteria (`appTypesWithoutCriteria[]`, R-LST-08, CAT-20) get the info notice
  * `criteria.list.noCriteriaFor` above the list — a regular state, not an error — with „Auswahl
@@ -107,6 +113,7 @@ const STATUS_KEY = 'criteria.list.status.count';
     CriterionCard,
     MatButtonModule,
     Notice,
+    RatingLegend,
     RouterLink,
     TranslatePipe,
     TranslatePluralPipe,
@@ -149,6 +156,8 @@ export class CriteriaListPage {
   protected readonly counts = computed(() =>
     levelCounts(this.answer()?.criteria ?? [], this.store.configurator.list.decisions()),
   );
+  /** The levels the rating legend above the list explains, from the whole list (O-S5-31-1). */
+  protected readonly ratings = computed(() => ratingsOfList(this.answer()?.criteria ?? []));
   /** Cards in the user's list, „Geprüft nach …“ included (`criteria.list.status.count`). */
   protected readonly included = computed(() =>
     includedCount(this.answer()?.criteria ?? [], this.store.configurator.list.decisions()),

@@ -679,6 +679,11 @@
       "blockade.explain": "Betroffene Menschen können die Funktion gar nicht nutzen.",
       "notApplicable.explain": "Das Produkt hat die Funktion nicht, um die es im Kriterium geht, zum Beispiel keine Videos. Das ist weder ein Mangel noch ein Pluspunkt.",
       "unknown.explain": "Zu diesem Kriterium gibt es noch keine Bewertung. Das heißt nicht, dass es nicht erfüllt ist."
+    },
+    "legend": {
+      "show": "Was bedeuten die Bewertungsstufen?",
+      "hide": "Erklärung der Bewertungsstufen ausblenden",
+      "footnote": "Welche Stufen bei einem Kriterium möglich sind, steht in seinen Details. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. ProcureAccess bildet daraus kein Gesamturteil."
     }
   },
   "org": {

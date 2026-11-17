@@ -119,6 +119,31 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     await expectNoAxeViolations();
   });
 
+  it.each(['reader', 'editor'] as const)(
+    'shows one collapsed rating legend between the filter row and the cards for a %s (S5-31)',
+    async (role) => {
+      const fixture = await openPage({ role });
+      const legend = screen.getByRole('button', { name: 'Was bedeuten die Bewertungsstufen?' });
+
+      expect(document.querySelectorAll('pa-rating-legend')).toHaveLength(1);
+      expect(legend.getAttribute('aria-expanded')).toBe('false');
+      const filter = screen.getByRole('group', { name: 'Liste filtern' });
+      expect(filter.compareDocumentPosition(legend) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(legend.compareDocumentPosition(screen.getByRole('list')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+      legend.click();
+      await fixture.whenStable();
+
+      expect([...document.querySelectorAll('pa-rating-legend dt')].map((term) => term.textContent?.trim())).toEqual([
+        'Erfüllt',
+        'Einschränkung',
+        'Barriere',
+        'Blockade',
+      ]);
+      await expectNoAxeViolations();
+    },
+  );
+
   describe('Reader (owner decision S5-21b 6a)', () => {
     it('shows the stored decisions read only, the filter row and only „Liste exportieren“', async () => {
       await openPage({ role: 'reader' });

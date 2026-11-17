@@ -275,6 +275,52 @@ describe('CriteriaListPage (S11, R-LST-01 – R-LST-10, R-LST-13)', () => {
     });
   });
 
+  describe('rating legend (S5-31, owner decisions #279 (b), O-S5-31-1)', () => {
+    const legendButton = () => screen.getByRole('button', { name: 'Was bedeuten die Bewertungsstufen?' });
+    const legendTerms = () =>
+      [...document.querySelectorAll('pa-rating-legend dt')].map((term) => term.textContent?.trim());
+
+    it('shows one collapsed legend between the filter row and the cards, with the levels of the whole list', async () => {
+      const answer = criteriaAnswer();
+      answer.criteria[1] = { ...answer.criteria[1], allowedRatings: ['fulfilled', 'notApplicable'] };
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(answer));
+
+      expect(document.querySelectorAll('pa-rating-legend')).toHaveLength(1);
+      expect(legendButton().getAttribute('aria-expanded')).toBe('false');
+      const filter = screen.getByRole('group', { name: 'Liste filtern' });
+      expect(filter.compareDocumentPosition(legendButton()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(legendButton().compareDocumentPosition(screen.getByRole('list')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+      legendButton().click();
+      await fixture.whenStable();
+
+      expect(legendTerms()).toEqual(['Erfüllt', 'Einschränkung', 'Barriere', 'Blockade', 'Nicht anwendbar']);
+      await expectNoAxeViolations();
+    });
+
+    it('keeps the legend and its levels when the filter leaves no card', async () => {
+      const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));
+      const search = screen.getByRole<HTMLInputElement>('searchbox', { name: 'In Kriterien suchen' });
+
+      search.value = 'gibt es nicht';
+      fireEvent.input(search);
+      await new Promise((resolve) => setTimeout(resolve, CRITERIA_SEARCH_DEBOUNCE_MS + 20));
+      await fixture.whenStable();
+
+      expect(screen.queryByRole('list')).toBeNull();
+      expect(legendTerms()).toEqual(['Erfüllt', 'Einschränkung', 'Barriere', 'Blockade']);
+    });
+
+    it('leaves the legend out when no criterion of the list allows a level („Geprüft nach …“ only)', async () => {
+      const answer = criteriaAnswer();
+      answer.criteria = answer.criteria.filter((criterion) => criterion.kind === 'testProcedure');
+      await setUp(vi.fn().mockResolvedValue(answer));
+
+      expect(screen.getAllByRole('listitem')).toHaveLength(1);
+      expect(document.querySelector('pa-rating-legend')).toBeNull();
+    });
+  });
+
   describe('„Geprüft nach …“ cards (R-LST-07)', () => {
     it('INV:CAT-16 lists the procedure criterion with priority B and lets the user deselect it; it stays in the list', async () => {
       const { fixture } = await setUp(vi.fn().mockResolvedValue(criteriaAnswer()));

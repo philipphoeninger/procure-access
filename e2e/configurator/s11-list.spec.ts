@@ -11,7 +11,7 @@ import { chooseFirstOption } from '../support/combobox';
  * E2E stack: summary, notices, counts, „Kriterium vorschlagen“ and the action bar, which is in the
  * flow below 600 px width or height and sticky from there without covering the focused element
  * (WCAG 2.4.11). Axe in both appearances (A11Y-01, A11Y-08). Since S4-18b also the usage event
- * `CriteriaListShown`: one report per new selection.
+ * `CriteriaListShown`: one report per new selection. Since S5-31 the rating legend above the list.
  *
  * Axe runs before any name-based locator on S11: in Firefox such locators followed by axe crashed
  * the page process (S4-16 P5, the class of TESTING_v43 V129).
@@ -81,6 +81,37 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
     await expect(actionBar(page).getByText('Noch nicht gespeichert', { exact: true })).toBeVisible();
     // „Liste speichern“ since S5-20b, before „Liste exportieren“; signed out it opens S01 (R-SAV-01).
     await expect(actionBar(page).getByRole('button')).toHaveText(['Liste speichern', 'Liste exportieren']);
+  });
+
+  test('INV:A11Y-01 INV:A11Y-08 explains the rating levels once, between the filter row and the cards (S5-31)', async ({ page }, testInfo) => {
+    // Owner decisions #279 (b), O-S5-31-1: one collapsed legend per page with the levels the list allows.
+    await toList(page);
+    const legend = page.locator('pa-rating-legend');
+    await expect(legend).toHaveCount(1);
+    const toggle = legend.locator('button');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(legend.locator('dl')).toBeVisible();
+    await settled(page.getByRole('main'));
+    await expectNoAxeViolations(page, testInfo, 's11 rating legend open');
+
+    await expect(toggle).toHaveText('Erklärung der Bewertungsstufen ausblenden');
+    await expect(legend.getByRole('term').first()).toHaveText('Erfüllt');
+    // Nothing on S11 is assessed: „Nicht eingeschätzt“ is never a level a criterion allows.
+    await expect(legend.getByRole('term').filter({ hasText: 'Nicht eingeschätzt' })).toHaveCount(0);
+    await expect(legend.getByText(/^Welche Stufen bei einem Kriterium möglich sind/)).toBeVisible();
+    const order = await page.evaluate(() => {
+      const filter = document.querySelector('pa-criteria-list-filter');
+      const legendHost = document.querySelector('pa-rating-legend');
+      const cards = document.querySelector('main ul');
+      return (
+        !!filter && !!legendHost && !!cards &&
+        !!(filter.compareDocumentPosition(legendHost) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+        !!(legendHost.compareDocumentPosition(cards) & Node.DOCUMENT_POSITION_FOLLOWING)
+      );
+    });
+    expect(order, 'filter row, legend, cards').toBe(true);
   });
 
   test('the action bar is sticky from 600 px width and height and in the flow below', async ({ page }) => {

@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<button matButton type="button" [attr.aria-expanded]="expanded()" [attr.aria-controls]="panelId" (click)="toggle()">
+  {{ (expanded() ? 'assessment.legend.hide' : 'assessment.legend.show') | translate }}
+</button>
+<div class="pa-rating-legend__panel" [id]="panelId" [hidden]="!expanded()">
+  <dl class="pa-rating-legend__list">
+    @for (value of shown(); track value) {
+      <div class="pa-rating-legend__row">
+        <dt>{{ 'assessment.value.' + value | translate }}</dt>
+        <dd>{{ 'assessment.value.' + value + '.explain' | translate }}</dd>
+      </div>
+    }
+  </dl>
+  <p class="pa-rating-legend__footnote">{{ 'assessment.legend.footnote' | translate }}</p>
+</div>

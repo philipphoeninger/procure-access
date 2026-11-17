@@ -100,6 +100,26 @@ describe('S16 Geteilte Kriterienliste (R-SAV-05, TEN-09)', () => {
     await expectNoAxeViolations();
   });
 
+  it('shows one collapsed rating legend after the counts, above the cards, with the levels of the list (S5-31)', async () => {
+    const fixture = await openPage(listView());
+    const legend = screen.getByRole('button', { name: 'Was bedeuten die Bewertungsstufen?' });
+
+    expect(document.querySelectorAll('pa-rating-legend')).toHaveLength(1);
+    expect(legend.getAttribute('aria-expanded')).toBe('false');
+    expect(legend.compareDocumentPosition(screen.getByRole('list')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    legend.click();
+    await fixture.whenStable();
+
+    expect([...document.querySelectorAll('pa-rating-legend dt')].map((term) => term.textContent?.trim())).toEqual([
+      'Erfüllt',
+      'Einschränkung',
+      'Barriere',
+      'Blockade',
+    ]);
+    await expectNoAxeViolations();
+  });
+
   it('INV:TEN-09 keeps the detail panel with „Warum diese Priorität?“ (CAT-02)', async () => {
     const fixture = await openPage(listView());
 
