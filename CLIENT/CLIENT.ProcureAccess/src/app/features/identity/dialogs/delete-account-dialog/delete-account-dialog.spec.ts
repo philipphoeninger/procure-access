@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { render, screen } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 
+import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 import { DeleteAccountDialog } from './delete-account-dialog';
 
@@ -23,6 +24,7 @@ import { DeleteAccountDialog } from './delete-account-dialog';
 // - Replace only what is outside the component (here: the dialog reference and its data).
 
 const accountEmail = 'anna.beispiel@example.org';
+const reason = 'Das Löschen ist erst möglich, wenn Sie Ihre E-Mail-Adresse genau so eingeben, wie sie in Ihrem Konto steht.';
 
 async function renderDialog(email = accountEmail) {
   const dialogRef = { close: vi.fn() };
@@ -36,60 +38,68 @@ async function renderDialog(email = accountEmail) {
   return { fixture, dialogRef };
 }
 
-const deleteButton = () => screen.getByRole('button', { name: 'Löschen' });
+const deleteButton = () => screen.getByRole('button', { name: 'Konto endgültig löschen' });
 
 async function typeEmail(fixture: ComponentFixture<DeleteAccountDialog>, value: string) {
-  fireEvent.input(screen.getByRole('textbox', { name: 'E-Mail' }), { target: { value } });
+  fireEvent.input(screen.getByRole('textbox', { name: 'E-Mail-Adresse' }), { target: { value } });
   await fixture.whenStable();
 }
 
-describe('DeleteAccountDialog', () => {
-  it('shows the title, the account e-mail and a labelled e-mail field', async () => {
-    await renderDialog();
-
-    expect(screen.getByRole('heading', { name: 'Konto löschen' })).toBeTruthy();
-    expect(screen.getByText(`Ihre E-Mail: ${accountEmail}`)).toBeTruthy();
-    expect(screen.getByRole('textbox', { name: 'E-Mail' })).toBeTruthy();
-  });
-
-  // The dialog uses native `disabled`. CLAUDE §9 asks for `aria-disabled` with a visible reason;
-  // this test describes today's behaviour and does not set the pattern (screen rebuilt in M1/M2).
-  it('keeps "Löschen" unavailable until the account e-mail is typed', async () => {
+describe('DeleteAccountDialog (S61, R-AUTH-10)', () => {
+  it('shows the title, the text and a labelled address field', async () => {
     const { fixture } = await renderDialog();
 
-    expect(deleteButton()).toHaveProperty('disabled', true);
+    expect(screen.getByRole('heading', { name: 'Konto endgültig löschen?' })).toBeTruthy();
+    expect(screen.getByText(/Das lässt sich nicht rückgängig machen/)).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: 'E-Mail-Adresse' }).getAttribute('autocomplete')).toBe('email');
+    await expectNoAxeViolations(fixture.nativeElement as HTMLElement);
+  });
+
+  // CLAUDE §9: an unavailable action is `aria-disabled`, never `disabled`, with a visible reason.
+  it('keeps the action unavailable with its visible reason until the account address is typed', async () => {
+    const { fixture } = await renderDialog();
+
+    expect(deleteButton().getAttribute('aria-disabled')).toBe('true');
+    expect(deleteButton()).toHaveProperty('disabled', false);
+    expect(deleteButton().getAttribute('aria-describedby')).toBe(screen.getByText(reason).id);
 
     await typeEmail(fixture, 'someone.else@example.org');
-    expect(deleteButton()).toHaveProperty('disabled', true);
+    expect(deleteButton().getAttribute('aria-disabled')).toBe('true');
 
     await typeEmail(fixture, accountEmail);
-    expect(deleteButton()).toHaveProperty('disabled', false);
+    expect(deleteButton().getAttribute('aria-disabled')).toBe('false');
+    expect(deleteButton().getAttribute('aria-describedby')).toBeNull();
+    expect(screen.queryByText(reason)).toBeNull();
   });
 
-  // The match is exact: no case folding, no trimming, no prefix match.
+  // The match is exact: no case folding, no prefix match. (An e-mail field drops surrounding
+  // spaces itself, so they never reach the comparison.)
   it.each([
     ['other upper/lower case', 'Anna.Beispiel@example.org'],
-    ['a trailing space', `${accountEmail} `],
     ['a prefix of the address', 'anna.beispiel@example'],
-  ])('keeps "Löschen" unavailable for %s', async (_case, typed) => {
-    const { fixture } = await renderDialog();
+  ])('does nothing for %s', async (_case, typed) => {
+    const { fixture, dialogRef } = await renderDialog();
 
     await typeEmail(fixture, typed);
+    deleteButton().click();
+    await fixture.whenStable();
 
-    expect(deleteButton()).toHaveProperty('disabled', true);
+    expect(deleteButton().getAttribute('aria-disabled')).toBe('true');
+    expect(dialogRef.close).not.toHaveBeenCalled();
   });
 
-  it('keeps "Löschen" unavailable when the account e-mail is empty (#95)', async () => {
-    const { fixture } = await renderDialog('');
-
-    expect(deleteButton()).toHaveProperty('disabled', true);
+  it('never matches an empty input, also when the account address is empty (#95)', async () => {
+    const { fixture, dialogRef } = await renderDialog('');
 
     await typeEmail(fixture, 'x');
     await typeEmail(fixture, '');
-    expect(deleteButton()).toHaveProperty('disabled', true);
+    deleteButton().click();
+
+    expect(deleteButton().getAttribute('aria-disabled')).toBe('true');
+    expect(dialogRef.close).not.toHaveBeenCalled();
   });
 
-  it('closes with true after "Löschen"', async () => {
+  it('closes with true once the address matches', async () => {
     const { fixture, dialogRef } = await renderDialog();
 
     await typeEmail(fixture, accountEmail);
@@ -98,10 +108,10 @@ describe('DeleteAccountDialog', () => {
     expect(dialogRef.close).toHaveBeenCalledExactlyOnceWith(true);
   });
 
-  it('closes with false after "Abbrechen" with nothing typed', async () => {
+  it('closes with false after „Konto behalten“', async () => {
     const { dialogRef } = await renderDialog();
 
-    screen.getByRole('button', { name: 'Abbrechen' }).click();
+    screen.getByRole('button', { name: 'Konto behalten' }).click();
 
     expect(dialogRef.close).toHaveBeenCalledExactlyOnceWith(false);
   });

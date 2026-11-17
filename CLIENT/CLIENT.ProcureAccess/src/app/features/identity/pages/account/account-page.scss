@@ -1,0 +1,66 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// S61 (Handoff §5.3: form card as in S51): one column, at most 40rem wide; one outlined card per
+// section, its action bottom right (over the whole width below 600 px).
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  inline-size: 100%;
+}
+
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
+.pa-account__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.pa-account__notice,
+.pa-account__card {
+  max-inline-size: 40rem;
+}
+
+.pa-account__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-account__heading {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.pa-account__text {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+}
+
+.pa-account__actions {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.pa-account__spinner {
+  margin-inline-end: var(--pa-space-xs);
+}

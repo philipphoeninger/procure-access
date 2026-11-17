@@ -70,7 +70,7 @@ SPDX-License-Identifier: MIT
       <button matButton="tonal" class="pa-main-nav__account-menu" type="button" [matMenuTriggerFor]="accountMenu"
         [attr.aria-label]="'shell.userMenu.label' | translate: { displayName: displayName() }">{{ 'shell.nav.account' | translate }}</button>
       <mat-menu #accountMenu="matMenu">
-        <a mat-menu-item routerLink="/profile" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.account' | translate }}</a>
+        <a mat-menu-item [routerLink]="accountLink" routerLinkActive="pa-main-nav__menu-item--active" ariaCurrentWhenActive="page">{{ 'shell.nav.account' | translate }}</a>
         <a mat-menu-item [routerLink]="organizationLink()" [class.pa-main-nav__menu-item--active]="organizationCurrent()"
           [attr.aria-current]="organizationCurrent() ? 'page' : null">{{ 'shell.nav.organization' | translate }}</a>
         @if (activeOrganization()) {
@@ -81,7 +81,7 @@ SPDX-License-Identifier: MIT
       </mat-menu>
     } @else {
       <!-- The compact menu is a modal drawer already: its account actions stay a flat list (Handoff §3.1) -->
-      <a matButton class="pa-main-nav__item" routerLink="/profile"
+      <a matButton class="pa-main-nav__item" [routerLink]="accountLink"
         routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
         (click)="navigated.emit()">{{ 'shell.nav.account' | translate }}</a>
       <a matButton class="pa-main-nav__item" [routerLink]="organizationLink()"

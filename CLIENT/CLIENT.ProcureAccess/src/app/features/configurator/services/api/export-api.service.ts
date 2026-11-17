@@ -10,7 +10,7 @@ import { API_URL } from '@app/app.config';
 import { CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
 import { ExportFile, ExportFormat, ExportRequest } from '../../models/export';
-import { fileNameOf } from '../../state/export-request';
+import { fileNameOf } from '@app/core/files/content-disposition';
 
 /** Name used when the answer names no file (never expected: the server always sends one). */
 const FALLBACK_FILE_NAME = 'ProcureAccess_Kriterien';

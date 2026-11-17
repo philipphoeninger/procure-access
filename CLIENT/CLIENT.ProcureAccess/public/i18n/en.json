@@ -2,8 +2,6 @@
   "COMMON": {
     "SAVE": "Save",
     "CANCEL": "Cancel",
-    "DELETE": "Delete",
-    "CHANGE": "Change",
     "SEND": "Send",
     "RESET": "Reset",
     "UPDATE": "Update",
@@ -27,12 +25,10 @@
     "EXPAND_ALL": "Expand All",
     "COLLAPSE_ALL": "Collapse All",
     "SELECTED": "selected",
-    "CANNOT_UNDO_WARNING": "Attention: this cannot be undone!",
     "TYPE_IN_YOUR_NEW": "Type in your new",
     "LANGUAGE": "Language",
     "PLEASE_WAIT": "Please wait...",
     "NUMBER": "No.",
-    "VALUE": "Value",
     "ACTIONS": "Actions",
     "TYPE": "Type",
     "WEBSITE": "Website",
@@ -42,14 +38,6 @@
   },
   "MENU": {
     "HOME_LABEL": "Home"
-  },
-  "AUTH": {
-    "PROFILE": "Profile",
-    "EMAIL": "Email",
-    "DELETE_ACCOUNT": "Delete account",
-    "DELETE_ACCOUNT_WARNING": "You're about to delete your account.",
-    "DELETE_ACCOUNT_VERIFICATION_MSG": "For verification, please enter your email below and click the 'Delete' button.",
-    "YOUR_EMAIL": "Your Email"
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Criterion",
@@ -90,14 +78,8 @@
   },
   "PROPOSALS": {
     "LABEL": "Proposals",
-    "OPEN_HEADER": "Your open proposals (max. 3)",
-    "CLOSED_HEADER": "Closed proposals made by you",
-    "CREATE": "Create new proposal",
     "STATUS": "Status",
-    "PENDING": "pending",
-    "NON_OPEN": "No open proposals yet",
     "NON_OPEN_FOUND": "No open proposals found",
-    "NON_CLOSED": "No closed proposals yet",
     "NOT_ALL_FIELDS_MSG": "Not all fields have to be filled out. The more information you can provide, the easier it is for our admin to recheck everything.",
     "PROPOSER": "Proposer",
     "APPROVER": "Approver",

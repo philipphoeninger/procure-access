@@ -1,9 +1,36 @@
 /*
- * SPDX-FileCopyrightText: 2025-2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
  *
  * SPDX-License-Identifier: MIT
  */
 
-#property-input {
-  width: 100%;
+.pa-delete-account__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-delete-account__text {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+}
+
+// DOM order = visual order (Handoff §2.2): below 600 px stacked, the action last; the reason of
+// the unavailable action below the buttons over the whole width.
+.pa-delete-account__actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--pa-space-xs);
+
+  @media (min-width: 37.5em) {
+    flex-flow: row wrap;
+    justify-content: flex-end;
+  }
+}
+
+.pa-delete-account__reason {
+  flex: 0 0 100%;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
 }

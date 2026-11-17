@@ -40,20 +40,6 @@ const LEGACY_EXCEPTIONS = {
     '@typescript-eslint/no-unsafe-enum-comparison',
   ],
   // M3 — cookie authentication, identity screens, settings S60
-  'src/app/features/identity/profile/profile.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-explicit-any',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-unsafe-assignment',
-    '@typescript-eslint/no-unsafe-member-access',
-  ],
-    'src/app/features/identity/services/identity-api.service.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-explicit-any',
-  ],
-  'src/app/features/identity/state/with-identity.ts': [
-    '@typescript-eslint/no-unsafe-assignment',
-  ],
   'src/app/features/settings/services/language.service.ts': [
     '@typescript-eslint/no-unsafe-assignment',
     '@typescript-eslint/no-unsafe-return',

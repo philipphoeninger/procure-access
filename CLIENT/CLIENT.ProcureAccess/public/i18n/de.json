@@ -2,8 +2,6 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
-    "DELETE": "Löschen",
-    "CHANGE": "Ändern",
     "SEND": "Senden",
     "RESET": "Zurücksetzen",
     "UPDATE": "Aktualisieren",
@@ -26,12 +24,10 @@
     "EXPAND_ALL": "Alle ausklappen",
     "COLLAPSE_ALL": "Alle einklappen",
     "SELECTED": "ausgewählt",
-    "CANNOT_UNDO_WARNING": "Achtung: Dies kann nicht rückgängig gemacht werden!",
     "TYPE_IN_YOUR_NEW": "Geben Sie Ihr neues",
     "LANGUAGE": "Sprache",
     "PLEASE_WAIT": "Bitte warten...",
     "NUMBER": "Nr.",
-    "VALUE": "Wert",
     "ACTIONS": "Aktionen",
     "TYPE": "Typ",
     "WEBSITE": "Webseite",
@@ -39,14 +35,6 @@
   },
   "MENU": {
     "HOME_LABEL": "Startseite"
-  },
-  "AUTH": {
-    "PROFILE": "Profil",
-    "EMAIL": "E-Mail",
-    "DELETE_ACCOUNT": "Konto löschen",
-    "DELETE_ACCOUNT_WARNING": "Sie sind dabei, Ihr Konto zu löschen.",
-    "DELETE_ACCOUNT_VERIFICATION_MSG": "Zur Bestätigung geben Sie bitte Ihre E-Mail-Adresse ein und klicken Sie auf „Löschen“.",
-    "YOUR_EMAIL": "Ihre E-Mail"
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Kriterium",
@@ -87,14 +75,8 @@
   },
   "PROPOSALS": {
     "LABEL": "Vorschläge",
-    "OPEN_HEADER": "Offene Vorschläge (max. 3)",
-    "CLOSED_HEADER": "Geschlossene Vorschläge",
-    "CREATE": "Neuen Vorschlag erstellen",
     "STATUS": "Status",
-    "PENDING": "ausstehend",
-    "NON_OPEN": "Keine offenen Vorschläge",
     "NON_OPEN_FOUND": "Keine offenen Vorschläge gefunden",
-    "NON_CLOSED": "Keine geschlossenen Vorschläge",
     "NOT_ALL_FIELDS_MSG": "Nicht alle Felder sind erforderlich. Je mehr Informationen Sie uns zur Verfügung stellen, desto einfacher ist die Prüfung durch unsere Admins.",
     "PROPOSER": "Ersteller",
     "APPROVER": "Genehmiger",
@@ -788,5 +770,29 @@
     "motion.system": "Wie im Betriebssystem eingestellt",
     "motion.reduced": "Bewegungen reduzieren",
     "saved": "Einstellungen gespeichert."
+  },
+  "account": {
+    "title": "Konto",
+    "export": {
+      "title": "Ihre Daten herunterladen",
+      "text": "Sie erhalten eine Datei (JSON) mit Ihren Kontodaten, Ihren Beitragsprofilen und Beiträgen sowie den Kriterienlisten und Beschaffungsprojekten, die Sie angelegt haben.",
+      "cta": "Daten herunterladen"
+    },
+    "delete": {
+      "title": "Konto löschen",
+      "text": "Wenn Sie Ihr Konto löschen, werden Ihre Anmeldedaten entfernt. Veröffentlichte Beiträge werden zurückgezogen und sind nicht mehr sichtbar. Text und Angaben zu Hilfsmitteln Ihrer Erfahrungsberichte werden gelöscht.",
+      "cta": "Konto löschen",
+      "confirm": {
+        "title": "Konto endgültig löschen?",
+        "body": "Das lässt sich nicht rückgängig machen. Geben Sie zur Bestätigung Ihre E-Mail-Adresse ein.",
+        "cta": "Konto endgültig löschen",
+        "unavailable": "Das Löschen ist erst möglich, wenn Sie Ihre E-Mail-Adresse genau so eingeben, wie sie in Ihrem Konto steht.",
+        "keep": "Konto behalten"
+      },
+      "error": {
+        "title": "Konto nicht gelöscht"
+      },
+      "soleOwner": "Sie sind das einzige Mitglied mit der Rolle „Verwalten“ in {{org}}. Geben Sie diese Rolle zuerst einem anderen Mitglied, bevor Sie Ihr Konto löschen."
+    }
   }
 }

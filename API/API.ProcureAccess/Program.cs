@@ -128,6 +128,7 @@ try
        .MapAuthEndpoints()
        .MapRegistrationEndpoints()
        .MapPasswordResetEndpoints()
+       .MapAccountEndpoints()
        .MapAccountExportEndpoints()
        .MapAccountDeletionEndpoints()
        .MapOrganizationEndpoints()

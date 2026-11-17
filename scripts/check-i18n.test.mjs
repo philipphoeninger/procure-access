@@ -16,6 +16,12 @@ const ux = (rows) =>
 const run = (texts, de, templates = []) =>
   check({ ...parseUxCopy(ux(texts)), de, templates, areas: ['shell'] }).errors;
 
+test('drops the legal-review marker in front of a text', () => {
+  const { texts, problems } = parseUxCopy(ux(['| `shell.legal` | Text | ⚖️ Vorläufiger Text. | abhängig von der Prüfung ⚖️ |']));
+  assert.deepEqual([...texts], [['shell.legal', 'Vorläufiger Text.']]);
+  assert.equal(problems.size, 0);
+});
+
 test('reads key rows of §5–§6 only, by the Text column', () => {
   const { texts, problems } = parseUxCopy(ux(['| `shell.a` | Button | Eins | Hinweis |']));
   assert.deepEqual([...texts], [['shell.a', 'Eins']]);

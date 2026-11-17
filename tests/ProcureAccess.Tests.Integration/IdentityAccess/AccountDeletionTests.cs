@@ -229,8 +229,38 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         login.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_SignedIn_ReturnsTheAddressAndWhetherItIsConfirmed(bool confirmed)
+    {
+        // S5-28b: S61 reads this to show the confirmation notice. Member's address is not confirmed.
+        var user = confirmed ? TestUsers.EditorA : TestUsers.Member;
+        using var client = CreateClient(user);
+
+        using var response = await client.GetAsync(Account, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
+        using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Cancellation));
+        body.RootElement.EnumerateObject().Select(p => p.Name).ShouldBe(["email", "emailConfirmed"]);
+        body.RootElement.GetProperty("email").GetString().ShouldBe(user.Email);
+        body.RootElement.GetProperty("emailConfirmed").GetBoolean().ShouldBe(confirmed);
+    }
+
+    [Fact(DisplayName = "INV:SEC-03 " + nameof(Get_Anonymous_Returns401))]
+    [Trait("Invariant", "SEC-03")]
+    public async Task Get_Anonymous_Returns401()
+    {
+        using var client = CreateClient();
+
+        using var response = await client.GetAsync(Account, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
     [Fact]
-    public async Task Delete_AccountDeletedBefore_Returns404()
+    public async Task GetAndDelete_AccountDeletedBefore_Return404()
     {
         using (var first = CreateClient(TestUsers.EditorA))
         {
@@ -240,8 +270,10 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         // The test scheme still signs the user in; the real session ends with the security stamp.
         using var client = CreateClient(TestUsers.EditorA);
         using var again = await client.DeleteAsync(Account, Cancellation);
+        using var read = await client.GetAsync(Account, Cancellation);
 
         again.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        read.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact(DisplayName = "INV:SEC-03 " + nameof(Delete_Anonymous_Returns401AndChangesNothing))]

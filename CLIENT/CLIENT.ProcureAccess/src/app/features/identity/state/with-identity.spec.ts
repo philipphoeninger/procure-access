@@ -5,14 +5,11 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
 
 import { API_URL } from '@app/app.config';
-import { SnackbarService } from '@app/core/services/snackbar.service';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { SessionResponse } from '../models/session';
-import { IdentityApiService } from '../services/identity-api.service';
 import { withIdentity } from './with-identity';
 
 const IdentityTestStore = signalStore(withIdentity());
@@ -34,19 +31,13 @@ const amt: OrganizationSummary = { id: 'org-a', name: 'Ämter Musterhausen', typ
 const verein: OrganizationSummary = { id: 'org-v', name: 'Verein Beispiel', type: 'association', role: 'reader' };
 
 let backend: HttpTestingController;
-let router: { navigateByUrl: ReturnType<typeof vi.fn> };
-
-function setUp(apiService: Partial<IdentityApiService> = {}) {
-  router = { navigateByUrl: vi.fn().mockResolvedValue(true) };
+function setUp() {
   TestBed.configureTestingModule({
     providers: [
       IdentityTestStore,
       provideHttpClient(),
       provideHttpClientTesting(),
       { provide: API_URL, useValue: '/api' },
-      { provide: Router, useValue: router },
-      { provide: IdentityApiService, useValue: apiService },
-      { provide: SnackbarService, useValue: { showInfo: vi.fn() } },
     ],
   });
   backend = TestBed.inject(HttpTestingController);
@@ -231,25 +222,18 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
     }
   });
 
-  // #168: a failed request must not leave the loading bar on (pa-loading-bar, R-SHL-09).
-  it('stops loading when deleting the account fails', async () => {
-    const failure = new Error('request failed');
-    const store = setUp({ deleteAccount: () => Promise.reject(failure) });
+  it('forgets the session of a deleted account without a sign-out request (R-AUTH-10)', async () => {
+    const store = setUp();
+    const loading = store.loadSession();
+    await answerProbe(moderator, [amt]);
+    await loading;
 
-    await expect(store.deleteAccount()).rejects.toBe(failure);
-
-    expect(store.isLoading()).toBe(false);
-  });
-
-  it('ends the session and opens the start page after the account was deleted', async () => {
-    const store = setUp({ deleteAccount: () => Promise.resolve(null) });
-
-    const deleting = store.deleteAccount();
-    (await expectRequest(LOGOUT)).flush(null, { status: 204, statusText: 'No Content' });
-    await deleting;
+    store.forgetSession();
 
     expect(store.signedIn()).toBe(false);
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/');
+    expect(store.user()).toBeNull();
+    expect(store.organizations()).toEqual([]);
+    // backend.verify(): no request went out.
   });
 
   describe('organisations (R-SHL-02, R-SHL-03; S5-18)', () => {

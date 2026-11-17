@@ -15,6 +15,7 @@ import { completeSelectionGuard, configuratorReleaseGuard } from './features/con
 import { INVITATION_SEGMENT, MEMBERS_SEGMENT, ORGANIZATION_PATH } from './features/organization/models/organization';
 import { SAVED_LISTS_PATH } from './features/configurator/models/saved-lists';
 import { SHARED_PATH } from './features/configurator/models/share-links';
+import { ACCOUNT_PATH } from './features/identity/models/account';
 import { SETTINGS_PATH } from './features/settings/models/user-preferences';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
@@ -88,11 +89,10 @@ export const routes: Routes = [
     canActivate: [permissionGuard],
     data: { [PERMISSION_KEY]: 'moderation:review' }
   },
+  // S61 account (R-AUTH-09, R-AUTH-10): the export download and the account deletion; signed in only
   {
-    path: 'profile',
-    loadComponent: () => import('@features/identity/profile/profile').then((m) => m.Profile),
-    canActivate: [authGuard],
-    data: { [PAGE_TITLE_KEY]: 'pageTitle.account' },
+    path: ACCOUNT_PATH,
+    loadChildren: () => import('./features/identity/pages/account/account.routing').then((m) => m.ACCOUNT_ROUTES),
   },
   // S10 configurator (R-CON-01): start page and header link it; without an active catalog release
   // the guard opens the legacy /filters instead (O-S4-3). The page fills the step number of its title.

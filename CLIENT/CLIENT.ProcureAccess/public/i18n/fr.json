@@ -2,8 +2,6 @@
   "COMMON": {
     "SAVE": "Enregistrer",
     "CANCEL": "Annuler",
-    "DELETE": "Supprimer",
-    "CHANGE": "Modifier",
     "SEND": "Envoyer",
     "RESET": "Réinitialiser",
     "UPDATE": "Mettre à jour",
@@ -27,12 +25,10 @@
     "EXPAND_ALL": "Tout développer",
     "COLLAPSE_ALL": "Tout réduire",
     "SELECTED": "sélectionné",
-    "CANNOT_UNDO_WARNING": "Attention : irréversible !",
     "TYPE_IN_YOUR_NEW": "Saisissez votre nouveau",
     "LANGUAGE": "Langue",
     "PLEASE_WAIT": "Veuillez patienter...",
     "NUMBER": "N°",
-    "VALUE": "Valeur",
     "ACTIONS": "Actions",
     "TYPE": "Type",
     "WEBSITE": "Site web",
@@ -42,14 +38,6 @@
   },
   "MENU": {
     "HOME_LABEL": "Accueil"
-  },
-  "AUTH": {
-    "PROFILE": "Profil",
-    "EMAIL": "E-mail",
-    "DELETE_ACCOUNT": "Supprimer le compte",
-    "DELETE_ACCOUNT_WARNING": "Vous êtes sur le point de supprimer votre compte.",
-    "DELETE_ACCOUNT_VERIFICATION_MSG": "Pour confirmer, saisissez votre e-mail et cliquez sur \"Supprimer\".",
-    "YOUR_EMAIL": "Votre e-mail"
   },
   "CRITERIA": {
     "CRITERION_LABEL": "Critère",
@@ -90,14 +78,8 @@
   },
   "PROPOSALS": {
     "LABEL": "Propositions",
-    "OPEN_HEADER": "Ouvertes",
-    "CLOSED_HEADER": "Fermées",
-    "CREATE": "Créer",
     "STATUS": "Statut",
-    "PENDING": "en attente",
-    "NON_OPEN": "Aucune ouverte",
     "NON_OPEN_FOUND": "Aucune trouvée",
-    "NON_CLOSED": "Aucune fermée",
     "NOT_ALL_FIELDS_MSG": "Tous les champs ne sont pas requis. Plus vous fournirez d'informations, plus il sera facile pour notre équipe administrative de tout revérifier.",
     "PROPOSER": "Proposant",
     "APPROVER": "Approbateur",
