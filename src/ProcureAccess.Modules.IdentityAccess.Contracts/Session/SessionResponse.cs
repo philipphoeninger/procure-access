@@ -21,10 +21,16 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Session;
 /// The absolute limit: sign-in time plus <c>Session:AbsoluteTimeout</c>. Left out like
 /// <paramref name="ExpiresAt"/>.
 /// </param>
+/// <param name="WarningLeadSeconds">
+/// How many seconds before the earlier of the two limits the shell warns (🔧
+/// <c>Session:WarningLead</c>, SPEC R-AUTH-06), so the client keeps no copy of the value. Left
+/// out without a session.
+/// </param>
 public sealed record SessionResponse(
     SessionUser? User,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] DateTimeOffset? ExpiresAt,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] DateTimeOffset? AbsoluteExpiresAt)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] DateTimeOffset? AbsoluteExpiresAt,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? WarningLeadSeconds = null)
 {
     /// <summary>The answer for a request without a session.</summary>
     public static readonly SessionResponse Anonymous = new(null, null, null);

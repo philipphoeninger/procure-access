@@ -148,7 +148,7 @@ public static class IdentityAccessModule
     /// <summary>
     /// Maps the module's endpoints as minimal APIs below <c>/auth</c> of <paramref name="routes"/>,
     /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
-    /// before the Swagger set-up (#176). The session probe, and the user's settings at
+    /// before the Swagger set-up (#176). The session probe, its extension (S5-29), and the user's settings at
     /// <c>/account/preferences</c> (S5-25a); sign-in and sign-out live in the host until the users
     /// move into this module (M3.1).
     /// </summary>
@@ -157,6 +157,7 @@ public static class IdentityAccessModule
         ArgumentNullException.ThrowIfNull(routes);
         var auth = routes.MapGroup("/auth").WithTags("Auth");
         SessionProbeEndpoint.Map(auth);
+        SessionExtendEndpoint.Map(auth);
         UserPreferencesEndpoints.Map(routes);
         return routes;
     }
