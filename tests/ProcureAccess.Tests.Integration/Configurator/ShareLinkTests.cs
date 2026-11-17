@@ -345,6 +345,30 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
         (await db.ShareLinks.SingleAsync(Cancellation)).RevokedAt.ShouldBe(revokedAt);
     }
 
+    [Fact]
+    public async Task DeleteList_WithLinks_DeletesItsLinksAndKeepsThoseOfOtherLists()
+    {
+        // S5-28a: the links of a deleted list go with it; before, the rows stayed and opened nothing.
+        var other = CriteriaConfiguration.Create(
+            Fixture.A.Id, "Zweite Liste", TestUsers.EditorA.Id, Clock.GetUtcNow(), MiniCatalog.T1Version, "hr",
+            ["web"], ["base"], ["softwareTest"], [new ConfigurationCriterionDraft(1, PriorityLevel.A)]);
+        await StoreAsync(other);
+        var ofList = await CreateAsync(TestUsers.EditorA, InDays(10));
+        var revoked = await CreateAsync(TestUsers.EditorA, InDays(20));
+        var ofOther = await CreateAsync(TestUsers.EditorA, InDays(10), other.Id);
+        using var client = CreateClient(TestUsers.EditorA);
+        (await client.DeleteAsync($"/api/v1/share-links/{revoked.Id}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        using var response = await client.DeleteAsync($"/api/v1/configurations/{List.Id}", Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await using var db = Platform(Fixture.A.Id);
+        (await db.ShareLinks.Select(l => l.Id).ToListAsync(Cancellation)).ShouldBe([ofOther.Id]);
+        using var anonymous = Api.Factory.CreateDefaultClient(BaseAddress);
+        (await anonymous.GetAsync($"{SharedPath}/{ofList.Token}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await anonymous.GetAsync($"{SharedPath}/{ofOther.Token}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
     [Theory(DisplayName = "INV:SEC-10 " + nameof(CreateAndRevoke_UnconfirmedAddress_Return403EmailUnconfirmed))]
     [Trait("Invariant", "SEC-10")]
     [InlineData("create")]

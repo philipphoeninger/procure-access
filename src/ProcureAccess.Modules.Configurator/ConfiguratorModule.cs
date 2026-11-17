@@ -68,6 +68,7 @@ public static class ConfiguratorModule
         services.AddScoped<IModuleDatabaseMigrator, ConfiguratorDatabaseMigrator>();
         services.AddScoped<IConfigurationReader, ConfigurationReader>();
         services.AddScoped<ICriteriaListDataExport, CriteriaListDataExportService>();
+        services.AddScoped<ICriteriaListDeletion, CriteriaListDeletionService>();
 
         // Read once here, so an impossible 🔧 weight range stops the start (SPEC SD23).
         services.AddSingleton(PriorityWeightRange.From(configuration));

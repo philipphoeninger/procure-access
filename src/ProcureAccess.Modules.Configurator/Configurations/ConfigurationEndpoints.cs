@@ -14,6 +14,7 @@ using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
+using ProcureAccess.Modules.Platform.Contracts.Sharing;
 
 namespace ProcureAccess.Modules.Configurator.Configurations;
 
@@ -284,6 +285,7 @@ internal static class ConfigurationEndpoints
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ConfigurationService configurations,
+        IShareLinks links,
         CancellationToken cancellationToken)
     {
         if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
@@ -291,9 +293,14 @@ internal static class ConfigurationEndpoints
             return refused;
         }
 
-        return await configurations.DeleteAsync(id, cancellationToken)
-            ? TypedResults.NoContent()
-            : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+        if (!await configurations.DeleteAsync(id, cancellationToken))
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+        }
+
+        // After the list, in Platform's own context: links that outlive a failure here open nothing.
+        await links.DeleteOfResourceAsync(ShareableResourceType.Configuration, id, cancellationToken);
+        return TypedResults.NoContent();
     }
 
     private static async Task<IResult> CopyAsync(

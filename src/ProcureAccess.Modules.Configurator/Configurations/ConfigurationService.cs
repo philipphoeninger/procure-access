@@ -274,8 +274,8 @@ internal sealed class ConfigurationService(
 
     /// <summary>
     /// Deletes the list with its rows (R-SAV-06); <c>false</c> when it does not exist for the
-    /// request. Project copies are separate lists (D1) and stay. Its share links stay in Platform's
-    /// table and answer 404, because the read finds no list (owner decision S5-23 8).
+    /// request. Project copies are separate lists (D1) and stay. The endpoint deletes its share
+    /// links in Platform afterwards (S5-28a); until then they answer 404, because the read finds no list.
     /// </summary>
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {

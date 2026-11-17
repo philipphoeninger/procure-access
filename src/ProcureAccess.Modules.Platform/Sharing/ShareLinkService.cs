@@ -89,6 +89,22 @@ internal sealed class ShareLinkService(
         return true;
     }
 
+    public async Task DeleteOfResourceAsync(
+        ShareableResourceType resourceType, Guid resourceId, CancellationToken cancellationToken) =>
+        await db.ShareLinks
+                .Where(l => l.ResourceType == resourceType && l.ResourceId == resourceId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+    public async Task DeleteOfOrganizationsAsync(IReadOnlyCollection<Guid> organizationIds, CancellationToken cancellationToken)
+    {
+        if (organizationIds.Count == 0)
+        {
+            return;
+        }
+
+        await db.ShareLinks.Where(l => organizationIds.Contains(l.OrganizationId)).ExecuteDeleteAsync(cancellationToken);
+    }
+
     /// <summary>
     /// The redacted resource behind <paramref name="token"/> for someone without an account
     /// (R-SAV-05, TEN-09), or <c>null</c> — one answer for a malformed, unknown, revoked or expired
