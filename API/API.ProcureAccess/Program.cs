@@ -57,6 +57,10 @@ builder.Services.AddPlatformModule(builder.Configuration)
                 .AddWorkspaceModule()
                 .AddModerationModule();
 
+// The movable clock of the E2E stack, only in Development and E2E when the stack switches it on
+// (S5-30; TESTING §3.3); after the modules, so it replaces Platform's TimeProvider
+builder.Services.AddTestClockIfAllowed(builder.Configuration, builder.Environment);
+
 // Legacy logging wrapper of the legacy controllers; Serilog itself is set up by the Platform module
 builder.Services.RegisterLoggingInterfaces();
 
@@ -103,6 +107,9 @@ try
     // E2E users with known test credentials, only in Development and E2E, when the E2E stack sets
     // their password (S5-14)
     await app.SeedTestUsersIfAllowedAsync();
+
+    // The E2E stack's clock offset of the request (S5-30), before anything reads the time
+    app.UseTestClockIfRegistered();
 
     // First in the pipeline: errors of every later middleware become Problem Details (S2-10)
     app.UsePlatformMiddleware();

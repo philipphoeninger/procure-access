@@ -58,6 +58,15 @@ export const ProcureAccessStore = signalStore(
              */
             forgetUser(): void {
                 state.forgetSession();
+                this.clearUserData();
+            },
+
+            /**
+             * Clears the in-memory data of the user that a sign-out clears, but keeps the session:
+             * another account signed in through the login overlay must not see or send the
+             * previous user's draft, list or legacy data (owner decision S5-30 D3 (b)).
+             */
+            clearUserData(): void {
                 state.resetConfigurator();
                 state.setProposals([]);
                 patchState(state, { productSaves: [], filterSets: [] });

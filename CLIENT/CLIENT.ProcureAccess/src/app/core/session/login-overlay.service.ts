@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 
@@ -15,19 +15,27 @@ import { firstValueFrom } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class LoginOverlayService {
   private readonly dialog = inject(MatDialog);
+  private readonly injector = inject(Injector);
   private pending: Promise<boolean> | null = null;
 
-  /** Resolves true once the user signed in, false when the overlay was closed instead. */
-  requestSignIn(): Promise<boolean> {
-    this.pending ??= this.open().finally(() => {
+  /**
+   * Resolves true once the user of the ended session signed in again, false when the overlay was
+   * closed instead or another account signed in (owner decision S5-30 D3 (b)). The session warning
+   * passes the previous user, whose session its probe already cleared; after a 401 the overlay
+   * reads it from the store. A request while the overlay is open shares it.
+   */
+  requestSignIn(previousUserId?: string | null): Promise<boolean> {
+    this.pending ??= this.open(previousUserId).finally(() => {
       this.pending = null;
     });
     return this.pending;
   }
 
-  private async open(): Promise<boolean> {
+  private async open(previousUserId: string | null | undefined): Promise<boolean> {
     const { LoginOverlay } = await import('@features/identity/dialogs/login-overlay/login-overlay');
-    const result = await firstValueFrom(LoginOverlay.open(this.dialog).afterClosed());
+    const data = previousUserId === undefined ? {} : { previousUserId };
+    const ref = await LoginOverlay.open(this.dialog, this.injector, data);
+    const result = await firstValueFrom(ref.afterClosed());
     return result === true;
   }
 }

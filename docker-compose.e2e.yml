@@ -16,6 +16,8 @@
 #   (S4-08, #241; catalog part of the seeder of TESTING §6.3, Development/E2E only);
 # - the E2E users with known test credentials, seeded at startup (S5-14; user part of the seeder,
 #   Development/E2E only, switched on by TestUsers__Password below);
+# - the movable clock of the session journey J5 (S5-30; TESTING §3.3): only a request with the
+#   cookie pa-test-clock sees the API's time moved, so the other tests keep the real time;
 # - client healthcheck on nginx and on the API's /health/ready, so --wait returns only when the
 #   client answers and the API reaches its database;
 # - relaxed rate limits of the anonymous export and of CriteriaListShown (SPEC §7.3, S4-21a): every
@@ -69,6 +71,9 @@ services:
       # Development/E2E only, when this password is set (S5-14). Test data, not a secret: the same
       # value is in e2e/support/users.ts (owner decision S5-14 3 (a))
       TestUsers__Password: e2e-Testkonto-Passwort
+      # The movable clock of the session journey J5 (S5-30): a request with the cookie pa-test-clock
+      # sees the API's time moved by that many seconds; Development/E2E only
+      TestClock__Enabled: "true"
       # Relaxed rate limits (S4-21a): all tests share one client address
       RateLimits__AnonymousExport__PermitLimit: "10000"
       RateLimits__CriteriaListShown__PermitLimit: "10000"

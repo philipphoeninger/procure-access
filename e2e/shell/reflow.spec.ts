@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { expect, test, type Page } from '@playwright/test';
+import { SessionClock } from '../support/clock';
 import { chooseFirstOption } from '../support/combobox';
 import { expireSessionOnce, signInThroughApi } from '../support/session';
 import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from '../support/users';
@@ -20,7 +21,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * switch since S5-18, the save dialog S12 with its error summary, the saved lists S14 and a saved list
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
- * S5-28b. The legacy screens are
+ * S5-28b; the session warning since S5-30. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -429,6 +430,19 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.goto('/einstellungen');
     await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
     await expect(page.getByRole('radio', { name: 'Deutsch' })).toBeChecked();
+    await expectReflow(page);
+  });
+
+  test('the session warning needs no horizontal scrolling', async ({ page }) => {
+    // Only signed in: the session's clock of this browser context moves, the seeded user stays unchanged
+    const clock = await SessionClock.install(page);
+    await signInThroughApi(page, CONFIRMED_USER, TEST_USER_PASSWORD);
+    await page.goto('/einstellungen');
+    await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
+
+    await clock.move(25);
+    const warning = page.getByRole('alertdialog', { name: 'Ihre Sitzung endet bald' });
+    await expect(warning.getByRole('button', { name: 'Angemeldet bleiben' })).toBeFocused();
     await expectReflow(page);
   });
 

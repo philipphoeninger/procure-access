@@ -70,6 +70,10 @@ export function createShellDoubles(signedIn = false, organizations: Organization
     ),
     switchOrganization: vi.fn((id: string) => activeOrganizationId.set(id)),
     endSession: vi.fn().mockResolvedValue(undefined),
+    // No limits: the session warning (S5-30), which App starts, plans nothing.
+    sessionExpiresAt: signal<string | null>(null),
+    sessionAbsoluteExpiresAt: signal<string | null>(null),
+    sessionWarningLeadSeconds: signal<number | null>(null),
   };
   const authService = { showLogin: vi.fn().mockResolvedValue(true) };
   const providers: Provider[] = [

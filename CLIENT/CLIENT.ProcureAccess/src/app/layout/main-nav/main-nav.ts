@@ -10,9 +10,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
-import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@features/identity/services/auth.service';
+import { SignOutService } from '@features/identity/services/sign-out.service';
 import { CONFIGURATOR_PATH, LEGACY_FILTER_PATH } from '@app/features/configurator/guards/configurator-guards';
 import { SAVED_LISTS_PATH } from '@app/features/configurator/models/saved-lists';
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from '@app/features/organization/models/organization';
@@ -53,7 +53,7 @@ export class MainNav {
   private readonly store = inject(ProcureAccessStore);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly pageTitle = inject(PageTitleStrategy);
+  private readonly signOutService = inject(SignOutService);
 
   private readonly navigationEnd = toSignal(
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)),
@@ -131,10 +131,7 @@ export class MainNav {
    */
   protected async logout(): Promise<void> {
     this.navigated.emit();
-    // The session is forgotten here also when the request fails; the error interceptor shows that.
-    await this.store.endSession().catch(() => undefined);
-    await this.router.navigateByUrl('/');
-    this.pageTitle.focusPageHeading();
+    await this.signOutService.signOut();
   }
 
   /** The path of the primary outlet, without query, fragment and the `login` outlet. */

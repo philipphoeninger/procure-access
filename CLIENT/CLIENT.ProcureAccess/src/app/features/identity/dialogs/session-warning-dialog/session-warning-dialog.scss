@@ -1,0 +1,25 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// Session warning (Handoff §5.3): the size of the dialog is set by the panel class `pa-dialog` in
+// styles/main.scss.
+.pa-session-warning__text {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+}
+
+// DOM order = visual order (Handoff §2.2): below 600 px stacked with the focused action last, as
+// the other dialogs.
+.pa-session-warning__actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--pa-space-xs);
+
+  @media (min-width: 37.5em) {
+    flex-flow: row wrap;
+    justify-content: flex-end;
+  }
+}

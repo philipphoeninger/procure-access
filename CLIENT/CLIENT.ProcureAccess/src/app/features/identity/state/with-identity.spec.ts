@@ -264,6 +264,50 @@ describe('withIdentity (session from GET /auth/session, ARCHITECTURE §8.3)', ()
     // backend.verify(): no request went out.
   });
 
+  describe('refreshSession() (the session warning, R-AUTH-06; S5-30)', () => {
+    async function signedIn() {
+      const store = setUp();
+      const loading = store.loadSession();
+      await answerProbe(moderator, [amt]);
+      await loading;
+      return store;
+    }
+
+    it('takes the limits of a session that is still there and answers signedIn', async () => {
+      const store = await signedIn();
+
+      const checking = store.refreshSession();
+      (await expectRequest(PROBE)).flush({ ...moderator, expiresAt: '2026-11-13T10:45:00+00:00' });
+
+      expect(await checking).toBe('signedIn');
+      expect(store.sessionExpiresAt()).toBe('2026-11-13T10:45:00+00:00');
+      expect(store.organizations()).toEqual([amt]);
+      // backend.verify(): the same user reads neither the legacy user nor the organisations again.
+    });
+
+    it('forgets a session the server ended and answers signedOut', async () => {
+      const store = await signedIn();
+
+      const checking = store.refreshSession();
+      (await expectRequest(PROBE)).flush(anonymous);
+
+      expect(await checking).toBe('signedOut');
+      expect(store.signedIn()).toBe(false);
+      expect(store.sessionExpiresAt()).toBeNull();
+    });
+
+    it('keeps the session when the probe fails and answers unknown (offline is not signed out)', async () => {
+      const store = await signedIn();
+
+      const checking = store.refreshSession();
+      (await expectRequest(PROBE)).error(new ProgressEvent('error'), { status: 0 });
+
+      expect(await checking).toBe('unknown');
+      expect(store.signedIn()).toBe(true);
+      expect(store.sessionExpiresAt()).toBe(moderator.expiresAt);
+    });
+  });
+
   describe('organisations (R-SHL-02, R-SHL-03; S5-18)', () => {
     async function signedInWith(organizations: OrganizationSummary[]) {
       const store = setUp();
