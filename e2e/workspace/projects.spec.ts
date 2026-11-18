@@ -103,6 +103,36 @@ test.describe('Procurement projects S30, S31', () => {
     await expectNoAxeViolations(page, testInfo, 's30-list');
   });
 
+  // Axe on S31 with the list choice in a test of its own (TESTING V341): in Firefox, axe on the dialog
+  // with its select crashes the page process when the select or its options were found by name before
+  // (as V129) or when the dialog closes after it. So this test finds them by role or CSS and ends with
+  // axe; the journey below checks S31 without axe. The names are checked by the unit test.
+  test('INV:A11Y-01 INV:A11Y-08 S31 offers „Keine Liste“ and the saved lists of the organisation', async ({ page, request }, testInfo) => {
+    await page.setViewportSize(WIDE);
+    const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
+    const address = `project-choice-${suffix}@example.test`;
+    await registerConfirmedAccount(request, address, PASSWORD);
+    await signInThroughApi(page, address, PASSWORD);
+    const organizationId = await createOrganizationThroughApi(page, `Amt ${suffix}`);
+    await saveListThroughApi(page.request, organizationId, 'HR-Software 2027');
+    await page.goto('/projekte');
+
+    await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
+    const dialog = page.locator('mat-dialog-container');
+    await expect(dialog.locator('input')).toBeFocused();
+    await expect(dialog).toContainText('Kriterienliste (optional)');
+    await expect(dialog).toContainText('Das Projekt erhält eine eigene Kopie der Liste');
+    const choice = dialog.locator('mat-select');
+    await expect(choice).toContainText('Keine Liste');
+    await choice.click();
+    await expect(page.locator('mat-option')).toHaveText(['Keine Liste', 'HR-Software 2027']);
+    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
+    await expect(page.locator('mat-option')).toHaveCount(0);
+    await expect(choice).toContainText('HR-Software 2027');
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's31-list-choice');
+  });
+
   test('INV:WSP-03 INV:A11Y-01 INV:A11Y-08 a project created with a list adjusts its own copy in S11; S32 reports the criteria taken in', async ({ page, request }, testInfo) => {
     await page.setViewportSize(WIDE);
     const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
@@ -116,28 +146,18 @@ test.describe('Procurement projects S30, S31', () => {
     await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
-    // Firefox crashes its page process when Playwright computes an accessible name after an axe run
-    // (TESTING V129, V165; here the dialog, labelled by MatDialog through aria-labelledby): every S31
-    // step comes before its axe run, the submit after it goes by CSS. The select is the dialog's only
-    // combobox; its name is checked by the unit test.
+    // S31's axe run is a test of its own (below): with the select in the dialog, axe followed by the
+    // dialog closing crashes Firefox's page process (TESTING V341)
     const project = `Mit Liste ${suffix}`;
     await dialog.getByRole('textbox', { name: 'Name des Projekts' }).fill(project);
-    const choice = dialog.getByRole('combobox');
-    await expect(choice).toHaveCount(1);
+    const choice = dialog.getByRole('combobox', { name: 'Kriterienliste (optional)' });
     await expect(choice).toContainText('Keine Liste');
     await choice.click();
-    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
-    await expect(page.locator('mat-option')).toHaveCount(0);
-    await expect(choice).toContainText('HR-Software 2027');
-    await expect(dialog).toContainText('Kriterienliste (optional)');
-    await expect(dialog).toContainText('Das Projekt erhält eine eigene Kopie der Liste');
-    await settled(dialog);
-    await expectNoAxeViolations(page, testInfo, 's31-list-choice');
-
+    await page.getByRole('option', { name: 'HR-Software 2027' }).click();
     const assigned = page.waitForResponse(
       (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname.endsWith('/criteria-configuration'),
     );
-    await page.locator('mat-dialog-container button[type="submit"]').click();
+    await dialog.getByRole('button', { name: 'Projekt anlegen' }).click();
     const assignment = await assigned;
     expect(assignment.status()).toBe(200);
     const copyId = ((await assignment.json()) as { id: string }).id;
