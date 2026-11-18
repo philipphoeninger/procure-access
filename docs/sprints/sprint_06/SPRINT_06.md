@@ -1,6 +1,6 @@
 # Sprint 06 — Workspace: projects, candidates and assessment (M5)
 
-> **Status:** plan (2026-11-17) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
+> **Status:** plan (2026-11-17; owner decisions O-S6-1 – O-S6-6 filled in 2026-11-18) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
 > **Based on:** `ROADMAP_v6.md` (M5, G-P), `TECH_DEBT_v5.md` (§3, §5, §6, §8, §9.1, §9.2, §9.4), the highest versions of TESTING (§4.1, §4.5, §4.6, §4.9, §4.10, §6, §9 step 5), ARCHITECTURE (§4.3, §5.4, §7.1, §7.2, §8.1, §9.1, §9.2, §12 step 5, ADR-014 – ADR-016), SPEC (R-PRJ-*, R-CAN-02 – R-CAN-11, R-SHL-07, §7.3, §8.4), the Design handoff (§5.1 workspace screens, §5.3 screens without a frame), the Figma mapping (§2: S32, S34, S34a, S34b, S37), `CODEBASE_v1.md`, the sprint-05 close-out and protocols in `docs/sprints/sprint_05/`, the open GitHub issues and pull requests as of 2026-11-17.
 > **Language:** English. **Dates:** none by design — the sprint is described in working days (D1 … D8) and halves, not calendar dates.
 > **Task prompts:** `TASK_PROMPTS.md` in this folder (one ready-to-paste prompt per task).
@@ -130,7 +130,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
-| S6-26 | Rate limits per **O-S6-2**: sign-in per IP and per address (like the reset), organisation creation per user (#318, TD-60); 429 with Problem Details and the UX key; relaxed in E2E like the export limit (TESTING §12.5) | 1 | #318 closed; limits tested on the fake clock |
+| S6-26 | Rate limits per **O-S6-2**: sign-in per IP and per address, organisation creation per user (#318, TD-60); 429 with Problem Details and the UX key; relaxed in E2E like the export limit (TESTING §12.5) | 1 | #318 closed; limits tested on the fake clock |
 | S6-27 | Reload flows per **O-S6-5**: one guarded reload when a lazy route chunk fails after a deployment (#296); the S13 reload after `release-mismatch` (TD-39, #310) | 1 | #296 and #310 closed; unit tests for the guard (no reload loop) |
 | S6-28 | Legal pages from Markdown (GP.3, R-SHL-07) per **O-S6-6**: Impressum, Datenschutzerklärung and Erklärung zur Barrierefreiheit rendered from Markdown files under the footer links; the production build fails while a placeholder is left (`check-release-config.mjs`, TD-29 legal-page part); development shows the placeholder | 2 | R-SHL-07 met with placeholder content; the production build fails on a placeholder (CI test); the pages in `reflow.spec.ts` |
 
@@ -189,18 +189,18 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 
 ### Owner decisions for this sprint
 
-| # | Decision | Needed by | Claude's proposal |
-|---|---|---|---|
-| O-S6-1 | TD-72: move the users into IdentityAccess at the start of M5 (S6-10)? Data: (a) the migration moves the tables with their rows; (b) a pre-pilot reset (users register again) | S6-10, D1 | Yes, at the start; (a), so staging accounts survive |
-| O-S6-2 | Rate limits (#318, TD-60): sign-in per IP and per address, organisation creation per user — values | S6-26 | Sign-in like the reset (per IP and per address, the reset's window); 5 organisations per day per user; both 🔧 |
-| O-S6-3 | SMTP timeout (TD-58) | S6-05 | 15 s per operation 🔧 |
-| O-S6-4 | Legacy proposals (TD-61, #384): (a) retire them and drop their tables with M5.6 (pre-pilot data, nothing to export); (b) keep the data and cover it in export and deletion | S6-23 | (a) |
-| O-S6-5 | Reload flows: (a) one automatic reload per failed chunk, guarded against loops, then the error page (#296); the S13 reload after `release-mismatch` as described in #310 (TD-39) | S6-27 | (a) and #310 as written |
-| O-S6-6 | Legal pages: (a) three Markdown files in the client with a placeholder marker that fails the production build; (b) served by the API | S6-28 | (a); the content follows from WERTE.IT before G-P |
-| O-S6-7 | Close milestone **M3** after #368, #375 and #380; move #318 → G-P, #170 → M6, #82 and #355 → M5 (TECH_DEBT_v5 §6, §7) | sprint review | Yes |
-| O-S6-8 | Add "release 2026.1 active" to the G-P gate criteria (ROADMAP_v6 G-P) | G-P planning (sprint 07) | Yes — otherwise a partner works with the legacy filter, and project copies only come from the test release |
-| — | Staging deployment (TD-28, #236), disk space (TD-74), TD-69 high contrast, TD-79 UX copy confirmations, TD-80 Figma frames for M3/M4, TD-47 export date, TD-77 Prettier, #377, TD-82 budget (TECH_DEBT_v5 §6) | before G-P; TD-74 now | see TECH_DEBT_v5 §6 |
-| — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-R | — |
+| # | Decision | Needed by | Claude's proposal | Owner decision (2026-11-18) |
+|---|---|---|---|---|
+| O-S6-1 | TD-72: move the users into IdentityAccess at the start of M5 (S6-10)? Data: (a) the migration moves the tables with their rows; (b) a pre-pilot reset (users register again) | S6-10, D1 | Yes, at the start; (a), so staging accounts survive | Yes, at the start; (a) |
+| O-S6-2 | Rate limits (#318, TD-60): sign-in per IP and per address, organisation creation per user — values | S6-26 | Sign-in like the reset (per IP and per address, the reset's window); 5 organisations per day per user; both 🔧 | Sign-in 30 per 10 minutes per IP and 10 per hour per address (not like the reset: an office behind one shared IP would be locked out after five sign-ins); 5 organisations per day per user; all 🔧, in SPEC §7.3 |
+| O-S6-3 | SMTP timeout (TD-58) | S6-05 | 15 s per operation 🔧 | 15 s per operation 🔧 |
+| O-S6-4 | Legacy proposals (TD-61, #384): (a) retire them and drop their tables with M5.6 (pre-pilot data, nothing to export); (b) keep the data and cover it in export and deletion | S6-23 | (a) | (a) |
+| O-S6-5 | Reload flows: (a) one automatic reload per failed chunk, guarded against loops, then the error page (#296); the S13 reload after `release-mismatch` as described in #310 (TD-39) | S6-27 | (a) and #310 as written | (a) for #296, the S10 draft may be lost on the reload (no warning); #310 follows the confirmed UX copy (selection kept, per-criterion changes dropped), not #310's proposal; new button `criteria.export.outdated.reload` „Kriterien neu laden“ (owner-confirmed wording) |
+| O-S6-6 | Legal pages: (a) three Markdown files in the client with a placeholder marker that fails the production build; (b) served by the API | S6-28 | (a); the content follows from WERTE.IT before G-P | (a), the files at `CLIENT/CLIENT.ProcureAccess/content/legal/*.de.md` (the client image cannot reach a root `content/legal/`); rendered with the existing `ngx-markdown` |
+| O-S6-7 | Close milestone **M3** after #368, #375 and #380; move #318 → G-P, #170 → M6, #82 and #355 → M5 (TECH_DEBT_v5 §6, §7) | sprint review | Yes | open |
+| O-S6-8 | Add "release 2026.1 active" to the G-P gate criteria (ROADMAP_v6 G-P) | G-P planning (sprint 07) | Yes — otherwise a partner works with the legacy filter, and project copies only come from the test release | open |
+| — | Staging deployment (TD-28, #236), disk space (TD-74), TD-69 high contrast, TD-79 UX copy confirmations, TD-80 Figma frames for M3/M4, TD-47 export date, TD-77 Prettier, #377, TD-82 budget (TECH_DEBT_v5 §6) | before G-P; TD-74 now | see TECH_DEBT_v5 §6 | – |
+| — | Priorities, rationales, titles of 2026.1 (O-1, K-1, K-6) and the criteria-suggestion channel (O-6) — project team | M2.3; O-6 before G-R | — | – |
 
 ---
 

@@ -1,6 +1,6 @@
 # Sprint 06 — task prompts for Claude Code
 
-> **Status:** v1.1 (2026-11-17; v1.1 adds the section "Running order (waves)" with the extra prompts for parallel work). Companion to `SPRINT_06.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_05/TASK_PROMPTS.md` (repeated, updated, at the end of this file). Claude Code implements; the owner's control chat for sprint 06 takes the decisions and reviews the reports. The model per task is the owner's choice and is not part of the prompts.
+> **Status:** v1.2 (2026-11-18; v1.2 fills in the owner decisions O-S6-1 – O-S6-6; v1.1 added the section "Running order (waves)" with the extra prompts for parallel work). Companion to `SPRINT_06.md`: one ready-to-paste prompt per task, built from the generic template at the end of `docs/sprints/sprint_05/TASK_PROMPTS.md` (repeated, updated, at the end of this file). Claude Code implements; the owner's control chat for sprint 06 takes the decisions and reviews the reports. The model per task is the owner's choice and is not part of the prompts.
 > **How to use:** copy the block of the task into a new Claude Code session (or a worktree session for parallel work). Replace only the placeholders in `<…>` after "Owner decisions for this task" (decisions not yet taken, see "Open placeholders"). `<invariant ID>`, `<NN>`, `<n>`, `<Name>` or `<date>` elsewhere in a prompt are naming patterns for Claude Code, not placeholders for you. Everything else is filled in from `SPRINT_06.md`, `TECH_DEBT_v5.md` and the GitHub issues and pull requests as of 2026-11-17.
 > **Changes to the template since sprint 05:** reads `TECH_DEBT_v5.md`; "Read first" adds the `CODEBASE` §2 sections of the touched areas (the code state moved out of `CLAUDE.md`, #346); step 5 updates `CODEBASE` §2/§3 and touches `CLAUDE.md` only for rules that apply across the codebase. Decision IDs `O-S6-n` are this sprint's; the SPEC open question O-S5 (dark mode) keeps its name.
 
@@ -47,12 +47,12 @@ Prompts are listed in task-ID order; the working order and the parallel lines ar
 
 | Placeholder | Where | Fill in after |
 |---|---|---|
-| O-S6-1 (users into IdentityAccess, data) | S6-10 | owner choice (D1) |
-| O-S6-2 (rate-limit values) | S6-26 | owner choice |
-| O-S6-3 (SMTP timeout) | S6-05 | owner choice |
-| O-S6-4 (legacy proposals) | S6-23 | owner choice (before S6-23) |
-| O-S6-5 (reload flows) | S6-27 | owner choice |
-| O-S6-6 (legal pages) | S6-28 | owner choice |
+| O-S6-1 (users into IdentityAccess, data) | S6-10 | decided 2026-11-18 |
+| O-S6-2 (rate-limit values) | S6-26 | decided 2026-11-18 |
+| O-S6-3 (SMTP timeout) | S6-05 | decided 2026-11-18 |
+| O-S6-4 (legacy proposals) | S6-23 | decided 2026-11-18 |
+| O-S6-5 (reload flows) | S6-27 | decided 2026-11-18 |
+| O-S6-6 (legal pages) | S6-28 | decided 2026-11-18 |
 
 O-S6-7 (milestone hygiene) and O-S6-8 (2026.1 as a G-P criterion) need no prompt.
 
@@ -114,7 +114,7 @@ The model in this prompt is the owner's choice and may be changed.
 
 ### Prompt 3 — subagent batch of wave 2 (window C)
 
-Prompt 2 with the first line changed to `Run the tasks S6-27 and S6-28 … model Opus 5.5.` Fill in O-S6-5 and O-S6-6 in both prompt blocks first.
+Prompt 2 with the first line changed to `Run the tasks S6-27 and S6-28 … model Opus 5.5.` O-S6-5 and O-S6-6 are filled in (2026-11-18).
 
 ### Prompt 4 — continue after a split (e.g. S6-10a merged)
 
@@ -235,7 +235,7 @@ Depends on: S6-10 merged; O-S6-3
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-05 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 382, gh issue view 383, gh issue view 381) and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: TECH_DEBT_v5 §3.2 (TD-57, TD-58, TD-59); the e-mail sender of S5-11 and the account tokens of S5-12a/S5-13a (CODEBASE §2); docs/sprints/sprint_05/S5-11_email_sender.md (P3), S5-12a_registration_server.md (P4), S5-23_share_links_api.md (P1); the client nginx.conf
 
-Owner decisions for this task: O-S6-3: <SMTP timeout value — decision and date>
+Owner decisions for this task: O-S6-3 (decided by the owner 2026-11-18): 🔧 `Email:Smtp:Timeout` = 15 s per SMTP operation, validated at startup and applied to the MailKit client.
 Additional instructions: Three commits. TD-58: a configurable 🔧 timeout per SMTP operation (connect, auth, send) with the decided value; a test with a stalled fake server. TD-59: a hosted cleanup that deletes expired and used account tokens on a schedule, driven by TimeProvider and tested with FakeTimeProvider; say whether it needs an index (then it adds an IdentityAccess migration). TD-57: the client nginx must not write the request line with a share token to error_log (access_log is already handled); show the log of a 404 share request before and after.
 
 Way of working:
@@ -355,7 +355,7 @@ Depends on: S6-01 merged; O-S6-1
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-10 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 387) and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: TECH_DEBT_v5 §3.3 (TD-72, TD-75) and §5 (the users row); ARCHITECTURE ADR-014 (rule 4), §4.3, §5.2; CODEBASE §2 (search S5-07, S5-12a, S5-15, S5-16b, S5-27, S5-28a, S4-25) and §3; docs/sprints/sprint_05/S5-15_organisations_tenancy.md (P5), S5-28a_account_deletion_server.md (R5), S5-14_e2e_users_account_journey.md
 
-Owner decisions for this task: O-S6-1: <(a) migration keeps the rows or (b) pre-pilot reset — decision and date>
+Owner decisions for this task: O-S6-1 (decided by the owner 2026-11-18): yes, at the start of M5; (a) the migration moves the Identity tables with their rows, so existing accounts (staging, local) sign in unchanged. No pre-pilot reset.
 Additional instructions: This is the first task of the M5 server line and blocks it. Plan the split (a: Identity tables into the IdentityAccess context with the decided data handling and the four foreign keys; b: host endpoints API/Account, API/Auth, API/Organizations and GET /api/me into module endpoints, UserService.GetCurrentUserAsync, the roles command, the E2E seeder, TD-75). Show how the migrations of both contexts stay in order on a fresh database and on an existing one (staging has accounts), and how OPS-03 checks it. Routes and answers of the moved endpoints stay the same unless a SPEC route says otherwise; no client change unless a route changes. Workspace (S6-11) will refer to users only by id through IdentityAccess.Contracts — provide what it needs for display names (API-03 names the competing editor).
 
 Way of working:
@@ -667,7 +667,7 @@ Depends on: S6-10 merged (legacy context migration); O-S6-4
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-23 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 384, gh issue view 158, gh issue view 82) and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: ARCHITECTURE §8.1, §12 step 5; TECH_DEBT_v5 §3.2 (TD-61) and §5 (ProposalService, DateTime.UtcNow, API-02 test, LiveAnnouncer, withProposal()); TESTING API-02, ARC-05; CODEBASE §2 (search S4-25 for moderation:review)
 
-Owner decisions for this task: O-S6-4: <(a) retire and drop the data or (b) keep and cover it — decision and date>
+Owner decisions for this task: O-S6-4 (decided by the owner 2026-11-18): (a) retire the proposals and drop their tables with M5.6 (pre-pilot data, nothing to export); no export or deletion code for proposals. TD-61 and #384 close by deletion.
 Additional instructions: First commit: move the tagged API-02 test from the legacy proposal form to a rebuilt form. Then remove ProposalService, ProposalsController, withProposal(), the proposal pages, routes, forms and the proposal-list LiveAnnouncer, and (with decision (a)) the proposal tables in a legacy-context migration; PlatformAdmin loses moderation:review; Proposal.ApproverId goes with the table. Repoint withProducts() / withFavorites() per ARCHITECTURE §8.1. ARC-05: BaseCrudController only for catalog-admin controllers. The „Kriterium vorschlagen“ link (R-SUG-01) is not part of the proposal workflow and stays. Check which parts of #82 disappear with the removed screens and comment the rest on #82.
 
 Way of working:
@@ -739,7 +739,7 @@ Depends on: S6-10 merged; O-S6-2
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-26 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 318) and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: SPEC §7.3; TECH_DEBT_v5 §3.2 (#318, TD-60); TESTING §12.5 (rate limits in E2E); CODEBASE §2 (search S5-13a for the reset limit, S4-19 for the export limit); docs/sprints/sprint_05/S5-07_cookie_session_server.md (P4), S5-16a_organisation_server.md (P3)
 
-Owner decisions for this task: O-S6-2: <values for sign-in and organisation creation — decision and date>
+Owner decisions for this task: O-S6-2 (decided by the owner 2026-11-18), all 🔧 and added to SPEC §7.3: sign-in 30 per 10 minutes per client IP and 10 per hour per e-mail address (not "like the reset": 5 per hour per IP would lock out an office behind one shared IP; the account lockout keeps protecting each account); organisation creation 5 per day per user.
 Additional instructions: Sign-in limited per IP and per address like the password reset; organisation creation per user; both 🔧 with the decided values; 429 Problem Details mapped to the existing UX key (ask if none fits). Relax them in the E2E stack like the export limit. Tests on the fake clock. Keep RateLimits:Invitation unchanged.
 
 Way of working:
@@ -763,8 +763,8 @@ Depends on: O-S6-5
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-27 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above (gh issue view 296, gh issue view 310) and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: TECH_DEBT_v5 §3.1, §9.4 (#296, TD-39); the issues #296 and #310; CODEBASE §2 (search S4-20 for the S13 export dialog and release-mismatch)
 
-Owner decisions for this task: O-S6-5: <reload flows as proposed or changed — decision and date>
-Additional instructions: When a lazy route chunk fails to load after a deployment, reload once (guarded so it can never loop; no persistent storage for signed-out users — use the URL or the session history as the guard) and show the error page if it fails again. S13: after release-mismatch reload the criteria list as described in #310. Unit tests for both guards.
+Owner decisions for this task: O-S6-5 (decided by the owner 2026-11-18): (1) failed lazy chunk (#296): one automatic full reload per target URL, guarded against loops, never while offline (the offline notice stays); if it fails again, the error page. (2) The in-memory S10 draft may be lost on that reload; no warning (`criteria.list.draftNote` already says a reload loses it). (3) S13 after `release-mismatch` (#310) follows the confirmed UX copy, not #310's proposal to keep per-criterion decisions: drop the pinned release, keep the S10 selection (use case, app types, product parts, test procedures), reload S11 for the active release; per-criterion changes are dropped as `criteria.export.outdated` says; if the selection is now excluded, back to S10 with `criteria.select.error.excluded`. The action in S13 is a new button `criteria.export.outdated.reload` „Kriterien neu laden“ — key and wording confirmed by the owner; add it to a new UX copy version and to de.json.
+Additional instructions: When a lazy route chunk fails to load after a deployment, reload once (guarded so it can never loop; no persistent storage for signed-out users — use the URL or the session history as the guard) and show the error page if it fails again. S13: after release-mismatch reload the criteria list as O-S6-5 decides. Unit tests for both guards.
 
 Way of working:
 1. Branch sprint06/S6-27-reload-flows from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
@@ -787,7 +787,7 @@ Depends on: O-S6-6
 Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-28 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
 Also read: SPEC R-SHL-07, §11 (release prerequisites); TECH_DEBT_v5 §9.4 (TD-29); scripts/check-release-config.mjs; the footer of S2-15 (CODEBASE §2)
 
-Owner decisions for this task: O-S6-6: <where the legal pages live and the placeholder marker — decision and date>
+Owner decisions for this task: O-S6-6 (decided by the owner 2026-11-18): (a) three Markdown files in the client at `CLIENT/CLIENT.ProcureAccess/content/legal/*.de.md` (the client image is built from the client folder and cannot reach a root `content/legal/`; correct the CLAUDE.md target layout line), rendered with the existing `ngx-markdown`/`marked` (no new dependency); a placeholder marker shows `legal.placeholder` outside production and fails the production build through `check-release-config.mjs`. Content follows from WERTE.IT before G-P.
 Additional instructions: Impressum, Datenschutzerklärung and Erklärung zur Barrierefreiheit rendered from Markdown files at the footer links (headings as real headings, page title and H1 focus like every page). The texts are placeholders until WERTE.IT delivers them: development shows the placeholder, the production build (check-release-config.mjs) fails while any placeholder is left, with a CI test of that failure. No new Markdown dependency without my OK — ngx-markdown is legacy and goes with the legacy filter; propose the smallest option (build-time conversion or an existing dependency).
 
 Way of working:
