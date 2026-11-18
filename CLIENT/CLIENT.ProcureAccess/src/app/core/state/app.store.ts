@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { patchState, signalStore, withHooks, withMethods, withState } from "@ngrx/signals";
-import { AppState, initialAppState } from "../models/appState.interface";
+import { patchState, signalStore, withHooks, withMethods } from "@ngrx/signals";
 import { withLoading } from "@app/shared/state/with-loading";
 import { withIdentity } from "@app/features/identity/state/with-identity";
 import { withFilters } from "@app/features/filters/state/with-filters";
@@ -14,9 +13,13 @@ import { withSettings } from "@app/features/settings/state/with-settings";
 import { withProposal } from "@app/features/proposal/state/with-proposal";
 import { withConfigurator } from "@app/features/configurator/state/with-configurator";
 
+/**
+ * The root store: the shared loading counter first, then the slices (ARCHITECTURE §8.1). A slice
+ * declares what it needs from the features before it (`LOADING_INPUT`, `type<…>()`) and never adds
+ * them again, so every member exists once and NgRx does not warn in dev mode (S6-24).
+ */
 export const ProcureAccessStore = signalStore(
     { providedIn: 'root' },
-    withState<AppState>(initialAppState),
     withLoading(),
     withIdentity(),
     withFilters(),
@@ -34,7 +37,8 @@ export const ProcureAccessStore = signalStore(
              */
             async startSession(email: string, password: string): Promise<void> {
                 await state.signIn(email, password);
-                void state.loadProposals();
+                // the sign-in has succeeded; the error interceptor reports a failed legacy read
+                state.loadProposals().catch(() => undefined);
             },
 
             /**
@@ -84,7 +88,9 @@ export const ProcureAccessStore = signalStore(
     }),
     withHooks((store) => ({
         onInit() {
-            void store.init().finally(() => console.log("store initialized"));
+            // The error interceptor reports a failed start-up read (offline notice, S80 page or
+            // snackbar); caught here so that it does not end as an unhandled rejection.
+            store.init().catch(() => undefined);
         }
     }))
 );

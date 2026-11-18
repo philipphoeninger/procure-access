@@ -28,51 +28,21 @@ const LEGACY_EXCEPTIONS = {
   'src/app/features/criteria/services/api/criteria-api.service.ts': [
     '@angular-eslint/prefer-inject',
   ],
-  'src/app/features/filters/selection/filters-selection.ts': [
-    '@typescript-eslint/no-misused-promises',
-    '@typescript-eslint/no-unsafe-argument',
-    '@typescript-eslint/no-unsafe-assignment',
-  ],
   'src/app/features/filters/services/api/filters-api.service.ts': [
     '@angular-eslint/prefer-inject',
   ],
-  'src/app/features/filters/state/with-filters.ts': [
-    '@typescript-eslint/no-unsafe-enum-comparison',
-  ],
-  // M5 — proposal workflow retired, withProducts / withFavorites reworked (M5.6); the store root loads them
+  // M5 — proposal workflow retired (M5.6, S6-23)
   'src/app/features/criteria/proposal/criterion-proposal.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-floating-promises',
     '@typescript-eslint/no-misused-promises',
     '@typescript-eslint/no-non-null-asserted-optional-chain',
   ],
-  'src/app/features/favorites/list/favorites.ts': [
-    '@angular-eslint/prefer-inject',
-  ],
-  'src/app/features/products/details/product-details.ts': [
-    '@angular-eslint/prefer-inject',
-  ],
-  'src/app/features/products/list/products-list.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-unsafe-argument',
-  ],
-  'src/app/features/products/pages/products-container/products-container.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/unbound-method',
-  ],
   'src/app/features/products/proposal/product-proposal.ts': [
     '@angular-eslint/prefer-inject',
     '@typescript-eslint/no-floating-promises',
     '@typescript-eslint/no-misused-promises',
     '@typescript-eslint/no-non-null-asserted-optional-chain',
-  ],
-  'src/app/features/products/services/api/products-api.service.ts': [
-    '@angular-eslint/prefer-inject',
-  ],
-  'src/app/features/products/state/with-products.spec.ts': [
-    '@typescript-eslint/prefer-promise-reject-errors',
   ],
   'src/app/features/proposal/list/proposal-list.ts': [
     '@angular-eslint/prefer-inject',

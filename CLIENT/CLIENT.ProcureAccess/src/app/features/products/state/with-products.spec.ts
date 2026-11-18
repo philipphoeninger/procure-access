@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 import { TestBed } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 
 import { TResult } from '@app/core/models/result.model';
 import { Product } from '../models/product.model';
@@ -13,7 +13,7 @@ import { withProducts } from './with-products';
 
 // Regression test for S1-08 N1 (with #37): a failed product request must not leave the
 // loading spinner on. The slice is tested in a store of its own; only the API service is replaced.
-const ProductsTestStore = signalStore(withProducts());
+const ProductsTestStore = signalStore(withLoading(), withProducts());
 
 function setUp(apiService: Partial<ProductsApiService>) {
   TestBed.configureTestingModule({
@@ -22,7 +22,8 @@ function setUp(apiService: Partial<ProductsApiService>) {
   return TestBed.inject(ProductsTestStore);
 }
 
-const serverError = new HttpErrorResponse({ status: 500 });
+// The slice does not look at the reason, so an `Error` stands in for the HTTP failure.
+const serverError = new Error('request failed');
 
 describe('withProducts', () => {
   it('stops loading when the filtered product request fails', async () => {
