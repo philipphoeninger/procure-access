@@ -72,12 +72,22 @@ public static class ProblemTypes
     /// </summary>
     public const string ProjectArchived = "project-archived";
 
+    /// <summary>
+    /// 409 with a field error at <c>testStatus</c>: the test status of a candidate product and its
+    /// test evidences do not fit — the status is to leave „Ja“ while evidences exist, or an evidence
+    /// is to be added while the status is not „Ja“ (SPEC §8.6 v2.53, R-CAN-05; WSP-01; S6-15).
+    /// Carries the extension <c>evidenceCount</c>; with evidences the client asks
+    /// <c>candidate.evidence.list.statusChange</c> and repeats the change with
+    /// <c>removeEvidences</c>.
+    /// </summary>
+    public const string TestStatusConflict = "test-status-conflict";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
         EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
-        ProjectArchived,
+        ProjectArchived, TestStatusConflict,
     ];
 }

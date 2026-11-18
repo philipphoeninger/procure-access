@@ -11,12 +11,14 @@ namespace ProcureAccess.Modules.Workspace.Persistence;
 
 /// <summary>
 /// The Workspace module's own database context (ARCHITECTURE ADR-014) in the <c>workspace</c>
-/// schema: the procurement projects (§5.4; S6-11). No other module and no legacy code uses it.
+/// schema: the procurement projects (§5.4; S6-11), their candidate products with test evidences and
+/// the private rows beside both (S6-15). No other module and no legacy code uses it.
 /// </summary>
 /// <remarks>
-/// Its history table is <c>workspace."__EFMigrationsHistory"</c>. The projects carry the global
-/// query filter of ADR-007, bound to <paramref name="organizations"/> (TEN-01): the context sees
-/// only the projects of the request's organisations. A context built outside a request
+/// Its history table is <c>workspace."__EFMigrationsHistory"</c>. Every entity carries
+/// <c>OrganizationId</c> and the global query filter of ADR-007, bound to
+/// <paramref name="organizations"/> (TEN-01): the context sees only the rows of the request's
+/// organisations, also when it reads a candidate or an evidence by its id. A context built outside a request
 /// (design-time factory, fixtures) gets <see cref="FixedOrganizationContext.None"/>.
 /// </remarks>
 internal sealed class WorkspaceDbContext(
@@ -33,6 +35,18 @@ internal sealed class WorkspaceDbContext(
     /// <summary>The projects; filtered to the organisations of the request (TEN-01).</summary>
     public DbSet<ProcurementProject> ProcurementProjects => Set<ProcurementProject>();
 
+    /// <summary>The candidate products with their test evidences (TEN-01).</summary>
+    public DbSet<CandidateProduct> CandidateProducts => Set<CandidateProduct>();
+
+    /// <summary>The private sections of the candidates (TEN-01).</summary>
+    public DbSet<CandidatePrivateSection> CandidatePrivateSections => Set<CandidatePrivateSection>();
+
+    /// <summary>The test evidences; also reachable through their candidate (TEN-01).</summary>
+    public DbSet<TestEvidence> TestEvidences => Set<TestEvidence>();
+
+    /// <summary>The private notes of the evidences (TEN-01).</summary>
+    public DbSet<TestEvidencePrivateNote> TestEvidencePrivateNotes => Set<TestEvidencePrivateNote>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -44,10 +58,23 @@ internal sealed class WorkspaceDbContext(
     {
         modelBuilder.HasDefaultSchema(Schema);
         modelBuilder.ApplyConfiguration(new ProcurementProjectConfiguration());
+        modelBuilder.ApplyConfiguration(new CandidateProductConfiguration());
+        modelBuilder.ApplyConfiguration(new CandidatePrivateSectionConfiguration());
+        modelBuilder.ApplyConfiguration(new TestEvidenceConfiguration());
+        modelBuilder.ApplyConfiguration(new TestEvidencePrivateNoteConfiguration());
 
-        // The organisation filter (ADR-007, TEN-01): a project of an organisation the request's
-        // user is no member of does not exist for this context.
+        // The organisation filter (ADR-007, TEN-01): a row of an organisation the request's user is
+        // no member of does not exist for this context. Every entity has its own, so a child read
+        // by its id needs no join to its project.
         modelBuilder.Entity<ProcurementProject>()
                     .HasQueryFilter(p => _organizations.OrganizationIds.Contains(p.OrganizationId));
+        modelBuilder.Entity<CandidateProduct>()
+                    .HasQueryFilter(c => _organizations.OrganizationIds.Contains(c.OrganizationId));
+        modelBuilder.Entity<CandidatePrivateSection>()
+                    .HasQueryFilter(s => _organizations.OrganizationIds.Contains(s.OrganizationId));
+        modelBuilder.Entity<TestEvidence>()
+                    .HasQueryFilter(e => _organizations.OrganizationIds.Contains(e.OrganizationId));
+        modelBuilder.Entity<TestEvidencePrivateNote>()
+                    .HasQueryFilter(n => _organizations.OrganizationIds.Contains(n.OrganizationId));
     }
 }

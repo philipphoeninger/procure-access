@@ -37,7 +37,9 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// list) and its export (every member); since S5-23 with the share links of a list (Editor; the organisation taken from the stored
 /// list or link); since S5-22 every answer of the matrix also carries <c>no-store</c>
 /// (TEN-04 workspace part); since S6-11 with the procurement projects (list, read: Reader; create, rename, status: Editor; the
-/// organisation named in the route or taken from the stored project). Every user has a confirmed account, so the gate of saving
+/// organisation named in the route or taken from the stored project); since S6-15 with the candidates and their evidences (read:
+/// Reader; create, change, test status, add, change and remove an evidence: Editor; the organisation taken from the stored
+/// project, candidate or evidence). Every user has a confirmed account, so the gate of saving
 /// (SEC-10) passes; the other workspace endpoints add their rows with their tasks of step 5.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -116,6 +118,27 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     /// <summary><c>PATCH /projects/{id}</c> with a status, of a project of A (S6-11): Editor and Owner.</summary>
     private const string ChangeProjectStatus = "change-project-status";
 
+    /// <summary><c>POST /projects/{id}/candidates</c> of a project of A (S6-15): Editor and Owner.</summary>
+    private const string CreateCandidate = "create-candidate";
+
+    /// <summary><c>GET /candidates/{id}</c> of a candidate of A (S6-15): every member of A.</summary>
+    private const string ReadCandidate = "read-candidate";
+
+    /// <summary><c>PATCH /candidates/{id}</c> of a candidate of A (S6-15): Editor and Owner.</summary>
+    private const string ChangeCandidate = "change-candidate";
+
+    /// <summary><c>PUT /candidates/{id}/test-status</c> of a candidate of A (S6-15): Editor and Owner.</summary>
+    private const string SetTestStatus = "set-test-status";
+
+    /// <summary><c>POST /candidates/{id}/test-evidences</c> of a candidate of A (S6-15): Editor and Owner.</summary>
+    private const string AddEvidence = "add-evidence";
+
+    /// <summary><c>PUT /test-evidences/{id}</c> of an evidence of A (S6-15): Editor and Owner.</summary>
+    private const string ChangeEvidence = "change-evidence";
+
+    /// <summary><c>DELETE /test-evidences/{id}</c> of an evidence of A (S6-15): Editor and Owner.</summary>
+    private const string RemoveEvidence = "remove-evidence";
+
     /// <summary>The revision of the one criterion of <see cref="_listOfA"/>; the domain needs no catalog for it.</summary>
     private const int RevisionOfListOfA = 1;
 
@@ -126,6 +149,11 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     private ShareLink? _linkOfA;
 
     private ProcurementProject? _projectOfA;
+
+    /// <summary>A candidate of <see cref="_projectOfA"/> with the status „Ja“ and <see cref="_evidenceOfA"/>.</summary>
+    private CandidateProduct? _candidateOfA;
+
+    private TestEvidence? _evidenceOfA;
 
     private bool _catalogImported;
 
@@ -278,6 +306,48 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, ChangeProjectStatus, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, ChangeProjectStatus, HttpStatusCode.NotFound },
         { Anonymous, ChangeProjectStatus, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, CreateCandidate, HttpStatusCode.Created },
+        { TestUsers.EditorA.Name, CreateCandidate, HttpStatusCode.Created },
+        { TestUsers.ReaderA.Name, CreateCandidate, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, CreateCandidate, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, CreateCandidate, HttpStatusCode.NotFound },
+        { Anonymous, CreateCandidate, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ReadCandidate, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ReadCandidate, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ReadCandidate, HttpStatusCode.OK },
+        { TestUsers.OwnerB.Name, ReadCandidate, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ReadCandidate, HttpStatusCode.NotFound },
+        { Anonymous, ReadCandidate, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ChangeCandidate, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ChangeCandidate, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ChangeCandidate, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ChangeCandidate, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ChangeCandidate, HttpStatusCode.NotFound },
+        { Anonymous, ChangeCandidate, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, SetTestStatus, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, SetTestStatus, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, SetTestStatus, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, SetTestStatus, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, SetTestStatus, HttpStatusCode.NotFound },
+        { Anonymous, SetTestStatus, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, AddEvidence, HttpStatusCode.Created },
+        { TestUsers.EditorA.Name, AddEvidence, HttpStatusCode.Created },
+        { TestUsers.ReaderA.Name, AddEvidence, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, AddEvidence, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, AddEvidence, HttpStatusCode.NotFound },
+        { Anonymous, AddEvidence, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ChangeEvidence, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ChangeEvidence, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ChangeEvidence, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, ChangeEvidence, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ChangeEvidence, HttpStatusCode.NotFound },
+        { Anonymous, ChangeEvidence, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, RemoveEvidence, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, RemoveEvidence, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, RemoveEvidence, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, RemoveEvidence, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, RemoveEvidence, HttpStatusCode.NotFound },
+        { Anonymous, RemoveEvidence, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
@@ -295,7 +365,14 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         _linkOfA = ShareLink.Create(
             _tenants.A.Id, ShareableResourceType.Configuration, _listOfA.Id, new byte[32], Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(30));
         _projectOfA = ProcurementProject.Create(_tenants.A.Id, "Projekt von A", TestUsers.OwnerA.Id, Clock.GetUtcNow());
-        await StoreAsync([.. _tenants.Entities, _invitation, _listOfA, _linkOfA, _projectOfA]);
+        _candidateOfA = CandidateProduct.Create(_projectOfA, new CandidateFacts("Produkt von A", null, null, null), Clock.GetUtcNow());
+        _candidateOfA.ChangeTestStatus(TestStatus.Tested, removeEvidences: false, Clock.GetUtcNow());
+        _evidenceOfA = _candidateOfA.AddEvidence(EvidenceOfA, Clock.GetUtcNow()).Evidence!;
+        await StoreAsync(
+        [
+            .. _tenants.Entities, _invitation, _listOfA, _linkOfA, _projectOfA, _candidateOfA,
+            CandidatePrivateSection.Of(_candidateOfA, null, null), TestEvidencePrivateNote.Of(_evidenceOfA, null),
+        ]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -423,6 +500,16 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     private string ProjectOfAPath => $"/api/v1/projects/{_projectOfA!.Id}";
 
+    private string CandidateOfAPath => $"/api/v1/candidates/{_candidateOfA!.Id}";
+
+    private string EvidenceOfAPath => $"/api/v1/test-evidences/{_evidenceOfA!.Id}";
+
+    private static TestEvidenceFacts EvidenceOfA =>
+        new(TestKind.Procedure, "softwareTest", null, "Prüfstelle", new DateOnly(2026, 2, 1), null, null);
+
+    private static object EvidenceBody(string testKind, string? testTypeId = null) =>
+        new { testKind, testTypeId, testedBy = "Prüfstelle", testDate = "2026-02-01" };
+
     /// <summary>A valid save of the whole <c>T.1</c> draft for A; imports the test releases on first use.</summary>
     private async Task<JsonObject> SaveBodyAsync(HttpClient client)
     {
@@ -506,6 +593,13 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             ReadProject => await client.GetAsync(ProjectOfAPath, Cancellation),
             RenameProject => await client.PatchAsJsonAsync(ProjectOfAPath, new { name = "Umbenannt" }, Cancellation),
             ChangeProjectStatus => await client.PatchAsJsonAsync(ProjectOfAPath, new { status = "archived" }, Cancellation),
+            CreateCandidate => await client.PostAsJsonAsync($"{ProjectOfAPath}/candidates", new { name = "Neues Produkt" }, Cancellation),
+            ReadCandidate => await client.GetAsync(CandidateOfAPath, Cancellation),
+            ChangeCandidate => await client.PatchAsJsonAsync(CandidateOfAPath, new { name = "Umbenannt" }, Cancellation),
+            SetTestStatus => await client.PutAsJsonAsync($"{CandidateOfAPath}/test-status", new { testStatus = "tested" }, Cancellation),
+            AddEvidence => await client.PostAsJsonAsync($"{CandidateOfAPath}/test-evidences", EvidenceBody("own"), Cancellation),
+            ChangeEvidence => await client.PutAsJsonAsync(EvidenceOfAPath, EvidenceBody("procedure", "softwareTest"), Cancellation),
+            RemoveEvidence => await client.DeleteAsync(EvidenceOfAPath, Cancellation),
             _ => await SendOrganizationRequestAsync(client, action, user),
         };
     }

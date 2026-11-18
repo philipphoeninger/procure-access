@@ -23,6 +23,78 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidatePrivateSection", b =>
+                {
+                    b.Property<Guid>("CandidateProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContactNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("InternalNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CandidateProductId");
+
+                    b.ToTable("CandidatePrivateSections", "workspace");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FunctionalSummary")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProcurementProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SoftwareProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TestStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasDefaultValue("Unknown");
+
+                    b.Property<string>("VendorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcurementProjectId");
+
+                    b.ToTable("CandidateProducts", "workspace");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.ProcurementProject", b =>
                 {
                     b.Property<Guid>("Id")
@@ -58,6 +130,116 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("ProcurementProjects", "workspace");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.TestEvidence", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EvidenceUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OtherTestTypeName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateOnly>("TestDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("TestKind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("TestTypeKey")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("TestedByName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TestedVersion")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateProductId", "TestTypeKey")
+                        .IsUnique()
+                        .HasFilter("\"TestTypeKey\" IS NOT NULL");
+
+                    b.ToTable("TestEvidences", "workspace");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.TestEvidencePrivateNote", b =>
+                {
+                    b.Property<Guid>("TestEvidenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("QualificationNote")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("TestEvidenceId");
+
+                    b.ToTable("TestEvidencePrivateNotes", "workspace");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidatePrivateSection", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", null)
+                        .WithOne()
+                        .HasForeignKey("ProcureAccess.Modules.Workspace.Domain.CandidatePrivateSection", "CandidateProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Workspace.Domain.ProcurementProject", null)
+                        .WithMany()
+                        .HasForeignKey("ProcurementProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.TestEvidence", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", null)
+                        .WithMany("TestEvidences")
+                        .HasForeignKey("CandidateProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.TestEvidencePrivateNote", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Workspace.Domain.TestEvidence", null)
+                        .WithOne()
+                        .HasForeignKey("ProcureAccess.Modules.Workspace.Domain.TestEvidencePrivateNote", "TestEvidenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", b =>
+                {
+                    b.Navigation("TestEvidences");
                 });
 #pragma warning restore 612, 618
         }

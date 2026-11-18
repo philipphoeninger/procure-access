@@ -61,6 +61,42 @@ public sealed class WorkspaceMigrationTests(ApiFixture api) : IAsyncDisposable
             "the Workspace model differs from the last migration's snapshot; add a migration");
     }
 
+    /// <summary>
+    /// SIG-03 workspace part (S6-15): the test status of a candidate is never null and is
+    /// „Nicht bekannt“ (<c>Unknown</c>) when a row is written without one.
+    /// </summary>
+    [Fact(DisplayName = "INV:SIG-03 " + nameof(CandidateTestStatus_Schema_NotNullWithDefaultUnknown))]
+    [Trait("Invariant", "SIG-03")]
+    public async Task CandidateTestStatus_Schema_NotNullWithDefaultUnknown()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = NewDatabase();
+        await using (var legacy = Legacy(connectionString))
+        {
+            await legacy.Database.MigrateAsync(cancellationToken);
+        }
+
+        await using var workspace = Workspace(connectionString);
+        await workspace.Database.MigrateAsync(cancellationToken);
+
+        (await ScalarAsync(connectionString, """
+            SELECT count(*) FROM information_schema.columns
+            WHERE table_schema = 'workspace' AND table_name = 'CandidateProducts' AND column_name = 'TestStatus'
+              AND is_nullable = 'NO' AND column_default LIKE '%Unknown%'
+            """)).ShouldBe(1);
+        var project = Guid.NewGuid();
+        var organization = Guid.NewGuid();
+        await ExecuteAsync(connectionString, $"""
+            INSERT INTO workspace."ProcurementProjects" ("Id", "OrganizationId", "Name", "Status", "CreatedByUserId", "CreatedAt", "ModifiedAt")
+            VALUES ('{project}', '{organization}', 'Projekt', 'Open', 'user', now(), now());
+            INSERT INTO workspace."CandidateProducts" ("Id", "OrganizationId", "ProcurementProjectId", "Name", "CreatedAt", "ModifiedAt")
+            VALUES ('{Guid.NewGuid()}', '{organization}', '{project}', 'Produkt', now(), now());
+            """);
+        (await ScalarAsync(connectionString, """SELECT count(*) FROM workspace."CandidateProducts" WHERE "TestStatus" = 'Unknown'""")).ShouldBe(1);
+        await Should.ThrowAsync<PostgresException>(() => ExecuteAsync(
+            connectionString, """UPDATE workspace."CandidateProducts" SET "TestStatus" = NULL"""));
+    }
+
     [Fact]
     public async Task Startup_EmptyDatabase_AppliesTheWorkspaceMigrations()
     {
@@ -102,6 +138,14 @@ public sealed class WorkspaceMigrationTests(ApiFixture api) : IAsyncDisposable
 
     private static WorkspaceDbContext Workspace(string connectionString) =>
         new(new DbContextOptionsBuilder<WorkspaceDbContext>().UseNpgsql(connectionString).Options, FixedOrganizationContext.None);
+
+    private static async Task ExecuteAsync(string connectionString, string sql)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+        await using var command = new NpgsqlCommand(sql, connection);
+        await command.ExecuteNonQueryAsync();
+    }
 
     private static async Task<long> ScalarAsync(string connectionString, string sql)
     {

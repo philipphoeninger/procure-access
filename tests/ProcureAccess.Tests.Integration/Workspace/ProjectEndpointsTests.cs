@@ -61,12 +61,13 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         var created = (await response.Content.ReadFromJsonAsync<ProjectResponse>(Cancellation)).ShouldNotBeNull();
         response.Headers.Location.ShouldNotBeNull().ToString().ShouldBe(ProjectPath(created.Id));
         var read = (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(created.Id), Cancellation)).ShouldNotBeNull();
-        read.ShouldBe(created);
+        read.ShouldBeEquivalentTo(created);
         read.ShouldSatisfyAllConditions(
             p => p.OrganizationId.ShouldBe(Fixture.A.Id),
             p => p.Name.ShouldBe("Neues Bewerbermanagement 2027"),
             p => p.Status.ShouldBe("open"),
             p => p.ProductCount.ShouldBe(0),
+            p => p.Candidates.ShouldBeEmpty(),
             p => p.CreatedAt.ShouldBe(Clock.GetUtcNow()),
             p => p.ModifiedAt.ShouldBe(Clock.GetUtcNow()));
 
@@ -251,7 +252,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
             p => p.Status.ShouldBe("done"),
             p => p.CreatedAt.ShouldBe(project.CreatedAt),
             p => p.ModifiedAt.ShouldBe(Clock.GetUtcNow()));
-        (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation)).ShouldBe(changed);
+        (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation)).ShouldBeEquivalentTo(changed);
     }
 
     [Fact]
