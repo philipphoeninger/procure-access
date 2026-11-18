@@ -7,9 +7,10 @@
 
 version = 1
 
-# Project documents, README files and AI onboarding.
+# Project documents, README files and AI onboarding; the legal pages of the client (S6-28),
+# kept free of a header so that the people who insert the texts see only the text.
 [[annotations]]
-path = ["docs/**", "**/README.md", "CLAUDE.md", "components/notes.txt"]
+path = ["docs/**", "**/README.md", "CLAUDE.md", "components/notes.txt", "CLIENT/CLIENT.ProcureAccess/content/legal/*.de.md"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"

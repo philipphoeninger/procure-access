@@ -106,7 +106,7 @@ src/ProcureAccess.Modules.<Name>.Contracts/     Catalog, Configurator, Workspace
 tests/ProcureAccess.Tests.{Unit,Architecture,Integration,Shared}/
 e2e/                                            Playwright journeys J1–J7
 catalog/releases/<version>/                     catalog release data (JSON), imported by CLI (SPEC SD20; no editor UI)
-content/legal/*.de.md                           imprint, privacy, accessibility statement
+CLIENT/CLIENT.ProcureAccess/content/legal/*.de.md   imprint, privacy, accessibility statement (built in S6-28, O-S6-6)
 scripts/check-invariants.mjs, scripts/check-figma-links.mjs
 ```
 
