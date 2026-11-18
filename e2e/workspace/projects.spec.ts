@@ -21,15 +21,8 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 const main = (page: Page) => page.getByRole('main');
 const mainNav = (page: Page) => page.getByRole('banner').getByRole('navigation', { name: 'Hauptnavigation' });
 
-/**
- * Waits until Material's animations are over, so axe sees the final colours. Two animation frames
- * first: a `mat-error` that has just been inserted starts its fade-in only on a later frame, and
- * axe measured its colour half-faded in CI (contrast 2.91 and 3.57 instead of the error colour).
- */
+/** Waits until Material's animations are over, so axe sees the final colours. */
 async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate(
-    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
-  );
   await locator.evaluate((element) =>
     Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
   );
@@ -71,6 +64,9 @@ test.describe('Procurement projects S30, S31', () => {
     const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     const name = dialog.getByRole('textbox', { name: 'Name des Projekts' });
     await expect(name).toBeFocused();
+    // Material adds `mat-form-field-animations-enabled` 300 ms after a field starts; an error shown
+    // before that fades in again once the class arrives, and axe measured it mid-fade (CI; as S02)
+    await expect(dialog.locator('mat-form-field.mat-form-field-animations-enabled')).toHaveCount(1);
     await dialog.getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
     // The field's own error, not only the summary's line with the same text, before axe runs
