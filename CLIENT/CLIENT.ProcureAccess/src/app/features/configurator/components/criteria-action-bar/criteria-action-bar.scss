@@ -36,6 +36,13 @@
     border-radius: 0;
     box-shadow: 0 0 0 100vmax var(--mat-sys-surface-container-high);
     clip-path: inset(0 -100vmax);
+
+    // Forced colours (Windows contrast themes) replace the background with Canvas and drop the
+    // shadow, so the bar would have no edge towards the cards scrolling under it (WCAG 1.4.11,
+    // #378). A system-colour top border makes it visible; the bar's measured height includes it.
+    @media (forced-colors: active) {
+      border-block-start: 1px solid CanvasText;
+    }
   }
 }
 

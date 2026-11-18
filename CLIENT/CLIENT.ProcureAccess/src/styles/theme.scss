@@ -94,23 +94,6 @@ html.theme-dark {
   color-scheme: dark;
 }
 
-// Legacy helper classes (.error and .text-error are used by the legacy account screens)
-.tertiary {
-  @include mat.theme((color: custom-colors.$tertiary-palette));
-}
-
-.secondary {
-  @include mat.theme((color: custom-colors.$secondary-palette));
-}
-
-.error {
-  @include mat.theme((color: custom-colors.$error-palette));
-}
-
-.text-error {
-  color: var(--mat-sys-error-container);
-}
-
 // More contrast (on html, AppearanceService): follows prefers-contrast: more (owner decision S5-25 3 (i)).
 // The colours are the legacy ones; the high-contrast design is still open (Handoff §1.1, H2).
 .contrast-more {

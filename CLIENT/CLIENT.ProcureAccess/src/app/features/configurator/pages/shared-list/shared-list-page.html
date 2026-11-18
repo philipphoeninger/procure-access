@@ -18,18 +18,20 @@ SPDX-License-Identifier: MIT
 
   <pa-notice kind="info">{{ 'criteria.list.priorityNote' | translate }}</pa-notice>
 
-  @if (counts().total > 0) {
-    <p class="pa-shared-list__counts">
-      {{
-        'criteria.list.counts'
-          | translate
-            : {
-                a: ('criteria.list.counts.a' | translatePlural: counts().A),
-                b: ('criteria.list.counts.b' | translatePlural: counts().B),
-                info: ('criteria.list.counts.info' | translatePlural: counts().Info),
-              }
-      }}
-    </p>
+  @if (shown.criteria.criteria.length > 0) {
+    @if (counts().total > 0) {
+      <p class="pa-shared-list__counts">
+        {{
+          'criteria.list.counts'
+            | translate
+              : {
+                  a: ('criteria.list.counts.a' | translatePlural: counts().A),
+                  b: ('criteria.list.counts.b' | translatePlural: counts().B),
+                  info: ('criteria.list.counts.info' | translatePlural: counts().Info),
+                }
+        }}
+      </p>
+    }
     @if (ratings().length > 0) {
       <pa-rating-legend [values]="ratings()" />
     }

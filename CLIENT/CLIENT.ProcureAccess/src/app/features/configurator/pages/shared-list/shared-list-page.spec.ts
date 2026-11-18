@@ -120,6 +120,20 @@ describe('S16 Geteilte Kriterienliste (R-SAV-05, TEN-09)', () => {
     await expectNoAxeViolations();
   });
 
+  it('shows the cards of a list of „Geprüft nach …“ criteria only, without counts and without the empty text (#375)', async () => {
+    const view = listView();
+    if (view.kind !== 'list') throw new Error('the fixture is a list');
+    const examinationOnly = view.criteria.criteria.filter((criterion) => criterion.kind === 'testProcedure');
+    expect(examinationOnly.length).toBeGreaterThan(0);
+    await openPage({ ...view, criteria: { ...view.criteria, criteria: examinationOnly } });
+
+    expect(screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent.trim())).toEqual([
+      'Geprüft nach BIT inklusiv Software-Test',
+    ]);
+    expect(document.body.textContent).not.toContain('Diese Liste enthält keine Kriterien');
+    expect(document.querySelector('.pa-shared-list__counts')).toBeNull();
+  });
+
   it('INV:TEN-09 keeps the detail panel with „Warum diese Priorität?“ (CAT-02)', async () => {
     const fixture = await openPage(listView());
 
