@@ -57,7 +57,14 @@ SPDX-License-Identifier: MIT
 
 <mat-dialog-actions class="pa-export__actions">
   @if (status().kind === 'outdated') {
-    <button #closeButton matButton="filled" type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+    @if (canReload) {
+      <button matButton type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+      <button #outdatedAction matButton="filled" type="button" (click)="reload()">
+        {{ 'criteria.export.outdated.reload' | translate }}
+      </button>
+    } @else {
+      <button #outdatedAction matButton="filled" type="button" mat-dialog-close>{{ 'common.actions.close' | translate }}</button>
+    }
   } @else {
     <button matButton type="button" mat-dialog-close>{{ 'common.actions.cancel' | translate }}</button>
     <!-- While the file is requested: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->

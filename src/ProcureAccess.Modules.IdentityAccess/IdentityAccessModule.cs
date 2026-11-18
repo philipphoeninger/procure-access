@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.IdentityAccess.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Auth;
+using ProcureAccess.Modules.IdentityAccess.Commands;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.DataProtection;
@@ -31,7 +33,10 @@ namespace ProcureAccess.Modules.IdentityAccess;
 /// today, and the session cookie and antiforgery tokens from step 3, stay valid when the container
 /// is replaced (§9.1, C60). Since S4-26 the keys are encrypted at rest with a certificate from the
 /// environment (<see cref="KeyRingCertificates"/>).
-/// Users and the JWT are still legacy in API, MODELS and SERVICES until migration step 3.
+/// Since S6-10 it holds the users and roles themselves (ADR-014 rule 4; TD-72): ASP.NET Core
+/// Identity on <see cref="IdentityAccessDbContext"/>, the endpoints of sign-in, registration,
+/// password reset, account and organisations, the <c>roles</c> command and the seeded users. The
+/// Identity cookie is the only authentication scheme (S5-08).
 /// </summary>
 public static class IdentityAccessModule
 {
@@ -62,6 +67,17 @@ public static class IdentityAccessModule
             options.EnableRetryOnFailure().CommandTimeout(60);
         });
         services.AddScoped<IModuleDatabaseMigrator, IdentityAccessDatabaseMigrator>();
+
+        // Users and roles (S6-10): ASP.NET Core Identity on this context, the 🔧 password and
+        // lockout rules and the e-mail confirmation gate (SEC-10, SEC-11).
+        services.AddIdentityAccessIdentity(configuration);
+        services.AddScoped<IUserDirectory, UserDirectory>();
+        services.AddScoped<SeedUsers>();
+
+        // Password-reset e-mails go out in the background, so a known address answers as fast as an
+        // unknown one (S5-13a, ARCHITECTURE C141); only a started web host runs the mailer.
+        services.AddSingleton<PasswordResetMailQueue>();
+        services.AddHostedService<PasswordResetMailer>();
 
         // Key ring in the database (ARCHITECTURE §9.1, C60), encrypted at rest with a certificate
         // (S4-26, owner decisions O-S4-87 – O-S4-88 (a)). Read while the services are registered, so
@@ -109,8 +125,8 @@ public static class IdentityAccessModule
         services.AddScoped<IOrganizationContext>(provider => provider.GetRequiredService<OrganizationContext>());
         services.AddScoped<IAuthorizationHandler, OrganizationRoleHandler>();
 
-        // Organisations and members (S5-16a): the rules behind the host's organisation endpoints,
-        // which add the members' addresses from the legacy users until M3.1 (owner decision S5-16 4a).
+        // Organisations and members (S5-16a): the rules behind the organisation endpoints, which
+        // add the members' addresses (owner decision S5-16 4a).
         services.AddScoped<IOrganizationMembers, OrganizationMemberService>();
 
         // Invitations by e-mail (S5-17a, SPEC R-ORG-02): 🔧 lifetime read at start; expired rows are
@@ -146,57 +162,116 @@ public static class IdentityAccessModule
     }
 
     /// <summary>
-    /// Maps the module's endpoints as minimal APIs below <c>/auth</c> of <paramref name="routes"/>,
-    /// the host's versioned group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it
-    /// before the Swagger set-up (#176). The session probe, its extension (S5-29), and the user's settings at
-    /// <c>/account/preferences</c> (S5-25a); sign-in and sign-out live in the host until the users
-    /// move into this module (M3.1).
+    /// Maps the module's endpoints as minimal APIs on <paramref name="routes"/>, the host's versioned
+    /// group <c>/api/v{version}</c>, as <c>MapCatalogEndpoints</c> does. Map it before the Swagger
+    /// set-up (#176). Below <c>/auth</c>: the session probe and its extension (S5-29), sign-in and
+    /// sign-out, registration and the password reset; below <c>/account</c>: the account, its
+    /// settings (S5-25a), export and deletion; below <c>/organizations</c>: organisations, members
+    /// and invitations. Sign-in, account and organisations came from the host with the users (S6-10).
     /// </summary>
     public static IEndpointRouteBuilder MapIdentityAccessEndpoints(this IEndpointRouteBuilder routes)
     {
         ArgumentNullException.ThrowIfNull(routes);
+
         var auth = routes.MapGroup("/auth").WithTags("Auth");
         SessionProbeEndpoint.Map(auth);
         SessionExtendEndpoint.Map(auth);
         UserPreferencesEndpoints.Map(routes);
+
+        routes.MapAuthEndpoints()
+              .MapRegistrationEndpoints()
+              .MapPasswordResetEndpoints()
+              .MapAccountEndpoints()
+              .MapAccountExportEndpoints()
+              .MapAccountDeletionEndpoints()
+              .MapOrganizationEndpoints()
+              .MapInvitationEndpoints();
         return routes;
     }
 
     /// <summary>
-    /// The organisation part of the E2E seeder (TESTING §6.3; S5-16b, owner decision S5-16 7a):
-    /// creates the organisation <paramref name="id"/> named <paramref name="name"/> with
-    /// <paramref name="members"/> (exactly one Owner); an existing one of the same Owner stays, one of
-    /// another Owner (users created again after a rebuild) is replaced. Returns true when it created it.
-    /// The host calls it only where it seeds the E2E users (<c>Development</c> and <c>E2E</c>, the
-    /// switch <c>TestUsers:Password</c>), after the migrations; nothing here checks the environment.
+    /// Maps <c>GET /me</c> on <paramref name="routes"/>, the host's unversioned group <c>/api</c>
+    /// (<see cref="LegacyAccountEndpoint"/>): the client still reads it while the legacy screens
+    /// need it.
     /// </summary>
-    public static async Task<bool> SeedTestOrganizationAsync(
+    public static IEndpointRouteBuilder MapIdentityAccessLegacyEndpoints(this IEndpointRouteBuilder routes)
+    {
+        ArgumentNullException.ThrowIfNull(routes);
+        LegacyAccountEndpoint.Map(routes);
+        return routes;
+    }
+
+    /// <summary>
+    /// True when the host was started with a <c>roles</c> command (<c>roles list|grant|revoke …</c>)
+    /// instead of as the API (SPEC R-ADM-03, S4-25).
+    /// </summary>
+    public static bool IsRolesCommand(IReadOnlyList<string> args) => RoleCommandLine.IsCommand(args);
+
+    /// <summary>
+    /// Runs the <c>roles</c> command in <paramref name="args"/> on <paramref name="services"/>, which
+    /// must hold the Platform and IdentityAccess modules. Returns the exit code: 0 done (also when
+    /// nothing had to change), 1 refused (nothing written), 2 wrong usage.
+    /// </summary>
+    public static Task<int> RunRolesCommandAsync(
         IServiceProvider services,
-        Guid id,
-        string name,
-        IReadOnlyList<(string UserId, OrganizationRole Role)> members,
+        IReadOnlyList<string> args,
+        TextWriter output,
+        TextWriter error,
+        CancellationToken cancellationToken = default) =>
+        RoleCommandLine.RunAsync(services, args, output, error, cancellationToken);
+
+    /// <summary>Exit code of a <c>roles</c> command that failed or was refused.</summary>
+    public const int RolesCommandFailure = RoleCommandLine.Failure;
+
+    /// <summary>
+    /// The Development rebuild of the users (SEC-06): deletes every account and creates the sample
+    /// user <see cref="SampleUserEmail"/> with <paramref name="sampleUserPassword"/>; without a
+    /// password no user is created. Returns true when it created the user. The host calls it only in
+    /// <c>Development</c> with <c>RebuildDatabase</c> set; nothing here checks the environment.
+    /// </summary>
+    public static async Task<bool> RebuildSampleUsersAsync(
+        IServiceProvider services, string? sampleUserPassword, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        await using var scope = services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<SeedUsers>().RebuildAsync(sampleUserPassword, cancellationToken);
+    }
+
+    /// <summary>Address of the sample user of the Development rebuild.</summary>
+    public const string SampleUserEmail = SeedUsers.SampleUserEmail;
+
+    /// <summary>
+    /// The E2E seeder (TESTING §6.3; S5-14, S5-16b, owner decision S5-16 7a): creates the users of
+    /// <paramref name="users"/> that do not exist yet, each with <paramref name="password"/>, and the
+    /// organisation <paramref name="organizationId"/> named <paramref name="organizationName"/> with
+    /// <paramref name="members"/> (addresses of <paramref name="users"/>, exactly one Owner). An
+    /// existing user stays as it is; an existing organisation of the same Owner stays, one of another
+    /// Owner (users created again after a rebuild) is replaced. The host calls it only in
+    /// <c>Development</c> and <c>E2E</c> with the switch <c>TestUsers:Password</c>, after the
+    /// migrations; nothing here checks the environment.
+    /// </summary>
+    public static async Task SeedTestUsersAsync(
+        IServiceProvider services,
+        IReadOnlyList<(string Email, bool EmailConfirmed)> users,
+        string password,
+        Guid organizationId,
+        string organizationName,
+        IReadOnlyList<(string Email, OrganizationRole Role)> members,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(users);
         ArgumentNullException.ThrowIfNull(members);
+        ArgumentException.ThrowIfNullOrEmpty(password);
         if (members.Count(m => m.Role == OrganizationRole.Owner) != 1)
         {
             throw new ArgumentException("A test organisation has exactly one Owner.", nameof(members));
         }
 
         await using var scope = services.CreateAsyncScope();
-        return await scope.ServiceProvider.GetRequiredService<TestOrganizationSeeder>().SeedAsync(id, name, members, cancellationToken);
-    }
-
-    /// <summary>
-    /// Issues the antiforgery token cookie for the user of <paramref name="context"/>
-    /// (<c>HttpContext.User</c>), as the session probe does (SEC-09). For the host's sign-in and
-    /// sign-out endpoints, which rotate the token because it is bound to the user; it moves into the
-    /// module with them (M3.1). Set <c>HttpContext.User</c> to the new principal first.
-    /// </summary>
-    public static void IssueAntiforgeryToken(HttpContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-        AntiforgeryTokenCookie.Issue(context);
+        var ids = await scope.ServiceProvider.GetRequiredService<SeedUsers>().EnsureAsync(users, password);
+        var memberIds = members.Select(m => (UserId: ids[m.Email], m.Role)).ToList();
+        await scope.ServiceProvider.GetRequiredService<TestOrganizationSeeder>()
+                   .SeedAsync(organizationId, organizationName, memberIds, cancellationToken);
     }
 }

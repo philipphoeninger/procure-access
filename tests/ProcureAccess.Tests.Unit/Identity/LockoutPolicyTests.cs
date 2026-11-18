@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using API.ProcureAccess.Auth;
+using ProcureAccess.Modules.IdentityAccess.Auth;
 using API.ProcureAccess.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

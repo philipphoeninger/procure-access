@@ -22,6 +22,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { injectSuggestionLink } from '@app/core/contact/criteria-suggestion';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@app/features/identity/services/auth.service';
@@ -88,7 +89,9 @@ const STATUS_KEY = 'criteria.list.status.count';
  * excludes a criterion — „Liste speichern“ (S5-20b) and „Liste exportieren“, which opens the export
  * dialog S13; under the counter `criteria.list.unsaved`, because the draft of S11 is never saved
  * itself — saving makes a list of the organisation (S5-22, owner decision S5-22 4). „Zur Notiz“ of
- * S13 (TD-40) opens the note of its criterion, after clearing a filter that hides its card. The
+ * S13 (TD-40) opens the note of its criterion, after clearing a filter that hides its card;
+ * „Kriterien neu laden“ of S13 after `release-mismatch` loads the list for the active release, the
+ * selection kept and the per-criterion changes dropped, and moves the focus to the H1 (TD-39). The
  * bar (`pa-criteria-action-bar`, shared with a saved list since S5-21b) is in the flow below 600 px
  * width or height and sticky from there, and never covers the focused element (WCAG 2.4.11). Not
  * `pa-criteria-list`: the legacy list has that selector.
@@ -138,6 +141,7 @@ export class CriteriaListPage {
   private readonly filterRow = viewChild(CriteriaListFilterRow);
   private readonly cards = viewChildren(CriterionCard);
   private readonly injector = inject(Injector);
+  private readonly pageTitle = inject(PageTitleStrategy);
 
   protected readonly configuratorPath = CONFIGURATOR_PATH;
   protected readonly appTypeStepState = APP_TYPE_STEP_STATE;
@@ -234,8 +238,27 @@ export class CriteriaListPage {
     ExportDialog.open(this.dialog)
       .afterClosed()
       .subscribe((result) => {
-        if (result !== undefined) this.showNote(result.toNote);
+        // „Abbrechen“, „Schließen“ and Esc close without a result object (`mat-dialog-close` gives '').
+        if (typeof result !== 'object') return;
+        if ('toNote' in result) this.showNote(result.toNote);
+        else void this.reloadForActiveRelease();
       });
+  }
+
+  /**
+   * „Kriterien neu laden“ of S13 after `release-mismatch` (TD-39, #310; owner decision O-S6-5): the
+   * list for the active release with the same selection and without the per-criterion changes. The
+   * button that opened S13 goes while the list loads, so the focus moves to the H1 afterwards; no
+   * release at all opens the legacy filter, as on entry.
+   */
+  private async reloadForActiveRelease(): Promise<void> {
+    const status = await this.store.reloadCriteriaListForActiveRelease();
+    if (this.destroyed) return;
+    if (status === 'noRelease') {
+      await this.router.navigateByUrl(LEGACY_FILTER_PATH);
+      return;
+    }
+    this.pageTitle.focusPageHeading();
   }
 
   /** „Zur Notiz“ of S13 (TD-40): the card opens its note; a filter that hides the card is cleared first. */

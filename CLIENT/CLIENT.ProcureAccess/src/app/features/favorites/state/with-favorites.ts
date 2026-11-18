@@ -3,30 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 import { computed } from '@angular/core';
-import { initialAppState } from '@app/core/models/appState.interface';
 import {
   patchState,
   signalStoreFeature,
+  type,
   withComputed,
   withMethods,
   withState
 } from '@ngrx/signals';
-import { withLoading } from '@app/shared/state/with-loading';
-// import { withFilters } from '@app/features/filters/state/with-filters';
+import { User } from '@app/features/identity/models/user.model';
 import { ProductSave } from '../models/productSave.model';
 import { FilterSet } from '../models/filterSet.model';
-import { withIdentity } from '@app/features/identity/state/with-identity';
 
 export type FavoritesState = { productSaves: ProductSave[], filterSets: FilterSet[] };
 
+/** Legacy favourites, in memory only (reworked into `withWorkspace()`, ARCHITECTURE §8.1). Needs `withIdentity()` before it in the store. */
 export const withFavorites = () => signalStoreFeature(
-    withState<FavoritesState>({
-        productSaves: initialAppState.productSaves,
-        filterSets: initialAppState.filterSets
-    }),
-    withLoading(),
-    withIdentity(),
-    // withFilters(),
+    { state: type<{ user: User | null }>() },
+    withState<FavoritesState>({ productSaves: [], filterSets: [] }),
     withMethods((state) => {
 
         return {

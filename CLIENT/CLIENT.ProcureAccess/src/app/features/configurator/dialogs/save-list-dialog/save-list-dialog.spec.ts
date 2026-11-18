@@ -8,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { provideRouter, Router } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
@@ -31,6 +32,7 @@ import { provideLoadedConfiguratorSettings } from '../../testing/configurator-se
 let signedIn = false;
 let organization: OrganizationSummary | null = null;
 const SaveTestStore = signalStore(
+  withLoading(),
   withConfigurator(),
   withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => organization })),
 );

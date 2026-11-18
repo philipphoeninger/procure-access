@@ -586,7 +586,8 @@
       "error": "Die Datei konnte nicht erstellt werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
       "outdated": "Die Datei konnte nicht erstellt werden, weil inzwischen eine neue Katalogversion gilt. Bitte laden Sie die Kriterien neu. Ihre Auswahl von Verwendungszweck, Anwendungstyp, Funktionsbereichen und Prüfverfahren bleibt erhalten; Ihre Änderungen an einzelnen Kriterien müssen Sie erneut vornehmen.",
       "noteTooLong": "Die Notiz zum Kriterium „{{criterion}}“ ist länger als {{max}} Zeichen. Bitte kürzen Sie sie, dann können Sie die Datei herunterladen.",
-      "toNote": "Zur Notiz"
+      "toNote": "Zur Notiz",
+      "outdated.reload": "Kriterien neu laden"
     },
     "save": {
       "title": "Kriterienliste speichern",

@@ -4,7 +4,6 @@
 
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ProcureAccessStore } from '@app/core/state/app.store';
-import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
 import { Product } from '../models/product.model';
 import { MatDividerModule } from '@angular/material/divider';
@@ -37,7 +36,7 @@ export class ProductDetails {
     return /^https?:\/\//i.test(link) ? link : `https://${link}`;
   });
 
-  constructor(protected snackbarService: SnackbarService) {
+  constructor() {
     const routeId = this.route.snapshot.paramMap.get('id');
     if (routeId == null) return; //gate
     this.productId.set(+routeId);

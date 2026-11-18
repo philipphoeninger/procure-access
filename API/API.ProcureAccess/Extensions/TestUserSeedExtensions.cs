@@ -15,10 +15,11 @@ namespace API.ProcureAccess.Extensions;
 /// are reserved (<c>example.invalid</c>), the password is test data in the repository, never a secret
 /// (owner decision S5-14 3 (a)). A user that exists already is left as it is, so a second start
 /// changes nothing; the E2E stack's <c>RebuildDatabase</c> deletes them on every start anyway.
-/// The users move into IdentityAccess with the users (M3.1).
 /// Since S5-16b (owner decision S5-16 7a) it also creates three organisation users and the
-/// organisation <see cref="OrganizationName"/> with them as Owner, Editor and Reader, through the
-/// IdentityAccess module; E2E tests only read it, a test that changes an organisation builds its own.
+/// organisation <see cref="OrganizationName"/> with them as Owner, Editor and Reader; E2E tests only
+/// read it, a test that changes an organisation builds its own. Since S6-10 the IdentityAccess
+/// module creates the users and the organisation (<c>IdentityAccessModule.SeedTestUsersAsync</c>);
+/// this class decides whether it runs and names the test data.
 /// </summary>
 public static class TestUserSeedExtensions
 {
@@ -87,37 +88,8 @@ public static class TestUserSeedExtensions
             return;
         }
 
-        using var scope = app.Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        foreach (var (email, emailConfirmed) in Users)
-        {
-            if (await userManager.FindByEmailAsync(email) is not null)
-            {
-                continue;
-            }
-
-            var created = await userManager.CreateAsync(
-                new User { UserName = email, Email = email, EmailConfirmed = emailConfirmed }, password);
-            if (!created.Succeeded)
-            {
-                // Error codes only: the descriptions may repeat the password rules, never the password.
-                throw new InvalidOperationException(
-                    "Creating an E2E test user failed: " +
-                    string.Join(", ", created.Errors.Select(e => e.Code)) +
-                    ". The test user password must meet the password rule.");
-            }
-        }
-
-        var members = new List<(string UserId, OrganizationRole Role)>();
-        foreach (var (email, role) in OrganizationMembers)
-        {
-            var user = await userManager.FindByEmailAsync(email)
-                       ?? throw new InvalidOperationException("An E2E organisation user is missing after seeding.");
-            members.Add((user.Id, role));
-        }
-
-        await IdentityAccessModule.SeedTestOrganizationAsync(app.Services, OrganizationId, OrganizationName, members);
-
+        await IdentityAccessModule.SeedTestUsersAsync(
+            app.Services, Users, password, OrganizationId, OrganizationName, OrganizationMembers);
         app.Logger.LogInformation("E2E test users and the E2E organisation are seeded");
     }
 }

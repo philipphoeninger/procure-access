@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
 import { problemFieldErrors, problemTypeName } from '@app/core/errors/problem-details';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
 import {
   CONFIGURATOR_LAYERS,
@@ -157,8 +157,8 @@ export const initialConfiguratorState: ConfiguratorState = {
  */
 export const withConfigurator = () =>
   signalStoreFeature(
+    LOADING_INPUT,
     withState({ configurator: initialConfiguratorState }),
-    withLoading(),
     withMethods((
       store,
       api = inject(CatalogApiService),
@@ -352,6 +352,8 @@ export const withConfigurator = () =>
         try {
           const answer = await api.getCriteria(selection, release ?? undefined, CRITERIA_LIST_PROBLEMS);
           if (request === latestListRequest) {
+            // Without a pinned release (its options failed after a reload) the answer pins it.
+            if (store.configurator.release() === null) patch({ release: answer.release });
             patchList(() => ({ status: 'loaded', answer }));
             countShownList(selection);
           }
@@ -369,9 +371,29 @@ export const withConfigurator = () =>
         return store.configurator.list.status();
       }
 
+      /**
+       * „Kriterien neu laden“ of S13 after `release-mismatch` (TD-39, #310; owner decision O-S6-5,
+       * UX copy `criteria.export.outdated`): the pinned release is dropped, the selection of the four
+       * layers kept and every per-criterion decision dropped, search and filter cleared. The options
+       * load first for the active release, whose answer pins it again (ADR-002) and gives S11 the
+       * names of the summary; then the list. A selection the active release no longer allows gets
+       * S11's failure state with „Auswahl ändern“. Requests of the old release still running are
+       * dropped.
+       */
+      async function reloadCriteriaListForActiveRelease(): Promise<CriteriaListStatus> {
+        latestRequest++;
+        latestListRequest++;
+        clearFilter();
+        patch({ release: null, options: null, optionsStatus: 'notLoaded', changedSinceAnswer: null, reset: null });
+        patchList(() => ({ status: 'notLoaded', answer: null, decisions: {} }));
+        await loadFilterOptions();
+        return loadCriteriaList();
+      }
+
       return {
         loadFilterOptions,
         loadCriteriaList,
+        reloadCriteriaListForActiveRelease,
         /** Includes or excludes a criterion; excluded ones stay in the list (R-LST-04). */
         setCriterionIncluded(key: string, included: boolean): void {
           decide(key, (decisions) => setIncluded(decisions, key, included));

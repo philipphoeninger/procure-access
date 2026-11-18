@@ -5,17 +5,12 @@
 namespace MODELS.ProcureAccess.Entities.Mapping;
 
 /// <summary>
-/// Hand-written maps of the legacy user and proposal entities (ADR-015, replaces
-/// AutoMapper, #31). ARC-06 checks that no target member stays unset.
+/// Hand-written map of the legacy proposal entity (ADR-015, replaces AutoMapper, #31). ARC-06
+/// checks that no target member stays unset. The user's map went with the users into the
+/// IdentityAccess module (S6-10).
 /// </summary>
 public static class AccountMappings
 {
-    public static UserDto ToDto(this User user) => new()
-    {
-        Id = user.Id,
-        Email = user.Email!,
-    };
-
     public static ProposalDto ToDto(this Proposal proposal) => new()
     {
         Id = proposal.Id,

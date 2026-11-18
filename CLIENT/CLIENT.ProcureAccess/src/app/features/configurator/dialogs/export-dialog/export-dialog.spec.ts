@@ -8,10 +8,12 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { FileSaver } from '@app/core/files/file-saver';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { AuthService } from '@app/features/identity/services/auth.service';
@@ -32,6 +34,7 @@ import { provideLoadedConfiguratorSettings } from '../../testing/configurator-se
 // The dialog reads the list S11 shows, so it runs on the S11 page with the real configurator slice.
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
+  withLoading(),
   withConfigurator(),
   withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => null })),
 );
@@ -51,6 +54,9 @@ describe('ExportDialog (S13, R-LST-11)', () => {
   let exportList: ReturnType<typeof vi.fn>;
   let save: ReturnType<typeof vi.fn>;
   let announce: ReturnType<typeof vi.fn>;
+  let getCriteria: ReturnType<typeof vi.fn>;
+  let getFilterOptions: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
 
   const downloaded = { content: new Blob(['x']), fileName: 'liste.xlsx' };
 
@@ -62,6 +68,9 @@ describe('ExportDialog (S13, R-LST-11)', () => {
     exportList = api;
     save = vi.fn();
     announce = vi.fn().mockResolvedValue(undefined);
+    getCriteria = vi.fn().mockResolvedValue(criteriaAnswer());
+    getFilterOptions = vi.fn().mockResolvedValue(filterOptionsAnswer());
+    focusPageHeading = vi.fn();
     const rendered = await render(CriteriaListPage, {
       providers: [
         provideLoadedConfiguratorSettings(),
@@ -74,8 +83,8 @@ describe('ExportDialog (S13, R-LST-11)', () => {
         {
           provide: CatalogApiService,
           useValue: {
-            getFilterOptions: vi.fn().mockResolvedValue(filterOptionsAnswer()),
-            getCriteria: vi.fn().mockResolvedValue(criteriaAnswer()),
+            getFilterOptions,
+            getCriteria,
           },
         },
         { provide: ConfiguratorApiService, useValue: { reportCriteriaListShown: () => Promise.resolve(null) } },
@@ -83,6 +92,7 @@ describe('ExportDialog (S13, R-LST-11)', () => {
         { provide: FileSaver, useValue: { save } },
         { provide: AuthService, useValue: { showLogin: vi.fn() } },
         { provide: A11yAnnouncerService, useValue: { announce } },
+        { provide: PageTitleStrategy, useValue: { focusPageHeading } },
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
     });
@@ -188,7 +198,7 @@ describe('ExportDialog (S13, R-LST-11)', () => {
     expect(within(dialog).getByRole('button', { name: 'Erneut versuchen' })).toBeTruthy();
   });
 
-  it('explains a release that is no longer active and offers only „Schließen“, which takes the focus', async () => {
+  it('explains a release that is no longer active and offers „Schließen“ and „Kriterien neu laden“, which takes the focus', async () => {
     const { fixture, dialog } = await open({
       api: vi.fn().mockRejectedValue(problem(400, { type: `${base}release-mismatch`, status: 400 })),
     });
@@ -198,13 +208,43 @@ describe('ExportDialog (S13, R-LST-11)', () => {
 
     expect(within(dialog).getByRole('alert').textContent).toContain('weil inzwischen eine neue Katalogversion gilt');
     const buttons = within(dialog).getAllByRole('button');
-    expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Schließen']);
-    expect(document.activeElement).toBe(buttons[0]);
+    expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Schließen', 'Kriterien neu laden']);
+    expect(document.activeElement).toBe(buttons[1]);
     await expectNoAxeViolations();
 
     buttons[0].click();
     await fixture.whenStable();
     expect(screen.queryByRole('dialog')).toBeNull();
+    // „Schließen“ leaves the list as it was.
+    expect(getCriteria).toHaveBeenCalledTimes(1);
+  });
+
+  it('„Kriterien neu laden“ loads the list for the active release, drops the changes to single criteria and focuses the H1 (TD-39, #310)', async () => {
+    const { fixture, dialog } = await open({
+      api: vi.fn().mockRejectedValue(problem(400, { type: `${base}release-mismatch`, status: 400 })),
+    });
+    const store = fixture.debugElement.injector.get(ProcureAccessStore) as unknown as InstanceType<typeof ConfiguratorTestStore>;
+    store.setCriterionIncluded('11.3.3', false);
+    const selection = store.configurator.list.selection();
+    expect(store.configurator.release()).toBe('T.1');
+    getFilterOptions.mockResolvedValue(filterOptionsAnswer(undefined, 'T.2'));
+    getCriteria.mockResolvedValue(criteriaAnswer('T.2'));
+
+    within(dialog).getByRole('button', { name: 'Datei herunterladen' }).click();
+    await fixture.whenStable();
+    within(dialog).getByRole('button', { name: 'Kriterien neu laden' }).click();
+    await vi.waitFor(() => expect(store.configurator.list.answer()?.release).toBe('T.2'));
+    await fixture.whenStable();
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    // The options ask without a release, so the server answers with the active one, which is pinned.
+    expect(getFilterOptions).toHaveBeenLastCalledWith(expect.anything(), undefined);
+    expect(getCriteria).toHaveBeenLastCalledWith(expect.objectContaining({ appTypeIds: selection?.appTypeIds }), 'T.2', ['not-found']);
+    expect(store.configurator.list.selection()?.useCase).toBe(selection?.useCase);
+    expect(store.configurator.list.decisions()).toEqual({});
+    expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
+    // The button that opened S13 was gone while the list loaded: the focus goes to the H1.
+    expect(focusPageHeading).toHaveBeenCalledTimes(1);
   });
 });
 

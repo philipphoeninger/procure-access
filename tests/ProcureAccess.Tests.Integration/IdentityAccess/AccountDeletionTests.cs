@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
-using API.ProcureAccess.Account;
+using ProcureAccess.Modules.IdentityAccess.Accounts;
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +75,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         await StoreAsync(_listOfA, _listOfSolo);
         await StoreAsync(LinkTo(_listOfA), LinkTo(_listOfSolo));
         // Member's address is not confirmed: the deletion needs no confirmed address.
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: u != TestUsers.Member))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.Member))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -340,7 +340,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
     private async Task<User> AccountOfAsync(TestUser user)
     {
         await using var scope = Api.Factory.Services.CreateAsyncScope();
-        return await scope.ServiceProvider.GetRequiredService<ApplicationDBContext>().Users
+        return await scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>().Users
                           .IgnoreQueryFilters().AsNoTracking().SingleAsync(u => u.Id == user.Id, Cancellation);
     }
 

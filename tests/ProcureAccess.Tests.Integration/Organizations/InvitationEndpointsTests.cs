@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
-using API.ProcureAccess.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Organizations;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MODELS.ProcureAccess.Entities;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
-using ProcureAccess.Modules.IdentityAccess.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Email;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
@@ -57,7 +56,7 @@ public sealed class InvitationEndpointsTests(ApiFixture api) : IntegrationTest(a
         Emails.Clear();
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => AccountOf(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync()
@@ -432,7 +431,7 @@ public sealed class InvitationEndpointsTests(ApiFixture api) : IntegrationTest(a
         using var invitee = CreateClient(TestUsers.ReaderB);
         (await AcceptAsync(invitee, token)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
 
-        await ConfirmAsync(TestUsers.ReaderB);
+        await TestAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
         using var response = await AcceptAsync(invitee, token);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -537,27 +536,6 @@ public sealed class InvitationEndpointsTests(ApiFixture api) : IntegrationTest(a
     private static OrganizationInvitation AnInvitation(Guid organizationId, string email, DateTimeOffset createdAt) =>
         OrganizationInvitation.Create(
             organizationId, email, OrganizationRole.Reader, RandomNumberGenerator.GetBytes(32), createdAt, TimeSpan.FromDays(14));
-
-    /// <summary>The legacy account of a fixture user, so the addresses and the confirmation gate are real.</summary>
-    private static User AccountOf(TestUser user, bool confirmed) => new()
-    {
-        Id = user.Id,
-        UserName = user.Email,
-        NormalizedUserName = user.Email.ToUpperInvariant(),
-        Email = user.Email,
-        NormalizedEmail = user.Email.ToUpperInvariant(),
-        EmailConfirmed = confirmed,
-        SecurityStamp = Guid.NewGuid().ToString(),
-    };
-
-    private async Task ConfirmAsync(TestUser user)
-    {
-        await using var scope = Api.Factory.Services.CreateAsyncScope();
-        var users = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<User>>();
-        var account = (await users.FindByIdAsync(user.Id)).ShouldNotBeNull();
-        account.EmailConfirmed = true;
-        (await users.UpdateAsync(account)).Succeeded.ShouldBeTrue();
-    }
 
     private async Task<OrganizationRole?> RoleOfAsync(Guid organizationId, TestUser user)
     {

@@ -39,13 +39,8 @@ public static class DatabaseRebuildExtensions
 
         app.Logger.LogWarning("RebuildDatabase is set in Development: deleting all users and reseeding sample data");
 
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        await SampleDataInitializer.ClearDatabase(dbContext, userManager);
-
-        var seeded = await SampleDataInitializer.InitializeData(
-            dbContext, userManager, app.Configuration[SampleUserPasswordKey]);
+        // The users belong to the IdentityAccess module (S6-10); the legacy context has no sample data.
+        var seeded = await IdentityAccessModule.RebuildSampleUsersAsync(app.Services, app.Configuration[SampleUserPasswordKey]);
         if (!seeded)
         {
             // The setting name as a literal: CodeQL treats a logged value named *Password* as a secret.

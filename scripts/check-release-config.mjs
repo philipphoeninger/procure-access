@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Release check (SPEC R-SUG-01, R-SHL-07; ARCHITECTURE C85, C110, C167). Node, no dependencies:
+// Release check (SPEC R-SUG-01, R-SHL-07; ARCHITECTURE C85, C110, C169). Node, no dependencies:
 //   node scripts/check-release-config.mjs
 // Run it before a production release, not on every pull request: while a 🔧 placeholder is
 // configured it fails, and placeholders stay until their owner decision (owner, S3-21 1a) or

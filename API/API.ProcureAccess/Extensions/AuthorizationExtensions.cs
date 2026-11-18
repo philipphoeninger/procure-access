@@ -1,9 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
 //
 // SPDX-License-Identifier: MIT
-using Microsoft.AspNetCore.Authorization.Policy;
-using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
-
 namespace API.ProcureAccess.Extensions;
 
 /// <summary>Names of the claim-based authorization policies (ARCHITECTURE §9.1).</summary>
@@ -20,20 +17,15 @@ public static class AuthorizationPolicies
 public static class AuthorizationExtensions
 {
     /// <summary>
-    /// Registers the policies of <see cref="AuthorizationPolicies"/> and the e-mail confirmation gate
-    /// <see cref="IdentityAccessPolicies.ConfirmedEmail"/> (S5-12a, SEC-10) with its 403 answer.
+    /// Registers the policies of <see cref="AuthorizationPolicies"/>. The e-mail confirmation gate
+    /// (SEC-10) is registered by the IdentityAccess module since S6-10.
     /// </summary>
     public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
     {
         services.AddAuthorizationBuilder()
                 .AddPolicy(AuthorizationPolicies.ModerationReview, policy => policy
                     .RequireAuthenticatedUser()
-                    .RequireClaim(CustomClaimTypes.Permission, Permissions.ModerationReview))
-                .AddPolicy(IdentityAccessPolicies.ConfirmedEmail, policy => policy
-                    .RequireAuthenticatedUser()
-                    .AddRequirements(new ConfirmedEmailRequirement()));
-        services.AddScoped<IAuthorizationHandler, ConfirmedEmailHandler>();
-        services.AddSingleton<IAuthorizationMiddlewareResultHandler, ConfirmedEmailResultHandler>();
+                    .RequireClaim(CustomClaimTypes.Permission, Permissions.ModerationReview));
         return services;
     }
 }

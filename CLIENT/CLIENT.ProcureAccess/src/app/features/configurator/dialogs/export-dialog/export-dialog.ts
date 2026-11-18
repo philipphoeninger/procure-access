@@ -57,10 +57,11 @@ export interface SavedListExport {
   tooLongNote: Criterion | null;
 }
 
-/** What S13 closes with: „Zur Notiz“ names the criterion whose note the page opens (TD-40). */
-export interface ExportDialogResult {
-  toNote: string;
-}
+/**
+ * What S13 closes with: „Zur Notiz“ names the criterion whose note the page opens (TD-40);
+ * „Kriterien neu laden“ asks S11 to load the list for the active release (TD-39, #310).
+ */
+export type ExportDialogResult = { toNote: string } | { reload: true };
 
 /** Panel class of the dialog: 600 px from 600 px, full screen below (`styles/main.scss`, Handoff §2.3). */
 export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
@@ -83,8 +84,12 @@ export const EXPORT_DIALOG_PANEL_CLASS = 'pa-dialog';
  *   the dialog with {@link ExportDialogResult}; the page opens that note and moves the focus into it.
  * - A failure shows an error notice above the actions (`role="alert"`, S13-E): `criteria.export.error`
  *   with „Erneut versuchen“ in place of „Datei herunterladen“; a 429 the same with `errors.rateLimit`
- *   and its minutes; `release-mismatch` `criteria.export.outdated` with „Schließen“ only, which takes
- *   the focus (owner decision O-S4-72 (a); reloading the list is a follow-up).
+ *   and its minutes; `release-mismatch` `criteria.export.outdated` with „Schließen“ and „Kriterien
+ *   neu laden“ (`criteria.export.outdated.reload`), which takes the focus and closes the dialog with
+ *   `{ reload: true }`: S11 loads the list for the active release, the selection kept and the
+ *   per-criterion changes dropped, as the text says (TD-39, #310; owner decision O-S6-5). A saved
+ *   list exports under its own release and never gets `release-mismatch`; should it, „Schließen“
+ *   stays the only action (O-S4-72 (a)).
  * - The request is marked `CALLER_SHOWS_FAILURES`, so no snackbar or server page shows besides
  *   (O-S4-74 (a)); a request without an answer also turns the offline notice on.
  *
@@ -124,7 +129,8 @@ export class ExportDialog {
   private readonly dialogRef = inject<MatDialogRef<ExportDialog, ExportDialogResult>>(MatDialogRef);
   private readonly translate = inject(TranslateService);
   private readonly injector = inject(Injector);
-  private readonly closeButton = viewChild('closeButton', { read: ElementRef });
+  /** The filled button of the outdated state, which takes the focus. */
+  private readonly outdatedAction = viewChild('outdatedAction', { read: ElementRef });
   /** The saved list to export; null for the draft of S11. */
   private readonly savedList = inject<SavedListExport | null>(MAT_DIALOG_DATA, { optional: true }) ?? null;
 
@@ -149,6 +155,8 @@ export class ExportDialog {
   });
   /** The limit `criteria.export.noteTooLong` names. */
   protected readonly noteMaxLength = NOTE_MAX_LENGTH;
+  /** The draft of S11 can be loaded again for the active release; a saved list cannot (TD-39). */
+  protected readonly canReload = this.savedList === null;
   /** After a failure the primary button retries (S13-E). */
   protected readonly failedBefore = computed(() => ['failed', 'rateLimited'].includes(this.status().kind));
 
@@ -173,6 +181,11 @@ export class ExportDialog {
       return;
     }
     void this.download();
+  }
+
+  /** „Kriterien neu laden“: S11 loads the list for the active release (TD-39, #310). */
+  protected reload(): void {
+    this.dialogRef.close({ reload: true });
   }
 
   protected chooseFormat(format: ExportFormat): void {
@@ -204,9 +217,9 @@ export class ExportDialog {
       if (this.destroyed) return;
       this.status.set(statusOf(error));
       if (this.status().kind === 'outdated') {
-        // „Datei herunterladen“ is gone: the focus moves to „Schließen“, which replaces it.
+        // „Datei herunterladen“ is gone: the focus moves to the filled button that replaces it.
         afterNextRender(
-          () => (this.closeButton()?.nativeElement as HTMLButtonElement | undefined)?.focus(),
+          () => (this.outdatedAction()?.nativeElement as HTMLButtonElement | undefined)?.focus(),
           { injector: this.injector },
         );
       }

@@ -4,13 +4,13 @@
 
 import {
   ChangeDetectionStrategy, Component, computed,
-  effect, inject, OnInit, output, signal, viewChild, ViewChildren, WritableSignal
+  effect, inject, OnInit, output, signal, viewChild, WritableSignal
 } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule, MatListOption } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -48,8 +48,6 @@ import { ProductType } from '@app/features/products/models/productType.model';
 export class FiltersSelection implements OnInit {
     protected store = inject(ProcureAccessStore);
     protected filtersApiService = inject(FiltersApiService);
-
-    protected listOptions = ViewChildren(MatListOption);
 
     EnFilterTypeName = EnFilterTypeName;
 
@@ -109,9 +107,10 @@ export class FiltersSelection implements OnInit {
       })
     }
 
-    async ngOnInit() {
+    ngOnInit() {
+        // The error interceptor reports a failed request (S3-02 R1, S6-24); the lists stay empty.
         if (this.store.filterTypes().length === 0)
-            await this.store.loadFilters();
+            this.store.loadFilters().catch(() => undefined);
 
         // this.filtersApiService.getAllCriteriaFilters().then((allFilters) => {
         //     let productFilterTypes =
@@ -152,7 +151,7 @@ export class FiltersSelection implements OnInit {
 
     selected(event: MatAutocompleteSelectedEvent): void {
         const selectedCriteriaFilterIds = this.markedCriteriaFilters();
-        const productType = this.store.getCriteriaFilterByName(event.option.value);
+        const productType = this.store.getCriteriaFilterByName(event.option.value as string);
         if (!productType) return; //gate
         if (!event.option.selected) {
             const index = selectedCriteriaFilterIds.findIndex(x => x.id == productType.id);

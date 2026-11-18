@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
@@ -14,9 +15,10 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 /// The IdentityAccess module's own database context (ARCHITECTURE ADR-014) in the <c>identity</c>
 /// schema. It holds the Data Protection key ring (§9.1, C60; S3-24) and, since S4-25, the contributor
 /// profiles and their user links (§5.2), since S5-12a the hashed account tokens (§9.1) and since
-/// S5-15 the organisations and their memberships (§5.2, §5.4), since S5-17a the invitations; the
-/// users follow with M3.1. No other
-/// module and no legacy code uses it.
+/// S5-15 the organisations and their memberships (§5.2, §5.4), since S5-17a the invitations, and
+/// since S6-10 the users and roles: the seven ASP.NET Core Identity tables, taken over from the
+/// legacy context with their rows (ADR-014 rule 4; <see cref="IdentityTablesConfiguration"/>). No
+/// other module and no legacy code uses it.
 /// </summary>
 /// <remarks>
 /// Its history table is <c>identity."__EFMigrationsHistory"</c>. The organisation-scoped tables
@@ -26,7 +28,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence;
 /// </remarks>
 internal sealed class IdentityAccessDbContext(
     DbContextOptions<IdentityAccessDbContext> options, IOrganizationContext organizations)
-    : DbContext(options), IDataProtectionKeyContext
+    : IdentityDbContext<User>(options), IDataProtectionKeyContext
 {
     // A field, not the primary-constructor parameter: EF turns a member chain rooted at the context
     // instance into a query parameter, so the filter is evaluated per query, never cached in the model.
@@ -81,7 +83,11 @@ internal sealed class IdentityAccessDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Identity's own mapping first (keys, indexes, the 256-character names and addresses).
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.HasDefaultSchema(Schema);
+        IdentityTablesConfiguration.Apply(modelBuilder);
         modelBuilder.HasCollation("public", CaseInsensitiveCollation, locale: "und-u-ks-level2", provider: "icu", deterministic: false);
         modelBuilder.ApplyConfiguration(new DataProtectionKeyConfiguration());
         modelBuilder.ApplyConfiguration(new ContributorProfileConfiguration());
