@@ -33,6 +33,7 @@ export const PROBLEM_TYPE_KEYS: Readonly<Record<string, string>> = {
   'last-owner': 'org.members.lastOwner',
   'invitation-mismatch': 'org.invite.mismatch',
   'sole-owner': 'account.delete.soleOwner',
+  'project-archived': 'projects.archived.note',
 };
 
 /**

@@ -99,6 +99,30 @@ describe('MainNav', () => {
       expect(screen.queryByRole('button', { name: /^Organisation:/ })).toBeNull();
     });
 
+    it.each(['bar', 'drawer'] as const)(
+      'lists „Projekte“ to S30 between Kriterien and Produkte in the layout %s (Figma 2017:565; S6-13)',
+      async (layout) => {
+        await renderNav(layout, true, ONE_ORGANIZATION);
+
+        const links = within(mainNav()).getAllByRole('link');
+        expect(links.map((link) => [link.textContent?.trim(), link.getAttribute('href')])).toEqual([
+          ['Kriterien', '/kriterien'],
+          ['Projekte', '/projekte'],
+          ['Produkte', '/products'],
+        ]);
+      },
+    );
+
+    it.each(['/projekte', '/projekte/p-1'])('marks „Projekte“ as current on %s (S30 and a project)', async (url) => {
+      const { fixture } = await renderNav('bar', true, ONE_ORGANIZATION);
+
+      await TestBed.inject(Router).navigateByUrl(url);
+      await fixture.whenStable();
+
+      expect(screen.getByRole('link', { name: 'Projekte' }).getAttribute('aria-current')).toBe('page');
+      expect(screen.getByRole('link', { name: 'Kriterien' }).hasAttribute('aria-current')).toBe(false);
+    });
+
     it('lists Konto, Organisation, Kriterienlisten, Einstellungen and Abmelden in the menu „Konto“; „Organisation“ opens S21', async () => {
       const { fixture } = await renderNav('bar', true, ONE_ORGANIZATION);
 
@@ -166,13 +190,19 @@ describe('MainNav', () => {
       expect(screen.queryByRole('link', { name: 'Kriterienlisten' })).toBeNull();
     });
 
-    it('shows the organisation display as soon as the first membership is read', async () => {
+    it.each(['bar', 'drawer'] as const)('shows no „Projekte“ without a membership in the layout %s (R-SHL-02)', async (layout) => {
+      await renderNav(layout, true);
+      expect(within(mainNav()).queryByRole('link', { name: 'Projekte' })).toBeNull();
+    });
+
+    it('shows the organisation display and „Projekte“ as soon as the first membership is read', async () => {
       const { fixture, store } = await renderNav('bar', true);
 
       store.organizations.set(ONE_ORGANIZATION);
       await fixture.whenStable();
 
       expect(screen.getByText('Organisation: Ämter Musterhausen')).toBeTruthy();
+      expect(within(mainNav()).getByRole('link', { name: 'Projekte' }).getAttribute('href')).toBe('/projekte');
     });
   });
 

@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@let shown = view();
+@if (shown.kind === 'project') {
+  <h1 class="pa-project__title">{{ shown.project.name }}</h1>
+  <p class="pa-project__meta">
+    {{ 'projects.detail.meta' | translatePlural: shown.project.productCount : { status: (statusKey(shown.project.status) | translate) } }}
+  </p>
+  @if (shown.project.status === 'archived') {
+    <pa-notice kind="info">
+      <p>{{ 'projects.archived.note' | translate }}</p>
+    </pa-notice>
+  }
+} @else {
+  <pa-error-page [kind]="shown.kind" />
+}

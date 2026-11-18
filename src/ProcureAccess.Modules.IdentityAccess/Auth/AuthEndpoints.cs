@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.IdentityAccess.Session;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
+using ProcureAccess.Modules.Platform.Contracts.RateLimiting;
 
 namespace ProcureAccess.Modules.IdentityAccess.Auth;
 
@@ -25,6 +26,11 @@ namespace ProcureAccess.Modules.IdentityAccess.Auth;
 /// sees a 401 it would open itself on (owner decision S5-07 Q2 (a)). A failed attempt counts
 /// towards the lockout (5 attempts, 15 minutes 🔧, R-AUTH-03). Success sets the session cookie
 /// and answers 204.</para>
+/// <para>Rate limits (SPEC §7.3, S6-26, owner decision O-S6-2): <see cref="RateLimitPolicies.SignIn"/>
+/// per client IP (middleware) and <see cref="RateLimitPolicies.SignInAddress"/> per address
+/// (<see cref="IKeyedRateLimiter"/>, after binding). Every attempt with both fields counts, also a
+/// successful one; the address counts before it is looked up, so the 429 is the same for an
+/// address with and without an account.</para>
 /// <para><c>POST /api/v1/auth/logout</c>: ends the session (the cookie is deleted) and answers 204,
 /// also for a request without a session.</para>
 /// <para>Both issue a new antiforgery token, because it is bound to the user (SEC-09); both are
@@ -46,14 +52,17 @@ internal static class AuthEndpoints
 
         auth.MapPost(LoginPath, LoginAsync)
             .AllowAnonymous()
+            .RequireRateLimiting(RateLimitPolicies.SignIn)
             .WithName("PostLogin")
             .WithSummary("Signs in with e-mail address and password and sets the session cookie")
             .WithDescription(
                 "204 with the session cookie and a new XSRF-TOKEN. 400 validation with an error for '$' for a wrong " +
-                "address or password, a locked or a deleted account; 400 antiforgery without the token of GET /auth/session.")
+                "address or password, a locked or a deleted account; 400 antiforgery without the token of GET /auth/session; " +
+                "429 rate-limit per client IP or per address.")
             .Accepts<LoginRequestBody>("application/json")
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem();
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         auth.MapPost(LogoutPath, LogoutAsync)
             .AllowAnonymous()
@@ -69,9 +78,10 @@ internal static class AuthEndpoints
         LoginRequestBody body,
         UserManager<User> users,
         SignInManager<User> signIn,
+        ILookupNormalizer normalizer,
+        IKeyedRateLimiter limiter,
         HttpContext context)
     {
-
         var fieldErrors = new Dictionary<string, string[]>(StringComparer.Ordinal);
         if (string.IsNullOrWhiteSpace(body.Email))
         {
@@ -87,6 +97,10 @@ internal static class AuthEndpoints
         {
             return TypedResults.ValidationProblem(fieldErrors, type: ProblemTypes.Validation);
         }
+
+        // Throws RateLimitExceededException (→ 429) for the 🔧 eleventh attempt per hour for this
+        // address, before the lookup, so the answer never tells whether the address has an account.
+        limiter.Acquire(RateLimitPolicies.SignInAddress, normalizer.NormalizeEmail(body.Email!.Trim()));
 
         var user = await users.FindByEmailAsync(body.Email!);
         if (user is null || user.IsDeleted)

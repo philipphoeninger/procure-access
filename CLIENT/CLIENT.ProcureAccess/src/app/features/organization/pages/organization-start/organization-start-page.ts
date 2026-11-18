@@ -25,10 +25,11 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
-import { applyServerErrors, problemTypeName, ServerErrorField } from '@app/core/errors/problem-details';
+import { applyServerErrors, problemDetails, problemTypeName, ServerErrorField } from '@app/core/errors/problem-details';
 import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm-required-notice/confirm-required-notice';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
 import { Notice } from '@app/shared/components/notice/notice';
+import { pluralKey } from '@app/shared/pipes/translate-plural.pipe';
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH, ORGANIZATION_TYPES, OrganizationType, typeKey } from '../../models/organization';
 import { OrganizationApiService } from '../../services/api/organization-api.service';
 
@@ -61,8 +62,9 @@ type Field = ServerErrorField & { path: string; message: () => TextKey | null };
  * the same. A failed submit shows the error summary with the focus. The server refuses an
  * unconfirmed address with 403 `email-unconfirmed` (SEC-10): then `pa-confirm-required-notice`
  * shows above the form and takes the focus, and the input is kept for a second submit after the
- * confirmation. Success opens S21 of the new organisation, whose route change titles, focuses and
- * announces it.
+ * confirmation. A 429 `rate-limit` (5 organisations per day per user, SPEC §7.3; S6-26) shows
+ * `errors.rateLimit` with the server's minutes in the error summary. Success opens S21 of the new
+ * organisation, whose route change titles, focuses and announces it.
  *
  * @spec docs/SPEC_v2.md R-ORG-01, R-ORG-06, §8.9; docs/design_handoff_procureaccess_v1.md §5.3, §6.4
  * @invariants API-02, SEC-10, A11Y-09
@@ -189,6 +191,12 @@ export class OrganizationStartPage {
       case 'antiforgery':
         this.showErrors([{ message: { key: 'errors.antiforgery' } }]);
         return;
+      case 'rate-limit': {
+        // 5 organisations per day per user (SPEC §7.3, S6-26): the minutes of the whole day.
+        const minutes = problemDetails(error)?.retryAfterMinutes ?? 1;
+        this.showErrors([{ message: { key: pluralKey(this.translate, 'errors.rateLimit', minutes), params: { minutes } } }]);
+        return;
+      }
       case 'validation': {
         const lines = applyServerErrors(error, (path) => this.fields.find((field) => field.path === path));
         this.typeError.set(this.typeMessage());

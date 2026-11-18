@@ -125,6 +125,18 @@ describe('OrganizationStartPage (S20, R-ORG-01)', () => {
     await expectNoAxeViolations();
   });
 
+  it('shows the wait of a 429 in the error summary (SPEC §7.3, S6-26)', async () => {
+    const { fixture } = await openPage({
+      rejectWith: new HttpErrorResponse({ status: 429, error: { type: `${base}rate-limit`, retryAfterMinutes: 1440 } }),
+    });
+
+    fillName('Stadt Musterhausen');
+    screen.getByRole('radio', { name: 'Unternehmen' }).click();
+    await submit(fixture);
+
+    expect(screen.getByText(/Bitte warten Sie 1440 Minuten und versuchen Sie es dann erneut\./)).toBeTruthy();
+  });
+
   it('puts the server field errors at their fields (API-02)', async () => {
     const { fixture } = await openPage({
       rejectWith: new HttpErrorResponse({

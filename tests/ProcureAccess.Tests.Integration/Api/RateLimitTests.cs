@@ -17,7 +17,9 @@ namespace ProcureAccess.Tests.Integration.Api;
 /// The rate limits of SPEC §7.3 on the anonymous endpoints (API-05; S4-21a, owner decisions
 /// O-S4-56 (b), O-S4-69 (a)): limit + 1 → 429 as Problem Details of type <c>rate-limit</c> with
 /// <c>retryAfterMinutes</c>, counted per client IP as the trusted proxies forward it; since S5-12a
-/// also the registration (per client IP) and the confirmation resend (per signed-in user). Runs on an API
+/// also the registration (per client IP) and the confirmation resend (per signed-in user); since S6-26
+/// the sign-in per client IP and the organisation creation per user (the sign-in per address is in
+/// <c>SignInRateLimitTests</c>). Runs on an API
 /// host of its own with a limit of <see cref="PermitLimit"/>, on the shared database.
 /// </summary>
 public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -29,6 +31,8 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
     private const string RegisterPath = "/api/v1/auth/register";
     private const string ResendPath = "/api/v1/auth/confirm-email/resend";
     private const string PasswordResetPath = "/api/v1/auth/password-reset";
+    private const string LoginPath = "/api/v1/auth/login";
+    private const string OrganizationsPath = "/api/v1/organizations";
 
     /// <summary>Address of the client's nginx in the Docker network: a trusted proxy.</summary>
     private const string Nginx = "172.18.0.3";
@@ -61,6 +65,10 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 ["RateLimits:Invitation:Window"] = WindowSetting,
                 ["RateLimits:SavedExport:PermitLimit"] = $"{PermitLimit}",
                 ["RateLimits:SavedExport:Window"] = WindowSetting,
+                ["RateLimits:SignIn:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:SignIn:Window"] = WindowSetting,
+                ["RateLimits:OrganizationCreation:PermitLimit"] = $"{PermitLimit}",
+                ["RateLimits:OrganizationCreation:Window"] = WindowSetting,
             },
             configureServices: TestRemoteAddress.AddTo);
         return ValueTask.CompletedTask;
@@ -74,7 +82,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         }
     }
 
-    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath, RegisterPath, PasswordResetPath];
+    public static TheoryData<string> LimitedPaths => [ExportPath, CriteriaListShownPath, RegisterPath, PasswordResetPath, LoginPath];
 
     [Theory(DisplayName = "INV:API-05 " + nameof(Post_OneMoreThanTheLimit_Returns429WithRetryAfterMinutes))]
     [Trait("Invariant", "API-05")]
@@ -244,6 +252,47 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
         otherUser.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
     }
 
+    [Fact(DisplayName = "INV:API-05 " + nameof(CreateOrganization_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree))]
+    [Trait("Invariant", "API-05")]
+    public async Task CreateOrganization_OneMoreThanTheLimitForOneUser_Returns429AndLeavesOtherUsersFree()
+    {
+        // The endpoint needs a confirmed address, and authorization runs before the limiter: without
+        // the accounts every request would answer 403 and never count (SPEC §7.3, S6-26).
+        await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.Of(TestUsers.OwnerA, confirmed: true), TestAccounts.Of(TestUsers.OwnerB, confirmed: true));
+        using var client = Host.CreateDefaultClient(BaseAddress);
+        const string sharedAddress = "203.0.113.100";
+
+        // Refused requests count too: these carry no antiforgery token and answer 400.
+        for (var i = 0; i < PermitLimit; i++)
+        {
+            using var allowed = await PostAsUserAsync(client, OrganizationsPath, TestUsers.OwnerA.Name, sharedAddress);
+            allowed.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests, $"request {i + 1}");
+        }
+
+        using var limited = await PostAsUserAsync(client, OrganizationsPath, TestUsers.OwnerA.Name, sharedAddress);
+        using var otherUser = await PostAsUserAsync(client, OrganizationsPath, TestUsers.OwnerB.Name, sharedAddress);
+
+        var problem = await ProblemResponse.ReadAsync(limited, Cancellation);
+        problem.Deviations(HttpStatusCode.TooManyRequests, TypeUri(ProblemTypes.RateLimit), requireErrors: false).ShouldBeEmpty();
+        problem.Json!.Value.GetProperty("retryAfterMinutes").GetInt32().ShouldBe(10);
+        otherUser.StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
+    }
+
+    [Fact]
+    public async Task CreateOrganization_UnconfirmedUser_Returns403AndDoesNotCount()
+    {
+        await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.Of(TestUsers.EditorA, confirmed: false));
+        using var client = Host.CreateDefaultClient(BaseAddress);
+
+        for (var i = 0; i <= PermitLimit; i++)
+        {
+            using var refused = await PostAsUserAsync(client, OrganizationsPath, TestUsers.EditorA.Name, "203.0.113.110");
+            refused.StatusCode.ShouldBe(HttpStatusCode.Forbidden, $"request {i + 1}");
+        }
+    }
+
     [Fact]
     public async Task Resend_Anonymous_Returns401AndDoesNotCount()
     {
@@ -265,7 +314,7 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
             .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false)
             .Build();
 
-        foreach (var policy in new[] { "AnonymousExport", "CriteriaListShown" })
+        foreach (var policy in new[] { "AnonymousExport", "CriteriaListShown", "SignIn" })
         {
             configuration[$"RateLimits:{policy}:PermitLimit"].ShouldBe("30", policy);
             configuration[$"RateLimits:{policy}:Window"].ShouldBe("00:10:00", policy);
@@ -282,6 +331,12 @@ public sealed class RateLimitTests(ApiFixture api) : IntegrationTest(api), IAsyn
 
         configuration["RateLimits:PasswordResetAddress:PermitLimit"].ShouldBe("3");
         configuration["RateLimits:PasswordResetAddress:Window"].ShouldBe("01:00:00");
+
+        // S6-26, owner decision O-S6-2.
+        configuration["RateLimits:SignInAddress:PermitLimit"].ShouldBe("10");
+        configuration["RateLimits:SignInAddress:Window"].ShouldBe("01:00:00");
+        configuration["RateLimits:OrganizationCreation:PermitLimit"].ShouldBe("5");
+        configuration["RateLimits:OrganizationCreation:Window"].ShouldBe("1.00:00:00");
 
         configuration["ForwardedHeaders:ForwardLimit"].ShouldBe("2");
         configuration["Health:ReadyConcurrentChecks"].ShouldBe("2");

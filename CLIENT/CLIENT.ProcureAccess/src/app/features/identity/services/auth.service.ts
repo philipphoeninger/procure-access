@@ -13,8 +13,8 @@ import { LOGIN_PATH, LoginNavigationState, LoginReason, REGISTER_PATH } from '..
 import { SessionResponse } from '../models/session';
 import { User } from '../models/user.model';
 
-/** Problem types of `POST /api/v1/auth/login` that the sign-in form shows itself (SPEC §8.8). */
-export const LOGIN_PROBLEMS: readonly string[] = ['validation', 'antiforgery'];
+/** Problem types of `POST /api/v1/auth/login` that the sign-in form shows itself (SPEC §8.8, §7.3). */
+export const LOGIN_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'rate-limit'];
 
 /** Problem types of `POST /api/v1/auth/register` that S02 shows in its error summary (SPEC §8.8). */
 export const REGISTER_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'rate-limit'];

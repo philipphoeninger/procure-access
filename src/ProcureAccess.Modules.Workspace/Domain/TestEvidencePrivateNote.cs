@@ -15,7 +15,7 @@ namespace ProcureAccess.Modules.Workspace.Domain;
 /// </remarks>
 internal sealed class TestEvidencePrivateNote
 {
-    /// <summary>Longest note (SPEC §7.2 v2.51, like the other private notes).</summary>
+    /// <summary>Longest note (SPEC §7.2 v2.53, like the other private notes).</summary>
     public const int QualificationNoteMaxLength = 2000;
 
     private TestEvidencePrivateNote()

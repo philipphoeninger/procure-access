@@ -144,6 +144,20 @@ describe('LoginForm (sign-in form of S01 and the login overlay, R-AUTH-03)', () 
     expect(screen.getByText(/aus Sicherheitsgründen nicht ausgeführt/)).toBeTruthy();
   });
 
+  it('shows the wait of a 429 in the error summary, without the lockout note (SPEC §7.3, S6-26)', async () => {
+    const { fixture } = await renderForm({
+      rejectWith: new HttpErrorResponse({ status: 429, error: { type: `${base}rate-limit`, retryAfterMinutes: 60 } }),
+    });
+
+    await fillAndSubmit(fixture);
+
+    expect(signedIn).not.toHaveBeenCalled();
+    const summary = screen.getByRole('heading', { level: 2, name: /1 Angabe muss noch korrigiert werden/ }).closest('pa-notice')!;
+    expect(summary.textContent).toContain('Bitte warten Sie 60 Minuten und versuchen Sie es dann erneut.');
+    expect(summary.textContent).not.toContain('Fehlversuchen');
+    expect(document.activeElement).toBe(summary);
+  });
+
   it('leaves other failures to the error interceptor and keeps the form usable', async () => {
     const { fixture } = await renderForm({ rejectWith: new HttpErrorResponse({ status: 503 }) });
 
