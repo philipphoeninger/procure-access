@@ -12,9 +12,11 @@ SPDX-License-Identifier: MIT
   </ItemGroup>
 
   <!-- Same EF Core and Npgsql versions as the other modules. DataProtection.EntityFrameworkCore (MIT, owner OK S3-24)
-       stores the Data Protection key ring in the database (ARCHITECTURE §9.1, C60). -->
+       stores the Data Protection key ring in the database (ARCHITECTURE §9.1, C60). Identity.EntityFrameworkCore (MIT,
+       owner OK S6-10) holds the users and roles; it came from the legacy DAL project with them. -->
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>

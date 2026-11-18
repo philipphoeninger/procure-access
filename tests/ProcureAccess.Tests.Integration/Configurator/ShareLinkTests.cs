@@ -64,7 +64,7 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 new ConfigurationCriterionDraft(3, PriorityLevel.B, IsIncluded: false, OverrideWeight: 7),
             ]);
         await StoreAsync([.. _tenants.Entities, _list]);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -388,7 +388,7 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
         rows.Count.ShouldBe(1);
         rows[0].RevokedAt.ShouldBeNull();
 
-        await LegacyAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
+        await TestAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
         using var confirmed = await SendAsync(client, action, created.Id);
         confirmed.StatusCode.ShouldBe(action == "create" ? HttpStatusCode.Created : HttpStatusCode.NoContent);
     }

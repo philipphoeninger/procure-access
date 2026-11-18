@@ -61,7 +61,7 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
                 .ShouldNotBe(PasswordVerificationResult.Failed);
         }
 
-        await using var db = CreateDbContext();
+        await using var db = CreateIdentityAccessContext();
         (await db.UserRoles.CountAsync(TestContext.Current.CancellationToken)).ShouldBe(0);
     }
 
@@ -156,7 +156,7 @@ public sealed class TestUserSeedGuardTests(ApiFixture api) : IAsyncDisposable
 
     private async Task<List<User>> UsersAsync()
     {
-        await using var db = CreateDbContext();
+        await using var db = CreateIdentityAccessContext();
         return await db.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync(TestContext.Current.CancellationToken);
     }
 

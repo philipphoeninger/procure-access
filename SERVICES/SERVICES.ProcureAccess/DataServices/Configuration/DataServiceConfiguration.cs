@@ -25,7 +25,6 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriterionService, CriterionService>();
         services.AddScoped<IFilterTypeService, FilterTypeService>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IProposalService, ProposalService>();
 
         return services;

@@ -12,7 +12,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Organizations;
 /// <summary>
 /// The organisation part of the E2E seeder (TESTING §6.3; owner decision S5-16 7a): one organisation
 /// with an Owner, an Editor and a Reader, created once. The host calls it through
-/// <see cref="IdentityAccessModule.SeedTestOrganizationAsync"/> only in <c>Development</c> and
+/// <see cref="IdentityAccessModule.SeedTestUsersAsync"/> only in <c>Development</c> and
 /// <c>E2E</c> and only when the E2E users are switched on; this class checks nothing about the
 /// environment.
 /// </summary>

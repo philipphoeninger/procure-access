@@ -15,7 +15,14 @@ public static class ApiVersionConfiguration
             {
                 //Set default version
                 options.DefaultApiVersion = defaultVersion;
+                // Still needed: the legacy controllers declare version 1.0 but keep their routes
+                // /api/<controller> without the version segment, and GET /api/me is unversioned.
+                // The analyzer only sees this project, where since S6-10 no minimal API is left
+                // without a version (the last one moved into the IdentityAccess module), so it
+                // reports AV0016. Remove the option and this pragma with the last legacy controller.
+#pragma warning disable AV0016
                 options.AssumeDefaultVersionWhenUnspecified = true;
+#pragma warning restore AV0016
                 //options.UseApiBehavior = true;
 
                 //reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"

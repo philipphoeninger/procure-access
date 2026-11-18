@@ -45,7 +45,7 @@ public sealed class SavedExportEndpointTests(ApiFixture api) : IntegrationTest(a
         await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: true))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

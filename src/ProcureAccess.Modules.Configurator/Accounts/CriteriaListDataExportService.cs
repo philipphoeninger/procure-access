@@ -4,9 +4,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Catalog.Contracts;
-using ProcureAccess.Modules.Configurator.Contracts.Accounts;
 using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.Configurator.Persistence;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 
 namespace ProcureAccess.Modules.Configurator.Accounts;
@@ -83,6 +83,15 @@ internal sealed class CriteriaListDataExportService(
                          .Select(c => CriterionOf(c, decisions[c.RevisionId]))]);
     }
 
+    /// <summary>The level names of SPEC §8.2: <c>A</c>, <c>B</c>, <c>Info</c>.</summary>
+    private static string LevelName(PriorityLevel level) => level switch
+    {
+        PriorityLevel.A => "A",
+        PriorityLevel.B => "B",
+        PriorityLevel.Info => "Info",
+        _ => throw new ArgumentOutOfRangeException(nameof(level), level, "Unknown priority level."),
+    };
+
     private static ExportedListCriterion CriterionOf(ResolvedCatalogCriterion criterion, ConfigurationCriterion decision)
     {
         var effective = decision.EffectiveLevel;
@@ -93,8 +102,8 @@ internal sealed class CriteriaListDataExportService(
             criterion.Number,
             criterion.PlainLanguageTitle ?? criterion.Title,
             decision.IsIncluded,
-            decision.ResolvedLevel,
-            effective,
+            LevelName(decision.ResolvedLevel),
+            LevelName(effective),
             weight,
             decision.NoteDe);
     }

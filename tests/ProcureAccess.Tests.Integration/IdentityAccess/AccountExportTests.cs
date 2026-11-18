@@ -4,7 +4,7 @@
 
 using System.Net;
 using System.Text.Json;
-using API.ProcureAccess.Account;
+using ProcureAccess.Modules.IdentityAccess.Accounts;
 using MODELS.ProcureAccess.Entities;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
