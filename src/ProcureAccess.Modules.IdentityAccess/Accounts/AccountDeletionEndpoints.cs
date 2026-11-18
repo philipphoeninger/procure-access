@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Session;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.Sharing;
@@ -35,7 +37,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// <para><b>The account</b> (owner decision S5-28 2a): the row stays, soft-deleted (ARCHITECTURE
 /// §9.3 never hard-deletes it), with a random address under the reserved domain <c>.invalid</c>,
 /// without password hash and with a new security stamp, so the user's other sessions end at its
-/// next check (the immediate end is SEC-08, S5-29).</para>
+/// next check (the immediate end is SEC-08, S5-29). Its platform roles, claims, external logins
+/// and Identity tokens are deleted and its lockout is reset in the same save (S6-10b).</para>
 /// <para><b>Not yet</b> (owner decision S5-28 3): contributor profiles, published entries and
 /// experience reports (steps 5 – 6) and procurement projects (step 5) join with their steps.</para>
 /// <para><b>Answer.</b> 204 without the session cookie and with a new antiforgery token, as the
@@ -77,6 +80,7 @@ internal static class AccountDeletionEndpoints
         IAccountDeletion accounts,
         IEnumerable<IOrganizationDataDeletion> moduleData,
         IShareLinks shareLinks,
+        IdentityAccessDbContext db,
         TimeProvider clock,
         HttpContext context,
         CancellationToken cancellationToken)
@@ -117,6 +121,16 @@ internal static class AccountDeletionEndpoints
         user.PasswordHash = null;
         user.IsDeleted = true;
         user.DeletedAt = clock.GetUtcNow().UtcDateTime;
+
+        // Nothing of the account stays but the row (S6-10b, owner decision S6-10 4; S5-28a R5): its
+        // platform roles, claims, external logins and Identity tokens go and the lockout is reset.
+        // Marked on the context UserManager saves, so they go in the one save below.
+        user.LockoutEnd = null;
+        user.AccessFailedCount = 0;
+        db.UserRoles.RemoveRange(await db.UserRoles.Where(r => r.UserId == userId).ToListAsync(cancellationToken));
+        db.UserClaims.RemoveRange(await db.UserClaims.Where(c => c.UserId == userId).ToListAsync(cancellationToken));
+        db.UserLogins.RemoveRange(await db.UserLogins.Where(l => l.UserId == userId).ToListAsync(cancellationToken));
+        db.UserTokens.RemoveRange(await db.UserTokens.Where(t => t.UserId == userId).ToListAsync(cancellationToken));
 
         // Stores the changes above with the new stamp (and the normalised address and name).
         var result = await users.UpdateSecurityStampAsync(user);

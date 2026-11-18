@@ -219,7 +219,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -268,7 +268,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -281,6 +281,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                         .HasColumnType("character varying(16)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.ToTable("Organizations", "identity");
                 });
@@ -342,7 +344,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTimeOffset?>("AcceptedAt")
                         .HasColumnType("timestamp with time zone");
@@ -447,7 +449,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("ContributorProfileId");
 
@@ -459,7 +461,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserPreferences", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Appearance")
                         .IsRequired()
@@ -537,6 +539,24 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.AccountToken", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.Organization", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.OrganizationInvitation", b =>
                 {
                     b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.Organization", null)
@@ -553,6 +573,12 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserContributorLink", b =>
@@ -560,6 +586,21 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                     b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.ContributorProfile", null)
                         .WithOne()
                         .HasForeignKey("ProcureAccess.Modules.IdentityAccess.Domain.UserContributorLink", "ContributorProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.IdentityAccess.Domain.UserPreferences", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.IdentityAccess.Domain.User", null)
+                        .WithOne()
+                        .HasForeignKey("ProcureAccess.Modules.IdentityAccess.Domain.UserPreferences", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

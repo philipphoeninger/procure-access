@@ -55,6 +55,8 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
         _list = CriteriaConfiguration.Create(
             _tenants.A.Id, "Liste für die Rechtsabteilung", TestUsers.EditorA.Id, Clock.GetUtcNow(), MiniCatalog.T1Version, "hr",
             ["web"], ["base"], ["softwareTest"],
@@ -64,7 +66,6 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 new ConfigurationCriterionDraft(3, PriorityLevel.B, IsIncluded: false, OverrideWeight: 7),
             ]);
         await StoreAsync([.. _tenants.Entities, _list]);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

@@ -11,8 +11,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// stored, so the table alone never yields a usable link.
 /// </summary>
 /// <remarks>
-/// <see cref="UserId"/> names a row of the legacy table <c>identity."Users"</c> without a foreign
-/// key, like <see cref="UserContributorLink"/> (ADR-014).
+/// <see cref="UserId"/> names a row of <c>identity."Users"</c>, with a foreign key since S6-10b:
+/// the tokens go with a deleted user row.
 /// </remarks>
 internal sealed class AccountToken
 {

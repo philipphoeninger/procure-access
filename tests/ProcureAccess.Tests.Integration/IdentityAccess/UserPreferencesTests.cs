@@ -28,7 +28,13 @@ public sealed class UserPreferencesTests(ApiFixture api) : IntegrationTest(api),
 
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
 
-    public async ValueTask InitializeAsync() => await Api.ResetDatabaseAsync();
+    public async ValueTask InitializeAsync()
+    {
+        await Api.ResetDatabaseAsync();
+
+        // The settings belong to an account (foreign key, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
+    }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 

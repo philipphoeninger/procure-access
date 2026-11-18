@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
@@ -93,6 +94,32 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
         await StartApiWithRebuildFlagAsync("Development", samplePassword: null);
 
         (await UserIdsAsync()).ShouldBeEmpty();
+    }
+
+    /// <summary>
+    /// The creator of an organisation is a foreign key with restrict (S6-10b): the rebuild deletes
+    /// the organisations before the users, or the start would fail.
+    /// </summary>
+    [Fact]
+    public async Task Startup_RebuildInDevelopment_DeletesTheOrganisationsBeforeTheirUsers()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var existing = await CreateDatabaseWithUserAsync();
+        await using (var identity = CreateIdentityAccessContext())
+        {
+            await identity.Database.MigrateAsync(cancellationToken);
+            var organization = Organization.Create("Bestand", OrganizationType.PublicBody, existing.Id, api.Clock.GetUtcNow());
+            identity.Organizations.Add(organization);
+            identity.OrganizationMemberships.Add(OrganizationMembership.Founder(organization, api.Clock.GetUtcNow()));
+            await identity.SaveChangesAsync(cancellationToken);
+        }
+
+        await StartApiWithRebuildFlagAsync("Development", samplePassword: null);
+
+        (await UserIdsAsync()).ShouldBeEmpty();
+        await using var after = CreateIdentityAccessContext();
+        (await after.Organizations.IgnoreQueryFilters().AnyAsync(cancellationToken)).ShouldBeFalse();
+        (await after.OrganizationMemberships.IgnoreQueryFilters().AnyAsync(cancellationToken)).ShouldBeFalse();
     }
 
     private async Task<User> CreateDatabaseWithUserAsync()

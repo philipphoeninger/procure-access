@@ -235,6 +235,8 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
         _invitation = OrganizationInvitation.Create(
             _tenants.A.Id, "eingeladen@example.test", OrganizationRole.Reader, new byte[32], Clock.GetUtcNow(), TimeSpan.FromDays(14));
         // A list of A to read; the domain needs no catalog for it, the save rows import one when they run.
@@ -244,7 +246,6 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         _linkOfA = ShareLink.Create(
             _tenants.A.Id, ShareableResourceType.Configuration, _listOfA.Id, new byte[32], Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(30));
         await StoreAsync([.. _tenants.Entities, _invitation, _listOfA, _linkOfA]);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

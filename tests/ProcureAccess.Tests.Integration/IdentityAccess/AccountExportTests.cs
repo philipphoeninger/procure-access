@@ -47,6 +47,8 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         var now = Clock.GetUtcNow();
         _createdAt = now.AddDays(-30);
         _tenants = Tenants.Build(now);
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => AccountOf(u, u == TestUsers.EditorA ? _createdAt : null))]);
 
         // Editor A joined organisation B a day later as a Reader: two memberships, both shared with other users.
         var secondMembership = OrganizationMembership.Create(
@@ -58,7 +60,6 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         await StoreAsync(
             _ownProfile, UserContributorLink.Create(TestUsers.EditorA.Id, _ownProfile),
             _otherProfile, UserContributorLink.Create(TestUsers.OwnerB.Id, _otherProfile));
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => AccountOf(u, u == TestUsers.EditorA ? _createdAt : null))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

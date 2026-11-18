@@ -37,7 +37,7 @@ public static class DatabaseRebuildExtensions
             return;
         }
 
-        app.Logger.LogWarning("RebuildDatabase is set in Development: deleting all users and reseeding sample data");
+        app.Logger.LogWarning("RebuildDatabase is set in Development: deleting all users and organisations and reseeding sample data");
 
         // The users belong to the IdentityAccess module (S6-10); the legacy context has no sample data.
         var seeded = await IdentityAccessModule.RebuildSampleUsersAsync(app.Services, app.Configuration[SampleUserPasswordKey]);
