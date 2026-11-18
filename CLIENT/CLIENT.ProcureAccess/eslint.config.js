@@ -39,11 +39,6 @@ const LEGACY_EXCEPTIONS = {
   'src/app/features/filters/state/with-filters.ts': [
     '@typescript-eslint/no-unsafe-enum-comparison',
   ],
-  // M3 — cookie authentication, identity screens, settings S60
-  'src/app/features/settings/services/language.service.ts': [
-    '@typescript-eslint/no-unsafe-assignment',
-    '@typescript-eslint/no-unsafe-return',
-  ],
   // M5 — proposal workflow retired, withProducts / withFavorites reworked (M5.6); the store root loads them
   'src/app/features/criteria/proposal/criterion-proposal.ts': [
     '@angular-eslint/prefer-inject',
