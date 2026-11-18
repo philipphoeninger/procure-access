@@ -1,0 +1,93 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@let current = state();
+@let editing = shown()?.candidate;
+@if (current === 'form' || current === 'archived') {
+  <h1 class="pa-candidate-form__title">
+    {{ (editing ? 'candidate.form.title.edit' : 'candidate.form.title.new') | translate }}
+  </h1>
+  @if (editing; as candidate) {
+    <!-- S33 edits the facts of Überblick: the tabs of S34a with Überblick selected (Handoff §5.3) -->
+    <pa-candidate-tabs [projectId]="candidate.projectId" [candidateId]="candidate.id" selected="overview">
+      <ng-container *ngTemplateOutlet="body" />
+    </pa-candidate-tabs>
+  } @else {
+    <ng-container *ngTemplateOutlet="body" />
+  }
+} @else {
+  <pa-error-page [kind]="errorKind()" />
+}
+
+<ng-template #body>
+@switch (current) {
+  @case ('archived') {
+    <pa-notice kind="info" class="pa-candidate-form__narrow">
+      <p>{{ 'projects.archived.note' | translate }}</p>
+    </pa-notice>
+  }
+  @case ('form') {
+    @if (confirmationRequired()) {
+      <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+      <div #confirmNotice class="pa-candidate-form__narrow" tabindex="-1">
+        <pa-confirm-required-notice />
+      </div>
+    }
+
+    <form class="pa-candidate-form__form" novalidate (submit)="submit($event)">
+      <pa-error-summary [items]="summary()" />
+
+      <div class="pa-candidate-form__card">
+        <p class="pa-candidate-form__text">{{ 'common.requiredNote' | translate }}</p>
+        @for (field of publicFields; track field.name) {
+          <ng-container *ngTemplateOutlet="input; context: { $implicit: field }" />
+        }
+      </div>
+
+      <!-- Private (PRV-01, PRV-02): visually apart; no accessible name on the section (TESTING V229) -->
+      <section class="pa-candidate-form__card pa-candidate-form__card--private">
+        <h2 class="pa-candidate-form__section-title">{{ 'candidate.form.privateSection' | translate }}</h2>
+        <p class="pa-candidate-form__text">{{ 'candidate.form.privateSection.text' | translate }}</p>
+        @for (field of privateFields; track field.name) {
+          <ng-container *ngTemplateOutlet="input; context: { $implicit: field }" />
+        }
+      </section>
+
+      <div class="pa-candidate-form__actions">
+        <a matButton [routerLink]="cancelPath()">{{ 'common.actions.cancel' | translate }}</a>
+        <button matButton="filled" type="submit" class="pa-candidate-form__submit" [attr.aria-disabled]="busy() || null">
+          @if (busy()) {
+            <mat-progress-spinner class="pa-candidate-form__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+          }
+          {{ 'common.actions.save' | translate }}
+        </button>
+      </div>
+    </form>
+  }
+}
+</ng-template>
+
+<ng-template #input let-field>
+  <mat-form-field appearance="outline">
+    <mat-label>
+      {{ field.labelKey | translate }}
+      @if (!field.required) {
+        {{ 'common.optional' | translate }}
+      }
+    </mat-label>
+    @if (field.multiline) {
+      <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="3" [id]="fieldId(field)" [name]="field.name"
+        [formControl]="controls[field.name]" [errorStateMatcher]="errorState"></textarea>
+    } @else {
+      <input matInput [id]="fieldId(field)" [type]="field.url ? 'url' : 'text'" [name]="field.name"
+        [attr.autocomplete]="field.autocomplete" [required]="field.required"
+        [formControl]="controls[field.name]" [errorStateMatcher]="errorState" />
+    }
+    @if (message(field); as message) {
+      <mat-error>{{ message.key | translate: message.params }}</mat-error>
+    }
+  </mat-form-field>
+</ng-template>

@@ -1,0 +1,61 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// K1 (Figma `2014:341`, Scope=Workspace `2101:3180`; Handoff §4.1): a card on
+// surface-container-lowest with an outline, corner-medium, padding md; title title-medium, intro
+// body-medium in on-surface-variant, then the rows: the level left, the count right (body-medium).
+// One look for every level: no colour, icon or weight per level (SIG-08, „never colour-code“).
+:host {
+  display: block;
+}
+
+.pa-fulfillment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+}
+
+.pa-fulfillment__title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+.pa-fulfillment__intro {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pa-fulfillment__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xxs);
+  margin: 0;
+}
+
+// Term and count on one line; a long term wraps, the count stays whole on the right.
+.pa-fulfillment__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--pa-space-sm);
+  font: var(--mat-sys-body-medium);
+
+  dt {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  dd {
+    margin: 0;
+    white-space: nowrap;
+  }
+}

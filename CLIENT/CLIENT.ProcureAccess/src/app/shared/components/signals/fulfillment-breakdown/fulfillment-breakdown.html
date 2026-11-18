@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<!-- No accessible name on the section: Firefox crashes axe on named regions (TESTING V229, S6-16 D5 (a)) -->
+<section class="pa-fulfillment">
+  @if (headingLevel() === 4) {
+    <h4 class="pa-fulfillment__title">{{ 'candidate.overview.status.breakdownTitle' | translate: { list: listName() } }}</h4>
+  } @else {
+    <h3 class="pa-fulfillment__title">{{ 'candidate.overview.status.breakdownTitle' | translate: { list: listName() } }}</h3>
+  }
+  <p class="pa-fulfillment__intro">{{ 'candidate.overview.status.breakdownIntro' | translate }}</p>
+  <dl class="pa-fulfillment__list">
+    @for (value of rows; track value) {
+      <div class="pa-fulfillment__row">
+        <dt>{{ 'assessment.value.' + value | translate }}</dt>
+        <dd>{{ 'signals.fulfillment.count' | translatePlural: counts()[value] }}</dd>
+      </div>
+    }
+  </dl>
+</section>

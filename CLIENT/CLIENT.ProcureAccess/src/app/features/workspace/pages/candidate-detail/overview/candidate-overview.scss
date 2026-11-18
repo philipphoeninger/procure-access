@@ -1,0 +1,118 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S34 Überblick (Figma 360 `2134:3184`, desktop `2097:2627`): four outlined cards on
+// surface-container-lowest, corner-medium, padding md below 600 px and lg from 600 px; the private
+// card on surface-container-low. Card title title-large; column titles title-small.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-overview__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+  container-type: inline-size;
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+
+  p {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+  }
+}
+
+// The private card stands apart (PRV-02, `candidate.form.privateSection.text`)
+.pa-overview__card--private {
+  background: var(--mat-sys-surface-container-low);
+}
+
+// Title and „Bearbeiten“ side by side; they wrap, so the button never leaves the card
+.pa-overview__card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pa-space-xs);
+  align-self: stretch;
+}
+
+.pa-overview__card-title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+  overflow-wrap: anywhere;
+}
+
+// dt above dd below 600 px, a column of terms from 600 px (Figma: 168 px)
+.pa-overview__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  align-self: stretch;
+  margin: 0;
+
+  div {
+    @media (min-width: 37.5em) {
+      display: grid;
+      grid-template-columns: 10.5rem 1fr;
+      column-gap: var(--pa-space-md);
+    }
+  }
+
+  dt {
+    font: var(--mat-sys-label-medium);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    overflow-wrap: anywhere;
+  }
+}
+
+// Text the user typed keeps its line breaks
+.pa-overview__text {
+  white-space: pre-line;
+}
+
+// „Stand der Bewertung“: two columns from an 840 px container (Handoff §5.1), stacked below
+.pa-overview__columns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  align-self: stretch;
+
+  @container (min-width: 52.5em) {
+    flex-direction: row;
+  }
+}
+
+.pa-overview__column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  min-inline-size: 0;
+
+  pa-fulfillment-breakdown,
+  pa-rating-legend,
+  pa-notice {
+    align-self: stretch;
+  }
+}
+
+.pa-overview__column-title {
+  margin: 0;
+  font: var(--mat-sys-title-small);
+}

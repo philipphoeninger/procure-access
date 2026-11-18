@@ -10,6 +10,7 @@ import { PAGE_TITLE_KEY } from '@app/core/a11y/page-title.strategy';
 import { authGuard } from '@app/core/guards/auth.guard';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 
+import { CANDIDATES_SEGMENT } from '../../models/candidates';
 import { PROJECT_CRITERIA_LIST_SEGMENT } from '../../models/projects';
 import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { ProjectLoad } from './project-detail-load';
@@ -43,7 +44,10 @@ export const projectResolver: ResolveFn<string> = async (route) => {
   }
 };
 
-/** S32 at `/projekte/:id`, lazy; signed in only (R-PRJ-03 with S6-14; the placeholder of S6-13); below it S11 of the project's copy. */
+/**
+ * S32 at `/projekte/:id`, lazy; signed in only (R-PRJ-03 with S6-14; the placeholder of S6-13); below it S11 of the
+ * project's copy and the project's products (S33, S34).
+ */
 export const PROJECT_ROUTES: Routes = [
   {
     path: '',
@@ -59,5 +63,11 @@ export const PROJECT_ROUTES: Routes = [
     path: PROJECT_CRITERIA_LIST_SEGMENT,
     loadChildren: () =>
       import('../project-criteria-list/project-criteria-list.routing').then((m) => m.PROJECT_CRITERIA_LIST_ROUTES),
+  },
+  {
+    // The products of the project (S6-16): S33 at `produkte/neu` and `produkte/:pid/bearbeiten`,
+    // S34 with its tabs at `produkte/:pid`; lazy, so S32's chunk stays small.
+    path: CANDIDATES_SEGMENT,
+    loadChildren: () => import('../candidate-detail/candidate-detail.routing').then((m) => m.CANDIDATE_ROUTES),
   },
 ];

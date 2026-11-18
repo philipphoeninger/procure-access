@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (shown(); as shown) {
+  <h1 class="pa-candidate__title">{{ shown.candidate.name }}</h1>
+  @if (shown.candidate.vendor) {
+    <p class="pa-candidate__meta">{{ 'candidate.vendorLine' | translate: { vendor: shown.candidate.vendor } }}</p>
+  }
+  @if (shown.project.status === 'archived') {
+    <pa-notice kind="info">
+      <p>{{ 'projects.archived.note' | translate }}</p>
+    </pa-notice>
+  }
+
+  <pa-candidate-tabs [projectId]="shown.project.id" [candidateId]="shown.candidate.id">
+    <router-outlet />
+  </pa-candidate-tabs>
+} @else {
+  <pa-error-page [kind]="errorKind()" />
+}
