@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 > **Sprint:** 06, task S6-12, part b (client) after S6-12a (server, #410). **Issues:** none.
 > **Requirements / invariants:** R-PRJ-02 (the list choice in S31), R-PRJ-06 (UI: S11 of the project's copy, `projects.detail.criteriaAdded`). No invariant changes status: **WSP-03** (active since S6-12a) gains its client and E2E cases; WSP-02's client case stays untagged until S6-18 flips it; TEN-01, A11Y-01, A11Y-08 gain cases.
-> **Status:** S6-12b done by Claude Code (2026-11-18) — pull request open, **stacked on #410** (S6-12a was not merged when this branch started; it is rebased onto main once #410 is merged). **No EF migration, no new dependency.**
+> **Status:** S6-12b done by Claude Code (2026-11-18) — pull request open; started stacked on #410 (S6-12a was not merged yet) and rebased onto main after #410 was merged. **No EF migration, no new dependency.**
 > **Scope (b):** S11 in project-copy mode at `/projekte/:id/kriterienliste`, the list choice of S31 with the copy after creating the project, `projects.detail.criteriaAdded` on return to S32, and the way from S32 to S11 until S6-14.
 > **Owner decisions (2026-11-18, with the plan):** **D5 (b)** — a list that cannot be copied after the project was created: S32 of the new project opens with the general notice, the project has no list · **D6 (a)** — S11 of a copy gets its own page title, wording „Kriterienliste – {{project}} – Beschaffungsprojekte“ (UX copy v42 U169) · **D7 (a)** — `/kriterienlisten/<id of a copy>` leads to `/projekte/:id/kriterienliste` · **D8 (a)** — the S32 placeholder gets a short section „Kriterienliste“ until S6-14 · **„Keine Liste“** as the first option of S31's select (`projects.create.criteria.none`, U170; asked during the work). From S6-12a: D3 (a) — the copy of an archived project is read-only in the client; D4 (a) — the address of S11 of a copy.
 
@@ -65,6 +65,6 @@ SPDX-License-Identifier: MIT
 ## 5. Open points
 
 1. **Assign or replace the list from S32** (`projects.detail.noCriteria.cta` „Kriterienliste zuordnen“, R-PRJ-04 in the UI, `projects.detail.criteriaLocked` once assessments exist): needs a choose dialog that neither the UX copy nor the Handoff describes. Proposed for S6-14 (it builds the criteria card) or a follow-up issue with a design decision.
-2. **Rebase after #410.** This branch contains S6-12a's commits; once #410 is merged it is rebased onto main (the PR then shows only S6-12b).
+2. ~~**Rebase after #410.**~~ Done: #410 was merged and this branch was rebased onto main; the PR holds only S6-12b.
 3. **S11 of a copy in the reflow run** (`e2e/shell/reflow.spec.ts`): S11 is already there as a saved list; the copy mode adds two notices only. S6-14 can add it with S32.
 4. **The general notice is a legacy key** (`ERROR.GENERIC`, D5 (b)); when the interceptor's general text moves to the UX copy, this case follows it.
