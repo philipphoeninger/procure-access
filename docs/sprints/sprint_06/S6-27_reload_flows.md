@@ -78,7 +78,7 @@ Own checks: the store method drops answers of the old release still in flight (b
 | C4 | `npm run typecheck`, `npm run lint` in `e2e/` | Green |
 | C5 | `node scripts/check-invariants.mjs`, `check-figma-links.mjs`, `check-i18n.mjs`, `check-icons.mjs` | Green |
 | C6 | `reuse lint` (local `fsfe/reuse` image, no pull) | Only `node_modules/` and the ignored `.env` listed — the container cannot read the worktree's git ignore rules; every repository file, the new ones included, carries its header |
-| C7 | E2E | Not run locally (another session used the E2E stack); CI runs the two new specs on Chromium, Firefox and WebKit — see the pull request |
+| C7 | E2E | Not run locally (another session used the E2E stack). CI (#399, run 44221236610): the new specs `shell/chunk-reload.spec.ts` (both cases) and the S13 case of `s11-list.spec.ts` pass on Chromium, Firefox, WebKit and both mobile projects. The first Firefox job failed in an existing, unchanged test (`start-and-error-pages.spec.ts:109`, S80 after an API 5xx: H1 not focused, also on its retry); the re-run of the failed jobs was green, all other branches pass it — a Firefox flake on that path (P7) |
 | C8 | Figma | S13-E `2039:1944` compared through the Figma MCP before building; the outdated state uses its action layout |
 
 ## 5. Open points
@@ -91,3 +91,4 @@ Own checks: the store method drops answers of the old release still in flight (b
 | P4 | SPEC_v2 and TESTING_v88 headers still name ARCHITECTURE v80 and UX copy v39 | Their next version (sprint-end documentation, S6-09) |
 | P5 | #296 asked for an E2E of the offline case; it is covered by unit tests only (`setOffline` and the browsers' `offline` event differ between engines) | If an offline regression appears |
 | P6 | A lost chunk while the server is out of reach but the browser reports online reloads into the browser's own error page (R2) | Watch item; a probe of `/health` before the reload would need an owner decision |
+| P7 | Firefox flake: `start-and-error-pages.spec.ts:109` (focus on the S80 H1 after an API 5xx) failed twice in one job and passed on the re-run; it does not reach the chunk handler (the failure is an HTTP 5xx) | Proposed issue if it recurs |
