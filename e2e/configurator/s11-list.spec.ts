@@ -356,4 +356,38 @@ test.describe('S13 export dialog', () => {
     await expect(dialog.getByRole('button', { name: 'Erneut versuchen' })).toBeFocused();
     await expect(page.locator('mat-snack-bar-container')).toHaveCount(0);
   });
+
+  test('INV:A11Y-01 INV:A11Y-08 after a release change „Kriterien neu laden“ loads the list for the active release and focuses the H1 (TD-39, #310)', async ({ page }, testInfo) => {
+    // The E2E stack has one release; a release activated meanwhile is simulated by the server's answer.
+    await page.route('**/api/v1/exports', (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/problem+json',
+        body: JSON.stringify({ type: 'https://procureaccess.de/problems/release-mismatch', status: 400 }),
+      }),
+    );
+    await openExport(page);
+    const dialog = page.getByRole('dialog');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    const alert = dialog.getByRole('alert');
+    await expect(alert).toContainText('weil inzwischen eine neue Katalogversion gilt');
+    const reload = dialog.getByRole('button', { name: 'Kriterien neu laden' });
+    await expect(reload).toBeFocused();
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's13 outdated release');
+
+    // The pinned release is dropped: the options ask without one, then the list names the answer's.
+    const options = page.waitForRequest(
+      (request) => request.url().includes('/api/v1/catalog/filter-options') && !new URL(request.url()).searchParams.has('release'),
+    );
+    await page.keyboard.press('Enter');
+    await options;
+
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+    await expect(actionBar(page).getByRole('button', { name: 'Liste exportieren' })).toBeVisible();
+    await expect(page.locator('mat-snack-bar-container')).toHaveCount(0);
+  });
 });
