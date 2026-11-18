@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { computed, effect, inject, untracked } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { patchState, signalStoreFeature, type, withHooks, withMethods, withState } from '@ngrx/signals';
 
 import { DEFAULT_LANGUAGE } from '@app/app.config';
@@ -10,7 +11,6 @@ import { AppearanceService } from '@app/core/a11y/appearance';
 import { SessionUser } from '@app/features/identity/models/session';
 import { UserPreferences } from '../models/user-preferences';
 import { PreferencesApiService } from '../services/api/preferences-api.service';
-import { LanguageService } from '../services/language.service';
 
 export interface SettingsState {
   /** The signed-in user's settings; null without a session or until they are read. */
@@ -101,7 +101,9 @@ export const withSettings = () =>
     withHooks({
       onInit(store) {
         // German is the only UI language of v1 (SPEC R-SET-01, SD12); <html lang> follows it (A11Y-05).
-        inject(LanguageService).init(DEFAULT_LANGUAGE);
+        const translate = inject(TranslateService);
+        translate.setFallbackLang(DEFAULT_LANGUAGE);
+        translate.use(DEFAULT_LANGUAGE);
 
         const userId = computed(() => store.session()?.id ?? null);
         effect(() => {

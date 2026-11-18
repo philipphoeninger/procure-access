@@ -18,7 +18,7 @@ import {
 } from '@app/testing/fake-media-matcher';
 import { UserPreferences } from '../models/user-preferences';
 import { PreferencesApiService } from '../services/api/preferences-api.service';
-import { LanguageService } from '../services/language.service';
+import { TranslateService } from '@ngx-translate/core';
 import { withSettings } from './with-settings';
 
 // The session of withIdentity() as the probe would report it, set from outside the store.
@@ -39,7 +39,7 @@ let get: ReturnType<typeof vi.fn<() => Promise<UserPreferences>>>;
 let read: ReturnType<typeof vi.fn<() => Promise<UserPreferences>>>;
 let save: ReturnType<typeof vi.fn<(preferences: UserPreferences) => Promise<UserPreferences>>>;
 let showInfo: ReturnType<typeof vi.fn>;
-let languageInit: ReturnType<typeof vi.fn>;
+let languageUse: ReturnType<typeof vi.fn>;
 
 function setUp(system: Record<string, boolean> = {}) {
   media = new FakeMediaMatcher(system);
@@ -47,14 +47,14 @@ function setUp(system: Record<string, boolean> = {}) {
   read = vi.fn<() => Promise<UserPreferences>>();
   save = vi.fn<(preferences: UserPreferences) => Promise<UserPreferences>>((preferences) => Promise.resolve(preferences));
   showInfo = vi.fn();
-  languageInit = vi.fn();
+  languageUse = vi.fn();
   TestBed.configureTestingModule({
     providers: [
       provideFakeMediaMatcher(media),
       provideAppearance(),
       SettingsTestStore,
       { provide: PreferencesApiService, useValue: { get, read, save } },
-      { provide: LanguageService, useValue: { init: languageInit } },
+      { provide: TranslateService, useValue: { use: languageUse, setFallbackLang: vi.fn() } },
       { provide: SnackbarService, useValue: { showInfo } },
     ],
   });
@@ -178,7 +178,7 @@ describe('withSettings', () => {
     setUp();
 
     expect(get).not.toHaveBeenCalled();
-    expect(languageInit).toHaveBeenCalledWith('de');
+    expect(languageUse).toHaveBeenCalledWith('de');
   });
 
   // S60 (S5-26): read again when the page opens, changed with immediate effect and saved in order.

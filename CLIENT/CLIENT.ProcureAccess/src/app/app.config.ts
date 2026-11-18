@@ -17,7 +17,6 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { environment } from '../environments/environment';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-import { EnLanguage } from './core/models/language.enum';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideAppearance } from './core/a11y/appearance';
@@ -26,7 +25,8 @@ import { PageTitleStrategy } from './core/a11y/page-title.strategy';
 
 export const APP_NAME = new InjectionToken<string>('APP_NAME');
 export const API_URL = new InjectionToken<string>('API_URL');
-export const DEFAULT_LANGUAGE = EnLanguage.de;
+/** German is the only UI language of v1 (SPEC R-SET-01, SD12). */
+export const DEFAULT_LANGUAGE = 'de';
 
 export const appConfig: ApplicationConfig = {
   providers: [

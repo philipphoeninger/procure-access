@@ -3,15 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import type { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { LanguageService } from '@features/settings/services/language.service';
+import { DEFAULT_LANGUAGE } from '@app/app.config';
 
 export const languageInterceptor: HttpInterceptorFn = (req, next) => {
-  const languageService = inject(LanguageService);
-
   req = req.clone({
     setHeaders: {
-      'Accept-Language': languageService.get()
+      'Accept-Language': DEFAULT_LANGUAGE
     }
   });
   return next(req);
