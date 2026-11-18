@@ -21,8 +21,15 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 const main = (page: Page) => page.getByRole('main');
 const mainNav = (page: Page) => page.getByRole('banner').getByRole('navigation', { name: 'Hauptnavigation' });
 
-/** Waits until Material's animations are over, so axe sees the final colours. */
+/**
+ * Waits until Material's animations are over, so axe sees the final colours. Two animation frames
+ * first: a `mat-error` that has just been inserted starts its fade-in only on a later frame, and
+ * axe measured its colour half-faded in CI (contrast 2.91 and 3.57 instead of the error colour).
+ */
 async function settled(locator: Locator): Promise<void> {
+  await locator.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+  );
   await locator.evaluate((element) =>
     Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
   );
@@ -66,7 +73,8 @@ test.describe('Procurement projects S30, S31', () => {
     await expect(name).toBeFocused();
     await dialog.getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
-    await expect(dialog).toContainText('Bitte geben Sie Name des Projekts an.');
+    // The field's own error, not only the summary's line with the same text, before axe runs
+    await expect(dialog.locator('mat-error')).toHaveText('Bitte geben Sie Name des Projekts an.');
     await settled(dialog);
     await expectNoAxeViolations(page, testInfo, 's31-error-summary');
 
