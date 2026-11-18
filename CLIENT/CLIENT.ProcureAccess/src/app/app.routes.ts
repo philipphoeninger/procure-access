@@ -8,7 +8,6 @@ import { authGuard } from '@core/guards/auth.guard';
 import { CONFIRM_EMAIL_PATH, LOGIN_PATH, NEW_PASSWORD_PATH, REGISTER_PATH, RESET_PASSWORD_PATH } from '@features/identity/models/login-navigation';
 import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
-import { LegalPage } from './pages/legal/legal-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
 import { completeSelectionGuard, configuratorReleaseGuard } from './features/configurator/guards/configurator-guards';
@@ -21,7 +20,10 @@ import { SETTINGS_PATH } from './features/settings/models/user-preferences';
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
 // Feature pages load with their route (`loadComponent`), so the first download holds only the shell,
-// the start page and the error and legal pages; the initial budget in angular.json counts that (#42).
+// the start page and the error pages; the initial budget in angular.json counts that (#42). The
+// legal pages load with their route too since their Markdown texts are bundled with them (S6-28).
+const legalPage = () => import('./pages/legal/legal-page').then((m) => m.LegalPage);
+
 export const routes: Routes = [
   // S04 start page (R-SHL-05); `/home` is the legacy address
   {
@@ -194,10 +196,11 @@ export const routes: Routes = [
     component: ErrorPage,
     data: { [ERROR_PAGE_KEY]: 'server', [PAGE_TITLE_KEY]: 'pageTitle.server' },
   },
-  // S71 legal pages (R-SHL-07): placeholders until GP.3; reachable without an account (R-SHL-06)
-  { path: 'impressum', component: LegalPage, data: { legalPage: 'imprint', [PAGE_TITLE_KEY]: 'pageTitle.legal.imprint' } },
-  { path: 'datenschutz', component: LegalPage, data: { legalPage: 'privacy', [PAGE_TITLE_KEY]: 'pageTitle.legal.privacy' } },
-  { path: 'barrierefreiheit', component: LegalPage, data: { legalPage: 'accessibility', [PAGE_TITLE_KEY]: 'pageTitle.legal.accessibility' } },
+  // S71 legal pages (R-SHL-07, S6-28): Markdown from content/legal/*.de.md, bundled into their own
+  // chunk; reachable without an account (R-SHL-06)
+  { path: 'impressum', loadComponent: legalPage, data: { legalPage: 'imprint', [PAGE_TITLE_KEY]: 'pageTitle.legal.imprint' } },
+  { path: 'datenschutz', loadComponent: legalPage, data: { legalPage: 'privacy', [PAGE_TITLE_KEY]: 'pageTitle.legal.privacy' } },
+  { path: 'barrierefreiheit', loadComponent: legalPage, data: { legalPage: 'accessibility', [PAGE_TITLE_KEY]: 'pageTitle.legal.accessibility' } },
   // Every other address: „Seite nicht gefunden“ in place, the URL stays (must stay last)
   { path: '**', component: ErrorPage, data: { [ERROR_PAGE_KEY]: 'notFound', [PAGE_TITLE_KEY]: 'pageTitle.notFound' } },
 ];

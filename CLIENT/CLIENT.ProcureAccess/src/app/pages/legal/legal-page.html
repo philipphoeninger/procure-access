@@ -12,4 +12,18 @@ SPDX-License-Identifier: MIT
   }
 </h1>
 
-<pa-notice kind="info">{{ 'legal.placeholder' | translate }}</pa-notice>
+@if (text.placeholder) {
+  <pa-notice kind="info">{{ 'legal.placeholder' | translate }}</pa-notice>
+}
+
+@for (block of text.blocks; track $index) {
+  @if (block.kind === 'heading') {
+    @switch (block.level) {
+      @case (2) { <h2 class="pa-legal-page__heading pa-legal-page__heading--2">{{ block.text }}</h2> }
+      @case (3) { <h3 class="pa-legal-page__heading pa-legal-page__heading--3">{{ block.text }}</h3> }
+      @default { <h4 class="pa-legal-page__heading pa-legal-page__heading--4">{{ block.text }}</h4> }
+    }
+  } @else {
+    <pa-catalog-text [text]="block.text" />
+  }
+}

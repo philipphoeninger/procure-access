@@ -2,21 +2,31 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Release check (SPEC R-SUG-01; ARCHITECTURE C85, C110). Node, no dependencies:
+// Release check (SPEC R-SUG-01, R-SHL-07; ARCHITECTURE C85, C110, C167). Node, no dependencies:
 //   node scripts/check-release-config.mjs
 // Run it before a production release, not on every pull request: while a 🔧 placeholder is
-// configured it fails, and placeholders stay until their owner decision (owner, S3-21 1a).
+// configured it fails, and placeholders stay until their owner decision (owner, S3-21 1a) or
+// until WERTE.IT delivers the legal texts (O-S6-6).
 // Checks the client's release environment (environment.prod.ts):
 //   1. `criteriaSuggestion` is set once, as `mailto:<address>` or an https URL (the forms the
 //      client accepts, core/contact/criteria-suggestion.ts);
 //   2. it is not the placeholder: no address or host on the reserved domain `.invalid` (O-6).
-// GP.3 adds the legal pages (R-SHL-07) here.
-import { readFileSync, realpathSync } from 'node:fs';
+// And the client's legal pages (content/legal/*.de.md, S6-28):
+//   3. each file exists, has content outside comments and no longer carries the placeholder
+//      marker `<!-- PLATZHALTER -->` (the client shows `legal.placeholder` on the same rule,
+//      src/app/pages/legal/legal-markdown.ts; keep the two patterns in step).
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const ENVIRONMENT_PROD = 'CLIENT/CLIENT.ProcureAccess/src/environments/environment.prod.ts';
+export const LEGAL_PAGES = ['impressum', 'datenschutz', 'barrierefreiheit'].map(
+  (name) => `CLIENT/CLIENT.ProcureAccess/content/legal/${name}.de.md`,
+);
+
+const LEGAL_PLACEHOLDER = /<!--\s*PLATZHALTER\s*-->/i;
+const COMMENT = /<!--[\s\S]*?-->/g;
 
 const SETTING = /^\s*criteriaSuggestion\s*:\s*(['"])(.*?)\1\s*,?\s*$/gm;
 const MAILTO = /^mailto:([^\s?#@/]+@[^\s?#@/]+)$/;
@@ -47,10 +57,30 @@ export function checkReleaseConfig(source) {
   return [];
 }
 
+/** Returns the problems of one legal page's Markdown source (null: the file is missing). */
+export function checkLegalPage(source) {
+  if (source === null) return ['the legal page is missing'];
+  if (LEGAL_PLACEHOLDER.test(source)) {
+    return ['the legal page is still the placeholder (<!-- PLATZHALTER -->); insert the text from WERTE.IT (O-S6-6)'];
+  }
+  if (source.replace(COMMENT, '').trim() === '') return ['the legal page has no content'];
+  return [];
+}
+
+/** Every problem of the repository below `root`, as [file, message] pairs. */
+export function checkRelease(root = ROOT) {
+  const read = (file) => (existsSync(join(root, file)) ? readFileSync(join(root, file), 'utf8') : null);
+  const environment = read(ENVIRONMENT_PROD);
+  return [
+    [ENVIRONMENT_PROD, environment === null ? ['the release environment is missing'] : checkReleaseConfig(environment)],
+    ...LEGAL_PAGES.map((file) => [file, checkLegalPage(read(file))]),
+  ].flatMap(([file, errors]) => errors.map((error) => [file, error]));
+}
+
 function main() {
-  const errors = checkReleaseConfig(readFileSync(join(ROOT, ENVIRONMENT_PROD), 'utf8'));
-  for (const error of errors) console.error(`::error file=${ENVIRONMENT_PROD}::${error}`);
-  console.log(`Release check (${ENVIRONMENT_PROD}): ${errors.length} error(s).`);
+  const errors = checkRelease();
+  for (const [file, error] of errors) console.error(`::error file=${file}::${error}`);
+  console.log(`Release check (${ENVIRONMENT_PROD}, ${LEGAL_PAGES.length} legal pages): ${errors.length} error(s).`);
   process.exit(errors.length ? 1 : 0);
 }
 
