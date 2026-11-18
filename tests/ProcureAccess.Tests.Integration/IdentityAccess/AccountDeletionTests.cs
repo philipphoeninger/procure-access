@@ -24,6 +24,8 @@ using ProcureAccess.Modules.Platform.Contracts.Sharing;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Modules.Platform.Sharing;
+using ProcureAccess.Modules.Workspace.Domain;
+using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
 using ProcureAccess.Tests.Shared.Fixtures;
@@ -37,8 +39,10 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// C79; TEN-11, account part). Every test starts from the Tenants fixture with the legacy accounts
 /// of its users stored, one criteria list of organisation A with a share link, and the organisation
 /// „Einzelbüro“ whose only member is <see cref="TestUsers.Member"/>, with a list, a share link and
-/// an open invitation. The parts of R-AUTH-10 that later steps build (contributor profiles,
-/// entries, experience reports, projects) are not here (owner decision S5-28 3).
+/// an open invitation. Since S6-25 each of the two organisations also has a procurement project
+/// with a candidate, its private section, a test evidence with its private note and the project's
+/// copy of the list. The parts of R-AUTH-10 that later steps build (contributor profiles, entries,
+/// experience reports) are not here (owner decision S5-28 3).
 /// </summary>
 public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -50,6 +54,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
     private Organization? _solo;
     private CriteriaConfiguration? _listOfA;
     private CriteriaConfiguration? _listOfSolo;
+    private CriteriaConfiguration? _copyOfA;
 
     private Tenants Fixture => _tenants ?? throw new InvalidOperationException("The fixture is not stored.");
 
@@ -76,6 +81,9 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         ]);
         await StoreAsync(_listOfA, _listOfSolo);
         await StoreAsync(LinkTo(_listOfA), LinkTo(_listOfSolo));
+        var projectOfA = ProjectRows(_listOfA, TestUsers.EditorA, "Projekt von A");
+        _copyOfA = projectOfA.OfType<CriteriaConfiguration>().Single();
+        await StoreAsync([.. projectOfA, .. ProjectRows(_listOfSolo, TestUsers.Member, "Projekt des Einzelbüros")]);
         // Member's address is not confirmed: the deletion needs no confirmed address.
     }
 
@@ -131,7 +139,10 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         (await identity.OrganizationMemberships.IgnoreQueryFilters().Where(m => m.OrganizationId == Fixture.A.Id).Select(m => m.UserId).ToListAsync(Cancellation))
             .ShouldBe([TestUsers.EditorA.Id, TestUsers.ReaderA.Id], ignoreOrder: true);
         (await identity.OrganizationInvitations.IgnoreQueryFilters().CountAsync(Cancellation)).ShouldBe(2);
-        (await CountRowsAsync()).ShouldBe(new Rows(Organizations: 3, Memberships: 6, Invitations: 2, Lists: 2, Links: 2));
+        // Two lists and their two project copies; the projects of both organisations with their rows.
+        (await CountRowsAsync()).ShouldBe(new Rows(
+            Organizations: 3, Memberships: 6, Invitations: 2, Lists: 4, Links: 2,
+            Projects: 2, Candidates: 2, PrivateSections: 2, Evidences: 2, PrivateNotes: 2));
         (await AccountOfAsync(TestUsers.OwnerA)).IsDeleted.ShouldBeTrue();
     }
 
@@ -152,13 +163,27 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         (await identity.OrganizationInvitations.IgnoreQueryFilters().Select(i => i.OrganizationId).ToListAsync(Cancellation))
             .ShouldBe([Fixture.A.Id]);
 
-        // The list of the organisation with its rows, and its link; those of A stay.
+        // The list of the organisation and its project's copy with their rows, and its link; those of A stay.
         await using var configurator = Configurator();
         (await configurator.CriteriaConfigurations.IgnoreQueryFilters().Select(c => c.Id).ToListAsync(Cancellation))
-            .ShouldBe([_listOfA!.Id]);
+            .ShouldBe([_listOfA!.Id, _copyOfA!.Id], ignoreOrder: true);
         (await configurator.Database.SqlQueryRaw<int>(
             "SELECT count(*)::int AS \"Value\" FROM configurator.\"ConfigurationCriteria\"").SingleAsync(Cancellation))
-            .ShouldBe(_listOfA.Criteria.Count);
+            .ShouldBe(_listOfA.Criteria.Count * 2);
+
+        // The project of the organisation with its candidate, evidence and both private rows
+        // (S6-25); those of A stay.
+        await using var workspace = Workspace();
+        (await workspace.ProcurementProjects.IgnoreQueryFilters().Select(p => p.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
+        (await workspace.CandidateProducts.IgnoreQueryFilters().Select(c => c.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
+        (await workspace.CandidatePrivateSections.IgnoreQueryFilters().Select(c => c.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
+        (await workspace.TestEvidences.IgnoreQueryFilters().Select(e => e.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
+        (await workspace.TestEvidencePrivateNotes.IgnoreQueryFilters().Select(n => n.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
         await using var platform = Platform();
         (await platform.ShareLinks.IgnoreQueryFilters().Select(l => l.ResourceId).ToListAsync(Cancellation))
             .ShouldBe([_listOfA.Id]);
@@ -246,7 +271,10 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         (await identity.UserPreferences.Select(p => p.UserId).ToListAsync(Cancellation)).ShouldBe([TestUsers.OwnerA.Id]);
         (await identity.AccountTokens.Select(t => t.UserId).ToListAsync(Cancellation)).ShouldBe([TestUsers.OwnerA.Id]);
         // The list the user created belongs to the organisation and stays.
-        (await CountRowsAsync()).ShouldBe(new Rows(Organizations: 3, Memberships: 6, Invitations: 2, Lists: 2, Links: 2));
+        // Two lists and their two project copies; the projects of both organisations with their rows.
+        (await CountRowsAsync()).ShouldBe(new Rows(
+            Organizations: 3, Memberships: 6, Invitations: 2, Lists: 4, Links: 2,
+            Projects: 2, Candidates: 2, PrivateSections: 2, Evidences: 2, PrivateNotes: 2));
 
         // The address and the password open nothing any more.
         using var anonymous = CreateClient();
@@ -337,6 +365,26 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
             ["web"], ["base"], ["softwareTest"],
             [new ConfigurationCriterionDraft(1, PriorityLevel.A), new ConfigurationCriterionDraft(2, PriorityLevel.B, Note: "Notiz")]);
 
+    /// <summary>
+    /// A project of the list's organisation with everything the Workspace holds below a project —
+    /// a candidate, its private section, a test evidence and its private note — and the project's
+    /// copy of <paramref name="list"/>.
+    /// </summary>
+    private object[] ProjectRows(CriteriaConfiguration list, TestUser creator, string name)
+    {
+        var now = Clock.GetUtcNow();
+        var project = ProcurementProject.Create(list.OrganizationId, name, creator.Id, now);
+        var candidate = CandidateProduct.Create(project, new CandidateFacts("Produkt", "Anbieter", null, null), now);
+        candidate.ChangeTestStatus(TestStatus.Tested, removeEvidences: false, now);
+        var evidence = candidate.AddEvidence(
+            new TestEvidenceFacts(TestKind.Own, null, null, "Prüfstelle", DateOnly.FromDateTime(now.UtcDateTime).AddDays(-30), null, null), now).Evidence!;
+        return
+        [
+            project, candidate, CandidatePrivateSection.Of(candidate, "Kontakt", "Interne Notiz"),
+            TestEvidencePrivateNote.Of(evidence, "Qualifikation"), list.CopyForProject(project.Id, creator.Id, now),
+        ];
+    }
+
     private ShareLink LinkTo(CriteriaConfiguration list) => ShareLink.Create(
         list.OrganizationId, ShareableResourceType.Configuration, list.Id, RandomHash(), Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(30));
 
@@ -374,15 +422,23 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         await using var identity = IdentityAccess();
         await using var configurator = Configurator();
         await using var platform = Platform();
+        await using var workspace = Workspace();
         return new Rows(
             await identity.Organizations.IgnoreQueryFilters().CountAsync(Cancellation),
             await identity.OrganizationMemberships.IgnoreQueryFilters().CountAsync(Cancellation),
             await identity.OrganizationInvitations.IgnoreQueryFilters().CountAsync(Cancellation),
             await configurator.CriteriaConfigurations.IgnoreQueryFilters().CountAsync(Cancellation),
-            await platform.ShareLinks.IgnoreQueryFilters().CountAsync(Cancellation));
+            await platform.ShareLinks.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.ProcurementProjects.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.CandidateProducts.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.CandidatePrivateSections.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.TestEvidences.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.TestEvidencePrivateNotes.IgnoreQueryFilters().CountAsync(Cancellation));
     }
 
-    private sealed record Rows(int Organizations, int Memberships, int Invitations, int Lists, int Links);
+    private sealed record Rows(
+        int Organizations, int Memberships, int Invitations, int Lists, int Links,
+        int Projects, int Candidates, int PrivateSections, int Evidences, int PrivateNotes);
 
     // Contexts of their own outside any request, so the tests read past the organisation filter.
     private IdentityAccessDbContext IdentityAccess() =>
@@ -393,4 +449,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
 
     private PlatformDbContext Platform() =>
         new(new DbContextOptionsBuilder<PlatformDbContext>().UseNpgsql(Api.ConnectionString).Options, FixedOrganizationContext.None);
+
+    private WorkspaceDbContext Workspace() =>
+        new(new DbContextOptionsBuilder<WorkspaceDbContext>().UseNpgsql(Api.ConnectionString).Options, FixedOrganizationContext.None);
 }

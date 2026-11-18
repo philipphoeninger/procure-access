@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Workspace.Accounts;
 using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Modules.Workspace.Projects;
@@ -19,7 +21,8 @@ namespace ProcureAccess.Modules.Workspace;
 /// projects (<see cref="WorkspaceDbContext"/>) and maps their endpoints
 /// (<see cref="ProjectEndpoints"/>), since S6-15 their candidate products with test status and
 /// evidences (<see cref="CandidateEndpoints"/>), since S6-12 a project's own copy of a list
-/// (<see cref="ProjectCriteriaListEndpoint"/>, stored by Configurator); the assessments
+/// (<see cref="ProjectCriteriaListEndpoint"/>, stored by Configurator), since S6-25 its parts of
+/// the account deletion and of the personal data export; the assessments
 /// follow with their tasks of migration step 5. Until their step retires them, products and
 /// favorites are legacy (the proposals went with S6-23).
 /// </summary>
@@ -54,6 +57,11 @@ public static class WorkspaceModule
         // replaces this registration by the check on its assessment rows (C47).
         services.AddScoped<ProjectCriteriaListService>();
         services.AddScoped<ICriteriaListLock, NoAssessmentsYet>();
+
+        // The module's parts of the account deletion and of the personal data export (S6-25),
+        // called by IdentityAccess through its contracts.
+        services.AddScoped<IOrganizationDataDeletion, ProjectDeletionService>();
+        services.AddScoped<IProjectDataExport, ProjectDataExportService>();
         return services;
     }
 

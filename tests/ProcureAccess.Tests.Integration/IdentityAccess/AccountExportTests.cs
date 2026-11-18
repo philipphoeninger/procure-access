@@ -8,7 +8,9 @@ using ProcureAccess.Modules.IdentityAccess.Accounts;
 using MODELS.ProcureAccess.Entities;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
+using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Tests.Integration.Configurator;
 using ProcureAccess.Tests.Integration.Export;
 using ProcureAccess.Tests.Integration.Infrastructure;
@@ -25,8 +27,9 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// legacy accounts of its users stored. Editor A is also a Reader of organisation B and has a
 /// contributor profile; Owner B has one too, which Editor A's export must not show. The criteria
 /// lists the user created came with S5-19 (owner decision S5-19 4), the settings with S5-25a (the
-/// effective values, owner decision S5-25 4). The parts of PRV-07 that later tasks fill (projects
-/// step 5, contributions and purged content step 6) are empty here (owner decision S5-27 1a).
+/// effective values, owner decision S5-25 4), the procurement projects with S6-25 (owner decisions
+/// S6-25 D1 (a), D2 (a)). The part of PRV-07 that step 6 fills (contributions and purged content)
+/// is empty here (owner decision S5-27 1a).
 /// </summary>
 public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -182,6 +185,134 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         text.ShouldNotContain(TestUsers.EditorA.Id, Case.Insensitive);
         text.ShouldNotContain(TestUsers.OwnerA.Id, Case.Insensitive);
         text.ShouldNotContain("revisionId", Case.Insensitive);
+    }
+
+    [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWhoCreatedProjects_ContainsTheirContentAndNoProjectOfOthersOrOfALeftOrganization))]
+    [Trait("Invariant", "PRV-07")]
+    public async Task Export_UserWhoCreatedProjects_ContainsTheirContentAndNoProjectOfOthersOrOfALeftOrganization()
+    {
+        var now = Clock.GetUtcNow();
+        var testDate = DateOnly.FromDateTime(now.UtcDateTime).AddDays(-30);
+
+        // Editor A created a project in A: two candidates, the first one tested with two
+        // evidences and every private field, the second with nothing but its name. Owner A
+        // assigned the criteria list, so the copy is Owner A's and only named here (D2 (a)).
+        var own = ProcurementProject.Create(Fixture.A.Id, "Lernplattform 2027", TestUsers.EditorA.Id, now.AddHours(-3));
+        var full = CandidateProduct.Create(
+            own, new CandidateFacts("Lernwelt", "Lernwelt GmbH", "https://lernwelt.example", "Kurse, Tests"), now.AddHours(-2));
+        full.ChangeTestStatus(TestStatus.Tested, removeEvidences: false, now.AddHours(-2));
+        var procedure = full.AddEvidence(
+            new TestEvidenceFacts(TestKind.Procedure, "softwareTest", null, "Prüfstelle Süd", testDate, "4.2", "https://lernwelt.example/bericht"),
+            now.AddHours(-2)).Evidence!;
+        var other = full.AddEvidence(
+            new TestEvidenceFacts(TestKind.Other, null, "Hausinterne Prüfung", "IT-Referat", testDate.AddDays(1), null, null),
+            now.AddHours(-1)).Evidence!;
+        var bare = CandidateProduct.Create(own, new CandidateFacts("Kursraum", null, null, null), now.AddHours(-1));
+        var copy = CriteriaConfiguration.Create(
+            Fixture.A.Id, "Vergabe 2027", TestUsers.OwnerA.Id, now, MiniCatalog.T1Version, "hr",
+            ["web"], ["base"], ["softwareTest"], [new ConfigurationCriterionDraft(1, PriorityLevel.A)])
+            .CopyForProject(own.Id, TestUsers.OwnerA.Id, now);
+
+        // A later one in B, archived, without candidates and without a list.
+        var ownInB = ProcurementProject.Create(Fixture.B.Id, "Rahmenvertrag", TestUsers.EditorA.Id, now.AddHours(-1));
+        ownInB.ChangeStatus(ProjectStatus.Archived, now);
+
+        // Not Editor A's: a project of a colleague in A, and one Editor A created in an organisation they have left.
+        var colleagues = ProcurementProject.Create(Fixture.A.Id, "Projekt der Kollegin", TestUsers.OwnerA.Id, now);
+        var colleaguesCandidate = CandidateProduct.Create(colleagues, new CandidateFacts("Fremdes Produkt", null, null, null), now);
+        var left = Organization.Create("Verlassene Organisation", OrganizationType.Association, TestUsers.OwnerB.Id, now);
+        var inLeft = ProcurementProject.Create(left.Id, "Projekt von früher", TestUsers.EditorA.Id, now);
+        await StoreAsync(
+            left, own, full, bare, copy, ownInB, colleagues, colleaguesCandidate, inLeft,
+            CandidatePrivateSection.Of(full, "Frau Beispiel, Vertrieb", "Angebot bis März"),
+            TestEvidencePrivateNote.Of(procedure, "Zertifizierte Prüferin"),
+            TestEvidencePrivateNote.Of(other, null),
+            CandidatePrivateSection.Of(colleaguesCandidate, "Kontakt der Kollegin", null));
+        using var client = CreateClient(TestUsers.EditorA);
+
+        using var response = await client.GetAsync(Export, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var text = await response.Content.ReadAsStringAsync(Cancellation);
+        using var body = JsonDocument.Parse(text);
+        var createdByMe = body.RootElement.GetProperty("createdByMe");
+        var projects = createdByMe.GetProperty("projects").EnumerateArray().ToList();
+        projects.Select(p => (p.GetProperty("name").GetString(), p.GetProperty("organization").GetString(), p.GetProperty("status").GetString()))
+                .ShouldBe([("Lernplattform 2027", "Organisation A", "open"), ("Rahmenvertrag", "Organisation B", "archived")]);
+
+        var first = projects[0];
+        first.EnumerateObject().Select(p => p.Name).ShouldBe(["name", "organization", "status", "createdAt", "criteriaList", "candidates"]);
+        first.GetProperty("createdAt").GetDateTimeOffset().ShouldBe(now.AddHours(-3));
+        var list = first.GetProperty("criteriaList");
+        list.EnumerateObject().Select(p => p.Name).ShouldBe(["name", "release"]);
+        list.GetProperty("name").GetString().ShouldBe("Vergabe 2027");
+        list.GetProperty("release").GetString().ShouldBe(MiniCatalog.T1Version);
+        // The copy itself is in the export of Owner A, who assigned it.
+        createdByMe.GetProperty("criteriaLists").GetArrayLength().ShouldBe(0);
+
+        // The candidates in the order they were added, the private section next to the facts.
+        var candidates = first.GetProperty("candidates").EnumerateArray().ToList();
+        candidates.Select(c => c.GetProperty("name").GetString()).ShouldBe(["Lernwelt", "Kursraum"]);
+        var candidate = candidates[0];
+        candidate.EnumerateObject().Select(p => p.Name).ShouldBe(
+            ["name", "vendor", "website", "functionalSummary", "testStatus", "contactNotes", "internalNotes", "createdAt", "testEvidences"]);
+        candidate.GetProperty("vendor").GetString().ShouldBe("Lernwelt GmbH");
+        candidate.GetProperty("website").GetString().ShouldBe("https://lernwelt.example");
+        candidate.GetProperty("functionalSummary").GetString().ShouldBe("Kurse, Tests");
+        candidate.GetProperty("testStatus").GetString().ShouldBe("tested");
+        candidate.GetProperty("contactNotes").GetString().ShouldBe("Frau Beispiel, Vertrieb");
+        candidate.GetProperty("internalNotes").GetString().ShouldBe("Angebot bis März");
+        candidate.GetProperty("createdAt").GetDateTimeOffset().ShouldBe(now.AddHours(-2));
+
+        var evidences = candidate.GetProperty("testEvidences").EnumerateArray().ToList();
+        evidences.Count.ShouldBe(2);
+        evidences[0].EnumerateObject().Select(p => p.Name).ShouldBe(
+            ["testKind", "testType", "otherTestTypeName", "testedBy", "testDate", "testedVersion", "evidenceUrl", "qualificationNote"]);
+        evidences[0].GetProperty("testKind").GetString().ShouldBe("procedure");
+        evidences[0].GetProperty("testType").GetString().ShouldBe("softwareTest");
+        evidences[0].GetProperty("otherTestTypeName").ValueKind.ShouldBe(JsonValueKind.Null);
+        evidences[0].GetProperty("testedBy").GetString().ShouldBe("Prüfstelle Süd");
+        evidences[0].GetProperty("testDate").GetString().ShouldBe(testDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
+        evidences[0].GetProperty("testedVersion").GetString().ShouldBe("4.2");
+        evidences[0].GetProperty("evidenceUrl").GetString().ShouldBe("https://lernwelt.example/bericht");
+        evidences[0].GetProperty("qualificationNote").GetString().ShouldBe("Zertifizierte Prüferin");
+        evidences[1].GetProperty("testKind").GetString().ShouldBe("other");
+        evidences[1].GetProperty("testType").ValueKind.ShouldBe(JsonValueKind.Null);
+        evidences[1].GetProperty("otherTestTypeName").GetString().ShouldBe("Hausinterne Prüfung");
+        evidences[1].GetProperty("qualificationNote").ValueKind.ShouldBe(JsonValueKind.Null);
+
+        // A candidate with only a name: „unknown“, no private section, no evidence.
+        candidates[1].GetProperty("testStatus").GetString().ShouldBe("unknown");
+        candidates[1].GetProperty("contactNotes").ValueKind.ShouldBe(JsonValueKind.Null);
+        candidates[1].GetProperty("internalNotes").ValueKind.ShouldBe(JsonValueKind.Null);
+        candidates[1].GetProperty("testEvidences").GetArrayLength().ShouldBe(0);
+
+        projects[1].GetProperty("criteriaList").ValueKind.ShouldBe(JsonValueKind.Null);
+        projects[1].GetProperty("candidates").GetArrayLength().ShouldBe(0);
+
+        // Nothing of the other projects, no id of any row and no user.
+        text.ShouldNotContain("Projekt der Kollegin");
+        text.ShouldNotContain("Fremdes Produkt");
+        text.ShouldNotContain("Kontakt der Kollegin");
+        text.ShouldNotContain("Projekt von früher");
+        text.ShouldNotContain("Verlassene Organisation");
+        foreach (var id in new[]
+                 {
+                     own.Id, ownInB.Id, colleagues.Id, inLeft.Id, full.Id, bare.Id, procedure.Id, other.Id, copy.Id,
+                     Fixture.A.Id, Fixture.B.Id, left.Id,
+                 })
+        {
+            text.ShouldNotContain(id.ToString(), Case.Insensitive);
+        }
+
+        foreach (var user in TestUsers.ByName.Values)
+        {
+            text.ShouldNotContain(user.Id, Case.Insensitive);
+            if (user != TestUsers.EditorA)
+            {
+                text.ShouldNotContain(user.Email, Case.Insensitive);
+            }
+        }
     }
 
     [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWithoutMembershipOrProfile_HasEverySectionOfSpec84AndTheUnbuiltOnesEmpty))]
