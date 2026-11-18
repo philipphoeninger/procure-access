@@ -116,8 +116,12 @@ test.describe('Procurement projects S30, S31', () => {
     await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
-    const choice = dialog.getByRole('combobox', { name: 'Kriterienliste (optional)' });
+    // Firefox crashes in axe after a name check of a Material control labelled by aria-labelledby
+    // (TESTING V129, V165): the select is the dialog's only combobox, its name is checked by the unit test
+    const choice = dialog.getByRole('combobox');
+    await expect(choice).toHaveCount(1);
     await expect(choice).toContainText('Keine Liste');
+    await expect(dialog).toContainText('Kriterienliste (optional)');
     await expect(dialog).toContainText('Das Projekt erhält eine eigene Kopie der Liste');
     await settled(dialog);
     await expectNoAxeViolations(page, testInfo, 's31-list-choice');
@@ -125,7 +129,7 @@ test.describe('Procurement projects S30, S31', () => {
     const project = `Mit Liste ${suffix}`;
     await dialog.getByRole('textbox', { name: 'Name des Projekts' }).fill(project);
     await choice.click();
-    await page.getByRole('option', { name: 'HR-Software 2027' }).click();
+    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
     const assigned = page.waitForResponse(
       (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname.endsWith('/criteria-configuration'),
     );
@@ -150,7 +154,9 @@ test.describe('Procurement projects S30, S31', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's11-project-copy');
 
-    const first = main(page).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).first();
+    // The include checkbox by role inside its card, without its name: after axe on S11 the name
+    // computation of that checkbox crashes Firefox (TESTING V165, as J1)
+    const first = main(page).locator('pa-criterion-card').first().getByRole('checkbox');
     const decide = (included: boolean) =>
       page.waitForResponse(
         (response) =>
@@ -170,7 +176,7 @@ test.describe('Procurement projects S30, S31', () => {
     await main(page).getByRole('link', { name: 'Kriterienliste anpassen' }).press('Enter');
     await expect(main(page).getByRole('heading', { level: 1, name: 'HR-Software 2027' })).toBeFocused();
     const included = decide(true);
-    await main(page).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).first().check();
+    await main(page).locator('pa-criterion-card').first().getByRole('checkbox').check();
     expect((await included).ok()).toBe(true);
 
     await page.goBack();
