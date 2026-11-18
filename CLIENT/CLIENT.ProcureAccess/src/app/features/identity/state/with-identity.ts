@@ -8,7 +8,7 @@ import { patchState, signalStoreFeature, withComputed, withMethods, withState } 
 import { SessionLimits } from '@app/core/session/session-limits';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { OrganizationApiService } from '@app/features/organization/services/api/organization-api.service';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 import { SessionResponse, SessionUser } from '../models/session';
 import { User } from '../models/user.model';
 import { AuthService } from '../services/auth.service';
@@ -65,8 +65,8 @@ export const initialIdentityState: IdentityState = {
  */
 export const withIdentity = () =>
   signalStoreFeature(
+    LOADING_INPUT,
     withState<IdentityState>(initialIdentityState),
-    withLoading(),
     withComputed((state, limits = inject(SessionLimits)) => ({
       /** Idle limit of the session (ISO 8601) as the server last told it; null without a session. */
       sessionExpiresAt: computed(() => (state.session() === null ? null : limits.expiresAt())),

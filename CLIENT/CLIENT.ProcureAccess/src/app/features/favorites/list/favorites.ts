@@ -34,7 +34,7 @@ export class Favorites {
 
   readonly dialog = inject(MatDialog);
 
-  constructor(protected snackbarService: SnackbarService) {}
+  protected snackbarService = inject(SnackbarService);
 
   showSnackbar(message: string) {
     this.snackbarService.showInfo(message);

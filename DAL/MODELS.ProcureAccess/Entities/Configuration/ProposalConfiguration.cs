@@ -29,16 +29,10 @@ public class ProposalConfiguration : BaseEntityConfiguration<Proposal>
             .WithOne(p => p.Proposal)
             .IsRequired(false);
 
-        builder
-            .HasOne(x => x.Proposer)
-            .WithMany(u => u.Proposals)
-            .HasForeignKey(x => x.ProposerId)
-            .IsRequired(true);
-        builder
-            .HasOne(x => x.Approver)
-            .WithMany(u => u.Approvals)
-            .HasForeignKey(x => x.ApproverId)
-            .IsRequired(false);
+        // The proposer and the reviewer are user ids without a relation since S6-10 (ADR-014
+        // rule 5); their indexes stay as the former foreign keys created them.
+        builder.HasIndex(x => x.ProposerId);
+        builder.HasIndex(x => x.ApproverId);
 
         // Check Constraints
         builder.ToTable(b => b.HasCheckConstraint(

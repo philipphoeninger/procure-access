@@ -19,7 +19,7 @@ SPDX-License-Identifier: MIT
 - **Texts:** `criteria.export.outdated.reload` is not in UX copy v39 → UX copy v40 with U161 (wording confirmed by the owner in O-S6-5), `de.json` through `check-i18n.mjs --write`. No other text needed (S80 and the offline notice exist).
 - **Figma:** S13-E `2039:1944` checked through the Figma MCP before building: secondary text button left of the filled primary; the outdated state follows that pattern. No frame of its own (Handoff §5.3 dialog rules).
 - **Tests:** unit — both guards (`chunk-reload.spec.ts`: messages, `chunkFailureAction`, `DocumentReload`, the handler in a router with a failing `loadComponent`; `with-configurator.spec.ts`: four reload cases), `export-dialog.spec.ts` (both buttons, the reload on S11). E2E (CI only) — `e2e/shell/chunk-reload.spec.ts` (404 once → one reload and the page; always → one reload and S80) and an S13 case in `e2e/configurator/s11-list.spec.ts`.
-- **Documents:** CODEBASE §2.86 and §3, CLAUDE.md §3 (client routing names the handler, as #296 asks), Handoff 1.34 (S13 row), ARCHITECTURE v81 C167 (v79 deleted), UX copy v40 (v38 deleted).
+- **Documents:** CODEBASE §2.88 and §3, CLAUDE.md §3 (client routing names the handler, as #296 asks), Handoff 1.34 (S13 row), ARCHITECTURE v82 C168 (v80 deleted; planned as v81 C167, renumbered after S6-10a merged its v81 first), UX copy v40 (v38 deleted).
 - **Invariants / migration / dependencies:** none activated; no EF migration; no new dependency. One session.
 
 ## 1. Starting point
@@ -47,9 +47,9 @@ SPDX-License-Identifier: MIT
 | `CLIENT/…/public/i18n/de.json` | `criteria.export.outdated.reload` (by `check-i18n.mjs --write`) |
 | `e2e/shell/chunk-reload.spec.ts` (new), `e2e/configurator/s11-list.spec.ts` | E2E as in the plan (run in CI only) |
 | `docs/ux_copy_procureaccess_v40.md` (new; v38 deleted) | U161, the key row in §5.6 |
-| `docs/ARCHITECTURE_v81.md` (new; v79 deleted) | C167 |
+| `docs/ARCHITECTURE_v82.md` (new; v80 deleted) | C168 (renumbered from v81 C167 after merging `main` with S6-10a) |
 | `docs/design_handoff_procureaccess_v1.md` | 1.34: S13 row |
-| `docs/CODEBASE_v1.md` | §1 change history, §2.44 pointer, §2.86, §3 layout line |
+| `docs/CODEBASE_v1.md` | §1 change history, §2.44 pointer, §2.88 (after S6-24 §2.86 and S6-10a §2.87), §3 layout line |
 | `CLAUDE.md` | §3 client routing: the navigation error handler and where a new engine message goes |
 
 Not changed: SPEC (no requirement changes; its header still names ARCHITECTURE v80 and UX copy v39, P4), TESTING (no invariant), Figma mapping (S13 frames unchanged), `LEGACY_EXCEPTIONS`, `nginx.conf`, the server.

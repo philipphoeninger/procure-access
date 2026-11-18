@@ -7,7 +7,6 @@ global using DAL.ProcureAccess.EFStructures;
 global using DAL.ProcureAccess.Exceptions;
 global using DAL.ProcureAccess.Repos.Base;
 global using DAL.ProcureAccess.Repos.Interfaces;
-global using DAL.ProcureAccess.Initialization;
 
 global using MODELS.ProcureAccess.Entities;
 global using MODELS.ProcureAccess.Entities.Authorization;
@@ -32,5 +31,3 @@ global using Microsoft.EntityFrameworkCore.Migrations;
 global using Microsoft.EntityFrameworkCore.Query;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.AspNetCore.Identity;
-global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

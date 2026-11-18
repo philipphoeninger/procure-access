@@ -11,7 +11,7 @@ if (CatalogModule.IsCommand(args))
 }
 
 // `roles list|grant|revoke …` grants and revokes platform roles and exits (SPEC R-ADM-03, S4-25).
-if (RoleCommandLine.IsCommand(args))
+if (IdentityAccessModule.IsRolesCommand(args))
 {
     return await RoleCommandHost.RunAsync(args);
 }
@@ -27,8 +27,6 @@ builder.Services.AddControllers()
 builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddProcureAccessApiVersionConfiguration(new ApiVersion(1, 0))
                 .AddPostgreSQLConnection(builder.Configuration)
-                .AddIdentityHandlersAndStores()
-                .ConfigureIdentityOptions(builder.Configuration)
                 .AddHttpContextAccessor()
                 .AddIdentityAuth()
                 .AddAuthorizationPolicies()
@@ -36,14 +34,10 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddDataServices()
                 .AddLocalization(options => options.ResourcesPath = "Resources");
 
-// Password-reset e-mails go out in the background, so a known address answers as fast as an
-// unknown one (S5-13a, ARCHITECTURE C141).
-builder.Services.AddSingleton<PasswordResetMailQueue>()
-                .AddHostedService<PasswordResetMailer>();
-
 // Module projects (ARCHITECTURE §4.3). Platform holds time, logging with retention, usage events,
 // the health checks (S2-07) and Problem Details (S2-10); IdentityAccess the Data Protection key
-// store (S3-24); Catalog its database context (S3-12). E-mail (S5-11) is registered only here, not in
+// store (S3-24), the session and, since S6-10, the users with ASP.NET Core Identity; Catalog its
+// database context (S3-12). E-mail (S5-11) is registered only here, not in
 // the command hosts, which send none. The others register nothing yet: the legacy
 // code in API, DAL, MODELS and SERVICES moves into them with the migration step that replaces it
 // (S2-06, owner decision O-S2-1).
@@ -119,7 +113,7 @@ try
     // API versions of the endpoints mapped so far (#176).
     app.MapControllers();
     app.MapGroup("/api")
-       .MapIdentityUserEndpoints();
+       .MapIdentityAccessLegacyEndpoints();
     app.MapPlatformEndpoints();
 
     // Module endpoints under /api/v1 (ARCHITECTURE §7.1; owner, S3-19: only the new endpoints are
@@ -131,15 +125,7 @@ try
        .MapCatalogEndpoints()
        .MapConfiguratorEndpoints()
        .MapExportEndpoints()
-       .MapIdentityAccessEndpoints()
-       .MapAuthEndpoints()
-       .MapRegistrationEndpoints()
-       .MapPasswordResetEndpoints()
-       .MapAccountEndpoints()
-       .MapAccountExportEndpoints()
-       .MapAccountDeletionEndpoints()
-       .MapOrganizationEndpoints()
-       .MapInvitationEndpoints();
+       .MapIdentityAccessEndpoints();
 
     app.ConfigureSwaggerExplorer();
 

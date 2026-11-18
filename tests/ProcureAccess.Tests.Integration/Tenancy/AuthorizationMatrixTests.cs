@@ -5,7 +5,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
-using API.ProcureAccess.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Organizations;
 using ProcureAccess.Modules.Catalog;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Configurator.Configurations;
@@ -244,7 +244,7 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         _linkOfA = ShareLink.Create(
             _tenants.A.Id, ShareableResourceType.Configuration, _listOfA.Id, new byte[32], Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(30));
         await StoreAsync([.. _tenants.Entities, _invitation, _listOfA, _linkOfA]);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: true))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

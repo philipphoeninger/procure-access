@@ -7,8 +7,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 /// <summary>
 /// The single-use tokens of the account e-mails (ARCHITECTURE §9.1, C72; SPEC §7.8, R-AUTH-02):
 /// a random value that only the e-mail holds, stored as its hash, valid for a 🔧 lifetime and
-/// redeemed at most once. Implemented by the IdentityAccess module; the host's registration
-/// endpoints use it while the users are still legacy (S5-12a), the password reset reuses it (S5-13a).
+/// redeemed at most once. Implemented by the IdentityAccess module; the registration
+/// endpoints use it (S5-12a), the password reset reuses it (S5-13a).
 /// </summary>
 public interface IAccountTokens
 {

@@ -2,9 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.IdentityAccess;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Domain;
 using API.ProcureAccess.Extensions;
 using DAL.ProcureAccess.EFStructures;
-using DAL.ProcureAccess.Initialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -68,9 +72,9 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
 
         await StartApiWithRebuildFlagAsync("Development", SampleUserPassword);
 
-        await using var db = CreateDbContext();
+        await using var db = CreateIdentityAccessContext();
         var user = await db.Users.SingleAsync(TestContext.Current.CancellationToken);
-        user.Email.ShouldBe(SampleData.SampleUserEmail);
+        user.Email.ShouldBe(IdentityAccessModule.SampleUserEmail);
         new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash!, SampleUserPassword)
             .ShouldNotBe(PasswordVerificationResult.Failed);
 
@@ -106,8 +110,10 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
             NormalizedEmail = "EXISTING@EXAMPLE.TEST",
             SecurityStamp = Guid.NewGuid().ToString(),
         };
-        db.Users.Add(user);
-        await db.SaveChangesAsync(cancellationToken);
+        // The legacy migrations created the table; the users are the IdentityAccess module's (S6-10).
+        await using var identity = CreateIdentityAccessContext();
+        identity.Users.Add(user);
+        await identity.SaveChangesAsync(cancellationToken);
         return user;
     }
 
@@ -130,9 +136,12 @@ public sealed class DatabaseRebuildGuardTests(ApiFixture api) : IAsyncDisposable
 
     private async Task<List<string>> UserIdsAsync()
     {
-        await using var db = CreateDbContext();
+        await using var db = CreateIdentityAccessContext();
         return await db.Users.IgnoreQueryFilters().Select(u => u.Id).ToListAsync(TestContext.Current.CancellationToken);
     }
+
+    private IdentityAccessDbContext CreateIdentityAccessContext() =>
+        new(new DbContextOptionsBuilder<IdentityAccessDbContext>().UseNpgsql(_connectionString).Options, FixedOrganizationContext.None);
 
     private ApplicationDBContext CreateDbContext() =>
         new(new DbContextOptionsBuilder<ApplicationDBContext>()

@@ -6,8 +6,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 
 /// <summary>
 /// Organisations and their members (SPEC R-ORG-01, R-ORG-03, R-ORG-04; ARCHITECTURE §5.2, C80;
-/// S5-16a). The host's organisation endpoints call it, because the members' e-mail addresses still
-/// come from the legacy users (owner decision S5-16 4a; until M3.1). It applies the organisation
+/// S5-16a). The organisation endpoints call it and add the members' e-mail addresses
+/// (owner decision S5-16 4a). It applies the organisation
 /// rules — the creator becomes Owner, the last Owner cannot be demoted, removed or leave (TEN-11) —
 /// but never decides who may call it: the caller checks <see cref="OrganizationRoleRequirement"/>
 /// on the organisation first. Reads and changes go through the organisation query filter, so an

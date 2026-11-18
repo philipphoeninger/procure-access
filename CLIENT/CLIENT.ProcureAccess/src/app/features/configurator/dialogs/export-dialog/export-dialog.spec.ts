@@ -8,6 +8,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
@@ -33,6 +34,7 @@ import { provideLoadedConfiguratorSettings } from '../../testing/configurator-se
 // The dialog reads the list S11 shows, so it runs on the S11 page with the real configurator slice.
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
+  withLoading(),
   withConfigurator(),
   withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => null })),
 );

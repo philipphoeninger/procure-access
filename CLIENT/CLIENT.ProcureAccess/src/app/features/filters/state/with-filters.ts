@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import { computed, inject } from '@angular/core';
-import { initialAppState } from '@app/core/models/appState.interface';
 import {
   patchState,
   signalStoreFeature,
@@ -12,7 +11,7 @@ import {
   withState
 } from '@ngrx/signals';
 import { FilterType } from '../models/filterType.model';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 import { FiltersApiService } from '../services/api/filters-api.service';
 import { CriteriaFilter } from '../models/criteriaFilter.model';
 import { EnFilterTypeId } from '../models/filterTypes.enum';
@@ -24,12 +23,12 @@ export type FiltersState = {
 };
 
 export const withFilters = () => signalStoreFeature(
+    LOADING_INPUT,
     withState<FiltersState>({
-      filterTypes: initialAppState.filters.filterTypes,
-      criteriaFilters: initialAppState.filters.criteriaFilters,
-      selectedCriteriaFilters: initialAppState.filters.selectedCriteriaFilters
+      filterTypes: [],
+      criteriaFilters: [],
+      selectedCriteriaFilters: []
     }),
-    withLoading(),
     withMethods((state, filtersApiService = inject(FiltersApiService)) => ({
         async loadFilters() {
           state.incrementLoadingCount();
@@ -73,20 +72,21 @@ export const withFilters = () => signalStoreFeature(
           });
         }
     })),
-    withComputed((state) => ({
-      selectedCriteriaFiltersCount: computed(() => {
-        return state.selectedCriteriaFilters().length;
-      }),
-      selectedCriteriaFiltersIds: computed(() =>
-        state.selectedCriteriaFilters().map(x => x.id)
-      ),
-      productTypes: computed(() =>
-        state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.productType)),
-      appTypes: computed(() =>
-        state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.appType)),
-      productParts: computed(() =>
-        state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.productPart)),
-      testTypes: computed(() =>
-        state.criteriaFilters().filter(x => x.filterTypeId == EnFilterTypeId.testType))
-    }))
+    withComputed((state) => {
+      // `filterTypeId` is the plain number the API sends; the enum names the four ids.
+      const ofType = (type: EnFilterTypeId) =>
+        computed(() => state.criteriaFilters().filter(x => x.filterTypeId === Number(type)));
+      return {
+        selectedCriteriaFiltersCount: computed(() => {
+          return state.selectedCriteriaFilters().length;
+        }),
+        selectedCriteriaFiltersIds: computed(() =>
+          state.selectedCriteriaFilters().map(x => x.id)
+        ),
+        productTypes: ofType(EnFilterTypeId.productType),
+        appTypes: ofType(EnFilterTypeId.appType),
+        productParts: ofType(EnFilterTypeId.productPart),
+        testTypes: ofType(EnFilterTypeId.testType)
+      };
+    })
 );

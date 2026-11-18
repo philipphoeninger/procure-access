@@ -9,6 +9,7 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { fireEvent } from '@testing-library/dom';
 import { provideRouter, Router } from '@angular/router';
 import { signalStore, withMethods } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
@@ -29,6 +30,7 @@ import { provideLoadedConfiguratorSettings } from '../../testing/configurator-se
 // sign-in state (`signedIn` of withIdentity(), from the session probe) is a flag here.
 let signedIn = false;
 const ConfiguratorTestStore = signalStore(
+  withLoading(),
   withConfigurator(),
   withMethods(() => ({ signedIn: () => signedIn, activeOrganization: () => null })),
 );

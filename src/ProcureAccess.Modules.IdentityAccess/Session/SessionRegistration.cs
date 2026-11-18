@@ -38,7 +38,7 @@ internal static class SessionRegistration
 
         // The three Identity cookie schemes (application, external, two-factor). SignInManager
         // signs out of all three, so they must exist; only the application cookie is used.
-        // The default scheme stays the host's choice (legacy JWT next to the cookie until S5-08).
+        // The default scheme is set by the host (AddIdentityAuth): the application cookie.
         services.AddAuthentication().AddIdentityCookies();
 
         services.ConfigureApplicationCookie(options =>

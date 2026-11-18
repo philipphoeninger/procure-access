@@ -67,7 +67,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -240,7 +240,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
             await ActivateAsync(MiniCatalog.T2Version);
         }
 
-        await LegacyAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
+        await TestAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
         using var response = await SendAsync(client, action, id, revision);
 
         response.StatusCode.ShouldBe(expected, await response.Content.ReadAsStringAsync(Cancellation));

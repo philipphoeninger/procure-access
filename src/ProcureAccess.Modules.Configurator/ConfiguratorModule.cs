@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Configurator.Accounts;
 using ProcureAccess.Modules.Configurator.Configurations;
-using ProcureAccess.Modules.Configurator.Contracts.Accounts;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Drafts;
@@ -18,6 +17,7 @@ using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.Configurator.Settings;
 using ProcureAccess.Modules.Configurator.Sharing;
 using ProcureAccess.Modules.Configurator.Usage;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Sharing;
 
@@ -68,7 +68,7 @@ public static class ConfiguratorModule
         services.AddScoped<IModuleDatabaseMigrator, ConfiguratorDatabaseMigrator>();
         services.AddScoped<IConfigurationReader, ConfigurationReader>();
         services.AddScoped<ICriteriaListDataExport, CriteriaListDataExportService>();
-        services.AddScoped<ICriteriaListDeletion, CriteriaListDeletionService>();
+        services.AddScoped<IOrganizationDataDeletion, CriteriaListDeletionService>();
 
         // Read once here, so an impossible 🔧 weight range stops the start (SPEC SD23).
         services.AddSingleton(PriorityWeightRange.From(configuration));

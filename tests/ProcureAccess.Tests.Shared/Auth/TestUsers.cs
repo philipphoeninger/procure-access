@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using MODELS.ProcureAccess.Entities.Authorization;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 namespace ProcureAccess.Tests.Shared.Auth;
 
@@ -72,7 +73,7 @@ public static class TestUsers
         Name: "moderator",
         Id: "00000000-0000-0000-0000-00000000a002",
         Email: "moderator@example.test",
-        Roles: [Roles.Moderator],
+        Roles: [PlatformRoles.Moderator],
         Permissions: [MODELS.ProcureAccess.Entities.Authorization.Permissions.ModerationReview]);
 
     /// <summary>All fixture users, looked up by <see cref="TestUser.Name"/>.</summary>

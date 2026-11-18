@@ -40,7 +40,6 @@ public static class MapCases
         Case<CreateCriterionDto, Criterion>("CreateCriterionDto → Criterion", dto => dto.ToEntity(),
             [.. ServerSetMembers, nameof(Criterion.CriteriaFilter), nameof(Criterion.Proposal)]),
         Case<Proposal, ProposalDto>("Proposal → ProposalDto", proposal => proposal.ToDto()),
-        Case<User, UserDto>("User → UserDto", user => user.ToDto()),
     ];
 
     public static TheoryData<MapCase> Theory() => [.. All];

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.IdentityAccess.Domain;
 using System.Net;
 using System.Net.Http.Json;
 using DAL.ProcureAccess.EFStructures;
@@ -80,18 +81,9 @@ public sealed class ModerationPolicyTests(ApiFixture api) : IntegrationTest(api)
         await Api.ResetDatabaseAsync();
         // A product proposal; a rejection never reads its snapshot.
         var proposal = new Proposal { ProposerId = TestUsers.Member.Id, ProductSnapshot = "{}", CreatedAt = TestData.DefaultCreatedAt };
-        await StoreAsync(UserRow(TestUsers.Member), UserRow(TestUsers.Moderator), proposal);
+        await StoreAsync(TestAccounts.Of(TestUsers.Member, confirmed: false), TestAccounts.Of(TestUsers.Moderator, confirmed: false), proposal);
         return proposal.Id;
     }
-
-    private static User UserRow(TestUser user) => new()
-    {
-        Id = user.Id,
-        UserName = user.Email,
-        NormalizedUserName = user.Email.ToUpperInvariant(),
-        Email = user.Email,
-        NormalizedEmail = user.Email.ToUpperInvariant(),
-    };
 
     private async Task<ProposalStatus> StatusAsync(int proposalId, CancellationToken cancellationToken)
     {

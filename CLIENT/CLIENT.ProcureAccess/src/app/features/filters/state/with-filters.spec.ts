@@ -4,13 +4,14 @@
 
 import { TestBed } from '@angular/core/testing';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 
 import { TResult } from '@app/core/models/result.model';
 import { FiltersApiService } from '../services/api/filters-api.service';
 import { withFilters } from './with-filters';
 
 // #168: a failed load must not leave the loading bar on (pa-loading-bar, R-SHL-09).
-const FiltersTestStore = signalStore(withFilters());
+const FiltersTestStore = signalStore(withLoading(), withFilters());
 
 function setUp(apiService: Partial<FiltersApiService>) {
   TestBed.configureTestingModule({

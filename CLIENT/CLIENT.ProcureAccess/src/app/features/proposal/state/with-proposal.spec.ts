@@ -4,6 +4,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 
 import { TResult } from '@app/core/models/result.model';
 import { ApproveProposal } from '../models/approve-proposal-request.model';
@@ -11,7 +12,7 @@ import { ProposalApiService } from '../services/api/proposal-api.service';
 import { withProposal } from './with-proposal';
 
 // #168 and S2-11 P6: a failed request must not leave the loading bar on (pa-loading-bar, R-SHL-09).
-const ProposalTestStore = signalStore(withProposal());
+const ProposalTestStore = signalStore(withLoading(), withProposal());
 
 function setUp(apiService: Partial<ProposalApiService>) {
   TestBed.configureTestingModule({

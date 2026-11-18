@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { patchState, signalStoreFeature, withComputed, withMethods, withState } from '@ngrx/signals';
 import { problemFieldErrors, problemTypeName } from '@app/core/errors/problem-details';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
 import {
   CONFIGURATOR_LAYERS,
@@ -157,8 +157,8 @@ export const initialConfiguratorState: ConfiguratorState = {
  */
 export const withConfigurator = () =>
   signalStoreFeature(
+    LOADING_INPUT,
     withState({ configurator: initialConfiguratorState }),
-    withLoading(),
     withMethods((
       store,
       api = inject(CatalogApiService),

@@ -6,48 +6,8 @@ namespace API.ProcureAccess.Extensions;
 
 public static class IdentityExtensions
 {
-    public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
-    {
-        services.AddIdentityCore<User>(options =>
-                    {
-                        options.SignIn.RequireConfirmedEmail = false;
-                    })
-                .AddUserManager<ClockedUserManager>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDBContext>()
-                .AddSignInManager()
-                .AddDefaultTokenProviders()
-                .AddPasswordValidator<MaximumLengthPasswordValidator>();
-        return services;
-    }
-
-    /// <summary>
-    /// Unique e-mail addresses, the password rule of <see cref="PasswordPolicy"/> (S5-12a): a
-    /// 🔧 minimum length, no composition rules, and the 🔧 lockout of <see cref="LockoutPolicy"/>
-    /// (S5-13a). The user name is the e-mail address, so it may hold every character an address may
-    /// (the default allows only letters, digits and <c>-._@+</c>).
-    /// </summary>
-    public static IServiceCollection ConfigureIdentityOptions(this IServiceCollection services, IConfiguration configuration)
-    {
-        var minLength = PasswordPolicy.MinLengthFrom(configuration);
-        var lockout = LockoutPolicy.From(configuration);
-        services.Configure<IdentityOptions>(options =>
-        {
-            options.Lockout.AllowedForNewUsers = true;
-            options.Lockout.MaxFailedAccessAttempts = lockout.MaxFailedAttempts;
-            options.Lockout.DefaultLockoutTimeSpan = lockout.Duration;
-
-            options.User.RequireUniqueEmail = true;
-            options.User.AllowedUserNameCharacters = "";
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireDigit = false;
-            options.Password.RequiredLength = minLength;
-            options.Password.RequiredUniqueChars = 1;
-        });
-        return services;
-    }
+    // The user and role stores, the sign-in manager and the password and lockout rules are
+    // registered by the IdentityAccess module since S6-10 (AddIdentityAccessModule).
 
     // Auth = Authentication + Authorization
     /// <summary>
