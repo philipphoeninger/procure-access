@@ -105,8 +105,11 @@ public static class IdentityAccessModule
         services.AddSession(configuration, environment);
 
         // Single-use, hashed tokens of the account e-mails (S5-12a, C72); 🔧 lifetimes read at start.
+        // Expired tokens, used or not, are deleted by a background job (S6-05, TD-59), which only
+        // the web host starts.
         services.AddSingleton(AccountTokenSettings.From(configuration));
         services.AddScoped<IAccountTokens, AccountTokenService>();
+        services.AddHostedService<AccountTokenCleanupService>();
 
         // The memberships and contributor profiles of the personal data export (S5-27, SPEC §8.4).
         services.AddScoped<IAccountDataExport, AccountDataExportService>();
