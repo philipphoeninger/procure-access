@@ -112,6 +112,22 @@ jobs:
       - name: ESLint (e2e and scripts)
         working-directory: e2e
         run: npm run lint
+      # `ng serve` has to render (S6-07, #388; regression of #264): the dev server pre-bundles
+      # dependencies, which neither the release build nor Vitest nor the E2E stack exercise. No API
+      # runs here, so the proxy answers 5xx for /api, which the script does not count. Node is the
+      # client's (e2e/.nvmrc is the same version); packages from the two `npm ci` runs above.
+      - name: Dev server smoke (ng serve renders)
+        working-directory: CLIENT/CLIENT.ProcureAccess
+        run: |
+          node --test ../../scripts/smoke-dev-server.test.mjs ../../scripts/check-chunk-cache.test.mjs
+          npx ng serve --port 4200 > "$RUNNER_TEMP/ng-serve.log" 2>&1 &
+          server=$!
+          status=0
+          timeout 180 bash -c 'until curl -sf -o /dev/null http://localhost:4200/; do sleep 2; done' || status=1
+          if [ "$status" = 0 ]; then node ../../scripts/smoke-dev-server.mjs http://localhost:4200 || status=1; fi
+          if [ "$status" != 0 ]; then echo "::group::ng serve log"; cat "$RUNNER_TEMP/ng-serve.log"; echo "::endgroup::"; fi
+          kill "$server" || true
+          exit "$status"
 
   build:
     name: 2. Build
@@ -277,6 +293,12 @@ jobs:
       - name: Start E2E stack
         working-directory: e2e
         run: npm run stack:up
+      # The client image's nginx gives hashed files `Cache-Control: immutable` (S6-07, #388;
+      # regression of #308): main, styles and one lazy chunk. Once per run, not per browser.
+      - name: Cache headers of the client image
+        if: matrix.project == 'chromium'
+        run: |
+          node scripts/check-chunk-cache.mjs http://localhost:4200
       # The host network reaches the stack on localhost like a local run. e2e/node_modules comes
       # from `npm ci` above; it has no native module, so it runs on the image's Node. The runner's
       # user keeps the reports writable for the next steps. GITHUB_WORKSPACE inside the container
