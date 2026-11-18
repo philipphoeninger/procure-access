@@ -44,8 +44,9 @@ public sealed class SavedExportEndpointTests(ApiFixture api) : IntegrationTest(a
         await Api.ResetDatabaseAsync();
         await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
         _tenants = Tenants.Build(Clock.GetUtcNow());
-        await StoreAsync(_tenants.Entities);
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
         await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
+        await StoreAsync(_tenants.Entities);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

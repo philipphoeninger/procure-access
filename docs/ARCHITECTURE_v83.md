@@ -38,7 +38,7 @@ Sprint 06, task S6-27 (`docs/sprints/sprint_06/S6-27_reload_flows.md`; owner dec
 
 ### Changes from v80
 
-Sprint 06, task S6-10a (`docs/sprints/sprint_06/S6-10_users_identityaccess.md`; owner decisions of 2026-11-18: O-S6-1 — yes, at the start of M5, (a) the migration keeps the rows · S6-10 split — a: the move, b: the foreign keys and the clean-up, because the entity and every user of `UserManager<User>` must move together · 1 (b) — the other modules implement IdentityAccess's contracts for the account export and deletion · 2 (a) — the legacy hand-over migration drops the two proposal foreign keys · 4 — the display name of a user is the e-mail address; TECH_DEBT TD-72, TD-75, #387).
+Sprint 06, task S6-10a (`docs/sprints/sprint_06/S6-10a_users_identityaccess.md`; owner decisions of 2026-11-18: O-S6-1 — yes, at the start of M5, (a) the migration keeps the rows · S6-10 split — a: the move, b: the foreign keys and the clean-up, because the entity and every user of `UserManager<User>` must move together · 1 (b) — the other modules implement IdentityAccess's contracts for the account export and deletion · 2 (a) — the legacy hand-over migration drops the two proposal foreign keys · 4 — the display name of a user is the e-mail address; TECH_DEBT TD-72, TD-75, #387).
 
 | # | Change | Reason |
 |---|---|---|

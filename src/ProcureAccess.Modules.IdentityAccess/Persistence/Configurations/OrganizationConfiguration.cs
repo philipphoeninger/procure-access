@@ -24,5 +24,13 @@ internal sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organ
         builder.Property(x => x.Name).HasMaxLength(Organization.NameMaxLength);
         builder.Property(x => x.Type).HasConversion<string>().HasMaxLength(16);
         builder.Property(x => x.CreatedByUserId).IsRequired();
+
+        // Restrict, not cascade: an organisation is the tenant boundary and never ends because a
+        // user row is deleted (S6-10b, owner decision S6-10 3). Accounts are only soft-deleted;
+        // the Development rebuild deletes the organisations before the users.
+        builder.HasOne<User>()
+               .WithMany()
+               .HasForeignKey(x => x.CreatedByUserId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

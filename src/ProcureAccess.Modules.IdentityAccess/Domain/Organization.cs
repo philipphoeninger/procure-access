@@ -27,7 +27,7 @@ internal sealed class Organization
 
     public OrganizationType Type { get; private set; }
 
-    /// <summary>The ASP.NET Core Identity user id of the creator (§5.2); no foreign key while users are legacy (ADR-014).</summary>
+    /// <summary>The ASP.NET Core Identity user id of the creator (§5.2); a foreign key onto the users since S6-10b (restrict).</summary>
     public string CreatedByUserId { get; private set; } = null!;
 
     public DateTimeOffset CreatedAt { get; private set; }

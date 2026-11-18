@@ -35,6 +35,8 @@ public sealed class CriteriaConfigurationPersistenceTests(ApiFixture api) : Inte
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
         await StoreAsync(_tenants.Entities);
     }
 

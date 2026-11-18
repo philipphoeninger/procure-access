@@ -43,8 +43,9 @@ public sealed class OrganizationEndpointsTests(ApiFixture api) : IntegrationTest
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
-        await StoreAsync(_tenants.Entities);
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
         await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync(_tenants.Entities);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

@@ -309,6 +309,10 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         IssuedAccountToken issued;
         using (var scope = Host.Services.CreateScope())
         {
+            // A token belongs to an account (foreign key, S6-10b).
+            var db = scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>();
+            db.Users.Add(TestAccounts.WithId("user-of-a-race"));
+            await db.SaveChangesAsync(Cancellation);
             issued = await scope.ServiceProvider.GetRequiredService<IAccountTokens>()
                 .IssueAsync("user-of-a-race", AccountTokenPurpose.EmailConfirmation, Cancellation);
         }

@@ -21,7 +21,7 @@ internal sealed class OrganizationMembership
 
     public Guid OrganizationId { get; private set; }
 
-    /// <summary>The ASP.NET Core Identity user id; no foreign key while users are legacy (ADR-014).</summary>
+    /// <summary>The ASP.NET Core Identity user id; a foreign key onto the users since S6-10b (cascade).</summary>
     public string UserId { get; private set; } = null!;
 
     public OrganizationRole Role { get; private set; }

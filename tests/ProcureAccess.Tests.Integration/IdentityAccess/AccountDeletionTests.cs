@@ -62,6 +62,8 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         await Api.ResetDatabaseAsync();
         var now = Clock.GetUtcNow();
         _tenants = Tenants.Build(now);
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.Member))]);
         _solo = Organization.Create("Einzelbüro", OrganizationType.Company, TestUsers.Member.Id, now);
         _listOfA = ListOf(_tenants.A.Id, TestUsers.EditorA, "Liste von A");
         _listOfSolo = ListOf(_solo.Id, TestUsers.Member, "Liste des Einzelbüros");
@@ -75,7 +77,6 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         await StoreAsync(_listOfA, _listOfSolo);
         await StoreAsync(LinkTo(_listOfA), LinkTo(_listOfSolo));
         // Member's address is not confirmed: the deletion needs no confirmed address.
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.Member))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -194,6 +195,23 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
             UserPreferences.Defaults(TestUsers.EditorA.Id), UserPreferences.Defaults(TestUsers.OwnerA.Id),
             AccountToken.Create(TestUsers.EditorA.Id, AccountTokenPurpose.PasswordReset, RandomHash(), now, TimeSpan.FromHours(2)),
             AccountToken.Create(TestUsers.OwnerA.Id, AccountTokenPurpose.EmailConfirmation, RandomHash(), now, TimeSpan.FromHours(24)));
+        // What Identity holds of an account besides its row (S6-10b): a platform role, a claim, an
+        // external login, a token and a running lockout count; Owner A keeps the same role.
+        await using (var seed = IdentityAccess())
+        {
+            var moderator = await seed.Roles.SingleAsync(r => r.Name == PlatformRoles.Moderator, Cancellation);
+            seed.UserRoles.AddRange(
+                new IdentityUserRole<string> { UserId = TestUsers.EditorA.Id, RoleId = moderator.Id },
+                new IdentityUserRole<string> { UserId = TestUsers.OwnerA.Id, RoleId = moderator.Id });
+            seed.UserClaims.Add(new IdentityUserClaim<string> { UserId = TestUsers.EditorA.Id, ClaimType = "sample", ClaimValue = "value" });
+            seed.UserLogins.Add(new IdentityUserLogin<string> { UserId = TestUsers.EditorA.Id, LoginProvider = "provider", ProviderKey = "key" });
+            seed.UserTokens.Add(new IdentityUserToken<string> { UserId = TestUsers.EditorA.Id, LoginProvider = "provider", Name = "name", Value = "value" });
+            var editor = await seed.Users.SingleAsync(u => u.Id == TestUsers.EditorA.Id, Cancellation);
+            editor.AccessFailedCount = 3;
+            editor.LockoutEnd = now.AddDays(-1);
+            await seed.SaveChangesAsync(Cancellation);
+        }
+
         var stampBefore = await SetPasswordAsync(TestUsers.EditorA);
         Clock.Advance(TimeSpan.FromMinutes(3));
         using var client = CreateClient(TestUsers.EditorA);
@@ -215,8 +233,15 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         account.NormalizedEmail.ShouldBe(account.Email.ToUpperInvariant());
         account.NormalizedUserName.ShouldBe(account.NormalizedEmail);
         account.SecurityStamp.ShouldNotBe(stampBefore);
+        account.AccessFailedCount.ShouldBe(0);
+        account.LockoutEnd.ShouldBeNull();
 
         await using var identity = IdentityAccess();
+        // Roles, claims, logins and tokens of this account are gone, those of others stay (S6-10b; S5-28a R5).
+        (await identity.UserRoles.Select(r => r.UserId).ToListAsync(Cancellation)).ShouldBe([TestUsers.OwnerA.Id]);
+        (await identity.UserClaims.AnyAsync(Cancellation)).ShouldBeFalse();
+        (await identity.UserLogins.AnyAsync(Cancellation)).ShouldBeFalse();
+        (await identity.UserTokens.AnyAsync(Cancellation)).ShouldBeFalse();
         (await identity.OrganizationMemberships.IgnoreQueryFilters().AnyAsync(m => m.UserId == TestUsers.EditorA.Id, Cancellation)).ShouldBeFalse();
         (await identity.UserPreferences.Select(p => p.UserId).ToListAsync(Cancellation)).ShouldBe([TestUsers.OwnerA.Id]);
         (await identity.AccountTokens.Select(t => t.UserId).ToListAsync(Cancellation)).ShouldBe([TestUsers.OwnerA.Id]);

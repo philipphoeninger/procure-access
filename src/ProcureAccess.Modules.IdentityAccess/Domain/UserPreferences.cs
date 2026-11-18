@@ -7,8 +7,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// <summary>
 /// The settings of one user (SPEC R-SET-01, R-SET-02; ARCHITECTURE §5.2, C73; S5-25a): language,
 /// appearance, motion and contrast, applied by the client on every device after the sign-in
-/// (A11Y-06). One row per user, keyed by the user id without a foreign key, because the users are
-/// still the legacy context's (ADR-014). A user without a row has <see cref="Defaults"/>.
+/// (A11Y-06). One row per user, keyed by the user id (a foreign key onto the users since
+/// S6-10b). A user without a row has <see cref="Defaults"/>.
 /// </summary>
 internal sealed class UserPreferences
 {

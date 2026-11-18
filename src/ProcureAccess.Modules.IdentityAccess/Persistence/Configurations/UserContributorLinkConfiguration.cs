@@ -10,8 +10,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
 
 /// <summary>
 /// Table <c>identity."UserContributorLinks"</c> (ARCHITECTURE §5.2): one row per profile, deleted
-/// with its profile. <c>UserId</c> has no foreign key, because the users are still in the legacy
-/// context (ADR-014).
+/// with its profile. <c>UserId</c> is a foreign key onto the users since S6-10b (cascade).
 /// </summary>
 internal sealed class UserContributorLinkConfiguration : IEntityTypeConfiguration<UserContributorLink>
 {
@@ -23,6 +22,10 @@ internal sealed class UserContributorLinkConfiguration : IEntityTypeConfiguratio
         builder.HasKey(x => x.ContributorProfileId);
         builder.Property(x => x.UserId).IsRequired();
         builder.HasIndex(x => x.UserId);
+        builder.HasOne<User>()
+               .WithMany()
+               .HasForeignKey(x => x.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<ContributorProfile>()
                .WithOne()
