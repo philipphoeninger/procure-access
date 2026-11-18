@@ -112,12 +112,26 @@ internal sealed record TestEvidenceResponse(
 /// </summary>
 /// <param name="Progress"><c>null</c> while the project has no list, as the two members below.</param>
 /// <param name="Fulfillment">The seven counts, never <c>notCovered</c> (SIG-13).</param>
+/// <param name="TestEvidences">
+/// The kind of each test evidence, in the order they were added, for the line „Ja – 2 Prüfnachweise:
+/// …“ of S32 (<c>projects.detail.row.tested.evidences</c>; S6-14); empty unless <c>tested</c>.
+/// </param>
 /// <param name="ProcedureAnswers">The derived answers of the list's procedure criteria (CAT-17).</param>
 internal sealed record CandidateSummaryResponse(
     Guid Id,
     string Name,
     string? Vendor,
     string TestStatus,
+    IReadOnlyList<TestEvidenceTypeResponse> TestEvidences,
     AssessmentProgressResponse? Progress,
     FulfillmentCountsResponse? Fulfillment,
     IReadOnlyList<ProcedureAnswerResponse>? ProcedureAnswers);
+
+/// <summary>
+/// What S32 names of a test evidence: its kind and, for a catalog procedure, its key or, for another
+/// test, the name entered (S6-14). Who tested, when and the private note stay on S34a.
+/// </summary>
+/// <param name="TestKind"><c>procedure</c>, <c>other</c> or <c>own</c>.</param>
+/// <param name="TestTypeId">The key of the catalog procedure; <c>null</c> unless <c>procedure</c>.</param>
+/// <param name="OtherTestTypeName">The name of the other test; <c>null</c> unless <c>other</c>.</param>
+internal sealed record TestEvidenceTypeResponse(string TestKind, string? TestTypeId, string? OtherTestTypeName);

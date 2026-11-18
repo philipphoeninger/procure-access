@@ -1,0 +1,62 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<h2 mat-dialog-title>{{ 'projects.edit.title' | translate }}</h2>
+
+<form class="pa-edit-project" novalidate (submit)="submit($event)">
+  <mat-dialog-content class="pa-edit-project__content">
+    <pa-error-summary [items]="summary()" />
+
+    @if (confirmationRequired()) {
+      <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+      <div #confirmNotice class="pa-edit-project__confirm" tabindex="-1">
+        <pa-confirm-required-notice />
+      </div>
+    }
+
+    @if (archived) {
+      <!-- An archived project changes only its status (R-PRJ-05) -->
+      <pa-notice kind="info">
+        <p>{{ 'projects.archived.note' | translate }}</p>
+      </pa-notice>
+    } @else {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'projects.create.name' | translate }}</mat-label>
+        <input matInput [id]="nameId" type="text" name="name" autocomplete="off" required
+          [formControl]="name" [errorStateMatcher]="errorState" />
+        @if (nameMessage(); as message) {
+          <mat-error>{{ message.key | translate: message.params }}</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <div class="pa-edit-project__status">
+      <span [id]="statusLabelId" class="pa-edit-project__status-label">{{ 'projects.status.label' | translate }}</span>
+      <mat-radio-group class="pa-edit-project__status-options" [formControl]="status" [attr.aria-labelledby]="statusLabelId">
+        @for (value of statuses; track value) {
+          <mat-radio-button [value]="value">{{ statusKey(value) | translate }}</mat-radio-button>
+        }
+      </mat-radio-group>
+    </div>
+
+    @if (error(); as error) {
+      <pa-notice kind="error" live="assertive" [title]="'projects.edit.error.title' | translate">
+        <p>{{ errorKey(error) | translate }}</p>
+      </pa-notice>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="pa-edit-project__actions">
+    <button matButton type="button" mat-dialog-close>{{ 'common.actions.cancel' | translate }}</button>
+    <!-- While saving: spinner before the label, aria-disabled, label kept (Handoff §6.2) -->
+    <button matButton="filled" type="submit" [attr.aria-disabled]="busy() ? 'true' : null">
+      @if (busy()) {
+        <mat-progress-spinner class="pa-edit-project__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+      }
+      {{ 'common.actions.save' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

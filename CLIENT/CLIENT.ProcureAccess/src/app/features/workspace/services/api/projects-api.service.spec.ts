@@ -20,6 +20,8 @@ const PROJECT: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: null,
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 describe('ProjectsApiService', () => {
@@ -65,6 +67,17 @@ describe('ProjectsApiService', () => {
     expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
     request.flush(PROJECT);
     await expect(read).resolves.toEqual(PROJECT);
+  });
+
+  it('changes name or status with a PATCH of what changes, every failure shown by the caller (R-PRJ-05)', async () => {
+    const changed = api.change('p/1', { status: 'archived' });
+
+    const request = backend.expectOne('/api/v1/projects/p%2F1');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ status: 'archived' });
+    expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
+    request.flush({ ...PROJECT, status: 'archived' });
+    await expect(changed).resolves.toEqual({ ...PROJECT, status: 'archived' });
   });
 
   it('gives the project its own copy of a list with a PUT of the source, every failure shown by the caller (R-PRJ-02, R-PRJ-04)', async () => {

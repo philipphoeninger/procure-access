@@ -2,13 +2,30 @@
 //
 // SPDX-License-Identifier: MIT
 
-// S32 placeholder (S6-13): H1, the meta line and the archived note; the section „Kriterienliste“
-// (S6-12); S6-14 builds the screen.
+// S32 Projektübersicht (Figma desktop `2148:3877`, 360 px `2148:4697`; Handoff §5.1): breadcrumb,
+// title row, meta line, then two outlined cards on surface-container-lowest like the S34 cards.
+// Below 600 px (S32-M) everything stacks: the title row, the card heads, the `<dl>` rows (dt above
+// dd); the products are separated by dividers and the counts are one per line. From 600 px the
+// products are outlined boxes inside their card and the counts run on, separated by „·“.
 :host {
   display: flex;
   flex-direction: column;
   gap: var(--pa-space-md);
   inline-size: 100%;
+}
+
+// Title row: H1 and „Projekt bearbeiten“; stacked in DOM order below 600 px, side by side from 600 px
+.pa-project__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 // H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
@@ -22,6 +39,10 @@
   }
 }
 
+.pa-project__edit {
+  flex-shrink: 0;
+}
+
 .pa-project__meta {
   margin: 0;
   font: var(--mat-sys-body-large);
@@ -32,39 +53,139 @@ pa-notice p {
   margin: 0;
 }
 
-.pa-project__criteria {
+.pa-project__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-lowest);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+// Card title and its action: stacked below 600 px (the action follows its heading in the DOM),
+// side by side from 600 px; they wrap, so the action never leaves the card.
+.pa-project__card-head {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--pa-space-sm);
+  gap: var(--pa-space-xs);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
-.pa-project__criteria-title {
+.pa-project__card-title {
   margin: 0;
   font: var(--mat-sys-title-large);
+  overflow-wrap: anywhere;
 }
 
-// dt above dd below 600 px, side by side from 600 px (Handoff §5.1 S32-M)
-.pa-project__criteria-facts {
+.pa-project__text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+// dt above dd below 600 px, a column of terms from 600 px (Figma: about 200 px)
+.pa-project__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
   margin: 0;
 
   div {
-    display: flex;
-    flex-direction: column;
-
     @media (min-width: 37.5em) {
-      flex-direction: row;
-      gap: var(--pa-space-sm);
+      display: grid;
+      grid-template-columns: 12.5rem 1fr;
+      column-gap: var(--pa-space-md);
     }
   }
 
   dt {
-    font: var(--mat-sys-title-small);
+    font: var(--mat-sys-label-medium);
   }
 
   dd {
     margin: 0;
     font: var(--mat-sys-body-medium);
     overflow-wrap: anywhere;
+  }
+}
+
+// The products: dividers below 600 px (no nested outlined cards, S32-M), outlined boxes from 600 px
+.pa-project__products {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 37.5em) {
+    gap: var(--pa-space-md);
+  }
+}
+
+.pa-project__product {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  padding-block: var(--pa-space-md);
+  border-block-start: 1px solid var(--mat-sys-outline-variant);
+
+  &:first-child {
+    padding-block-start: 0;
+    border-block-start: none;
+  }
+
+  @media (min-width: 37.5em) {
+    &,
+    &:first-child {
+      padding: var(--pa-space-md);
+      border: 1px solid var(--mat-sys-outline-variant);
+      border-radius: var(--mat-sys-corner-medium);
+    }
+  }
+}
+
+.pa-project__product-name {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+// Text links (the list name, the product names) in the primary colour, underlined (Figma S32)
+.pa-project__facts dd a,
+.pa-project__product-name a {
+  color: var(--mat-sys-primary);
+}
+
+// „Abgleich“ (UX copy U54): a list, each value without a break inside it; one per line below 600 px,
+// running on with „·“ from 600 px. The separator ends its value, so a wrapped line starts with a value
+// (Figma: „Nicht anwendbar: 2 ·“ ↵); it is CSS only, with no text for screen readers.
+.pa-project__counts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    white-space: nowrap;
+  }
+
+  @media (min-width: 37.5em) {
+    display: flex;
+    flex-wrap: wrap;
+
+    li:not(:last-child)::after {
+      content: '·' / '';
+      padding-inline: var(--pa-space-xs);
+    }
   }
 }

@@ -28,6 +28,8 @@ const PROJECT: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: { id: 'copy-1', name: 'HR-Software 2027', releaseVersion: 'T.1' },
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 const COPY: SavedList = {

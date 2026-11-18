@@ -6,44 +6,160 @@ SPDX-License-Identifier: MIT
 
 @let shown = view();
 @if (shown.kind === 'project') {
-  <h1 class="pa-project__title">{{ shown.project.name }}</h1>
+  @let project = shown.project;
+  <pa-breadcrumb [items]="breadcrumb()" />
+
+  <div class="pa-project__head">
+    <h1 class="pa-project__title">{{ project.name }}</h1>
+    @if (canEdit()) {
+      <button matButton="outlined" type="button" class="pa-project__edit" (click)="edit(project)">
+        {{ 'projects.detail.edit' | translate }}
+      </button>
+    }
+  </div>
   <p class="pa-project__meta">
-    {{ 'projects.detail.meta' | translatePlural: shown.project.productCount : { status: (statusKey(shown.project.status) | translate) } }}
+    {{ 'projects.detail.meta' | translatePlural: project.productCount : { status: (statusKey(project.status) | translate) } }}
   </p>
-  @if (shown.project.status === 'archived') {
+  @if (project.status === 'archived') {
     <pa-notice kind="info">
       <p>{{ 'projects.archived.note' | translate }}</p>
     </pa-notice>
   }
 
-  <!-- The section of S6-12 (D8 (a)); S6-14 replaces it by the criteria card. No <section>: Firefox (CLAUDE §3, E2E) -->
-  <div class="pa-project__criteria">
-    <h2 class="pa-project__criteria-title">{{ 'projects.detail.criteria.title' | translate }}</h2>
-    @if (shown.project.criteriaList; as list) {
-      <dl class="pa-project__criteria-facts">
+  <!-- Card „Kriterienliste“ (Handoff §5.1 S32). No <section>: Firefox crashes axe on named regions (TESTING V229) -->
+  <div class="pa-project__card">
+    <div class="pa-project__card-head">
+      <h2 class="pa-project__card-title">{{ 'projects.detail.criteria.title' | translate }}</h2>
+      @if (project.criteriaList !== null && canChange()) {
+        <a matButton class="pa-project__card-action" [routerLink]="criteriaListPath(project.id)">
+          {{ 'projects.detail.criteria.adjust' | translate }}
+        </a>
+      }
+    </div>
+
+    @if (shown.criteria; as criteria) {
+      <dl class="pa-project__facts">
         <div>
           <dt>{{ 'projects.detail.criteria.list' | translate }}</dt>
-          <dd><a [routerLink]="criteriaListPath(shown.project.id)">{{ list.name }}</a></dd>
+          <dd><a [routerLink]="criteriaListPath(project.id)">{{ criteria.listName }}</a></dd>
         </div>
         <div>
           <dt>{{ 'projects.detail.criteria.release' | translate }}</dt>
-          <dd>{{ list.releaseVersion }}</dd>
+          <dd>{{ criteria.releaseVersion }}</dd>
         </div>
+        <div>
+          <dt>{{ 'projects.detail.criteria.scope' | translate }}</dt>
+          <!-- A count of the list, not of a product; „Geprüft nach …“ named apart, never counted (U55, CAT-17) -->
+          <dd>
+            {{
+              (criteria.scope.procedures > 0 ? 'projects.detail.criteria.scope.value' : 'projects.detail.criteria.scope.value.noProcedures')
+                | translate: criteria.scope
+            }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'projects.detail.criteria.useCase' | translate }}</dt>
+          <dd>{{ criteria.useCase ?? ('criteria.select.step1.none' | translate) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'projects.detail.criteria.appTypes' | translate }}</dt>
+          <dd>{{ criteria.appTypes.join(', ') }}</dd>
+        </div>
+        @if (criteria.testTypes.length > 0) {
+          <div>
+            <dt>{{ 'projects.detail.criteria.testTypes' | translate }}</dt>
+            <dd>{{ criteria.testTypes.join(', ') }}</dd>
+          </div>
+        }
       </dl>
+      <p class="pa-project__text">{{ 'projects.detail.criteria.copyNote' | translate: { source: criteria.listName } }}</p>
       @if (criteriaAdded() > 0) {
         <pa-notice kind="info">
           <p>{{ 'projects.detail.criteriaAdded' | translatePlural: criteriaAdded() }}</p>
         </pa-notice>
       }
-      @if (canAdjust()) {
-        <a matButton class="pa-project__criteria-adjust" [routerLink]="criteriaListPath(shown.project.id)">
-          {{ 'projects.detail.criteria.adjust' | translate }}
-        </a>
+      @if (project.criteriaListLocked) {
+        <pa-notice kind="info">
+          <p>{{ 'projects.detail.criteriaLocked' | translate }}</p>
+        </pa-notice>
       }
     } @else {
       <pa-notice kind="info">
         <p>{{ 'projects.detail.noCriteria' | translate }}</p>
       </pa-notice>
+    }
+  </div>
+
+  <!-- Card „Produkte in diesem Projekt“ -->
+  <div class="pa-project__card">
+    <div class="pa-project__card-head">
+      <h2 class="pa-project__card-title">{{ 'projects.detail.products' | translate }}</h2>
+      @if (canChange()) {
+        <!-- MatMenuTrigger sets aria-haspopup="menu" and aria-expanded (UX copy U60) -->
+        <button matButton type="button" class="pa-project__card-action pa-project__add" [matMenuTriggerFor]="addMenu">
+          {{ 'projects.detail.addProduct' | translate }}
+          <mat-icon iconPositionEnd aria-hidden="true">arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #addMenu="matMenu">
+          <!-- „Aus dem Produktverzeichnis übernehmen“ comes with M6 (owner decision S6-14 D3 (a)) -->
+          <a mat-menu-item [routerLink]="newCandidatePath(project.id)">{{ 'projects.detail.addProduct.new' | translate }}</a>
+        </mat-menu>
+      }
+    </div>
+
+    @if (products().length === 0) {
+      <p class="pa-project__text">{{ 'projects.detail.empty' | translate }}</p>
+    } @else {
+      <p class="pa-project__text">{{ 'projects.detail.orderNote' | translate }}</p>
+      <ul class="pa-project__products">
+        @for (product of products(); track product.id) {
+          <li class="pa-project__product">
+            <!-- The name is the only link to S34 (UX copy U60) -->
+            <h3 class="pa-project__product-name">
+              <a [routerLink]="candidatePath(project.id, product.id)">{{ product.name }}</a>
+            </h3>
+            @if (product.vendor) {
+              <p class="pa-project__text">{{ 'candidate.vendorLine' | translate: { vendor: product.vendor } }}</p>
+            }
+            <dl class="pa-project__facts">
+              <div>
+                <dt>{{ 'projects.detail.row.tested' | translate }}</dt>
+                <dd>
+                  @if (product.testStatus === 'tested' && product.testEvidences.length > 0) {
+                    {{ 'projects.detail.row.tested.evidences' | translatePlural: product.testEvidences.length : { types: evidenceTypes(product) } }}
+                  } @else {
+                    {{ testStatusKey(product.testStatus) | translate }}
+                  }
+                </dd>
+              </div>
+              @if (product.progress; as progress) {
+                <div>
+                  <dt>{{ 'projects.detail.row.progress' | translate }}</dt>
+                  <dd>{{ 'candidate.assessment.progress' | translate: progress }}</dd>
+                </div>
+              }
+              @if (product.fulfillment; as counts) {
+                <div>
+                  <dt>{{ 'projects.detail.row.counts' | translate }}</dt>
+                  <!-- All seven, fixed order, label first, zeros too; separators by CSS only (U54, SIG-08, SIG-13) -->
+                  <dd>
+                    <ul class="pa-project__counts">
+                      @for (value of countValues; track value) {
+                        <li>{{ 'directory.entry.row.' + value | translate: { count: counts[value] } }}</li>
+                      }
+                    </ul>
+                  </dd>
+                </div>
+              }
+              <div>
+                <dt>{{ 'projects.detail.row.publication' | translate }}</dt>
+                <!-- Publishing comes with step 6 -->
+                <dd>{{ 'projects.detail.row.publication.none' | translate }}</dd>
+              </div>
+            </dl>
+          </li>
+        }
+      </ul>
     }
   </div>
 } @else {

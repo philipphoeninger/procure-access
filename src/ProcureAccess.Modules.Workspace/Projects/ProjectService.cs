@@ -24,10 +24,15 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// <para>The project's criteria list (S6-12) is stored on Configurator's copy, not on the project
 /// (owner decision S6-12 D1 (a)); the answers read it through <see cref="IProjectCriteriaLists"/>.</para>
 /// <para>Every candidate of a project with a list carries its progress, the seven counts and the
-/// derived procedure answers (<see cref="AssessmentReader"/>; C34, SIG-13; S6-18).</para>
+/// derived procedure answers (<see cref="AssessmentReader"/>; C34, SIG-13; S6-18), and the kinds of
+/// its test evidences; the project says whether its list is locked (S6-14).</para>
 /// </remarks>
 internal sealed class ProjectService(
-    WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, AssessmentReader assessments, TimeProvider clock)
+    WorkspaceDbContext db,
+    IProjectCriteriaLists criteriaLists,
+    ProjectCriteriaListService criteriaListAssignment,
+    AssessmentReader assessments,
+    TimeProvider clock)
 {
     /// <summary>The wire names of the status, the suffixes of <c>projects.status.*</c>.</summary>
     private static readonly IReadOnlyDictionary<string, ProjectStatus> StatusByName =
@@ -55,7 +60,7 @@ internal sealed class ProjectService(
         var project = ProcurementProject.Create(organizationId, name, createdByUserId, clock.GetUtcNow());
         db.ProcurementProjects.Add(project);
         await db.SaveChangesAsync(cancellationToken);
-        return ResponseOf(project, [], null);
+        return ResponseOf(project, [], null, criteriaListLocked: false);
     }
 
     /// <summary>The project, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
@@ -129,7 +134,11 @@ internal sealed class ProjectService(
     private async Task<ProjectResponse> ResponseOfAsync(ProcurementProject project, CancellationToken cancellationToken)
     {
         var list = await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken);
-        return ResponseOf(project, await CandidatesOfAsync(project.Id, list, cancellationToken), list);
+        return ResponseOf(
+            project,
+            await CandidatesOfAsync(project.Id, list, cancellationToken),
+            list,
+            await criteriaListAssignment.IsLockedAsync(project.Id, cancellationToken));
     }
 
     /// <summary>
@@ -149,21 +158,37 @@ internal sealed class ProjectService(
                                      c.Name,
                                      c.VendorName,
                                      c.TestStatus,
-                                     EvidenceTestTypeKeys = c.TestEvidences.Where(e => e.TestTypeKey != null).Select(e => e.TestTypeKey!).ToList(),
+                                     Evidences = c.TestEvidences.OrderBy(e => e.CreatedAt)
+                                                  .ThenBy(e => e.Id)
+                                                  .Select(e => new { e.TestKind, e.TestTypeKey, e.OtherTestTypeName })
+                                                  .ToList(),
                                  })
                                  .ToListAsync(cancellationToken);
         var summaries = await assessments.SummariesAsync(
-            list, [.. candidates.Select(c => new AssessedCandidate(c.Id, c.TestStatus, c.EvidenceTestTypeKeys))], cancellationToken);
+            list,
+            [.. candidates.Select(c => new AssessedCandidate(
+                c.Id, c.TestStatus, [.. c.Evidences.Where(e => e.TestTypeKey != null).Select(e => e.TestTypeKey!)]))],
+            cancellationToken);
         return [.. candidates.Select(c =>
         {
             var summary = summaries?[c.Id];
             return new CandidateSummaryResponse(
-                c.Id, c.Name, c.VendorName, CandidateNames.Of(c.TestStatus), summary?.Progress, summary?.Fulfillment, summary?.ProcedureAnswers);
+                c.Id,
+                c.Name,
+                c.VendorName,
+                CandidateNames.Of(c.TestStatus),
+                [.. c.Evidences.Select(e => new TestEvidenceTypeResponse(CandidateNames.Of(e.TestKind), e.TestTypeKey, e.OtherTestTypeName))],
+                summary?.Progress,
+                summary?.Fulfillment,
+                summary?.ProcedureAnswers);
         })];
     }
 
     private static ProjectResponse ResponseOf(
-        ProcurementProject project, IReadOnlyList<CandidateSummaryResponse> candidates, ProjectCriteriaList? list) => new(
+        ProcurementProject project,
+        IReadOnlyList<CandidateSummaryResponse> candidates,
+        ProjectCriteriaList? list,
+        bool criteriaListLocked) => new(
         project.Id,
         project.OrganizationId,
         project.Name,
@@ -172,7 +197,8 @@ internal sealed class ProjectService(
         candidates,
         project.CreatedAt,
         project.ModifiedAt,
-        list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion));
+        list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion),
+        criteriaListLocked);
 }
 
 /// <summary>How a change of a project ended.</summary>

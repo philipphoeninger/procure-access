@@ -1,0 +1,29 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// pa-breadcrumb (Figma S32, S34): body/medium, the links in the primary colour, „›“ between the
+// items drawn by CSS with an empty alternative text, so screen readers read only the list.
+
+.pa-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pa-breadcrumb__item {
+  overflow-wrap: anywhere;
+
+  & + &::before {
+    content: '›' / '';
+    padding-inline: var(--pa-space-xs);
+  }
+
+  a {
+    color: var(--mat-sys-primary);
+  }
+}

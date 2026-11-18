@@ -198,7 +198,10 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         using var client = CreateClient(TestUsers.EditorA);
         var copy = await AssignAsync(client, project.Id, first);
         var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        (await ReadProjectAsync(client, project.Id)).CriteriaListLocked.ShouldBeFalse();
         await AssessAsync(client, candidate.Id, revision, "fulfilled");
+        // S32 reads the lock with the project and shows `projects.detail.criteriaLocked` (S6-14).
+        (await ReadProjectAsync(client, project.Id)).CriteriaListLocked.ShouldBeTrue();
 
         using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation);
 
@@ -212,6 +215,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
 
         // Back to „Nicht eingeschätzt“: no assessment exists any more, the list can be replaced again.
         await AssessAsync(client, candidate.Id, revision, "unknown");
+        (await ReadProjectAsync(client, project.Id)).CriteriaListLocked.ShouldBeFalse();
         (await AssignAsync(client, project.Id, second)).Name.ShouldBe("Zweite Liste");
     }
 
@@ -235,6 +239,8 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var revision = criteria[0]!["revisionId"]!.GetValue<int>();
         await AssessAsync(client, candidate.Id, revision, "unknown", "Nachfragen beim Anbieter");
         await AssessAsync(client, candidateOfOther.Id, revision, "barrier");
+        (await ReadProjectAsync(client, project.Id)).CriteriaListLocked.ShouldBeFalse();
+        (await ReadProjectAsync(client, other.Id)).CriteriaListLocked.ShouldBeTrue();
 
         var replaced = await AssignAsync(client, project.Id, second);
 

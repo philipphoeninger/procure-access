@@ -7,6 +7,8 @@
 // Types and route paths only, so app.routes.ts and the header can name the paths without loading a
 // store or service (CLAUDE.md §3, client routing).
 
+import type { AssessmentProgress, CandidateFulfillment, TestKind, TestStatus } from './candidates';
+
 /**
  * S30 „Beschaffungsprojekte“ at `/projekte`, a project (S32) at `/projekte/:id`, the project's own
  * copy of a list (S11 in project-copy mode) at `/projekte/:id/kriterienliste` (owner decision S6-12 D4 (a)).
@@ -57,13 +59,58 @@ export interface ProjectCriteriaList {
   releaseVersion: string;
 }
 
-/** A project (`GET /api/v1/projects/{id}` and the answer of creating it). The creator is not served (S6-11 4 (a)). */
+/**
+ * What S32 names of a test evidence (S6-14): its kind and, for a catalog procedure, its key
+ * (`testType.<key>`) or, for „Andere Prüfung“, the name entered.
+ */
+export interface ProjectEvidenceType {
+  testKind: TestKind;
+  testTypeId: string | null;
+  otherTestTypeName: string | null;
+}
+
+/**
+ * A candidate in the product list of S32 (R-PRJ-03). The server lists them in the order they were
+ * added; S32 shows the last added first (`projects.detail.orderNote`). Progress and the seven counts
+ * are null while the project has no list (S6-18).
+ */
+export interface ProjectCandidate {
+  id: string;
+  name: string;
+  vendor: string | null;
+  testStatus: TestStatus;
+  /** In the order they were added; empty unless `tested`. */
+  testEvidences: ProjectEvidenceType[];
+  progress: AssessmentProgress | null;
+  fulfillment: CandidateFulfillment | null;
+}
+
+/** A project (`GET /api/v1/projects/{id}` and the answers of creating and changing it). The creator is not served (S6-11 4 (a)). */
 export interface Project extends ProjectSummary {
   organizationId: string;
   createdAt: string;
   /** The project's copy of a list; null while it has none (S6-12). The answer of creating a project has none yet. */
   criteriaList: ProjectCriteriaList | null;
+  /**
+   * True once a candidate has an assessment other than „Nicht eingeschätzt“: the list can no longer
+   * be replaced and S32 shows `projects.detail.criteriaLocked` (R-PRJ-04, WSP-02; S6-14).
+   */
+  criteriaListLocked: boolean;
+  /** The candidate products, in the order they were added (S6-15). */
+  candidates: ProjectCandidate[];
 }
+
+/**
+ * Body of `PATCH /api/v1/projects/{id}` (R-PRJ-05): what is named changes. An archived project
+ * changes only its status (owner decision S6-11 2 (a)).
+ */
+export interface ProjectChange {
+  name?: string;
+  status?: ProjectStatus;
+}
+
+/** The statuses in the order of the UX copy („Laufend“, „Abgeschlossen“, „Archiviert“). */
+export const PROJECT_STATUSES: readonly ProjectStatus[] = ['open', 'done', 'archived'];
 
 /** The orders of S30's „Sortieren nach“ (UX copy U162): only by date or name (Handoff §5.3). */
 export type ProjectSort = 'modified' | 'name';
