@@ -12,7 +12,7 @@
 - **TD-58:** `EmailSettings.Timeout` from the 🔧 setting, `SmtpClient.Timeout` in `MailKitSmtpTransport`; a fake SMTP server that stalls before the greeting, at the sign-in and at the send.
 - **TD-59:** `AccountTokenCleanupService` like `InvitationCleanupService`, `Account:Tokens:CleanupInterval` (1 h, operations setting); tests of the rule and of the hosted service on `FakeTimeProvider`. Open question D1 (when a row may go) and the index question put to the owner.
 - **TD-57:** `error_log … crit` in the `server` block; a per-location rule would miss the referrer. Before/after log on `nginx:1.30-alpine` without host ports.
-- **Docs:** SPEC v2.49, ARCHITECTURE v86 (C172 – C174), CODEBASE §2.93 and §3. **Invariants:** none activated. **Migration:** none. One session.
+- **Docs:** SPEC v2.50, ARCHITECTURE v88 (C174 – C176), CODEBASE §2.95 and §3. **Invariants:** none activated. **Migration:** none. One session.
 
 ## 1. Starting point
 
@@ -26,10 +26,10 @@
 
 ## 2. Changes
 
-1. **SMTP timeout (commit 1, TD-58).** `EmailSettings` reads `Email:Smtp:Timeout` and stops the start unless it is a duration of at least 1 ms and at most `int.MaxValue` ms (MailKit's type); `appsettings.json` holds `00:00:15` (O-S6-3). `MailKitSmtpTransport` sets `SmtpClient.Timeout` from it, which bounds connect, greeting, sign-in and each command of the send. The retry is unchanged, so a stalled server ends the request after about 2 × 15 s. The in-memory configurations of `SmtpEmailSenderTests` and `EmailDeliveryTests` set the value. New `SmtpTimeoutTests` (integration project, no container): a loopback `TcpListener` that stalls before the greeting, at `AUTH` or at `MAIL FROM`, a 1 s timeout; each attempt ends within the bound, and `SmtpEmailSender` ends with `EmailDeliveryException` after two connections. `EmailSettingsTests`: the value is read, `appsettings.json` holds 15 s, empty/zero/negative/too large stop the start. SPEC v2.49-1, ARCHITECTURE C172.
-2. **Token clean-up (commit 2, TD-59).** `IdentityAccess/Accounts/AccountTokenCleanupService.cs`: at startup and every `Account:Tokens:CleanupInterval` (`01:00:00`) on a `PeriodicTimer` over `TimeProvider`, `DeleteExpiredAsync` runs one `ExecuteDeleteAsync` over `ExpiresAt <= now` (D1 (a)); a failed run is logged and retried, it never stops the host; registered in `IdentityAccessModule` next to the token service. `AccountTokenSettings.CleanupInterval` is read and validated like the lifetimes. Tests: `AccountTokenCleanupTests` — expired unused, expired used and expiring-now rows deleted, valid unused and valid used kept; the hosted service deletes a token that expires within one interval after `Clock.Advance(interval)` and keeps a valid one; `AccountTokenTests` — the interval is read and required. SPEC v2.49-2 (§8.8: the second click on a used confirmation link answers 204 until the clean-up deletes the expired token), ARCHITECTURE C173 and §9.1.
-3. **nginx error log (commit 3, TD-57).** `CLIENT/CLIENT.ProcureAccess/nginx.conf`: `error_log /var/log/nginx/error.log crit;` in the `server` block, with the reason in a comment. ARCHITECTURE C174 and §9.5.
-4. **Docs.** ARCHITECTURE v86 (v84 deleted), SPEC v2.49, CODEBASE §2.93 and §3, this protocol. TECH_DEBT stays at v5 (new version at the sprint end, S6-09); SPRINT_06 unchanged (finished tasks are not marked there).
+1. **SMTP timeout (commit 1, TD-58).** `EmailSettings` reads `Email:Smtp:Timeout` and stops the start unless it is a duration of at least 1 ms and at most `int.MaxValue` ms (MailKit's type); `appsettings.json` holds `00:00:15` (O-S6-3). `MailKitSmtpTransport` sets `SmtpClient.Timeout` from it, which bounds connect, greeting, sign-in and each command of the send. The retry is unchanged, so a stalled server ends the request after about 2 × 15 s. The in-memory configurations of `SmtpEmailSenderTests` and `EmailDeliveryTests` set the value. New `SmtpTimeoutTests` (integration project, no container): a loopback `TcpListener` that stalls before the greeting, at `AUTH` or at `MAIL FROM`, a 1 s timeout; each attempt ends within the bound, and `SmtpEmailSender` ends with `EmailDeliveryException` after two connections. `EmailSettingsTests`: the value is read, `appsettings.json` holds 15 s, empty/zero/negative/too large stop the start. SPEC v2.50-1, ARCHITECTURE C174.
+2. **Token clean-up (commit 2, TD-59).** `IdentityAccess/Accounts/AccountTokenCleanupService.cs`: at startup and every `Account:Tokens:CleanupInterval` (`01:00:00`) on a `PeriodicTimer` over `TimeProvider`, `DeleteExpiredAsync` runs one `ExecuteDeleteAsync` over `ExpiresAt <= now` (D1 (a)); a failed run is logged and retried, it never stops the host; registered in `IdentityAccessModule` next to the token service. `AccountTokenSettings.CleanupInterval` is read and validated like the lifetimes. Tests: `AccountTokenCleanupTests` — expired unused, expired used and expiring-now rows deleted, valid unused and valid used kept; the hosted service deletes a token that expires within one interval after `Clock.Advance(interval)` and keeps a valid one; `AccountTokenTests` — the interval is read and required. SPEC v2.50-2 (§8.8: the second click on a used confirmation link answers 204 until the clean-up deletes the expired token), ARCHITECTURE C175 and §9.1.
+3. **nginx error log (commit 3, TD-57).** `CLIENT/CLIENT.ProcureAccess/nginx.conf`: `error_log /var/log/nginx/error.log crit;` in the `server` block, with the reason in a comment. ARCHITECTURE C176 and §9.5.
+4. **Docs.** ARCHITECTURE v88 (v86 deleted), SPEC v2.50, CODEBASE §2.95 and §3, this protocol. TECH_DEBT stays at v5 (new version at the sprint end, S6-09); SPRINT_06 unchanged (finished tasks are not marked there).
 
 ## 3. Self-review (CLAUDE §6.7, §6.8)
 
@@ -53,7 +53,7 @@ No correctness or security bug that affects current behaviour is left: merge rec
 |---|---|
 | `dotnet build ProcureAccess.sln -warnaserror …` | 0 warnings, 0 errors |
 | `dotnet format ProcureAccess.sln --verify-no-changes` | no changes |
-| `dotnet test --solution ProcureAccess.sln` | 1704 tests passed (unit, architecture, integration with Testcontainers); `SmtpTimeoutTests` again after the review fix: 4 passed |
+| `dotnet test --solution ProcureAccess.sln` | 1704 tests passed (unit, architecture, integration with Testcontainers); `SmtpTimeoutTests` again after the review fix: 4 passed; after the merge with main (S6-11, S6-23): 1806 passed |
 | `SmtpTimeoutTests` without the timeout (control) | the three stall cases ran past 300 s (MailKit's 120 s each) and were stopped — the test fails without the fix |
 | `AccountTokenCleanupTests` without the hosted-service registration (control) | the hosted-service case fails after its 30 s wait, the rule case passes |
 | `node scripts/check-invariants.mjs` | Invariant gate passed |
@@ -99,5 +99,4 @@ Lines of the container log since the restart with the new configuration that con
 |---|---|---|
 | P1 | TD-57, TD-58 and TD-59 are resolved; TECH_DEBT_v6 records it at the sprint end; the Traefik/Dokploy access log stays TD-28 (9) | S6-09 |
 | P2 | `TimeSpan` settings accept a bare number as days (`"15"` = 15 days) everywhere in the API, not only for the new timeout | Follow-up issue if wanted: a shared reader that requires the `hh:mm:ss` form |
-| P3 | The header of TESTING_v91 still names ARCHITECTURE_v84, which this PR deletes (v85 and v86 remain) | S6-09 (as S6-03 P3) |
-| P4 | If another PR merges ARCHITECTURE v86 first, this branch renumbers to v87 and C175 – C177 (and SPEC v2.50 if needed) | at the merge |
+| P3 | Renumbered at the merge with main (after S6-11 and S6-23): ARCHITECTURE v86 → v88 and C172 – C174 → C174 – C176, SPEC v2.49 → v2.50, CODEBASE §2.93 → §2.95 | done |

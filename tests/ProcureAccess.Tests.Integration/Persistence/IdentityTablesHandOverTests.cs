@@ -74,10 +74,11 @@ public sealed class IdentityTablesHandOverTests(ApiFixture api) : IAsyncDisposab
         expected.Count(line => line.Contains(" column ", StringComparison.Ordinal)).ShouldBe(40);
         (await LayoutAsync(moduleOnly)).ShouldBe(expected);
 
-        // The platform roles and the reviewers' permission exist both ways, each once.
+        // The platform roles and the moderators' permission exist both ways, each once; PlatformAdmin
+        // lost it with the proposals (RevokePlatformAdminModerationReview, S6-23).
         (await RolesWithPermissionAsync(moduleOnly)).ShouldBe(await RolesWithPermissionAsync(withLegacy));
         (await RolesWithPermissionAsync(moduleOnly)).ShouldBe(
-            [$"{PlatformRoles.CatalogEditor}:", $"{PlatformRoles.Moderator}:moderation:review", $"{PlatformRoles.PlatformAdmin}:moderation:review"]);
+            [$"{PlatformRoles.CatalogEditor}:", $"{PlatformRoles.Moderator}:moderation:review", $"{PlatformRoles.PlatformAdmin}:"]);
     }
 
     [Fact(DisplayName = "INV:OPS-03 " + nameof(Migrate_DatabaseWithAccountsFromBeforeTheHandOver_KeepsTheRowsAndTheSignIn))]
@@ -156,15 +157,17 @@ public sealed class IdentityTablesHandOverTests(ApiFixture api) : IAsyncDisposab
         user.CreatedAt.ShouldBe(before.CreatedAt);
         (await after.UserRoles.AsNoTracking().CountAsync(r => r.UserId == before.Id, cancellationToken)).ShouldBe(1);
 
-        // The proposals no longer point at the users with a constraint (ADR-014 rule 5); the ids keep their indexes.
+        // No legacy table points at the users with a constraint (ADR-014 rule 5); the proposals, which
+        // did until the hand-over, are gone since RetireProposals (S6-23).
         (await ScalarAsync(connectionString, """
-            SELECT count(*) FROM pg_constraint
-            WHERE conrelid = 'public."Proposals"'::regclass AND confrelid = 'identity."Users"'::regclass
+            SELECT count(*) FROM pg_constraint c
+            JOIN pg_class t ON t.oid = c.conrelid
+            JOIN pg_namespace n ON n.oid = t.relnamespace
+            WHERE n.nspname = 'public' AND c.confrelid = 'identity."Users"'::regclass
             """)).ShouldBe(0);
         (await ScalarAsync(connectionString, """
-            SELECT count(*) FROM pg_indexes
-            WHERE schemaname = 'public' AND tablename = 'Proposals' AND indexname IN ('IX_Proposals_ProposerId', 'IX_Proposals_ApproverId')
-            """)).ShouldBe(2);
+            SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Proposals'
+            """)).ShouldBe(0);
     }
 
     public async ValueTask DisposeAsync()

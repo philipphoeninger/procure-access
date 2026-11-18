@@ -12,8 +12,9 @@ public static class Permissions
     public const string ObjectsDelete = "objects:delete";
 
     /// <summary>
-    /// Review and approve proposals; carried by <see cref="Roles.Moderator"/> and
-    /// <see cref="Roles.PlatformAdmin"/>. Replaces <c>objects:approve</c> since S4-25 (ARCHITECTURE §9.1).
+    /// The moderation permission of <see cref="Roles.Moderator"/> (ARCHITECTURE §9.1); replaces
+    /// <c>objects:approve</c> since S4-25. No endpoint needs it since the legacy proposals went
+    /// (S6-23), which also took it from PlatformAdmin; the moderation of step 7 uses it again.
     /// </summary>
     public const string ModerationReview = "moderation:review";
 }

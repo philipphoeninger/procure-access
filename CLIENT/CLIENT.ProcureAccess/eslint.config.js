@@ -31,26 +31,6 @@ const LEGACY_EXCEPTIONS = {
   'src/app/features/filters/services/api/filters-api.service.ts': [
     '@angular-eslint/prefer-inject',
   ],
-  // M5 — proposal workflow retired (M5.6, S6-23)
-  'src/app/features/criteria/proposal/criterion-proposal.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-misused-promises',
-    '@typescript-eslint/no-non-null-asserted-optional-chain',
-  ],
-  'src/app/features/products/proposal/product-proposal.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-    '@typescript-eslint/no-misused-promises',
-    '@typescript-eslint/no-non-null-asserted-optional-chain',
-  ],
-  'src/app/features/proposal/list/proposal-list.ts': [
-    '@angular-eslint/prefer-inject',
-    '@typescript-eslint/no-floating-promises',
-  ],
-  'src/app/features/proposal/services/api/proposal-api.service.ts': [
-    '@angular-eslint/prefer-inject',
-  ],
 };
 
 for (const file of Object.keys(LEGACY_EXCEPTIONS)) {

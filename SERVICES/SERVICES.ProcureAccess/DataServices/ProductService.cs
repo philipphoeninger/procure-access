@@ -17,9 +17,6 @@ public class ProductService : BaseService<Product, ProductDto>, IProductService
         return Result<IEnumerable<ProductDto>>.Success(
             await MainRepo.Context.Products
                 .AsNoTracking()
-                .Where(x =>
-                    x.Proposal == null ||
-                    x.Proposal.Status == ProposalStatus.Approved)
                 .OrderBy(x => x.Id)
                 .Select(CatalogMappings.ProductProjection)
                 .ToListAsync());

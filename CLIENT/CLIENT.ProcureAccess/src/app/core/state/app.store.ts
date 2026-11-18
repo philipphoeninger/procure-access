@@ -10,7 +10,6 @@ import { withCriteria } from "@app/features/criteria/state/with-criteria";
 import { withFavorites } from "@app/features/favorites/state/with-favorites";
 import { withProducts } from "@app/features/products/state/with-products";
 import { withSettings } from "@app/features/settings/state/with-settings";
-import { withProposal } from "@app/features/proposal/state/with-proposal";
 import { withConfigurator } from "@app/features/configurator/state/with-configurator";
 
 /**
@@ -26,7 +25,6 @@ export const ProcureAccessStore = signalStore(
     withCriteria(),
     withFavorites(),
     withProducts(),
-    withProposal(),
     withSettings(),
     withConfigurator(),
     withMethods((state) => {
@@ -37,15 +35,12 @@ export const ProcureAccessStore = signalStore(
              */
             async startSession(email: string, password: string): Promise<void> {
                 await state.signIn(email, password);
-                // the sign-in has succeeded; the error interceptor reports a failed legacy read
-                state.loadProposals().catch(() => undefined);
             },
 
             /**
              * Signs out (R-AUTH-08): the server deletes the cookie and issues a new antiforgery token,
              * and every in-memory state of the user goes — the configurator draft and list too, the
-             * legacy proposals and favourites; appearance, motion and contrast follow the system
-             * again (withSettings).
+             * legacy favourites; appearance, motion and contrast follow the system again (withSettings).
              */
             async endSession(): Promise<void> {
                 try {
@@ -72,7 +67,6 @@ export const ProcureAccessStore = signalStore(
              */
             clearUserData(): void {
                 state.resetConfigurator();
-                state.setProposals([]);
                 patchState(state, { productSaves: [], filterSets: [] });
             },
 

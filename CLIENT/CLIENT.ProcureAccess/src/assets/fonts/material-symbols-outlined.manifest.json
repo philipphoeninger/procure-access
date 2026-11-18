@@ -8,26 +8,14 @@
     "arrow_drop_down",
     "cancel",
     "check",
-    "checklist",
     "create",
     "done",
-    "edit",
     "error",
-    "format_bold",
-    "format_italic",
-    "format_list_bulleted",
-    "format_list_numbered",
-    "format_quote",
-    "fullscreen",
-    "help",
-    "image",
     "info",
     "link",
     "remove",
-    "title",
-    "vertical_split",
     "visibility",
     "warning"
   ],
-  "sha256": "a3607c6b660cb6102caf7db4d707982e58d00d765d5156d5d2eeacd6af508431"
+  "sha256": "d16a2ada4a98c3e431ce38f19185f7044c403cbcf2caa2a5ac9a62c6d6a17a0b"
 }

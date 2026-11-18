@@ -24,7 +24,6 @@ export const SHELL_TEST_ROUTES: Routes = [
   'kriterien/ergebnis',
   'filters',
   'products',
-  'product-proposal/:id',
   'konto',
   'kriterienlisten',
   'einstellungen',

@@ -49,7 +49,7 @@ public class MappingCompletenessTests
     {
         // Every public map method and query projection of the mapping classes has a case, so a new
         // map cannot skip the check above.
-        var methods = new[] { typeof(CatalogMappings), typeof(AccountMappings) }
+        var methods = new[] { typeof(CatalogMappings) }
             .SelectMany(type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
             .Select(method => $"{method.GetParameters()[0].ParameterType.Name} → {method.ReturnType.Name}");
         var projections = typeof(CatalogMappings).GetFields(BindingFlags.Public | BindingFlags.Static)
