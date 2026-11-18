@@ -26,7 +26,7 @@ SPDX-License-Identifier: MIT
 |---|---|---|
 | F1 | The server creates a project from `{ name }` only (S6-11, C172); the copy of a list is S6-12's `PUT …/criteria-configuration`, in the Configurator context, so create and copy can never be one transaction | Decision D1 (a): S31 without the list choice; it joins with S6-12 |
 | F2 | UX copy v40 had no texts for S30's sorting, its column heads, the announcement after the filter, the case „every project archived“, S30 without a membership, and S31's error notice and success announcement | Decision D2 (a): UX copy v41 U162 – U168 |
-| F3 | ARCHITECTURE C173 (6) moved the rework of `withProducts()` / `withFavorites()` into S6-13, but both only serve the legacy product screens `/filters`, `/products`, `/favorites`, which step 6 replaces | Decision D3 (a); ARCHITECTURE v88 C174 (2) |
+| F3 | ARCHITECTURE C173 (6) moved the rework of `withProducts()` / `withFavorites()` into S6-13, but both only serve the legacy product screens `/filters`, `/products`, `/favorites`, which step 6 replaces | Decision D3 (a); ARCHITECTURE v88 C177 (2) |
 | F4 | S6-24 is merged: a slice declares `LOADING_INPUT` and the root store adds `withLoading()` once | `withWorkspace()` follows that pattern |
 | F5 | S30 and S31 have no Figma frame; the header frame `2017:565` (Auth = SignedIn, Active = Projekte) places „Projekte“ between „Kriterien“ and „Produkte“ | Built from Handoff §5.3 like S14 and S12; the header as the frame shows |
 | F6 | The Figma mapping places S32 at `features/workspace/pages/project-detail/project-detail.ts`, and `check-figma-links.mjs` checks the tag of every mapped file that exists | The placeholder sits at that path and is on the check's `PENDING` list until S6-14 (no frame-less tag) |
@@ -43,7 +43,7 @@ SPDX-License-Identifier: MIT
 7. **Header** (`layout/main-nav/`): „Projekte“ between „Kriterien“ and „Produkte“ with an active organisation, `aria-current` on S30 and below, in bar and drawer. `SHELL_TEST_ROUTES` know the two routes.
 8. **Root store and errors:** `withWorkspace()` and `resetWorkspace()` in `app.store.ts`; `project-archived` in `PROBLEM_TYPE_KEYS`.
 9. **Tests.** New: `projects-api.service.spec.ts`, `with-workspace.spec.ts`, `projects-page.spec.ts` (`INV:TEN-01`), `create-project-dialog.spec.ts` (`INV:SEC-10`, `INV:API-02`), `project-detail.spec.ts`, `project-detail.routing.spec.ts` (`INV:TEN-01`), `testing/workspace-test-store.ts`; `e2e/workspace/projects.spec.ts` (`INV:A11Y-01`, `INV:A11Y-08`). Changed: `main-nav.spec.ts`, `app.store.spec.ts`, `e2e/shell/reflow.spec.ts` (S30, S31; „Projekte“ in the compact menu).
-10. **Documents.** ARCHITECTURE v88 (C174; v86 deleted), TESTING v94 (V323 – V325; v92 deleted), SPEC v2.50 (three rows), Handoff 1.36 (§5.3 S30, S31, S32 placeholder; §3.1), Figma mapping 1.28, CODEBASE §2.95 and §3, CLAUDE.md (§3 state, §4 the two legacy slices; 39 849 bytes).
+10. **Documents.** ARCHITECTURE v89 (C177; v87 deleted), TESTING v94 (V323 – V325; v92 deleted), SPEC v2.51 (three rows), Handoff 1.36 (§5.3 S30, S31, S32 placeholder; §3.1), Figma mapping 1.28, CODEBASE §2.96 and §3, CLAUDE.md (§3 state, §4 the two legacy slices; 39 849 bytes). S6-05 merged first with ARCHITECTURE v88 (C174 – C176), SPEC v2.50 and CODEBASE §2.95; after merging `main` this task's parts were renumbered to v89 / C177, v2.51 and §2.96 (TESTING was not touched by S6-05, so v94 stays).
 
 Not changed: server, migrations, `appsettings.json`, compose files, TECH_DEBT (next version at the end of the sprint), the sprint file, `LEGACY_EXCEPTIONS` (no listed file touched).
 
@@ -73,4 +73,4 @@ Checklist of CLAUDE §6.7 with `/engineering:code-review` on the whole diff; fin
 1. **List choice in S31 (D1 (a)).** S6-12 adds `projects.create.criteria` (saved lists of the active organisation only, no project copies) with `projects.create.criteria.hint`, calls its `PUT …/criteria-configuration` after the create, and needs a text for „project created, list not copied“ (not in the UX copy yet). Until then R-PRJ-02's criterion „project copies of other projects are not offered“ has nothing to check.
 2. **Organisation switch on S32.** The placeholder keeps showing the project after the header switches to another organisation (no leak: the user is a member of both). S6-14 decides what S32 does on a switch (e.g. back to S30), as S21 opens the chosen organisation's page.
 3. **S32 in the reflow run and its Figma tag** come with S6-14, which removes the `PENDING` entry.
-4. The legacy slices `withProducts()` / `withFavorites()` and the legacy screens go with step 6 (D3 (a), C174 (2)).
+4. The legacy slices `withProducts()` / `withFavorites()` and the legacy screens go with step 6 (D3 (a), C177 (2)).

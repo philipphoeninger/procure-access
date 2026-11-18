@@ -19,13 +19,16 @@ internal interface ISmtpTransport
 /// Sends one message over SMTP with MailKit (MIT): connect, sign in if credentials are set, send,
 /// disconnect — one connection per e-mail, so no connection outlives a request. STARTTLS is
 /// required, not optional, unless the settings say <see cref="SmtpSecurity.None"/> (Mailpit,
-/// Development and E2E only). No protocol logger: it would write the recipient.
+/// Development and E2E only). No protocol logger: it would write the recipient. Every network
+/// operation (connect, greeting, sign-in, each command of the send) waits at most
+/// <see cref="EmailSettings.Timeout"/> (TD-58): a stalled server ends the attempt with a
+/// <see cref="TimeoutException"/>, which the sender handles like any failed attempt.
 /// </summary>
 internal sealed class MailKitSmtpTransport(EmailSettings settings) : ISmtpTransport
 {
     public async Task SendAsync(MimeMessage message, CancellationToken cancellationToken)
     {
-        using var client = new SmtpClient();
+        using var client = new SmtpClient { Timeout = (int)settings.Timeout.TotalMilliseconds };
         var options = settings.Security switch
         {
             SmtpSecurity.StartTls => SecureSocketOptions.StartTls,
