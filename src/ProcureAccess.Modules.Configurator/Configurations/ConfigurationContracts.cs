@@ -31,6 +31,10 @@ internal sealed record CreatedConfiguration(Guid Id);
 /// A saved list as S11 shows it: the texts and the order of the criteria come from the criteria
 /// endpoint of its release; <paramref name="Criteria"/> holds one decision per criterion, by revision id.
 /// </summary>
+/// <param name="ProcurementProjectId">
+/// The project that owns the list as its copy (C53, S6-12), whose four selection layers are fixed;
+/// <c>null</c> for a list of the organisation.
+/// </param>
 internal sealed record ConfigurationResponse(
     Guid Id,
     Guid OrganizationId,
@@ -38,6 +42,7 @@ internal sealed record ConfigurationResponse(
     string ReleaseVersion,
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt,
+    Guid? ProcurementProjectId,
     ConfigurationSelectionResponse Selection,
     IReadOnlyList<ConfigurationCriterionResponse> Criteria);
 

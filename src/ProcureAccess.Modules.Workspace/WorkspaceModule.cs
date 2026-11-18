@@ -18,7 +18,8 @@ namespace ProcureAccess.Modules.Workspace;
 /// projects, candidate products, test evidences and private assessments. Since S6-11 it owns the
 /// projects (<see cref="WorkspaceDbContext"/>) and maps their endpoints
 /// (<see cref="ProjectEndpoints"/>), since S6-15 their candidate products with test status and
-/// evidences (<see cref="CandidateEndpoints"/>); the project copy of a list and the assessments
+/// evidences (<see cref="CandidateEndpoints"/>), since S6-12 a project's own copy of a list
+/// (<see cref="ProjectCriteriaListEndpoint"/>, stored by Configurator); the assessments
 /// follow with their tasks of migration step 5. Until their step retires them, products and
 /// favorites are legacy (the proposals went with S6-23).
 /// </summary>
@@ -48,6 +49,11 @@ public static class WorkspaceModule
         services.AddSingleton(WorkspaceSettings.From(configuration));
         services.AddScoped<ProjectService>();
         services.AddScoped<CandidateService>();
+
+        // The project's own copy of a list (S6-12, C53). The lock answers „not locked“ until S6-18
+        // replaces this registration by the check on its assessment rows (C47).
+        services.AddScoped<ProjectCriteriaListService>();
+        services.AddScoped<ICriteriaListLock, NoAssessmentsYet>();
         return services;
     }
 
@@ -61,6 +67,7 @@ public static class WorkspaceModule
         ArgumentNullException.ThrowIfNull(routes);
         ProjectEndpoints.Map(routes);
         CandidateEndpoints.Map(routes);
+        ProjectCriteriaListEndpoint.Map(routes);
         return routes;
     }
 }

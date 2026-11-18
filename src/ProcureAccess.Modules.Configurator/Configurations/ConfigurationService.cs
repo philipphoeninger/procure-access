@@ -82,6 +82,7 @@ internal sealed class ConfigurationService(
                 list.ReleaseVersion,
                 list.CreatedAt,
                 list.ModifiedAt,
+                list.ProcurementProjectId,
                 SelectionOf(list),
                 DecisionsOf(list));
     }
@@ -106,11 +107,12 @@ internal sealed class ConfigurationService(
 
     /// <summary>
     /// The lists of <paramref name="organizationId"/>, the most recently changed first; the client
-    /// sorts them (S14). Only the columns of the list, none of its rows.
+    /// sorts them (S14). Only the columns of the list, none of its rows. The copies the projects own
+    /// are not listed (R-SAV-02, R-PRJ-02: never offered as a source, WSP-02).
     /// </summary>
     public async Task<IReadOnlyList<ConfigurationSummaryResponse>> ListAsync(Guid organizationId, CancellationToken cancellationToken) =>
         await db.CriteriaConfigurations.AsNoTracking()
-                .Where(c => c.OrganizationId == organizationId)
+                .Where(c => c.OrganizationId == organizationId && c.ProcurementProjectId == null)
                 .OrderByDescending(c => c.ModifiedAt)
                 .ThenBy(c => c.Id)
                 .Select(c => new ConfigurationSummaryResponse(c.Id, c.Name, c.ReleaseVersion, c.CreatedAt, c.ModifiedAt))
@@ -118,16 +120,24 @@ internal sealed class ConfigurationService(
 
     /// <summary>The organisation of the list, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<Guid?> OrganizationOfAsync(Guid id, CancellationToken cancellationToken) =>
+        (await OwnerOfAsync(id, cancellationToken))?.OrganizationId;
+
+    /// <summary>
+    /// The organisation of the list and whether it is a project's copy, or <c>null</c> when it does
+    /// not exist for the request (TEN-01).
+    /// </summary>
+    public async Task<ListOwner?> OwnerOfAsync(Guid id, CancellationToken cancellationToken) =>
         await db.CriteriaConfigurations.AsNoTracking()
                 .Where(c => c.Id == id)
-                .Select(c => (Guid?)c.OrganizationId)
+                .Select(c => new ListOwner(c.OrganizationId, c.ProcurementProjectId != null))
                 .SingleOrDefaultAsync(cancellationToken);
 
     /// <summary>
     /// Replaces the decision on one criterion of the list (R-SAV-03): the rules of a saved row —
     /// level name, the 🔧 weight range and B only, the note limit —, keyed by the body's members.
     /// <see cref="EditOutcome.NotFound"/> for an unknown list or a criterion that is not on it.
-    /// Also on a list of an older release: its criteria stay editable (owner decision S5-21 5a).
+    /// Also on a list of an older release: its criteria stay editable (owner decision S5-21 5a), and
+    /// on a project's copy (C51, WSP-03).
     /// </summary>
     public async Task<EditResult<bool>> DecideAsync(
         Guid id, int criterionRevisionId, ConfigurationDecisionBody body, CancellationToken cancellationToken)
@@ -185,7 +195,8 @@ internal sealed class ConfigurationService(
     /// copied instead) — else <see cref="EditOutcome.ReleaseMismatch"/>. The selection is checked as
     /// for saving (CAT-11, CAT-12, CAT-18); every criterion gets the recommendation of the new
     /// selection, a criterion that stays keeps its decision (<see cref="DecisionCarryOver"/>), and the
-    /// decisions of criteria that leave are named in the answer (owner decision S5-21 4a).
+    /// decisions of criteria that leave are named in the answer (owner decision S5-21 4a). The four
+    /// selection layers of a project's copy are fixed: <see cref="EditOutcome.ProjectCopy"/> (WSP-03).
     /// </summary>
     public async Task<EditResult<ChangedSelection>> ChangeSelectionAsync(
         Guid id, DraftSelection? selection, CancellationToken cancellationToken)
@@ -194,6 +205,11 @@ internal sealed class ConfigurationService(
         if (list is null)
         {
             return EditResult<ChangedSelection>.NotFound();
+        }
+
+        if (list.IsProjectCopy)
+        {
+            return ProjectCopyRefused<ChangedSelection>("The selection of a project's criteria list is fixed.");
         }
 
         if (selection is null)
@@ -273,21 +289,27 @@ internal sealed class ConfigurationService(
     }
 
     /// <summary>
-    /// Deletes the list with its rows (R-SAV-06); <c>false</c> when it does not exist for the
-    /// request. Project copies are separate lists (D1) and stay. The endpoint deletes its share
-    /// links in Platform afterwards (S5-28a); until then they answer 404, because the read finds no list.
+    /// Deletes the list with its rows (R-SAV-06). Project copies of it are separate lists (D1) and
+    /// stay; a project's copy itself is not deleted here — it goes only when the project's list is
+    /// replaced (<see cref="EditOutcome.ProjectCopy"/>). The endpoint deletes the list's share links
+    /// in Platform afterwards (S5-28a); until then they answer 404, because the read finds no list.
     /// </summary>
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<EditResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         var list = await db.CriteriaConfigurations.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
         if (list is null)
         {
-            return false;
+            return EditResult<bool>.NotFound();
+        }
+
+        if (list.IsProjectCopy)
+        {
+            return ProjectCopyRefused<bool>("A project's criteria list is not deleted on its own.");
         }
 
         db.CriteriaConfigurations.Remove(list);
         await db.SaveChangesAsync(cancellationToken);
-        return true;
+        return EditResult<bool>.Done(true);
     }
 
     /// <summary>
@@ -296,7 +318,9 @@ internal sealed class ConfigurationService(
     /// <paramref name="userId"/>. Values the active release no longer allows are dropped and named;
     /// each decision moves to the criterion that continues it by key or successor key
     /// (<see cref="ICatalogReleaseCarryOver"/>, <see cref="DecisionCarryOver"/>), and the criteria
-    /// whose decisions find no place are named. The source list is not changed (ADR-002).
+    /// whose decisions find no place are named. The source list is not changed (ADR-002). A project's
+    /// copy is never a source (<see cref="EditOutcome.ProjectCopy"/>, WSP-02): a newer release means a
+    /// new project with a copy of the re-pinned organisation list (ARCHITECTURE §5.4).
     /// </summary>
     public async Task<EditResult<CopiedConfiguration>> CopyToActiveReleaseAsync(
         Guid id, string userId, CancellationToken cancellationToken)
@@ -305,6 +329,11 @@ internal sealed class ConfigurationService(
         if (list is null)
         {
             return EditResult<CopiedConfiguration>.NotFound();
+        }
+
+        if (list.IsProjectCopy)
+        {
+            return ProjectCopyRefused<CopiedConfiguration>("A project's criteria list is not a source for a copy.");
         }
 
         var result = await carryOver.CarryOverAsync(list.ReleaseVersion, QueryOf(list), cancellationToken);
@@ -390,6 +419,9 @@ internal sealed class ConfigurationService(
     private static ConfigurationCriterionName NameOf(ResolvedCatalogCriterion criterion) =>
         new(criterion.RevisionId, criterion.Number, criterion.PlainLanguageTitle ?? criterion.Title);
 
+    private static EditResult<T> ProjectCopyRefused<T>(string detail) =>
+        EditResult<T>.Refused(EditOutcome.ProjectCopy, detail, NoErrors());
+
     private static Dictionary<string, string[]> ErrorAt(string field, string message) =>
         new(StringComparer.Ordinal) { [field] = [message] };
 
@@ -412,7 +444,13 @@ internal enum EditOutcome
 
     /// <summary>400 <c>release-mismatch</c>: the list is not on the active release, or the body names another release.</summary>
     ReleaseMismatch = 5,
+
+    /// <summary>409 <c>project-copy</c>: the action is for organisation lists, the list is a project's copy (C53, S6-12).</summary>
+    ProjectCopy = 6,
 }
+
+/// <summary>The organisation of a stored list and whether a project owns it as its copy (C53).</summary>
+internal sealed record ListOwner(Guid OrganizationId, bool IsProjectCopy);
 
 /// <summary>The outcome of a change, its answer when it is done, else a detail and the field errors.</summary>
 internal sealed record EditResult<T>(EditOutcome Outcome, T? Value, string? Detail, IReadOnlyDictionary<string, string[]> Errors)

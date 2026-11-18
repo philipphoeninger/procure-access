@@ -46,6 +46,9 @@ namespace ProcureAccess.Modules.Configurator.Persistence.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ProcurementProjectId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ReleaseVersion")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -60,6 +63,10 @@ namespace ProcureAccess.Modules.Configurator.Persistence.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProcurementProjectId")
+                        .IsUnique()
+                        .HasFilter("\"ProcurementProjectId\" IS NOT NULL");
 
                     b.ToTable("CriteriaConfigurations", "configurator");
                 });

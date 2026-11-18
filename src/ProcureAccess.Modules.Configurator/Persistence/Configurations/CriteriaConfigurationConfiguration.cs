@@ -11,8 +11,9 @@ namespace ProcureAccess.Modules.Configurator.Persistence.Configurations;
 /// <summary>
 /// Table <c>configurator."CriteriaConfigurations"</c> and the four tables of its rows
 /// (ARCHITECTURE §5.3). The rows are owned collections: deleted with their list, loaded with it and
-/// without a set of their own. <c>OrganizationId</c> and <c>CreatedByUserId</c> have no foreign
-/// key, because organisations and users live in other contexts (ADR-014); the release and the
+/// without a set of their own. <c>OrganizationId</c>, <c>CreatedByUserId</c> and
+/// <c>ProcurementProjectId</c> have no foreign key, because organisations, users and projects live
+/// in other contexts (ADR-014); the release and the
 /// values are named by version and key (owner decision S5-19 2a). The organisation filter is bound
 /// in <see cref="ConfiguratorDbContext"/>, because it needs the context's organisation set.
 /// </summary>
@@ -40,6 +41,13 @@ internal sealed class CriteriaConfigurationConfiguration : IEntityTypeConfigurat
         // The lists of an organisation (S14) and the lists a user created (personal data export).
         builder.HasIndex(x => x.OrganizationId);
         builder.HasIndex(x => x.CreatedByUserId);
+
+        // A project owns at most one copy (C53, S6-12); the organisation lists have none. The project
+        // lives in Workspace's context, so the id has no foreign key (ADR-014).
+        builder.Ignore(x => x.IsProjectCopy);
+        builder.HasIndex(x => x.ProcurementProjectId)
+               .IsUnique()
+               .HasFilter($"\"{nameof(CriteriaConfiguration.ProcurementProjectId)}\" IS NOT NULL");
 
         builder.OwnsMany(x => x.AppTypes, rows =>
         {

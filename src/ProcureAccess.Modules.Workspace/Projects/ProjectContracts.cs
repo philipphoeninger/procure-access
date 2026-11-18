@@ -35,6 +35,7 @@ internal sealed record ChangeProjectBody(string? Name, string? Status);
 /// The last change of the project, also of a candidate, its test status or an evidence (owner
 /// decision S6-15 5 (a)).
 /// </param>
+/// <param name="CriteriaList">The project's own copy of a list (S6-12, C53); <c>null</c> while it has none.</param>
 internal sealed record ProjectResponse(
     Guid Id,
     Guid OrganizationId,
@@ -43,7 +44,23 @@ internal sealed record ProjectResponse(
     int ProductCount,
     IReadOnlyList<CandidateSummaryResponse> Candidates,
     DateTimeOffset CreatedAt,
-    DateTimeOffset ModifiedAt);
+    DateTimeOffset ModifiedAt,
+    ProjectCriteriaListResponse? CriteriaList);
+
+/// <summary>
+/// Body of <c>PUT /api/v1/projects/{id}/criteria-configuration</c> (R-PRJ-02, R-PRJ-04; S6-12):
+/// the organisation list the project gets a copy of.
+/// </summary>
+/// <param name="SourceConfigurationId">Required; a saved list of the project's organisation, not a project's copy.</param>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+internal sealed record AssignCriteriaListBody(Guid? SourceConfigurationId);
+
+/// <summary>
+/// The project's copy of a list (C53): its id — S11 opens it through <c>/api/v1/configurations/{id}</c>
+/// (C51) —, its name, which is the name of the list it was copied from
+/// (<c>projects.detail.criteria.copyNote</c>), and its catalog release.
+/// </summary>
+internal sealed record ProjectCriteriaListResponse(Guid Id, string Name, string ReleaseVersion);
 
 /// <summary>A project as S30 lists it: name, status, number of products, last change (R-PRJ-01).</summary>
 internal sealed record ProjectSummaryResponse(

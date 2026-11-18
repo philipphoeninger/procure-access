@@ -35,7 +35,8 @@ namespace ProcureAccess.Modules.Configurator;
 /// Since S5-22 it serves its 🔧 weight range at <c>GET /configurator/settings</c>
 /// (<see cref="ConfiguratorSettingsEndpoint"/>). Since S5-23 it maps the share links of a list
 /// (<see cref="ShareLinkEndpoints"/>) and reads a shared list for Platform
-/// (<see cref="ConfigurationShareProvider"/>).
+/// (<see cref="ConfigurationShareProvider"/>). Since S6-12 it stores the copy a procurement project
+/// owns and answers <see cref="IProjectCriteriaLists"/> for Workspace.
 /// </summary>
 public static class ConfiguratorModule
 {
@@ -67,6 +68,9 @@ public static class ConfiguratorModule
         });
         services.AddScoped<IModuleDatabaseMigrator, ConfiguratorDatabaseMigrator>();
         services.AddScoped<IConfigurationReader, ConfigurationReader>();
+
+        // The copy a procurement project owns (C53, S6-12): Workspace assigns and reads it through it.
+        services.AddScoped<IProjectCriteriaLists, ProjectCriteriaLists>();
         services.AddScoped<ICriteriaListDataExport, CriteriaListDataExportService>();
         services.AddScoped<IOrganizationDataDeletion, CriteriaListDeletionService>();
 
