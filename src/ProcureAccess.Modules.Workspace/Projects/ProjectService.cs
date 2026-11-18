@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.EntityFrameworkCore;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
 
@@ -18,8 +19,10 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// <b>Seam for S6-20 (API-03).</b> Every change of a stored project goes through
 /// <see cref="ChangeAsync"/>: it loads the row, changes it and saves once. The concurrency token
 /// and the <c>If-Match</c> check join there; until then the last change wins.
+/// <para>The project's criteria list (S6-12) is stored on Configurator's copy, not on the project
+/// (owner decision S6-12 D1 (a)); the answers read it through <see cref="IProjectCriteriaLists"/>.</para>
 /// </remarks>
-internal sealed class ProjectService(WorkspaceDbContext db, TimeProvider clock)
+internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, TimeProvider clock)
 {
     /// <summary>The number of candidate products of every project until S6-15 stores them.</summary>
     private const int NoProductsYet = 0;
@@ -50,13 +53,13 @@ internal sealed class ProjectService(WorkspaceDbContext db, TimeProvider clock)
         var project = ProcurementProject.Create(organizationId, name, createdByUserId, clock.GetUtcNow());
         db.ProcurementProjects.Add(project);
         await db.SaveChangesAsync(cancellationToken);
-        return ResponseOf(project);
+        return ResponseOf(project, null);
     }
 
     /// <summary>The project, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<ProjectResponse?> FindAsync(Guid id, CancellationToken cancellationToken) =>
         await db.ProcurementProjects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == id, cancellationToken) is { } project
-            ? ResponseOf(project)
+            ? ResponseOf(project, await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken))
             : null;
 
     /// <summary>
@@ -111,17 +114,19 @@ internal sealed class ProjectService(WorkspaceDbContext db, TimeProvider clock)
         }
 
         await db.SaveChangesAsync(cancellationToken);
-        return new ProjectChange(ProjectChangeOutcome.Done, ResponseOf(project));
+        return new ProjectChange(
+            ProjectChangeOutcome.Done, ResponseOf(project, await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken)));
     }
 
-    private static ProjectResponse ResponseOf(ProcurementProject project) => new(
+    private static ProjectResponse ResponseOf(ProcurementProject project, ProjectCriteriaList? list) => new(
         project.Id,
         project.OrganizationId,
         project.Name,
         NameOf(project.Status),
         NoProductsYet,
         project.CreatedAt,
-        project.ModifiedAt);
+        project.ModifiedAt,
+        list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion));
 }
 
 /// <summary>How a change of a project ended.</summary>

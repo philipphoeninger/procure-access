@@ -35,8 +35,8 @@ internal sealed record ShareLinksResponse(ShareLinkExpiryWindow Expiry, IReadOnl
 /// stored list or link through the organisation filter: 404 for a non-member or another
 /// organisation's list or link (TEN-01), 403 for a Reader (TEN-05; owner decision S5-23 4a).
 /// Creating and revoking change something: a confirmed address (SEC-10; owner decision S5-23 3a)
-/// and antiforgery (SEC-02). A project copy cannot be shared (409, C59) once project copies exist
-/// in migration step 5. No rate limit (owner decision S5-23 7).
+/// and antiforgery (SEC-02). A project's copy cannot be shared: creating a link answers 409
+/// <c>project-copy</c> (C59, TEN-08; S6-12). No rate limit (owner decision S5-23 7).
 /// </remarks>
 internal static class ShareLinkEndpoints
 {
@@ -58,12 +58,13 @@ internal static class ShareLinkEndpoints
                   "201 { id, token, expiresAt }: the token only here, the link is /geteilt/<token>; expiresAt is the end of " +
                   "the chosen day. Body { expiresOn: \"yyyy-MM-dd\" }, required, from tomorrow to the maximum (one year). " +
                   "400 validation at 'expiresOn'; 400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404 for an " +
-                  "unknown list or one of another organisation.")
+                  "unknown list or one of another organisation; 409 project-copy for a project's list, which is never shared.")
               .Accepts<CreateShareLinkBody>("application/json")
               .Produces<CreatedShareLink>(StatusCodes.Status201Created)
               .ProducesValidationProblem()
               .ProducesProblem(StatusCodes.Status403Forbidden)
-              .ProducesProblem(StatusCodes.Status404NotFound);
+              .ProducesProblem(StatusCodes.Status404NotFound)
+              .ProducesProblem(StatusCodes.Status409Conflict);
 
         ofList.MapGet("", ListAsync)
               .WithName("GetConfigurationShareLinks")
@@ -102,15 +103,22 @@ internal static class ShareLinkEndpoints
         CancellationToken cancellationToken)
     {
         // The organisation is the list's, read through the filter (TEN-01): 404 for another's.
-        if (await configurations.OrganizationOfAsync(id, cancellationToken) is not { } organizationId)
+        if (await configurations.OwnerOfAsync(id, cancellationToken) is not { } owner)
         {
             return NotFound();
         }
 
+        var organizationId = owner.OrganizationId;
         if (await ConfigurationEndpoints.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor)
             is { } refused)
         {
             return refused;
+        }
+
+        // After the role check, so only a member who may share learns that the list is a project's.
+        if (owner.IsProjectCopy)
+        {
+            return ConfigurationEndpoints.ProjectCopyConflict("A project's criteria list cannot be shared by link.");
         }
 
         var creation = await links.CreateAsync(

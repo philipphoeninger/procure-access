@@ -191,6 +191,67 @@ public class CriteriaConfigurationTests
         Criterion(list, 12).HasDecision.ShouldBe(expected);
     }
 
+    [Fact]
+    public void CopyForProject_OrganisationList_CopiesSelectionAndDecisionsAndLeavesTheSource()
+    {
+        var source = List(
+            new ConfigurationCriterionDraft(11, PriorityLevel.A, IsIncluded: false, Note: "nicht bei uns"),
+            new ConfigurationCriterionDraft(12, PriorityLevel.B, OverrideWeight: 5));
+        var project = Guid.NewGuid();
+        var later = CreatedAt.AddDays(2);
+
+        var copy = source.CopyForProject(project, "user-2", later);
+
+        copy.ShouldSatisfyAllConditions(
+            c => c.Id.ShouldNotBe(source.Id),
+            c => c.ProcurementProjectId.ShouldBe(project),
+            c => c.IsProjectCopy.ShouldBeTrue(),
+            c => c.OrganizationId.ShouldBe(Organization),
+            c => c.Name.ShouldBe("Vergabe 2027"),
+            c => c.ReleaseVersion.ShouldBe("T.1"),
+            c => c.UseCaseKey.ShouldBe("hr"),
+            c => c.AppTypes.Select(v => v.AppTypeKey).ShouldBe(["web"]),
+            c => c.ProductParts.Select(v => v.ProductPartKey).ShouldBe(["base"]),
+            c => c.TestTypes.ShouldBeEmpty(),
+            c => c.CreatedByUserId.ShouldBe("user-2"),
+            c => c.CreatedAt.ShouldBe(later),
+            c => c.ModifiedAt.ShouldBe(later));
+        Criterion(copy, 11).ShouldSatisfyAllConditions(
+            c => c.IsIncluded.ShouldBeFalse(), c => c.ResolvedLevel.ShouldBe(PriorityLevel.A), c => c.NoteDe.ShouldBe("nicht bei uns"));
+        Criterion(copy, 12).ShouldSatisfyAllConditions(
+            c => c.ResolvedLevel.ShouldBe(PriorityLevel.B), c => c.OverrideWeight.ShouldBe(5));
+
+        // Rows of their own: a decision on the copy leaves the source as it was (D1).
+        copy.Decide(11, isIncluded: true, overrideLevel: null, overrideWeight: null, note: null, later);
+        Criterion(source, 11).IsIncluded.ShouldBeFalse();
+        source.ShouldSatisfyAllConditions(
+            s => s.ProcurementProjectId.ShouldBeNull(), s => s.IsProjectCopy.ShouldBeFalse(), s => s.ModifiedAt.ShouldBe(CreatedAt));
+    }
+
+    [Fact]
+    public void CopyForProject_ProjectCopyAsSource_Throws()
+    {
+        var copy = List(new ConfigurationCriterionDraft(11, PriorityLevel.A)).CopyForProject(Guid.NewGuid(), "user-1", CreatedAt);
+
+        Should.Throw<InvalidOperationException>(() => copy.CopyForProject(Guid.NewGuid(), "user-1", CreatedAt));
+        Should.Throw<ArgumentException>(() => List().CopyForProject(Guid.Empty, "user-1", CreatedAt));
+    }
+
+    [Fact(DisplayName = "INV:WSP-03 " + nameof(ChangeSelection_ProjectCopy_ThrowsAndKeepsTheSelection))]
+    [Trait("Invariant", "WSP-03")]
+    public void ChangeSelection_ProjectCopy_ThrowsAndKeepsTheSelection()
+    {
+        var copy = List(new ConfigurationCriterionDraft(11, PriorityLevel.A)).CopyForProject(Guid.NewGuid(), "user-1", CreatedAt);
+
+        Should.Throw<InvalidOperationException>(() => copy.ChangeSelection(
+            null, ["web", "softwareOpen"], ["base"], [], [new ConfigurationCriterionDraft(11, PriorityLevel.A)], CreatedAt.AddHours(1)));
+
+        copy.ShouldSatisfyAllConditions(
+            c => c.UseCaseKey.ShouldBe("hr"),
+            c => c.AppTypes.Select(v => v.AppTypeKey).ShouldBe(["web"]),
+            c => c.ModifiedAt.ShouldBe(CreatedAt));
+    }
+
     private static CriteriaConfiguration List(params ConfigurationCriterionDraft[] criteria) =>
         CriteriaConfiguration.Create(Organization, "Vergabe 2027", "user-1", CreatedAt, "T.1", "hr", ["web"], ["base"], [], criteria);
 

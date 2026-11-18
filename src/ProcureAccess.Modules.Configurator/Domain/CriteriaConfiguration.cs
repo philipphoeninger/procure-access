@@ -14,7 +14,9 @@ namespace ProcureAccess.Modules.Configurator.Domain;
 /// </summary>
 /// <remarks>
 /// The release is stored by its version and the selection by value keys (owner decision S5-19 2a).
-/// <c>ProcurementProjectId</c> (the project copy, C53) comes with migration step 5.
+/// A list with <see cref="ProcurementProjectId"/> is the copy a procurement project owns (C53,
+/// S6-12): made by <see cref="CopyForProject"/>, its four selection layers are fixed
+/// (<see cref="ChangeSelection"/> refuses), and it is never a source, never listed and never shared.
 /// </remarks>
 internal sealed class CriteriaConfiguration
 {
@@ -49,6 +51,16 @@ internal sealed class CriteriaConfiguration
 
     /// <summary>The key of the use case; <c>null</c> for a selection without one.</summary>
     public string? UseCaseKey { get; private set; }
+
+    /// <summary>
+    /// The procurement project (Workspace) that owns this list as its copy (C53); <c>null</c> for a
+    /// list of the organisation. A plain id: no foreign key across contexts (ADR-014), and the link
+    /// is stored only here (owner decision S6-12 D1 (a)).
+    /// </summary>
+    public Guid? ProcurementProjectId { get; private set; }
+
+    /// <summary>Whether the list is a project's copy rather than a list of the organisation.</summary>
+    public bool IsProjectCopy => ProcurementProjectId is not null;
 
     /// <summary>The ASP.NET Core Identity user id of the creator; no foreign key while users are legacy (ADR-014).</summary>
     public string CreatedByUserId { get; private set; } = null!;
@@ -124,6 +136,41 @@ internal sealed class CriteriaConfiguration
     }
 
     /// <summary>
+    /// The copy of this organisation list that <paramref name="projectId"/> owns (R-PRJ-02, R-PRJ-04;
+    /// C53): the same organisation, name, release, selection and decisions, the recommendations as
+    /// they were stored (CAT-08), a new id, the creator who assigned it and <paramref name="now"/> as
+    /// its creation time. This list stays as it is. Throws for a list that is a project copy itself:
+    /// a copy is never a source (WSP-02).
+    /// </summary>
+    public CriteriaConfiguration CopyForProject(Guid projectId, string createdByUserId, DateTimeOffset now)
+    {
+        if (projectId == Guid.Empty)
+        {
+            throw new ArgumentException("A copy belongs to a project.", nameof(projectId));
+        }
+
+        if (IsProjectCopy)
+        {
+            throw new InvalidOperationException("A project copy is not a source for another project.");
+        }
+
+        var copy = Create(
+            OrganizationId,
+            Name,
+            createdByUserId,
+            now,
+            ReleaseVersion,
+            UseCaseKey,
+            [.. _appTypes.Select(v => v.AppTypeKey)],
+            [.. _productParts.Select(v => v.ProductPartKey)],
+            [.. _testTypes.Select(v => v.TestTypeKey)],
+            [.. _criteria.Select(c => new ConfigurationCriterionDraft(
+                c.CriterionRevisionId, c.ResolvedLevel, c.IsIncluded, c.OverrideLevel, c.OverrideWeight, c.NoteDe))]);
+        copy.ProcurementProjectId = projectId;
+        return copy;
+    }
+
+    /// <summary>
     /// Stores the user's decision on one criterion of the list (R-LST-03 – R-LST-05) and stamps
     /// <see cref="ModifiedAt"/>. The recommended level of the criterion stays as it is (CAT-08).
     /// Throws for a criterion that is not on the list and for an impossible decision
@@ -148,7 +195,8 @@ internal sealed class CriteriaConfiguration
     /// decision S5-21 3a) and stamps <see cref="ModifiedAt"/>. <paramref name="criteria"/> names every
     /// criterion of the new selection once, with the recommendation the catalog resolved for it and
     /// the decision the caller carried over. Value rows and criterion rows that stay are kept, so the
-    /// change touches only what changed. Throws as <see cref="Create"/> does.
+    /// change touches only what changed. Throws as <see cref="Create"/> does, and for a project copy,
+    /// whose four selection layers are fixed (WSP-03).
     /// </summary>
     public void ChangeSelection(
         string? useCaseKey,
@@ -158,6 +206,11 @@ internal sealed class CriteriaConfiguration
         IReadOnlyCollection<ConfigurationCriterionDraft> criteria,
         DateTimeOffset now)
     {
+        if (IsProjectCopy)
+        {
+            throw new InvalidOperationException("The selection of a project copy is fixed.");
+        }
+
         CheckSelection(useCaseKey, appTypeKeys, productPartKeys, testTypeKeys, criteria);
 
         UseCaseKey = useCaseKey;

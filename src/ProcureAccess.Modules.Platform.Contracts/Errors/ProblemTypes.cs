@@ -72,12 +72,21 @@ public static class ProblemTypes
     /// </summary>
     public const string ProjectArchived = "project-archived";
 
+    /// <summary>
+    /// 409: an action that only an organisation list allows, asked of a procurement project's copy
+    /// of a list — changing its selection, deleting it, copying it to the active release or sharing
+    /// it by link (SPEC §8.6 v2.52, R-PRJ-06, R-SAV-04; ARCHITECTURE C53, C59; WSP-03, TEN-08; S6-12,
+    /// owner decision D2 (a)). No screen offers these actions on a copy, so the client has no text of
+    /// its own for it.
+    /// </summary>
+    public const string ProjectCopy = "project-copy";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
         EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
-        ProjectArchived,
+        ProjectArchived, ProjectCopy,
     ];
 }

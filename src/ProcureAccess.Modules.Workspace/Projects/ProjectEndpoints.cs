@@ -226,7 +226,7 @@ internal static class ProjectEndpoints
     /// read through the filter — 404 for an unknown project or one of another organisation
     /// (TEN-01) —, then Editor on it — 403 for a Reader. <c>null</c> when it passed.
     /// </summary>
-    private static async Task<IResult?> RefusedForProjectAsync(
+    internal static async Task<IResult?> RefusedForProjectAsync(
         IAuthorizationService authorization,
         ClaimsPrincipal user,
         ProjectService projects,
@@ -237,18 +237,18 @@ internal static class ProjectEndpoints
             : NotFound();
 
     /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
-    private static async Task<ProblemHttpResult?> RefusedAsync(
+    internal static async Task<ProblemHttpResult?> RefusedAsync(
         IAuthorizationService authorization, ClaimsPrincipal user, Guid organizationId, OrganizationRoleRequirement requirement)
     {
         var result = await authorization.AuthorizeAsync(user, new OrganizationReference(organizationId), requirement);
         return OrganizationAccess.StatusOf(result) is { } status ? TypedResults.Problem(statusCode: status) : null;
     }
 
-    private static ProblemHttpResult NotFound() =>
+    internal static ProblemHttpResult NotFound() =>
         TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
 
     /// <summary>The signed-in user's id; the groups require a sign-in, so it is always there.</summary>
-    private static string UserIdOf(ClaimsPrincipal user) =>
+    internal static string UserIdOf(ClaimsPrincipal user) =>
         user.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new InvalidOperationException("A signed-in principal without a user id reached a project endpoint.");
 }

@@ -39,7 +39,9 @@ namespace ProcureAccess.Modules.Configurator.Configurations;
 /// bytes, like the export's (SPEC §7.2). SPEC §7.3 sets no rate limit.</para>
 /// <para><b>Changes (S5-21a).</b> Changing, deleting and copying a list take the organisation from
 /// the stored list and need Editor on it (404 non-member, 403 Reader), a confirmed address (SEC-10)
-/// and antiforgery. No <c>ETag</c>/<c>If-Match</c> yet: the concurrency of shared resources comes
+/// and antiforgery. A project's copy (C53, S6-12) is read and its criteria are changed here as on
+/// any list (C51); its selection change, its deletion and its copy answer 409 <c>project-copy</c>.
+/// No <c>ETag</c>/<c>If-Match</c> yet: the concurrency of shared resources comes
 /// with API-03 in migration step 5 (owner decision S5-21 2a); until then the last change wins.</para>
 /// <para><b>Ids.</b> No route constraint on <c>{id}</c>, so a malformed id answers 400
 /// <c>validation</c> like every other bad input (API-01), as the organisation endpoints do.</para>
@@ -83,8 +85,9 @@ internal static class ConfigurationEndpoints
                       .WithName("GetConfiguration")
                       .WithSummary("A saved list with its selection and the decision on each criterion")
                       .WithDescription(
-                          "200 for every member of the list's organisation; the texts come from GET /catalog/criteria with " +
-                          "release=<releaseVersion>. 401; 404 for an unknown list or one of another organisation.")
+                          "200 for every member of the list's organisation, also for a project's copy (procurementProjectId set); " +
+                          "the texts come from GET /catalog/criteria with release=<releaseVersion>. 401; 404 for an unknown list or " +
+                          "one of another organisation.")
                       .Produces<ConfigurationResponse>()
                       .ProducesProblem(StatusCodes.Status404NotFound);
 
@@ -92,7 +95,8 @@ internal static class ConfigurationEndpoints
                       .WithName("GetConfigurations")
                       .WithSummary("The saved lists of the organisation (Reader and up), for S14")
                       .WithDescription(
-                          "200 [ { id, name, releaseVersion, createdAt, modifiedAt } ], the most recently changed first. " +
+                          "200 [ { id, name, releaseVersion, createdAt, modifiedAt } ], the most recently changed first; the " +
+                          "copies the projects own are not listed. " +
                           "400 validation at 'organizationId' without it; 401; 404 for a non-member.")
                       .Produces<IReadOnlyList<ConfigurationSummaryResponse>>()
                       .ProducesValidationProblem()
@@ -124,12 +128,14 @@ internal static class ConfigurationEndpoints
                           "left with the old selection; decisions of criteria that stay are kept. Only while the list's release " +
                           "is active. 400 validation (also an inactive use case), selection-excluded or release-mismatch (another " +
                           "release, or the list's release is no longer active); 400 antiforgery; 401; 403 email-unconfirmed or " +
-                          "below Editor; 404 for an unknown list or one of another organisation.")
+                          "below Editor; 404 for an unknown list or one of another organisation; 409 project-copy for a project's " +
+                          "list, whose selection is fixed.")
                       .Accepts<ChangeSelectionBody>("application/json")
                       .Produces<ChangedSelection>()
                       .ProducesValidationProblem()
                       .ProducesProblem(StatusCodes.Status403Forbidden)
-                      .ProducesProblem(StatusCodes.Status404NotFound);
+                      .ProducesProblem(StatusCodes.Status404NotFound)
+                      .ProducesProblem(StatusCodes.Status409Conflict);
 
         configurations.MapDelete("/{id}", DeleteAsync)
                       .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
@@ -137,10 +143,12 @@ internal static class ConfigurationEndpoints
                       .WithSummary("Deletes a saved list (Editor or Owner)")
                       .WithDescription(
                           "204. Project copies are not affected. 400 antiforgery; 401; 403 email-unconfirmed or below Editor; " +
-                          "404 for an unknown list or one of another organisation.")
+                          "404 for an unknown list or one of another organisation; 409 project-copy for a project's list, which goes " +
+                          "only when the project's list is replaced.")
                       .Produces(StatusCodes.Status204NoContent)
                       .ProducesProblem(StatusCodes.Status403Forbidden)
-                      .ProducesProblem(StatusCodes.Status404NotFound);
+                      .ProducesProblem(StatusCodes.Status404NotFound)
+                      .ProducesProblem(StatusCodes.Status409Conflict);
 
         configurations.MapPost("/{id}/copies", CopyAsync)
                       .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
@@ -153,12 +161,14 @@ internal static class ConfigurationEndpoints
                           "allows are dropped and named, decisions move by criterion key or successor key, the others are named. " +
                           "The source list is unchanged. 400 validation (another release, or the list is already on the active " +
                           "release) or selection-excluded (nothing complete is left); 400 antiforgery; 401; 403 email-unconfirmed " +
-                          "or below Editor; 404 for an unknown list, one of another organisation, or without an active release.")
+                          "or below Editor; 404 for an unknown list, one of another organisation, or without an active release; " +
+                          "409 project-copy for a project's list, which is never a source.")
                       .Accepts<CopyConfigurationBody>("application/json")
                       .Produces<CopiedConfiguration>(StatusCodes.Status201Created)
                       .ProducesValidationProblem()
                       .ProducesProblem(StatusCodes.Status403Forbidden)
-                      .ProducesProblem(StatusCodes.Status404NotFound);
+                      .ProducesProblem(StatusCodes.Status404NotFound)
+                      .ProducesProblem(StatusCodes.Status409Conflict);
 
         return routes;
     }
@@ -293,9 +303,10 @@ internal static class ConfigurationEndpoints
             return refused;
         }
 
-        if (!await configurations.DeleteAsync(id, cancellationToken))
+        var result = await configurations.DeleteAsync(id, cancellationToken);
+        if (result.Outcome != EditOutcome.Done)
         {
-            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+            return ProblemOf(result);
         }
 
         // After the list, in Platform's own context: links that outlive a failure here open nothing.
@@ -353,8 +364,16 @@ internal static class ConfigurationEndpoints
             result.Errors, detail: result.Detail, type: ProblemTypes.SelectionExcluded),
         EditOutcome.ReleaseMismatch => TypedResults.ValidationProblem(
             result.Errors, detail: result.Detail, type: ProblemTypes.ReleaseMismatch),
+        EditOutcome.ProjectCopy => ProjectCopyConflict(result.Detail),
         _ => throw new InvalidOperationException($"No problem for outcome {result.Outcome}."),
     };
+
+    /// <summary>
+    /// 409 <c>project-copy</c>: the action is for organisation lists, and the list is a project's
+    /// copy (C53; owner decision S6-12 D2 (a)).
+    /// </summary>
+    internal static ProblemHttpResult ProjectCopyConflict(string? detail) =>
+        TypedResults.Problem(detail: detail, statusCode: StatusCodes.Status409Conflict, type: ProblemTypes.ProjectCopy);
 
     /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
     internal static async Task<ProblemHttpResult?> RefusedAsync(

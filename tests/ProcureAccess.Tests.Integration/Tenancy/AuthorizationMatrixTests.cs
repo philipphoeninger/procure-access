@@ -37,7 +37,7 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// list) and its export (every member); since S5-23 with the share links of a list (Editor; the organisation taken from the stored
 /// list or link); since S5-22 every answer of the matrix also carries <c>no-store</c>
 /// (TEN-04 workspace part); since S6-11 with the procurement projects (list, read: Reader; create, rename, status: Editor; the
-/// organisation named in the route or taken from the stored project). Every user has a confirmed account, so the gate of saving
+/// organisation named in the route or taken from the stored project); since S6-12 with the project's copy of a list (Editor). Every user has a confirmed account, so the gate of saving
 /// (SEC-10) passes; the other workspace endpoints add their rows with their tasks of step 5.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -115,6 +115,9 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     /// <summary><c>PATCH /projects/{id}</c> with a status, of a project of A (S6-11): Editor and Owner.</summary>
     private const string ChangeProjectStatus = "change-project-status";
+
+    /// <summary><c>PUT /projects/{id}/criteria-configuration</c> with a list of A, of a project of A (S6-12): Editor and Owner.</summary>
+    private const string AssignProjectList = "assign-project-list";
 
     /// <summary>The revision of the one criterion of <see cref="_listOfA"/>; the domain needs no catalog for it.</summary>
     private const int RevisionOfListOfA = 1;
@@ -278,6 +281,12 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, ChangeProjectStatus, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, ChangeProjectStatus, HttpStatusCode.NotFound },
         { Anonymous, ChangeProjectStatus, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, AssignProjectList, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, AssignProjectList, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, AssignProjectList, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, AssignProjectList, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, AssignProjectList, HttpStatusCode.NotFound },
+        { Anonymous, AssignProjectList, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
@@ -506,6 +515,8 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             ReadProject => await client.GetAsync(ProjectOfAPath, Cancellation),
             RenameProject => await client.PatchAsJsonAsync(ProjectOfAPath, new { name = "Umbenannt" }, Cancellation),
             ChangeProjectStatus => await client.PatchAsJsonAsync(ProjectOfAPath, new { status = "archived" }, Cancellation),
+            AssignProjectList => await client.PutAsJsonAsync(
+                $"{ProjectOfAPath}/criteria-configuration", new { sourceConfigurationId = _listOfA!.Id }, Cancellation),
             _ => await SendOrganizationRequestAsync(client, action, user),
         };
     }
