@@ -22,7 +22,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
- * S5-31; the project list S30 and the create dialog S31 since S6-13. The legacy screens are
+ * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
+ * Überblick with its tabs since S6-16. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -31,20 +32,26 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  */
 const ZOOM_400 = { width: 320, height: 256 };
 
-async function expectReflow(page: Page): Promise<void> {
+/**
+ * `scrollingTabBars`: links inside a `mat-tab-nav-bar` that scrolls itself are not counted — the
+ * tabs of S34 do not fit at 320 px and scroll inside their bar, never the page (Figma S34-M note,
+ * TESTING V356); the test checks instead that the selected tab is scrolled into view.
+ */
+async function expectReflow(page: Page, { scrollingTabBars = false } = {}): Promise<void> {
   const tooWide = () =>
-    page.evaluate((width) => {
+    page.evaluate(([width, exemptTabs]) => {
       const pageWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
       const outside = [...document.querySelectorAll<HTMLElement>('a[href], button')]
         // The closed compact menu is hidden off-screen (`visibility: hidden`), so it does not count.
         .filter((element) => element.checkVisibility() && getComputedStyle(element).visibility === 'visible')
+        .filter((element) => !(exemptTabs && element.closest('.mat-mdc-tab-link-container')))
         .filter((element) => {
           const box = element.getBoundingClientRect();
           return box.left < 0 || box.right > width;
         })
         .map((element) => element.textContent?.trim() || element.tagName);
       return { pageWidth: pageWidth > width ? pageWidth : 0, outside };
-    }, ZOOM_400.width);
+    }, [ZOOM_400.width, scrollingTabBars] as const);
   await expect.poll(tooWide).toEqual({ pageWidth: 0, outside: [] });
 }
 
@@ -289,6 +296,108 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
     await expectReflow(page);
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+  });
+
+  test('S33 with its error summary, and S34 Überblick with K1, the open legend and its tabs, need no horizontal scrolling', async ({ page }) => {
+    // Project, product and the project's copy are answered here (the criteria come from T.1), so
+    // the seeded organisation stays unchanged (owner decision S5-16 7a)
+    const projectId = '0e2e0000-0000-4000-8000-0000000000c1';
+    const candidateId = '0e2e0000-0000-4000-8000-0000000000c2';
+    const listId = '0e2e0000-0000-4000-8000-0000000000c3';
+    const projectName = 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke';
+    const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
+    await page.route(`**/api/v1/projects/${projectId}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id: projectId,
+          organizationId: E2E_ORGANIZATION.id,
+          name: projectName,
+          status: 'open',
+          productCount: 1,
+          createdAt: '2026-11-18T09:00:00Z',
+          modifiedAt: '2026-11-18T09:00:00Z',
+          criteriaList: { id: listId, name: listName, releaseVersion: 'T.1' },
+        },
+      }),
+    );
+    await page.route(`**/api/v1/candidates/${candidateId}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id: candidateId,
+          projectId,
+          organizationId: E2E_ORGANIZATION.id,
+          name: 'Bewerbermanagementsystem mit Stellenausschreibung und Terminplanung',
+          vendor: 'Beispiel Software Gesellschaft mit beschränkter Haftung',
+          website: 'https://www.beispiel-software.de/produkte/bewerbermanagement/barrierefreiheit',
+          functionalSummary: 'Bewerbermanagement, Stellenausschreibungen, Terminplanung',
+          testStatus: 'unknown',
+          privateSection: { contactNotes: 'Frau Beispiel, Vertrieb – vertrieb@beispiel-software.de', internalNotes: 'Demo vereinbart.' },
+          testEvidences: [],
+          createdAt: '2026-11-18T09:00:00Z',
+          modifiedAt: '2026-11-18T09:00:00Z',
+          progress: { done: 36, total: 146 },
+          fulfillment: { fulfilled: 22, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 110 },
+        },
+      }),
+    );
+    await page.route(`**/api/v1/configurations/${listId}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id: listId,
+          organizationId: E2E_ORGANIZATION.id,
+          name: listName,
+          releaseVersion: 'T.1',
+          createdAt: '2026-11-18T09:00:00Z',
+          modifiedAt: '2026-11-18T09:00:00Z',
+          procurementProjectId: projectId,
+          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
+          criteria: [],
+        },
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    const main = page.getByRole('main');
+
+    await page.goto(`/projekte/${projectId}/produkte/neu`);
+    await expect(main.getByRole('heading', { level: 1, name: 'Produkt hinzufügen' })).toBeVisible();
+    await main.getByRole('button', { name: 'Speichern' }).click();
+    await expect(main.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+
+    // Below 600 px the third tab has its short label (U31); at 320 px the three do not fit and the
+    // bar scrolls inside itself (Figma S34-M note): the selected tab is in view, the page never scrolls
+    const tabs = main.getByRole('tab');
+    const selectedTabInView = async (index: number) => {
+      await expect(tabs.nth(index)).toHaveAttribute('aria-selected', 'true');
+      await expect
+        .poll(() =>
+          tabs.nth(index).evaluate((element) => {
+            const label = element.getBoundingClientRect();
+            const bar = element.closest('.mat-mdc-tab-link-container')!.getBoundingClientRect();
+            return label.left >= bar.left - 1 && label.right <= bar.right + 1;
+          }),
+        )
+        .toBe(true);
+    };
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}`);
+    await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
+    await expect(main.locator('pa-fulfillment-breakdown dd')).toHaveCount(7);
+    await expect(tabs).toHaveText(['Überblick', 'Prüfnachweis', 'Einschätzung']);
+    await selectedTabInView(0);
+    await expectReflow(page, { scrollingTabBars: true });
+
+    await page.locator('pa-rating-legend button').click();
+    await expect(page.locator('pa-rating-legend dl')).toBeVisible();
+    await expectReflow(page, { scrollingTabBars: true });
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
+    await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
+    await selectedTabInView(2);
+    await expectReflow(page, { scrollingTabBars: true });
   });
 
   test('a saved list, editable for its Owner, with an open detail panel and the open rating legend needs no horizontal scrolling', async ({ page }) => {

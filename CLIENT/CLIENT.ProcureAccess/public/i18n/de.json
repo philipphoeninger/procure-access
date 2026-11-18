@@ -316,7 +316,9 @@
       "invite": "Einladung in eine Organisation",
       "invite.invalid": "Einladung nicht mehr gültig"
     },
-    "project.criteria": "Kriterienliste – {{project}} – Beschaffungsprojekte"
+    "project.criteria": "Kriterienliste – {{project}} – Beschaffungsprojekte",
+    "candidate.new": "Produkt hinzufügen – {{project}} – Beschaffungsprojekte",
+    "candidate.edit": "Produkt bearbeiten – {{product}} – {{project}}"
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",
@@ -863,5 +865,154 @@
       "note": "Dieses Projekt ist archiviert. Sie können es ansehen, aber nicht mehr bearbeiten. Um es wieder zu bearbeiten, setzen Sie den Stand auf „Laufend“."
     },
     "create.criteria.none": "Keine Liste"
+  },
+  "candidate": {
+    "form": {
+      "title": {
+        "new": "Produkt hinzufügen",
+        "edit": "Produkt bearbeiten"
+      },
+      "name": "Produktname",
+      "name.match": "Dieses Produkt gibt es bereits im Produktverzeichnis. Möchten Sie es verknüpfen? Dann sehen Sie veröffentlichte Angaben direkt hier.",
+      "vendor": "Anbieter",
+      "website": "Webseite des Anbieters",
+      "summary": "Was kann das Produkt? (Stichworte)",
+      "privateSection": "Nur für Ihre Organisation",
+      "privateSection.text": "Diese Angaben werden nie veröffentlicht, auch nicht, wenn Sie das Produkt später im Verzeichnis veröffentlichen.",
+      "contacts": "Ansprechpersonen und Kontaktdaten",
+      "internalNotes": "Interne Notizen"
+    },
+    "tabs": {
+      "evidence": "Prüfnachweis",
+      "assessment": "Einschätzung nach Kriterien",
+      "assessment.short": "Einschätzung",
+      "overview": "Überblick"
+    },
+    "vendorLine": "Anbieter: {{vendor}}",
+    "overview": {
+      "details": {
+        "title": "Produktangaben"
+      },
+      "appType": "Anwendungstyp",
+      "appType.none": "Noch keine Kriterienliste",
+      "directory": "Im Produktverzeichnis",
+      "directory.linked": "Verknüpft: {{product}} – {{count}} veröffentlichte Einträge ansehen",
+      "directory.linked.one": "Verknüpft: {{product}} – 1 veröffentlichten Eintrag ansehen",
+      "directory.linked.zero": "Verknüpft: {{product}} – im Produktverzeichnis ansehen",
+      "directory.none": "Nicht verknüpft",
+      "status": {
+        "title": "Stand der Bewertung",
+        "evidence": "Prüfnachweis",
+        "tested": "Auf Barrierefreiheit geprüft: {{status}}",
+        "toEvidence": "Zum Prüfnachweis",
+        "assessment": "Einschätzung nach Kriterien",
+        "progress": "{{done}} von {{total}} Kriterien eingeschätzt · Kriterienliste „{{list}}“ (Katalogversion {{release}})",
+        "breakdownTitle": "Ihre Einschätzung nach „{{list}}“",
+        "breakdownIntro": "So haben Sie die Kriterien Ihrer Liste bisher eingeschätzt:",
+        "toAssessment": "Zur Einschätzung"
+      },
+      "publication": {
+        "title": "Veröffentlichung",
+        "none": "Noch nicht im Produktverzeichnis veröffentlicht.",
+        "explain": "Wenn Sie veröffentlichen, erscheinen Prüfnachweis und Einschätzungen als „Unabhängige Angaben“ unter einem Anzeigenamen. Ihre Organisation und die Angaben im Bereich „Nur für Ihre Organisation“ werden nie veröffentlicht."
+      },
+      "private": {
+        "title": "Nur für Ihre Organisation"
+      }
+    },
+    "evidence": {
+      "tested": "Wurde das Produkt auf Barrierefreiheit geprüft?",
+      "tested.yes": "Ja",
+      "tested.no": "Nein",
+      "tested.unknown": "Nicht bekannt",
+      "tested.hint": "Gemeint ist eine Prüfung durch Anbieter, Prüfstelle oder Ihre Organisation. Wenn Sie es noch nicht wissen, lassen Sie „Nicht bekannt“ stehen und ergänzen Sie es später. Vor einer Veröffentlichung brauchen wir Ja oder Nein.",
+      "details": {
+        "hint": "Angaben zu Art, Stelle und Datum der Prüfung – und Ihre interne Notiz zur prüfenden Stelle – erscheinen, sobald Sie „Ja“ wählen."
+      },
+      "list": {
+        "title": "Prüfnachweise",
+        "item": "Prüfnachweis {{n}}: {{testType}}",
+        "add": "Weiteren Prüfnachweis hinzufügen",
+        "remove": "Prüfnachweis {{n}} entfernen",
+        "removed": "Prüfnachweis entfernt.",
+        "duplicate": "Für dieses Prüfverfahren gibt es schon einen Prüfnachweis.",
+        "statusChange": "Ihre {{count}} Prüfnachweise werden dabei entfernt. Möchten Sie fortfahren?",
+        "statusChange.one": "Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren?"
+      },
+      "testType": "Art der Prüfung",
+      "testType.otherName": "Name des Prüfverfahrens",
+      "testedBy": "Wer hat geprüft?",
+      "testDate": "Datum der Prüfung",
+      "version": "Geprüfte Version (optional)",
+      "url": "Link zum Prüfbericht (optional)",
+      "qualification": "Ihre Notiz zur Qualifikation der prüfenden Stelle"
+    },
+    "assessment": {
+      "intro": "Schätzen Sie für jedes Kriterium ein, wie gut das Produkt es erfüllt. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. Grundlage können eigene Tests, Prüfberichte oder Angaben des Anbieters sein. Notieren Sie, worauf Sie sich stützen.",
+      "progress": "{{done}} von {{total}} Kriterien eingeschätzt",
+      "filter": {
+        "unassessed": "Nur noch nicht eingeschätzte anzeigen"
+      },
+      "legend": "Wie erfüllt das Produkt dieses Kriterium?",
+      "select": "Einschätzung",
+      "note.add": "Begründung hinzufügen",
+      "note.edit": "Begründung bearbeiten",
+      "note": "Worauf stützt sich Ihre Einschätzung? (optional)",
+      "saved": "Einschätzung gespeichert.",
+      "unionNote": "Ihre Liste gilt für mehrere Anwendungstypen. Bei jedem Kriterium stehen alle Stufen zur Auswahl, die für mindestens einen davon vorgesehen sind."
+    },
+    "publish": {
+      "cta": "Im Produktverzeichnis veröffentlichen",
+      "cta.hint": "Erst möglich, wenn angegeben ist, ob das Produkt geprüft wurde."
+    },
+    "published": {
+      "status": "Veröffentlicht am {{date}}. Spätere Änderungen hier werden nicht automatisch übernommen.",
+      "changed": "Sie haben seit der Veröffentlichung Änderungen vorgenommen. Möchten Sie den Eintrag aktualisieren?",
+      "republish": "Eintrag aktualisieren",
+      "otherProfile": "Dieser Eintrag wurde unter dem Beitragsprofil „{{displayName}}“ veröffentlicht. Aktualisieren kann ihn nur, wer dieses Profil nutzt. Sie können die Veröffentlichung zurückziehen und den Eintrag danach unter Ihrem Profil neu veröffentlichen.",
+      "withdraw": "Veröffentlichung zurückziehen"
+    },
+    "remove": "Produkt aus dem Projekt entfernen",
+    "remove.title": "Produkt entfernen?",
+    "remove.body": "„{{product}}“ wird mit Prüfnachweisen und Einschätzungen aus diesem Projekt entfernt. Das lässt sich nicht rückgängig machen.",
+    "remove.publishedNote": "Der veröffentlichte Eintrag bleibt im Produktverzeichnis sichtbar. Zurückziehen kann ihn danach nur, wer das Beitragsprofil „{{displayName}}“ nutzt.",
+    "remove.confirm": "Produkt entfernen",
+    "removed": "„{{product}}“ wurde aus dem Projekt entfernt.",
+    "duplicate": "Dieses Produkt ist schon in diesem Projekt."
+  },
+  "signals": {
+    "fulfillment": {
+      "title": {
+        "config": "Abgleich mit Ihrer Kriterienliste „{{name}}“",
+        "public": "Eingeschätzte Kriterien"
+      },
+      "intro": {
+        "config": "So wurden die Kriterien Ihrer Liste in diesem Eintrag eingeschätzt:",
+        "public": "So wurden die Kriterien in diesem Eintrag eingeschätzt:"
+      },
+      "fulfilled": "Erfüllt: {{count}} Kriterien",
+      "fulfilled.one": "Erfüllt: 1 Kriterium",
+      "slightRestriction": "Leichte Einschränkung: {{count}} Kriterien",
+      "slightRestriction.one": "Leichte Einschränkung: 1 Kriterium",
+      "restriction": "Einschränkung: {{count}} Kriterien",
+      "restriction.one": "Einschränkung: 1 Kriterium",
+      "barrier": "Barriere: {{count}} Kriterien",
+      "barrier.one": "Barriere: 1 Kriterium",
+      "blockade": "Blockade: {{count}} Kriterien",
+      "blockade.one": "Blockade: 1 Kriterium",
+      "notApplicable": "Nicht anwendbar: {{count}} Kriterien",
+      "notApplicable.one": "Nicht anwendbar: 1 Kriterium",
+      "unknown": "Nicht eingeschätzt: {{count}} Kriterien",
+      "unknown.one": "Nicht eingeschätzt: 1 Kriterium",
+      "count": "{{count}} Kriterien",
+      "count.one": "1 Kriterium",
+      "notCovered": "Damals nicht im Katalog: {{count}} Kriterien",
+      "notCovered.one": "Damals nicht im Katalog: 1 Kriterium",
+      "notCovered.explain": "Diese Kriterien gab es noch nicht, als der Eintrag veröffentlicht wurde. Sie konnten deshalb nicht eingeschätzt werden. Das ist kein Mangel des Produkts.",
+      "unknown.explain": "Zu diesen Kriterien hat die veröffentlichende Stelle keine Einschätzung abgegeben. Das heißt nicht, dass das Produkt sie nicht erfüllt.",
+      "details": "Einschätzung je Kriterium anzeigen",
+      "release": "Eingeschätzt nach Katalogversion {{entryRelease}}. Ihre Liste nutzt Version {{configRelease}}.",
+      "none": "Keine Einschätzungen einzelner Kriterien veröffentlicht."
+    }
   }
 }

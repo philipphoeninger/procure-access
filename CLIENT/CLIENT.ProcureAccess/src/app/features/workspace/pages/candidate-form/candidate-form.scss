@@ -1,0 +1,85 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S33 (Handoff §5.3: no frame; the title row and tabs of S34a, the form card of S20, the private
+// section apart): one column; the fields at most 40rem wide; actions below, stacked under 600 px
+// and right-aligned from 600 px.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  inline-size: 100%;
+}
+
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
+.pa-candidate-form__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.pa-candidate-form__narrow {
+  max-inline-size: 40rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.pa-candidate-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+  max-inline-size: 40rem;
+}
+
+.pa-candidate-form__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+// „Nur für Ihre Organisation“ stands apart: its own surface and a stronger border (PRV-02);
+// the text says why, the surface only adds to it
+.pa-candidate-form__card--private {
+  border-color: var(--mat-sys-outline);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.pa-candidate-form__section-title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.pa-candidate-form__text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-candidate-form__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.pa-candidate-form__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pa-space-xs);
+}

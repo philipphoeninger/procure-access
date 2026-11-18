@@ -1,0 +1,121 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (overview(); as overview) {
+  <!-- Cards are <section>s without an accessible name: Firefox crashes axe on named regions (TESTING V229, S6-16 D5 (a)) -->
+  <section class="pa-overview__card">
+    <div class="pa-overview__card-head">
+      <h2 id="pa-overview-details" class="pa-overview__card-title">{{ 'candidate.overview.details.title' | translate }}</h2>
+      @if (canEdit()) {
+        <a matButton [routerLink]="editPath(overview)" aria-describedby="pa-overview-details">{{ 'common.actions.edit' | translate }}</a>
+      }
+    </div>
+    <dl class="pa-overview__facts">
+      <div>
+        <dt>{{ 'candidate.form.name' | translate }}</dt>
+        <dd>{{ overview.candidate.name }}</dd>
+      </div>
+      @if (overview.candidate.vendor) {
+        <div>
+          <dt>{{ 'candidate.form.vendor' | translate }}</dt>
+          <dd>{{ overview.candidate.vendor }}</dd>
+        </div>
+      }
+      @if (overview.candidate.website) {
+        <div>
+          <dt>{{ 'candidate.form.website' | translate }}</dt>
+          <dd><a [href]="overview.candidate.website">{{ overview.candidate.website }}</a></dd>
+        </div>
+      }
+      @if (overview.candidate.functionalSummary) {
+        <div>
+          <dt>{{ 'candidate.form.summary' | translate }}</dt>
+          <dd class="pa-overview__text">{{ overview.candidate.functionalSummary }}</dd>
+        </div>
+      }
+      <div>
+        <dt>{{ 'candidate.overview.appType' | translate }}</dt>
+        <dd>
+          @if (overview.criteria) {
+            {{ overview.criteria.appTypeNames.join(', ') }}
+          } @else {
+            {{ 'candidate.overview.appType.none' | translate }}
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'candidate.overview.directory' | translate }}</dt>
+        <dd>{{ 'candidate.overview.directory.none' | translate }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="pa-overview__card">
+    <h2 class="pa-overview__card-title">{{ 'candidate.overview.status.title' | translate }}</h2>
+    <div class="pa-overview__columns">
+      <div class="pa-overview__column">
+        <h3 class="pa-overview__column-title">{{ 'candidate.overview.status.evidence' | translate }}</h3>
+        <p>{{ 'candidate.overview.status.tested' | translate: { status: testedStatus() } }}</p>
+        <a matButton [routerLink]="tabPath(overview, 'evidence')">{{ 'candidate.overview.status.toEvidence' | translate }}</a>
+      </div>
+      <div class="pa-overview__column">
+        <h3 class="pa-overview__column-title">{{ 'candidate.overview.status.assessment' | translate }}</h3>
+        @if (overview.criteria; as criteria) {
+          @if (overview.candidate.progress; as progress) {
+            <p>
+              {{
+                'candidate.overview.status.progress'
+                  | translate: { done: progress.done, total: progress.total, list: criteria.listName, release: criteria.releaseVersion }
+              }}
+            </p>
+          }
+          @if (overview.candidate.fulfillment; as counts) {
+            <pa-fulfillment-breakdown scope="workspace" [counts]="counts" [listName]="criteria.listName" [headingLevel]="4" />
+          }
+          <pa-rating-legend />
+        } @else {
+          <pa-notice kind="info">
+            <p>{{ 'projects.detail.noCriteria' | translate }}</p>
+          </pa-notice>
+        }
+        <a matButton [routerLink]="tabPath(overview, 'assessment')">{{ 'candidate.overview.status.toAssessment' | translate }}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pa-overview__card">
+    <h2 class="pa-overview__card-title">{{ 'candidate.overview.publication.title' | translate }}</h2>
+    <p>{{ 'candidate.overview.publication.none' | translate }}</p>
+    <p>{{ 'candidate.overview.publication.explain' | translate }}</p>
+  </section>
+
+  <!-- Private (PRV-02): never part of a publication -->
+  <section class="pa-overview__card pa-overview__card--private">
+    <div class="pa-overview__card-head">
+      <h2 id="pa-overview-private" class="pa-overview__card-title">{{ 'candidate.overview.private.title' | translate }}</h2>
+      @if (canEdit()) {
+        <a matButton [routerLink]="editPath(overview)" aria-describedby="pa-overview-private">{{ 'common.actions.edit' | translate }}</a>
+      }
+    </div>
+    <p>{{ 'candidate.form.privateSection.text' | translate }}</p>
+    @if (overview.candidate.privateSection.contactNotes || overview.candidate.privateSection.internalNotes) {
+      <dl class="pa-overview__facts">
+        @if (overview.candidate.privateSection.contactNotes) {
+          <div>
+            <dt>{{ 'candidate.form.contacts' | translate }}</dt>
+            <dd class="pa-overview__text">{{ overview.candidate.privateSection.contactNotes }}</dd>
+          </div>
+        }
+        @if (overview.candidate.privateSection.internalNotes) {
+          <div>
+            <dt>{{ 'candidate.form.internalNotes' | translate }}</dt>
+            <dd class="pa-overview__text">{{ overview.candidate.privateSection.internalNotes }}</dd>
+          </div>
+        }
+      </dl>
+    }
+  </section>
+}

@@ -110,3 +110,30 @@ export async function saveListThroughApi(request: APIRequestContext, organizatio
   expect(response.status(), `saving ${name}`).toBe(201);
   return ((await response.json()) as { id: string }).id;
 }
+
+/**
+ * Creates a procurement project in the organisation as the user `request` is signed in as (Editor
+ * or Owner) and, with `listId`, gives it its own copy of that saved list (S6-16): for tests whose
+ * subject is not creating the project. Returns the project's id.
+ */
+export async function createProjectThroughApi(
+  request: APIRequestContext,
+  organizationId: string,
+  name: string,
+  listId?: string,
+): Promise<string> {
+  const response = await request.post(`/api/v1/organizations/${organizationId}/projects`, {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+    data: { name },
+  });
+  expect(response.status(), `creating ${name}`).toBe(201);
+  const id = ((await response.json()) as { id: string }).id;
+  if (listId !== undefined) {
+    const assigned = await request.put(`/api/v1/projects/${id}/criteria-configuration`, {
+      headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+      data: { sourceConfigurationId: listId },
+    });
+    expect(assigned.status(), `assigning the list to ${name}`).toBe(200);
+  }
+  return id;
+}
