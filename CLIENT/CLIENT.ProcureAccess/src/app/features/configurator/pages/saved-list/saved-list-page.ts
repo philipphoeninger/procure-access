@@ -261,7 +261,9 @@ export class SavedListPage {
     })
       .afterClosed()
       .subscribe((result) => {
-        if (result !== undefined) this.showNote(result.toNote);
+        // A saved list exports under its own release, so S13 never offers „Kriterien neu laden“ here.
+        // „Abbrechen“ and Esc close without a result object (`mat-dialog-close` gives '').
+        if (typeof result === 'object' && 'toNote' in result) this.showNote(result.toNote);
       });
   }
 

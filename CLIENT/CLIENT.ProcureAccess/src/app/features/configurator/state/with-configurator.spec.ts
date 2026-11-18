@@ -628,6 +628,85 @@ describe('withConfigurator', () => {
       expect(store.configurator.list.searchInput()).toBe('');
       expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
     });
+
+    describe('„Kriterien neu laden“ after release-mismatch (TD-39, #310, O-S6-5)', () => {
+      it('drops the pinned release and the decisions, keeps the selection and pins the active release again', async () => {
+        await fillAllLayers();
+        await listLoaded();
+        store.setCriterionIncluded('11.3.3', false);
+        store.setCriterionNote('11.1.1', 'Notiz');
+        store.showOnlyIncludedCriteria(true);
+        const selection = store.configurator.list.selection();
+
+        const reload = store.reloadCriteriaListForActiveRelease();
+        expect(store.configurator.list.decisions()).toEqual({});
+        expect(store.configurator.list.answer()).toBeNull();
+        expect(store.configurator.list.filter()).toEqual({ query: '', levels: [], onlyIncluded: false });
+        const options = nextRequest();
+        expect(options.request.params.has('release')).toBe(false);
+        expect(options.request.params.get('useCase')).toBe('hr');
+        options.flush(filterOptionsAnswer(filterOptions(), 'T.2'));
+        await settle();
+        expect(store.configurator.release()).toBe('T.2');
+        const list = listRequest();
+        expect(list.request.params.get('release')).toBe('T.2');
+        list.flush(criteriaAnswer('T.2'));
+
+        expect(await reload).toBe('loaded');
+        expect(store.configurator.list.answer()?.release).toBe('T.2');
+        expect(store.configurator.list.selection()).toEqual(selection);
+        expect(store.configurator.draft.testTypeIds()).toEqual(['softwareTest']);
+        expect(store.configurator.list.decisions()).toEqual({});
+        expect(visibleKeys()).toEqual(['11.1.1', '11.2.2', '11.3.3', 'PROC-softwareTest']);
+      });
+
+      it('loads the list for the active release and pins it when the options fail', async () => {
+        await fillAllLayers();
+        await listLoaded();
+
+        const reload = store.reloadCriteriaListForActiveRelease();
+        nextRequest().flush(null, { status: 500, statusText: 'Server Error' });
+        await settle();
+        const list = listRequest();
+        expect(list.request.params.has('release')).toBe(false);
+        list.flush(criteriaAnswer('T.2'));
+
+        expect(await reload).toBe('loaded');
+        expect(store.configurator.release()).toBe('T.2');
+      });
+
+      it('reports a selection the active release no longer allows as failed, with the selection kept', async () => {
+        await fillAllLayers();
+        await listLoaded();
+
+        const reload = store.reloadCriteriaListForActiveRelease();
+        nextRequest().flush(filterOptionsAnswer(filterOptions(), 'T.2'));
+        await settle();
+        listRequest().flush(
+          { type: 'x/problems/selection-excluded', errors: { 'productPartIds[0]': ['x'] } },
+          { status: 400, statusText: 'Bad Request' },
+        );
+
+        expect(await reload).toBe('failed');
+        expect(store.configurator.draft.useCase()).toEqual({ kind: 'useCase', id: 'hr' });
+      });
+
+      it('drops the answer of a list request of the old release still running', async () => {
+        await fillAllLayers();
+        const old = store.loadCriteriaList();
+        const oldRequest = listRequest();
+
+        const reload = store.reloadCriteriaListForActiveRelease();
+        oldRequest.flush(criteriaAnswer('T.1'));
+        await old;
+        nextRequest().flush(filterOptionsAnswer(filterOptions(), 'T.2'));
+        await settle();
+        listRequest().flush(criteriaAnswer('T.2'));
+
+        expect(await reload).toBe('loaded');
+        expect(store.configurator.list.answer()?.release).toBe('T.2');
+      });
+    });
   });
 
   describe('CriteriaListShown once per new selection (R-MET-01, R-CON-10, O-S4-55)', () => {
