@@ -103,8 +103,16 @@ public sealed class AccountTokenTests
         Should.Throw<InvalidOperationException>(() => AccountTokenSettings.From(Configuration(reset: value)))
               .Message.ShouldContain("Account:Tokens:PasswordResetLifetime");
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("00:00:00")]
+    [InlineData("hourly")]
+    public void Settings_MissingOrUnusableCleanupInterval_StopsTheStart(string? value) =>
+        Should.Throw<InvalidOperationException>(() => AccountTokenSettings.From(Configuration(cleanupInterval: value)))
+              .Message.ShouldContain("Account:Tokens:CleanupInterval");
+
     [Fact]
-    public void Settings_DefaultsOfAppsettings_Are24And2Hours()
+    public void Settings_DefaultsOfAppsettings_Are24And2HoursWithAnHourlyCleanup()
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false)
@@ -113,14 +121,17 @@ public sealed class AccountTokenTests
         var settings = AccountTokenSettings.From(configuration);
         settings.EmailConfirmationLifetime.ShouldBe(TimeSpan.FromHours(24));
         settings.PasswordResetLifetime.ShouldBe(TimeSpan.FromHours(2));
+        settings.CleanupInterval.ShouldBe(TimeSpan.FromHours(1));
     }
 
-    private static IConfiguration Configuration(string? confirmation = "1.00:00:00", string? reset = "02:00:00") =>
+    private static IConfiguration Configuration(
+        string? confirmation = "1.00:00:00", string? reset = "02:00:00", string? cleanupInterval = "01:00:00") =>
         new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Account:Tokens:EmailConfirmationLifetime"] = confirmation,
                 ["Account:Tokens:PasswordResetLifetime"] = reset,
+                ["Account:Tokens:CleanupInterval"] = cleanupInterval,
             })
             .Build();
 }
