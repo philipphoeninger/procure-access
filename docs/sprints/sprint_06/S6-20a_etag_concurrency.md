@@ -86,6 +86,7 @@ Code review per CLAUDE §6.7 (`/engineering:code-review` on the staged diff), so
 - **Backend:** build with `-warnaserror` clean; `dotnet format --verify-no-changes` clean; `dotnet test --solution`: **2 141 passed, 0 failed** (before the migration case was added; `WorkspaceMigrationTests` then run alone: 5 passed).
 - **Client:** `npm run lint` clean; `npx ng test`: **1 008 passed**; `tsc` on the specs clean.
 - **E2E:** `npm run typecheck` and `npm run lint` clean. The suite was not run locally — another session (worktree `s6-14`) may use the stack — and runs in CI.
+- **CI, first run (f88cd10):** every stage green except E2E — in all five browsers the one test of `e2e/shell/reflow.spec.ts` that answers the project and the candidate itself (S33, S34) failed, because its answers had no `ETag` and the client refuses such an answer (`withEtag`). **Fixed** in the test: both mocked answers carry `ETag: "1-1"`. A spec that answers a project or a candidate itself has to send the header.
 - **Scripts:** `check-invariants` (gate passed with API-03 and API-04 active), `check-figma-links`, `check-i18n`, `check-icons`, `check-api-notices` passed; `reuse lint` compliant.
 
 ## 5. Open points
