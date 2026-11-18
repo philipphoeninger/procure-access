@@ -213,6 +213,21 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
     await expect(actionBar(page)).not.toHaveCSS('border-top-left-radius', '0px');
   });
 
+  test('in forced colours the sticky action bar shows a top edge towards the list (WCAG 1.4.11, #378)', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'forced-colors emulation is Chromium only');
+    await toList(page);
+    await page.emulateMedia({ forcedColors: 'active' });
+    const edge = (): Promise<number> => actionBar(page).evaluate((bar) => parseFloat(getComputedStyle(bar).borderTopWidth));
+
+    expect(await edge()).toBeGreaterThan(0);
+    // In the flow nothing changes, and neither does the bar outside forced colours.
+    await page.setViewportSize({ width: 1280, height: 560 });
+    expect(await edge()).toBe(0);
+    await page.setViewportSize(WIDE);
+    await page.emulateMedia({ forcedColors: 'none' });
+    expect(await edge()).toBe(0);
+  });
+
   test('the sticky action bar never covers the element with the keyboard focus (WCAG 2.4.11)', async ({ page }) => {
     await toList(page);
     const exportButton = page.getByRole('button', { name: 'Liste exportieren' });
