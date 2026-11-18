@@ -14,12 +14,14 @@ function apiHealthUrl(apiUrl: string): string {
   return new URL('/health/live', new URL(apiUrl, window.location.origin)).href;
 }
 
-// call this from main.ts only in development
+// Call this from main.ts only in development. `credentials: 'omit'`: the probe must not send the
+// session cookie, because every authenticated request renews the idle limit (S5-29) and the
+// session warning would never show under `npm start` (TD-64).
 function startApiHealthWatcher() {
   const checkUrl = apiHealthUrl(environment.apiUrl);
   setInterval(async () => {
     try {
-      const res = await fetch(checkUrl, { method: 'GET', cache: 'no-cache' });
+      const res = await fetch(checkUrl, { method: 'GET', cache: 'no-cache', credentials: 'omit' });
       if (!res.ok) {
         console.debug('API not healthy (status ' + res.status + ')');
       }
