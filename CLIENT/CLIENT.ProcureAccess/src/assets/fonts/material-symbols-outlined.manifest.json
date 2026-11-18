@@ -1,6 +1,6 @@
 {
   "package": "material-symbols",
-  "version": "0.48.3",
+  "version": "0.49.0",
   "icons": [
     "add",
     "add_2",
@@ -29,5 +29,5 @@
     "visibility",
     "warning"
   ],
-  "sha256": "7cad345b5b4efd419f468da0e09e40930f29213a940f5106a039ff181e22360b"
+  "sha256": "a3607c6b660cb6102caf7db4d707982e58d00d765d5156d5d2eeacd6af508431"
 }
