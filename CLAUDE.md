@@ -2,7 +2,7 @@
 
 This file guides Claude Code (and any other AI assistant) when working in this repository. It is the project's AI onboarding document: read it at the start of every session.
 
-> **Version:** v4 (2026-11-16) — v3 (2026-10-19, step 9 of `docs/ai_development_process.md`) grew with every task to 206 000 characters, far above the 40 000 at which Claude Code warns. v4 keeps the rules, the short layout and the everyday commands; the state of the code task by task, the annotated layout, the further commands and the change history of v3 moved verbatim to `docs/CODEBASE_v1.md` (owner request, 2026-11-16). Last task reflected: S6-10a. Keep this file under 40 000 characters: a task records what it built in `CODEBASE_v*.md` and changes this file only when a rule, command or convention that applies across the codebase changes.
+> **Version:** v4 (2026-11-16) — v3 (2026-10-19, step 9 of `docs/ai_development_process.md`) grew with every task to 206 000 characters, far above the 40 000 at which Claude Code warns. v4 keeps the rules, the short layout and the everyday commands; the state of the code task by task, the annotated layout, the further commands and the change history of v3 moved verbatim to `docs/CODEBASE_v1.md` (owner request, 2026-11-16). Last tasks reflected: S6-24, S6-10a. Keep this file under 40 000 characters: a task records what it built in `CODEBASE_v*.md` and changes this file only when a rule, command or convention that applies across the codebase changes.
 
 ---
 
@@ -110,7 +110,7 @@ content/legal/*.de.md                           imprint, privacy, accessibility 
 scripts/check-invariants.mjs, scripts/check-figma-links.mjs
 ```
 
-Angular features follow `src/app/features/<name>/{models,services/api,state,pages,components,dialogs}`; store slices `withCatalog`, `withConfigurator`, `withWorkspace`, `withDirectory`, `withIdentity`, `withSettings`, `withLoading`. `withProposal()` and `withProducts()`/`withFavorites()` are legacy and will be retired or reworked; the `Approver` role is `Moderator` since S4-25 (`ARCHITECTURE §8.1`).
+Angular features follow `src/app/features/<name>/{models,services/api,state,pages,components,dialogs}`; store slices `withCatalog`, `withConfigurator`, `withWorkspace`, `withDirectory`, `withIdentity`, `withSettings`, `withLoading`. The root store adds `withLoading()` once, first; a slice never adds `withLoading()` or another slice again but declares what it reads as its typed input (`LOADING_INPUT`, `type<…>()`), and a test store of a slice adds `withLoading()` first (S6-24). `withProposal()` and `withProducts()`/`withFavorites()` are legacy and will be retired or reworked; the `Approver` role is `Moderator` since S4-25 (`ARCHITECTURE §8.1`).
 
 ## 5. Commands
 

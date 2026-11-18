@@ -12,6 +12,7 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
 import { CALLER_HANDLES_PROBLEMS } from '@app/core/errors/problem-details';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 
 import { CriteriaResponse } from '../models/criteria';
 import { FilterOptionsLayers } from '../models/filter-options';
@@ -20,7 +21,7 @@ import { excluded, filterOptions, filterOptionsAnswer } from '../testing/filter-
 import { provideLoadedConfiguratorSettings } from '../testing/configurator-settings-stub';
 import { CRITERIA_SEARCH_DEBOUNCE_MS, initialConfiguratorState, withConfigurator } from './with-configurator';
 
-const ConfiguratorTestStore = signalStore(withConfigurator());
+const ConfiguratorTestStore = signalStore(withLoading(), withConfigurator());
 const url = '/api/v1/catalog/filter-options';
 
 describe('withConfigurator', () => {

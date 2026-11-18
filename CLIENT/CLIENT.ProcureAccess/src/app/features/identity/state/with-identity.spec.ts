@@ -6,6 +6,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 
 import { API_URL } from '@app/app.config';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
@@ -13,7 +14,7 @@ import { SessionLimits } from '@app/core/session/session-limits';
 import { SessionResponse } from '../models/session';
 import { withIdentity } from './with-identity';
 
-const IdentityTestStore = signalStore(withIdentity());
+const IdentityTestStore = signalStore(withLoading(), withIdentity());
 
 const PROBE = '/api/v1/auth/session';
 const LOGIN = '/api/v1/auth/login';

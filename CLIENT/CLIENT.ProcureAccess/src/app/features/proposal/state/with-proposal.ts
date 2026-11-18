@@ -4,7 +4,6 @@
 
 import { HttpContext } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
-import { initialAppState } from '@app/core/models/appState.interface';
 import {
   patchState,
   signalStoreFeature,
@@ -12,7 +11,7 @@ import {
   withMethods,
   withState
 } from '@ngrx/signals';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 import { ProposalApiService } from '../services/api/proposal-api.service';
 import { ProposalDto } from '../models/proposal.dto';
 import { UpsertProposal } from '../models/upsert-proposal-request.model';
@@ -22,8 +21,8 @@ import { ApproveProposal } from '../models/approve-proposal-request.model';
 export type ProposalState = { proposals: ProposalDto[] };
 
 export const withProposal = () => signalStoreFeature(
-    withState<ProposalState>({ proposals: initialAppState.proposals }),
-    withLoading(),
+    LOADING_INPUT,
+    withState<ProposalState>({ proposals: [] }),
     withMethods((state, proposalApiService = inject(ProposalApiService)) => ({
       async loadProposals() {
           state.incrementLoadingCount();
