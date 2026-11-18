@@ -24,8 +24,8 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// another organisation's project, 403 Reader; TEN-01, TEN-05), a confirmed address (SEC-10) and
 /// antiforgery (SEC-02). The role check comes before the body's check, as on the other project
 /// endpoints. An archived project answers 409 <c>project-archived</c> (R-PRJ-05); once an assessment
-/// other than „Nicht eingeschätzt“ exists, 409 <c>locked-criteria-list</c> (C47; the check is
-/// <see cref="ICriteriaListLock"/>, real with S6-18). A source that is unknown, of another
+/// other than „Nicht eingeschätzt“ exists, 409 <c>locked-criteria-list</c> (C47;
+/// <see cref="ProjectCriteriaListService.IsLockedAsync"/>, on the assessment rows since S6-18). A source that is unknown, of another
 /// organisation or a project copy answers 400 <c>validation</c> at <c>sourceConfigurationId</c>
 /// (WSP-02): one answer for all three, so the request learns nothing about lists it cannot use.
 /// No <c>ETag</c>/<c>If-Match</c> until S6-20 (API-03); the last assignment wins.

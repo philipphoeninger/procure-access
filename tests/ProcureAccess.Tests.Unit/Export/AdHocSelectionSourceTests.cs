@@ -33,7 +33,7 @@ public class AdHocSelectionSourceTests
     private static readonly ResolvedCatalogCriterion RequirementInfo = Criterion(13, "99.3", PriorityLevel.Info, null);
     private static readonly ResolvedCatalogCriterion TestedBy = new(
         14, "PROC-softwareTest", CriterionKind.TestProcedure, null, "Software-Test", null, null, null, null,
-        new CatalogPriority(PriorityLevel.Info, null, "Begründung PROC"), "https://example.org/software");
+        new CatalogPriority(PriorityLevel.Info, null, "Begründung PROC"), "https://example.org/software", Rating.None, "softwareTest");
 
     private static readonly ResolvedCatalogCriterion[] All = [RequirementA, RequirementB, RequirementInfo, TestedBy];
 
@@ -292,7 +292,7 @@ public class AdHocSelectionSourceTests
     private static ResolvedCatalogCriterion Criterion(int revisionId, string key, PriorityLevel level, int? weight) =>
         new(revisionId, key, CriterionKind.Requirement, key, $"Titel {key}", null, $"Kurzbeschreibung {key}",
             $"Originaltitel {key}", "Basisfunktionalität",
-            new CatalogPriority(level, weight, $"Begründung {key}"), $"https://example.org/{key}");
+            new CatalogPriority(level, weight, $"Begründung {key}"), $"https://example.org/{key}", Rating.All, null);
 
     private static CatalogSelectionResult Resolved(ResolvedCatalogCriterion[] criteria, bool active = true, int criterionCount = 15) =>
         new(

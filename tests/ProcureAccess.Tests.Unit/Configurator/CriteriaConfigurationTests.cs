@@ -191,7 +191,8 @@ public class CriteriaConfigurationTests
         Criterion(list, 12).HasDecision.ShouldBe(expected);
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(CopyForProject_OrganisationList_CopiesSelectionAndDecisionsAndLeavesTheSource))]
+    [Trait("Invariant", "WSP-02")]
     public void CopyForProject_OrganisationList_CopiesSelectionAndDecisionsAndLeavesTheSource()
     {
         var source = List(
@@ -228,7 +229,8 @@ public class CriteriaConfigurationTests
             s => s.ProcurementProjectId.ShouldBeNull(), s => s.IsProjectCopy.ShouldBeFalse(), s => s.ModifiedAt.ShouldBe(CreatedAt));
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(CopyForProject_ProjectCopyAsSource_Throws))]
+    [Trait("Invariant", "WSP-02")]
     public void CopyForProject_ProjectCopyAsSource_Throws()
     {
         var copy = List(new ConfigurationCriterionDraft(11, PriorityLevel.A)).CopyForProject(Guid.NewGuid(), "user-1", CreatedAt);

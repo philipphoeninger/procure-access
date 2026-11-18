@@ -95,7 +95,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         // The project lists it and counts it, and its last change moved (owner decision S6-15 5 (a)).
         var projectRead = (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation)).ShouldNotBeNull();
         projectRead.ProductCount.ShouldBe(1);
-        projectRead.Candidates.ShouldHaveSingleItem().ShouldBe(new CandidateSummaryResponse(created.Id, "Bewerbermanager", "Anbieter GmbH", "unknown"));
+        projectRead.Candidates.ShouldHaveSingleItem().ShouldBe(new CandidateSummaryResponse(created.Id, "Bewerbermanager", "Anbieter GmbH", "unknown", null, null, null));
         projectRead.ModifiedAt.ShouldBe(Clock.GetUtcNow());
         var list = await client.GetFromJsonAsync<List<ProjectSummaryResponse>>($"/api/v1/organizations/{Fixture.A.Id}/projects", Cancellation);
         list.ShouldNotBeNull().ShouldHaveSingleItem().ProductCount.ShouldBe(1);

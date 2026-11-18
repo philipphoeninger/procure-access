@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.EntityFrameworkCore;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
 
@@ -21,7 +23,8 @@ namespace ProcureAccess.Modules.Workspace.Candidates;
 /// candidate and of its project (owner decision S6-15 5 (a)).</para>
 /// <para>The private rows are read and written beside the candidate, never through it.</para>
 /// </remarks>
-internal sealed class CandidateService(WorkspaceDbContext db, TimeProvider clock)
+internal sealed class CandidateService(
+    WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, AssessmentReader assessments, TimeProvider clock)
 {
     /// <summary>The organisation of the candidate, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<Guid?> OrganizationOfCandidateAsync(Guid id, CancellationToken cancellationToken) =>
@@ -278,6 +281,10 @@ internal sealed class CandidateService(WorkspaceDbContext db, TimeProvider clock
         var notes = await db.TestEvidencePrivateNotes.AsNoTracking()
                             .Where(n => evidenceIds.Contains(n.TestEvidenceId))
                             .ToDictionaryAsync(n => n.TestEvidenceId, cancellationToken);
+
+        // Progress and the seven counts against the project's list (C34; S6-18); null without one.
+        var list = await criteriaLists.FindOfProjectAsync(candidate.ProcurementProjectId, cancellationToken);
+        var summary = (await assessments.SummariesAsync(list, [AssessedCandidate.Of(candidate)], cancellationToken))?[candidate.Id];
         return new CandidateResponse(
             candidate.Id,
             candidate.ProcurementProjectId,
@@ -290,7 +297,9 @@ internal sealed class CandidateService(WorkspaceDbContext db, TimeProvider clock
             new CandidatePrivateSectionResponse(section.ContactNotes, section.InternalNotes),
             [.. candidate.TestEvidences.OrderBy(e => e.CreatedAt).ThenBy(e => e.Id).Select(e => ResponseOf(e, notes[e.Id]))],
             candidate.CreatedAt,
-            candidate.ModifiedAt);
+            candidate.ModifiedAt,
+            summary?.Progress,
+            summary?.Fulfillment);
     }
 
     private static TestEvidenceResponse ResponseOf(TestEvidence evidence, TestEvidencePrivateNote note) => new(

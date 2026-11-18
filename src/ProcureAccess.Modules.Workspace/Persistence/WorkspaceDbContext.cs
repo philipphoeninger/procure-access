@@ -12,7 +12,7 @@ namespace ProcureAccess.Modules.Workspace.Persistence;
 /// <summary>
 /// The Workspace module's own database context (ARCHITECTURE ADR-014) in the <c>workspace</c>
 /// schema: the procurement projects (§5.4; S6-11), their candidate products with test evidences and
-/// the private rows beside both (S6-15). No other module and no legacy code uses it.
+/// the private rows beside both (S6-15), and the candidates' assessments (S6-18). No other module and no legacy code uses it.
 /// </summary>
 /// <remarks>
 /// Its history table is <c>workspace."__EFMigrationsHistory"</c>. Every entity carries
@@ -47,6 +47,9 @@ internal sealed class WorkspaceDbContext(
     /// <summary>The private notes of the evidences (TEN-01).</summary>
     public DbSet<TestEvidencePrivateNote> TestEvidencePrivateNotes => Set<TestEvidencePrivateNote>();
 
+    /// <summary>The assessments of the candidates, one row per assessed criterion (TEN-01; S6-18).</summary>
+    public DbSet<CandidateAssessment> CandidateAssessments => Set<CandidateAssessment>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // As in the other module contexts: set here, so every instance (application, design-time
@@ -62,6 +65,7 @@ internal sealed class WorkspaceDbContext(
         modelBuilder.ApplyConfiguration(new CandidatePrivateSectionConfiguration());
         modelBuilder.ApplyConfiguration(new TestEvidenceConfiguration());
         modelBuilder.ApplyConfiguration(new TestEvidencePrivateNoteConfiguration());
+        modelBuilder.ApplyConfiguration(new CandidateAssessmentConfiguration());
 
         // The organisation filter (ADR-007, TEN-01): a row of an organisation the request's user is
         // no member of does not exist for this context. Every entity has its own, so a child read
@@ -76,5 +80,7 @@ internal sealed class WorkspaceDbContext(
                     .HasQueryFilter(e => _organizations.OrganizationIds.Contains(e.OrganizationId));
         modelBuilder.Entity<TestEvidencePrivateNote>()
                     .HasQueryFilter(n => _organizations.OrganizationIds.Contains(n.OrganizationId));
+        modelBuilder.Entity<CandidateAssessment>()
+                    .HasQueryFilter(a => _organizations.OrganizationIds.Contains(a.OrganizationId));
     }
 }
