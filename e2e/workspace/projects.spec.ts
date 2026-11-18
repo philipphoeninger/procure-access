@@ -116,24 +116,28 @@ test.describe('Procurement projects S30, S31', () => {
     await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
-    // Firefox crashes in axe after a name check of a Material control labelled by aria-labelledby
-    // (TESTING V129, V165): the select is the dialog's only combobox, its name is checked by the unit test
+    // Firefox crashes its page process when Playwright computes an accessible name after an axe run
+    // (TESTING V129, V165; here the dialog, labelled by MatDialog through aria-labelledby): every S31
+    // step comes before its axe run, the submit after it goes by CSS. The select is the dialog's only
+    // combobox; its name is checked by the unit test.
+    const project = `Mit Liste ${suffix}`;
+    await dialog.getByRole('textbox', { name: 'Name des Projekts' }).fill(project);
     const choice = dialog.getByRole('combobox');
     await expect(choice).toHaveCount(1);
     await expect(choice).toContainText('Keine Liste');
+    await choice.click();
+    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
+    await expect(page.locator('mat-option')).toHaveCount(0);
+    await expect(choice).toContainText('HR-Software 2027');
     await expect(dialog).toContainText('Kriterienliste (optional)');
     await expect(dialog).toContainText('Das Projekt erhält eine eigene Kopie der Liste');
     await settled(dialog);
     await expectNoAxeViolations(page, testInfo, 's31-list-choice');
 
-    const project = `Mit Liste ${suffix}`;
-    await dialog.getByRole('textbox', { name: 'Name des Projekts' }).fill(project);
-    await choice.click();
-    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
     const assigned = page.waitForResponse(
       (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname.endsWith('/criteria-configuration'),
     );
-    await dialog.getByRole('button', { name: 'Projekt anlegen' }).click();
+    await page.locator('mat-dialog-container button[type="submit"]').click();
     const assignment = await assigned;
     expect(assignment.status()).toBe(200);
     const copyId = ((await assignment.json()) as { id: string }).id;
