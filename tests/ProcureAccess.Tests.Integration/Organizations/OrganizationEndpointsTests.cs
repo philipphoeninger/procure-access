@@ -5,7 +5,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using API.ProcureAccess.Organizations;
+using ProcureAccess.Modules.IdentityAccess.Organizations;
 using Microsoft.EntityFrameworkCore;
 using MODELS.ProcureAccess.Entities;
 using Npgsql;
@@ -44,7 +44,7 @@ public sealed class OrganizationEndpointsTests(ApiFixture api) : IntegrationTest
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => AccountOf(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -413,18 +413,6 @@ public sealed class OrganizationEndpointsTests(ApiFixture api) : IntegrationTest
 
     private Task<HttpResponseMessage> PatchRoleAsync(HttpClient client, TestUser member, string role) =>
         client.PatchAsJsonAsync(MemberPath(Fixture.A.Id, member.Id), new { role }, Cancellation);
-
-    /// <summary>The legacy account of a fixture user, so the addresses and the confirmation gate are real.</summary>
-    private static User AccountOf(TestUser user, bool confirmed) => new()
-    {
-        Id = user.Id,
-        UserName = user.Email,
-        NormalizedUserName = user.Email.ToUpperInvariant(),
-        Email = user.Email,
-        NormalizedEmail = user.Email.ToUpperInvariant(),
-        EmailConfirmed = confirmed,
-        SecurityStamp = Guid.NewGuid().ToString(),
-    };
 
     private async Task<OrganizationRole?> RoleOfAsync(Guid organizationId, TestUser user)
     {

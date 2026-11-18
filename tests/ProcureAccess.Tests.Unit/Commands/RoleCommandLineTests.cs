@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using API.ProcureAccess.Commands;
+using ProcureAccess.Modules.IdentityAccess.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;

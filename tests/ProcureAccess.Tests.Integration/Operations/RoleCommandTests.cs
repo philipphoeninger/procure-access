@@ -2,7 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-using API.ProcureAccess.Commands;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Tenancy;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.IdentityAccess.Commands;
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +40,7 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
         result.ExitCode.ShouldBe(RoleCommandLine.Success);
         result.Output.ShouldStartWith($"Granted the role Moderator to {Alice}.");
         result.Error.ShouldBeEmpty();
-        (await RolesOfAsync(Alice)).ShouldBe([Roles.Moderator]);
+        (await RolesOfAsync(Alice)).ShouldBe([PlatformRoles.Moderator]);
     }
 
     [Fact]
@@ -47,7 +51,7 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
         var result = await RunAsync($"roles grant {Alice} platformadmin");
 
         result.ExitCode.ShouldBe(RoleCommandLine.Success);
-        (await RolesOfAsync(Alice)).ShouldBe([Roles.PlatformAdmin]);
+        (await RolesOfAsync(Alice)).ShouldBe([PlatformRoles.PlatformAdmin]);
     }
 
     [Fact]
@@ -60,7 +64,7 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
 
         result.ExitCode.ShouldBe(RoleCommandLine.Success);
         result.Output.ShouldBe($"{Alice} already has the role CatalogEditor; nothing changed.{Environment.NewLine}");
-        (await RolesOfAsync(Alice)).ShouldBe([Roles.CatalogEditor]);
+        (await RolesOfAsync(Alice)).ShouldBe([PlatformRoles.CatalogEditor]);
     }
 
     [Fact]
@@ -74,7 +78,7 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
 
         result.ExitCode.ShouldBe(RoleCommandLine.Success);
         result.Output.ShouldStartWith($"Revoked the role Moderator from {Alice}.");
-        (await RolesOfAsync(Alice)).ShouldBe([Roles.PlatformAdmin]);
+        (await RolesOfAsync(Alice)).ShouldBe([PlatformRoles.PlatformAdmin]);
     }
 
     [Fact]
@@ -190,7 +194,7 @@ public sealed class RoleCommandTests(ApiFixture api) : IntegrationTest(api)
     private async Task<List<string?>> RolesOfAsync(string email)
     {
         await using var scope = Api.Factory.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var db = scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>();
         return await (
             from user in db.Users
             join userRole in db.UserRoles on user.Id equals userRole.UserId

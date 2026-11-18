@@ -6,8 +6,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 
 /// <summary>
 /// Invitations into an organisation by e-mail (SPEC R-ORG-02, R-ORG-03; ARCHITECTURE §5.2, §9.1,
-/// C72, C80; S5-17a). The host's invitation endpoints call it, because the invited and the signed-in
-/// addresses come from the legacy users (until M3.1). An invitation is bound to the invited address,
+/// C72, C80; S5-17a). The invitation endpoints call it with the invited and the signed-in
+/// address. An invitation is bound to the invited address,
 /// carries the role chosen on invitation, is valid for the 🔧 <see cref="Lifetime"/> and accepted at
 /// most once; only the hash of the link's token is stored (SEC-11).
 /// </summary>

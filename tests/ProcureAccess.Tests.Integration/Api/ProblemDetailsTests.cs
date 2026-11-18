@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ProcureAccess.Modules.IdentityAccess.Domain;
 using System.Net;
 using System.Reflection;
 using System.Security.Claims;

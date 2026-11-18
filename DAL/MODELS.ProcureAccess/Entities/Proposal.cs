@@ -8,12 +8,15 @@ namespace MODELS.ProcureAccess.Entities;
 public partial class Proposal : BaseEntity
 {
     #region fields
+    /// <summary>
+    /// The user id of the proposer, without a relation: the users live in the IdentityAccess
+    /// module's context since S6-10, and no foreign key crosses two contexts (ADR-014 rule 5).
+    /// </summary>
     [Required]
     public string ProposerId { get; set; } = null!;
-    public User Proposer { get; set; } = null!;
 
+    /// <summary>The user id of the reviewer, without a relation like <see cref="ProposerId"/>.</summary>
     public string? ApproverId { get; set; }
-    public User? Approver { get; set; }
 
     [ForeignKey("Product")]
     public int? ProductId { get; set; }

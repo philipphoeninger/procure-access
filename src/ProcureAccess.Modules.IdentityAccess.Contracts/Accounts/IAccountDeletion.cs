@@ -6,9 +6,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 /// <summary>
 /// The IdentityAccess part of the account deletion (SPEC R-AUTH-10; ARCHITECTURE C79; TEN-11;
-/// S5-28a): the organisation rules and the rows of one user. The host's endpoint
-/// <c>DELETE /api/v1/account</c> calls it for the signed-in user, because the account itself is
-/// still a legacy user (until M3.1).
+/// S5-28a): the organisation rules and the rows of one user. The endpoint
+/// <c>DELETE /api/v1/account</c> calls it for the signed-in user.
 /// </summary>
 /// <remarks>
 /// <para><b>Two steps, because the modules share no transaction (ADR-014).</b>

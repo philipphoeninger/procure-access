@@ -8,9 +8,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 /// <summary>
 /// The IdentityAccess part of the personal data export (SPEC R-AUTH-09, §8.4; ARCHITECTURE C79;
-/// PRV-07; S5-27): the memberships and contributor profiles of one user. The host's endpoint
-/// <c>GET /api/v1/account/export</c> calls it for the signed-in user and adds the account fields of
-/// the legacy users (until M3.1).
+/// PRV-07; S5-27): the memberships and contributor profiles of one user. The endpoint
+/// <c>GET /api/v1/account/export</c> calls it for the signed-in user and adds the account fields.
 /// </summary>
 /// <remarks>
 /// Nothing in the answer names another user or carries an id: no organisation id, no profile id,

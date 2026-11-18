@@ -4,7 +4,12 @@
 
 namespace DAL.ProcureAccess.EFStructures;
 
-public partial class ApplicationDBContext : IdentityDbContext<User>
+/// <summary>
+/// The legacy context: the legacy catalog, products and proposals until their steps retire them.
+/// The users and roles left it with S6-10 (ADR-014 rule 4): the seven ASP.NET Core Identity
+/// tables belong to the IdentityAccess module's context, with their rows.
+/// </summary>
+public partial class ApplicationDBContext : DbContext
 {
     #region ctors
     public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
@@ -40,16 +45,6 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // configure Identity Framework schema
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<User>().ToTable("Users", "identity");
-        modelBuilder.Entity<IdentityRole>().ToTable("Roles", "identity");
-        modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims", "identity");
-        modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "identity");
-        modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", "identity");
-        modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "identity");
-        modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "identity");
-
         new FilterTypeConfiguration().Configure(modelBuilder.Entity<FilterType>());
         new CriterionConfiguration().Configure(modelBuilder.Entity<Criterion>());
         new CriteriaFilterConfiguration().Configure(modelBuilder.Entity<CriteriaFilter>());
@@ -57,7 +52,6 @@ public partial class ApplicationDBContext : IdentityDbContext<User>
         new CriteriaFilterExclusionConfiguration().Configure(modelBuilder.Entity<CriteriaFilterExclusion>());
         new ProductCriteriaFilterConfiguration().Configure(modelBuilder.Entity<ProductCriteriaFilter>());
         new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
-        new UserConfiguration().Configure(modelBuilder.Entity<User>());
 
         //modelBuilder.ApplyConfigurationsFromAssembly(
         //	typeof(ApplicationDBContext).Assembly);

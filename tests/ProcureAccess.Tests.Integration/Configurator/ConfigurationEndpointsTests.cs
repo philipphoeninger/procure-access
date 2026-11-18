@@ -46,7 +46,7 @@ public sealed class ConfigurationEndpointsTests(ApiFixture api) : IntegrationTes
         await ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
         _tenants = Tenants.Build(Clock.GetUtcNow());
         await StoreAsync(_tenants.Entities);
-        await StoreAsync([.. TestUsers.ByName.Values.Select(u => LegacyAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: u != TestUsers.ReaderB))]);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
@@ -294,7 +294,7 @@ public sealed class ConfigurationEndpointsTests(ApiFixture api) : IntegrationTes
         var body = SaveBody(Fixture.A.Id, "Liste", criteria);
         (await client.PostAsJsonAsync(Path, body, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
 
-        await LegacyAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
+        await TestAccounts.ConfirmAsync(Api.Factory.Services, TestUsers.ReaderB);
         using var response = await client.PostAsJsonAsync(Path, body, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
