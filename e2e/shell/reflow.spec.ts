@@ -22,7 +22,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * since S5-20b; since S5-21b the saved list editable for its Owner (filter row and action bar) and
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
- * S5-31. The legacy screens are
+ * S5-31; the project list S30 and the create dialog S31 since S6-13. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -141,6 +141,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expect(switchList.getByRole('button')).toHaveCount(2);
     await expectReflow(page);
     for (const item of [
+      drawer.getByRole('link', { name: 'Projekte' }),
       ...(await switchList.getByRole('button').all()),
       drawer.getByRole('link', { name: 'Konto' }),
       drawer.getByRole('link', { name: 'Organisation', exact: true }),
@@ -248,6 +249,44 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await main.getByRole('button', { name: 'Liste löschen' }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Kriterienliste löschen?' });
     await expect(dialog).toBeVisible();
+    await expectReflow(page);
+    await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+  });
+
+  test('S30 with projects and the archived filter, and S31 with its error summary, need no horizontal scrolling', async ({ page }) => {
+    // The projects are answered here, and S31 is only submitted empty and cancelled: the seeded
+    // organisation stays unchanged (owner decision S5-16 7a)
+    await page.route(`**/api/v1/organizations/${E2E_ORGANIZATION.id}/projects`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: [
+          {
+            id: '0e2e0000-0000-4000-8000-0000000000b1',
+            name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+            status: 'open',
+            productCount: 12,
+            modifiedAt: '2026-11-16T09:00:00Z',
+          },
+          { id: '0e2e0000-0000-4000-8000-0000000000b2', name: 'Zeiterfassung', status: 'archived', productCount: 0, modifiedAt: '2026-11-15T09:00:00Z' },
+        ],
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto('/projekte');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: 'Beschaffungsprojekte' })).toBeVisible();
+    await expect(main.getByRole('listitem')).toHaveCount(1);
+    await main.getByRole('checkbox', { name: 'Archivierte Projekte anzeigen' }).check();
+    await expect(main.getByRole('listitem')).toHaveCount(2);
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Projekt anlegen' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
+    await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
+    await expectReflow(page);
+
+    await dialog.getByRole('button', { name: 'Projekt anlegen' }).click();
+    await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
     await expectReflow(page);
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });

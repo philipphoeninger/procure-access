@@ -79,4 +79,23 @@ describe('ProcureAccessStore (root store, S6-24)', () => {
     expect(store.isLoading()).toBe(false);
     expect(store.productsLoaded()).toBe(false);
   });
+
+  it('forgets the projects of the workspace with the user’s other data (S6-13)', async () => {
+    const store = setUp();
+    backend.expectOne(PROBE).flush({ user: null });
+    await settle();
+    backend.expectOne(PRODUCTS).flush({ value: [] });
+    await settle();
+
+    const load = store.loadProjects('o1');
+    backend
+      .expectOne('/api/v1/organizations/o1/projects')
+      .flush([{ id: 'p1', name: 'Projekt', status: 'open', productCount: 0, modifiedAt: '2026-11-18T09:00:00Z' }]);
+    await load;
+    expect(store.workspace.projects().items).toHaveLength(1);
+
+    store.clearUserData();
+
+    expect(store.workspace.projects()).toEqual({ organizationId: null, status: 'idle', items: [] });
+  });
 });

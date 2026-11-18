@@ -54,8 +54,11 @@ export const PAGES = {
 // Mapped paths where a file exists that is not the mapped component or page yet (TESTING V60), with the reason.
 // They get a notice instead of a failure while they carry no tag of this Figma file; a wrong node still fails.
 // Remove an entry when the mapped file replaces it (the check says so), or when the file is gone (the check fails).
-// Empty since S2-15 (the shell header carries its tag).
-export const PENDING = {};
+// Empty from S2-15 (the shell header carries its tag) until S6-13.
+export const PENDING = {
+  'src/app/features/workspace/pages/project-detail/project-detail.ts':
+    'S32 placeholder of S6-13 (name, status line, archived note); S6-14 builds it from its frames and adds the tag',
+};
 
 /** Node ids of the @figma lines of a source in their order; null for a link to another file or a foreign URL. */
 export function figmaTags(source) {

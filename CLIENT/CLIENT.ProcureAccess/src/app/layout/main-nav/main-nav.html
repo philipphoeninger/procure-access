@@ -13,6 +13,15 @@ SPDX-License-Identifier: MIT
         [attr.cdkFocusInitial]="layout() === 'drawer' ? '' : null"
         (click)="navigated.emit()">{{ 'shell.nav.criteria' | translate }}</a>
     </li>
+    @if (activeOrganization()) {
+      <!-- „Projekte“ (R-SHL-02): S30, only with a membership (state SignedIn), between „Kriterien“ and
+           „Produkte“ as in Figma `2017:565`; current on S30 and on every page of a project -->
+      <li>
+        <a matButton class="pa-main-nav__item" [routerLink]="projectsLink"
+          routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
+          (click)="navigated.emit()">{{ 'shell.nav.projects' | translate }}</a>
+      </li>
+    }
     <li>
       <a matButton class="pa-main-nav__item" routerLink="/products"
         routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
