@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text.Json.Serialization;
+using ProcureAccess.Modules.Workspace.Candidates;
 
 namespace ProcureAccess.Modules.Workspace.Projects;
 
@@ -28,14 +29,19 @@ internal sealed record ChangeProjectBody(string? Name, string? Status);
 /// stored but not served (owner decision S6-11 4 (a)).
 /// </summary>
 /// <param name="Status"><c>open</c>, <c>done</c> or <c>archived</c> (<c>projects.status.*</c>).</param>
-/// <param name="ProductCount">The number of candidate products; 0 until they exist (S6-15).</param>
-/// <param name="ModifiedAt">The last change of the project.</param>
+/// <param name="ProductCount">The number of candidate products (S6-15).</param>
+/// <param name="Candidates">The candidate products, in the order they were added (S6-15).</param>
+/// <param name="ModifiedAt">
+/// The last change of the project, also of a candidate, its test status or an evidence (owner
+/// decision S6-15 5 (a)).
+/// </param>
 internal sealed record ProjectResponse(
     Guid Id,
     Guid OrganizationId,
     string Name,
     string Status,
     int ProductCount,
+    IReadOnlyList<CandidateSummaryResponse> Candidates,
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt);
 

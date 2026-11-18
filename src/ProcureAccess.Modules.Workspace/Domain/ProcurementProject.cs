@@ -7,7 +7,7 @@ namespace ProcureAccess.Modules.Workspace.Domain;
 /// <summary>
 /// A procurement project, the Beschaffungsvorgang (ARCHITECTURE §5.4; SPEC R-PRJ-01, R-PRJ-05):
 /// owned by an organisation, with a name and a status. Its copy of a criteria list (C53) comes
-/// with S6-12, its candidate products with S6-15. A project is never deleted in v1 (SPEC §3).
+/// with S6-12; its candidate products (<see cref="CandidateProduct"/>, S6-15) refer to it. A project is never deleted in v1 (SPEC §3).
 /// </summary>
 internal sealed class ProcurementProject
 {
@@ -33,7 +33,10 @@ internal sealed class ProcurementProject
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    /// <summary>When the name or the status last changed; the creation time until then.</summary>
+    /// <summary>
+    /// When the name, the status or something below the project last changed (<see cref="MarkChanged"/>);
+    /// the creation time until then.
+    /// </summary>
     public DateTimeOffset ModifiedAt { get; private set; }
 
     /// <summary>An archived project is read-only for everyone; only its status may change (R-PRJ-05).</summary>
@@ -103,6 +106,21 @@ internal sealed class ProcurementProject
         }
 
         Status = status;
+        ModifiedAt = now;
+    }
+
+    /// <summary>
+    /// Records a change below the project — a candidate, its test status, an evidence — as the
+    /// project's last change (owner decision S6-15 5 (a)). Throws for an archived project, which
+    /// changes nothing but its status.
+    /// </summary>
+    public void MarkChanged(DateTimeOffset now)
+    {
+        if (IsArchived)
+        {
+            throw new InvalidOperationException("Nothing of an archived project changes but its status.");
+        }
+
         ModifiedAt = now;
     }
 

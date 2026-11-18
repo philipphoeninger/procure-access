@@ -66,6 +66,9 @@ public static class CatalogModule
         // A saved selection carried over to the active release, for „Neue Liste mit derselben Auswahl“ (CAT-22, S5-21a).
         services.AddScoped<ICatalogReleaseCarryOver, CatalogReleaseCarryOver>();
 
+        // The keys of the test procedures, for the test evidences of the workspace (S6-15).
+        services.AddScoped<ICatalogTestTypes, CatalogTestTypes>();
+
         return services;
     }
 
