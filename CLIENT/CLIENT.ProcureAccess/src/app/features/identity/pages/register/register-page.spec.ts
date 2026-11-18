@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
@@ -153,19 +153,57 @@ describe('RegisterPage (S02, R-AUTH-01)', () => {
     await expectNoAxeViolations();
   });
 
-  it('binds the server field errors to their fields (API-02)', async () => {
-    const refused = new HttpErrorResponse({
-      status: 400,
-      error: { type: `${base}validation`, errors: { email: ['The e-mail address is not valid.'] } },
-    });
-    const { fixture } = await openPage({ rejectWith: refused });
+  // API-02 moved here from the legacy product proposal (S2-11) before the proposals went (S6-23).
+  // "Announced" (WCAG 3.3.1) means the focus on the error summary, not a live region (S2-11 decision 1).
+  const emailError = 'The e-mail address is not valid.';
+  const bodyError = 'The request body is invalid.';
+
+  function validationProblem(errors: Record<string, string[]>) {
+    return new HttpErrorResponse({ status: 400, error: { type: `${base}validation`, title: 'Validation failed', status: 400, errors } });
+  }
+
+  it('Submit_ServerFieldErrors_BoundToFieldsAndSummaryFocused INV:API-02', async () => {
+    const { fixture } = await openPage({ rejectWith: validationProblem({ email: [emailError], $: [bodyError] }) });
 
     fill({ email: 'ada@example.test', password: goodPassword, consent: true });
     await submit(fixture);
 
-    expect(screen.getByRole('link', { name: 'E-Mail-Adresse: The e-mail address is not valid.' })).toBeTruthy();
-    expect(screen.getByLabelText('E-Mail-Adresse').getAttribute('aria-invalid')).toBe('true');
+    // The summary names the number of errors and takes the focus, so it is announced.
+    const heading = screen.getByRole('heading', { level: 2, name: 'Fehler: 2 Angaben müssen noch korrigiert werden' });
+    const notice = heading.closest('pa-notice') as HTMLElement;
+    expect(document.activeElement).toBe(notice);
+
+    // The field error sits at the field and is linked to it.
+    const email = screen.getByLabelText('E-Mail-Adresse');
+    const fieldError = screen.getByText(emailError, { selector: 'mat-error' });
+    expect(email.getAttribute('aria-invalid')).toBe('true');
+    expect(email.getAttribute('aria-describedby')?.split(' ')).toContain(fieldError.id);
+
+    // A known field is a link in the summary that moves the focus to the field;
+    // a path without a field ($ = the whole body) is a line without a link.
+    const summary = within(notice);
+    summary.getByRole('link', { name: `E-Mail-Adresse: ${emailError}` }).click();
+    expect(document.activeElement).toBe(email);
+    expect(summary.getByText(bodyError).closest('a')).toBeNull();
+    expect(summary.getAllByRole('link')).toHaveLength(1);
     expect(screen.queryByRole('heading', { name: 'E-Mail-Adresse bestätigen' })).toBeNull();
+  });
+
+  it('removes a server field error when the user edits the field and focuses the summary again on the next refusal', async () => {
+    const { fixture } = await openPage({ rejectWith: validationProblem({ email: [emailError] }) });
+    fill({ email: 'ada@example.test', password: goodPassword, consent: true });
+    await submit(fixture);
+
+    fill({ email: 'grace@example.test' });
+    await fixture.whenStable();
+    expect(screen.getByLabelText('E-Mail-Adresse').getAttribute('aria-invalid')).toBe('false');
+    expect(screen.queryByText(emailError, { selector: 'mat-error' })).toBeNull();
+
+    screen.getByLabelText('E-Mail-Adresse').focus();
+    await submit(fixture);
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Fehler: 1 Angabe muss noch korrigiert werden' });
+    expect(document.activeElement).toBe(heading.closest('pa-notice'));
   });
 
   it('shows the rate limit with its minutes in the error summary (API-05)', async () => {
