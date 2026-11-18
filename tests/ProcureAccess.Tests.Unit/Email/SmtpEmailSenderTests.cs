@@ -91,6 +91,7 @@ public class SmtpEmailSenderTests
                 ["Email:Smtp:Host"] = "mailpit",
                 ["Email:Smtp:Port"] = "1025",
                 ["Email:Smtp:Security"] = "None",
+                ["Email:Smtp:Timeout"] = "00:00:15",
                 ["Email:From"] = "noreply@procureaccess.example",
             }).Build(),
             new HostingEnvironment { EnvironmentName = "Development" });

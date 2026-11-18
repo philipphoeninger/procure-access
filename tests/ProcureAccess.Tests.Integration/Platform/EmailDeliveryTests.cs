@@ -116,6 +116,7 @@ public sealed partial class EmailDeliveryTests(MailpitContainer mailpit) : IClas
                 ["Email:Smtp:Host"] = mailpit.Host,
                 ["Email:Smtp:Port"] = mailpit.SmtpPort.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["Email:Smtp:Security"] = "None",
+                ["Email:Smtp:Timeout"] = "00:00:15",
                 ["Email:From"] = Sender,
                 ["Email:DisplayName"] = "ProcureAccess",
             }).Build(),

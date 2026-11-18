@@ -58,6 +58,18 @@ public class EmailSettingsTests
         settings.Password.ShouldBe("secret-password");
         settings.Sender.Address.ShouldBe("noreply@example.test");
         settings.Sender.Name.ShouldBe("ProcureAccess");
+        settings.Timeout.ShouldBe(TimeSpan.FromSeconds(15));
+    }
+
+    [Fact]
+    public void From_AppSettingsOfTheApi_HoldTheOwnersTimeout()
+    {
+        // O-S6-3 (2026-11-18): 15 s per SMTP operation, read from the API's appsettings.json.
+        var appSettings = new ConfigurationBuilder()
+            .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false)
+            .Build();
+
+        appSettings["Email:Smtp:Timeout"].ShouldBe("00:00:15");
     }
 
     [Theory]
@@ -65,6 +77,10 @@ public class EmailSettingsTests
     [InlineData("Email:Smtp:Port", "0")]
     [InlineData("Email:Smtp:Port", "smtp")]
     [InlineData("Email:Smtp:Security", "Opportunistic")]
+    [InlineData("Email:Smtp:Timeout", "")]
+    [InlineData("Email:Smtp:Timeout", "00:00:00")]
+    [InlineData("Email:Smtp:Timeout", "-00:00:15")]
+    [InlineData("Email:Smtp:Timeout", "30.00:00:00")]
     [InlineData("Email:From", "")]
     [InlineData("Email:From", "not an address")]
     public void From_ImpossibleValue_StopsTheStartInEveryEnvironment(string key, string value)
@@ -105,6 +121,7 @@ public class EmailSettingsTests
         {
             ["Email:Smtp:Host"] = "smtp.example.test",
             ["Email:Smtp:Port"] = "587",
+            ["Email:Smtp:Timeout"] = "00:00:15",
             ["Email:From"] = "noreply@example.test",
             ["Email:DisplayName"] = "ProcureAccess",
         };
