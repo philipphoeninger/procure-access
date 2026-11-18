@@ -11,9 +11,9 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// most one user, so <see cref="ContributorProfileId"/> is the key.
 /// </summary>
 /// <remarks>
-/// <see cref="UserId"/> names a row of the legacy table <c>identity."Users"</c> without a foreign
-/// key: no key crosses two database contexts (ADR-014). Account deletion removes the link
-/// (SPEC R-AUTH-10, „detached“) once users belong to this module.
+/// <see cref="UserId"/> names a row of <c>identity."Users"</c>, with a foreign key since S6-10b.
+/// Account deletion will remove the link (SPEC R-AUTH-10, „detached“) with the step that builds
+/// the contributor profiles (owner decision S5-28 3).
 /// </remarks>
 internal sealed class UserContributorLink
 {

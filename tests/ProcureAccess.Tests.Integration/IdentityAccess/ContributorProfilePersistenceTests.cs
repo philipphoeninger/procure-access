@@ -27,6 +27,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
         var profile = ContributorProfile.Create("Leselupe", ContributorKind.Auditor, Clock.GetUtcNow());
 
         await StoreAsync(profile, UserContributorLink.Create("user-1", profile));
@@ -47,6 +48,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     public async Task Store_DisplayNameDifferingOnlyInCase_IsRefused(string secondName)
     {
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
         await StoreAsync(ContributorProfile.Create("Leselupe", ContributorKind.Individual, Clock.GetUtcNow()));
 
         var exception = await Should.ThrowAsync<DbUpdateException>(() =>
@@ -60,6 +62,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
 
         await StoreAsync(
             ContributorProfile.Create("Bar", ContributorKind.Individual, Clock.GetUtcNow()),
@@ -74,6 +77,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     public async Task Store_SecondLinkForTheSameProfile_IsRefused()
     {
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
         var profile = ContributorProfile.Create("Leselupe", ContributorKind.Individual, Clock.GetUtcNow());
         await StoreAsync(profile, UserContributorLink.Create("user-1", profile));
 
@@ -88,6 +92,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
         var individual = ContributorProfile.Create("Leselupe", ContributorKind.Individual, Clock.GetUtcNow());
         var vendor = ContributorProfile.Create("Beispiel GmbH", ContributorKind.Vendor, Clock.GetUtcNow());
 
@@ -103,6 +108,7 @@ public sealed class ContributorProfilePersistenceTests(ApiFixture api) : Integra
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await Api.ResetDatabaseAsync();
+        await StoreAsync(TestAccounts.WithId("user-1"), TestAccounts.WithId("user-2"));
         var profile = ContributorProfile.Create("Leselupe", ContributorKind.Individual, Clock.GetUtcNow());
         await StoreAsync(profile, UserContributorLink.Create("user-1", profile));
 

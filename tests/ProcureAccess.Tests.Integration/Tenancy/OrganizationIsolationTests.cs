@@ -101,6 +101,8 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         var now = Clock.GetUtcNow();
         var a = Organization.Create("Organisation A", OrganizationType.PublicBody, "owner-a", now);
         var b = Organization.Create("Organisation B", OrganizationType.Company, "owner-b", now);
+        // The users the rows name: organisations and memberships reference them (S6-10b).
+        await StoreAsync(TestAccounts.WithId("owner-a"), TestAccounts.WithId("owner-b"), TestAccounts.WithId("sample-user"));
         await StoreAsync(a, b);
         var entityType = Type.GetType(entityTypeName) ?? ScopedEntityTypes().Single(t => t.FullName == entityTypeName);
         var sample = Samples[entityType](a, now);

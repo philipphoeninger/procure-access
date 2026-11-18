@@ -10,4 +10,4 @@
 # The image brings its own Node (26 from Playwright 1.65 on); e2e/.nvmrc stays the Node of npm ci
 # and local runs. e2e/ has no native module, so its node_modules run on either.
 # CI only reads this line; nothing builds the file.
-FROM mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d
+FROM mcr.microsoft.com/playwright:v1.65.1-noble@sha256:1507cbfc550a63a6b7396791ca4f00df17beb56342d2447b3f106c306f525579

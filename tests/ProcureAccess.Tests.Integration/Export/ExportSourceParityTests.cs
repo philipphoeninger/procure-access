@@ -43,6 +43,8 @@ public sealed class ExportSourceParityTests(ApiFixture api) : IntegrationTest(ap
     {
         await Api.ResetDatabaseAsync();
         _tenants = Tenants.Build(Clock.GetUtcNow());
+        // The accounts first: organisations and memberships reference them (foreign keys, S6-10b).
+        await StoreAsync([.. TestUsers.ByName.Values.Select(u => TestAccounts.Of(u, confirmed: true))]);
         await StoreAsync(_tenants.Entities);
         await ExportTestCatalog.ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
     }

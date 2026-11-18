@@ -16,7 +16,7 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// </summary>
 internal sealed class OrganizationInvitation
 {
-    /// <summary>Longest address: the column of the legacy <c>identity."Users"</c>.</summary>
+    /// <summary>Longest address: the column of <c>identity."Users"</c>.</summary>
     public const int EmailMaxLength = 256;
 
     private OrganizationInvitation()

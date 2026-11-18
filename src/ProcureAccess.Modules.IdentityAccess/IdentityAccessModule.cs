@@ -224,7 +224,7 @@ public static class IdentityAccessModule
     public const int RolesCommandFailure = RoleCommandLine.Failure;
 
     /// <summary>
-    /// The Development rebuild of the users (SEC-06): deletes every account and creates the sample
+    /// The Development rebuild of the users (SEC-06): deletes every organisation and account and creates the sample
     /// user <see cref="SampleUserEmail"/> with <paramref name="sampleUserPassword"/>; without a
     /// password no user is created. Returns true when it created the user. The host calls it only in
     /// <c>Development</c> with <c>RebuildDatabase</c> set; nothing here checks the environment.

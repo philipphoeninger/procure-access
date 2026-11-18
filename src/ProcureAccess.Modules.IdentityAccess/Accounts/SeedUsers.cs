@@ -5,6 +5,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.IdentityAccess.Persistence;
 
 namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 
@@ -15,18 +16,25 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// host decides whether either may run (<c>Development</c>, <c>E2E</c>, the settings); this class
 /// checks nothing about the environment.
 /// </summary>
-internal sealed class SeedUsers(UserManager<User> users)
+internal sealed class SeedUsers(UserManager<User> users, IdentityAccessDbContext db)
 {
     /// <summary>The sample user of the Development rebuild; its address is confirmed.</summary>
     public const string SampleUserEmail = "sample.user@example.org";
 
     /// <summary>
-    /// Deletes every account (a soft-deleted row stays, as before S6-10) and creates the sample user with
+    /// Deletes every organisation and every account (a soft-deleted row stays, as before S6-10) and
+    /// creates the sample user with
     /// <paramref name="sampleUserPassword"/>. Without a password no user is created: a fixed
     /// password or hash would be public in the repository. Returns true when it created the user.
     /// </summary>
     public async Task<bool> RebuildAsync(string? sampleUserPassword, CancellationToken cancellationToken)
     {
+        // The organisations first: their creator is a foreign key with restrict (S6-10b), and an
+        // organisation without its users is of no use. Outside a request the filter shows none, so
+        // the delete goes past it (TEN-02 allow-list; Development only). Memberships and
+        // invitations cascade; tokens, memberships and settings of a user go with the user row.
+        await db.Organizations.IgnoreQueryFilters().ExecuteDeleteAsync(cancellationToken);
+
         foreach (var user in await users.Users.ToListAsync(cancellationToken))
         {
             await users.DeleteAsync(user);

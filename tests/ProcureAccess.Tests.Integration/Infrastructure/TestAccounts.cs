@@ -29,6 +29,24 @@ internal static class TestAccounts
         SecurityStamp = Guid.NewGuid().ToString(),
     };
 
+    /// <summary>
+    /// An account with the id <paramref name="userId"/> for a test that only needs the row its other
+    /// rows reference (the foreign keys onto the users, S6-10b); the address is made from the id.
+    /// </summary>
+    public static User WithId(string userId)
+    {
+        var address = $"{userId}@example.test";
+        return new User
+        {
+            Id = userId,
+            UserName = address,
+            NormalizedUserName = address.ToUpperInvariant(),
+            Email = address,
+            NormalizedEmail = address.ToUpperInvariant(),
+            SecurityStamp = Guid.NewGuid().ToString(),
+        };
+    }
+
     /// <summary>Confirms the stored account's address, as the confirmation link does.</summary>
     public static async Task ConfirmAsync(IServiceProvider services, TestUser user)
     {
