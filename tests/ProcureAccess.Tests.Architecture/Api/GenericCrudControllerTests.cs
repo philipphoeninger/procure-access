@@ -21,7 +21,7 @@ public class GenericCrudControllerTests
         [typeof(CriteriaController), typeof(CriteriaFiltersController), typeof(FilterTypesController)];
 
     /// <summary>
-    /// Deferred part of ARC-05 (TESTING V313, owner decision S6-23 D3 (a)): the legacy product read
+    /// Deferred part of ARC-05 (TESTING V317, owner decision S6-23 D3 (a)): the legacy product read
     /// belongs to the directory, not to catalog administration, and stays on the generic base until
     /// step 6 retires it. Remove the entry with the controller; never add one.
     /// </summary>

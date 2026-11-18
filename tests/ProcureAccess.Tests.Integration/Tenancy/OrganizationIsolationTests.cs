@@ -18,6 +18,8 @@ using ProcureAccess.Modules.IdentityAccess.Tenancy;
 using ProcureAccess.Modules.Platform.Contracts.Sharing;
 using ProcureAccess.Modules.Platform.Persistence;
 using ProcureAccess.Modules.Platform.Sharing;
+using ProcureAccess.Modules.Workspace.Domain;
+using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
@@ -42,6 +44,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         typeof(CatalogDbContext),
         typeof(IdentityAccessDbContext),
         typeof(ConfiguratorDbContext),
+        typeof(WorkspaceDbContext),
     ];
 
     /// <summary>
@@ -62,6 +65,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
                     [new ConfigurationCriterionDraft(1, PriorityLevel.A)]),
             [typeof(ShareLink)] = (a, now) =>
                 ShareLink.Create(a.Id, ShareableResourceType.Configuration, Guid.NewGuid(), new byte[32], now, now.AddDays(90)),
+            [typeof(ProcurementProject)] = (a, now) => ProcurementProject.Create(a.Id, "Sample project", "sample-user", now),
         };
 
     public static TheoryData<string> ScopedEntityNames => [.. ScopedEntityTypes().Select(t => t.FullName!)];
@@ -77,6 +81,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         types.ShouldContain(typeof(OrganizationInvitation));
         types.ShouldContain(typeof(CriteriaConfiguration));
         types.ShouldContain(typeof(ShareLink));
+        types.ShouldContain(typeof(ProcurementProject));
         types.ShouldBe(Samples.Keys, ignoreOrder: true,
             "Every entity with OrganizationId needs a sample row in Samples (TEN-01), and every sample a live entity.");
     }
@@ -159,6 +164,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
             new CatalogDbContext(Options<CatalogDbContext>(connectionString), TimeProvider.System),
             new IdentityAccessDbContext(Options<IdentityAccessDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),
             new ConfiguratorDbContext(Options<ConfiguratorDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),
+            new WorkspaceDbContext(Options<WorkspaceDbContext>(connectionString), Modules.Platform.Contracts.Tenancy.FixedOrganizationContext.None),
         };
         try
         {

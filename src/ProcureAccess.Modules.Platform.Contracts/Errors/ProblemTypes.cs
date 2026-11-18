@@ -66,11 +66,18 @@ public static class ProblemTypes
     /// </summary>
     public const string SoleOwner = "sole-owner";
 
+    /// <summary>
+    /// 409: a change of an archived procurement project that is more than a change of its status
+    /// (SPEC §8.6 v2.49, R-PRJ-05; S6-11); the client shows <c>projects.archived.note</c>.
+    /// </summary>
+    public const string ProjectArchived = "project-archived";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
         EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
+        ProjectArchived,
     ];
 }
