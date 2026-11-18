@@ -11,7 +11,10 @@ import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { SavedListSummary } from '@app/features/configurator/models/saved-lists';
+import { ConfiguratorApiService } from '@app/features/configurator/services/api/configurator-api.service';
 import { OrganizationSummary } from '@app/features/organization/models/organization';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
@@ -35,7 +38,12 @@ const CREATED: Project = {
   productCount: 0,
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
+  criteriaList: null,
 };
+
+function savedList(id: string, name: string): SavedListSummary {
+  return { id, name, releaseVersion: 'T.1', createdAt: '2026-11-10T09:00:00Z', modifiedAt: '2026-11-10T09:00:00Z' };
+}
 
 function problem(status: number, body: object): HttpErrorResponse {
   return new HttpErrorResponse({ status, error: body });
@@ -44,9 +52,19 @@ function problem(status: number, body: object): HttpErrorResponse {
 describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', () => {
   let create: ReturnType<typeof vi.fn>;
   let announce: ReturnType<typeof vi.fn>;
+  let assignCriteriaList: ReturnType<typeof vi.fn>;
+  let listSavedLists: ReturnType<typeof vi.fn>;
+  let showError: ReturnType<typeof vi.fn>;
 
-  async function openDialog({ api = vi.fn().mockResolvedValue(CREATED) }: { api?: ReturnType<typeof vi.fn> } = {}) {
+  async function openDialog({
+    api = vi.fn().mockResolvedValue(CREATED),
+    lists = [],
+    assign = vi.fn().mockResolvedValue({ id: 'copy-1', name: 'Alpha', releaseVersion: 'T.1' }),
+  }: { api?: ReturnType<typeof vi.fn>; lists?: SavedListSummary[] | 'failed'; assign?: ReturnType<typeof vi.fn> } = {}) {
     create = api;
+    assignCriteriaList = assign;
+    listSavedLists = lists === 'failed' ? vi.fn().mockRejectedValue(problem(500, { status: 500 })) : vi.fn().mockResolvedValue(lists);
+    showError = vi.fn();
     announce = vi.fn().mockResolvedValue(undefined);
     testActiveOrganization.set(ORG);
     const rendered = await render(ProjectsPage, {
@@ -55,7 +73,9 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
         provideTestTranslations(),
         provideLayout(false),
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
-        { provide: ProjectsApiService, useValue: { list: vi.fn().mockResolvedValue([]), create } },
+        { provide: ProjectsApiService, useValue: { list: vi.fn().mockResolvedValue([]), create, assignCriteriaList } },
+        { provide: ConfiguratorApiService, useValue: { list: listSavedLists } },
+        { provide: SnackbarService, useValue: { showError } },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: ProcureAccessStore, useClass: WorkspaceTestStore },
       ],
@@ -65,6 +85,8 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
     await new Promise((resolve) => setTimeout(resolve));
     await fixture.whenStable();
     screen.getByRole('button', { name: 'Projekt anlegen' }).click();
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve));
     await fixture.whenStable();
     return { fixture, dialog: screen.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' }) };
   }
@@ -85,6 +107,8 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
     expect(document.activeElement).toBe(field);
     expect(dialog.textContent).toContain('Zum Beispiel „Neues Bewerbermanagement 2027“.');
     expect(within(dialog).getByRole('button', { name: 'Abbrechen' })).toBeTruthy();
+    // Without saved lists there is nothing to choose: the list is assigned later.
+    expect(within(dialog).queryByRole('combobox', { name: 'Kriterienliste (optional)' })).toBeNull();
     await expectNoAxeViolations();
   });
 
@@ -150,5 +174,77 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
 
     await submit(fixture, dialog, 'Mein Projekt 2');
     expect(within(dialog).getByRole('alert').textContent).toContain('Das Projekt konnte nicht angelegt werden.');
+  });
+
+  describe('„Kriterienliste (optional)“ (R-PRJ-02, S6-12)', () => {
+    const LISTS = [savedList('list-b', 'Beta'), savedList('list-a', 'Alpha')];
+
+    async function choose(fixture: { whenStable(): Promise<unknown> }, dialog: HTMLElement, name: string) {
+      within(dialog).getByRole('combobox', { name: 'Kriterienliste (optional)' }).click();
+      await fixture.whenStable();
+      screen.getByRole('option', { name }).click();
+      await fixture.whenStable();
+    }
+
+    it('offers „Keine Liste“, preselected, and the saved lists of the organisation by name, with the hint', async () => {
+      const { fixture, dialog } = await openDialog({ lists: LISTS });
+
+      expect(listSavedLists).toHaveBeenCalledWith('org-1');
+      const select = within(dialog).getByRole('combobox', { name: 'Kriterienliste (optional)' });
+      expect(select.textContent).toContain('Keine Liste');
+      expect(dialog.textContent).toContain('Das Projekt erhält eine eigene Kopie der Liste');
+      await expectNoAxeViolations();
+
+      select.click();
+      await fixture.whenStable();
+      expect(screen.getAllByRole('option').map((option) => option.textContent.trim())).toEqual(['Keine Liste', 'Alpha', 'Beta']);
+    });
+
+    it('gives the new project its own copy of the chosen list, then opens S32 (WSP-02, tagged with S6-18)', async () => {
+      const { fixture, dialog } = await openDialog({ lists: LISTS });
+
+      await choose(fixture, dialog, 'Beta');
+      await submit(fixture, dialog, 'Mit Liste');
+
+      expect(create).toHaveBeenCalledWith('org-1', 'Mit Liste');
+      expect(assignCriteriaList).toHaveBeenCalledWith('p-2', 'list-b');
+      expect(TestBed.inject(Router).url).toBe('/projekte/p-2');
+      expect(announce).toHaveBeenCalledWith('projects.created', { name: 'Mit Liste' });
+      expect(showError).not.toHaveBeenCalled();
+    });
+
+    it('creates the project without a copy for „Keine Liste“', async () => {
+      const { fixture, dialog } = await openDialog({ lists: LISTS });
+
+      await choose(fixture, dialog, 'Alpha');
+      await choose(fixture, dialog, 'Keine Liste');
+      await submit(fixture, dialog, 'Ohne Liste');
+
+      expect(create).toHaveBeenCalledWith('org-1', 'Ohne Liste');
+      expect(assignCriteriaList).not.toHaveBeenCalled();
+    });
+
+    it('opens S32 of the created project with the general notice when the list was not copied (owner decision S6-12 D5 (b))', async () => {
+      const { fixture, dialog } = await openDialog({ lists: LISTS, assign: vi.fn().mockRejectedValue(problem(500, { status: 500 })) });
+
+      await choose(fixture, dialog, 'Alpha');
+      await submit(fixture, dialog, 'Liste fehlt');
+
+      expect(TestBed.inject(Router).url).toBe('/projekte/p-2');
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(announce).toHaveBeenCalledWith('projects.created', { name: 'Liste fehlt' });
+      expect(showError).toHaveBeenCalledWith(
+        'Ein Fehler ist aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support.',
+      );
+    });
+
+    it('leaves the field out when the saved lists cannot be read: the list is assigned later', async () => {
+      const { fixture, dialog } = await openDialog({ lists: 'failed' });
+
+      expect(within(dialog).queryByRole('combobox', { name: 'Kriterienliste (optional)' })).toBeNull();
+      await submit(fixture, dialog, 'Trotzdem');
+      expect(create).toHaveBeenCalledWith('org-1', 'Trotzdem');
+      expect(assignCriteriaList).not.toHaveBeenCalled();
+    });
   });
 });

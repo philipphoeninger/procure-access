@@ -27,6 +27,20 @@ SPDX-License-Identifier: MIT
       }
     </mat-form-field>
 
+    @if (savedLists().length > 0) {
+      <!-- Only lists of the organisation: the server lists no project's copy (R-PRJ-02, S6-12) -->
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'projects.create.criteria' | translate }}</mat-label>
+        <mat-select [formControl]="criteriaList">
+          <mat-option [value]="noList">{{ 'projects.create.criteria.none' | translate }}</mat-option>
+          @for (list of savedLists(); track list.id) {
+            <mat-option [value]="list.id">{{ list.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint [id]="criteriaHintId">{{ 'projects.create.criteria.hint' | translate }}</mat-hint>
+      </mat-form-field>
+    }
+
     @if (error(); as error) {
       <pa-notice kind="error" live="assertive" [title]="'projects.create.error.title' | translate">
         <p>{{ errorKey(error) | translate: { org: organizationName } }}</p>

@@ -19,6 +19,7 @@ const PROJECT: Project = {
   productCount: 0,
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
+  criteriaList: null,
 };
 
 describe('ProjectsApiService', () => {
@@ -64,5 +65,17 @@ describe('ProjectsApiService', () => {
     expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
     request.flush(PROJECT);
     await expect(read).resolves.toEqual(PROJECT);
+  });
+
+  it('gives the project its own copy of a list with a PUT of the source, every failure shown by the caller (R-PRJ-02, R-PRJ-04)', async () => {
+    const assigned = api.assignCriteriaList('p/1', 'list-1');
+
+    const request = backend.expectOne('/api/v1/projects/p%2F1/criteria-configuration');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ sourceConfigurationId: 'list-1' });
+    expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
+    const copy = { id: 'copy-1', name: 'HR-Software 2027', releaseVersion: 'T.1' };
+    request.flush(copy);
+    await expect(assigned).resolves.toEqual(copy);
   });
 });

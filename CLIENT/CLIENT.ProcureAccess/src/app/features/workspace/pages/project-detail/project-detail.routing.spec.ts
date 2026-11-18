@@ -21,6 +21,7 @@ const PROJECT: Project = {
   productCount: 0,
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
+  criteriaList: null,
 };
 
 describe('projectResolver (S32)', () => {

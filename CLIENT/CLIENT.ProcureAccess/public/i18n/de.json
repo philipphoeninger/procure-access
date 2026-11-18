@@ -315,7 +315,8 @@
       "members": "Mitglieder von {{org}}",
       "invite": "Einladung in eine Organisation",
       "invite.invalid": "Einladung nicht mehr gültig"
-    }
+    },
+    "project.criteria": "Kriterienliste – {{project}} – Beschaffungsprojekte"
   },
   "home": {
     "title": "Barrierefreie Software beschaffen – Schritt für Schritt",
@@ -860,6 +861,7 @@
     },
     "archived": {
       "note": "Dieses Projekt ist archiviert. Sie können es ansehen, aber nicht mehr bearbeiten. Um es wieder zu bearbeiten, setzen Sie den Stand auf „Laufend“."
-    }
+    },
+    "create.criteria.none": "Keine Liste"
   }
 }

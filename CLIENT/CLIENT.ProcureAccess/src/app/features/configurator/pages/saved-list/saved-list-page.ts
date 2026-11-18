@@ -84,9 +84,19 @@ const STATUS_KEY = 'criteria.list.status.count';
  * The resolver loads the list, so the title „{{name}} – Gespeicherte Kriterienlisten“ is known at
  * the route change; a list that does not exist for the user shows „Seite nicht gefunden“ in place.
  *
+ * **Project-copy mode** (R-PRJ-06, WSP-03; S6-12) at `/projekte/:id/kriterienliste`, the project's
+ * own copy of a list: the notice `criteria.list.projectCopy` names the project; the four selection
+ * layers are fixed, so „Auswahl ändern“, „Freigabelink erstellen“ and the older-release notice with
+ * „Neue Liste mit derselben Auswahl“ are not offered (the server answers 409 `project-copy`, D2 (a));
+ * including, excluding, priorities and notes are changed as on any list. The copy of an archived
+ * project is read-only, with `projects.archived.note` (owner decision S6-12 D3 (a)). The title is
+ * „Kriterienliste – {{project}} – Beschaffungsprojekte“ (D6 (a)). Leaving the page reports to the
+ * workspace how many criteria were taken into the list, for `projects.detail.criteriaAdded` on the
+ * next S32 of the project.
+ *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
- * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-SAV-04, R-LST-06, R-LST-10, R-LST-14, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
- * @invariants CAT-02, CAT-06, CAT-22, TEN-01, TEN-08, A11Y-09
+ * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-SAV-04, R-LST-06, R-LST-10, R-LST-14, R-PRJ-06, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
+ * @invariants CAT-02, CAT-06, CAT-22, TEN-01, TEN-08, WSP-03, A11Y-09
  */
 @Component({
   selector: 'pa-saved-list-page',
@@ -138,12 +148,19 @@ export class SavedListPage {
   /** The levels the rating legend above the list explains, from the whole list (O-S5-31-1). */
   protected readonly ratings = computed(() => ratingsOfList(this.criteria()));
 
-  /** Editor or Owner of the list's organisation (the header may show another one). */
+  /** The project of a project's copy (S6-12); null for a list of the organisation. */
+  protected readonly project = computed(() => this.shown()?.project ?? null);
+  /**
+   * Editor or Owner of the list's organisation (the header may show another one); never for the
+   * copy of an archived project (owner decision S6-12 D3 (a)).
+   */
   protected readonly canEdit = computed(() => {
     const organizationId = this.shown()?.list.organizationId;
     const role = this.store.organizations().find((organization) => organization.id === organizationId)?.role;
-    return role === 'owner' || role === 'editor';
+    return (role === 'owner' || role === 'editor') && this.project()?.archived !== true;
   });
+  /** „Auswahl ändern“, „Freigabelink erstellen“ and a new list of the older release: lists of the organisation only. */
+  protected readonly listActions = computed(() => this.canEdit() && this.project() === null);
   /** The list is on an older release than the active one (R-LST-14); only Editor and Owner see it (S5-21b 5b). */
   protected readonly olderRelease = computed(() => {
     const shown = this.shown();
@@ -185,14 +202,16 @@ export class SavedListPage {
     inject(DestroyRef).onDestroy(() => {
       clearTimeout(this.searchTimer);
       this.editor.flush();
+      this.reportAddedCriteria();
     });
 
     // The route change clears the title state; the name is known from the resolver.
     effect(() => {
-      const name = this.shown()?.list.name;
-      if (name !== undefined) {
-        this.pageTitle.setPageTitleState({ params: { name } });
-      }
+      const shown = this.shown();
+      if (shown === null) return;
+      this.pageTitle.setPageTitleState({
+        params: shown.project === null ? { name: shown.list.name } : { project: shown.project.name },
+      });
     });
 
     effect(() => {
@@ -315,7 +334,22 @@ export class SavedListPage {
     return criteria.map((criterion) => (criterion.number ? `${criterion.number} ${criterion.title}` : criterion.title)).join(', ');
   }
 
+  /**
+   * The criteria of a project's copy that were left out when the page showed it and are in the
+   * list now (R-PRJ-06, WSP-03): reported to the workspace for the next S32 of the project.
+   */
+  private reportAddedCriteria(): void {
+    const shown = this.shown();
+    if (shown === null || shown.project === null || !this.canEdit()) return;
+    const now = this.decisions();
+    const added = shown.criteria.criteria.filter(
+      (criterion) => !decisionOf(shown.decisions, criterion.key).included && decisionOf(now, criterion.key).included,
+    ).length;
+    this.store.noteCriteriaAdded(shown.project.id, added);
+  }
+
   private show(): void {
+    this.reportAddedCriteria();
     clearTimeout(this.searchTimer);
     this.searchInput.set('');
     this.query.set('');

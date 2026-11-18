@@ -6,13 +6,20 @@ SPDX-License-Identifier: MIT
 
 @if (shown(); as shown) {
   <h1 class="pa-saved-list__title">{{ shown.list.name }}</h1>
-  @if (canEdit()) {
+  @if (listActions()) {
     <div class="pa-saved-list__title-actions">
       @if (!olderRelease() && changeSelectionPath(); as path) {
         <a matButton="outlined" [routerLink]="path">{{ 'criteria.list.changeSelection' | translate }}</a>
       }
       <button matButton="outlined" type="button" (click)="openShare()">{{ 'criteria.list.share' | translate }}</button>
     </div>
+  }
+
+  @if (project(); as project) {
+    <pa-notice kind="info">{{ 'criteria.list.projectCopy' | translate: { project: project.name } }}</pa-notice>
+    @if (project.archived) {
+      <pa-notice kind="info">{{ 'projects.archived.note' | translate }}</pa-notice>
+    }
   }
 
   @if (arrival(); as arrival) {
@@ -41,7 +48,7 @@ SPDX-License-Identifier: MIT
     }
   }
 
-  @if (canEdit() && olderRelease()) {
+  @if (listActions() && olderRelease()) {
     <pa-notice kind="info">
       <p>{{ 'criteria.list.olderRelease' | translate: { release: shown.list.releaseVersion, latest: shown.activeRelease } }}</p>
       <button

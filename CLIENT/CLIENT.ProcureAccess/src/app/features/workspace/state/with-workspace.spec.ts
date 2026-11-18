@@ -24,6 +24,7 @@ const CREATED: Project = {
   productCount: 0,
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
+  criteriaList: null,
 };
 
 describe('withWorkspace', () => {
@@ -113,5 +114,34 @@ describe('withWorkspace', () => {
 
     await expect(loaded).resolves.toBe(false);
     expect(store.workspace.projects()).toEqual({ organizationId: null, status: 'idle', items: [] });
+  });
+
+  it('assigns a list to a project and resolves to its copy (R-PRJ-02, R-PRJ-04)', async () => {
+    const assigned = store.assignCriteriaList('p2', 'list-1');
+    const request = backend.expectOne('/api/v1/projects/p2/criteria-configuration');
+    expect(request.request.body).toEqual({ sourceConfigurationId: 'list-1' });
+    request.flush({ id: 'copy-1', name: 'HR', releaseVersion: 'T.1' });
+
+    await expect(assigned).resolves.toEqual({ id: 'copy-1', name: 'HR', releaseVersion: 'T.1' });
+  });
+
+  it('keeps the criteria S11 of a copy took in for the next S32 of that project only, once (R-PRJ-06)', () => {
+    store.noteCriteriaAdded('p1', 3);
+    expect(store.takeCriteriaAdded('p2')).toBe(0);
+    expect(store.takeCriteriaAdded('p1')).toBe(0);
+
+    store.noteCriteriaAdded('p1', 3);
+    expect(store.takeCriteriaAdded('p1')).toBe(3);
+    expect(store.takeCriteriaAdded('p1')).toBe(0);
+
+    store.noteCriteriaAdded('p1', 2);
+    store.noteCriteriaAdded('p1', 0);
+    expect(store.takeCriteriaAdded('p1')).toBe(0);
+  });
+
+  it('forgets a waiting report of added criteria on reset', () => {
+    store.noteCriteriaAdded('p1', 1);
+    store.resetWorkspace();
+    expect(store.takeCriteriaAdded('p1')).toBe(0);
   });
 });

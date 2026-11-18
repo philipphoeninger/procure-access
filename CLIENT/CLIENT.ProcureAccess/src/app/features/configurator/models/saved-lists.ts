@@ -56,6 +56,11 @@ export interface SavedList {
   releaseVersion: string;
   createdAt: string;
   modifiedAt: string;
+  /**
+   * The procurement project whose own copy this list is (S6-12, ARCHITECTURE C53), or null for a
+   * list of the organisation. A copy opens at its project's address (`/projekte/:id/kriterienliste`).
+   */
+  procurementProjectId: string | null;
   selection: {
     useCaseTemplateId: string | null;
     appTypeIds: string[];
