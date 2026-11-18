@@ -44,10 +44,9 @@ public sealed class SmtpTimeoutTests
         var mime = composer.Build(Message(), settings.Sender, DateTimeOffset.UtcNow);
 
         var watch = Stopwatch.StartNew();
-        var exception = await Should.ThrowAsync<Exception>(() => transport.SendAsync(mime, TestContext.Current.CancellationToken));
+        await Should.ThrowAsync<TimeoutException>(() => transport.SendAsync(mime, TestContext.Current.CancellationToken));
         watch.Stop();
 
-        exception.ShouldNotBeAssignableTo<OperationCanceledException>();
         server.ReachedStallPoint.ShouldBeTrue();
         watch.Elapsed.ShouldBeGreaterThanOrEqualTo(Timeout - TimeSpan.FromMilliseconds(100));
         watch.Elapsed.ShouldBeLessThan(Bound);
