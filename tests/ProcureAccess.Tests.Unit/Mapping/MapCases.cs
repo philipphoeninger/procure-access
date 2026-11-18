@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using MODELS.ProcureAccess.Entities;
-using MODELS.ProcureAccess.Entities.Base;
 using MODELS.ProcureAccess.Entities.Dto;
 using MODELS.ProcureAccess.Entities.Mapping;
 using Xunit;
@@ -21,10 +20,6 @@ public sealed record MapCase(string Name, Type Source, Type Target, Func<object,
 /// </summary>
 public static class MapCases
 {
-    /// <summary>Members the server or EF sets on a new entity: key, audit fields, concurrency token.</summary>
-    private static readonly string[] ServerSetMembers =
-        [nameof(BaseEntity.Id), nameof(BaseEntity.CreatedAt), nameof(BaseEntity.xmin), "IsDeleted"];
-
     public static readonly IReadOnlyList<MapCase> All =
     [
         Case<Criterion, CriterionDto>("Criterion → CriterionDto", criterion => criterion.ToDto()),
@@ -35,11 +30,6 @@ public static class MapCases
         Case<FilterType, FilterTypeDto>("FilterType → FilterTypeDto", filterType => filterType.ToDto()),
         Case<Product, ProductDto>("Product → ProductDto", product => product.ToDto()),
         Case<Product, ProductDto>("Product → ProductDto (query)", CatalogMappings.ProductProjection.Compile()),
-        Case<CreateProductDto, Product>("CreateProductDto → Product", dto => dto.ToEntity(),
-            [.. ServerSetMembers, nameof(Product.Proposal)]),
-        Case<CreateCriterionDto, Criterion>("CreateCriterionDto → Criterion", dto => dto.ToEntity(),
-            [.. ServerSetMembers, nameof(Criterion.CriteriaFilter), nameof(Criterion.Proposal)]),
-        Case<Proposal, ProposalDto>("Proposal → ProposalDto", proposal => proposal.ToDto()),
     ];
 
     public static TheoryData<MapCase> Theory() => [.. All];

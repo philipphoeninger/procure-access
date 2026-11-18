@@ -33,7 +33,6 @@ global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Mapping;
-global using MODELS.ProcureAccess.Entities.Requests;
 
 global using SERVICES.ProcureAccess.DataServices;
 global using SERVICES.ProcureAccess.DataServices.Configuration;

@@ -97,8 +97,9 @@ test.describe('Error pages S80', () => {
   });
 
   test('INV:A11Y-01 INV:A11Y-08 a page without the permission shows „Kein Zugriff“', async ({ page }, testInfo) => {
-    // The legacy proposal list for moderators: the permission guard sends visitors without the permission here.
-    await page.goto('/proposals');
+    // No route needs a permission since the legacy proposal list went (S6-23); the moderation screens of
+    // step 7 will send visitors without the permission here again. Until then the page is opened directly.
+    await page.goto('/unauthorized');
 
     await expect(page).toHaveURL(/\/unauthorized$/);
     await expect(page).toHaveTitle('Kein Zugriff – ProcureAccess');

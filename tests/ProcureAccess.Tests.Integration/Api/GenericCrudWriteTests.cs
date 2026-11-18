@@ -19,12 +19,12 @@ namespace ProcureAccess.Tests.Integration.Api;
 /// <summary>
 /// The generic CRUD controllers are read-only (S3-07, owner decision O-S3-4 (c), #90): their
 /// <c>POST</c>, <c>PUT</c> and <c>DELETE</c> were reachable without sign-in. The catalog changes only
-/// through the CLI import (SPEC SD20); proposals only through their own endpoints.
+/// through the CLI import (SPEC SD20).
 /// </summary>
 public sealed class GenericCrudWriteTests(ApiFixture api) : IntegrationTest(api)
 {
     private static readonly string[] GenericCrudControllers =
-        ["Criteria", "CriteriaFilters", "FilterTypes", "Products", "Proposals"];
+        ["Criteria", "CriteriaFilters", "FilterTypes", "Products"];
 
     private static readonly HashSet<string> WriteMethods = ["POST", "PUT", "PATCH", "DELETE"];
 

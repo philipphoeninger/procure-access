@@ -89,11 +89,3 @@ SPDX-License-Identifier: MIT
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 </div>
-
-<div class="product-list-actions">
-  @if (store.signedIn()) {
-    <button
-      matButton="filled"
-      [routerLink]="'/product-proposal/0'">{{ 'PRODUCTS.PROPOSE' | translate }}</button>
-  }
-</div>

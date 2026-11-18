@@ -13,7 +13,6 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriterionRepo, CriterionRepo>();
         services.AddScoped<ICriteriaFilterRepo, CriteriaFilterRepo>();
         services.AddScoped<IProductRepo, ProductRepo>();
-        services.AddScoped<IProposalRepo, ProposalRepo>();
 
         return services;
     }
@@ -25,7 +24,6 @@ public static class DataServiceConfiguration
         services.AddScoped<ICriterionService, CriterionService>();
         services.AddScoped<IFilterTypeService, FilterTypeService>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IProposalService, ProposalService>();
 
         return services;
     }

@@ -32,13 +32,11 @@
             "styles": [
               "src/styles/theme.scss",
               "src/styles/main.scss",
-              "node_modules/easymde/dist/easymde.min.css",
               "src/styles/material-symbols.scss",
               "node_modules/@fontsource/roboto/400.css",
               "node_modules/@fontsource/roboto/500.css"
             ],
             "allowedCommonJsDependencies": [
-              "easymde",
               "reflect-metadata"
             ]
           },

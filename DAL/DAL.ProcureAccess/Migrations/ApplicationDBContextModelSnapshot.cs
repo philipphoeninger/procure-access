@@ -2397,82 +2397,6 @@ namespace DAL.ProcureAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Proposal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApproverId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamptz")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<int?>("CriterionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CriterionSnapshot")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime?>("FinishedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(200)
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ProductSnapshot")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("ProposerId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<uint>("xmin")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApproverId");
-
-                    b.HasIndex("CriterionId")
-                        .IsUnique();
-
-                    b.HasIndex("ProductId")
-                        .IsUnique();
-
-                    b.HasIndex("ProposerId");
-
-                    b.HasIndex("ProductId", "CriterionId")
-                        .IsUnique();
-
-                    b.ToTable("Proposals", "public", t =>
-                        {
-                            t.HasCheckConstraint("CK_Proposal_Snapshot_NN", "(\"ProductSnapshot\" IS NULL) <> (\"CriterionSnapshot\" IS NULL)");
-                        });
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilter", b =>
                 {
                     b.HasOne("MODELS.ProcureAccess.Entities.FilterType", "FilterType")
@@ -2533,21 +2457,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Proposal", b =>
-                {
-                    b.HasOne("MODELS.ProcureAccess.Entities.Criterion", "Criterion")
-                        .WithOne("Proposal")
-                        .HasForeignKey("MODELS.ProcureAccess.Entities.Proposal", "CriterionId");
-
-                    b.HasOne("MODELS.ProcureAccess.Entities.Product", "Product")
-                        .WithOne("Proposal")
-                        .HasForeignKey("MODELS.ProcureAccess.Entities.Proposal", "ProductId");
-
-                    b.Navigation("Criterion");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.CriteriaFilter", b =>
                 {
                     b.Navigation("Criteria");
@@ -2559,11 +2468,6 @@ namespace DAL.ProcureAccess.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("MODELS.ProcureAccess.Entities.Criterion", b =>
-                {
-                    b.Navigation("Proposal");
-                });
-
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.FilterType", b =>
                 {
                     b.Navigation("CriteriaFilters");
@@ -2572,8 +2476,6 @@ namespace DAL.ProcureAccess.Migrations
             modelBuilder.Entity("MODELS.ProcureAccess.Entities.Product", b =>
                 {
                     b.Navigation("ProductCriteriaFilters");
-
-                    b.Navigation("Proposal");
                 });
 #pragma warning restore 612, 618
         }

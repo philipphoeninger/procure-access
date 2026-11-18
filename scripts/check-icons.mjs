@@ -9,9 +9,10 @@
 // Checks:
 //   1. the icon list holds exactly the names the client uses: the literal names in `<mat-icon>`
 //      (templates and inline templates, HTML comments left out; quoted names inside `{{ }}`), the
-//      glyphs of the EasyMDE toolbar map in main.scss, the names of `computed` (a `<mat-icon>` whose
-//      name has no literal needs its component's .ts file there, and each name there must be
-//      written in that file) and of `material` (icons that Angular Material renders itself);
+//      names of `computed` (a `<mat-icon>` whose name has no literal needs its component's .ts file
+//      there, and each name there must be written in that file) and of `material` (icons that
+//      Angular Material renders itself). The glyphs of the EasyMDE toolbar map in main.scss went
+//      with the editor and the legacy proposal forms (S6-23);
 //   2. the manifest that scripts/subset-material-symbols.py writes matches the list, the version of
 //      material-symbols pinned in package.json and the font file — otherwise the subset is stale
 //      and scripts/subset-material-symbols.sh regenerates it (e.g. after a Dependabot update).
@@ -26,8 +27,6 @@ export const CLIENT = 'CLIENT/CLIENT.ProcureAccess';
 export const ICON_LIST = `${CLIENT}/src/assets/fonts/material-symbols-icons.json`;
 export const MANIFEST = `${CLIENT}/src/assets/fonts/material-symbols-outlined.manifest.json`;
 export const FONT = `${CLIENT}/src/assets/fonts/material-symbols-outlined.woff2`;
-/** Relative to the client, like the file names in the icon list. */
-export const MAIN_SCSS = 'src/styles/main.scss';
 const PACKAGE_JSON = `${CLIENT}/package.json`;
 const REGENERATE = 'run scripts/subset-material-symbols.sh';
 
@@ -60,17 +59,9 @@ export function iconsInTemplate(source) {
   return { names, computed, errors };
 }
 
-/** The glyph names of the `$easymde-toolbar-icons` map in main.scss. */
-export function iconsInScssMap(source) {
-  const map = /\$easymde-toolbar-icons:\s*\(([\s\S]*?)\);/.exec(source);
-  if (!map) return null;
-  return [...map[1].matchAll(/['"][^'"]+['"]\s*:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
-}
-
 /**
  * Every problem of the icon list and the subset; empty when they fit the client.
- * `sources` maps each client file (path relative to the client) to its text: templates, .ts files,
- * main.scss.
+ * `sources` maps each client file (path relative to the client) to its text: templates and .ts files.
  */
 export function checkIcons({ list, manifest, fontSha256, pinnedVersion, sources }) {
   const errors = [];
@@ -93,10 +84,6 @@ export function checkIcons({ list, manifest, fontSha256, pinnedVersion, sources 
       errors.push(`${at(file)}: a <mat-icon> computes its name; list its names under "computed" for ${component}`);
     }
   }
-
-  const scss = iconsInScssMap(sources[MAIN_SCSS] ?? '');
-  if (scss === null) errors.push(`${at(MAIN_SCSS)}: $easymde-toolbar-icons not found`);
-  for (const name of scss ?? []) add(name, at(MAIN_SCSS));
 
   for (const [file, names] of Object.entries(computedFiles)) {
     const source = sources[file];
@@ -162,7 +149,7 @@ const sha256 = (file) => {
 
 /** The check's input as read from the repository. */
 export function repositoryInput() {
-  const files = [...clientSources('src/app'), MAIN_SCSS];
+  const files = clientSources('src/app');
   return {
     list: JSON.parse(read(ICON_LIST)),
     manifest: readJson(MANIFEST),

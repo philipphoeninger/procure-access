@@ -14,7 +14,6 @@ global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Mapping;
-global using MODELS.ProcureAccess.Entities.Requests;
 
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Hosting;

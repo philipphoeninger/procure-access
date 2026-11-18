@@ -12,11 +12,12 @@ namespace ProcureAccess.Tests.Integration.FixtureTests;
 
 /// <summary>
 /// The test authentication handler signs requests in as a fixture user; without one the request
-/// stays anonymous. <c>GET /api/Proposals</c> is an existing endpoint that requires a signed-in user.
+/// stays anonymous. <c>GET /api/v1/account/preferences</c> is an existing endpoint that requires a signed-in user
+/// (the legacy <c>GET /api/Proposals</c> until S6-23).
 /// </summary>
 public sealed class TestAuthenticationTests(ApiFixture api) : IntegrationTest(api)
 {
-    private const string ProtectedEndpoint = "/api/Proposals";
+    private const string ProtectedEndpoint = "/api/v1/account/preferences";
 
     [Fact]
     public async Task ProtectedEndpoint_Anonymous_Returns401()

@@ -17,8 +17,8 @@ namespace ProcureAccess.Modules.Workspace;
 /// projects, candidate products, test evidences and private assessments. Since S6-11 it owns the
 /// projects (<see cref="WorkspaceDbContext"/>) and maps their endpoints
 /// (<see cref="ProjectEndpoints"/>); the project copy of a list, the candidates and the assessments
-/// follow with their tasks of migration step 5. Until their step retires them, proposals, products
-/// and favorites are legacy.
+/// follow with their tasks of migration step 5. Until their step retires them, products and
+/// favorites are legacy (the proposals went with S6-23).
 /// </summary>
 public static class WorkspaceModule
 {

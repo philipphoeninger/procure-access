@@ -33,6 +33,7 @@ namespace ProcureAccess.Tests.Integration.Api;
 public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
 {
     private const string MalformedJson = "{";
+    private const string Register = "/api/v1/auth/register";
 
     /// <summary>Value for every route parameter except the API version: today all of them are numbers or GUIDs.</summary>
     private const string InvalidRouteValue = "not-a-number";
@@ -94,23 +95,22 @@ public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
     public async Task ValidationErrors_FieldErrors_KeyedByJsonFieldPath()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        using var client = CreateClient(TestUsers.Member);
+        using var client = CreateClient();
 
-        // A missing required property: the key is the JSON path "product.name", not the C# path
-        // "Product.Name" (the legacy change-email of S2-10 went with S5-10).
-        using var missing = await client.PostAsync(
-            "/api/Proposals/upsert", Json("""{"product":{}}"""), cancellationToken);
+        // The registration (S02) since the legacy proposal upsert went (S6-23); no legacy controller
+        // takes a request body any more. A missing required property: the key is the JSON name
+        // "email", not the C# name "Email".
+        using var missing = await client.PostAsync(Register, Json("{}"), cancellationToken);
         var missingProblem = await ProblemResponse.ReadAsync(missing, cancellationToken);
         missingProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
-        missingProblem.ErrorKeys.ShouldContain("product.name");
+        missingProblem.ErrorKeys.ShouldContain("email");
 
         // A value of the wrong type: the key is the path in the payload, without the JSON-path root "$."
-        // (the legacy UI settings of S2-10 went with S5-25b; minimal APIs: UserPreferencesTests).
-        using var wrongType = await client.PostAsync(
-            "/api/Proposals/upsert", Json("""{"product":{"name":5}}"""), cancellationToken);
+        // (the JSON reader's "$.email", BadRequestExceptionHandler).
+        using var wrongType = await client.PostAsync(Register, Json("""{"email":5}"""), cancellationToken);
         var wrongTypeProblem = await ProblemResponse.ReadAsync(wrongType, cancellationToken);
         wrongTypeProblem.Deviations(HttpStatusCode.BadRequest, TypeUri(ProblemTypes.Validation), requireErrors: true).ShouldBeEmpty();
-        wrongTypeProblem.ErrorKeys.ShouldContain("product.name");
+        wrongTypeProblem.ErrorKeys.ShouldContain("email");
         wrongTypeProblem.ErrorKeys.ShouldNotContain(key => key.StartsWith("$.", StringComparison.Ordinal));
     }
 

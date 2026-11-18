@@ -5,7 +5,8 @@
 namespace DAL.ProcureAccess.EFStructures;
 
 /// <summary>
-/// The legacy context: the legacy catalog, products and proposals until their steps retire them.
+/// The legacy context: the legacy catalog and products until their steps retire them; the
+/// proposals went with S6-23.
 /// The users and roles left it with S6-10 (ADR-014 rule 4): the seven ASP.NET Core Identity
 /// tables belong to the IdentityAccess module's context, with their rows.
 /// </summary>
@@ -40,7 +41,6 @@ public partial class ApplicationDBContext : DbContext
     public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<ProductCriteriaFilter> ProductCriteriaFilters { get; set; }
     public virtual DbSet<CriteriaFilterExclusion> CriteriaFilterExclusions { get; set; }
-    public virtual DbSet<Proposal> Proposals { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,7 +51,6 @@ public partial class ApplicationDBContext : DbContext
         new ProductConfiguration().Configure(modelBuilder.Entity<Product>());
         new CriteriaFilterExclusionConfiguration().Configure(modelBuilder.Entity<CriteriaFilterExclusion>());
         new ProductCriteriaFilterConfiguration().Configure(modelBuilder.Entity<ProductCriteriaFilter>());
-        new ProposalConfiguration().Configure(modelBuilder.Entity<Proposal>());
 
         //modelBuilder.ApplyConfigurationsFromAssembly(
         //	typeof(ApplicationDBContext).Assembly);

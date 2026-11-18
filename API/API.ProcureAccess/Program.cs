@@ -29,7 +29,6 @@ builder.Services.AddSwaggerExplorer(builder.Configuration)
                 .AddPostgreSQLConnection(builder.Configuration)
                 .AddHttpContextAccessor()
                 .AddIdentityAuth()
-                .AddAuthorizationPolicies()
                 .AddRepositories()
                 .AddDataServices()
                 .AddLocalization(options => options.ResourcesPath = "Resources");
