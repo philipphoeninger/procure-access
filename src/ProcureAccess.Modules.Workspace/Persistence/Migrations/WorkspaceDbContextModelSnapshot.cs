@@ -23,6 +23,34 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidateAssessment", b =>
+                {
+                    b.Property<Guid>("CandidateProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CriterionRevisionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EvidenceNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Fulfillment")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTimeOffset>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CandidateProductId", "CriterionRevisionId");
+
+                    b.ToTable("CandidateAssessments", "workspace");
+                });
+
             modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidatePrivateSection", b =>
                 {
                     b.Property<Guid>("CandidateProductId")
@@ -199,6 +227,15 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.HasKey("TestEvidenceId");
 
                     b.ToTable("TestEvidencePrivateNotes", "workspace");
+                });
+
+            modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidateAssessment", b =>
+                {
+                    b.HasOne("ProcureAccess.Modules.Workspace.Domain.CandidateProduct", null)
+                        .WithMany()
+                        .HasForeignKey("CandidateProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProcureAccess.Modules.Workspace.Domain.CandidatePrivateSection", b =>

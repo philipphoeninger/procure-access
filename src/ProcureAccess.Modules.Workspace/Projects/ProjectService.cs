@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
@@ -22,8 +23,11 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// and the <c>If-Match</c> check join there; until then the last change wins.
 /// <para>The project's criteria list (S6-12) is stored on Configurator's copy, not on the project
 /// (owner decision S6-12 D1 (a)); the answers read it through <see cref="IProjectCriteriaLists"/>.</para>
+/// <para>Every candidate of a project with a list carries its progress, the seven counts and the
+/// derived procedure answers (<see cref="AssessmentReader"/>; C34, SIG-13; S6-18).</para>
 /// </remarks>
-internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, TimeProvider clock)
+internal sealed class ProjectService(
+    WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, AssessmentReader assessments, TimeProvider clock)
 {
     /// <summary>The wire names of the status, the suffixes of <c>projects.status.*</c>.</summary>
     private static readonly IReadOnlyDictionary<string, ProjectStatus> StatusByName =
@@ -57,10 +61,7 @@ internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaList
     /// <summary>The project, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<ProjectResponse?> FindAsync(Guid id, CancellationToken cancellationToken) =>
         await db.ProcurementProjects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == id, cancellationToken) is { } project
-            ? ResponseOf(
-                project,
-                await CandidatesOfAsync(id, cancellationToken),
-                await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken))
+            ? await ResponseOfAsync(project, cancellationToken)
             : null;
 
     /// <summary>
@@ -122,24 +123,43 @@ internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaList
         }
 
         await db.SaveChangesAsync(cancellationToken);
-        return new ProjectChange(
-            ProjectChangeOutcome.Done,
-            ResponseOf(
-                project,
-                await CandidatesOfAsync(id, cancellationToken),
-                await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken)));
+        return new ProjectChange(ProjectChangeOutcome.Done, await ResponseOfAsync(project, cancellationToken));
     }
 
-    /// <summary>The candidates of the project for S32, in the order they were added (S6-15).</summary>
-    private async Task<IReadOnlyList<CandidateSummaryResponse>> CandidatesOfAsync(Guid projectId, CancellationToken cancellationToken)
+    private async Task<ProjectResponse> ResponseOfAsync(ProcurementProject project, CancellationToken cancellationToken)
+    {
+        var list = await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken);
+        return ResponseOf(project, await CandidatesOfAsync(project.Id, list, cancellationToken), list);
+    }
+
+    /// <summary>
+    /// The candidates of the project for S32, in the order they were added (S6-15), each with its
+    /// assessment summary against <paramref name="list"/> (S6-18).
+    /// </summary>
+    private async Task<IReadOnlyList<CandidateSummaryResponse>> CandidatesOfAsync(
+        Guid projectId, ProjectCriteriaList? list, CancellationToken cancellationToken)
     {
         var candidates = await db.CandidateProducts.AsNoTracking()
                                  .Where(c => c.ProcurementProjectId == projectId)
                                  .OrderBy(c => c.CreatedAt)
                                  .ThenBy(c => c.Id)
-                                 .Select(c => new { c.Id, c.Name, c.VendorName, c.TestStatus })
+                                 .Select(c => new
+                                 {
+                                     c.Id,
+                                     c.Name,
+                                     c.VendorName,
+                                     c.TestStatus,
+                                     EvidenceTestTypeKeys = c.TestEvidences.Where(e => e.TestTypeKey != null).Select(e => e.TestTypeKey!).ToList(),
+                                 })
                                  .ToListAsync(cancellationToken);
-        return [.. candidates.Select(c => new CandidateSummaryResponse(c.Id, c.Name, c.VendorName, CandidateNames.Of(c.TestStatus)))];
+        var summaries = await assessments.SummariesAsync(
+            list, [.. candidates.Select(c => new AssessedCandidate(c.Id, c.TestStatus, c.EvidenceTestTypeKeys))], cancellationToken);
+        return [.. candidates.Select(c =>
+        {
+            var summary = summaries?[c.Id];
+            return new CandidateSummaryResponse(
+                c.Id, c.Name, c.VendorName, CandidateNames.Of(c.TestStatus), summary?.Progress, summary?.Fulfillment, summary?.ProcedureAnswers);
+        })];
     }
 
     private static ProjectResponse ResponseOf(

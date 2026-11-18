@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
+using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Modules.Workspace.Projects;
@@ -19,8 +20,8 @@ namespace ProcureAccess.Modules.Workspace;
 /// projects (<see cref="WorkspaceDbContext"/>) and maps their endpoints
 /// (<see cref="ProjectEndpoints"/>), since S6-15 their candidate products with test status and
 /// evidences (<see cref="CandidateEndpoints"/>), since S6-12 a project's own copy of a list
-/// (<see cref="ProjectCriteriaListEndpoint"/>, stored by Configurator); the assessments
-/// follow with their tasks of migration step 5. Until their step retires them, products and
+/// (<see cref="ProjectCriteriaListEndpoint"/>, stored by Configurator), since S6-18 the assessments
+/// of the candidates (<see cref="AssessmentEndpoints"/>). Until their step retires them, products and
 /// favorites are legacy (the proposals went with S6-23).
 /// </summary>
 public static class WorkspaceModule
@@ -50,10 +51,10 @@ public static class WorkspaceModule
         services.AddScoped<ProjectService>();
         services.AddScoped<CandidateService>();
 
-        // The project's own copy of a list (S6-12, C53). The lock answers „not locked“ until S6-18
-        // replaces this registration by the check on its assessment rows (C47).
+        // The project's own copy of a list (S6-12, C53) with the lock on the assessment rows (C47; S6-18).
         services.AddScoped<ProjectCriteriaListService>();
-        services.AddScoped<ICriteriaListLock, NoAssessmentsYet>();
+        services.AddScoped<AssessmentReader>();
+        services.AddScoped<AssessmentService>();
         return services;
     }
 
@@ -68,6 +69,7 @@ public static class WorkspaceModule
         ProjectEndpoints.Map(routes);
         CandidateEndpoints.Map(routes);
         ProjectCriteriaListEndpoint.Map(routes);
+        AssessmentEndpoints.Map(routes);
         return routes;
     }
 }

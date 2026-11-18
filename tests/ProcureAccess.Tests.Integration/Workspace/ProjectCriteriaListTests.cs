@@ -19,7 +19,9 @@ using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Domain;
+using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Modules.Workspace.Projects;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Auth;
@@ -35,7 +37,8 @@ namespace ProcureAccess.Tests.Integration.Workspace;
 /// R-SAV-04; ARCHITECTURE §5.4, C47, C51, C53, C59): <c>PUT /projects/{id}/criteria-configuration</c>
 /// copies an organisation list into the project and replaces its previous copy; the source stays as
 /// it was; a copy is never a source, never listed for S14 and never shared; its criteria can be
-/// changed, its selection cannot. Every test starts from the Tenants fixture with the accounts of
+/// changed, its selection cannot; since S6-18 the lock of the list on the candidates' assessments
+/// (WSP-02) and what an adjusted copy means for them (WSP-03). Every test starts from the Tenants fixture with the accounts of
 /// its users stored (all confirmed but Reader B) and the test releases with <c>T.1</c> active. The
 /// authorisation matrix is <c>AuthorizationMatrixTests</c> (TEN-05).
 /// </summary>
@@ -61,7 +64,8 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    [Fact]
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Assign_OrganisationList_CopiesItIntoTheProjectAndLeavesTheSourceUnchanged))]
+    [Trait("Invariant", "WSP-02")]
     public async Task Assign_OrganisationList_CopiesItIntoTheProjectAndLeavesTheSourceUnchanged()
     {
         var (sourceId, criteria) = await SaveListAsync("HR-Software 2027", (index, entry) =>
@@ -101,7 +105,8 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         (await ReadRawAsync(client, sourceId)).ShouldBe(sourceBefore);
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Assign_SecondList_ReplacesTheProjectsCopyAndKeepsBothSources))]
+    [Trait("Invariant", "WSP-02")]
     public async Task Assign_SecondList_ReplacesTheProjectsCopyAndKeepsBothSources()
     {
         var (first, _) = await SaveListAsync("Erste Liste");
@@ -122,7 +127,8 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
             .ShouldBe([first, second, secondCopy.Id], ignoreOrder: true);
     }
 
-    [Fact]
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Assign_ProjectCopyAsSource_Returns400AndCopiesAreNotListed))]
+    [Trait("Invariant", "WSP-02")]
     public async Task Assign_ProjectCopyAsSource_Returns400AndCopiesAreNotListed()
     {
         var (sourceId, _) = await SaveListAsync("Liste");
@@ -178,28 +184,23 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
     }
 
     /// <summary>
-    /// The hook of S6-18 (C47): once the lock says an assessment exists, replacing answers 409
-    /// <c>locked-criteria-list</c> with its field error and the copy stays. The lock is a test double
-    /// on a host of its own until S6-18 stores assessments.
+    /// The lock (C47, C53): once a candidate of the project has an assessment with a value, replacing
+    /// answers 409 <c>locked-criteria-list</c> with its field error; the copy and the assessment stay.
     /// </summary>
-    [Fact]
-    public async Task Replace_LockedList_Returns409LockedCriteriaListAndKeepsTheCopy()
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Replace_OnceACandidateHasAnAssessment_Returns409LockedCriteriaListAndKeepsCopyAndAssessment))]
+    [Trait("Invariant", "WSP-02")]
+    public async Task Replace_OnceACandidateHasAnAssessment_Returns409LockedCriteriaListAndKeepsCopyAndAssessment()
     {
-        var (first, _) = await SaveListAsync("Erste Liste");
+        var (first, criteria) = await SaveListAsync("Erste Liste");
         var (second, _) = await SaveListAsync("Zweite Liste");
         var project = await StoreProjectAsync();
+        var candidate = await StoreCandidateAsync(project);
         using var client = CreateClient(TestUsers.EditorA);
         var copy = await AssignAsync(client, project.Id, first);
-        await using var locked = new ProcureAccessApiFactory(Api.ConnectionString, Clock, configureServices: services =>
-        {
-            services.RemoveAll<ICriteriaListLock>();
-            services.AddScoped<ICriteriaListLock, AlwaysLocked>();
-        });
-        var cookies = new CookieContainer();
-        using var lockedClient = locked.CreateDefaultClient(BaseAddress, new AntiforgeryHandler(cookies), new CookieContainerHandler(cookies));
-        lockedClient.DefaultRequestHeaders.Add(TestAuthHandler.UserHeader, TestUsers.EditorA.Name);
+        var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        await AssessAsync(client, candidate.Id, revision, "fulfilled");
 
-        using var response = await lockedClient.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation);
+        using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation);
 
         var text = await response.Content.ReadAsStringAsync(Cancellation);
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict, text);
@@ -207,6 +208,41 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         body.RootElement.GetProperty("type").GetString().ShouldNotBeNull().ShouldEndWith("/problems/" + ProblemTypes.LockedCriteriaList);
         body.RootElement.GetProperty("errors").EnumerateObject().Select(p => p.Name).ShouldBe(["sourceConfigurationId"]);
         (await ReadProjectAsync(client, project.Id)).CriteriaList.ShouldBe(copy);
+        (await ReadAssessmentsAsync(client, candidate.Id)).Criteria.Single(c => c.CriterionRevisionId == revision).Value.ShouldBe("fulfilled");
+
+        // Back to „Nicht eingeschätzt“: no assessment exists any more, the list can be replaced again.
+        await AssessAsync(client, candidate.Id, revision, "unknown");
+        (await AssignAsync(client, project.Id, second)).Name.ShouldBe("Zweite Liste");
+    }
+
+    /// <summary>
+    /// Rows with „Nicht eingeschätzt“ — a note without a value — do not lock (WSP-02). They belong
+    /// to the replaced copy and go with it (owner decision S6-18 4 (a)); another project's rows stay.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Replace_WhileOnlyRowsWithoutAValueExist_SucceedsAndRemovesThem))]
+    [Trait("Invariant", "WSP-02")]
+    public async Task Replace_WhileOnlyRowsWithoutAValueExist_SucceedsAndRemovesThem()
+    {
+        var (first, criteria) = await SaveListAsync("Erste Liste");
+        var (second, _) = await SaveListAsync("Zweite Liste");
+        var project = await StoreProjectAsync();
+        var other = await StoreProjectAsync("Anderes Projekt");
+        var candidate = await StoreCandidateAsync(project);
+        var candidateOfOther = await StoreCandidateAsync(other);
+        using var client = CreateClient(TestUsers.EditorA);
+        await AssignAsync(client, project.Id, first);
+        await AssignAsync(client, other.Id, first);
+        var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        await AssessAsync(client, candidate.Id, revision, "unknown", "Nachfragen beim Anbieter");
+        await AssessAsync(client, candidateOfOther.Id, revision, "barrier");
+
+        var replaced = await AssignAsync(client, project.Id, second);
+
+        replaced.Name.ShouldBe("Zweite Liste");
+        (await ReadProjectAsync(client, project.Id)).CriteriaList.ShouldBe(replaced);
+        (await ReadAssessmentsAsync(client, candidate.Id)).Criteria.ShouldAllBe(c => c.Value == "unknown" && c.Note == null);
+        await using var db = Workspace(Fixture.A.Id);
+        (await db.CandidateAssessments.Select(a => a.CandidateProductId).ToListAsync(Cancellation)).ShouldBe([candidateOfOther.Id]);
     }
 
     [Fact]
@@ -277,6 +313,55 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
             c => c.IsIncluded.ShouldBeTrue(), c => c.Note.ShouldBe("Doch nötig"));
         decided.Single(c => c.CriterionRevisionId == prioritised).OverrideLevel.ShouldBe("Info");
         (await ReadRawAsync(client, sourceId)).ShouldBe(sourceBefore);
+    }
+
+    /// <summary>
+    /// The candidate clauses of WSP-03 (C51; S6-18): an excluded criterion keeps its assessment,
+    /// hidden and uncounted, and shows it unchanged when it is included again; a criterion that was
+    /// excluded when the list was assigned is „Nicht eingeschätzt“ for every candidate once included.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-03 " + nameof(ExcludeAndInclude_CriteriaOfAnAssessedProject_KeepTheAssessmentHiddenAndStartNewOnesAsUnknown))]
+    [Trait("Invariant", "WSP-03")]
+    public async Task ExcludeAndInclude_CriteriaOfAnAssessedProject_KeepTheAssessmentHiddenAndStartNewOnesAsUnknown()
+    {
+        var (sourceId, criteria) = await SaveListAsync("Liste", (index, entry) => entry["isIncluded"] = index != 1);
+        var project = await StoreProjectAsync();
+        var first = await StoreCandidateAsync(project);
+        var second = await StoreCandidateAsync(project);
+        using var client = CreateClient(TestUsers.EditorA);
+        var copy = await AssignAsync(client, project.Id, sourceId);
+        var assessed = criteria[0]!["revisionId"]!.GetValue<int>();
+        var newlyIncluded = criteria[1]!["revisionId"]!.GetValue<int>();
+        await AssessAsync(client, first.Id, assessed, "fulfilled", "Prüfbericht");
+        var before = await ReadAssessmentsAsync(client, first.Id);
+
+        using var exclude = await client.PatchAsJsonAsync(CriterionPath(copy.Id, assessed), new { isIncluded = false }, Cancellation);
+        exclude.StatusCode.ShouldBe(HttpStatusCode.NoContent, await exclude.Content.ReadAsStringAsync(Cancellation));
+        var whileExcluded = await ReadAssessmentsAsync(client, first.Id);
+        using var includeNew = await client.PatchAsJsonAsync(CriterionPath(copy.Id, newlyIncluded), new { isIncluded = true }, Cancellation);
+        using var includeAgain = await client.PatchAsJsonAsync(CriterionPath(copy.Id, assessed), new { isIncluded = true }, Cancellation);
+
+        includeNew.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        includeAgain.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        whileExcluded.ShouldSatisfyAllConditions(
+            w => w.Criteria.ShouldNotContain(c => c.CriterionRevisionId == assessed),
+            w => w.Progress.ShouldBe(new AssessmentProgressResponse(0, before.Progress.Total - 1)));
+        await using (var db = Workspace(Fixture.A.Id))
+        {
+            (await db.CandidateAssessments.SingleAsync(Cancellation)).Fulfillment.ShouldBe(Fulfillment.Fulfilled);
+        }
+
+        var after = await ReadAssessmentsAsync(client, first.Id);
+        after.Criteria.Single(c => c.CriterionRevisionId == assessed)
+             .ShouldBeEquivalentTo(before.Criteria.Single(c => c.CriterionRevisionId == assessed));
+        after.Criteria.Single(c => c.CriterionRevisionId == assessed).ShouldSatisfyAllConditions(
+            c => c.Value.ShouldBe("fulfilled"), c => c.Note.ShouldBe("Prüfbericht"));
+        after.Progress.ShouldBe(new AssessmentProgressResponse(1, before.Progress.Total + 1));
+        foreach (var candidate in new[] { first, second })
+        {
+            (await ReadAssessmentsAsync(client, candidate.Id)).Criteria.Single(c => c.CriterionRevisionId == newlyIncluded)
+                .ShouldSatisfyAllConditions(c => c.Value.ShouldBe("unknown"), c => c.Note.ShouldBeNull());
+        }
     }
 
     [Fact(DisplayName = "INV:WSP-03 " + nameof(ChangeSelection_ProjectCopy_Returns409ProjectCopyAndKeepsTheSelection))]
@@ -394,6 +479,27 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         return project;
     }
 
+    private async Task<CandidateProduct> StoreCandidateAsync(ProcurementProject project)
+    {
+        var candidate = CandidateProduct.Create(project, new CandidateFacts("Produkt", null, null, null), Clock.GetUtcNow());
+        await StoreAsync(candidate, CandidatePrivateSection.Of(candidate, null, null));
+        return candidate;
+    }
+
+    private static async Task AssessAsync(HttpClient client, Guid candidateId, int revision, string value, string? note = null)
+    {
+        using var response = await ProjectLists.SetAssessmentAsync(client, candidateId, revision, value, Cancellation, note);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
+    }
+
+    private static async Task<CandidateAssessmentsResponse> ReadAssessmentsAsync(HttpClient client, Guid candidateId) =>
+        (await client.GetFromJsonAsync<CandidateAssessmentsResponse>(ProjectLists.AssessmentsPath(candidateId), Cancellation)).ShouldNotBeNull();
+
+    /// <summary>A workspace context of its own outside any request that sees <paramref name="organizationIds"/>.</summary>
+    private WorkspaceDbContext Workspace(params Guid[] organizationIds) =>
+        new(new DbContextOptionsBuilder<WorkspaceDbContext>().UseNpgsql(Api.ConnectionString).Options,
+            FixedOrganizationContext.Of(organizationIds));
+
     private static async Task<ProjectCriteriaListResponse> AssignAsync(HttpClient client, Guid projectId, Guid sourceId)
     {
         using var response = await client.PutAsJsonAsync(CriteriaPath(projectId), new { sourceConfigurationId = sourceId }, Cancellation);
@@ -433,11 +539,5 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
     {
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Cancellation));
         return body.RootElement.GetProperty("type").GetString()!;
-    }
-
-    /// <summary>The lock S6-18 will answer once an assessment exists.</summary>
-    private sealed class AlwaysLocked : ICriteriaListLock
-    {
-        public Task<bool> IsLockedAsync(Guid projectId, CancellationToken cancellationToken) => Task.FromResult(true);
     }
 }

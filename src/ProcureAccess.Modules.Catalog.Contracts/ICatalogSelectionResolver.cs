@@ -82,7 +82,16 @@ public sealed record ResolvedCatalogSelection(
     IReadOnlyList<CatalogValueName> ProductParts,
     IReadOnlyList<CatalogValueName> TestTypes,
     IReadOnlyList<ResolvedCatalogCriterion> Criteria,
-    bool UseCaseIsActive = true);
+    bool UseCaseIsActive = true)
+{
+    /// <summary>
+    /// The keys of the test procedures the release maps to the selected app types, in catalog
+    /// order: the procedures whose texts decide the allowed ratings (C31). More than one means the
+    /// ratings of a criterion can come from several procedures
+    /// (<c>candidate.assessment.unionNote</c>, S6-18).
+    /// </summary>
+    public IReadOnlyList<string> MappedTestTypeKeys { get; init; } = [];
+}
 
 /// <summary>A filter value by key and German name.</summary>
 public sealed record CatalogValueName(string Key, string Name);
@@ -97,6 +106,13 @@ public sealed record CatalogValueName(string Key, string Name);
 /// <param name="OriginalTitle">The BIT inklusiv title of the first procedure text that applies; null without one.</param>
 /// <param name="ProductPart">Name of the product part of the matching applicability rule; null when none names a part.</param>
 /// <param name="TestStepUrl">The test step of the first procedure text that applies, or for a procedure criterion the page of its test type.</param>
+/// <param name="AllowedRatings">
+/// The levels an assessment of the criterion may have under the selection (C31, CAT-15): the union
+/// over the procedure texts of the procedures mapped to the selected app types, all six without
+/// such a text, none for a procedure criterion, which is never assessed (CAT-17). „Nicht
+/// eingeschätzt“ is always allowed and has no flag.
+/// </param>
+/// <param name="TestTypeKey">The test procedure of a procedure criterion; null for a requirement criterion.</param>
 public sealed record ResolvedCatalogCriterion(
     int RevisionId,
     string Key,
@@ -108,7 +124,9 @@ public sealed record ResolvedCatalogCriterion(
     string? OriginalTitle,
     string? ProductPart,
     CatalogPriority RecommendedPriority,
-    string? TestStepUrl);
+    string? TestStepUrl,
+    Rating AllowedRatings,
+    string? TestTypeKey);
 
 /// <summary>
 /// The priority the catalog recommends for a criterion under a selection (CAT-02): level, weight

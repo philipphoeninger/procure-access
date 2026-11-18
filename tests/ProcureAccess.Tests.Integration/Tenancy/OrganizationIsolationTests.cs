@@ -93,6 +93,14 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
                 var candidate = SampleCandidate(project, now);
                 return [project, candidate, TestEvidencePrivateNote.Of(SampleEvidence(candidate, now), "Sample note")];
             },
+            [typeof(CandidateAssessment)] = (a, now) =>
+            {
+                var project = SampleProject(a, now);
+                var candidate = SampleCandidate(project, now);
+                var assessment = CandidateAssessment.Of(candidate, criterionRevisionId: 1);
+                assessment.Change(Fulfillment.Fulfilled, "Sample note", now);
+                return [project, candidate, assessment];
+            },
         };
 
     public static TheoryData<string> ScopedEntityNames => [.. ScopedEntityTypes().Select(t => t.FullName!)];
@@ -113,6 +121,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         types.ShouldContain(typeof(CandidatePrivateSection));
         types.ShouldContain(typeof(TestEvidence));
         types.ShouldContain(typeof(TestEvidencePrivateNote));
+        types.ShouldContain(typeof(CandidateAssessment));
         types.ShouldBe(Samples.Keys, ignoreOrder: true,
             "Every entity with OrganizationId needs a sample row in Samples (TEN-01), and every sample a live entity.");
     }

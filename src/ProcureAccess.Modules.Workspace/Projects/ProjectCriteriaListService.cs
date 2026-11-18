@@ -16,15 +16,22 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// (<see cref="IProjectCriteriaLists"/>), which also deletes the previous copy. The project row is
 /// not changed: the link lives on the copy (owner decision S6-12 D1 (a)).
 /// </summary>
-internal sealed class ProjectCriteriaListService(
-    WorkspaceDbContext db,
-    IProjectCriteriaLists lists,
-    ICriteriaListLock listLock)
+/// <remarks>
+/// <para><b>The lock (C47, C51, C53; WSP-02; S6-18).</b> The list can be replaced until a candidate
+/// of the project has an assessment with a value other than „Nicht eingeschätzt“. Rows with that
+/// value — a note without a value — do not lock; they belong to criteria of the replaced copy and
+/// are deleted with it (owner decision S6-18 4 (a)). Adjusting the copy within its release is
+/// never locked: that goes through the saved-list endpoints.</para>
+/// <para><b>Not one transaction.</b> The copy is stored by Configurator's context, the assessments
+/// by this one, so an assessment saved between the check and the copy is not seen; such a row keeps
+/// its value and locks the new list (S6-18 open point 1).</para>
+/// </remarks>
+internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProjectCriteriaLists lists)
 {
     /// <summary>
     /// Copies <paramref name="sourceConfigurationId"/> into the project. In this order: an unknown
     /// project (also another organisation's, TEN-01), an archived one (R-PRJ-05), a locked list
-    /// (<see cref="ICriteriaListLock"/>, C47), then the source — a list of the project's organisation
+    /// (<see cref="IsLockedAsync"/>, C47), then the source — a list of the project's organisation
     /// that is not a project copy (WSP-02).
     /// </summary>
     public async Task<CriteriaListAssignment> AssignAsync(
@@ -44,12 +51,18 @@ internal sealed class ProjectCriteriaListService(
             return new CriteriaListAssignment(CriteriaListAssignmentOutcome.Archived, null);
         }
 
-        if (await listLock.IsLockedAsync(projectId, cancellationToken))
+        if (await IsLockedAsync(projectId, cancellationToken))
         {
             return new CriteriaListAssignment(CriteriaListAssignmentOutcome.Locked, null);
         }
 
         var copy = await lists.CopyIntoProjectAsync(sourceConfigurationId, projectId, project.OrganizationId, userId, cancellationToken);
+        if (copy.Outcome == ProjectCopyOutcome.Copied)
+        {
+            // What is left are notes without a value on criteria of the replaced copy.
+            await AssessmentsOf(projectId).Where(a => a.Fulfillment == Fulfillment.Unknown).ExecuteDeleteAsync(cancellationToken);
+        }
+
         return copy.Outcome switch
         {
             ProjectCopyOutcome.Copied => new CriteriaListAssignment(CriteriaListAssignmentOutcome.Done, ResponseOf(copy.List!)),
@@ -58,6 +71,17 @@ internal sealed class ProjectCriteriaListService(
             _ => throw new InvalidOperationException($"Unknown outcome {copy.Outcome} of a project copy."),
         };
     }
+
+    /// <summary>
+    /// <c>true</c> when a candidate of the project has an assessment other than „Nicht
+    /// eingeschätzt“, so its list can no longer be replaced (WSP-02).
+    /// </summary>
+    public async Task<bool> IsLockedAsync(Guid projectId, CancellationToken cancellationToken) =>
+        await AssessmentsOf(projectId).AnyAsync(a => a.Fulfillment != Fulfillment.Unknown, cancellationToken);
+
+    private IQueryable<CandidateAssessment> AssessmentsOf(Guid projectId) =>
+        db.CandidateAssessments.Where(a => db.CandidateProducts.Any(
+            c => c.Id == a.CandidateProductId && c.ProcurementProjectId == projectId));
 
     private static ProjectCriteriaListResponse ResponseOf(ProjectCriteriaList list) => new(list.Id, list.Name, list.ReleaseVersion);
 }
