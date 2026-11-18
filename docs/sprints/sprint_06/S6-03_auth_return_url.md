@@ -10,7 +10,7 @@
 
 - **Starting point:** `main` at 84bfac1 (after S6-27, S6-28).
 - **Approach:** `authGuard` keeps sending a signed-out user to S01 over the start page (S01 cannot open over the guarded page: the guard would run again and the page would load signed out), but as a `RedirectCommand` whose navigation state carries `returnUrl` — memory only, never the URL or browser storage (R-SET-02). S01 reads it like the `save` reason, checks it with `safeReturnUrl` and goes there after the sign-in; without a valid target it closes the outlet as before, so „Liste speichern“ (R-SAV-01) is unchanged.
-- **Files:** `core/guards/auth.guard.ts` (+ new spec), `features/identity/models/login-navigation.ts`, new `features/identity/models/return-url.ts` (+ spec), `features/identity/pages/login/login-page.ts` (+ spec), `e2e/identity/login.spec.ts`; ARCHITECTURE v84 (C170), CODEBASE §2.90 and §3 (renumbered to v85 C171 and §2.91 at the merge, §2 item 6).
+- **Files:** `core/guards/auth.guard.ts` (+ new spec), `features/identity/models/login-navigation.ts`, new `features/identity/models/return-url.ts` (+ spec), `features/identity/pages/login/login-page.ts` (+ spec), `e2e/identity/login.spec.ts`; ARCHITECTURE v84 (C170), CODEBASE §2.90 and §3 (renumbered to v85 C171 and §2.92 at the merge, §2 item 6).
 - **Tests:** a unit test per refused form (absolute URL, `//host`, backslashes, `javascript:`, control characters, the `login` outlet, non-strings), the guard's redirect and state, S01's return and its refusal; one E2E case for `/konto`.
 - **Invariants:** none activated. **Migration:** none. One session.
 
@@ -34,8 +34,8 @@
    - `auth.guard.spec.ts` (4): a signed-in user passes; the `RedirectCommand` to `/(login:anmelden)` with `{ returnUrl: '/konto?tab=daten' }`; the state at the `login` outlet with the shell open and on a deep link (outlet created after the navigation).
    - `login-page.spec.ts` (+6): back to `/konto?ansicht=daten` after the sign-in, no draft handling; four refused targets (`https://evil.example/konto`, `//evil.example`, `/\evil.example`, `javascript:alert(1)`) only close the outlet; the deep-link case with the real S01.
    - E2E `e2e/identity/login.spec.ts`: signed out, `/konto` → S01 over the start page (`/(login:anmelden)`, the target not in the address) → sign-in by keyboard as the seeded confirmed user (correct password, nothing changed) → `/konto`, H1 „Konto“ focused, title „Konto – ProcureAccess“, the menu „Konto“ in the header.
-6. **Merge with `main`:** S6-10b merged first and took ARCHITECTURE v84 C170 and CODEBASE §2.90, so `main` was merged into the branch (no rebase, no force-push): this task's change is ARCHITECTURE v85 C171 and CODEBASE §2.91; only those two documents conflicted.
-7. **Documents:** ARCHITECTURE v85 (C171 and the as-built sentence in §8.3; v83 deleted), CODEBASE §2.91 and the §3 layout line of `features/identity`. No change to SPEC (R-AUTH-03 is met as written), TESTING (no status change), UX copy, Handoff, Figma mapping, `LEGACY_EXCEPTIONS` or `CLAUDE.md` (no rule that applies across the codebase).
+6. **Merge with `main` (twice):** S6-10b merged first and took ARCHITECTURE v84 C170 and CODEBASE §2.90, then S6-08 took CODEBASE §2.91, so `main` was merged into the branch each time (no rebase, no force-push): this task's change is ARCHITECTURE v85 C171 and CODEBASE §2.92; only ARCHITECTURE and CODEBASE conflicted.
+7. **Documents:** ARCHITECTURE v85 (C171 and the as-built sentence in §8.3; v83 deleted), CODEBASE §2.92 and the §3 layout line of `features/identity`. No change to SPEC (R-AUTH-03 is met as written), TESTING (no status change), UX copy, Handoff, Figma mapping, `LEGACY_EXCEPTIONS` or `CLAUDE.md` (no rule that applies across the codebase).
 
 ## 3. Self-review (CLAUDE §6.7, §6.8)
 
