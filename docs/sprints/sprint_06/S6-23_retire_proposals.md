@@ -63,7 +63,7 @@ Checklist of CLAUDE §6.7 (with `/engineering:code-review` on the branch diff); 
 ## 4. Checks
 
 - `dotnet build ProcureAccess.sln -warnaserror …`: 0 warnings, 0 errors. `dotnet format --verify-no-changes`: green.
-- Unit tests: 793 passed. Architecture tests: 67 passed (with ARC-05). Integration tests (Testcontainers, PostgreSQL 17): first full run 824 of 825 (R2); after the fix the persistence classes 25 of 25 and the full suite again: see the pull request.
+- Unit tests: 793 passed. Architecture tests: 67 passed (with ARC-05). Integration tests (Testcontainers, PostgreSQL 17): first full run 824 of 825 (R2); after the fix the persistence classes 25 of 25 and the full suite 825 of 825.
 - `dotnet ef migrations has-pending-model-changes` for `ApplicationDBContext` and `IdentityAccessDbContext`: none.
 - Client: `npm run lint` green; `ng test` 87 files passed; `npm run build:release` without warnings (EasyMDE's critical-CSS warning is gone); `tsc` for app and specs clean.
 - `e2e/`: `npm run typecheck` and `npm run lint` green. **E2E not run locally:** another session uses the local E2E stack at the same time (shared ports); E2E is left to CI (`reflow.spec.ts`, `start-and-error-pages.spec.ts` changed).
