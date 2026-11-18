@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 # S6-10b — Foreign keys onto the users and the clean-up (part b of the users' move)
 
 > **Sprint:** 06, task S6-10, part b (S6-10b). **Issues:** #387 (TD-72) — closed by this part.
-> **Requirements / invariants:** no requirement changes. OPS-03, TEN-01, TEN-02, TEN-05, TEN-11, PRV-07, SEC-01 – SEC-03, SEC-07 – SEC-11 and ARC-01 – ARC-03 stay green; no invariant changes its status. New OPS-03 case for the migration (TESTING V306).
+> **Requirements / invariants:** no requirement changes. OPS-03, TEN-01, TEN-02, TEN-05, TEN-11, PRV-07, SEC-01 – SEC-03, SEC-07 – SEC-11 and ARC-01 – ARC-03 stay green; no invariant changes its status. New OPS-03 case for the migration (TESTING V309).
 > **Status:** done by Claude Code (2026-11-18) — pull request open. **One EF migration:** IdentityAccess `AddUserForeignKeys`. No legacy migration.
 > **Scope:** as agreed in the plan of S6-10a (`S6-10a_users_identityaccess.md`, section 5, point 1): the foreign keys onto `identity."Users"` with the orphan handling and the delete rules, the clean-up of soft-deleted accounts, the order of the Development rebuild, the comments "no foreign key while users are legacy". Routes and answers are unchanged; no client change.
 > **Owner decisions (2026-11-18, with the plan of S6-10a):** **3** — also `UserPreferences.UserId` (the fifth key); the migration deletes orphan rows; cascade for tokens, contributor links, memberships and settings, restrict for `Organization.CreatedByUserId` · **4** — a deleted account loses its role, claim, login and token rows and its lockout, once for the existing soft-deleted rows too. No decision was needed in this part.
@@ -28,8 +28,8 @@ SPDX-License-Identifier: MIT
 | F2 | The Development rebuild deleted every user on each start and left tokens, memberships and organisations behind | Orphans exist only in Development databases; the migration deletes them before it adds the keys (decision 3) |
 | F3 | With restrict on the creator, the rebuild could no longer delete a user who created an organisation | The rebuild deletes every organisation first |
 | F4 | Identity and the deletion endpoint share one scoped context since S6-10a | The role, claim, login and token rows are marked on that context and go in the one save of the soft delete |
-| F5 | The Tenants fixture and four test classes stored organisations, memberships, tokens, settings and contributor links for users without an account | 424 integration tests failed on the keys; the tests store the accounts first (TESTING V309) |
-| F6 | The part-a protocol was named `S6-10_…`; the prompt for this part expects `S6-10a_…` | Renamed, references in ARCHITECTURE v81 and TESTING v89 updated |
+| F5 | The Tenants fixture and four test classes stored organisations, memberships, tokens, settings and contributor links for users without an account | 424 integration tests failed on the keys; the tests store the accounts first (TESTING V312) |
+| F6 | The part-a protocol was named `S6-10_…`; the prompt for this part expects `S6-10a_…` | Renamed, references in the ARCHITECTURE and TESTING versions that name it updated |
 
 ## 2. Changes
 
@@ -44,7 +44,7 @@ SPDX-License-Identifier: MIT
 4. **Development rebuild** (`SeedUsers.RebuildAsync`): every organisation first, then the users; one new entry in the TEN-02 allow-list with its reason.
 5. **Comments** in the five entities and configurations and in `OrganizationInvitation` no longer speak of legacy users.
 6. **Tests.** New `Persistence/UserForeignKeysMigrationTests.cs` (1 × `INV:OPS-03`, 1 without tag); `AccountDeletionTests` (member case extended); `DatabaseRebuildGuardTests` (organisations before users); `TestAccounts.WithId`; accounts before the Tenants fixture in eleven classes; accounts for `OrganizationIsolationTests`, `UserPreferencesTests`, `ContributorProfilePersistenceTests` and the token race of `RegistrationTests`.
-7. **Documents.** ARCHITECTURE v82 (C168; §5.2, §12 step 3), TESTING v90 (V306 – V309), CODEBASE §2.88, CLAUDE.md (§3: state and the test rule), SPRINT_06 (both parts done), the part-a protocol renamed. `ARCHITECTURE_v80.md` and `TESTING_v88.md` deleted (two newest stay).
+7. **Documents.** ARCHITECTURE v84 (C170; §5.2, §12 step 3), TESTING v91 (V309 – V312), CODEBASE §2.90, CLAUDE.md (§3: state and the test rule), SPRINT_06 (both parts done), the part-a protocol renamed. `ARCHITECTURE_v82.md` and `TESTING_v89.md` deleted (two newest stay). After the merge of `main` (S6-27, S6-28 and S6-08 had merged first) the versions and numbers were renumbered: ARCHITECTURE v82 → v84, C168 → C170, TESTING v90 → v91, V306 – V309 → V309 – V312, CODEBASE §2.88 → §2.90.
 
 Not changed: SPEC, UX copy, client, e2e, the legacy projects, Dockerfile and compose files, TECH_DEBT (next version at the end of the sprint).
 
