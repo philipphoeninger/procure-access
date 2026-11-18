@@ -39,6 +39,20 @@ internal sealed class ProcurementProject
     /// </summary>
     public DateTimeOffset ModifiedAt { get; private set; }
 
+    /// <summary>
+    /// Counts the changes of the name, the status and the assigned criteria list (<see cref="MarkEdited"/>); the concurrency
+    /// token and, with the 🔧 epoch, the <c>ETag</c> (API-03, API-04; S6-20). A change below the
+    /// project (<see cref="MarkChanged"/>) does not count: it overwrites nothing of the project.
+    /// </summary>
+    public int Version { get; private set; }
+
+    /// <summary>
+    /// The user id (IdentityAccess) of who made <see cref="Version"/>, the competing editor of a 409
+    /// <c>conflict</c>; <c>null</c> for a row older than S6-20 or made without a user. No foreign
+    /// key across contexts (ADR-014).
+    /// </summary>
+    public string? ModifiedByUserId { get; private set; }
+
     /// <summary>An archived project is read-only for everyone; only its status may change (R-PRJ-05).</summary>
     public bool IsArchived => Status == ProjectStatus.Archived;
 
@@ -65,6 +79,8 @@ internal sealed class ProcurementProject
             CreatedByUserId = createdByUserId,
             CreatedAt = createdAt,
             ModifiedAt = createdAt,
+            Version = 1,
+            ModifiedByUserId = createdByUserId,
         };
     }
 
@@ -110,9 +126,20 @@ internal sealed class ProcurementProject
     }
 
     /// <summary>
+    /// Counts a change of the name, the status or the assigned criteria list by <paramref name="userId"/>: a new
+    /// <see cref="Version"/>, so every <c>ETag</c> issued before is stale (API-03).
+    /// </summary>
+    public void MarkEdited(string userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        Version++;
+        ModifiedByUserId = userId;
+    }
+
+    /// <summary>
     /// Records a change below the project — a candidate, its test status, an evidence — as the
     /// project's last change (owner decision S6-15 5 (a)). Throws for an archived project, which
-    /// changes nothing but its status.
+    /// changes nothing but its status. The <see cref="Version"/> stays.
     /// </summary>
     public void MarkChanged(DateTimeOffset now)
     {

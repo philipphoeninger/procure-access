@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Domain;
@@ -18,16 +19,18 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// before they call it.
 /// </summary>
 /// <remarks>
-/// <b>Seam for S6-20 (API-03).</b> Every change of a stored project goes through
-/// <see cref="ChangeAsync"/>: it loads the row, changes it and saves once. The concurrency token
-/// and the <c>If-Match</c> check join there; until then the last change wins.
+/// <b>Concurrency (API-03; S6-20).</b> A change of a stored project names the version its sender
+/// has seen (<see cref="EditPrecondition"/>): <see cref="ChangeAsync"/> loads the row, refuses a
+/// stale <c>If-Match</c>, changes it and saves once; a change counts a new version
+/// (<see cref="ProcurementProject.MarkEdited"/>). A save that met a concurrent one runs again
+/// (<see cref="ConcurrentChange"/>).
 /// <para>The project's criteria list (S6-12) is stored on Configurator's copy, not on the project
 /// (owner decision S6-12 D1 (a)); the answers read it through <see cref="IProjectCriteriaLists"/>.</para>
 /// <para>Every candidate of a project with a list carries its progress, the seven counts and the
 /// derived procedure answers (<see cref="AssessmentReader"/>; C34, SIG-13; S6-18).</para>
 /// </remarks>
 internal sealed class ProjectService(
-    WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, AssessmentReader assessments, TimeProvider clock)
+    WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, AssessmentReader assessments, EntityTags tags, TimeProvider clock)
 {
     /// <summary>The wire names of the status, the suffixes of <c>projects.status.*</c>.</summary>
     private static readonly IReadOnlyDictionary<string, ProjectStatus> StatusByName =
@@ -96,35 +99,50 @@ internal sealed class ProjectService(
     /// <summary>
     /// Changes the name, the status or both (R-PRJ-05). On an archived project only the status may
     /// change: a change that names a name is refused, also together with a status (owner decision
-    /// S6-11 2 (a)). The caller has checked <paramref name="name"/> against the limits.
+    /// S6-11 2 (a)). The caller has checked <paramref name="name"/> against the limits. A stale
+    /// <c>If-Match</c> is refused before anything else (API-03); the same values change nothing and
+    /// keep the version.
     /// </summary>
-    public async Task<ProjectChange> ChangeAsync(Guid id, string? name, ProjectStatus? status, CancellationToken cancellationToken)
-    {
-        var project = await db.ProcurementProjects.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-        if (project is null)
+    public Task<ProjectChange> ChangeAsync(
+        Guid id, string? name, ProjectStatus? status, EditPrecondition edit, CancellationToken cancellationToken) =>
+        ConcurrentChange.RunAsync(db, async () =>
         {
-            return new ProjectChange(ProjectChangeOutcome.NotFound, null);
-        }
+            var project = await db.ProcurementProjects.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+            if (project is null)
+            {
+                return new ProjectChange(ProjectChangeOutcome.NotFound, null);
+            }
 
-        if (project.IsArchived && name is not null)
-        {
-            return new ProjectChange(ProjectChangeOutcome.Archived, null);
-        }
+            if (!tags.Matches(edit.IfMatch, project.Version))
+            {
+                return new ProjectChange(ProjectChangeOutcome.Conflict, null, project.ModifiedByUserId);
+            }
 
-        var now = clock.GetUtcNow();
-        if (name is not null)
-        {
-            project.Rename(name, now);
-        }
+            if (project.IsArchived && name is not null)
+            {
+                return new ProjectChange(ProjectChangeOutcome.Archived, null);
+            }
 
-        if (status is { } newStatus)
-        {
-            project.ChangeStatus(newStatus, now);
-        }
+            var now = clock.GetUtcNow();
+            var before = (project.Name, project.Status);
+            if (name is not null)
+            {
+                project.Rename(name, now);
+            }
 
-        await db.SaveChangesAsync(cancellationToken);
-        return new ProjectChange(ProjectChangeOutcome.Done, await ResponseOfAsync(project, cancellationToken));
-    }
+            if (status is { } newStatus)
+            {
+                project.ChangeStatus(newStatus, now);
+            }
+
+            if ((project.Name, project.Status) != before)
+            {
+                project.MarkEdited(edit.UserId);
+            }
+
+            await db.SaveChangesAsync(cancellationToken);
+            return new ProjectChange(ProjectChangeOutcome.Done, await ResponseOfAsync(project, cancellationToken));
+        });
 
     private async Task<ProjectResponse> ResponseOfAsync(ProcurementProject project, CancellationToken cancellationToken)
     {
@@ -162,7 +180,7 @@ internal sealed class ProjectService(
         })];
     }
 
-    private static ProjectResponse ResponseOf(
+    private ProjectResponse ResponseOf(
         ProcurementProject project, IReadOnlyList<CandidateSummaryResponse> candidates, ProjectCriteriaList? list) => new(
         project.Id,
         project.OrganizationId,
@@ -172,7 +190,8 @@ internal sealed class ProjectService(
         candidates,
         project.CreatedAt,
         project.ModifiedAt,
-        list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion));
+        list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion),
+        tags.Of(project.Version));
 }
 
 /// <summary>How a change of a project ended.</summary>
@@ -185,7 +204,11 @@ internal enum ProjectChangeOutcome
 
     /// <summary>The project is archived and the change is more than a status (409 <c>project-archived</c>).</summary>
     Archived,
+
+    /// <summary>The <c>If-Match</c> is not the tag of the stored version (409 <c>conflict</c>, API-03).</summary>
+    Conflict,
 }
 
 /// <param name="Project">The project after the change; only with <see cref="ProjectChangeOutcome.Done"/>.</param>
-internal sealed record ProjectChange(ProjectChangeOutcome Outcome, ProjectResponse? Project);
+/// <param name="EditorUserId">Who made the stored version; only with <see cref="ProjectChangeOutcome.Conflict"/>.</param>
+internal sealed record ProjectChange(ProjectChangeOutcome Outcome, ProjectResponse? Project, string? EditorUserId = null);

@@ -91,12 +91,19 @@ public static class ProblemTypes
     /// </summary>
     public const string ProjectCopy = "project-copy";
 
+    /// <summary>
+    /// 428: a change of a shared resource without <c>If-Match</c> (SPEC §8.6, R-PRJ-07; API-03;
+    /// S6-20, owner decision D3 (a)). The client always sends the header, so no screen reaches it
+    /// and the client has no text of its own for it.
+    /// </summary>
+    public const string PreconditionRequired = "precondition-required";
+
     /// <summary>Every name above.</summary>
     public static IReadOnlyList<string> All { get; } =
     [
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
         EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
-        ProjectArchived, TestStatusConflict, ProjectCopy,
+        ProjectArchived, TestStatusConflict, ProjectCopy, PreconditionRequired,
     ];
 }

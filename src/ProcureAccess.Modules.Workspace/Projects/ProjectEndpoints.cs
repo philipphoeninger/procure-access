@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
@@ -34,8 +35,10 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// <para><b>Archived projects</b> are read-only for everyone (R-PRJ-05): only the status may
 /// change; a change that names a name answers 409 <c>project-archived</c>, also together with a
 /// status (owner decisions S6-11 1 (a), 2 (a)).</para>
-/// <para><b>Concurrency.</b> No <c>ETag</c>/<c>If-Match</c> yet: API-03 comes with S6-20; until
-/// then the last change wins.</para>
+/// <para><b>Concurrency (API-03, API-04; S6-20).</b> Every answer with a project carries its
+/// <c>ETag</c>. A change needs it in <c>If-Match</c>: 428 <c>precondition-required</c> without the
+/// header (after the role check, before the validation), 409 <c>conflict</c> with
+/// <c>editorDisplayName</c> when the project has a newer version.</para>
 /// <para><b>Ids.</b> No route constraint on the ids, so a malformed id answers 400
 /// <c>validation</c> like every other bad input (API-01), as the saved lists do.</para>
 /// </remarks>
@@ -89,16 +92,19 @@ internal static class ProjectEndpoints
                 .WithName("PatchProject")
                 .WithSummary("Changes the name or the status of a procurement project (Editor or Owner)")
                 .WithDescription(
-                    "200 with the project. Body { name?, status? }: what is named changes; status is open, done or archived. " +
+                    "200 with the project and its new ETag. Needs If-Match with the ETag of the project. Body { name?, " +
+                    "status? }: what is named changes; status is open, done or archived. " +
                     "400 validation; 400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404 for an unknown project or " +
-                    "one of another organisation; 409 project-archived when the body names a name and the project is archived " +
-                    "(only its status may change).")
+                    "one of another organisation; 409 conflict with editorDisplayName for a stale If-Match; 409 " +
+                    "project-archived when the body names a name and the project is archived (only its status may change); " +
+                    "428 precondition-required without If-Match.")
                 .Accepts<ChangeProjectBody>("application/json")
                 .Produces<ProjectResponse>()
                 .ProducesValidationProblem()
                 .ProducesProblem(StatusCodes.Status403Forbidden)
                 .ProducesProblem(StatusCodes.Status404NotFound)
-                .ProducesProblem(StatusCodes.Status409Conflict);
+                .ProducesProblem(StatusCodes.Status409Conflict)
+                .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         return routes;
     }
@@ -124,6 +130,7 @@ internal static class ProjectEndpoints
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ProjectService projects,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
@@ -148,6 +155,7 @@ internal static class ProjectEndpoints
         }
 
         var project = await projects.CreateAsync(organizationId, name!, WorkspaceAccess.UserIdOf(user), cancellationToken);
+        response.Headers.ETag = project.Etag;
         return TypedResults.Created($"/api/v1{GroupPath}/{project.Id}", project);
     }
 
@@ -155,21 +163,38 @@ internal static class ProjectEndpoints
     private static async Task<Results<Ok<ProjectResponse>, ProblemHttpResult>> GetAsync(
         Guid id,
         ProjectService projects,
-        CancellationToken cancellationToken) =>
-        await projects.FindAsync(id, cancellationToken) is { } project ? TypedResults.Ok(project) : WorkspaceAccess.NotFound();
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (await projects.FindAsync(id, cancellationToken) is not { } project)
+        {
+            return WorkspaceAccess.NotFound();
+        }
+
+        response.Headers.ETag = project.Etag;
+        return TypedResults.Ok(project);
+    }
 
     private static async Task<IResult> ChangeAsync(
         Guid id,
         ChangeProjectBody body,
+        [FromHeader(Name = "If-Match")] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ProjectService projects,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await projects.OrganizationOfAsync(id, cancellationToken);
         if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
+        }
+
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
         }
 
         var errors = new Dictionary<string, string[]>(StringComparer.Ordinal);
@@ -201,12 +226,19 @@ internal static class ProjectEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var change = await projects.ChangeAsync(id, name, status, cancellationToken);
+        var change = await projects.ChangeAsync(
+            id, name, status, new EditPrecondition(WorkspaceAccess.UserIdOf(user), ifMatch), cancellationToken);
+        if (change.Outcome == ProjectChangeOutcome.Done)
+        {
+            response.Headers.ETag = change.Project!.Etag;
+        }
+
         return change.Outcome switch
         {
             ProjectChangeOutcome.Done => TypedResults.Ok(change.Project),
             ProjectChangeOutcome.NotFound => WorkspaceAccess.NotFound(),
             ProjectChangeOutcome.Archived => WorkspaceAccess.ProjectArchived(),
+            ProjectChangeOutcome.Conflict => await WorkspaceAccess.ConflictAsync(users, change.EditorUserId, cancellationToken),
             _ => throw new InvalidOperationException($"Unknown outcome {change.Outcome} of a project change."),
         };
     }

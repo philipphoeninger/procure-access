@@ -59,7 +59,21 @@ internal sealed class TestEvidence
     /// <summary>Orders the evidences of a candidate as they were added.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
-    internal static TestEvidence Create(CandidateProduct candidate, TestEvidenceFacts facts, DateTimeOffset createdAt)
+    /// <summary>
+    /// Counts the changes of the fields and the private note (<see cref="MarkEdited"/>); the concurrency
+    /// token and, with the 🔧 epoch, the <c>ETag</c> (API-03, API-04; S6-20).
+    /// </summary>
+    public int Version { get; private set; }
+
+    /// <summary>
+    /// The user id (IdentityAccess) of who made <see cref="Version"/>, the competing editor of a 409
+    /// <c>conflict</c>; <c>null</c> for a row older than S6-20 or made without a user. No foreign
+    /// key across contexts (ADR-014).
+    /// </summary>
+    public string? ModifiedByUserId { get; private set; }
+
+    internal static TestEvidence Create(
+        CandidateProduct candidate, TestEvidenceFacts facts, DateTimeOffset createdAt, string? createdByUserId)
     {
         var evidence = new TestEvidence
         {
@@ -67,9 +81,22 @@ internal sealed class TestEvidence
             OrganizationId = candidate.OrganizationId,
             CandidateProductId = candidate.Id,
             CreatedAt = createdAt,
+            Version = 1,
+            ModifiedByUserId = createdByUserId,
         };
         evidence.Apply(facts);
         return evidence;
+    }
+
+    /// <summary>
+    /// Counts a change of a field or of the private note by <paramref name="userId"/>: a new
+    /// <see cref="Version"/>, so every <c>ETag</c> issued before is stale (API-03).
+    /// </summary>
+    public void MarkEdited(string userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        Version++;
+        ModifiedByUserId = userId;
     }
 
     /// <summary>Whether <paramref name="facts"/> describe what this evidence holds.</summary>

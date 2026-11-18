@@ -28,6 +28,9 @@ internal sealed class ProcurementProjectConfiguration : IEntityTypeConfiguration
         builder.Property(x => x.CreatedByUserId).IsRequired();
         builder.Ignore(x => x.IsArchived);
 
+        // The concurrency token behind the ETag (API-03, S6-20); rows older than it start at 1.
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(1);
+
         // The projects of an organisation (S30) and the projects a user created (personal data export, S6-25).
         builder.HasIndex(x => x.OrganizationId);
         builder.HasIndex(x => x.CreatedByUserId);

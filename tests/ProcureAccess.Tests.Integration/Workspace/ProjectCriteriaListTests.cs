@@ -81,9 +81,12 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var sourceBefore = await ReadRawAsync(client, sourceId);
         Clock.Advance(TimeSpan.FromHours(1));
 
-        using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
+        // The assignment is the project's second version; the answer's ETag is the project's (API-03, S6-20).
+        response.Headers.ETag.ShouldNotBeNull().ToString().ShouldBe("\"1-2\"");
+        (await client.TagOfAsync($"/api/v1/projects/{project.Id}", Cancellation)).ShouldBe("\"1-2\"");
         var assigned = (await response.Content.ReadFromJsonAsync<ProjectCriteriaListResponse>(Cancellation)).ShouldNotBeNull();
         assigned.ShouldSatisfyAllConditions(
             l => l.Id.ShouldNotBe(sourceId),
@@ -137,7 +140,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         using var client = CreateClient(TestUsers.EditorA);
         var copy = await AssignAsync(client, project.Id, sourceId);
 
-        using var response = await client.PutAsJsonAsync(CriteriaPath(other.Id), new { sourceConfigurationId = copy.Id }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(other.Id), new { sourceConfigurationId = copy.Id }, Cancellation);
 
         await ShouldBeValidationProblemAsync(response, "sourceConfigurationId");
         (await ReadProjectAsync(client, other.Id)).CriteriaList.ShouldBeNull();
@@ -155,9 +158,9 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var project = await StoreProjectAsync();
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var missing = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { }, Cancellation);
-        using var unknown = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = Guid.NewGuid() }, Cancellation);
-        using var foreign = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = ofB }, Cancellation);
+        using var missing = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { }, Cancellation);
+        using var unknown = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = Guid.NewGuid() }, Cancellation);
+        using var foreign = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = ofB }, Cancellation);
 
         foreach (var response in new[] { missing, unknown, foreign })
         {
@@ -166,6 +169,8 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
 
         await using var db = Configurator(Fixture.A.Id, Fixture.B.Id);
         (await db.CriteriaConfigurations.CountAsync(c => c.ProcurementProjectId != null, Cancellation)).ShouldBe(0);
+        // A refused assignment is no version of the project: its sender's tag stays valid (API-03, S6-20).
+        (await client.TagOfAsync($"/api/v1/projects/{project.Id}", Cancellation)).ShouldBe(IfMatchRequests.FirstTag);
     }
 
     /// <summary>R-PRJ-05: an archived project is read-only, its list too.</summary>
@@ -176,7 +181,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var project = await StoreProjectAsync(status: ProjectStatus.Archived);
         using var client = CreateClient(TestUsers.OwnerA);
 
-        using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
         (await TypeOf(response)).ShouldEndWith("/problems/" + ProblemTypes.ProjectArchived);
@@ -200,7 +205,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var revision = criteria[0]!["revisionId"]!.GetValue<int>();
         await AssessAsync(client, candidate.Id, revision, "fulfilled");
 
-        using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation);
 
         var text = await response.Content.ReadAsStringAsync(Cancellation);
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict, text);
@@ -246,7 +251,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
     }
 
     [Fact]
-    public async Task Assign_TwoFirstAssignmentsAtOnce_LeaveExactlyOneCopy()
+    public async Task Assign_TwoFirstAssignmentsAtOnce_OneWinsAndExactlyOneCopyIsLeft()
     {
         var (first, _) = await SaveListAsync("Erste Liste");
         var (second, _) = await SaveListAsync("Zweite Liste");
@@ -255,13 +260,15 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         using var editor = CreateClient(TestUsers.EditorA);
         using var owner = CreateClient(TestUsers.OwnerA);
 
+        // Both have read the project at its first version.
         var responses = await Task.WhenAll(
-            editor.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = first }, Cancellation),
-            owner.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = second }, Cancellation));
+            editor.SendWithTagAsync(HttpMethod.Put, CriteriaPath(project.Id), new { sourceConfigurationId = first }, IfMatchRequests.FirstTag, Cancellation),
+            owner.SendWithTagAsync(HttpMethod.Put, CriteriaPath(project.Id), new { sourceConfigurationId = second }, IfMatchRequests.FirstTag, Cancellation));
 
+        // One assignment is the project's second version; the other meets it (API-03, S6-20).
+        responses.Select(r => r.StatusCode).Order().ShouldBe([HttpStatusCode.OK, HttpStatusCode.Conflict]);
         foreach (var response in responses)
         {
-            response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
             response.Dispose();
         }
 
@@ -439,7 +446,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var project = await StoreProjectAsync();
         using var client = CreateClient(TestUsers.ReaderB);
 
-        using var response = await client.PutAsJsonAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(project.Id), new { sourceConfigurationId = sourceId }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         (await TypeOf(response)).ShouldEndWith("/problems/" + ProblemTypes.EmailUnconfirmed);
@@ -502,7 +509,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
 
     private static async Task<ProjectCriteriaListResponse> AssignAsync(HttpClient client, Guid projectId, Guid sourceId)
     {
-        using var response = await client.PutAsJsonAsync(CriteriaPath(projectId), new { sourceConfigurationId = sourceId }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(CriteriaPath(projectId), new { sourceConfigurationId = sourceId }, Cancellation);
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         return (await response.Content.ReadFromJsonAsync<ProjectCriteriaListResponse>(Cancellation)).ShouldNotBeNull();
     }

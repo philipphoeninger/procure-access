@@ -129,8 +129,9 @@ export async function createProjectThroughApi(
   expect(response.status(), `creating ${name}`).toBe(201);
   const id = ((await response.json()) as { id: string }).id;
   if (listId !== undefined) {
+    // The assignment is a change of the project and needs the tag of its answer (API-03, S6-20).
     const assigned = await request.put(`/api/v1/projects/${id}/criteria-configuration`, {
-      headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+      headers: { 'X-XSRF-TOKEN': await xsrfToken(request), 'If-Match': response.headers()['etag'] },
       data: { sourceConfigurationId: listId },
     });
     expect(assigned.status(), `assigning the list to ${name}`).toBe(200);

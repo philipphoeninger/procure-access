@@ -26,6 +26,7 @@ const EVIDENCE: TestEvidence = {
   testedVersion: null,
   evidenceUrl: null,
   qualificationNote: null,
+  etag: '"1-1"',
 };
 
 describe('CandidateOverview (S34 Überblick, R-CAN-04)', () => {

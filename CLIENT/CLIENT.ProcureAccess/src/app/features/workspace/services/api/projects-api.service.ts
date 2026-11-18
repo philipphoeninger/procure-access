@@ -7,6 +7,7 @@ import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 
 import { API_URL } from '@app/app.config';
+import { ifMatch, withEtag } from '@app/core/concurrency/etag';
 import { CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
 import { Project, ProjectCriteriaList, ProjectSummary } from '../../models/projects';
@@ -16,7 +17,8 @@ import { Project, ProjectCriteriaList, ProjectSummary } from '../../models/proje
  * is marked {@link CALLER_SHOWS_FAILURES}: S30 shows a failed list as the S80 server text in place,
  * S31 every failure of creating in its error notice, S32 a failed read as S80 in place; a failed
  * assignment of a list after creating the project shows the general notice on S32 (owner decision
- * S6-12 D5 (b)).
+ * S6-12 D5 (b)). Every answer with a project carries its `ETag`, kept as `etag`; a change of the
+ * project sends it back in `If-Match` (API-03, S6-20).
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectsApiService {
@@ -35,34 +37,40 @@ export class ProjectsApiService {
   /** Creates a project of the organisation with the status „Laufend“ (R-PRJ-02); Editor or Owner, confirmed address. */
   create(organizationId: string, name: string): Promise<Project> {
     return lastValueFrom(
-      this.http.post<Project>(
+      this.http.post<ProjectBody>(
         `${this.apiUrl}/v1/organizations/${encodeURIComponent(organizationId)}/projects`,
         { name },
-        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true) },
+        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true), observe: 'response' },
       ),
-    );
+    ).then(withEtag);
   }
 
   /** A project of an organisation the user belongs to; 404 for any other (TEN-01). */
   get(id: string): Promise<Project> {
     return lastValueFrom(
-      this.http.get<Project>(`${this.apiUrl}/v1/projects/${encodeURIComponent(id)}`, {
+      this.http.get<ProjectBody>(`${this.apiUrl}/v1/projects/${encodeURIComponent(id)}`, {
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+        observe: 'response',
       }),
-    );
+    ).then(withEtag);
   }
 
   /**
    * Gives the project its own copy of an organisation list, replacing a copy it had (R-PRJ-02,
-   * R-PRJ-04; `PUT /api/v1/projects/{id}/criteria-configuration`, S6-12); Editor or Owner.
+   * R-PRJ-04; `PUT /api/v1/projects/{id}/criteria-configuration`, S6-12); Editor or Owner. The
+   * assignment is a change of the project: `projectEtag` is the tag of the project as it was read,
+   * and the project has a new one afterwards (API-03, owner decision S6-20 D2 (a)).
    */
-  assignCriteriaList(projectId: string, sourceConfigurationId: string): Promise<ProjectCriteriaList> {
+  assignCriteriaList(projectId: string, sourceConfigurationId: string, projectEtag: string): Promise<ProjectCriteriaList> {
     return lastValueFrom(
       this.http.put<ProjectCriteriaList>(
         `${this.apiUrl}/v1/projects/${encodeURIComponent(projectId)}/criteria-configuration`,
         { sourceConfigurationId },
-        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true) },
+        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true), headers: ifMatch(projectEtag) },
       ),
     );
   }
 }
+
+/** A project as the body of an answer names it; its tag is the `ETag` header. */
+type ProjectBody = Omit<Project, 'etag'>;

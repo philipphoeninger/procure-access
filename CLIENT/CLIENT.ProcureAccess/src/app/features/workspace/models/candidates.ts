@@ -87,6 +87,8 @@ export interface TestEvidence {
   evidenceUrl: string | null;
   /** Private (PRV-01): never published. */
   qualificationNote: string | null;
+  /** The tag of the evidence for `If-Match` when it is changed or removed (API-03, S6-20); a member of the body. */
+  etag: string;
 }
 
 /** „Nur für Ihre Organisation“: never published (PRV-01, PRV-02). */
@@ -118,6 +120,8 @@ export interface CandidateFulfillment {
 /** A candidate (`GET /api/v1/candidates/{id}` and the answers of creating and changing it). */
 export interface Candidate {
   id: string;
+  /** The `ETag` of the answer, sent back in `If-Match` with a change (API-03, S6-20); not a member of the body. */
+  etag: string;
   projectId: string;
   organizationId: string;
   name: string;

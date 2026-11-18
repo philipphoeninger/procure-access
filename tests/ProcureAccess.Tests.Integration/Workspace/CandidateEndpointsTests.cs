@@ -166,8 +166,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         Clock.Advance(TimeSpan.FromMinutes(5));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
-            CandidatePath(candidate.Id), new { name = " Neuer Name ", website = "", internalNotes = "Neu" }, Cancellation);
+        using var response = await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { name = " Neuer Name ", website = "", internalNotes = "Neu" }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         var changed = (await response.Content.ReadFromJsonAsync<CandidateResponse>(Cancellation)).ShouldNotBeNull();
@@ -189,7 +188,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         Clock.Advance(TimeSpan.FromMinutes(5));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(CandidatePath(candidate.Id), new { contactNotes = "" }, Cancellation);
+        using var response = await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { contactNotes = "" }, Cancellation);
 
         (await response.Content.ReadFromJsonAsync<CandidateResponse>(Cancellation)).ShouldNotBeNull().ShouldSatisfyAllConditions(
             c => c.PrivateSection.ContactNotes.ShouldBeNull(),
@@ -204,9 +203,8 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         Clock.Advance(TimeSpan.FromMinutes(5));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var empty = await client.PatchAsJsonAsync(CandidatePath(candidate.Id), new { }, Cancellation);
-        using var same = await client.PatchAsJsonAsync(
-            CandidatePath(candidate.Id), new { name = "Produkt", contactNotes = "Kontakt" }, Cancellation);
+        using var empty = await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { }, Cancellation);
+        using var same = await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { name = "Produkt", contactNotes = "Kontakt" }, Cancellation);
 
         empty.StatusCode.ShouldBe(HttpStatusCode.OK);
         (await same.Content.ReadFromJsonAsync<CandidateResponse>(Cancellation)).ShouldNotBeNull().ModifiedAt.ShouldBe(candidate.ModifiedAt);
@@ -223,8 +221,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         var (_, candidate) = await StoreCandidateAsync(Fixture.A.Id);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
-            CandidatePath(candidate.Id), new Dictionary<string, string?> { [field] = LongOrValue(value) }, Cancellation);
+        using var response = await client.PatchCurrentAsync(CandidatePath(candidate.Id), new Dictionary<string, string?> { [field] = LongOrValue(value) }, Cancellation);
 
         await ShouldBeValidationProblemAsync(response, field);
         (await ReadAsync(client, candidate.Id)).ShouldSatisfyAllConditions(c => c.Name.ShouldBe("Produkt"), c => c.Vendor.ShouldBe("Anbieter"));
@@ -256,7 +253,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         var firstEvidence = (await first.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
         first.Headers.Location.ShouldNotBeNull().ToString().ShouldBe($"/api/v1/test-evidences/{firstEvidence.Id}");
         firstEvidence.ShouldBe(new TestEvidenceResponse(
-            firstEvidence.Id, "procedure", "softwareTest", null, "Prüfstelle", TestDate, "3.2", "https://bericht.example/1", "Zertifizierte Stelle"));
+            firstEvidence.Id, "procedure", "softwareTest", null, "Prüfstelle", TestDate, "3.2", "https://bericht.example/1", "Zertifizierte Stelle", "\"1-1\""));
         foreach (var response in new[] { second, other, own })
         {
             response.StatusCode.ShouldBe(HttpStatusCode.Created, await response.Content.ReadAsStringAsync(Cancellation));
@@ -339,8 +336,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("softwareTest"), Cancellation);
         await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("appTest"), Cancellation);
 
-        using var response = await client.PutAsJsonAsync(
-            StatusPath(candidate.Id), new { testStatus = status, removeEvidences }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(StatusPath(candidate.Id), new { testStatus = status, removeEvidences }, Cancellation);
 
         await ShouldBeTestStatusConflictAsync(response, evidenceCount: 2);
         var read = await ReadAsync(client, candidate.Id);
@@ -357,8 +353,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("softwareTest") with { QualificationNote = "Notiz" }, Cancellation);
         Clock.Advance(TimeSpan.FromMinutes(5));
 
-        using var response = await client.PutAsJsonAsync(
-            StatusPath(candidate.Id), new { testStatus = "notTested", removeEvidences = true }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(StatusPath(candidate.Id), new { testStatus = "notTested", removeEvidences = true }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         (await response.Content.ReadFromJsonAsync<CandidateResponse>(Cancellation)).ShouldNotBeNull().ShouldSatisfyAllConditions(
@@ -395,7 +390,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         var (_, candidate) = await StoreCandidateAsync(Fixture.A.Id);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PutAsJsonAsync(StatusPath(candidate.Id), new { testStatus = status }, Cancellation);
+        using var response = await client.PutBelowCurrentAsync(StatusPath(candidate.Id), new { testStatus = status }, Cancellation);
 
         await ShouldBeValidationProblemAsync(response, "testStatus");
         (await ReadAsync(client, candidate.Id)).TestStatus.ShouldBe("unknown");
@@ -412,15 +407,17 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         var evidence = (await added.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
         Clock.Advance(TimeSpan.FromDays(1));
 
-        using var response = await client.PutAsJsonAsync(
+        using var response = await client.SendWithTagAsync(
+            HttpMethod.Put,
             EvidencePath(evidence.Id),
             Procedure("softwareTest") with { TestedVersion = "2.0", TestDate = "2026-02-15", QualificationNote = "Neu" },
+            evidence.Etag,
             Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         var read = await ReadAsync(client, candidate.Id);
         read.TestEvidences.ShouldHaveSingleItem().ShouldBe(
-            new TestEvidenceResponse(evidence.Id, "procedure", "softwareTest", null, "Prüfstelle", new DateOnly(2026, 2, 15), "2.0", null, "Neu"));
+            new TestEvidenceResponse(evidence.Id, "procedure", "softwareTest", null, "Prüfstelle", new DateOnly(2026, 2, 15), "2.0", null, "Neu", "\"1-2\""));
         read.ModifiedAt.ShouldBe(Clock.GetUtcNow());
         (await ReadProjectAsync(client, project.Id)).ModifiedAt.ShouldBe(Clock.GetUtcNow());
         (await CountAsync<TestEvidence>()).ShouldBe(1);
@@ -438,7 +435,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         using var added = await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation);
         var second = (await added.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
 
-        using var response = await client.PutAsJsonAsync(EvidencePath(second.Id), Procedure("softwareTest"), Cancellation);
+        using var response = await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(second.Id), Procedure("softwareTest"), IfMatchRequests.FirstTag, Cancellation);
 
         await ShouldBeValidationProblemAsync(response, "testTypeId");
         (await ReadAsync(client, candidate.Id)).TestEvidences.Select(e => e.TestTypeId).ShouldBe(["softwareTest", "bikWeb"]);
@@ -454,8 +451,8 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         var first = (await added.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
         await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation);
 
-        using var response = await client.DeleteAsync(EvidencePath(first.Id), Cancellation);
-        using var again = await client.DeleteAsync(EvidencePath(first.Id), Cancellation);
+        using var response = await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(first.Id), IfMatchRequests.FirstTag, Cancellation);
+        using var again = await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(first.Id), IfMatchRequests.FirstTag, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         again.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -538,16 +535,16 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         using var client = CreateClient(TestUsers.OwnerA);
         using var added = await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("softwareTest"), Cancellation);
         var evidence = (await added.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
-        (await client.PatchAsJsonAsync(ProjectPath(project.Id), new { status = "archived" }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await client.PatchCurrentAsync(ProjectPath(project.Id), new { status = "archived" }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.OK);
 
         HttpResponseMessage[] responses =
         [
             await client.PostAsJsonAsync(CandidatesPath(project.Id), new { name = "Neu" }, Cancellation),
-            await client.PatchAsJsonAsync(CandidatePath(candidate.Id), new { name = "Umbenannt" }, Cancellation),
-            await client.PutAsJsonAsync(StatusPath(candidate.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
+            await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { name = "Umbenannt" }, Cancellation),
+            await client.PutBelowCurrentAsync(StatusPath(candidate.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
             await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation),
-            await client.PutAsJsonAsync(EvidencePath(evidence.Id), Procedure("softwareTest") with { TestedVersion = "2" }, Cancellation),
-            await client.DeleteAsync(EvidencePath(evidence.Id), Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidence.Id), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidence.Id), IfMatchRequests.FirstTag, Cancellation),
         ];
 
         foreach (var response in responses)
@@ -577,11 +574,11 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         HttpResponseMessage[] responses =
         [
             await client.PostAsJsonAsync(CandidatesPath(project.Id), new { name = "Neu" }, Cancellation),
-            await client.PatchAsJsonAsync(CandidatePath(candidate.Id), new { name = "Umbenannt" }, Cancellation),
-            await client.PutAsJsonAsync(StatusPath(candidate.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
+            await client.PatchCurrentAsync(CandidatePath(candidate.Id), new { name = "Umbenannt" }, Cancellation),
+            await client.PutBelowCurrentAsync(StatusPath(candidate.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
             await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation),
-            await client.PutAsJsonAsync(EvidencePath(evidence), Procedure("softwareTest") with { TestedVersion = "2" }, Cancellation),
-            await client.DeleteAsync(EvidencePath(evidence), Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidence), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidence), IfMatchRequests.FirstTag, Cancellation),
         ];
         // Reading needs no confirmed address.
         var read = await ReadAsync(client, candidate.Id);
@@ -614,11 +611,11 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         [
             await client.GetAsync(CandidatePath(candidateOfB.Id), Cancellation),
             await client.PostAsJsonAsync(CandidatesPath(projectOfB.Id), new { name = "Neu" }, Cancellation),
-            await client.PatchAsJsonAsync(CandidatePath(candidateOfB.Id), new { name = "Übernommen" }, Cancellation),
-            await client.PutAsJsonAsync(StatusPath(candidateOfB.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
+            await client.PatchCurrentAsync(CandidatePath(candidateOfB.Id), new { name = "Übernommen" }, Cancellation),
+            await client.PutBelowCurrentAsync(StatusPath(candidateOfB.Id), new { testStatus = "unknown", removeEvidences = true }, Cancellation),
             await client.PostAsJsonAsync(EvidencesPath(candidateOfB.Id), Procedure("bikWeb"), Cancellation),
-            await client.PutAsJsonAsync(EvidencePath(evidenceOfB), Procedure("softwareTest") with { TestedVersion = "2" }, Cancellation),
-            await client.DeleteAsync(EvidencePath(evidenceOfB), Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidenceOfB), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidenceOfB), IfMatchRequests.FirstTag, Cancellation),
         ];
 
         foreach (var response in responses)
@@ -684,7 +681,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
     };
 
     private async Task<HttpResponseMessage> SetStatusAsync(HttpClient client, Guid candidateId, string status) =>
-        await client.PutAsJsonAsync(StatusPath(candidateId), new { testStatus = status }, Cancellation);
+        await client.PutBelowCurrentAsync(StatusPath(candidateId), new { testStatus = status }, Cancellation);
 
     private static async Task<CandidateResponse> ReadAsync(HttpClient client, Guid id) =>
         (await client.GetFromJsonAsync<CandidateResponse>(CandidatePath(id), Cancellation)).ShouldNotBeNull();

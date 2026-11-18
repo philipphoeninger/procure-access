@@ -87,6 +87,9 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ModifiedByUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -111,6 +114,12 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.Property<string>("VendorName")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(2048)
@@ -138,6 +147,9 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ModifiedByUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -150,6 +162,12 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.HasKey("Id");
 
@@ -174,6 +192,9 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.Property<string>("EvidenceUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("ModifiedByUserId")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
@@ -202,6 +223,12 @@ namespace ProcureAccess.Modules.Workspace.Persistence.Migrations
                     b.Property<string>("TestedVersion")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.HasKey("Id");
 

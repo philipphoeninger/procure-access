@@ -219,6 +219,29 @@ public sealed class AssessmentEndpointsTests(ApiFixture api) : IntegrationTest(a
         }
     }
 
+    [Fact(DisplayName = "INV:API-03 " + nameof(Set_WithoutIfMatch_SucceedsAndLeavesTheTagsOfCandidateAndProjectValid))]
+    [Trait("Invariant", "API-03")]
+    public async Task Set_WithoutIfMatch_SucceedsAndLeavesTheTagsOfCandidateAndProjectValid()
+    {
+        var (candidate, criteria) = await CandidateWithListAsync(WebSelection);
+        using var editor = CreateClient(TestUsers.EditorA);
+        using var owner = CreateClient(TestUsers.OwnerA);
+        var candidatePath = $"/api/v1/candidates/{candidate.Id}";
+        var projectPath = $"/api/v1/projects/{candidate.ProcurementProjectId}";
+        // The editor has S33 and S32 open …
+        var candidateTag = await editor.TagOfAsync(candidatePath, Cancellation);
+        var projectTag = await editor.TagOfAsync(projectPath, Cancellation);
+
+        // … while a colleague assesses: the last write wins per row, without If-Match (R-CAN-11).
+        await SetAndCheckAsync(owner, candidate.Id, RevisionOf(criteria, MiniCatalog.Keys.DefaultOnly), "barrier", "Notiz");
+
+        (await editor.TagOfAsync(candidatePath, Cancellation)).ShouldBe(candidateTag);
+        using var change = await editor.SendWithTagAsync(HttpMethod.Patch, candidatePath, new { name = "Umbenannt" }, candidateTag, Cancellation);
+        using var rename = await editor.SendWithTagAsync(HttpMethod.Patch, projectPath, new { name = "Umbenannt" }, projectTag, Cancellation);
+        change.StatusCode.ShouldBe(HttpStatusCode.OK, await change.Content.ReadAsStringAsync(Cancellation));
+        rename.StatusCode.ShouldBe(HttpStatusCode.OK, await rename.Content.ReadAsStringAsync(Cancellation));
+    }
+
     [Fact]
     public async Task Set_ValueNoteAndBackToNothing_StoresOneRowLazilyTheLastWriteWinsAndTheLastChangeMoves()
     {
@@ -334,7 +357,7 @@ public sealed class AssessmentEndpointsTests(ApiFixture api) : IntegrationTest(a
         using var client = CreateClient(TestUsers.OwnerA);
         var revision = RevisionOf(criteria, MiniCatalog.Keys.DefaultOnly);
         await SetAndCheckAsync(client, candidate.Id, revision, "fulfilled");
-        (await client.PatchAsJsonAsync($"/api/v1/projects/{candidate.ProcurementProjectId}", new { status = "archived" }, Cancellation))
+        (await client.PatchCurrentAsync($"/api/v1/projects/{candidate.ProcurementProjectId}", new { status = "archived" }, Cancellation))
             .StatusCode.ShouldBe(HttpStatusCode.OK);
 
         using var response = await SetAssessmentAsync(client, candidate.Id, revision, "blockade", Cancellation);

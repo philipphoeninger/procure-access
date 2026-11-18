@@ -208,9 +208,10 @@ export class CreateProjectDialog {
     // The project exists once created: a list that cannot be copied leaves it without one (D5 (b)).
     let listCopied = true;
     try {
-      ({ id } = await this.store.createProject(this.organization.id, name));
+      let etag: string;
+      ({ id, etag } = await this.store.createProject(this.organization.id, name));
       if (listId !== null) {
-        listCopied = await this.store.assignCriteriaList(id, listId).then(
+        listCopied = await this.store.assignCriteriaList(id, listId, etag).then(
           () => true,
           () => false,
         );

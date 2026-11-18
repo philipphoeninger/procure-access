@@ -124,8 +124,8 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         using var client = CreateClient(TestUsers.ReaderB);
 
         using var create = await client.PostAsJsonAsync(ProjectsPath(Fixture.A.Id), new { name = "Neu" }, Cancellation);
-        using var rename = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { name = "Umbenannt" }, Cancellation);
-        using var status = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { status = "done" }, Cancellation);
+        using var rename = await client.PatchCurrentAsync(ProjectPath(project.Id), new { name = "Umbenannt" }, Cancellation);
+        using var status = await client.PatchCurrentAsync(ProjectPath(project.Id), new { status = "done" }, Cancellation);
         // Reading needs no confirmed address.
         var read = await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation);
 
@@ -163,7 +163,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         client.DefaultRequestHeaders.Add("X-Organization-Id", Fixture.B.Id.ToString());
 
         using var read = await client.GetAsync(ProjectPath(ofB.Id), Cancellation);
-        using var change = await client.PatchAsJsonAsync(ProjectPath(ofB.Id), new { name = "Übernommen", status = "archived" }, Cancellation);
+        using var change = await client.PatchCurrentAsync(ProjectPath(ofB.Id), new { name = "Übernommen", status = "archived" }, Cancellation);
 
         read.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         change.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -243,7 +243,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         Clock.Advance(TimeSpan.FromMinutes(5));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { name = "  Umbenannt  ", status = "done" }, Cancellation);
+        using var response = await client.PatchCurrentAsync(ProjectPath(project.Id), new { name = "  Umbenannt  ", status = "done" }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         var changed = (await response.Content.ReadFromJsonAsync<ProjectResponse>(Cancellation)).ShouldNotBeNull();
@@ -261,7 +261,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         var project = await StoreProjectAsync(Fixture.A.Id, "Projekt");
         using var client = CreateClient(TestUsers.OwnerA);
 
-        using var response = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { status = "archived" }, Cancellation);
+        using var response = await client.PatchCurrentAsync(ProjectPath(project.Id), new { status = "archived" }, Cancellation);
 
         var changed = (await response.Content.ReadFromJsonAsync<ProjectResponse>(Cancellation)).ShouldNotBeNull();
         changed.ShouldSatisfyAllConditions(p => p.Name.ShouldBe("Projekt"), p => p.Status.ShouldBe("archived"));
@@ -274,8 +274,8 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         Clock.Advance(TimeSpan.FromMinutes(5));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var empty = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { }, Cancellation);
-        using var same = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { name = "Projekt", status = "open" }, Cancellation);
+        using var empty = await client.PatchCurrentAsync(ProjectPath(project.Id), new { }, Cancellation);
+        using var same = await client.PatchCurrentAsync(ProjectPath(project.Id), new { name = "Projekt", status = "open" }, Cancellation);
 
         empty.StatusCode.ShouldBe(HttpStatusCode.OK);
         same.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -295,7 +295,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         using var client = CreateClient(TestUsers.EditorA);
         var sent = name == "121" ? new string('a', 121) : name;
 
-        using var response = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { name = sent, status }, Cancellation);
+        using var response = await client.PatchCurrentAsync(ProjectPath(project.Id), new { name = sent, status }, Cancellation);
 
         await ShouldBeValidationProblemAsync(response, fields.Split(','));
         (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation)).ShouldNotBeNull()
@@ -313,7 +313,7 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         using var client = CreateClient(TestUsers.ByName[userName]);
         object body = withStatus ? new { name = "Umbenannt", status = "open" } : new { name = "Umbenannt" };
 
-        using var response = await client.PatchAsJsonAsync(ProjectPath(project.Id), body, Cancellation);
+        using var response = await client.PatchCurrentAsync(ProjectPath(project.Id), body, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
         (await TypeOf(response)).ShouldEndWith("/problems/" + ProblemTypes.ProjectArchived);
@@ -332,8 +332,8 @@ public sealed class ProjectEndpointsTests(ApiFixture api) : IntegrationTest(api)
         var project = await StoreProjectAsync(Fixture.A.Id, "Projekt", ProjectStatus.Archived);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var reopened = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { status }, Cancellation);
-        using var renamed = await client.PatchAsJsonAsync(ProjectPath(project.Id), new { name = "Umbenannt" }, Cancellation);
+        using var reopened = await client.PatchCurrentAsync(ProjectPath(project.Id), new { status }, Cancellation);
+        using var renamed = await client.PatchCurrentAsync(ProjectPath(project.Id), new { name = "Umbenannt" }, Cancellation);
 
         reopened.StatusCode.ShouldBe(HttpStatusCode.OK);
         renamed.StatusCode.ShouldBe(HttpStatusCode.OK);
