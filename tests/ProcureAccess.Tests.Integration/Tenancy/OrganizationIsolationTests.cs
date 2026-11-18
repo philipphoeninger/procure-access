@@ -48,24 +48,51 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
     ];
 
     /// <summary>
-    /// One row of organisation <c>a</c> per scoped entity type. <see cref="Organization"/> maps to
-    /// <c>null</c>: the organisations A and B are stored first and are their own samples.
+    /// The rows of organisation <c>a</c> that make one sample row per scoped entity type — with the
+    /// rows it refers to, such as the project of a candidate. <see cref="Organization"/> maps to no
+    /// row: the organisations A and B are stored first and are their own samples.
     /// </summary>
-    private static readonly IReadOnlyDictionary<Type, Func<Organization, DateTimeOffset, object?>> Samples =
-        new Dictionary<Type, Func<Organization, DateTimeOffset, object?>>
+    private static readonly IReadOnlyDictionary<Type, Func<Organization, DateTimeOffset, object[]>> Samples =
+        new Dictionary<Type, Func<Organization, DateTimeOffset, object[]>>
         {
-            [typeof(Organization)] = (_, _) => null,
+            [typeof(Organization)] = (_, _) => [],
             [typeof(OrganizationMembership)] = (a, now) =>
-                OrganizationMembership.Create(a.Id, "sample-user", OrganizationRole.Reader, now, now),
+                [OrganizationMembership.Create(a.Id, "sample-user", OrganizationRole.Reader, now, now)],
             [typeof(OrganizationInvitation)] = (a, now) =>
-                OrganizationInvitation.Create(a.Id, "sample@example.test", OrganizationRole.Reader, new byte[32], now, TimeSpan.FromDays(14)),
+                [OrganizationInvitation.Create(a.Id, "sample@example.test", OrganizationRole.Reader, new byte[32], now, TimeSpan.FromDays(14))],
             [typeof(CriteriaConfiguration)] = (a, now) =>
+            [
                 CriteriaConfiguration.Create(
                     a.Id, "Sample list", "sample-user", now, "T.1", "hr", ["web"], ["base"], [],
                     [new ConfigurationCriterionDraft(1, PriorityLevel.A)]),
+            ],
             [typeof(ShareLink)] = (a, now) =>
-                ShareLink.Create(a.Id, ShareableResourceType.Configuration, Guid.NewGuid(), new byte[32], now, now.AddDays(90)),
-            [typeof(ProcurementProject)] = (a, now) => ProcurementProject.Create(a.Id, "Sample project", "sample-user", now),
+                [ShareLink.Create(a.Id, ShareableResourceType.Configuration, Guid.NewGuid(), new byte[32], now, now.AddDays(90))],
+            [typeof(ProcurementProject)] = (a, now) => [SampleProject(a, now)],
+            [typeof(CandidateProduct)] = (a, now) =>
+            {
+                var project = SampleProject(a, now);
+                return [project, SampleCandidate(project, now)];
+            },
+            [typeof(CandidatePrivateSection)] = (a, now) =>
+            {
+                var project = SampleProject(a, now);
+                var candidate = SampleCandidate(project, now);
+                return [project, candidate, CandidatePrivateSection.Of(candidate, "Sample contact", "Sample note")];
+            },
+            [typeof(TestEvidence)] = (a, now) =>
+            {
+                var project = SampleProject(a, now);
+                var candidate = SampleCandidate(project, now);
+                SampleEvidence(candidate, now);
+                return [project, candidate];
+            },
+            [typeof(TestEvidencePrivateNote)] = (a, now) =>
+            {
+                var project = SampleProject(a, now);
+                var candidate = SampleCandidate(project, now);
+                return [project, candidate, TestEvidencePrivateNote.Of(SampleEvidence(candidate, now), "Sample note")];
+            },
         };
 
     public static TheoryData<string> ScopedEntityNames => [.. ScopedEntityTypes().Select(t => t.FullName!)];
@@ -82,6 +109,10 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         types.ShouldContain(typeof(CriteriaConfiguration));
         types.ShouldContain(typeof(ShareLink));
         types.ShouldContain(typeof(ProcurementProject));
+        types.ShouldContain(typeof(CandidateProduct));
+        types.ShouldContain(typeof(CandidatePrivateSection));
+        types.ShouldContain(typeof(TestEvidence));
+        types.ShouldContain(typeof(TestEvidencePrivateNote));
         types.ShouldBe(Samples.Keys, ignoreOrder: true,
             "Every entity with OrganizationId needs a sample row in Samples (TEN-01), and every sample a live entity.");
     }
@@ -111,7 +142,7 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
         await StoreAsync(a, b);
         var entityType = Type.GetType(entityTypeName) ?? ScopedEntityTypes().Single(t => t.FullName == entityTypeName);
         var sample = Samples[entityType](a, now);
-        if (sample is not null)
+        if (sample.Length > 0)
         {
             await StoreAsync(sample);
         }
@@ -140,6 +171,20 @@ public sealed class OrganizationIsolationTests(ApiFixture api) : IntegrationTest
             .MakeGenericMethod(entityType)
             .Invoke(null, [context])!;
         return await (Task<int>)count;
+    }
+
+    private static ProcurementProject SampleProject(Organization a, DateTimeOffset now) =>
+        ProcurementProject.Create(a.Id, "Sample project", "sample-user", now);
+
+    private static CandidateProduct SampleCandidate(ProcurementProject project, DateTimeOffset now) =>
+        CandidateProduct.Create(project, new CandidateFacts("Sample product", null, null, null), now);
+
+    /// <summary>Sets the candidate to „Ja“ and adds an evidence, which is stored with the candidate.</summary>
+    private static TestEvidence SampleEvidence(CandidateProduct candidate, DateTimeOffset now)
+    {
+        candidate.ChangeTestStatus(TestStatus.Tested, removeEvidences: false, now);
+        return candidate.AddEvidence(
+            new TestEvidenceFacts(TestKind.Own, null, null, "Sample tester", DateOnly.FromDateTime(now.UtcDateTime), null, null), now).Evidence!;
     }
 
     private static Task<int> CountAsync<TEntity>(DbContext context) where TEntity : class =>

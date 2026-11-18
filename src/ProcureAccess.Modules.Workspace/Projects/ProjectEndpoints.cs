@@ -110,7 +110,7 @@ internal static class ProjectEndpoints
         ProjectService projects,
         CancellationToken cancellationToken)
     {
-        if (await RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Reader) is { } refused)
+        if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Reader) is { } refused)
         {
             return refused;
         }
@@ -126,7 +126,7 @@ internal static class ProjectEndpoints
         ProjectService projects,
         CancellationToken cancellationToken)
     {
-        if (await RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
+        if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
         }
@@ -147,7 +147,7 @@ internal static class ProjectEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var project = await projects.CreateAsync(organizationId, name!, UserIdOf(user), cancellationToken);
+        var project = await projects.CreateAsync(organizationId, name!, WorkspaceAccess.UserIdOf(user), cancellationToken);
         return TypedResults.Created($"/api/v1{GroupPath}/{project.Id}", project);
     }
 
@@ -156,7 +156,7 @@ internal static class ProjectEndpoints
         Guid id,
         ProjectService projects,
         CancellationToken cancellationToken) =>
-        await projects.FindAsync(id, cancellationToken) is { } project ? TypedResults.Ok(project) : NotFound();
+        await projects.FindAsync(id, cancellationToken) is { } project ? TypedResults.Ok(project) : WorkspaceAccess.NotFound();
 
     private static async Task<IResult> ChangeAsync(
         Guid id,
@@ -166,7 +166,8 @@ internal static class ProjectEndpoints
         ProjectService projects,
         CancellationToken cancellationToken)
     {
-        if (await RefusedForProjectAsync(authorization, user, projects, id, cancellationToken) is { } refused)
+        var organizationId = await projects.OrganizationOfAsync(id, cancellationToken);
+        if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
         }
@@ -204,11 +205,8 @@ internal static class ProjectEndpoints
         return change.Outcome switch
         {
             ProjectChangeOutcome.Done => TypedResults.Ok(change.Project),
-            ProjectChangeOutcome.NotFound => NotFound(),
-            ProjectChangeOutcome.Archived => TypedResults.Problem(
-                detail: "The project is archived; only its status can change.",
-                statusCode: StatusCodes.Status409Conflict,
-                type: ProblemTypes.ProjectArchived),
+            ProjectChangeOutcome.NotFound => WorkspaceAccess.NotFound(),
+            ProjectChangeOutcome.Archived => WorkspaceAccess.ProjectArchived(),
             _ => throw new InvalidOperationException($"Unknown outcome {change.Outcome} of a project change."),
         };
     }
@@ -220,35 +218,4 @@ internal static class ProjectEndpoints
             errors[NameField] = [$"The name has at most {ProcurementProject.NameMaxLength} characters."];
         }
     }
-
-    /// <summary>
-    /// The role check of a change to a stored project (TEN-05): the organisation is the project's,
-    /// read through the filter — 404 for an unknown project or one of another organisation
-    /// (TEN-01) —, then Editor on it — 403 for a Reader. <c>null</c> when it passed.
-    /// </summary>
-    internal static async Task<IResult?> RefusedForProjectAsync(
-        IAuthorizationService authorization,
-        ClaimsPrincipal user,
-        ProjectService projects,
-        Guid id,
-        CancellationToken cancellationToken) =>
-        await projects.OrganizationOfAsync(id, cancellationToken) is { } organizationId
-            ? await RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor)
-            : NotFound();
-
-    /// <summary>The 404 or 403 of a failed role check (TEN-05), or <c>null</c> when it passed.</summary>
-    internal static async Task<ProblemHttpResult?> RefusedAsync(
-        IAuthorizationService authorization, ClaimsPrincipal user, Guid organizationId, OrganizationRoleRequirement requirement)
-    {
-        var result = await authorization.AuthorizeAsync(user, new OrganizationReference(organizationId), requirement);
-        return OrganizationAccess.StatusOf(result) is { } status ? TypedResults.Problem(statusCode: status) : null;
-    }
-
-    internal static ProblemHttpResult NotFound() =>
-        TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
-
-    /// <summary>The signed-in user's id; the groups require a sign-in, so it is always there.</summary>
-    internal static string UserIdOf(ClaimsPrincipal user) =>
-        user.FindFirstValue(ClaimTypes.NameIdentifier)
-        ?? throw new InvalidOperationException("A signed-in principal without a user id reached a project endpoint.");
 }

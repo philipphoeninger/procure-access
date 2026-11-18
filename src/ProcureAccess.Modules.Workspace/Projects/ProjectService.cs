@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
 
@@ -24,9 +25,6 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// </remarks>
 internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaLists criteriaLists, TimeProvider clock)
 {
-    /// <summary>The number of candidate products of every project until S6-15 stores them.</summary>
-    private const int NoProductsYet = 0;
-
     /// <summary>The wire names of the status, the suffixes of <c>projects.status.*</c>.</summary>
     private static readonly IReadOnlyDictionary<string, ProjectStatus> StatusByName =
         new Dictionary<string, ProjectStatus>(StringComparer.Ordinal)
@@ -53,13 +51,16 @@ internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaList
         var project = ProcurementProject.Create(organizationId, name, createdByUserId, clock.GetUtcNow());
         db.ProcurementProjects.Add(project);
         await db.SaveChangesAsync(cancellationToken);
-        return ResponseOf(project, null);
+        return ResponseOf(project, [], null);
     }
 
     /// <summary>The project, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<ProjectResponse?> FindAsync(Guid id, CancellationToken cancellationToken) =>
         await db.ProcurementProjects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == id, cancellationToken) is { } project
-            ? ResponseOf(project, await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken))
+            ? ResponseOf(
+                project,
+                await CandidatesOfAsync(id, cancellationToken),
+                await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken))
             : null;
 
     /// <summary>
@@ -72,9 +73,16 @@ internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaList
                                .Where(p => p.OrganizationId == organizationId)
                                .OrderByDescending(p => p.ModifiedAt)
                                .ThenBy(p => p.Id)
-                               .Select(p => new { p.Id, p.Name, p.Status, p.ModifiedAt })
+                               .Select(p => new
+                               {
+                                   p.Id,
+                                   p.Name,
+                                   p.Status,
+                                   p.ModifiedAt,
+                                   ProductCount = db.CandidateProducts.Count(c => c.ProcurementProjectId == p.Id),
+                               })
                                .ToListAsync(cancellationToken);
-        return [.. projects.Select(p => new ProjectSummaryResponse(p.Id, p.Name, NameOf(p.Status), NoProductsYet, p.ModifiedAt))];
+        return [.. projects.Select(p => new ProjectSummaryResponse(p.Id, p.Name, NameOf(p.Status), p.ProductCount, p.ModifiedAt))];
     }
 
     /// <summary>The organisation of the project, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
@@ -115,15 +123,33 @@ internal sealed class ProjectService(WorkspaceDbContext db, IProjectCriteriaList
 
         await db.SaveChangesAsync(cancellationToken);
         return new ProjectChange(
-            ProjectChangeOutcome.Done, ResponseOf(project, await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken)));
+            ProjectChangeOutcome.Done,
+            ResponseOf(
+                project,
+                await CandidatesOfAsync(id, cancellationToken),
+                await criteriaLists.FindOfProjectAsync(project.Id, cancellationToken)));
     }
 
-    private static ProjectResponse ResponseOf(ProcurementProject project, ProjectCriteriaList? list) => new(
+    /// <summary>The candidates of the project for S32, in the order they were added (S6-15).</summary>
+    private async Task<IReadOnlyList<CandidateSummaryResponse>> CandidatesOfAsync(Guid projectId, CancellationToken cancellationToken)
+    {
+        var candidates = await db.CandidateProducts.AsNoTracking()
+                                 .Where(c => c.ProcurementProjectId == projectId)
+                                 .OrderBy(c => c.CreatedAt)
+                                 .ThenBy(c => c.Id)
+                                 .Select(c => new { c.Id, c.Name, c.VendorName, c.TestStatus })
+                                 .ToListAsync(cancellationToken);
+        return [.. candidates.Select(c => new CandidateSummaryResponse(c.Id, c.Name, c.VendorName, CandidateNames.Of(c.TestStatus)))];
+    }
+
+    private static ProjectResponse ResponseOf(
+        ProcurementProject project, IReadOnlyList<CandidateSummaryResponse> candidates, ProjectCriteriaList? list) => new(
         project.Id,
         project.OrganizationId,
         project.Name,
         NameOf(project.Status),
-        NoProductsYet,
+        candidates.Count,
+        candidates,
         project.CreatedAt,
         project.ModifiedAt,
         list is null ? null : new ProjectCriteriaListResponse(list.Id, list.Name, list.ReleaseVersion));

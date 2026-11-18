@@ -1,0 +1,91 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (status() === 'failed') {
+  <pa-error-page kind="server" />
+} @else {
+  <h1 class="pa-projects__title" [id]="titleId">{{ 'projects.title' | translate }}</h1>
+
+  @switch (status()) {
+    @case ('noOrganization') {
+      <p class="pa-projects__text">{{ 'projects.needOrg' | translate }}</p>
+      <div>
+        <a matButton="filled" [routerLink]="organizationPath">{{ 'projects.needOrg.cta' | translate }}</a>
+      </div>
+    }
+    @case ('loaded') {
+      <p class="pa-projects__text">{{ 'projects.intro' | translate }}</p>
+      @if (canCreate()) {
+        <div>
+          <button matButton="filled" type="button" (click)="create()">{{ 'projects.create' | translate }}</button>
+        </div>
+      }
+
+      @if (all().length === 0) {
+        <p class="pa-projects__text">{{ 'projects.empty' | translate }}</p>
+      } @else {
+        <div class="pa-projects__controls">
+          <mat-form-field appearance="outline" class="pa-projects__sort" subscriptSizing="dynamic">
+            <mat-label>{{ 'projects.sort' | translate }}</mat-label>
+            <mat-select [value]="sort()" (selectionChange)="chooseSort($event.value)">
+              @for (option of sorts; track option) {
+                <mat-option [value]="option">{{ sortKey(option) | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-checkbox [checked]="showArchived()" (change)="chooseArchived($event.checked)">
+            {{ 'projects.filter.archived' | translate }}
+          </mat-checkbox>
+        </div>
+
+        @if (shown().length === 0) {
+          <p class="pa-projects__text">{{ 'projects.empty.archivedOnly' | translate }}</p>
+        } @else if (wide()) {
+          <table mat-table class="pa-projects__table" [dataSource]="shown()" [attr.aria-labelledby]="titleId">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'projects.list.name' | translate }}</th>
+              <td mat-cell *matCellDef="let project">
+                <a class="pa-projects__link" [routerLink]="path(project)">{{ project.name }}</a>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'projects.status.label' | translate }}</th>
+              <td mat-cell *matCellDef="let project">{{ statusKey(project) | translate }}</td>
+            </ng-container>
+            <ng-container matColumnDef="products">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'projects.list.products' | translate }}</th>
+              <td mat-cell *matCellDef="let project">{{ project.productCount }}</td>
+            </ng-container>
+            <ng-container matColumnDef="modified">
+              <th mat-header-cell *matHeaderCellDef scope="col">{{ 'projects.list.modified' | translate }}</th>
+              <td mat-cell *matCellDef="let project">{{ date(project.modifiedAt) }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let project; columns: columns"></tr>
+          </table>
+        } @else {
+          <ul class="pa-projects__list">
+            @for (project of shown(); track project.id) {
+              <li class="pa-projects__item">
+                <h2 class="pa-projects__name">
+                  <a class="pa-projects__link" [routerLink]="path(project)">{{ project.name }}</a>
+                </h2>
+                <dl class="pa-projects__facts">
+                  <dt>{{ 'projects.status.label' | translate }}</dt>
+                  <dd>{{ statusKey(project) | translate }}</dd>
+                  <dt>{{ 'projects.list.products' | translate }}</dt>
+                  <dd>{{ project.productCount }}</dd>
+                  <dt>{{ 'projects.list.modified' | translate }}</dt>
+                  <dd>{{ date(project.modifiedAt) }}</dd>
+                </dl>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  }
+}

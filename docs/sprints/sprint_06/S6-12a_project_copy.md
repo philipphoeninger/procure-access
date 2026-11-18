@@ -25,14 +25,14 @@ SPDX-License-Identifier: MIT
 
 | # | Finding | Consequence |
 |---|---|---|
-| F1 | ARCHITECTURE §5.4 lists `ProcurementProject.CriteriaConfigurationId` and §5.3 `CriteriaConfiguration.ProcurementProjectId` — a pointer on both sides, in two contexts that cannot share a transaction | D1 (a): only the copy carries the link; replacing is one save of `ConfiguratorDbContext`; §5.4 records that `CriteriaConfigurationId` is not built (C178) |
+| F1 | ARCHITECTURE §5.4 lists `ProcurementProject.CriteriaConfigurationId` and §5.3 `CriteriaConfiguration.ProcurementProjectId` — a pointer on both sides, in two contexts that cannot share a transaction | D1 (a): only the copy carries the link; replacing is one save of `ConfiguratorDbContext`; §5.4 records that `CriteriaConfigurationId` is not built (C180) |
 | F2 | §5.3 says „the column **and its foreign key** are added in step 5“, CLAUDE §7 / ADR-014: no foreign key crosses two contexts | No foreign key; a unique index where set; §5.3 corrected |
 | F3 | The module map allows Workspace → Configurator.Contracts, not the other way | Workspace calls `IProjectCriteriaLists`; Configurator cannot see a project's status (→ D3, open point 2) |
 | F4 | SPEC R-SAV-04 and TEN-08 ask for a 409 on a share link of a copy; no problem type fits (`conflict` is S37's with `editorDisplayName`) | D2 (a): `project-copy`, also for the selection change, the deletion and the copy of a copy |
-| F5 | TESTING WSP-03 speaks of „after assessments exist“ and of candidates; assessments come with S6-18 | WSP-03 `active` with the two candidate clauses deferred (V326) |
+| F5 | TESTING WSP-03 speaks of „after assessments exist“ and of candidates; assessments come with S6-18 | WSP-03 `active` with the two candidate clauses deferred (V335) |
 | F6 | S6-15 (#409) changes `ProjectService`, `ProjectContracts`, `ProjectEndpoints` and `ProblemTypes` | The PUT lives in files of its own; the remaining overlaps are small (the answer record, four helpers made `internal`, one problem-type line) |
 | F7 | S6-13 (#407) says S6-12 adds the list choice to S31 and needs a text for „project created, list not copied“; UX copy v40 (and S6-13's v41) has none | D5 open; blocks only S6-12b |
-| F8 | The gate warns on tags of a `planned` invariant; earlier tasks (V191, V277) left such tests untagged until the flip | WSP-02's tests are named in TESTING V327 and tagged by S6-18 |
+| F8 | The gate warns on tags of a `planned` invariant; earlier tasks (V191, V277) left such tests untagged until the flip | WSP-02's tests are named in TESTING V336 and tagged by S6-18 |
 
 ## 2. Changes
 
@@ -43,7 +43,7 @@ SPDX-License-Identifier: MIT
 5. **Platform contracts:** `ProblemTypes.ProjectCopy` (`project-copy`), in `All`; no client key (D2 (a)).
 6. **Workspace:** `Projects/ProjectCriteriaListEndpoint` (`PUT /projects/{id}/criteria-configuration`) and `ProjectCriteriaListService`; role (Editor, from the stored project), confirmed address, antiforgery; 400 at `sourceConfigurationId` (missing, unknown, foreign, copy — one answer); 409 `project-archived`; 409 `locked-criteria-list` with an `errors` extension at `sourceConfigurationId`. `ICriteriaListLock` with `NoAssessmentsYet` (the hook for S6-18). `ProjectResponse.CriteriaList` on read and PATCH; `ProjectService` takes `IProjectCriteriaLists`. The helpers of `ProjectEndpoints` are `internal` for the new endpoint.
 7. **Tests.** New: `Integration/Workspace/ProjectCriteriaListTests.cs` (13). Changed: `Unit/Configurator/CriteriaConfigurationTests.cs` (+3), `Integration/Tenancy/AuthorizationMatrixTests.cs` (row `assign-project-list`, six users).
-8. **Documents.** TESTING v95 (V326 – V329; WSP-03 `active`, rows WSP-02, TEN-08), ARCHITECTURE v90 (C178; §5.3, §5.4, §7.2, §12 step 5), SPEC v2.52 (§8.6, §8.10, five rows), CODEBASE §2.97 and §3, CLAUDE.md §3 (state line; 39 589 characters). `TESTING_v93.md` and `ARCHITECTURE_v88.md` deleted (two newest stay).
+8. **Documents.** TESTING v97 (V335 – V338; WSP-03 `active`, rows WSP-02, TEN-08), ARCHITECTURE v92 (C180; §5.3, §5.4, §7.2, §12 step 5), SPEC v2.54 (§8.6, §8.10, five rows), CODEBASE §2.99 and §3, CLAUDE.md §3 (state line; 39 589 characters). `TESTING_v93.md` and `ARCHITECTURE_v88.md` deleted (two newest stay).
 
 Not changed: client, e2e, UX copy, Handoff, Figma mapping, `Dockerfile` (no new project), compose files, `appsettings.json`, TECH_DEBT (next version at the end of the sprint), the sprint file.
 
@@ -73,7 +73,7 @@ Checklist of CLAUDE §6.7 with `/engineering:code-review` on the whole diff (sec
 1. **Lock and copy are two steps in two contexts (S6-18).** `ICriteriaListLock` is asked in Workspace, the copy is made in Configurator: an assessment saved between the two is not caught. S6-18 decides whether the window matters (a re-check after the copy, or accepted with API-03 in S6-20).
 2. **Archived project's copy (D3 (a)).** `PATCH /configurations/{copyId}/criteria/{rev}` still changes the copy of an archived project; Configurator cannot see the project's status. S6-12b shows the copy read-only. A server refusal needs Workspace to tell Configurator (e.g. through the contract on a status change) — proposed for S6-20 or a follow-up issue.
 3. **Personal data export.** A copy is a list the assigning user „created“, so `ICriteriaListDataExport` lists it like any list, without its project. Whether the export should name the project or leave copies out is for S6-25 (the workspace part of the export).
-4. **„Last change“ of a project.** An assignment does not move `ProcurementProject.ModifiedAt` (S6-11 open point 3 stays open; S6-15/S6-18 decide it for candidates and assessments).
+4. **„Last change“ of a project.** An assignment does not move `ProcurementProject.ModifiedAt`. S6-15 decided that candidates and evidences move it (owner decision S6-15 5 (a)); whether an assignment should as well stays open (S6-11 open point 3).
 5. **S6-12b (client):** S11 at `/projekte/:id/kriterienliste` (D4 (a)) with `criteria.list.projectCopy`, „Auswahl ändern“, share, delete and copy hidden, read-only for a Reader and an archived project; `projects.detail.criteriaAdded` on return to S32 (the placeholder of S6-13); the list choice of S31 (`projects.create.criteria`, `.hint`, only organisation lists). Needs S6-13 merged and **D5**: the wording for „project created, list not copied“, or the decision that this case shows the general error text.
-6. **Merge order with S6-13 and S6-15:** whichever merges later renumbers its TESTING (v95), ARCHITECTURE (v90, C178), SPEC (v2.52) and CODEBASE (§2.97) entries; S6-15's changes to `ProjectService`/`ProjectContracts`/`ProjectEndpoints`/`ProblemTypes` overlap in a few lines.
+6. **Merge order with S6-13 and S6-15:** both merged first, so main was merged into this branch (2026-11-18) and S6-12a renumbered to TESTING v97 (V335 – V338), ARCHITECTURE v92 (C180), SPEC v2.54 and CODEBASE §2.99; this protocol was renamed from `S6-12_project_copy.md`. S6-15's `WorkspaceAccess` replaced the role-check helpers this task had opened up in `ProjectEndpoints`; `ProjectCriteriaListEndpoint` uses it.
 7. **CLAUDE §3 rule „a new problem type gets its UX key“** has an owner-decided exception (`project-copy`, D2 (a)); SPEC §8.6 records it.

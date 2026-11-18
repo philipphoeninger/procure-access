@@ -73,9 +73,19 @@ public static class ProblemTypes
     public const string ProjectArchived = "project-archived";
 
     /// <summary>
+    /// 409 with a field error at <c>testStatus</c>: the test status of a candidate product and its
+    /// test evidences do not fit — the status is to leave „Ja“ while evidences exist, or an evidence
+    /// is to be added while the status is not „Ja“ (SPEC §8.6 v2.53, R-CAN-05; WSP-01; S6-15).
+    /// Carries the extension <c>evidenceCount</c>; with evidences the client asks
+    /// <c>candidate.evidence.list.statusChange</c> and repeats the change with
+    /// <c>removeEvidences</c>.
+    /// </summary>
+    public const string TestStatusConflict = "test-status-conflict";
+
+    /// <summary>
     /// 409: an action that only an organisation list allows, asked of a procurement project's copy
     /// of a list — changing its selection, deleting it, copying it to the active release or sharing
-    /// it by link (SPEC §8.6 v2.52, R-PRJ-06, R-SAV-04; ARCHITECTURE C53, C59; WSP-03, TEN-08; S6-12,
+    /// it by link (SPEC §8.6 v2.54, R-PRJ-06, R-SAV-04; ARCHITECTURE C53, C59; WSP-03, TEN-08; S6-12,
     /// owner decision D2 (a)). No screen offers these actions on a copy, so the client has no text of
     /// its own for it.
     /// </summary>
@@ -87,6 +97,6 @@ public static class ProblemTypes
         Validation, Antiforgery, RateLimit, Conflict, LockedCriteriaList, TestStatusUnknown,
         NoCriteriaList, ProfileMismatch, EntryWithdrawn, SelectionExcluded, ReleaseMismatch,
         EmailUnconfirmed, NotFound, EmailDelivery, LastOwner, InvitationMismatch, SoleOwner,
-        ProjectArchived, ProjectCopy,
+        ProjectArchived, TestStatusConflict, ProjectCopy,
     ];
 }

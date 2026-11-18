@@ -777,5 +777,89 @@
       },
       "soleOwner": "Sie sind das einzige Mitglied mit der Rolle „Verwalten“ in {{org}}. Geben Sie diese Rolle zuerst einem anderen Mitglied, bevor Sie Ihr Konto löschen."
     }
+  },
+  "projects": {
+    "title": "Beschaffungsprojekte",
+    "intro": "Halten Sie hier fest, welche Produkte für eine Beschaffung infrage kommen, und schätzen Sie sie anhand Ihrer Kriterien ein. Alles hier ist nur für Ihre Organisation sichtbar.",
+    "create": "Projekt anlegen",
+    "empty": "Noch keine Beschaffungsprojekte. Legen Sie ein Projekt an, sobald Sie Produkte für eine Beschaffung vergleichen möchten.",
+    "empty.archivedOnly": "Alle Projekte Ihrer Organisation sind archiviert. Sie sehen sie mit „Archivierte Projekte anzeigen“.",
+    "needOrg": "Beschaffungsprojekte gehören zu einer Organisation. Legen Sie eine Organisation an oder treten Sie einer bei, um Projekte anzulegen.",
+    "needOrg.cta": "Organisation anlegen oder beitreten",
+    "sort": "Sortieren nach",
+    "sort.modified": "Zuletzt geändert",
+    "sort.name": "Name",
+    "sort.updated": "Sortiert nach: {{sort}}.",
+    "list": {
+      "name": "Name",
+      "products": "Produkte",
+      "modified": "Zuletzt geändert"
+    },
+    "shown": "{{count}} Projekte angezeigt.",
+    "shown.one": "1 Projekt angezeigt.",
+    "shown.zero": "Keine Projekte angezeigt.",
+    "create.title": "Beschaffungsprojekt anlegen",
+    "create.name": "Name des Projekts",
+    "create.name.hint": "Zum Beispiel „Neues Bewerbermanagement 2027“.",
+    "create.criteria": "Kriterienliste (optional)",
+    "create.criteria.hint": "Anhand dieser Liste schätzen Sie die Produkte ein. Das Projekt erhält eine eigene Kopie der Liste; Änderungen daran gelten nur für dieses Projekt. Sie können die Liste auch später festlegen.",
+    "create.error.title": "Projekt nicht angelegt",
+    "create.error": "Das Projekt konnte nicht angelegt werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
+    "create.notAllowed": "Sie können für {{org}} keine Projekte anlegen. Dafür brauchen Sie die Rolle „Bearbeiten“ oder „Verwalten“.",
+    "created": "Das Projekt „{{name}}“ wurde angelegt.",
+    "status": {
+      "label": "Stand",
+      "open": "Laufend",
+      "done": "Abgeschlossen",
+      "archived": "Archiviert"
+    },
+    "detail": {
+      "meta": "Stand: {{status}} · {{count}} Produkte · nur für Ihre Organisation sichtbar",
+      "meta.one": "Stand: {{status}} · 1 Produkt · nur für Ihre Organisation sichtbar",
+      "meta.zero": "Stand: {{status}} · noch keine Produkte · nur für Ihre Organisation sichtbar",
+      "edit": "Projekt bearbeiten",
+      "criteria": {
+        "title": "Kriterienliste",
+        "adjust": "Kriterienliste anpassen",
+        "list": "Liste",
+        "release": "Katalogversion",
+        "scope": "Umfang",
+        "useCase": "Verwendungszweck",
+        "appTypes": "Anwendungstyp",
+        "testTypes": "Prüfverfahren",
+        "scope.value": "{{total}} Kriterien: {{a}} Mindestanforderungen (A), {{b}} Bewertungskriterien (B), {{info}} Hinweise – dazu {{procedures}} × „Geprüft nach …“ (zählen im Abgleich nicht mit)",
+        "scope.value.noProcedures": "{{total}} Kriterien: {{a}} Mindestanforderungen (A), {{b}} Bewertungskriterien (B), {{info}} Hinweise",
+        "copyNote": "Dieses Projekt nutzt eine eigene Kopie der Liste „{{source}}“. Änderungen daran gelten nur für dieses Projekt. Verwendungszweck, Anwendungstyp, Funktionsbereiche und Prüfverfahren sind fest."
+      },
+      "addProduct.fromDirectory": "Aus dem Produktverzeichnis übernehmen",
+      "addProduct.new": "Neu erfassen",
+      "orderNote": "Reihenfolge: zuletzt hinzugefügt zuerst. Die Liste ist kein Ranking – ein Gesamturteil gibt es bewusst nicht.",
+      "row": {
+        "tested": "Auf Barrierefreiheit geprüft",
+        "tested.evidences": "Ja – {{count}} Prüfnachweise: {{types}}",
+        "tested.evidences.one": "Ja – 1 Prüfnachweis: {{types}}",
+        "progress": "Einschätzung",
+        "counts": "Abgleich",
+        "publication": "Veröffentlichung"
+      },
+      "products": "Produkte in diesem Projekt",
+      "addProduct": "Produkt hinzufügen",
+      "noCriteria": "Diesem Projekt ist noch keine Kriterienliste zugeordnet. Ohne Liste können Sie Produkte erfassen, aber nicht anhand von Kriterien einschätzen.",
+      "noCriteria.cta": "Kriterienliste zuordnen",
+      "criteriaLocked": "Die Kriterienliste kann nicht mehr gegen eine andere ausgetauscht werden, weil schon Produkte danach eingeschätzt wurden. Sie können die Liste aber weiter anpassen: Kriterien aufnehmen oder entfernen, Prioritäten und Notizen ändern. Für eine Liste nach einer neueren Katalogversion legen Sie ein neues Projekt an.",
+      "criteriaAdded": "{{count}} Kriterien neu in der Liste. Sie sind bei allen Produkten noch nicht eingeschätzt.",
+      "criteriaAdded.one": "1 Kriterium neu in der Liste. Es ist bei allen Produkten noch nicht eingeschätzt.",
+      "empty": "Noch keine Produkte in diesem Projekt. Fügen Sie die Produkte hinzu, die Sie in Betracht ziehen.",
+      "lookup": "Im Produktverzeichnis ansehen",
+      "noResults": {
+        "werteit": "Sie finden keine passenden Produkte? Das Projekt WERTE.IT berät Sie gern."
+      }
+    },
+    "filter": {
+      "archived": "Archivierte Projekte anzeigen"
+    },
+    "archived": {
+      "note": "Dieses Projekt ist archiviert. Sie können es ansehen, aber nicht mehr bearbeiten. Um es wieder zu bearbeiten, setzen Sie den Stand auf „Laufend“."
+    }
   }
 }

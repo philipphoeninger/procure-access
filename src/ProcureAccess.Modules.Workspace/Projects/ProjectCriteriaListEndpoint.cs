@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 
 namespace ProcureAccess.Modules.Workspace.Projects;
@@ -69,7 +70,8 @@ internal static class ProjectCriteriaListEndpoint
         ProjectCriteriaListService criteriaLists,
         CancellationToken cancellationToken)
     {
-        if (await ProjectEndpoints.RefusedForProjectAsync(authorization, user, projects, id, cancellationToken) is { } refused)
+        var organizationId = await projects.OrganizationOfAsync(id, cancellationToken);
+        if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
         }
@@ -79,11 +81,11 @@ internal static class ProjectCriteriaListEndpoint
             return SourceProblem("The list to copy is required.");
         }
 
-        var assignment = await criteriaLists.AssignAsync(id, sourceId, ProjectEndpoints.UserIdOf(user), cancellationToken);
+        var assignment = await criteriaLists.AssignAsync(id, sourceId, WorkspaceAccess.UserIdOf(user), cancellationToken);
         return assignment.Outcome switch
         {
             CriteriaListAssignmentOutcome.Done => TypedResults.Ok(assignment.List),
-            CriteriaListAssignmentOutcome.NotFound => ProjectEndpoints.NotFound(),
+            CriteriaListAssignmentOutcome.NotFound => WorkspaceAccess.NotFound(),
             CriteriaListAssignmentOutcome.Archived => TypedResults.Problem(
                 detail: "The project is archived; its criteria list cannot change.",
                 statusCode: StatusCodes.Status409Conflict,
