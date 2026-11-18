@@ -9,7 +9,7 @@ version = 1
 
 # Project documents, README files and AI onboarding.
 [[annotations]]
-path = ["docs/**", "**/README.md", "CLAUDE.md", "components/notes.txt", "**/todo.txt"]
+path = ["docs/**", "**/README.md", "CLAUDE.md", "components/notes.txt"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Blinden- und Sehbehindertenverein Hamburg e.V."
 SPDX-License-Identifier = "MIT"
@@ -98,11 +98,6 @@ path = [
   "CLIENT/CLIENT.ProcureAccess/package-lock.json",
   "CLIENT/CLIENT.ProcureAccess/package.json",
   "CLIENT/CLIENT.ProcureAccess/public/products.csv",
-  "CLIENT/CLIENT.ProcureAccess/src/app/core/utils/todo.txt",
-  "CLIENT/CLIENT.ProcureAccess/src/app/features/feature-1/**/todo.txt",
-  "CLIENT/CLIENT.ProcureAccess/src/app/layout/sidebar/todo.txt",
-  "CLIENT/CLIENT.ProcureAccess/src/app/shared/directives/todo.txt",
-  "CLIENT/CLIENT.ProcureAccess/src/app/shared/pipes/todo.txt",
   "CLIENT/CLIENT.ProcureAccess/tsconfig.app.json",
   "CLIENT/CLIENT.ProcureAccess/tsconfig.json",
   "CLIENT/CLIENT.ProcureAccess/tsconfig.spec.json",

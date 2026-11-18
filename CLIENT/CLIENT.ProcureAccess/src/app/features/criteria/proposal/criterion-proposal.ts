@@ -135,7 +135,6 @@ export class CriterionProposal implements OnInit {
     //         this.snackbarService.showInfo('Login failed. Please try again.');
     //         return;
     //       } //gate
-    //       localStorage.setItem(this.jwtName, response.body.token);
     //       let user: User = new User(loginCommand.email, false);
     //       this.store.setUser(user);
     //       this.store.setUICustomization(response.body.uiCustomization);
