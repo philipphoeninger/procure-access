@@ -15,6 +15,7 @@ import { SAVED_LISTS_PATH } from './features/configurator/models/saved-lists';
 import { SHARED_PATH } from './features/configurator/models/share-links';
 import { ACCOUNT_PATH } from './features/identity/models/account';
 import { SETTINGS_PATH } from './features/settings/models/user-preferences';
+import { PROJECTS_PATH } from './features/workspace/models/projects';
 
 // `data[PAGE_TITLE_KEY]` names the page title (R-SHL-04, UX copy §5.16). Legacy screens without a
 // matching key keep the app name as title until their screen is rebuilt (S2-16).
@@ -124,6 +125,21 @@ export const routes: Routes = [
   {
     path: `${SHARED_PATH}/:token`,
     loadChildren: () => import('./features/configurator/pages/shared-list/shared-list.routing').then((m) => m.SHARED_LIST_ROUTES),
+  },
+  // S30 „Beschaffungsprojekte“ (R-PRJ-01, S6-13): the projects of the organisation the header
+  // shows; signed in only; „Projekte“ in the header leads here (R-SHL-02)
+  {
+    path: PROJECTS_PATH,
+    pathMatch: 'full',
+    loadComponent: () => import('./features/workspace/pages/projects/projects-page').then((m) => m.ProjectsPage),
+    canActivate: [authGuard],
+    data: { [PAGE_TITLE_KEY]: 'pageTitle.projects' },
+  },
+  // S32 of a project, the placeholder of S6-13 until S6-14: its resolver loads the project and
+  // names the page title (lazy child routes like a saved list)
+  {
+    path: `${PROJECTS_PATH}/:id`,
+    loadChildren: () => import('./features/workspace/pages/project-detail/project-detail.routing').then((m) => m.PROJECT_ROUTES),
   },
   {
     path: SETTINGS_PATH,

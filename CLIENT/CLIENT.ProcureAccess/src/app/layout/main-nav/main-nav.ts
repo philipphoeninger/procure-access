@@ -18,6 +18,7 @@ import { SAVED_LISTS_PATH } from '@app/features/configurator/models/saved-lists'
 import { MEMBERS_SEGMENT, ORGANIZATION_PATH } from '@app/features/organization/models/organization';
 import { ACCOUNT_PATH } from '@app/features/identity/models/account';
 import { SETTINGS_PATH } from '@app/features/settings/models/user-preferences';
+import { PROJECTS_PATH } from '@app/features/workspace/models/projects';
 
 /**
  * Main navigation and account actions of the header (Handoff §3.1; SPEC R-SHL-02, R-SHL-03). `bar`
@@ -25,7 +26,8 @@ import { SETTINGS_PATH } from '@app/features/settings/models/user-preferences';
  *
  * The three states come from `withIdentity()`: Anonymous shows „Anmelden“; SignedIn shows the
  * organisation display and the menu „Konto“; SignedInNoOrg the menu alone (S5-18). „Projekte“
- * comes with the projects screens of the workspace step (owner decision S5-18 1a). With more than
+ * leads to S30, only with a membership, after „Kriterien“ (S6-13; owner decision S5-18 1a); it is
+ * current on S30 and on every page of a project. With more than
  * one membership the display is the organisation switch: in the bar a menu button whose name is
  * its visible text, with one `menuitemradio` per organisation (a select would change the context
  * on input, WCAG 3.2.2); in the drawer a list of buttons, the active one `aria-current`. The menu
@@ -86,6 +88,9 @@ export class MainNav {
     return active ? ['/', ORGANIZATION_PATH, active.id, MEMBERS_SEGMENT] : ['/', ORGANIZATION_PATH];
   });
 
+  /** „Projekte“ (R-SHL-02): S30, only with a membership (S6-13). */
+  protected readonly projectsLink = `/${PROJECTS_PATH}`;
+
   /** „Kriterienlisten“ (U140, owner decision S5-20b 4a): S14, only with a membership. */
   protected readonly savedListsLink = `/${SAVED_LISTS_PATH}`;
 
@@ -103,8 +108,8 @@ export class MainNav {
   /**
    * Makes another organisation the active one (R-SHL-03). On S21 the page follows: it opens S21 of
    * the chosen organisation, which loads its data and is announced as a page change. S14 reads the
-   * active organisation and loads its lists (S5-20b); projects and the compare select read it when
-   * they are built (workspace and directory steps).
+   * active organisation and loads its lists (S5-20b), S30 its projects (S6-13); the compare select
+   * reads it when it is built (directory step).
    */
   protected async switchTo(organizationId: string): Promise<void> {
     this.navigated.emit();

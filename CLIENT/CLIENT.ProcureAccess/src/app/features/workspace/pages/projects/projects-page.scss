@@ -1,0 +1,104 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S30 (Handoff §5.3: list as S14; Handoff §2.2 tables): cards below 600 px, a table from 600 px.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-lg);
+  inline-size: 100%;
+}
+
+// H1: headline-small below 600 px, headline-large from 600 px (Handoff §1.3)
+.pa-projects__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+
+  @media (min-width: 37.5em) {
+    font: var(--mat-sys-headline-large);
+  }
+}
+
+.pa-projects__text {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+}
+
+// „Sortieren nach“ and „Archivierte Projekte anzeigen“: stacked below 600 px, one row from 600 px.
+.pa-projects__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pa-space-sm) var(--pa-space-lg);
+  }
+}
+
+.pa-projects__sort {
+  inline-size: 100%;
+
+  @media (min-width: 37.5em) {
+    inline-size: auto;
+    min-inline-size: 16rem;
+  }
+}
+
+.pa-projects__link {
+  color: var(--mat-sys-primary);
+  overflow-wrap: anywhere;
+}
+
+.pa-projects__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pa-projects__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+}
+
+.pa-projects__name {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+// „Stand“, „Produkte“ and „Zuletzt geändert“: term and value on one line each, wrapping when narrow.
+.pa-projects__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--pa-space-xs) var(--pa-space-sm);
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.pa-projects__table {
+  inline-size: 100%;
+
+  td {
+    vertical-align: middle;
+    padding-block: var(--pa-space-xs);
+  }
+}
