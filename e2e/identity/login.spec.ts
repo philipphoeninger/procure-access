@@ -139,6 +139,21 @@ test.describe('S01 „Anmelden“, login overlay and sign-out', () => {
     await expect(accountMenuButton(page)).toBeVisible();
   });
 
+  test('a signed-out deep link to a guarded page returns to it after the sign-in (S6-03, #386)', async ({ page }) => {
+    await page.goto('/konto');
+
+    // authGuard opens S01 over the start page and keeps /konto in memory only, never in the address.
+    await expect(main(page).getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
+    await expect(page).toHaveURL(/\/\(login:anmelden\)$/);
+
+    await signIn(main(page));
+
+    await expect(page).toHaveURL(/\/konto$/);
+    await expect(main(page).getByRole('heading', { level: 1, name: 'Konto' })).toBeFocused();
+    await expect(page).toHaveTitle('Konto – ProcureAccess');
+    await expect(accountMenuButton(page)).toBeVisible();
+  });
+
   test('INV:A11Y-01 INV:A11Y-08 the overlay after a 401 keeps the selection and sends the request again', async ({ page }, testInfo) => {
     await expireSessionOnce(page, '**/api/v1/catalog/criteria?**');
     await toStep4(page);

@@ -5,7 +5,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Router, RouterOutlet, TitleStrategy } from '@angular/router';
+import { provideRouter, Router, RouterOutlet, TitleStrategy } from '@angular/router';
 import { render, screen } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 
@@ -22,6 +22,12 @@ import { LoginPage } from './login-page';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ListPage {}
+
+@Component({
+  template: '<h1>Mein Konto</h1>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class AccountPage {}
 
 /** The primary page and the `login` outlet, as in the shell. */
 @Component({
@@ -48,6 +54,7 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
         { path: 'kriterien/ergebnis', component: ListPage, data: { [PAGE_TITLE_KEY]: 'pageTitle.criteria.list' } },
         { path: LOGIN_PATH, component: LoginPage, outlet: 'login', data: { [PAGE_TITLE_KEY]: 'pageTitle.login' } },
         { path: 'registrieren', component: ListPage },
+        { path: 'konto', component: AccountPage, data: { [PAGE_TITLE_KEY]: 'pageTitle.account' } },
       ],
       providers: [
         provideTestTranslations(),
@@ -120,6 +127,29 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
     expect(keepDraftAfterSignIn).toHaveBeenCalled();
   });
 
+  it('opens the guarded page the user came for after the sign-in (returnUrl, S6-03)', async () => {
+    const { fixture, router } = await openLogin({ state: { returnUrl: '/konto?ansicht=daten' } });
+
+    await fillAndSubmit(fixture);
+
+    expect(router.url).toBe('/konto?ansicht=daten');
+    expect(screen.queryByRole('heading', { level: 1, name: 'Anmelden' })).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'Mein Konto' })).toBeTruthy();
+    expect(keepDraftAfterSignIn).not.toHaveBeenCalled();
+  });
+
+  it.each(['https://evil.example/konto', '//evil.example', '/\\evil.example', 'javascript:alert(1)'])(
+    'only closes the outlet when the returnUrl %s is not a path of this app',
+    async (returnUrl) => {
+      const { fixture, router } = await openLogin({ state: { returnUrl } });
+
+      await fillAndSubmit(fixture);
+
+      expect(router.url).toBe('/kriterien/ergebnis');
+      expect(screen.getByRole('heading', { level: 1, name: 'Ihre Kriterienliste' })).toBeTruthy();
+    },
+  );
+
   it('prefixes the page title with „Fehler:“ while the error summary shows', async () => {
     const refused = new HttpErrorResponse({ status: 400, error: { type: `${base}validation`, errors: { $: ['wrong'] } } });
     const { fixture } = await openLogin({ rejectWith: refused });
@@ -131,5 +161,34 @@ describe('LoginPage (S01, R-AUTH-03)', () => {
     await fillAndSubmit(fixture);
     expect(document.title).toBe('Fehler: Anmelden – ProcureAccess');
     expect(screen.getByText(/Anmeldung nicht möglich/)).toBeTruthy();
+  });
+
+  it('opens the guarded page also on a deep link, when the shell creates S01 after the first navigation', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          { path: '', component: ListPage },
+          { path: LOGIN_PATH, component: LoginPage, outlet: 'login', data: { [PAGE_TITLE_KEY]: 'pageTitle.login' } },
+          { path: 'konto', component: AccountPage, data: { [PAGE_TITLE_KEY]: 'pageTitle.account' } },
+        ]),
+        provideTestTranslations(),
+        { provide: TitleStrategy, useExisting: PageTitleStrategy },
+        {
+          provide: ProcureAccessStore,
+          useValue: { startSession: vi.fn().mockResolvedValue(undefined), keepDraftAfterSignIn: vi.fn() },
+        },
+        { provide: A11yAnnouncerService, useValue: { announce: vi.fn(), announcePageTitle: vi.fn().mockResolvedValue(undefined) } },
+      ],
+    });
+    const router = TestBed.inject(Router);
+    // As authGuard's redirect does it during the first navigation, before the shell has its outlets.
+    await router.navigate(['', { outlets: { login: [LOGIN_PATH] } }], { state: { returnUrl: '/konto' } });
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+
+    await fillAndSubmit(fixture);
+
+    expect(router.url).toBe('/konto');
+    expect(screen.getByRole('heading', { level: 1, name: 'Mein Konto' })).toBeTruthy();
   });
 });

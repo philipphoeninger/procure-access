@@ -22,7 +22,12 @@ export const NEW_PASSWORD_PATH = `${RESET_PASSWORD_PATH}/neu`;
 /** Why S01 opens: `save` shows `auth.login.reasonSave` (S11 „Liste speichern“, R-AUTH-03). */
 export type LoginReason = 'save';
 
-/** Router state that carries the {@link LoginReason} to S01; never in the URL. */
+/** Router state that carries the {@link LoginReason} and the return target to S01; never in the URL. */
 export interface LoginNavigationState {
   loginReason?: LoginReason;
+  /**
+   * The guarded page a signed-out user opened (`authGuard`, S6-03); S01 goes there after the
+   * sign-in, after `safeReturnUrl` has accepted it.
+   */
+  returnUrl?: string;
 }
