@@ -23,18 +23,22 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// memberships and contributor profiles through <see cref="IAccountDataExport"/>, the settings
 /// through <see cref="IUserPreferences"/> (S5-25a). The criteria lists the user created come from
 /// the Configurator module, which implements <see cref="ICriteriaListDataExport"/> of this
-/// module's contracts (S5-19; inverted in S6-10, because IdentityAccess depends on no module).
+/// module's contracts (S5-19; inverted in S6-10, because IdentityAccess depends on no module),
+/// the procurement projects the user created from the Workspace module in the same way
+/// (<see cref="IProjectDataExport"/>, S6-25).
 /// </summary>
 /// <remarks>
 /// <para><b>Only the user's own data (PRV-07).</b> No id of any kind and nothing of another user:
 /// memberships name the organisation, the role and since when; profiles their display name, kind
 /// and creation time; criteria lists their name, organisation, release, selection and criteria
 /// with the user's decisions (owner decision S5-19 4), for the organisations the user still
-/// belongs to.</para>
+/// belongs to; projects their name, organisation, status, criteria list by name and release, and
+/// every candidate with its private section and test evidences (owner decisions S6-25 D1 (a),
+/// D2 (a)), for the same organisations.</para>
 /// <para><b>Settings</b> (S5-25a, owner decision S5-25 4): <c>preferences</c> holds the effective
 /// values — the defaults for a user who never saved any —, spelled as the settings API does.</para>
-/// <para><b>Sections not built yet</b> (owner decision S5-27 1a): <c>contributions</c> (step 6) and
-/// <c>createdByMe.projects</c> (step 5) are empty arrays. Each of these tasks fills its section and its part of PRV-07; the format stays
+/// <para><b>Section not built yet</b> (owner decision S5-27 1a): <c>contributions</c> (step 6) is
+/// an empty array. Its task fills it and its part of PRV-07; the format stays
 /// <c>formatVersion</c> 1. <c>account.createdAt</c> is <c>null</c> for accounts created before
 /// S5-27 (decision 2a).</para>
 /// <para><b>Answer.</b> Generated synchronously; <c>Cache-Control: no-store</c> on every answer of
@@ -80,6 +84,7 @@ internal static class AccountExportEndpoints
         IAccountDataExport accountData,
         IUserPreferences preferences,
         ICriteriaListDataExport criteriaLists,
+        IProjectDataExport projects,
         TimeProvider clock,
         HttpContext context,
         CancellationToken cancellationToken)
@@ -98,6 +103,7 @@ internal static class AccountExportEndpoints
         var part = await accountData.GetAsync(userId, cancellationToken);
         var settings = await preferences.GetAsync(userId, cancellationToken);
         var lists = await criteriaLists.GetCreatedByAsync(userId, cancellationToken);
+        var createdProjects = await projects.GetCreatedByAsync(userId, cancellationToken);
         var generatedAt = clock.GetUtcNow();
         var document = new AccountExportDocument(
             generatedAt,
@@ -106,7 +112,7 @@ internal static class AccountExportEndpoints
             [.. part.Memberships.Select(m => new AccountExportMembership(m.Organization, OrganizationEndpoints.NameOf(m.Role), m.Since))],
             [.. part.ContributorProfiles.Select(p => new AccountExportContributorProfile(p.DisplayName, p.Kind, p.CreatedAt))],
             Contributions: [],
-            new AccountExportCreatedByMe([.. lists.Select(ListOf)], Projects: []));
+            new AccountExportCreatedByMe([.. lists.Select(ListOf)], [.. createdProjects.Select(ProjectOf)]));
 
         return TypedResults.File(JsonSerializer.SerializeToUtf8Bytes(document, Json), ContentType, FileNameOf(generatedAt));
     }
@@ -119,6 +125,17 @@ internal static class AccountExportEndpoints
         new AccountExportListSelection(list.Selection.UseCase, list.Selection.AppTypes, list.Selection.ProductParts, list.Selection.TestTypes),
         [.. list.Criteria.Select(c => new AccountExportListCriterion(
             c.Number, c.Title, c.IsIncluded, c.RecommendedLevel, c.EffectiveLevel, c.Weight, c.Note))]);
+
+    private static AccountExportProject ProjectOf(ExportedProject project) => new(
+        project.Name,
+        project.Organization,
+        project.Status,
+        project.CreatedAt,
+        project.CriteriaList is { } list ? new AccountExportProjectCriteriaList(list.Name, list.Release) : null,
+        [.. project.Candidates.Select(c => new AccountExportCandidate(
+            c.Name, c.Vendor, c.Website, c.FunctionalSummary, c.TestStatus, c.ContactNotes, c.InternalNotes, c.CreatedAt,
+            [.. c.TestEvidences.Select(e => new AccountExportTestEvidence(
+                e.TestKind, e.TestType, e.OtherTestTypeName, e.TestedBy, e.TestDate, e.TestedVersion, e.EvidenceUrl, e.QualificationNote))]))]);
 
     private static AccountExportPreferences PreferencesOf(UserPreferencesValues settings) =>
         new(settings.Language, settings.Appearance, settings.Motion, settings.Contrast);
@@ -149,8 +166,9 @@ internal sealed record AccountExportMembership(string Organization, string Role,
 /// <summary>A contributor profile of the user.</summary>
 internal sealed record AccountExportContributorProfile(string DisplayName, string Kind, DateTimeOffset CreatedAt);
 
-/// <summary>What the user created: criteria lists (S5-19) and procurement projects (step 5, empty until then).</summary>
-internal sealed record AccountExportCreatedByMe(IReadOnlyList<AccountExportCriteriaList> CriteriaLists, IReadOnlyList<object> Projects);
+/// <summary>What the user created: criteria lists (S5-19) and procurement projects (S6-25).</summary>
+internal sealed record AccountExportCreatedByMe(
+    IReadOnlyList<AccountExportCriteriaList> CriteriaLists, IReadOnlyList<AccountExportProject> Projects);
 
 /// <summary>A criteria list the user created, with its current content (owner decision S5-19 4).</summary>
 internal sealed record AccountExportCriteriaList(
@@ -171,3 +189,48 @@ internal sealed record AccountExportListSelection(
 /// </summary>
 internal sealed record AccountExportListCriterion(
     string? Number, string Title, bool IsIncluded, string RecommendedLevel, string EffectiveLevel, int? Weight, string? Note);
+
+/// <summary>
+/// A procurement project the user created, with its current content (owner decision S6-25 D1 (a)):
+/// status as <c>open</c>, <c>done</c>, <c>archived</c>; the criteria list by name and release, or
+/// <c>null</c> (D2 (a)); the candidates in the order they were added.
+/// </summary>
+internal sealed record AccountExportProject(
+    string Name,
+    string Organization,
+    string Status,
+    DateTimeOffset CreatedAt,
+    AccountExportProjectCriteriaList? CriteriaList,
+    IReadOnlyList<AccountExportCandidate> Candidates);
+
+/// <summary>The criteria list of a project.</summary>
+internal sealed record AccountExportProjectCriteriaList(string Name, string Release);
+
+/// <summary>
+/// A candidate product with its private section: test status as <c>tested</c>, <c>notTested</c>,
+/// <c>unknown</c>.
+/// </summary>
+internal sealed record AccountExportCandidate(
+    string Name,
+    string? Vendor,
+    string? Website,
+    string? FunctionalSummary,
+    string TestStatus,
+    string? ContactNotes,
+    string? InternalNotes,
+    DateTimeOffset CreatedAt,
+    IReadOnlyList<AccountExportTestEvidence> TestEvidences);
+
+/// <summary>
+/// A test evidence with its private note: kind as <c>procedure</c>, <c>other</c>, <c>own</c>; the
+/// test type is the catalog key of a procedure.
+/// </summary>
+internal sealed record AccountExportTestEvidence(
+    string TestKind,
+    string? TestType,
+    string? OtherTestTypeName,
+    string TestedBy,
+    DateOnly TestDate,
+    string? TestedVersion,
+    string? EvidenceUrl,
+    string? QualificationNote);

@@ -28,10 +28,11 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// <para><b>Rule (TEN-11).</b> A user who is the only Owner of an organisation with other members
 /// gets 409 <c>sole-owner</c> with the names of these organisations, and nothing changes. An
 /// organisation whose only member the user is ends with the account: its criteria lists, share
-/// links and invitations are deleted.</para>
+/// links and invitations are deleted, and since S6-25 its procurement projects with their
+/// candidates, test evidences and project copies of a list.</para>
 /// <para><b>Order.</b> The modules share no transaction (ADR-014), so the steps run in an order in
-/// which each can be repeated: the check (<see cref="IAccountDeletion.BeginAsync"/>), the lists and
-/// links of the organisations that end, the memberships and organisations
+/// which each can be repeated: the check (<see cref="IAccountDeletion.BeginAsync"/>), the lists,
+/// projects and links of the organisations that end, the memberships and organisations
 /// (<see cref="IAccountDeletion.CompleteAsync"/>), the account last. A failure in between answers
 /// 500, the account still signs in, and the next attempt finishes the deletion.</para>
 /// <para><b>The account</b> (owner decision S5-28 2a): the row stays, soft-deleted (ARCHITECTURE
