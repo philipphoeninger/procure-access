@@ -25,7 +25,7 @@ import { criteriaAnswer } from '../../testing/criteria-fixture';
 import { filterOptionsAnswer } from '../../testing/filter-options-fixture';
 import { SavedListEditor } from './saved-list-editor';
 import { SavedListPage } from './saved-list-page';
-import { decisionsOf, SavedListLoad, SavedListNavigationState, SavedListView, selectionOf } from './saved-list-load';
+import { decisionsOf, SavedListLoad, SavedListNavigationState, SavedListProject, SavedListView, selectionOf } from './saved-list-load';
 
 /** The fixture answer with one revision per criterion, as a release has them. */
 function answer(): CriteriaResponse {
@@ -40,6 +40,7 @@ const LIST: SavedList = {
   releaseVersion: 'T.1',
   createdAt: '2026-11-16T09:00:00Z',
   modifiedAt: '2026-11-16T09:00:00Z',
+  procurementProjectId: null,
   selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: ['softwareTest'] },
   criteria: [
     { criterionRevisionId: 200, isIncluded: false, resolvedLevel: 'A', overrideLevel: null, overrideWeight: null, note: null },
@@ -49,7 +50,7 @@ const LIST: SavedList = {
   ],
 };
 
-function listView(activeRelease: string | null = 'T.1'): SavedListView {
+function listView(activeRelease: string | null = 'T.1', project: SavedListProject | null = null): SavedListView {
   const criteria = answer();
   return {
     kind: 'list',
@@ -59,6 +60,7 @@ function listView(activeRelease: string | null = 'T.1'): SavedListView {
     options: filterOptionsAnswer().layers,
     decisions: decisionsOf(LIST, criteria),
     activeRelease,
+    project,
   };
 }
 
@@ -72,6 +74,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
   let decide: ReturnType<typeof vi.fn>;
   let copyToActiveRelease: ReturnType<typeof vi.fn>;
   let paramMap: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+  let noteCriteriaAdded: ReturnType<typeof vi.fn>;
 
   async function openPage({
     view = listView(),
@@ -82,6 +85,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     decide = vi.fn().mockResolvedValue(null);
     copyToActiveRelease = vi.fn().mockResolvedValue({ id: 'list-2', releaseVersion: 'T.2', droppedValues: [], notCarried: [] });
     paramMap = new BehaviorSubject(convertToParamMap({ id: 'list-1' }));
+    noteCriteriaAdded = vi.fn();
     const load = new SavedListLoad();
     load.view = view;
     const rendered = await render(SavedListPage, {
@@ -96,7 +100,10 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
         provideLoadedConfiguratorSettings(),
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: ConfiguratorApiService, useValue: { decide, copyToActiveRelease } },
-        { provide: ProcureAccessStore, useValue: { organizations: signal(role === null ? [] : [membership(role)]) } },
+        {
+          provide: ProcureAccessStore,
+          useValue: { organizations: signal(role === null ? [] : [membership(role)]), noteCriteriaAdded },
+        },
       ],
     });
     await rendered.fixture.whenStable();
@@ -331,6 +338,65 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     await fixture.whenStable();
 
     expect(screen.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' })).toBeTruthy();
+  });
+
+  describe('project copy (R-PRJ-06, WSP-03; S6-12)', () => {
+    const PROJECT: SavedListProject = { id: 'project-1', name: 'Bewerbermanagement 2027', archived: false };
+
+    it('INV:WSP-03 shows the copy with criteria.list.projectCopy, without „Auswahl ändern“, sharing or a new list of the release', async () => {
+      await openPage({ view: listView('T.2', PROJECT), role: 'owner' });
+
+      expect(screen.getByRole('heading', { level: 1, name: 'Vergabe Personalsoftware 2027' })).toBeTruthy();
+      expect(setPageTitleState).toHaveBeenCalledWith({ params: { project: 'Bewerbermanagement 2027' } });
+      expect(screen.getByText(/^Diese Liste gehört zum Beschaffungsprojekt „Bewerbermanagement 2027“\./)).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'Auswahl ändern' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Freigabelink erstellen' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Neue Liste mit derselben Auswahl' })).toBeNull();
+      expect(document.body.textContent).not.toContain('Inzwischen gibt es die Version');
+      expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
+      await expectNoAxeViolations();
+    });
+
+    it('INV:WSP-03 saves an inclusion of the copy as on any list and reports it for S32 when left', async () => {
+      const fixture = await openPage({ view: listView('T.1', PROJECT), role: 'editor' });
+
+      within(card('Bilder haben einen Alternativtext')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+      expect(decide).toHaveBeenCalledWith('list-1', 200, { isIncluded: true, overrideLevel: null, overrideWeight: null, note: null });
+
+      fixture.destroy();
+      expect(noteCriteriaAdded).toHaveBeenCalledWith('project-1', 1);
+    });
+
+    it('counts only criteria that were left out when the page opened', async () => {
+      const fixture = await openPage({ view: listView('T.1', PROJECT), role: 'editor' });
+
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await fixture.whenStable();
+
+      fixture.destroy();
+      expect(noteCriteriaAdded).toHaveBeenCalledWith('project-1', 0);
+    });
+
+    it('shows the copy of an archived project read only with the archived note (owner decision S6-12 D3 (a))', async () => {
+      const fixture = await openPage({ view: listView('T.1', { ...PROJECT, archived: true }), role: 'owner' });
+
+      expect(screen.getByText(/^Dieses Projekt ist archiviert\./)).toBeTruthy();
+      expect(screen.queryByRole('checkbox', { name: /^In Liste aufnehmen/ })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Liste exportieren' })).toBeTruthy();
+
+      fixture.destroy();
+      expect(noteCriteriaAdded).not.toHaveBeenCalled();
+    });
+
+    it('shows the copy read only to a Reader', async () => {
+      await openPage({ view: listView('T.1', PROJECT), role: 'reader' });
+
+      expect(screen.getByText(/^Diese Liste gehört zum Beschaffungsprojekt/)).toBeTruthy();
+      expect(screen.queryByRole('checkbox', { name: /^In Liste aufnehmen/ })).toBeNull();
+    });
   });
 
   it('shows „Seite nicht gefunden“ for a list that does not exist for the user (TEN-01)', async () => {

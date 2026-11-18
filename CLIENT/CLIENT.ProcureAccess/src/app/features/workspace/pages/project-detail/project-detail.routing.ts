@@ -10,6 +10,7 @@ import { PAGE_TITLE_KEY } from '@app/core/a11y/page-title.strategy';
 import { authGuard } from '@app/core/guards/auth.guard';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 
+import { PROJECT_CRITERIA_LIST_SEGMENT } from '../../models/projects';
 import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { ProjectLoad } from './project-detail-load';
 import { ProjectDetailPage } from './project-detail';
@@ -42,7 +43,7 @@ export const projectResolver: ResolveFn<string> = async (route) => {
   }
 };
 
-/** S32 at `/projekte/:id`, lazy; signed in only (R-PRJ-03 with S6-14; the placeholder of S6-13). */
+/** S32 at `/projekte/:id`, lazy; signed in only (R-PRJ-03 with S6-14; the placeholder of S6-13); below it S11 of the project's copy. */
 export const PROJECT_ROUTES: Routes = [
   {
     path: '',
@@ -51,5 +52,12 @@ export const PROJECT_ROUTES: Routes = [
     canActivate: [authGuard],
     providers: [ProjectLoad],
     resolve: { [PAGE_TITLE_KEY]: projectResolver },
+  },
+  {
+    // S11 of the project's own copy of a list (R-PRJ-06; S6-12), lazy: the configurator's page
+    // stays out of S32's chunk.
+    path: PROJECT_CRITERIA_LIST_SEGMENT,
+    loadChildren: () =>
+      import('../project-criteria-list/project-criteria-list.routing').then((m) => m.PROJECT_CRITERIA_LIST_ROUTES),
   },
 ];

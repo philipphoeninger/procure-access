@@ -11,13 +11,17 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
 import { applyServerErrors, problemTypeName } from '@app/core/errors/problem-details';
+import { SnackbarService } from '@app/core/services/snackbar.service';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { SavedListSummary } from '@app/features/configurator/models/saved-lists';
+import { ConfiguratorApiService } from '@app/features/configurator/services/api/configurator-api.service';
 import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm-required-notice/confirm-required-notice';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
 import { Notice } from '@app/shared/components/notice/notice';
@@ -34,6 +38,12 @@ function nameLength(control: AbstractControl<string>): ValidationErrors | null {
 
 /** A failure the dialog shows in its error notice above the actions (Handoff §5.1 S13-E). */
 type CreateError = 'failed' | 'notAllowed' | 'antiforgery';
+
+/** The general notice of the error interceptor, for a list that was not copied (owner decision S6-12 D5 (b)). */
+const GENERAL_ERROR_KEY = 'ERROR.GENERIC';
+
+/** The value of „Keine Liste“; the lists have UUIDs. */
+const NO_LIST = '';
 
 /**
  * S31 · Beschaffungsprojekt anlegen (R-PRJ-02; UX copy §5.8, U167; Handoff §5.3: no Figma frame,
@@ -52,12 +62,17 @@ type CreateError = 'failed' | 'notAllowed' | 'antiforgery';
  *   for the role `projects.create.notAllowed`; `antiforgery` its text; everything else
  *   `projects.create.error`. A field error at `name` shows at the field. The request is marked
  *   `CALLER_SHOWS_FAILURES`.
- * - The list choice `projects.create.criteria` with its hint joins with the project copy of S6-12
- *   (owner decision S6-13 D1 (a)): the server creates a project with its name only.
+ * - „Kriterienliste (optional)“ (`projects.create.criteria`, R-PRJ-02; S6-12) offers „Keine Liste“
+ *   (preselected) and the saved lists of the organisation by name — the server lists no project's
+ *   copy, so no list of another project is offered. Without saved lists, or when they cannot be
+ *   read, the field is left out: the list can be assigned later. With a list chosen, the project
+ *   gets its own copy right after it is created (`PUT …/criteria-configuration`). If that fails,
+ *   S32 of the new project still opens and the general notice shows (owner decision S6-12 D5 (b)):
+ *   the project exists, without a list.
  *
  * Below 600 px the dialog fills the screen and stacks its actions in DOM order (S13-M).
  *
- * @spec docs/SPEC_v2.md R-PRJ-02; docs/design_handoff_procureaccess_v1.md §5.3, §6.4
+ * @spec docs/SPEC_v2.md R-PRJ-02, R-PRJ-04; docs/design_handoff_procureaccess_v1.md §5.3, §6.4
  * @invariants SEC-10, API-02, A11Y-09
  */
 @Component({
@@ -70,6 +85,7 @@ type CreateError = 'failed' | 'notAllowed' | 'antiforgery';
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     Notice,
     ReactiveFormsModule,
     TranslatePipe,
@@ -93,6 +109,8 @@ export class CreateProjectDialog {
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly translate = inject(TranslateService);
   private readonly dialogRef = inject<MatDialogRef<CreateProjectDialog>>(MatDialogRef);
+  private readonly lists = inject(ConfiguratorApiService);
+  private readonly snackbar = inject(SnackbarService);
   private readonly injector = inject(Injector);
   private readonly confirmNotice = viewChild<ElementRef<HTMLElement>>('confirmNotice');
 
@@ -104,6 +122,16 @@ export class CreateProjectDialog {
   protected readonly name = new FormControl('', { nonNullable: true, validators: [requiredName, nameLength] });
   protected readonly nameId = 'pa-create-project-name';
   protected readonly hintId = 'pa-create-project-name-hint';
+
+  /**
+   * The organisation list to copy into the project; {@link NO_LIST} for „Keine Liste“ — a real
+   * value, because MatSelect shows an option with the value null as no choice at all.
+   */
+  protected readonly criteriaList = new FormControl(NO_LIST, { nonNullable: true });
+  protected readonly noList = NO_LIST;
+  protected readonly criteriaHintId = 'pa-create-project-criteria-hint';
+  /** The saved lists of the organisation by name (German collation); empty hides the field. */
+  protected readonly savedLists = signal<SavedListSummary[]>([]);
 
   protected readonly busy = signal(false);
   protected readonly summary = signal<ErrorSummaryItem[]>([]);
@@ -121,6 +149,17 @@ export class CreateProjectDialog {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => (this.destroyed = true));
+    if (this.organization !== null) void this.loadSavedLists(this.organization.id);
+  }
+
+  /** The lists „Kriterienliste (optional)“ offers; a failure leaves the field out (assigned later). */
+  private async loadSavedLists(organizationId: string): Promise<void> {
+    try {
+      const lists = await this.lists.list(organizationId);
+      this.savedLists.set([...lists].sort((a, b) => a.name.localeCompare(b.name, 'de')));
+    } catch {
+      this.savedLists.set([]);
+    }
   }
 
   /** The message at the name field, also the line of the error summary (E12). */
@@ -161,12 +200,21 @@ export class CreateProjectDialog {
     }
 
     const name = this.name.value.trim();
+    const listId = this.savedLists().some((list) => list.id === this.criteriaList.value) ? this.criteriaList.value : null;
     this.summary.set([]);
     this.error.set(null);
     this.busy.set(true);
     let id: string;
+    // The project exists once created: a list that cannot be copied leaves it without one (D5 (b)).
+    let listCopied = true;
     try {
       ({ id } = await this.store.createProject(this.organization.id, name));
+      if (listId !== null) {
+        listCopied = await this.store.assignCriteriaList(id, listId).then(
+          () => true,
+          () => false,
+        );
+      }
     } catch (error: unknown) {
       if (!this.destroyed) this.refused(error);
       return;
@@ -177,6 +225,7 @@ export class CreateProjectDialog {
     this.dialogRef.close(id);
     await this.router.navigateByUrl(projectPath(id));
     void this.announcer.announce('projects.created', { name });
+    if (!listCopied) this.snackbar.showError(this.translate.instant(GENERAL_ERROR_KEY) as string);
   }
 
   private refused(error: unknown): void {

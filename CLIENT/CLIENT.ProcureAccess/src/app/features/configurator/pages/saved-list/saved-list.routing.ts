@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 import { inject } from '@angular/core';
-import { ResolveFn, Routes } from '@angular/router';
+import { RedirectCommand, ResolveFn, Router, Routes } from '@angular/router';
 
 import { PAGE_TITLE_KEY } from '@app/core/a11y/page-title.strategy';
 import { authGuard } from '@app/core/guards/auth.guard';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { projectCriteriaListPath } from '@app/features/workspace/models/projects';
 
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
@@ -22,12 +23,15 @@ import { SavedListSelection, savedListSelectionGuard } from './saved-list-select
  * before its page shows (SPEC §8.10), so the route change titles, focuses and
  * announces „{{name}} – Gespeicherte Kriterienlisten“ with the name already known (A11Y-03). A list
  * that does not exist for the user shows „Seite nicht gefunden“ in place, any other failure the S80
- * server text, as S21 does; so do settings that fail. The loading bar shows meanwhile.
+ * server text, as S21 does; so do settings that fail. The loading bar shows meanwhile. A project's
+ * own copy of a list has one address, its project's (`/projekte/:id/kriterienliste`, owner decision
+ * S6-12 D7 (a)): its id here leads there, replacing this address in the history.
  */
 export const savedListResolver: ResolveFn<string> = async (route) => {
   const load = inject(SavedListLoad);
   const store = inject(ProcureAccessStore);
   const settings = inject(ConfiguratorSettings);
+  const router = inject(Router);
   store.incrementLoadingCount();
   try {
     const [view, settingsReady] = await Promise.all([
@@ -39,8 +43,12 @@ export const savedListResolver: ResolveFn<string> = async (route) => {
     store.decrementLoadingCount();
   }
   switch (load.view.kind) {
-    case 'list':
-      return 'pageTitle.criteria.list.saved';
+    case 'list': {
+      const projectId = load.view.list.procurementProjectId;
+      return projectId === null
+        ? 'pageTitle.criteria.list.saved'
+        : new RedirectCommand(router.parseUrl(projectCriteriaListPath(projectId)), { replaceUrl: true });
+    }
     case 'notFound':
       return 'pageTitle.notFound';
     default:

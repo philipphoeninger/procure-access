@@ -57,7 +57,7 @@ export const PAGES = {
 // Empty from S2-15 (the shell header carries its tag) until S6-13.
 export const PENDING = {
   'src/app/features/workspace/pages/project-detail/project-detail.ts':
-    'S32 placeholder of S6-13 (name, status line, archived note); S6-14 builds it from its frames and adds the tag',
+    'S32 placeholder of S6-13 (name, status line, archived note) with the list section of S6-12; S6-14 builds it from its frames and adds the tag',
 };
 
 /** Node ids of the @figma lines of a source in their order; null for a link to another file or a foreign URL. */

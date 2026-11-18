@@ -9,12 +9,14 @@ import { lastValueFrom } from 'rxjs';
 import { API_URL } from '@app/app.config';
 import { CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
-import { Project, ProjectSummary } from '../../models/projects';
+import { Project, ProjectCriteriaList, ProjectSummary } from '../../models/projects';
 
 /**
  * Client of the project endpoints of the Workspace module (ARCHITECTURE §7.2; S6-11). Every request
  * is marked {@link CALLER_SHOWS_FAILURES}: S30 shows a failed list as the S80 server text in place,
- * S31 every failure of creating in its error notice, S32 a failed read as S80 in place.
+ * S31 every failure of creating in its error notice, S32 a failed read as S80 in place; a failed
+ * assignment of a list after creating the project shows the general notice on S32 (owner decision
+ * S6-12 D5 (b)).
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectsApiService {
@@ -47,6 +49,20 @@ export class ProjectsApiService {
       this.http.get<Project>(`${this.apiUrl}/v1/projects/${encodeURIComponent(id)}`, {
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
       }),
+    );
+  }
+
+  /**
+   * Gives the project its own copy of an organisation list, replacing a copy it had (R-PRJ-02,
+   * R-PRJ-04; `PUT /api/v1/projects/{id}/criteria-configuration`, S6-12); Editor or Owner.
+   */
+  assignCriteriaList(projectId: string, sourceConfigurationId: string): Promise<ProjectCriteriaList> {
+    return lastValueFrom(
+      this.http.put<ProjectCriteriaList>(
+        `${this.apiUrl}/v1/projects/${encodeURIComponent(projectId)}/criteria-configuration`,
+        { sourceConfigurationId },
+        { context: new HttpContext().set(CALLER_SHOWS_FAILURES, true) },
+      ),
     );
   }
 }

@@ -14,6 +14,17 @@ import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 
 /**
+ * The procurement project whose own copy of a list the page shows (S11 in project-copy mode,
+ * R-PRJ-06; S6-12): its name for `criteria.list.projectCopy` and the title, and whether it is
+ * archived — then the copy is read-only (owner decision S6-12 D3 (a)).
+ */
+export interface SavedListProject {
+  id: string;
+  name: string;
+  archived: boolean;
+}
+
+/**
  * What the page of a saved list shows: the list with the criteria and filter values of its own
  * release and its decisions by criterion key, or the S80 page in place.
  */
@@ -27,6 +38,8 @@ export type SavedListView =
       decisions: CriterionDecisions;
       /** The release that is active now; null without one. Another one than the list's shows the older-release notice (R-LST-14). */
       activeRelease: string | null;
+      /** The project for a project's copy at `/projekte/:id/kriterienliste`; null for a list of the organisation. */
+      project: SavedListProject | null;
     }
   | { kind: 'notFound' }
   | { kind: 'server' };
@@ -121,6 +134,7 @@ export async function loadSavedListView(
       options: options.layers,
       decisions: decisionsOf(list, criteria),
       activeRelease: active,
+      project: null,
     };
   } catch {
     // A stored list names a stored release (CAT-05); a failure here is the server's.

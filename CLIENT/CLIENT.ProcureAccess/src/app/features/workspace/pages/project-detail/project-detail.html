@@ -15,6 +15,37 @@ SPDX-License-Identifier: MIT
       <p>{{ 'projects.archived.note' | translate }}</p>
     </pa-notice>
   }
+
+  <!-- The section of S6-12 (D8 (a)); S6-14 replaces it by the criteria card. No <section>: Firefox (CLAUDE §3, E2E) -->
+  <div class="pa-project__criteria">
+    <h2 class="pa-project__criteria-title">{{ 'projects.detail.criteria.title' | translate }}</h2>
+    @if (shown.project.criteriaList; as list) {
+      <dl class="pa-project__criteria-facts">
+        <div>
+          <dt>{{ 'projects.detail.criteria.list' | translate }}</dt>
+          <dd><a [routerLink]="criteriaListPath(shown.project.id)">{{ list.name }}</a></dd>
+        </div>
+        <div>
+          <dt>{{ 'projects.detail.criteria.release' | translate }}</dt>
+          <dd>{{ list.releaseVersion }}</dd>
+        </div>
+      </dl>
+      @if (criteriaAdded() > 0) {
+        <pa-notice kind="info">
+          <p>{{ 'projects.detail.criteriaAdded' | translatePlural: criteriaAdded() }}</p>
+        </pa-notice>
+      }
+      @if (canAdjust()) {
+        <a matButton class="pa-project__criteria-adjust" [routerLink]="criteriaListPath(shown.project.id)">
+          {{ 'projects.detail.criteria.adjust' | translate }}
+        </a>
+      }
+    } @else {
+      <pa-notice kind="info">
+        <p>{{ 'projects.detail.noCriteria' | translate }}</p>
+      </pa-notice>
+    }
+  </div>
 } @else {
   <pa-error-page [kind]="shown.kind" />
 }

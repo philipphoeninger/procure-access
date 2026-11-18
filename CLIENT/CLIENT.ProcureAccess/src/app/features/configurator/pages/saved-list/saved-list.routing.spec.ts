@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, convertToParamMap, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, convertToParamMap, provideRouter, RedirectCommand, RouterStateSnapshot } from '@angular/router';
 
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { SavedList } from '../../models/saved-lists';
@@ -22,6 +22,7 @@ const LIST: SavedList = {
   releaseVersion: 'T.1',
   createdAt: '2026-11-16T09:00:00Z',
   modifiedAt: '2026-11-16T09:00:00Z',
+  procurementProjectId: null,
   selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
   criteria: [],
 };
@@ -29,15 +30,18 @@ const LIST: SavedList = {
 describe('savedListResolver (SPEC §8.10, §8.11)', () => {
   let settingsReady: boolean;
   let load: SavedListLoad;
+  let list: SavedList;
 
   beforeEach(() => {
     settingsReady = true;
+    list = LIST;
     load = new SavedListLoad();
     TestBed.configureTestingModule({
       providers: [
+        provideRouter([]),
         { provide: SavedListLoad, useValue: load },
         { provide: ProcureAccessStore, useValue: { incrementLoadingCount: vi.fn(), decrementLoadingCount: vi.fn() } },
-        { provide: ConfiguratorApiService, useValue: { get: () => Promise.resolve(LIST) } },
+        { provide: ConfiguratorApiService, useValue: { get: () => Promise.resolve(list) } },
         {
           provide: CatalogApiService,
           useValue: {
@@ -53,7 +57,7 @@ describe('savedListResolver (SPEC §8.10, §8.11)', () => {
   const resolve = () =>
     TestBed.runInInjectionContext(() =>
       savedListResolver({ paramMap: convertToParamMap({ id: 'list-1' }) } as ActivatedRouteSnapshot, {} as RouterStateSnapshot),
-    ) as Promise<string>;
+    ) as Promise<string | RedirectCommand>;
 
   it('shows the list once list and settings are loaded', async () => {
     expect(await resolve()).toBe('pageTitle.criteria.list.saved');
@@ -65,5 +69,16 @@ describe('savedListResolver (SPEC §8.10, §8.11)', () => {
 
     expect(await resolve()).toBe('pageTitle.server');
     expect(load.view.kind).toBe('server');
+  });
+
+  it('leads the address of the copy of a project to the address of the project, replacing it (owner decision S6-12 D7 (a))', async () => {
+    list = { ...LIST, procurementProjectId: 'project-1' };
+
+    const result = await resolve();
+
+    expect(result).toBeInstanceOf(RedirectCommand);
+    const redirect = result as RedirectCommand;
+    expect(redirect.redirectTo.toString()).toBe('/projekte/project-1/kriterienliste');
+    expect(redirect.navigationBehaviorOptions).toEqual({ replaceUrl: true });
   });
 });

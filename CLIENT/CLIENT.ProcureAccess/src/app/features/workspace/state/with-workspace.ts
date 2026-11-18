@@ -7,7 +7,7 @@ import { patchState, signalStoreFeature, withMethods, withState } from '@ngrx/si
 
 import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
-import { Project, ProjectSummary } from '../models/projects';
+import { Project, ProjectCriteriaList, ProjectSummary } from '../models/projects';
 import { ProjectsApiService } from '../services/api/projects-api.service';
 
 /**
@@ -26,13 +26,25 @@ export interface ProjectsState {
   items: ProjectSummary[];
 }
 
+/**
+ * The criteria S11 of a project's copy took into the list during one visit, for the notice
+ * `projects.detail.criteriaAdded` on the next S32 of that project (R-PRJ-06, WSP-03; S6-12).
+ */
+export interface CriteriaAdded {
+  projectId: string;
+  count: number;
+}
+
 /** The workspace of the active organisation; candidates and assessments join with S6-15 and S6-18. */
 export interface WorkspaceState {
   projects: ProjectsState;
+  /** Waiting for S32 of its project; null when there is nothing to report. */
+  criteriaAdded: CriteriaAdded | null;
 }
 
 export const initialWorkspaceState: WorkspaceState = {
   projects: { organizationId: null, status: 'idle', items: [] },
+  criteriaAdded: null,
 };
 
 /**
@@ -42,7 +54,10 @@ export const initialWorkspaceState: WorkspaceState = {
  * S30 loads the projects of the active organisation, again after the organisation switch
  * (R-SHL-03): an answer for an earlier request is dropped, so a slow answer for the previous
  * organisation never shows (TEN-01 on the client). Creating a project (S31) adds it to the list of
- * its organisation. The legacy `withProducts()` / `withFavorites()` stay with the legacy product
+ * its organisation; assigning a list gives the project its own copy (S6-12). After S11 of a
+ * project's copy took criteria into the list, the next S32 of that project reports how many
+ * (`noteCriteriaAdded`, `takeCriteriaAdded`; any way back counts: a link, the header, the browser).
+ * The legacy `withProducts()` / `withFavorites()` stay with the legacy product
  * screens until step 6 replaces them (owner decision S6-13 D3 (a)).
  */
 export const withWorkspace = () =>
@@ -93,6 +108,31 @@ export const withWorkspace = () =>
             patchProjects({ items: [{ id, name: project.name, status, productCount, modifiedAt }, ...projects.items] });
           }
           return project;
+        },
+
+        /**
+         * Gives the project its own copy of an organisation list (R-PRJ-02, R-PRJ-04). Rejects with
+         * the error of the request; the caller shows it.
+         */
+        assignCriteriaList(projectId: string, sourceConfigurationId: string): Promise<ProjectCriteriaList> {
+          return api.assignCriteriaList(projectId, sourceConfigurationId);
+        },
+
+        /**
+         * S11 of the project's copy is left after `count` criteria were taken into the list (R-PRJ-06):
+         * kept for the next S32 of that project; nothing when none were taken in.
+         */
+        noteCriteriaAdded(projectId: string, count: number): void {
+          patchState(store, (state) => ({
+            workspace: { ...state.workspace, criteriaAdded: count > 0 ? { projectId, count } : null },
+          }));
+        },
+
+        /** The number S32 of the project reports once; 0 when there is nothing for it. Forgets it either way. */
+        takeCriteriaAdded(projectId: string): number {
+          const added = store.workspace.criteriaAdded();
+          patchState(store, (state) => ({ workspace: { ...state.workspace, criteriaAdded: null } }));
+          return added?.projectId === projectId ? added.count : 0;
         },
 
         /** Forgets the projects (sign-out, another account through the login overlay); a running load is dropped. */
