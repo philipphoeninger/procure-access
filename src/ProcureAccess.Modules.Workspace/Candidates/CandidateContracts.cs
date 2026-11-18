@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text.Json.Serialization;
+using ProcureAccess.Modules.Workspace.Assessments;
 
 namespace ProcureAccess.Modules.Workspace.Candidates;
 
@@ -69,7 +70,9 @@ internal sealed record TestEvidenceBody(
 /// </summary>
 /// <param name="TestStatus"><c>tested</c>, <c>notTested</c> or <c>unknown</c> (<c>candidate.evidence.tested.*</c>).</param>
 /// <param name="TestEvidences">In the order they were added; empty unless <c>tested</c>.</param>
-/// <param name="ModifiedAt">The last change of the facts, the private section, the test status or an evidence.</param>
+/// <param name="ModifiedAt">The last change of the facts, the private section, the test status, an evidence or an assessment.</param>
+/// <param name="Progress">How many requirement criteria of the project's list are assessed (S6-18); <c>null</c> while the project has no list.</param>
+/// <param name="Fulfillment">The seven counts (C34, SIG-13); <c>null</c> while the project has no list.</param>
 internal sealed record CandidateResponse(
     Guid Id,
     Guid ProjectId,
@@ -82,7 +85,9 @@ internal sealed record CandidateResponse(
     CandidatePrivateSectionResponse PrivateSection,
     IReadOnlyList<TestEvidenceResponse> TestEvidences,
     DateTimeOffset CreatedAt,
-    DateTimeOffset ModifiedAt);
+    DateTimeOffset ModifiedAt,
+    AssessmentProgressResponse? Progress,
+    FulfillmentCountsResponse? Fulfillment);
 
 /// <summary>The private section of a candidate; never published (PRV-01, PRV-02).</summary>
 internal sealed record CandidatePrivateSectionResponse(string? ContactNotes, string? InternalNotes);
@@ -101,5 +106,18 @@ internal sealed record TestEvidenceResponse(
     string? EvidenceUrl,
     string? QualificationNote);
 
-/// <summary>A candidate in the product list of a project (S32), in the order they were added.</summary>
-internal sealed record CandidateSummaryResponse(Guid Id, string Name, string? Vendor, string TestStatus);
+/// <summary>
+/// A candidate in the product list of a project (S32), in the order they were added, with its
+/// assessment against the project's list (C34, C67; S6-18).
+/// </summary>
+/// <param name="Progress"><c>null</c> while the project has no list, as the two members below.</param>
+/// <param name="Fulfillment">The seven counts, never <c>notCovered</c> (SIG-13).</param>
+/// <param name="ProcedureAnswers">The derived answers of the list's procedure criteria (CAT-17).</param>
+internal sealed record CandidateSummaryResponse(
+    Guid Id,
+    string Name,
+    string? Vendor,
+    string TestStatus,
+    AssessmentProgressResponse? Progress,
+    FulfillmentCountsResponse? Fulfillment,
+    IReadOnlyList<ProcedureAnswerResponse>? ProcedureAnswers);

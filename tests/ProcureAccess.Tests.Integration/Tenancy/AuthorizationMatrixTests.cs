@@ -39,7 +39,9 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// (TEN-04 workspace part); since S6-11 with the procurement projects (list, read: Reader; create, rename, status: Editor; the
 /// organisation named in the route or taken from the stored project); since S6-15 with the candidates and their evidences (read:
 /// Reader; create, change, test status, add, change and remove an evidence: Editor; the organisation taken from the stored
-/// project, candidate or evidence); since S6-12 with the project's copy of a list (Editor). Every user has a confirmed account, so the gate of saving
+/// project, candidate or evidence); since S6-12 with the project's copy of a list (Editor); since S6-18 with the assessments of a
+/// candidate (read: Reader; set: Editor — the project of the matrix has no list, so a role that may set one gets the 400 of the
+/// check that follows the role check; the 200 is <c>AssessmentEndpointsTests</c>). Every user has a confirmed account, so the gate of saving
 /// (SEC-10) passes; the other workspace endpoints add their rows with their tasks of step 5.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -141,6 +143,12 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     /// <summary><c>DELETE /test-evidences/{id}</c> of an evidence of A (S6-15): Editor and Owner.</summary>
     private const string RemoveEvidence = "remove-evidence";
+
+    /// <summary><c>GET /candidates/{id}/assessments</c> of a candidate of A (S6-18): every member of A.</summary>
+    private const string ReadAssessments = "read-assessments";
+
+    /// <summary><c>PUT /candidates/{id}/assessments/{criterionRevisionId}</c> of a candidate of A (S6-18): Editor and Owner.</summary>
+    private const string SetAssessment = "set-assessment";
 
     /// <summary>The revision of the one criterion of <see cref="_listOfA"/>; the domain needs no catalog for it.</summary>
     private const int RevisionOfListOfA = 1;
@@ -357,6 +365,19 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, RemoveEvidence, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, RemoveEvidence, HttpStatusCode.NotFound },
         { Anonymous, RemoveEvidence, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, ReadAssessments, HttpStatusCode.OK },
+        { TestUsers.EditorA.Name, ReadAssessments, HttpStatusCode.OK },
+        { TestUsers.ReaderA.Name, ReadAssessments, HttpStatusCode.OK },
+        { TestUsers.OwnerB.Name, ReadAssessments, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, ReadAssessments, HttpStatusCode.NotFound },
+        { Anonymous, ReadAssessments, HttpStatusCode.Unauthorized },
+        // Past the role check: the project has no list, so the criterion is refused (400).
+        { TestUsers.OwnerA.Name, SetAssessment, HttpStatusCode.BadRequest },
+        { TestUsers.EditorA.Name, SetAssessment, HttpStatusCode.BadRequest },
+        { TestUsers.ReaderA.Name, SetAssessment, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, SetAssessment, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, SetAssessment, HttpStatusCode.NotFound },
+        { Anonymous, SetAssessment, HttpStatusCode.Unauthorized },
     };
 
     public async ValueTask InitializeAsync()
@@ -611,6 +632,9 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             AddEvidence => await client.PostAsJsonAsync($"{CandidateOfAPath}/test-evidences", EvidenceBody("own"), Cancellation),
             ChangeEvidence => await client.PutAsJsonAsync(EvidenceOfAPath, EvidenceBody("procedure", "softwareTest"), Cancellation),
             RemoveEvidence => await client.DeleteAsync(EvidenceOfAPath, Cancellation),
+            ReadAssessments => await client.GetAsync($"{CandidateOfAPath}/assessments", Cancellation),
+            SetAssessment => await client.PutAsJsonAsync(
+                $"{CandidateOfAPath}/assessments/{RevisionOfListOfA}", new { value = "fulfilled" }, Cancellation),
             _ => await SendOrganizationRequestAsync(client, action, user),
         };
     }

@@ -40,8 +40,8 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// of its users stored, one criteria list of organisation A with a share link, and the organisation
 /// „Einzelbüro“ whose only member is <see cref="TestUsers.Member"/>, with a list, a share link and
 /// an open invitation. Since S6-25 each of the two organisations also has a procurement project
-/// with a candidate, its private section, a test evidence with its private note and the project's
-/// copy of the list. The parts of R-AUTH-10 that later steps build (contributor profiles, entries,
+/// with a candidate, its private section, an assessment (S6-18), a test evidence with its private
+/// note and the project's copy of the list. The parts of R-AUTH-10 that later steps build (contributor profiles, entries,
 /// experience reports) are not here (owner decision S5-28 3).
 /// </summary>
 public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -142,7 +142,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         // Two lists and their two project copies; the projects of both organisations with their rows.
         (await CountRowsAsync()).ShouldBe(new Rows(
             Organizations: 3, Memberships: 6, Invitations: 2, Lists: 4, Links: 2,
-            Projects: 2, Candidates: 2, PrivateSections: 2, Evidences: 2, PrivateNotes: 2));
+            Projects: 2, Candidates: 2, PrivateSections: 2, Assessments: 2, Evidences: 2, PrivateNotes: 2));
         (await AccountOfAsync(TestUsers.OwnerA)).IsDeleted.ShouldBeTrue();
     }
 
@@ -171,14 +171,16 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
             "SELECT count(*)::int AS \"Value\" FROM configurator.\"ConfigurationCriteria\"").SingleAsync(Cancellation))
             .ShouldBe(_listOfA.Criteria.Count * 2);
 
-        // The project of the organisation with its candidate, evidence and both private rows
-        // (S6-25); those of A stay.
+        // The project of the organisation with its candidate, assessment, evidence and both
+        // private rows (S6-25); those of A stay.
         await using var workspace = Workspace();
         (await workspace.ProcurementProjects.IgnoreQueryFilters().Select(p => p.OrganizationId).ToListAsync(Cancellation))
             .ShouldBe([Fixture.A.Id]);
         (await workspace.CandidateProducts.IgnoreQueryFilters().Select(c => c.OrganizationId).ToListAsync(Cancellation))
             .ShouldBe([Fixture.A.Id]);
         (await workspace.CandidatePrivateSections.IgnoreQueryFilters().Select(c => c.OrganizationId).ToListAsync(Cancellation))
+            .ShouldBe([Fixture.A.Id]);
+        (await workspace.CandidateAssessments.IgnoreQueryFilters().Select(a => a.OrganizationId).ToListAsync(Cancellation))
             .ShouldBe([Fixture.A.Id]);
         (await workspace.TestEvidences.IgnoreQueryFilters().Select(e => e.OrganizationId).ToListAsync(Cancellation))
             .ShouldBe([Fixture.A.Id]);
@@ -274,7 +276,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         // Two lists and their two project copies; the projects of both organisations with their rows.
         (await CountRowsAsync()).ShouldBe(new Rows(
             Organizations: 3, Memberships: 6, Invitations: 2, Lists: 4, Links: 2,
-            Projects: 2, Candidates: 2, PrivateSections: 2, Evidences: 2, PrivateNotes: 2));
+            Projects: 2, Candidates: 2, PrivateSections: 2, Assessments: 2, Evidences: 2, PrivateNotes: 2));
 
         // The address and the password open nothing any more.
         using var anonymous = CreateClient();
@@ -367,7 +369,7 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
 
     /// <summary>
     /// A project of the list's organisation with everything the Workspace holds below a project —
-    /// a candidate, its private section, a test evidence and its private note — and the project's
+    /// a candidate, its private section, an assessment, a test evidence and its private note — and the project's
     /// copy of <paramref name="list"/>.
     /// </summary>
     private object[] ProjectRows(CriteriaConfiguration list, TestUser creator, string name)
@@ -378,9 +380,11 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
         candidate.ChangeTestStatus(TestStatus.Tested, removeEvidences: false, now);
         var evidence = candidate.AddEvidence(
             new TestEvidenceFacts(TestKind.Own, null, null, "Prüfstelle", DateOnly.FromDateTime(now.UtcDateTime).AddDays(-30), null, null), now).Evidence!;
+        var assessment = CandidateAssessment.Of(candidate, criterionRevisionId: 1);
+        assessment.Change(Fulfillment.Restriction, "Laut Prüfbericht", now);
         return
         [
-            project, candidate, CandidatePrivateSection.Of(candidate, "Kontakt", "Interne Notiz"),
+            project, candidate, CandidatePrivateSection.Of(candidate, "Kontakt", "Interne Notiz"), assessment,
             TestEvidencePrivateNote.Of(evidence, "Qualifikation"), list.CopyForProject(project.Id, creator.Id, now),
         ];
     }
@@ -432,13 +436,14 @@ public sealed class AccountDeletionTests(ApiFixture api) : IntegrationTest(api),
             await workspace.ProcurementProjects.IgnoreQueryFilters().CountAsync(Cancellation),
             await workspace.CandidateProducts.IgnoreQueryFilters().CountAsync(Cancellation),
             await workspace.CandidatePrivateSections.IgnoreQueryFilters().CountAsync(Cancellation),
+            await workspace.CandidateAssessments.IgnoreQueryFilters().CountAsync(Cancellation),
             await workspace.TestEvidences.IgnoreQueryFilters().CountAsync(Cancellation),
             await workspace.TestEvidencePrivateNotes.IgnoreQueryFilters().CountAsync(Cancellation));
     }
 
     private sealed record Rows(
         int Organizations, int Memberships, int Invitations, int Lists, int Links,
-        int Projects, int Candidates, int PrivateSections, int Evidences, int PrivateNotes);
+        int Projects, int Candidates, int PrivateSections, int Assessments, int Evidences, int PrivateNotes);
 
     // Contexts of their own outside any request, so the tests read past the organisation filter.
     private IdentityAccessDbContext IdentityAccess() =>

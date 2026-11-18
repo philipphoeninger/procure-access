@@ -69,7 +69,9 @@ internal sealed class CatalogSelectionResolver(CatalogReader reader) : ICatalogS
                 r.Texts.Count > 0 ? r.Texts[0].OriginalTitleDe : null,
                 r.ProductPart is null ? null : productParts[r.ProductPart],
                 new CatalogPriority(r.Priority.Level, r.Priority.Weight, r.Priority.RationaleDe),
-                TestStepUrl(r, testTypes)))
+                TestStepUrl(r, testTypes),
+                r.AllowedRatings,
+                r.IsProcedure ? r.Criterion.TestType : null))
             .ToList();
 
         return new CatalogSelectionResult(
@@ -81,7 +83,13 @@ internal sealed class CatalogSelectionResolver(CatalogReader reader) : ICatalogS
                 InOrder(valid.ProductParts, values.ProductParts, p => p.SortOrder),
                 InOrder(valid.TestTypes, values.TestTypes, t => t.SortOrder),
                 criteria,
-                UseCaseIsActive: useCaseTemplate?.IsActive ?? true),
+                UseCaseIsActive: useCaseTemplate?.IsActive ?? true)
+            {
+                MappedTestTypeKeys = [.. values.TestTypes
+                    .Where(t => snapshot.Procedures.Any(p => p.TestType == t.Key && valid.AppTypes.Contains(p.AppType)))
+                    .OrderBy(t => t.SortOrder).ThenBy(t => t.Key, StringComparer.Ordinal)
+                    .Select(t => t.Key)],
+            },
             noErrors);
     }
 

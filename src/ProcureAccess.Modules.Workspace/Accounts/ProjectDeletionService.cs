@@ -15,8 +15,8 @@ namespace ProcureAccess.Modules.Workspace.Accounts;
 /// </summary>
 /// <remarks>
 /// Only the projects are deleted here; the database deletes what belongs to them through its
-/// cascading foreign keys: candidates, their private sections, test evidences and their private
-/// notes. A table added below a project or a candidate needs a cascading foreign key too, or its
+/// cascading foreign keys: candidates, their private sections, assessments, test evidences and
+/// their private notes. A table added below a project or a candidate needs a cascading foreign key too, or its
 /// own delete here. A project's copy of a criteria list is a list of the organisation and goes
 /// with the Configurator's part.
 /// </remarks>

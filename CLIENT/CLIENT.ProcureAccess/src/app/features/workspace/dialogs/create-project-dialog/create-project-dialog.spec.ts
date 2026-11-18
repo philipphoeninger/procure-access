@@ -200,7 +200,7 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
       expect(screen.getAllByRole('option').map((option) => option.textContent.trim())).toEqual(['Keine Liste', 'Alpha', 'Beta']);
     });
 
-    it('gives the new project its own copy of the chosen list, then opens S32 (WSP-02, tagged with S6-18)', async () => {
+    it('INV:WSP-02 gives the new project its own copy of the chosen list, then opens S32', async () => {
       const { fixture, dialog } = await openDialog({ lists: LISTS });
 
       await choose(fixture, dialog, 'Beta');

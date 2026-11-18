@@ -114,7 +114,7 @@ public class ConfigurationDraftCheckTests
 
     private static ResolvedCatalogCriterion Criterion(int revisionId, string key, PriorityLevel level, int? weight) =>
         new(revisionId, key, CriterionKind.Requirement, key, $"Titel {key}", null, null, null, null,
-            new CatalogPriority(level, weight, $"Begründung {key}"), null);
+            new CatalogPriority(level, weight, $"Begründung {key}"), null, Rating.All, null);
 
     private static DraftCriterion Entry(
         int revisionId, bool included = true, string? overrideLevel = null, int? overrideWeight = null, string? note = null) =>
