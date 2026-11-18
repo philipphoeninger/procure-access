@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MimeKit;
@@ -24,7 +25,8 @@ internal enum SmtpSecurity
 /// <summary>
 /// The SMTP settings of the e-mail sender (SPEC §7.6, ARCHITECTURE C71), from the environment only:
 /// <c>Email:Smtp:Host</c>, <c>:Port</c>, <c>:Username</c>, <c>:Password</c>, <c>:Security</c>,
-/// <c>Email:From</c> and <c>Email:DisplayName</c>. Only <c>Development</c> and <c>E2E</c> may send
+/// <c>Email:From</c> and <c>Email:DisplayName</c>; the 🔧 <c>Email:Smtp:Timeout</c> per SMTP operation
+/// comes from <c>appsettings.json</c> (owner decision O-S6-3: 15 s). Only <c>Development</c> and <c>E2E</c> may send
 /// without credentials or without TLS (Mailpit); every other environment stops at startup without
 /// them (owner decision S5-11 4a), like the key-ring certificate (S4-26). Not a record: its
 /// <c>ToString</c> would print the password.
@@ -36,13 +38,14 @@ internal sealed class EmailSettings
     /// <summary>Environment of the E2E stack once it has its own (TESTING §3.3); until then it runs as Development.</summary>
     public const string E2EEnvironmentName = "E2E";
 
-    private EmailSettings(string host, int port, string? username, string? password, SmtpSecurity security, MailboxAddress sender)
+    private EmailSettings(string host, int port, string? username, string? password, SmtpSecurity security, TimeSpan timeout, MailboxAddress sender)
     {
         Host = host;
         Port = port;
         Username = username;
         Password = password;
         Security = security;
+        Timeout = timeout;
         Sender = sender;
     }
 
@@ -56,6 +59,13 @@ internal sealed class EmailSettings
     public string? Password { get; }
 
     public SmtpSecurity Security { get; }
+
+    /// <summary>
+    /// 🔧 How long one SMTP operation (connect, greeting, sign-in, each command of the send) may wait
+    /// for the server (owner decision O-S6-3, TD-58): a stalled server ends the attempt instead of
+    /// holding the request for MailKit's default of two minutes.
+    /// </summary>
+    public TimeSpan Timeout { get; }
 
     /// <summary>The sender address with its display name.</summary>
     public MailboxAddress Sender { get; }
@@ -101,6 +111,14 @@ internal sealed class EmailSettings
             throw Invalid("Email:Smtp:Security None is allowed only in Development and E2E; e-mails leave every other environment over TLS.");
         }
 
+        // MailKit takes whole milliseconds as an int.
+        if (!TimeSpan.TryParse(smtp["Timeout"], CultureInfo.InvariantCulture, out var timeout)
+            || timeout < TimeSpan.FromMilliseconds(1)
+            || timeout > TimeSpan.FromMilliseconds(int.MaxValue))
+        {
+            throw Invalid("Email:Smtp:Timeout must be a positive duration such as 00:00:15 (owner decision O-S6-3).");
+        }
+
         var username = Blank(smtp["Username"]);
         var password = Blank(smtp["Password"]);
         if ((username is null) != (password is null))
@@ -126,7 +144,7 @@ internal sealed class EmailSettings
             sender = new MailboxAddress(displayName, sender.Address);
         }
 
-        return new EmailSettings(host.Trim(), port, username, password, security, sender);
+        return new EmailSettings(host.Trim(), port, username, password, security, timeout, sender);
     }
 
     private static string? Blank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;

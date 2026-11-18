@@ -28,8 +28,8 @@ SPDX-License-Identifier: MIT
 | F1 | No module holds the directory's product identities yet (Directory is an empty skeleton; the legacy `Products` table is out of reach of a module, ARC-01), so the name-match hint has nothing to match against | Decision 1 (a): `SoftwareProductId` stored, `null`; the hint comes with M6 (open point 3) |
 | F2 | The UX copy marks none of the S33 fields and not `candidate.evidence.qualification` with „(optional)“; by `common.requiredNote` every field, the private notes included, would be required | Decision 2 (a); the UX copy needs the markers (open point 2) |
 | F3 | WSP-01 asks for „409 with field error“; SPEC §8.6 had no type for it, and `conflict` belongs to the S37 dialog | Decision 3 (a): `test-status-conflict` |
-| F4 | ARCHITECTURE §5.4 lists `ContactNotes`, `InternalNotes` and `TesterQualificationNote` as columns of `CandidateProduct` and `TestEvidence`; the sprint row asks for the private section to be stored apart | Rows of their own (decision 4 (a) for the evidence note); ARCHITECTURE C174 records the deviation |
-| F5 | SPEC §7.2 has no limit for the qualification note | 2 000, like the other private notes (decision 4 (a), SPEC v2.50-2) |
+| F4 | ARCHITECTURE §5.4 lists `ContactNotes`, `InternalNotes` and `TesterQualificationNote` as columns of `CandidateProduct` and `TestEvidence`; the sprint row asks for the private section to be stored apart | Rows of their own (decision 4 (a) for the evidence note); ARCHITECTURE C177 records the deviation |
+| F5 | SPEC §7.2 has no limit for the qualification note | 2 000, like the other private notes (decision 4 (a), SPEC v2.51-2) |
 | F6 | The catalog's test procedures are filter values that belong to no release (C104); the Workspace module had no way to check a key | `ICatalogTestTypes` in Catalog.Contracts (Workspace may reference it, §4.3; no `ModuleMap` change) |
 | F7 | „Not after today“ needs a calendar day; Platform's `ShareLinks:TimeZone` belongs to another module | 🔧 `Workspace:TimeZone` (`Europe/Berlin`) in `appsettings.json`, checked at the start |
 | F8 | The UX copy area `candidate` is not in `AREAS` of `check-i18n.mjs`, so the client has no key to map `test-status-conflict` to | The client mapping waits for S6-16/S6-17 (open point 1), as `project-archived` waits for S6-13/S6-14 |
@@ -57,7 +57,7 @@ SPDX-License-Identifier: MIT
 6. **Other modules:** `ICatalogTestTypes` (Catalog.Contracts) with `CatalogTestTypes` on the cached filter values; `ProblemTypes.TestStatusConflict` in Platform.Contracts (also in `All`).
 7. **Configuration:** 🔧 `Workspace:TimeZone` = `Europe/Berlin` in `API/API.ProcureAccess/appsettings.json`, read by `WorkspaceSettings` at the start.
 8. **Tests.** New: `Unit/Workspace/CandidateProductTests.cs` (7 × `INV:WSP-01`, 1 × `INV:SIG-03`, the private-field check of the copied types), `Integration/Workspace/CandidateEndpointsTests.cs` (8 × `INV:WSP-01`, 1 × `INV:SIG-03`, 1 × `INV:TEN-01`, 1 × `INV:SEC-10`, 5 × `INV:API-01`, archived project, date edge in Berlin), `WorkspaceMigrationTests.CandidateTestStatus_Schema_NotNullWithDefaultUnknown` (`INV:SIG-03`). Changed: `OrganizationIsolationTests` (four samples; a sample is a list of rows), `AuthorizationMatrixTests` (seven actions × six users), `ProjectEndpointsTests` (`ShouldBeEquivalentTo`, the empty `candidates`).
-9. **Documents.** TESTING v94 (V323 – V328; WSP-01, SIG-03, TEN-05 rows, §9 step 5), ARCHITECTURE v88 (C174; §4.3, §5.4, §7.2, §12 step 5), SPEC v2.50 (§7.2, §8.6, five rows), CODEBASE §2.95 and §3, CLAUDE.md (the state line and „Last tasks reflected“ only; 39 839 characters). `TESTING_v92.md` and `ARCHITECTURE_v86.md` deleted (two newest stay).
+9. **Documents.** TESTING v94 (V323 – V328; WSP-01, SIG-03, TEN-05 rows, §9 step 5), ARCHITECTURE v89 (C177; §4.3, §5.4, §7.2, §12 step 5), SPEC v2.51 (§7.2, §8.6, five rows), CODEBASE §2.96 and §3, CLAUDE.md (the state line and „Last tasks reflected“ only; 39 839 characters). `TESTING_v92.md` and `ARCHITECTURE_v87.md` deleted (two newest stay). Renumbered after S6-05 (#406) merged first with ARCHITECTURE v88 (C174 – C176), SPEC v2.50 and CODEBASE §2.95: this task's parts are ARCHITECTURE v89 (C177), SPEC v2.51, CODEBASE §2.96; TESTING was not touched by S6-05.
 
 Not changed: client, e2e, UX copy, Figma mapping, `Dockerfile` (no new project), compose files, `ModuleMap`, TECH_DEBT (next version at the end of the sprint), the sprint file.
 
@@ -76,7 +76,7 @@ Checklist of CLAUDE §6.7, with `/engineering:code-review` on the whole diff; fi
 ## 4. Checks
 
 - `dotnet build ProcureAccess.sln -warnaserror …`: 0 warnings, 0 errors. `dotnet format ProcureAccess.sln --verify-no-changes`: green.
-- `dotnet test --solution ProcureAccess.sln` (unit, architecture, integration with Testcontainers / PostgreSQL 17): 1 961 passed, 0 failed, after the fixes R1 and R2 (the run before them: 1 960 passed, R2 failed once).
+- `dotnet test --solution ProcureAccess.sln` (unit, architecture, integration with Testcontainers / PostgreSQL 17): 1 961 passed, 0 failed, after the fixes R1 and R2 (the run before them: 1 960 passed, R2 failed once); after merging `main` with S6-05: 1 975 passed, 0 failed.
 - OPS-03: `WorkspaceMigrationTests` (both migrations on an empty database, no pending model changes, applied at the start).
 - `check-invariants` (WSP-01, SIG-03 active and tagged), `check-figma-links`, `check-i18n`, `check-icons`, `check-api-notices` (38 packages, unchanged): green. `reuse lint` (full, through the `fsfe/reuse` image): compliant.
 - Client tests and lint: not run, the client is unchanged. E2E: left to CI; no screen or seeded data changes.

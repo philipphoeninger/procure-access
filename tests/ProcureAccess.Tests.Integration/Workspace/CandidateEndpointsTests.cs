@@ -23,7 +23,7 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.Workspace;
 
 /// <summary>
-/// The candidate and evidence endpoints (S6-15; SPEC R-CAN-02, R-CAN-05, §7.2, §8.6 v2.50;
+/// The candidate and evidence endpoints (S6-15; SPEC R-CAN-02, R-CAN-05, §7.2, §8.6 v2.51;
 /// ARCHITECTURE §5.4, §7.2): adding, reading and changing a candidate with its private section,
 /// the test status „Nicht bekannt“ of a new candidate (SIG-03), the evidences under „Ja“ with at
 /// most one per procedure and the status change that removes them (WSP-01), archived projects,

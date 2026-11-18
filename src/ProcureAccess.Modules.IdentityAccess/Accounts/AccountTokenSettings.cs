@@ -11,7 +11,9 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// <summary>
 /// The 🔧 lifetimes of the account tokens (ARCHITECTURE §9.1, C72; SPEC R-AUTH-02), read from the
 /// section <see cref="SectionName"/>: <c>EmailConfirmationLifetime</c> 24 h, <c>PasswordResetLifetime</c> 2 h (S5-13a). Never hard-code them
-/// (CLAUDE §6.6); a missing or unusable value stops the start.
+/// (CLAUDE §6.6); a missing or unusable value stops the start. The same section holds
+/// <c>CleanupInterval</c>, how often expired tokens are deleted (1 h, S6-05) — an operations
+/// setting, not a 🔧 value.
 /// </summary>
 internal sealed class AccountTokenSettings
 {
@@ -20,6 +22,9 @@ internal sealed class AccountTokenSettings
     public TimeSpan EmailConfirmationLifetime { get; init; }
 
     public TimeSpan PasswordResetLifetime { get; init; }
+
+    /// <summary>How often <see cref="AccountTokenCleanupService"/> runs.</summary>
+    public TimeSpan CleanupInterval { get; init; }
 
     public TimeSpan LifetimeOf(AccountTokenPurpose purpose) => purpose switch
     {
@@ -35,6 +40,7 @@ internal sealed class AccountTokenSettings
         {
             EmailConfirmationLifetime = Read(section, nameof(EmailConfirmationLifetime)),
             PasswordResetLifetime = Read(section, nameof(PasswordResetLifetime)),
+            CleanupInterval = Read(section, nameof(CleanupInterval)),
         };
     }
 
