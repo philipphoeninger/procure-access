@@ -11,6 +11,7 @@ using Microsoft.Extensions.Time.Testing;
 using Npgsql;
 using ProcureAccess.Modules.Catalog.Persistence;
 using ProcureAccess.Modules.Configurator.Persistence;
+using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Persistence.Configurations;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
@@ -132,6 +133,11 @@ public sealed class ApiFixture : IAsyncLifetime
             await context.Database.MigrateAsync();
         }
 
+        await using (var context = CreateWorkspaceDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
         await using (var connection = await OpenConnectionAsync())
         {
             _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
@@ -144,6 +150,7 @@ public sealed class ApiFixture : IAsyncLifetime
                     new Table(IdentityAccessDbContext.Schema, IdentityAccessDbContext.HistoryTable),
                     new Table(CatalogDbContext.Schema, CatalogDbContext.HistoryTable),
                     new Table(ConfiguratorDbContext.Schema, ConfiguratorDbContext.HistoryTable),
+                    new Table(WorkspaceDbContext.Schema, WorkspaceDbContext.HistoryTable),
                     .. CatalogFilterValueTables,
                     DataProtectionKeysTable,
                     .. LegacyRoleTables,
@@ -173,7 +180,8 @@ public sealed class ApiFixture : IAsyncLifetime
     /// Stores entities through the application's own context that maps them, never through raw
     /// SQL, so the EF configuration is exercised (TESTING §6.1): the module contexts
     /// (<see cref="PlatformDbContext"/>, <see cref="CatalogDbContext"/>,
-    /// <see cref="IdentityAccessDbContext"/>, <see cref="ConfiguratorDbContext"/>) for their entities, the
+    /// <see cref="IdentityAccessDbContext"/>, <see cref="ConfiguratorDbContext"/>,
+    /// <see cref="WorkspaceDbContext"/>) for their entities, the
     /// legacy <see cref="ApplicationDBContext"/> for all others.
     /// </summary>
     public async Task StoreAsync(params object[] entities)
@@ -186,6 +194,7 @@ public sealed class ApiFixture : IAsyncLifetime
             scope.ServiceProvider.GetRequiredService<CatalogDbContext>(),
             scope.ServiceProvider.GetRequiredService<IdentityAccessDbContext>(),
             scope.ServiceProvider.GetRequiredService<ConfiguratorDbContext>(),
+            scope.ServiceProvider.GetRequiredService<WorkspaceDbContext>(),
         ];
         foreach (var entity in entities)
         {
@@ -247,6 +256,12 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private ConfiguratorDbContext CreateConfiguratorDbContext() =>
         new(new DbContextOptionsBuilder<ConfiguratorDbContext>()
+                .UseNpgsql(_database.GetConnectionString())
+                .Options,
+            FixedOrganizationContext.None);
+
+    private WorkspaceDbContext CreateWorkspaceDbContext() =>
+        new(new DbContextOptionsBuilder<WorkspaceDbContext>()
                 .UseNpgsql(_database.GetConnectionString())
                 .Options,
             FixedOrganizationContext.None);
