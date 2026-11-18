@@ -8,13 +8,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { checkIcons, iconsInScssMap, iconsInTemplate, MAIN_SCSS, repositoryInput } from './check-icons.mjs';
-
-const SCSS = "$easymde-toolbar-icons: (\n  'fa-bold': 'format_bold',\n  'fa-link': \"link\",\n);";
+import { checkIcons, iconsInTemplate, repositoryInput } from './check-icons.mjs';
 
 /** A small client that fits its list; each test changes one thing. */
 function input() {
-  const icons = ['add', 'contrast', 'contrast_rtl_off', 'done', 'format_bold', 'info', 'link', 'warning'];
+  const icons = ['add', 'contrast', 'contrast_rtl_off', 'done', 'info', 'warning'];
   return {
     list: {
       icons,
@@ -29,7 +27,6 @@ function input() {
       'src/app/settings/settings.html': "<mat-icon>\n  {{ on() ? 'contrast_rtl_off' : \"contrast\" }}\n</mat-icon>",
       'src/app/notice/notice.html': '<mat-icon aria-hidden="true">{{ icon() }}</mat-icon>',
       'src/app/notice/notice.ts': "const ICONS = { info: 'info', attention: 'warning' };",
-      [MAIN_SCSS]: SCSS,
     },
   };
 }
@@ -58,11 +55,6 @@ test('a comment ends at its first -->: an icon after it counts, one inside does 
   assert.deepEqual(names, ['add', 'edit']);
 });
 
-test('reads the glyphs of the EasyMDE map', () => {
-  assert.deepEqual(iconsInScssMap(SCSS), ['format_bold', 'link']);
-  assert.equal(iconsInScssMap('$other: (a: b);'), null);
-});
-
 test('fails on a used icon that is not in the list', () => {
   for (const [file, source] of [
     ['src/app/list/list.html', '<mat-icon>add</mat-icon><mat-icon>lock</mat-icon>'],
@@ -72,8 +64,6 @@ test('fails on a used icon that is not in the list', () => {
     assert.equal(errors.length, 1, file);
     assert.match(errors[0], /icon "lock" is not in .*material-symbols-icons\.json; add it and run scripts\/subset-material-symbols\.sh/);
   }
-  const fromScss = errorsOf((v) => (v.sources[MAIN_SCSS] = SCSS.replace('"link"', '"image"')));
-  assert.ok(fromScss.some((e) => /main\.scss: icon "image" is not in/.test(e)), fromScss.join('\n'));
 });
 
 test('fails on a listed icon nobody uses', () => {
@@ -86,7 +76,7 @@ test('fails on a listed icon nobody uses', () => {
 });
 
 test('fails on an unsorted or duplicated list', () => {
-  for (const icons of [['link', 'add'], ['add', 'add']]) {
+  for (const icons of [['info', 'add'], ['add', 'add']]) {
     const errors = errorsOf((v) => (v.list.icons = icons));
     assert.ok(errors.some((e) => /must be sorted and without duplicates/.test(e)), icons.join());
   }
@@ -110,11 +100,6 @@ test('fails on a "computed" name its file does not write, and on an unknown file
 test('fails on <mat-icon> content that is not an icon name', () => {
   const errors = errorsOf((v) => (v.sources['src/app/list/list.html'] += '<mat-icon>Add item</mat-icon>'));
   assert.ok(errors.some((e) => /<mat-icon> content "Add item" is not an icon name/.test(e)), errors.join('\n'));
-});
-
-test('fails when the EasyMDE map is gone', () => {
-  const errors = errorsOf((v) => (v.sources[MAIN_SCSS] = ''));
-  assert.ok(errors.some((e) => /\$easymde-toolbar-icons not found/.test(e)), errors.join('\n'));
 });
 
 test('fails on a stale subset: other package version, other list, other font, no manifest', () => {

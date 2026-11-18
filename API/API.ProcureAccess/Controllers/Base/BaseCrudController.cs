@@ -5,7 +5,8 @@
 namespace API.ProcureAccess.Controllers.Base;
 
 /// <summary>
-/// Read-only base of the legacy catalog and proposal controllers. The generic <c>POST</c>,
+/// Read-only base of the legacy catalog controllers; only catalog-admin controllers derive from it
+/// (ARC-05, D11; the legacy product read until step 6). The generic <c>POST</c>,
 /// <c>PUT</c> and <c>DELETE</c> are gone (S3-07, owner decision O-S3-4 (c), #90): they accepted
 /// anonymous requests, and the catalog changes only through the CLI import (SPEC SD20).
 /// Its routes stay unversioned (<c>api/[controller]</c>; the derived controllers declare the same):

@@ -81,28 +81,6 @@ public static class CatalogMappings
         CriteriaFilters = product.ProductCriteriaFilters.Select(link => link.CriteriaFilter.ToLookupDtoOrNull()).ToList()!,
     };
 
-    /// <summary>A product from an approved proposal (<c>ProposalService</c>); the server sets key, audit fields and navigations.</summary>
-    public static Product ToEntity(this CreateProductDto dto) => new()
-    {
-        Name = dto.Name,
-        Link = dto.Link,
-        Description = dto.Description,
-        ProductCriteriaFilters = dto.CriteriaFilterIds
-            .Select(id => new ProductCriteriaFilter { CriteriaFilterId = id })
-            .ToList(),
-    };
-
-    /// <summary>A criterion from an approved proposal (<c>ProposalService</c>); the server sets key, audit fields and navigations.</summary>
-    public static Criterion ToEntity(this CreateCriterionDto dto) => new()
-    {
-        Name = dto.Name,
-        Description = dto.Description,
-        CriteriaFilterId = dto.CriteriaFilterId,
-    };
-
-    /// <summary>
-    /// A join row whose filter is not loaded gives a <c>null</c> element, as AutoMapper did: after an
-    /// approval the new product's join rows carry only the filter id.
-    /// </summary>
+    /// <summary>A join row whose filter is not loaded gives a <c>null</c> element, as AutoMapper did.</summary>
     private static LookupDto? ToLookupDtoOrNull(this CriteriaFilter? filter) => filter?.ToLookupDto();
 }

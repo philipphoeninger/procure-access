@@ -9,8 +9,8 @@ namespace ProcureAccess.Modules.Workspace;
 /// <summary>
 /// Registration of the Workspace module (ARCHITECTURE §4.3): the organisations' procurement
 /// projects, candidate products, test evidences and private assessments.
-/// It registers no services yet. Its code arrives with migration step 5; until then proposals,
-/// products and favorites are legacy.
+/// It registers no services yet. Its code arrives with migration step 5; until then products and
+/// favorites are legacy (the proposals went with S6-23).
 /// </summary>
 public static class WorkspaceModule
 {

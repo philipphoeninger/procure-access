@@ -21,8 +21,6 @@ public partial class Product : BaseEntity
 
     public ICollection<ProductCriteriaFilter> ProductCriteriaFilters { get; set; } = new List<ProductCriteriaFilter>();
 
-    public Proposal? Proposal { get; set; }
-
     [Required]
     public bool IsDeleted { get; set; } = false;
 

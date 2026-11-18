@@ -24,12 +24,6 @@ SPDX-License-Identifier: MIT
 
       <div class="stepper-actions-container">
         <button matButton (click)="stepper.reset()">{{ 'COMMON.RESET' | translate }}</button>
-        @if (store.signedIn()) {
-          <button
-            matButton="filled"
-            [routerLink]="'/criterion-proposal/0'"
-          >{{ 'CRITERIA.PROPOSE' | translate }}</button>
-        }
         <button matButton matStepperNext (click)="enterFilters()">{{ 'common.actions.next' | translate }}</button>
       </div>
     </form>
@@ -83,13 +77,6 @@ SPDX-License-Identifier: MIT
             }
         </div>
         <div>
-            @if (store.signedIn()) {
-                <button
-                  matButton="elevated"
-                  [routerLink]="'/criterion-proposal/0'"
-                  style="margin-right: 8px">{{ 'CRITERIA.PROPOSE' | translate }}
-                </button>
-            }
             <button
                 matButton="filled"
                 class="products-page-btn"

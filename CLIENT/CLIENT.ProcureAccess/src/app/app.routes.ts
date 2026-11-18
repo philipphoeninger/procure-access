@@ -6,7 +6,6 @@ import { Routes } from '@angular/router';
 import { Home } from '@pages/home/home';
 import { authGuard } from '@core/guards/auth.guard';
 import { CONFIRM_EMAIL_PATH, LOGIN_PATH, NEW_PASSWORD_PATH, REGISTER_PATH, RESET_PASSWORD_PATH } from '@features/identity/models/login-navigation';
-import { PERMISSION_KEY, permissionGuard } from './features/identity/guards/permission.guard';
 import { ERROR_PAGE_KEY, ErrorPage } from './pages/error/error-page';
 import { PAGE_TITLE_KEY } from './core/a11y/page-title.strategy';
 import { SERVER_ERROR_PATH } from './core/errors/system-errors';
@@ -85,12 +84,6 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: RESET_PASSWORD_PATH,
   },
-  {
-    path: 'proposals',
-    loadComponent: () => import('./features/proposal/list/proposal-list').then((m) => m.ProposalList),
-    canActivate: [permissionGuard],
-    data: { [PERMISSION_KEY]: 'moderation:review' }
-  },
   // S61 account (R-AUTH-09, R-AUTH-10): the export download and the account deletion; signed in only
   {
     path: ACCOUNT_PATH,
@@ -152,16 +145,6 @@ export const routes: Routes = [
   { 
     path: 'product/:id', 
     loadComponent: () => import('@app/features/products/details/product-details').then((m) => m.ProductDetails)
-   },
-   {
-    path: 'product-proposal/:id',
-    loadComponent: () => import('@app/features/products/proposal/product-proposal').then((m) => m.ProductProposal),
-    canActivate: [authGuard]
-   },
-   {
-    path: 'criterion-proposal/:id',
-    loadComponent: () => import('@app/features/criteria/proposal/criterion-proposal').then((m) => m.CriterionProposal),
-    canActivate: [authGuard]
    },
   // S20 „Organisation anlegen oder beitreten“ and S21 „Mitglieder“ (R-ORG-01, R-ORG-03, R-ORG-04;
   // signed in only; no menu entry until S5-18, owner decision S5-16 6a). S21 loads its members

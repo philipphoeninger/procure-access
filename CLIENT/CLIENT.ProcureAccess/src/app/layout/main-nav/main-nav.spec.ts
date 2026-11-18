@@ -41,14 +41,13 @@ async function openAccountMenu(fixture: { whenStable(): Promise<unknown> }): Pro
 const mainNav = () => screen.getByRole('navigation', { name: 'Hauptnavigation' });
 
 describe('MainNav', () => {
-  it('lists Kriterien, Produkte and Beitragen in the main navigation (state Anonymous)', async () => {
+  it('lists Kriterien and Produkte in the main navigation (state Anonymous); „Beitragen“ follows with S53 (S6-23)', async () => {
     await renderNav();
 
     const links = within(mainNav()).getAllByRole('link');
     expect(links.map((link) => [link.textContent?.trim(), link.getAttribute('href')])).toEqual([
       ['Kriterien', '/kriterien'],
       ['Produkte', '/products'],
-      ['Beitragen', '/product-proposal/0'],
     ]);
     expect(screen.getByRole('button', { name: 'Anmelden' })).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Einstellungen' })).toBeNull();
@@ -62,7 +61,6 @@ describe('MainNav', () => {
 
     expect(screen.getByRole('link', { name: 'Produkte' }).getAttribute('aria-current')).toBe('page');
     expect(screen.getByRole('link', { name: 'Kriterien' }).hasAttribute('aria-current')).toBe(false);
-    expect(screen.getByRole('link', { name: 'Beitragen' }).hasAttribute('aria-current')).toBe(false);
   });
 
   it.each(['/kriterien', '/kriterien/ergebnis', '/filters'])(

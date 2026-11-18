@@ -17,8 +17,6 @@ public class CriterionService : BaseService<Criterion, CriterionDto>, ICriterion
         return Result<IEnumerable<CriterionDto>>.Success(
             await MainRepo.Context.Criteria
                 .AsNoTracking()
-                .Where(x => x.Proposal == null ||
-                            x.Proposal.Status == ProposalStatus.Approved)
                 .OrderBy(x => x.Id)
                 .Select(CatalogMappings.CriterionProjection)
                 .ToListAsync());

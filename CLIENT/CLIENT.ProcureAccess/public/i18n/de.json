@@ -2,14 +2,10 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
-    "SEND": "Senden",
     "RESET": "Zurücksetzen",
     "UPDATE": "Aktualisieren",
-    "REJECT": "Ablehnen",
-    "APPROVE": "Genehmigen",
     "SEARCH": "Suchen",
     "REMOVE": "Entfernen",
-    "EDIT": "Bearbeiten",
     "BACK": "Zurück",
     "PREVIOUS": "Vorherige",
     "NEXT": "Nächste",
@@ -18,8 +14,6 @@
     "NAME": "Name",
     "LINK": "Link",
     "DETAILS": "Details",
-    "IS_REQUIRED": "ist erforderlich",
-    "DESCRIPTION": "Beschreibung",
     "SHOW_LIST": "Liste anzeigen",
     "EXPAND_ALL": "Alle ausklappen",
     "COLLAPSE_ALL": "Alle einklappen",
@@ -37,27 +31,19 @@
     "HOME_LABEL": "Startseite"
   },
   "CRITERIA": {
-    "CRITERION_LABEL": "Kriterium",
     "CRITERIA_LABEL": "Kriterien",
     "SEARCHES": "Suchen",
     "EMPTY_LIST": "Keine Kriterien gefunden. Bitte versuchen Sie es erneut...",
-    "PRIORITY": "Priorität",
-    "PRODUCT_PART": "Produktteil",
-    "ENTER_INFO_MSG": "Bitte geben Sie Informationen zum Kriterium ein.",
-    "ENTER_PRODUCT_PART_INFO": "Beschreibung, warum dies benötigt wird und worauf zu achten ist.",
-    "PROPOSE": "Kriterium vorschlagen"
+    "PRIORITY": "Priorität"
   },
   "PRODUCTS": {
-    "PRODUCT_LABEL": "Produkt",
     "PRODUCTS_LABEL": "Produkte",
     "NO_ID_FOUND_MSG": "Keine gültige Produkt-ID gefunden. Bitte versuchen Sie es erneut...",
     "NO_PRODUCT_FOUND_MSG_1": "Kein Produkt mit der ID",
     "NO_PRODUCT_FOUND_MSG_2": "gefunden. Bitte versuchen Sie es erneut...",
-    "PROPOSE": "Produkt vorschlagen",
     "CREATE_LINK": "Link erstellen",
     "SHOW": "Produkte anzeigen",
-    "SHOW_TOOLTIP": "Produkte anzeigen, die den Filterkriterien entsprechen",
-    "ENTER_INFO_MSG": "Bitte geben Sie Informationen zum Produkt ein."
+    "SHOW_TOOLTIP": "Produkte anzeigen, die den Filterkriterien entsprechen"
   },
   "FAVORITES": {
     "LABEL": "Favoriten",
@@ -72,17 +58,6 @@
   "FILTERS": {
     "LABEL": "Filter",
     "ENTER_FILTERS_INFO": "Bitte geben Sie die Filter ein."
-  },
-  "PROPOSALS": {
-    "LABEL": "Vorschläge",
-    "STATUS": "Status",
-    "NON_OPEN_FOUND": "Keine offenen Vorschläge gefunden",
-    "NOT_ALL_FIELDS_MSG": "Nicht alle Felder sind erforderlich. Je mehr Informationen Sie uns zur Verfügung stellen, desto einfacher ist die Prüfung durch unsere Admins.",
-    "PROPOSER": "Ersteller",
-    "APPROVER": "Genehmiger",
-    "NOTE": "Notiz",
-    "CREATED_AT": "Erstellt am",
-    "FINISHED_AT": "Abgeschlossen am"
   },
   "ERROR": {
     "GENERIC": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder kontaktieren Sie den Support."

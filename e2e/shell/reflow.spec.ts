@@ -113,7 +113,6 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     for (const item of [
       nav.getByRole('link', { name: 'Kriterien' }),
       nav.getByRole('link', { name: 'Produkte' }),
-      nav.getByRole('link', { name: 'Beitragen' }),
       // „Anmelden“ follows the navigation in the menu, outside the nav landmark.
       page.getByRole('button', { name: 'Anmelden' }),
     ]) {

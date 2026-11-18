@@ -18,12 +18,8 @@ SPDX-License-Identifier: MIT
         routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
         (click)="navigated.emit()">{{ 'shell.nav.directory' | translate }}</a>
     </li>
-    <li>
-      <!-- Legacy product proposal until the contribution screens of step 6 (owner, S2-15) -->
-      <a matButton class="pa-main-nav__item" routerLink="/product-proposal/0"
-        routerLinkActive="pa-main-nav__item--active" ariaCurrentWhenActive="page"
-        (click)="navigated.emit()">{{ 'shell.nav.contribute' | translate }}</a>
-    </li>
+    <!-- „Beitragen“ (shell.nav.contribute) returns with S53 of step 6: its legacy target, the product
+         proposal, went with the proposals (S6-23, owner decision D1 (a) of 2026-11-18) -->
   </ul>
 </nav>
 
