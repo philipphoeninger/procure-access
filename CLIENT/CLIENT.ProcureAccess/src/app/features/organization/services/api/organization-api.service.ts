@@ -21,8 +21,8 @@ import {
   PendingInvitation,
 } from '../../models/organization';
 
-/** Problem types of `POST /api/v1/organizations` that S20 shows itself (SPEC §8.9). */
-export const CREATE_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'email-unconfirmed'];
+/** Problem types of `POST /api/v1/organizations` that S20 shows itself (SPEC §8.9, §7.3). */
+export const CREATE_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'email-unconfirmed', 'rate-limit'];
 
 /** Problem types of a role change or a removal that S21 shows itself (SPEC §8.9). */
 export const MEMBER_CHANGE_PROBLEMS: readonly string[] = ['last-owner', 'not-found', 'antiforgery'];

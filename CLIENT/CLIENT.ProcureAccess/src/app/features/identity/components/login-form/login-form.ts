@@ -13,9 +13,16 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
-import { applyServerErrors, problemFieldErrors, problemTypeName, ServerErrorField } from '@app/core/errors/problem-details';
+import {
+  applyServerErrors,
+  problemDetails,
+  problemFieldErrors,
+  problemTypeName,
+  ServerErrorField,
+} from '@app/core/errors/problem-details';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
+import { pluralKey } from '@app/shared/pipes/translate-plural.pipe';
 import { LOCKOUT_RULE } from '../../models/lockout-rule';
 import { RESET_PASSWORD_PATH } from '../../models/login-navigation';
 
@@ -39,7 +46,9 @@ const BODY_PATH = '$';
  * without a field for the server's answer on the body as a whole — a wrong address or password,
  * a locked or a deleted account, so it never names a field (SPEC §8.8) — followed by the fixed
  * lockout note `auth.login.error.lockout` with the 🔧 numbers (owner decisions S5-13 1 (a),
- * S5-13b 2 (a): the server never says whether an account is locked) — or `errors.antiforgery`.
+ * S5-13b 2 (a): the server never says whether an account is locked) — or `errors.antiforgery`, or
+ * `errors.rateLimit` with the server's minutes for a 429 (SPEC §7.3, per client IP or per address;
+ * S6-26).
  * Other failures keep the system states of the error interceptor. A successful sign-in emits
  * `signedIn`; the host decides what follows.
  *
@@ -152,6 +161,10 @@ export class LoginForm {
     switch (problemTypeName(error)) {
       case 'antiforgery':
         return [{ message: { key: 'errors.antiforgery' } }];
+      case 'rate-limit': {
+        const minutes = problemDetails(error)?.retryAfterMinutes ?? 1;
+        return [{ message: { key: pluralKey(this.translate, 'errors.rateLimit', minutes), params: { minutes } } }];
+      }
       case 'validation':
         return this.refusedAsAWhole(error)
           ? [{ message: { key: 'auth.login.error.invalid' } }]
