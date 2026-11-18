@@ -49,4 +49,23 @@ public static class RateLimitPolicies
     /// (SPEC §7.3 „Saved export“; S5-21a).
     /// </summary>
     public const string SavedExport = "SavedExport";
+
+    /// <summary>
+    /// <c>POST /api/v1/auth/login</c>: per client IP, 30 per 10 minutes 🔧 (S6-26, owner decision
+    /// O-S6-2: more than the reset's 5 per hour, so an office behind one shared address is not locked
+    /// out).
+    /// </summary>
+    public const string SignIn = "SignIn";
+
+    /// <summary>
+    /// <c>POST /api/v1/auth/login</c>: per e-mail address, 10 per hour 🔧 (S6-26, O-S6-2). Asked by the
+    /// endpoint through <see cref="IKeyedRateLimiter"/>, before it looks the address up, so the answer
+    /// is the same for an address with and without an account. The per-account lockout stays.
+    /// </summary>
+    public const string SignInAddress = "SignInAddress";
+
+    /// <summary>
+    /// <c>POST /api/v1/organizations</c>: per signed-in user, 5 per day 🔧 (S6-26, O-S6-2).
+    /// </summary>
+    public const string OrganizationCreation = "OrganizationCreation";
 }

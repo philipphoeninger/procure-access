@@ -14,6 +14,7 @@ using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
+using ProcureAccess.Modules.Platform.Contracts.RateLimiting;
 
 namespace ProcureAccess.Modules.IdentityAccess.Organizations;
 
@@ -34,6 +35,10 @@ namespace ProcureAccess.Modules.IdentityAccess.Organizations;
 /// (<see cref="IdentityAccessPolicies.ConfirmedEmail"/>, SEC-10). A change that would leave the
 /// organisation without an Owner answers 409 <c>last-owner</c> (TEN-11). The state-changing
 /// endpoints are validated against antiforgery like every other (SEC-02).</para>
+/// <para><c>POST /organizations</c> is limited per signed-in user by
+/// <see cref="RateLimitPolicies.OrganizationCreation"/> (5 per day 🔧, SPEC §7.3; S6-26, owner
+/// decision O-S6-2). Authorization runs first, so a refused request of an unconfirmed account
+/// does not count.</para>
 /// </remarks>
 internal static class OrganizationEndpoints
 {
@@ -63,14 +68,17 @@ internal static class OrganizationEndpoints
 
         organizations.MapPost("", CreateAsync)
                      .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                     .RequireRateLimiting(RateLimitPolicies.OrganizationCreation)
                      .WithName("PostOrganization")
                      .WithSummary("Creates an organisation; the signed-in user becomes its Owner")
                      .WithDescription(
                          "201 { id }. 400 validation at 'name' (required, at most 120 characters) or 'type' " +
-                         "(publicBody, company, association); 400 antiforgery; 401; 403 email-unconfirmed.")
+                         "(publicBody, company, association); 400 antiforgery; 401; 403 email-unconfirmed; " +
+                         "429 rate-limit per user.")
                      .Accepts<CreateOrganizationBody>("application/json")
                      .Produces<CreatedOrganization>(StatusCodes.Status201Created)
-                     .ProducesValidationProblem();
+                     .ProducesValidationProblem()
+                     .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         organizations.MapGet("", ListMineAsync)
                      .WithName("GetOrganizations")

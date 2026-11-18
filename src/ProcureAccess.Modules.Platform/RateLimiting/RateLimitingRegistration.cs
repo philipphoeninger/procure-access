@@ -45,6 +45,7 @@ internal static class RateLimitingRegistration
         RateLimitPolicies.CriteriaListShown,
         RateLimitPolicies.Registration,
         RateLimitPolicies.PasswordReset,
+        RateLimitPolicies.SignIn,
     ];
 
     /// <summary>
@@ -57,6 +58,7 @@ internal static class RateLimitingRegistration
         RateLimitPolicies.ConfirmationResend,
         RateLimitPolicies.Invitation,
         RateLimitPolicies.SavedExport,
+        RateLimitPolicies.OrganizationCreation,
     ];
 
     /// <summary>
@@ -66,6 +68,7 @@ internal static class RateLimitingRegistration
     private static readonly string[] KeyedPolicies =
     [
         RateLimitPolicies.PasswordResetAddress,
+        RateLimitPolicies.SignInAddress,
     ];
 
     public static IServiceCollection AddPlatformRateLimiting(this IServiceCollection services, IConfiguration configuration)
