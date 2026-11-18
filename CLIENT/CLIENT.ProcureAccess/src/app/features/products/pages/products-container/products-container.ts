@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Component, inject, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,13 +53,12 @@ export class ProductsContainer {
     criteriaFilter: []
   });
   secondFormGroup = this._formBuilder.group({
-    secondCtrl: ['', Validators.required],
+    secondCtrl: ['', (control: AbstractControl) => Validators.required(control)],
   });
 
-  constructor(
-    protected snackbarService: SnackbarService,
-    private router: Router
-  ) {}
+  protected snackbarService = inject(SnackbarService);
+
+  private router = inject(Router);
 
     linkCopied() {
       this.snackbarService.showInfo('Link was copied to clipboard!');
@@ -91,11 +90,18 @@ export class ProductsContainer {
 
     enterFilters() {
       this.store.setSelectedCriteriaFilters(this.markedCriteriaFilters());
-      this.store.getCriteriaBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds());
+      // The error interceptor reports a failed request (S3-02 R1, S6-24); the list stays as it was.
+      this.store.getCriteriaBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds())
+        .catch(() => undefined);
     }
 
     async showProductsByCriteriaFilters() {
-      await this.store.getProductsBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds());
-      this.router.navigateByUrl('/products');
+      try {
+        await this.store.getProductsBySelectedCriteriaFilterIds(this.store.selectedCriteriaFiltersIds());
+      } catch {
+        // The error interceptor reports a failed request; the page stays (S6-24).
+        return;
+      }
+      void this.router.navigateByUrl('/products');
     }
 }

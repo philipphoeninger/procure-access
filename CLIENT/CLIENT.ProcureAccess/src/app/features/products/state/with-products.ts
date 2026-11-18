@@ -11,15 +11,14 @@ import {
   withState
 } from '@ngrx/signals';
 import { Product } from '../models/product.model';
-import { initialAppState } from '@app/core/models/appState.interface';
 import { ProductsApiService } from '../services/api/products-api.service';
-import { withLoading } from '@app/shared/state/with-loading';
+import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
 export type ProductState = { products: Product[], productsLoaded: boolean };
 
 export const withProducts = () => signalStoreFeature(
-    withState<ProductState>({ products: initialAppState.products, productsLoaded: false }),
-    withLoading(),
+    LOADING_INPUT,
+    withState<ProductState>({ products: [], productsLoaded: false }),
     withMethods((state, productsApiService = inject(ProductsApiService)) => {
       // Only the newest product request may write its result, so a slow full list
       // cannot replace a filtered list the user asked for later.

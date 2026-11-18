@@ -49,7 +49,9 @@ export class ProductsList implements AfterViewInit {
 
   readonly dialog = inject(MatDialog);
 
-  constructor(protected snackbarService: SnackbarService) {
+  protected snackbarService = inject(SnackbarService);
+
+  constructor() {
     // Products load asynchronously; keep the table in sync with the store.
     effect(() => {
       this.dataSource.data = this.store.products();
@@ -67,9 +69,9 @@ export class ProductsList implements AfterViewInit {
     // Furthermore, you can customize the message to add additional
     // details about the values being sorted.
     if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      void this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
     } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+      void this._liveAnnouncer.announce('Sorting cleared');
     }
   }
 
@@ -103,7 +105,7 @@ export class ProductsList implements AfterViewInit {
     this.store.addProductFavorite(productId);
     this.translate
           .get('FAVORITES.SAVED_PRODUCT')
-          .pipe(tap(message => this.snackbarService.showInfo(message)))
+          .pipe(tap((message: string) => this.snackbarService.showInfo(message)))
           .subscribe();
   }
 }

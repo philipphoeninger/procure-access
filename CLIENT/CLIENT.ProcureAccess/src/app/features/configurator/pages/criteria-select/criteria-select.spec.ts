@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterOutlet } from '@angular/router';
 import { signalStore } from '@ngrx/signals';
+import { withLoading } from '@app/shared/state/with-loading';
 import { fireEvent } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/angular';
 
@@ -24,7 +25,7 @@ import { SavedListSelection } from '../saved-list/saved-list-selection';
 import { CriteriaSelect } from './criteria-select';
 
 // The real configurator slice stands in for the root store, so the page runs the S4-09 rules.
-const ConfiguratorTestStore = signalStore(withConfigurator());
+const ConfiguratorTestStore = signalStore(withLoading(), withConfigurator());
 
 const NONE_OPTION = 'Keiner davon passt Es gelten die allgemeinen Empfehlungen.';
 
