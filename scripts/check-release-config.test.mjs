@@ -83,7 +83,7 @@ test('fails on the placeholder marker, in any spacing and case and next to conte
 
 test('fails on a legal page that is missing, empty or only comments', () => {
   assert.match(checkLegalPage(null)[0], /missing/);
-  for (const source of ['', ' \n\n', '<!-- Inhalt folgt -->\n']) {
+  for (const source of ['', ' \n\n', '<!-- Inhalt folgt -->\n', '<!-- Kommentar ohne Ende\n## Titel\nText\n']) {
     assert.match(checkLegalPage(source)[0], /no content/, JSON.stringify(source));
   }
 });

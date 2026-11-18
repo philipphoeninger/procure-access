@@ -52,6 +52,14 @@ describe('parseLegalText', () => {
     });
   });
 
+  it('hides the rest of the file after a comment without its end, as HTML does', () => {
+    expect(parseLegalText('## Titel\nText <!-- offen\n## Nicht gezeigt').blocks).toEqual([
+      { kind: 'heading', level: 2, text: 'Titel' },
+      { kind: 'text', text: 'Text ' },
+    ]);
+    expect(parseLegalText('<!-- offen\n## Nicht gezeigt').placeholder).toBe(true);
+  });
+
   it('is a placeholder while the marker is in the file, in any case and next to content', () => {
     expect(parseLegalText('<!-- PLATZHALTER -->\n')).toEqual({ placeholder: true, blocks: [] });
     expect(parseLegalText('<!--Platzhalter-->\n## Titel\nText').placeholder).toBe(true);

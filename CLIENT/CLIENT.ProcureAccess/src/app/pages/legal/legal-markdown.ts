@@ -10,12 +10,13 @@
  *
  * - `## `, `### ` and `#### ` lines are headings of level 2 to 4; level 1 is the page's H1, a UX
  *   copy text, so a `# ` line is shown as written.
- * - `<!-- … -->` is a comment, also over several lines, and is never shown.
+ * - `<!-- … -->` is a comment, also over several lines, and is never shown; a comment without
+ *   its end hides the rest of the file, as in HTML.
  * - The text between two headings goes to `pa-catalog-text` as it is.
  *
  * The placeholder marker is the comment `<!-- PLATZHALTER -->`: while a file carries it, or has no
  * content, the page shows `legal.placeholder` and the release check fails
- * (`scripts/check-release-config.mjs` uses the same two patterns; keep them in step).
+ * (`scripts/check-release-config.mjs` uses the same marker and comment rule; keep them in step).
  */
 export type LegalBlock =
   | { kind: 'heading'; level: 2 | 3 | 4; text: string }
@@ -28,7 +29,6 @@ export interface LegalText {
 }
 
 export const LEGAL_PLACEHOLDER = /<!--\s*PLATZHALTER\s*-->/i;
-const COMMENT = /<!--[\s\S]*?-->/g;
 const HEADING = /^(#{2,4}) +(\S.*)$/;
 
 export function parseLegalText(source: string): LegalText {
@@ -42,7 +42,7 @@ export function parseLegalText(source: string): LegalText {
     lines = [];
   };
 
-  for (const line of source.replace(COMMENT, '').replace(/\r\n?/g, '\n').split('\n')) {
+  for (const line of withoutComments(source).replace(/\r\n?/g, '\n').split('\n')) {
     const heading = HEADING.exec(line.trimEnd());
     if (heading) {
       endText();
@@ -58,4 +58,26 @@ export function parseLegalText(source: string): LegalText {
   endText();
 
   return { placeholder: LEGAL_PLACEHOLDER.test(source) || blocks.length === 0, blocks };
+}
+
+/**
+ * The source without its comments. A scan instead of a regular-expression replacement, so no
+ * `<!--` can survive by nesting (the result is never HTML, but nothing is left to look like a
+ * comment either).
+ */
+export function withoutComments(source: string): string {
+  let result = '';
+  let from = 0;
+  for (;;) {
+    const start = source.indexOf('<!--', from);
+    if (start === -1) {
+      return result + source.slice(from);
+    }
+    result += source.slice(from, start);
+    const end = source.indexOf('-->', start + 4);
+    if (end === -1) {
+      return result;
+    }
+    from = end + 3;
+  }
 }

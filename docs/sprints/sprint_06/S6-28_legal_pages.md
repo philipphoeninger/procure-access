@@ -78,19 +78,20 @@ Not changed: SPEC (R-SHL-07 is met as written; its path `content/legal/*.de.md` 
 | R6 | Legal routes now lazy: offline, a not yet loaded legal page cannot open | **Won't fix** | Like every feature page; the chunk-reload flow of S6-27 applies to it too |
 | R7 | Security | **Checked** | No `innerHTML`; text comes only from repository files at build time; links limited to http(s) with `rel="noopener noreferrer"`; no new request, no secret |
 | R8 | Accessibility | **Checked** | One H1 (UX copy), file headings start at H2 (a `# ` line is refused by a unit test on the repository's files); notice before the content in DOM order; long headings hyphenate at 320 px; no colour or size below body/medium |
+| R9 | CodeQL (CI, 2 high): „Incomplete multi-character sanitization“ on the regular-expression removal of `<!-- … -->` in `legal-markdown.ts` and the script | **Fix applied** (follow-up commit) | Not exploitable — the result is never HTML, it becomes text nodes or is only tested for emptiness — but a required check: both sides now remove comments with a scan (`withoutComments`); a comment without its end hides the rest of the file, as in HTML, so an unterminated comment can neither leak `<!--` nor let a file pass the release check (tested on both sides) |
 
 ## 4. Checks
 
 | # | Check | Result |
 |---|---|---|
-| C1 | `npx ng test` (Vitest, whole client) | 85 files, 835 tests pass (14 in `pages/legal/`) |
+| C1 | `npx ng test` (Vitest, whole client) | 85 files, 835 tests pass (14 in `pages/legal/`); after the CodeQL fix 15 in `pages/legal/` |
 | C2 | `npm run lint` (client) | All files pass |
 | C3 | `npm run build:release` | Builds; initial 756.0 kB (budget 850 kB warning); the legal texts in a lazy chunk of 3.3 kB |
 | C4 | `node --test scripts/check-release-config.test.mjs` | 13 tests pass (7 new: content passes with comments; the marker in any spacing/case and next to content; missing, empty, only comments; „Platzhalter“ as a word; ready root passes; each page as placeholder or missing fails naming its file; the script on the repository exits 1 with an `::error` line per placeholder page) |
 | C5 | `node scripts/check-release-config.mjs` on the repository | Exit 1: the O-6 channel and the three legal pages |
 | C6 | `node scripts/check-invariants.mjs`, `check-i18n.mjs`, `check-figma-links.mjs`, `check-icons.mjs` and their self-tests | Green (TESTING_v89 is the gate's file) |
 | C7 | `npm run typecheck`, `npm run lint` in `e2e/` (covers `scripts/*.mjs`) | Green |
-| C8 | `reuse lint` (local `fsfe/reuse` image, on a `git archive` of the branch so ignored folders are not scanned) | Compliant, 1592/1592 files. First run found two test fixtures with the text „SPDX-License-Identifier: MIT“ inside a string, read by REUSE as a broken expression — changed to neutral comment text |
+| C8 | `reuse lint` (local `fsfe/reuse:6.2.0` image, the CI's version, on a `git archive` of the branch so ignored folders are not scanned) | Compliant. First runs found two test fixtures and then a line of this protocol that quoted an SPDX licence tag inside a string; REUSE reads such a quote as a broken expression — the fixtures now use neutral comment text and the protocol no longer quotes the tag (CI stage 1 had failed on the protocol line, fixed in a follow-up commit) |
 | C9 | E2E (`shell.spec.ts`, `reflow.spec.ts`, `route-change.spec.ts`) | **Not run locally** (another session used the E2E stack); CI runs them — see the pull request |
 | C10 | Figma comparison | Not applicable: S71 has no frame |
 

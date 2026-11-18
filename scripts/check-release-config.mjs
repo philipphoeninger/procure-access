@@ -14,7 +14,7 @@
 // And the client's legal pages (content/legal/*.de.md, S6-28):
 //   3. each file exists, has content outside comments and no longer carries the placeholder
 //      marker `<!-- PLATZHALTER -->` (the client shows `legal.placeholder` on the same rule,
-//      src/app/pages/legal/legal-markdown.ts; keep the two patterns in step).
+//      src/app/pages/legal/legal-markdown.ts; keep marker and comment rule in step).
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +26,6 @@ export const LEGAL_PAGES = ['impressum', 'datenschutz', 'barrierefreiheit'].map(
 );
 
 const LEGAL_PLACEHOLDER = /<!--\s*PLATZHALTER\s*-->/i;
-const COMMENT = /<!--[\s\S]*?-->/g;
 
 const SETTING = /^\s*criteriaSuggestion\s*:\s*(['"])(.*?)\1\s*,?\s*$/gm;
 const MAILTO = /^mailto:([^\s?#@/]+@[^\s?#@/]+)$/;
@@ -63,8 +62,22 @@ export function checkLegalPage(source) {
   if (LEGAL_PLACEHOLDER.test(source)) {
     return ['the legal page is still the placeholder (<!-- PLATZHALTER -->); insert the text from WERTE.IT (O-S6-6)'];
   }
-  if (source.replace(COMMENT, '').trim() === '') return ['the legal page has no content'];
+  if (withoutComments(source).trim() === '') return ['the legal page has no content'];
   return [];
+}
+
+/** The source without its `<!-- … -->` comments; a comment without its end hides the rest (as in HTML). */
+export function withoutComments(source) {
+  let result = '';
+  let from = 0;
+  for (;;) {
+    const start = source.indexOf('<!--', from);
+    if (start === -1) return result + source.slice(from);
+    result += source.slice(from, start);
+    const end = source.indexOf('-->', start + 4);
+    if (end === -1) return result;
+    from = end + 3;
+  }
 }
 
 /** Every problem of the repository below `root`, as [file, message] pairs. */
