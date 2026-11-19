@@ -66,7 +66,7 @@ describe('CandidatesApiService', () => {
     const request = backend.expectOne('/api/v1/projects/p%2F1/candidates');
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(BODY);
-    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed']);
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'conflict']);
     expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(false);
     request.flush(CANDIDATE_BODY, { status: 201, statusText: 'Created', headers: { ETag: TEST_CANDIDATE.etag } });
     await expect(created).resolves.toEqual(TEST_CANDIDATE);
@@ -79,7 +79,7 @@ describe('CandidatesApiService', () => {
     expect(request.request.method).toBe('PATCH');
     expect(request.request.body).toEqual(BODY);
     expect(request.request.headers.get('If-Match')).toBe('"1-4"');
-    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed']);
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'conflict']);
     request.flush(CANDIDATE_BODY, { headers: { ETag: '"1-5"' } });
     await expect(changed).resolves.toEqual({ ...TEST_CANDIDATE, etag: '"1-5"' });
   });
@@ -95,6 +95,7 @@ describe('CandidatesApiService', () => {
       'validation',
       'antiforgery',
       'email-unconfirmed',
+      'conflict',
       'test-status-conflict',
     ]);
     request.flush({ ...CANDIDATE_BODY, testStatus: 'notTested' }, { headers: { ETag: '"1-5"' } });
@@ -107,7 +108,7 @@ describe('CandidatesApiService', () => {
     expect(post.request.method).toBe('POST');
     expect(post.request.headers.has('If-Match')).toBe(false);
     expect(post.request.body).toEqual(EVIDENCE_BODY);
-    expect(post.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed']);
+    expect(post.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'conflict']);
     post.flush(EVIDENCE, { status: 201, statusText: 'Created' });
     await expect(added).resolves.toEqual(EVIDENCE);
 
@@ -123,7 +124,7 @@ describe('CandidatesApiService', () => {
     const remove = backend.expectOne('/api/v1/test-evidences/e%2F1');
     expect(remove.request.method).toBe('DELETE');
     expect(remove.request.headers.get('If-Match')).toBe('"1-2"');
-    expect(remove.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'not-found']);
+    expect(remove.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'conflict', 'not-found']);
     remove.flush(null, { status: 204, statusText: 'No Content' });
     await expect(removed).resolves.toBeNull();
   });

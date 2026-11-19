@@ -15,10 +15,11 @@ import { Candidate, CandidateRequest, TestEvidence, TestEvidenceRequest, TestSta
 
 /**
  * Problem types of saving S33 that the form shows itself (SPEC §8.6), as S20 does: field errors,
- * antiforgery and the unconfirmed address. Anything else keeps the system states of the error
- * interceptor (`project-archived` → `projects.archived.note`, 5xx → S80).
+ * antiforgery, the unconfirmed address and `conflict` — a stale `If-Match` opens S37 (R-CAN-11,
+ * S6-21; adding needs no tag and never meets it). Anything else keeps the system states of the
+ * error interceptor (`project-archived` → `projects.archived.note`, 5xx → S80).
  */
-export const SAVE_CANDIDATE_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'email-unconfirmed'];
+export const SAVE_CANDIDATE_PROBLEMS: readonly string[] = ['validation', 'antiforgery', 'email-unconfirmed', 'conflict'];
 
 /**
  * Problem types of changing the test status that S34a shows itself: those of
@@ -36,8 +37,8 @@ export const SAVE_TEST_STATUS_PROBLEMS: readonly string[] = [...SAVE_CANDIDATE_P
  * `test-status-conflict` of the test status (S6-17). Every answer with a candidate carries its
  * `ETag`, kept as `etag`; an evidence names its tag as the body member `etag`. A change sends the
  * tag back in `If-Match` (API-03, S6-20): the candidate's for its facts and its test status, the
- * evidence's for changing or removing it; adding one needs none. A 409 `conflict` shows the general
- * error text until the conflict dialog S37 comes (S6-21).
+ * evidence's for changing or removing it; adding one needs none. A 409 `conflict` is the caller's:
+ * S33 and S34a open the conflict dialog S37 (S6-21).
  */
 @Injectable({ providedIn: 'root' })
 export class CandidatesApiService {

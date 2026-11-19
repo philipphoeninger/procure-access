@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { TextFieldModule } from '@angular/cdk/text-field';
+import { HttpErrorResponse } from '@angular/common/http';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   afterNextRender,
@@ -20,6 +21,7 @@ import {
 import { AbstractControl, FormControl, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -32,6 +34,8 @@ import { applyServerErrors, problemTypeName, ServerErrorField } from '@app/core/
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm-required-notice/confirm-required-notice';
 import { ErrorPage, ErrorPageKind } from '@app/pages/error/error-page';
+import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
+import { changesText, EditConflict } from '@app/shared/components/conflict-dialog/edit-conflict';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
 import { Notice } from '@app/shared/components/notice/notice';
 
@@ -42,6 +46,18 @@ import { CandidatesApiService } from '../../services/api/candidates-api.service'
 import { CandidateLoad, isProjectEditor } from '../candidate-detail/candidate-load';
 
 type FieldName = keyof CandidateRequest;
+
+/** The fields of a stored candidate as the form shows them; an empty optional field is ''. */
+function valuesOf(candidate: Candidate): CandidateRequest {
+  return {
+    name: candidate.name,
+    vendor: candidate.vendor ?? '',
+    website: candidate.website ?? '',
+    functionalSummary: candidate.functionalSummary ?? '',
+    contactNotes: candidate.privateSection.contactNotes ?? '',
+    internalNotes: candidate.privateSection.internalNotes ?? '',
+  };
+}
 
 /** One field of S33 in the order of the form; the private ones in the section „Nur für Ihre Organisation“. */
 interface FieldSpec {
@@ -100,6 +116,10 @@ function httpsAddress(control: AbstractControl<string>): ValidationErrors | null
  *   gets „Fehler:“. Server field errors show at their fields (API-02); antiforgery in the summary;
  *   an unconfirmed address shows `pa-confirm-required-notice` with the focus (SEC-10) and keeps the
  *   input. Anything else keeps the interceptor's system states (`project-archived` → its note).
+ * - 409 `conflict` when editing (someone else changed the product since it was read; API-03,
+ *   R-CAN-11) opens S37 with the changed fields as text (S6-21). „Neue Fassung laden“ reads the
+ *   product again, fills the form with it and moves the focus to the H1; after Escape „Speichern“
+ *   opens S37 again without a request until then.
  * - „Speichern“ with the button spinner, `aria-disabled` while sending; „Abbrechen“ leads back
  *   (to S32 for a new product, to S34 when editing). Success opens S34 Überblick of the product,
  *   whose route change titles, focuses and announces it. Sending every field: an empty optional
@@ -140,6 +160,8 @@ export class CandidateFormPage {
   private readonly translate = inject(TranslateService);
   private readonly pageTitle = inject(PageTitleStrategy);
   private readonly injector = inject(Injector);
+  private readonly dialog = inject(MatDialog);
+  private readonly conflict = new EditConflict();
 
   protected readonly publicFields = FIELDS.filter((field) => !field.private);
   protected readonly privateFields = FIELDS.filter((field) => field.private);
@@ -232,6 +254,11 @@ export class CandidateFormPage {
       this.showErrors(invalid);
       return;
     }
+    // After a conflict nothing is sent until the product is read again (S37)
+    if (this.conflict.blocked && shown.candidate !== null) {
+      await this.showConflict(shown.candidate);
+      return;
+    }
     this.busy.set(true);
     let saved: Candidate;
     try {
@@ -241,7 +268,13 @@ export class CandidateFormPage {
           ? await this.api.create(shown.project.id, body)
           : await this.api.change(shown.candidate.id, body, shown.candidate.etag);
     } catch (error: unknown) {
-      this.refused(error);
+      this.busy.set(false);
+      if (shown.candidate !== null && this.conflict.caught(error)) {
+        this.showErrors([]);
+        await this.showConflict(shown.candidate);
+      } else {
+        this.refused(error);
+      }
       return;
     } finally {
       this.busy.set(false);
@@ -251,15 +284,47 @@ export class CandidateFormPage {
   }
 
   private fill(candidate: Candidate): void {
-    const values: CandidateRequest = {
-      name: candidate.name,
-      vendor: candidate.vendor ?? '',
-      website: candidate.website ?? '',
-      functionalSummary: candidate.functionalSummary ?? '',
-      contactNotes: candidate.privateSection.contactNotes ?? '',
-      internalNotes: candidate.privateSection.internalNotes ?? '',
-    };
+    const values = valuesOf(candidate);
     for (const field of FIELDS) this.controls[field.name].setValue(values[field.name]);
+  }
+
+  /**
+   * S37 with the fields that differ from the product as it was read (UX copy U189). „Neue Fassung
+   * laden“ reads it again: the form is filled from the stored version and the focus goes to the H1.
+   */
+  private async showConflict(candidate: Candidate): Promise<void> {
+    const read = valuesOf(candidate);
+    const body = this.body();
+    const fields = FIELDS.filter((field) => body[field.name] !== read[field.name]).map((field) => ({
+      label: this.translate.instant(field.labelKey) as string,
+      value: body[field.name],
+    }));
+    const reload = await ConflictDialog.show(this.dialog, {
+      editorDisplayName: this.conflict.editorDisplayName,
+      changes: changesText([{ fields }]),
+    });
+    if (reload) await this.reload(candidate.id);
+  }
+
+  private async reload(candidateId: string): Promise<void> {
+    this.store.incrementLoadingCount();
+    let candidate: Candidate;
+    try {
+      candidate = await this.api.get(candidateId);
+    } catch (error: unknown) {
+      const status = error instanceof HttpErrorResponse ? error.status : 0;
+      this.load.view.set(status === 404 || status === 400 ? { kind: 'notFound' } : { kind: 'server' });
+      this.pageTitle.focusPageHeading();
+      return;
+    } finally {
+      this.store.decrementLoadingCount();
+    }
+    this.conflict.clear();
+    this.submitted.set(false);
+    // The effect fills the form with the stored version
+    this.load.view.update((view) => (view.kind === 'candidate' ? { ...view, candidate } : view));
+    this.showErrors([]);
+    this.pageTitle.focusPageHeading();
   }
 
   /** Every field, trimmed; an empty optional one clears it on a change. */

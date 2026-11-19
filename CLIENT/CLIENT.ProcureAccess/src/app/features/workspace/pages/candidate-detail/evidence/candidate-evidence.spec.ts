@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { fireEvent } from '@testing-library/dom';
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
@@ -47,6 +47,7 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
   let api: Record<'get' | 'changeTestStatus' | 'addEvidence' | 'changeEvidence' | 'removeEvidence', ReturnType<typeof vi.fn>>;
   let announce: ReturnType<typeof vi.fn>;
   let setPageTitleState: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
   let load: CandidateLoad;
 
   async function openTab(view: CandidateView = candidateView(), role: OrganizationRole = 'editor') {
@@ -60,6 +61,7 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
     };
     announce = vi.fn().mockResolvedValue(undefined);
     setPageTitleState = vi.fn();
+    focusPageHeading = vi.fn();
     load = new CandidateLoad();
     load.view.set(view);
     const rendered = await render(CandidateEvidence, {
@@ -70,8 +72,15 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
         { provide: CandidateLoad, useValue: load },
         { provide: CandidatesApiService, useValue: api },
         { provide: A11yAnnouncerService, useValue: { announce } },
-        { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: ProcureAccessStore, useValue: { organizations: signal([{ id: 'org-1', name: 'Personalamt', type: 'publicBody', role }]) } },
+        { provide: PageTitleStrategy, useValue: { setPageTitleState, focusPageHeading } },
+        {
+          provide: ProcureAccessStore,
+          useValue: {
+            organizations: signal([{ id: 'org-1', name: 'Personalamt', type: 'publicBody', role }]),
+            incrementLoadingCount: vi.fn(),
+            decrementLoadingCount: vi.fn(),
+          },
+        },
       ],
     });
     await rendered.fixture.whenStable();
@@ -299,6 +308,77 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
     );
     expect(api.get).toHaveBeenCalledWith('c-1');
     expect(announce).toHaveBeenCalledWith('candidate.evidence.saved');
+  });
+
+  describe('409 conflict (R-CAN-11, S37)', () => {
+    const conflict = () => problem(409, { type: `${base}conflict`, status: 409, editorDisplayName: null });
+
+    it('INV:API-03 opens S37 for a stale evidence; after Escape „Speichern“ sends nothing and opens S37 again', async () => {
+      const { fixture } = await openTab(candidateView({ candidate: TESTED }));
+      api.changeEvidence.mockRejectedValue(conflict());
+
+      type(/^Geprüfte Version/, '5.0');
+      await save(fixture);
+
+      const s37 = screen.getByRole('alertdialog', { name: 'Inzwischen geändert' });
+      expect(s37.textContent).toContain('Eine andere Person hat diesen Inhalt geändert');
+      expect(announce).not.toHaveBeenCalledWith('candidate.evidence.saved');
+
+      fireEvent.keyDown(s37, { key: 'Escape', code: 'Escape', keyCode: 27 });
+      await settle(fixture);
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(textbox(/^Geprüfte Version/).value).toBe('5.0');
+
+      await save(fixture);
+      expect(api.changeEvidence).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy();
+    });
+
+    it('copies the changed status and each unsaved card under its heading', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      try {
+        const { fixture } = await openTab(candidateView({ candidate: TESTED }));
+        api.changeEvidence.mockRejectedValue(conflict());
+        type(/^Geprüfte Version/, '5.0');
+        screen.getByRole('button', { name: 'Weiteren Prüfnachweis hinzufügen' }).click();
+        await settle(fixture);
+        await chooseKind(fixture, 'Eigene Prüfung', 1);
+        fillCard(1);
+        await save(fixture);
+
+        within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Meine Änderungen kopieren' }).click();
+        await settle(fixture);
+
+        expect(writeText).toHaveBeenCalledWith(
+          'Prüfnachweis 1: BIT inklusiv Software-Test\nGeprüfte Version (optional): 5.0\n\n' +
+            'Prüfnachweis 2: Eigene Prüfung ohne festes Verfahren\nArt der Prüfung: Eigene Prüfung ohne festes Verfahren\n' +
+            'Wer hat geprüft?: Prüfstelle Beispiel\nDatum der Prüfung: 14.03.2026',
+        );
+      } finally {
+        Reflect.deleteProperty(navigator, 'clipboard');
+      }
+    });
+
+    it('„Neue Fassung laden“ fills the tab from the stored product and focuses the H1', async () => {
+      const { fixture } = await openTab(candidateView({ candidate: TESTED }));
+      api.changeEvidence.mockRejectedValue(conflict());
+      type(/^Geprüfte Version/, '5.0');
+      await save(fixture);
+
+      const stored: Candidate = { ...TESTED, etag: '"1-9"', testEvidences: [{ ...SOFTWARE_TEST, etag: '"1-4"', testedVersion: '4.3' }] };
+      api.get.mockResolvedValue(stored);
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neue Fassung laden' }).click();
+      await settle(fixture);
+
+      expect(textbox(/^Geprüfte Version/).value).toBe('4.3');
+      expect(focusPageHeading).toHaveBeenCalled();
+
+      api.changeEvidence.mockImplementation((id: string, body: object) => ({ id, ...body }));
+      type(/^Geprüfte Version/, '5.0');
+      await save(fixture);
+      expect(api.changeEvidence).toHaveBeenLastCalledWith('e-1', expect.objectContaining({ testedVersion: '5.0' }), '"1-4"');
+    });
   });
 
   it('removes a card: announces it, moves the focus to the add button, and removes the evidence on „Speichern“', async () => {

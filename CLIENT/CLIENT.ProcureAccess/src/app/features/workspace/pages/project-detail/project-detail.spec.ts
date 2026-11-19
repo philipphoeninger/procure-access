@@ -15,7 +15,11 @@ import { OrganizationRole } from '@app/features/organization/models/organization
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 
+import { CatalogApiService } from '@app/features/configurator/services/api/catalog-api.service';
+import { ConfiguratorApiService } from '@app/features/configurator/services/api/configurator-api.service';
+
 import { Project, ProjectCandidate } from '../../models/projects';
+import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { ProjectCriteriaFacts, ProjectLoad, ProjectView } from './project-detail-load';
 import { ProjectDetailPage } from './project-detail';
 
@@ -103,12 +107,16 @@ describe('ProjectDetailPage (S32)', () => {
   let takeCriteriaAdded: ReturnType<typeof vi.fn>;
   let openDialog: ReturnType<typeof vi.fn>;
   let activeOrganization: WritableSignal<{ id: string } | null>;
+  let getProject: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
 
   async function openPage(
     view: ProjectView,
-    { role = 'editor', added = 0, changed }: { role?: OrganizationRole; added?: number; changed?: Project } = {},
+    { role = 'editor', added = 0, changed, stored }: { role?: OrganizationRole; added?: number; changed?: Project | 'reload'; stored?: Project } = {},
   ) {
     setPageTitleState = vi.fn();
+    focusPageHeading = vi.fn();
+    getProject = vi.fn().mockResolvedValue(stored);
     announce = vi.fn().mockResolvedValue(undefined);
     takeCriteriaAdded = vi.fn().mockReturnValue(added);
     openDialog = vi.fn().mockReturnValue({ afterClosed: () => of(changed) });
@@ -125,7 +133,10 @@ describe('ProjectDetailPage (S32)', () => {
       providers: [
         provideTestTranslations(),
         { provide: ProjectLoad, useValue: load },
-        { provide: PageTitleStrategy, useValue: { setPageTitleState } },
+        { provide: PageTitleStrategy, useValue: { setPageTitleState, focusPageHeading } },
+        { provide: ProjectsApiService, useValue: { get: getProject } },
+        { provide: ConfiguratorApiService, useValue: {} },
+        { provide: CatalogApiService, useValue: {} },
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: MatDialog, useValue: { open: openDialog } },
         {
@@ -134,6 +145,8 @@ describe('ProjectDetailPage (S32)', () => {
             organizations: signal([{ id: 'org-1', name: 'Personalamt Beispielstadt', type: 'publicBody', role }]),
             activeOrganization,
             takeCriteriaAdded,
+            incrementLoadingCount: vi.fn(),
+            decrementLoadingCount: vi.fn(),
           },
         },
       ],
@@ -168,6 +181,17 @@ describe('ProjectDetailPage (S32)', () => {
       expect(openDialog).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ data: PROJECT }));
       expect(screen.getByText('Stand: Abgeschlossen · noch keine Produkte · nur für Ihre Organisation sichtbar')).toBeTruthy();
       expect(setPageTitleState).toHaveBeenLastCalledWith({ params: { project: 'Bewerbermanagement 2028' } });
+    });
+
+    it('reads the project again after „Neue Fassung laden“ in S37 and focuses the H1 (R-CAN-11)', async () => {
+      const stored = { ...PROJECT, etag: '"1-2"', name: 'Von anderen umbenannt' };
+      await openPage(withoutList(), { changed: 'reload', stored });
+
+      screen.getByRole('button', { name: 'Projekt bearbeiten' }).click();
+      await screen.findByRole('heading', { level: 1, name: 'Von anderen umbenannt' });
+
+      expect(getProject).toHaveBeenCalledWith('p-1');
+      expect(focusPageHeading).toHaveBeenCalled();
     });
 
     it('is not offered to a Reader', async () => {

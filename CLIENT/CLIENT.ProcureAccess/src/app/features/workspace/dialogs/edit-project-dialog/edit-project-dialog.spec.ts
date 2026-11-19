@@ -17,7 +17,7 @@ import { provideTestTranslations } from '@app/testing/provide-test-translations'
 import { Project } from '../../models/projects';
 import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { WorkspaceTestStore } from '../../testing/workspace-test-store';
-import { EditProjectDialog } from './edit-project-dialog';
+import { EditProjectDialog, EditProjectResult } from './edit-project-dialog';
 
 const base = 'https://procureaccess.de/problems/';
 const PROJECT: Project = {
@@ -42,7 +42,7 @@ const PROJECT: Project = {
 class Host {
   readonly project = input(PROJECT);
   private readonly dialog = inject(MatDialog);
-  result: Project | undefined | 'open' = 'open';
+  result: EditProjectResult | undefined | 'open' = 'open';
 
   open(): void {
     EditProjectDialog.open(this.dialog, this.project())
@@ -201,6 +201,65 @@ describe('dialog „Projekt bearbeiten“ of S32 (R-PRJ-05)', () => {
 
     expect(within(dialog).getByRole('link', { name: /Der Name ist zu lang\./ })).toBeTruthy();
     expect(within(dialog).queryByRole('alert', { name: /Änderungen nicht gespeichert/ })).toBeNull();
+  });
+
+  describe('409 conflict (R-CAN-11, S37)', () => {
+    const conflict = () =>
+      problem(409, { type: `${base}conflict`, status: 409, editorDisplayName: 'a.schmidt@example.test' });
+
+    it('INV:API-03 opens S37 over the dialog with the other editor; after Escape „Speichern“ sends nothing and opens S37 again', async () => {
+      const { fixture, host, dialog } = await openDialog({ api: vi.fn().mockRejectedValue(conflict()) });
+
+      rename(dialog, 'Umbenannt');
+      await save(fixture, dialog);
+
+      const s37 = screen.getByRole('alertdialog', { name: 'Inzwischen geändert' });
+      expect(s37.textContent).toContain('a.schmidt@example.test hat diesen Inhalt geändert');
+      expect(document.activeElement).toBe(within(s37).getByRole('button', { name: 'Meine Änderungen kopieren' }));
+      expect(within(dialog).queryByRole('alert')).toBeNull();
+
+      fireEvent.keyDown(s37, { key: 'Escape', code: 'Escape', keyCode: 27 });
+      await settle(fixture);
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.getByRole('dialog', { name: 'Projekt bearbeiten' })).toBeTruthy();
+      expect(within(dialog).getByRole<HTMLInputElement>('textbox', { name: 'Name des Projekts' }).value).toBe('Umbenannt');
+
+      await save(fixture, dialog);
+      expect(change).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy();
+      expect(host.result).toBe('open');
+    });
+
+    it('copies the changed name and status as text', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      try {
+        const { fixture, dialog } = await openDialog({ api: vi.fn().mockRejectedValue(conflict()) });
+        rename(dialog, 'Umbenannt');
+        within(dialog).getByRole('radio', { name: 'Abgeschlossen' }).click();
+        await save(fixture, dialog);
+
+        within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Meine Änderungen kopieren' }).click();
+        await settle(fixture);
+
+        expect(writeText).toHaveBeenCalledWith('Name des Projekts: Umbenannt\nStand: Abgeschlossen');
+      } finally {
+        Reflect.deleteProperty(navigator, 'clipboard');
+      }
+    });
+
+    it('closes both dialogs with „reload“ for „Neue Fassung laden“', async () => {
+      const { fixture, host, dialog } = await openDialog({ api: vi.fn().mockRejectedValue(conflict()) });
+
+      rename(dialog, 'Umbenannt');
+      await save(fixture, dialog);
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neue Fassung laden' }).click();
+      await settle(fixture);
+
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(host.result).toBe('reload');
+    });
   });
 
   it('shows the error notice for any other failure and keeps the dialog open', async () => {

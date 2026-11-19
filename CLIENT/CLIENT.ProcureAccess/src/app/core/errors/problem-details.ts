@@ -23,6 +23,8 @@ export interface ProblemDetails {
   organizations?: string[];
   /** Of a `test-status-conflict` problem (409): the evidences that block leaving „Ja“ (SPEC §8.6 v2.53). */
   evidenceCount?: number;
+  /** Of a `conflict` problem (409, API-03): who made the stored version; null when nobody is known (SPEC §8.6 v2.59-2). */
+  editorDisplayName?: string | null;
 }
 
 /**
