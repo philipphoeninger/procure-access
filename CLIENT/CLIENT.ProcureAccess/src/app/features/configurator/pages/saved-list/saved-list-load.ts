@@ -48,6 +48,11 @@ export type SavedListView =
 @Injectable()
 export class SavedListLoad {
   view: SavedListView = { kind: 'notFound' };
+  /**
+   * Reads the same list again as the resolver did — „Neue Fassung laden“ of S37 (R-CAN-11,
+   * S6-21b). Set by the resolver; without one the view stays as it is.
+   */
+  reload: () => Promise<SavedListView> = () => Promise.resolve(this.view);
 }
 
 /**

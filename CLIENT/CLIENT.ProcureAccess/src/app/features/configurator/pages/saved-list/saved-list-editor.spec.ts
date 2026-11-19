@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
 import { Criterion } from '../../models/criteria';
@@ -89,6 +90,60 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
     expect(decide).toHaveBeenNthCalledWith(1, 'list-1', 11, expect.anything(), '"1-1"');
     expect(decide).toHaveBeenNthCalledWith(2, 'list-1', 22, expect.anything(), '"1-1"');
     expect(editor.decisions()['1.1']?.included ?? true).toBe(true);
+  });
+
+  describe('409 conflict (R-CAN-11, S37; owner decision S6-21 D3 (a))', () => {
+    const conflict = () =>
+      new HttpErrorResponse({
+        status: 409,
+        error: { type: 'https://procureaccess.de/problems/conflict', status: 409, editorDisplayName: 'a.schmidt@example.test' },
+      });
+
+    it('INV:API-03 keeps the shown decision, reports the conflict with its editor and sends nothing more until the list is read again', async () => {
+      setUp();
+      const reported = vi.fn();
+      editor.conflicts.subscribe(reported);
+      decide.mockRejectedValueOnce(conflict());
+
+      editor.setIncluded('1.1', false);
+      await editor.settled();
+      expect(reported).toHaveBeenCalledTimes(1);
+      expect(editor.conflictEditor).toBe('a.schmidt@example.test');
+      expect(editor.decisions()['1.1'].included).toBe(false);
+
+      // A further change shows at once, is not sent and reports the conflict again
+      editor.overridePriority('2.2', 'A');
+      await editor.settled();
+      expect(decide).toHaveBeenCalledTimes(1);
+      expect(reported).toHaveBeenCalledTimes(2);
+      expect(editor.unsaved().map((unsaved) => [unsaved.criterion.key, unsaved.saved.included, unsaved.shown])).toEqual([
+        ['1.1', true, { included: false, overrideLevel: null, overrideWeight: null, note: '' }],
+        ['2.2', true, { included: true, overrideLevel: 'A', overrideWeight: null, note: '' }],
+      ]);
+
+      // Read again: the editor starts on the stored list and saves with its tag
+      editor.start('list-1', '"1-9"', [A, B], {});
+      expect(editor.unsaved()).toEqual([]);
+      editor.setIncluded('2.2', false);
+      await editor.settled();
+      expect(decide).toHaveBeenLastCalledWith('list-1', 22, expect.anything(), '"1-9"');
+      expect(reported).toHaveBeenCalledTimes(2);
+    });
+
+    it('reports nothing for a change that returns to the saved decision', async () => {
+      setUp();
+      const reported = vi.fn();
+      editor.conflicts.subscribe(reported);
+      decide.mockRejectedValueOnce(conflict());
+      editor.setIncluded('1.1', false);
+      await editor.settled();
+
+      editor.setIncluded('1.1', true);
+      await editor.settled();
+
+      expect(reported).toHaveBeenCalledTimes(1);
+      expect(editor.unsaved()).toEqual([]);
+    });
   });
 
   it('puts a criterion back to its last saved decision when the save fails', async () => {

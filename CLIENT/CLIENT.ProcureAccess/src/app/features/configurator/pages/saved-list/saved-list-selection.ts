@@ -7,10 +7,19 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { ProcureAccessStore } from '@app/core/state/app.store';
 
+import { CriteriaSelection } from '../../models/configurator-draft';
 import { savedListPath } from '../../models/saved-lists';
 import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { selectionOf } from './saved-list-load';
+
+/** The saved list S10 changes the selection of, as the guard read it. */
+export interface SavedListSelectionContext {
+  id: string;
+  release: string;
+  etag: string;
+  selection: CriteriaSelection;
+}
 
 /**
  * The saved list whose selection S10 changes at `/kriterienlisten/:id/auswahl` (owner decision
@@ -19,8 +28,11 @@ import { selectionOf } from './saved-list-load';
  */
 @Injectable()
 export class SavedListSelection {
-  /** With the tag the list was read at, for the `If-Match` of the selection change (API-03, S6-20b). */
-  list: { id: string; release: string; etag: string } | null = null;
+  /**
+   * With the tag the list was read at, for the `If-Match` of the selection change (API-03, S6-20b),
+   * and its stored selection, to tell what the user changed when S37 copies it (S6-21b).
+   */
+  list: SavedListSelectionContext | null = null;
 }
 
 /**
@@ -52,7 +64,7 @@ export const savedListSelectionGuard: CanActivateFn = async (route) => {
       store.endSavedListSelection();
       return back;
     }
-    context.list = { id: list.id, release: list.releaseVersion, etag: list.etag };
+    context.list = { id: list.id, release: list.releaseVersion, etag: list.etag, selection: selectionOf(list) };
     return true;
   } catch {
     return back;

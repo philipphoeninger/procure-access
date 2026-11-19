@@ -23,6 +23,7 @@ import { FormControl, ReactiveFormsModule, ValidationErrors } from '@angular/for
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -35,12 +36,14 @@ import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { injectWideLayout } from '@app/layout/shell/wide-layout';
+import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
+import { ChangedField, changesText, EditConflict } from '@app/shared/components/conflict-dialog/edit-conflict';
 import { Notice } from '@app/shared/components/notice/notice';
 import { Stepper } from '@app/shared/components/stepper/stepper';
 import { FilterOptionCheckbox, OptionLink } from '../../components/filter-option/filter-option';
 import { ConfiguratorNavigationState, CRITERIA_LIST_PATH, LEGACY_FILTER_PATH } from '../../guards/configurator-guards';
 import { linkTo } from '../../state/catalog-names';
-import { CONFIGURATOR_LAYERS, ConfiguratorLayer, ResetReport } from '../../models/configurator-draft';
+import { CONFIGURATOR_LAYERS, ConfiguratorLayer, CriteriaSelection, ResetReport } from '../../models/configurator-draft';
 import { FilterOption, TestTypeOption, UseCaseOption } from '../../models/filter-options';
 import {
   exclusionReasonLines,
@@ -52,10 +55,11 @@ import {
 } from '../../state/selection-rules';
 import { savedListPath } from '../../models/saved-lists';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
+import { selectionNames } from '../../state/selection-names';
 import { toCriteriaSelection } from '../../state/selection-rules';
 import { SubmitResult } from '../../state/with-configurator';
 import { SavedListNavigationState } from '../saved-list/saved-list-load';
-import { SavedListSelection } from '../saved-list/saved-list-selection';
+import { SavedListSelection, SavedListSelectionContext } from '../saved-list/saved-list-selection';
 
 /** „Keiner davon passt“: its own answer of step 1, not a use case (R-CON-02). */
 interface NoneEntry {
@@ -158,7 +162,10 @@ function normalize(text: string): string {
  * the draft. „Abbrechen“ under the intro leads back to the list without a change; „Kriterienliste
  * anzeigen“ lets the server check the selection, then saves it with `PUT …/selection` and opens the
  * list with the decisions that were dropped (owner decision S5-21 4a). Leaving the page in any way
- * brings the draft back (`endSavedListSelection`).
+ * brings the draft back (`endSavedListSelection`). When someone else changed the list since the
+ * page read it, the 409 `conflict` opens S37 (R-CAN-11, S6-21b, owner decision S6-21 D4 (a)) with
+ * the changed layers as text; after Escape „Kriterienliste anzeigen“ opens S37 again without a
+ * request; „Neue Fassung laden“ drops the new selection and opens the list as stored now.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2134-3174
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2019-407
@@ -201,6 +208,9 @@ export class CriteriaSelect {
   private readonly pageTitle = inject(PageTitleStrategy);
   private readonly router = inject(Router);
   private readonly configurator = inject(ConfiguratorApiService);
+  private readonly dialog = inject(MatDialog);
+  /** The conflict of the selection change of a saved list (S37). */
+  private readonly conflict = new EditConflict();
   /** The saved list whose selection this page changes; null for the draft. */
   protected readonly savedList = inject(SavedListSelection, { optional: true })?.list ?? null;
   protected readonly savedListPath = this.savedList === null ? null : savedListPath(this.savedList.id);
@@ -519,11 +529,17 @@ export class CriteriaSelect {
    */
   protected async submit(): Promise<void> {
     if (this.submitting()) return;
+    // After a conflict nothing is sent until the list is read again (S37)
+    if (this.savedList !== null && this.conflict.blocked) {
+      await this.showConflict(this.savedList);
+      return;
+    }
     this.submitting.set(true);
+    let conflicted = false;
     try {
       const result = await this.store.submitSelection();
       if (result.kind === 'accepted' && this.savedList !== null) {
-        await this.saveSelectionOfSavedList(this.savedList);
+        conflicted = (await this.saveSelectionOfSavedList(this.savedList)) === 'conflict';
       } else if (result.kind === 'accepted') {
         await this.router.navigateByUrl(CRITERIA_LIST_PATH);
       } else if (result.kind === 'noRelease' && this.savedListPath !== null) {
@@ -536,13 +552,15 @@ export class CriteriaSelect {
     } finally {
       this.submitting.set(false);
     }
+    if (conflicted && this.savedList !== null) await this.showConflict(this.savedList);
   }
 
   /**
    * Saves the checked selection on the saved list (R-SAV-03) and opens the list with the decisions
-   * that were dropped. A failure keeps the page; the error interceptor shows it.
+   * that were dropped. A 409 `conflict` resolves to 'conflict' for S37; any other failure keeps the
+   * page and the error interceptor shows it.
    */
-  private async saveSelectionOfSavedList(list: { id: string; release: string; etag: string }): Promise<void> {
+  private async saveSelectionOfSavedList(list: SavedListSelectionContext): Promise<'saved' | 'conflict' | 'failed'> {
     const selection = toCriteriaSelection(this.store.configurator.draft());
     try {
       const request = {
@@ -559,9 +577,43 @@ export class CriteriaSelect {
         savedListArrival: { kind: 'selectionChanged', droppedDecisions: changed.droppedDecisions },
       };
       await this.router.navigateByUrl(savedListPath(list.id), { state });
-    } catch {
-      // Shown by the error interceptor.
+      return 'saved';
+    } catch (error: unknown) {
+      // A conflict is S37's; anything else is shown by the error interceptor.
+      return this.conflict.caught(error) ? 'conflict' : 'failed';
     }
+  }
+
+  /**
+   * S37 with the layers whose values differ from the list as read (UX copy U189: the labels of the
+   * summary of S11). „Neue Fassung laden“ opens the list as stored now; its route change focuses the H1.
+   */
+  private async showConflict(list: SavedListSelectionContext): Promise<void> {
+    const options = this.store.configurator.options();
+    const now = selectionNames(this.draftSelection(), options);
+    const read = selectionNames(list.selection, options);
+    const text = (key: string) => this.translate.instant(key) as string;
+    const fields: ChangedField[] = [];
+    if (now.useCase !== read.useCase) {
+      fields.push({ label: text('criteria.list.summary.useCase'), value: now.useCase ?? text('criteria.select.step1.none') });
+    }
+    const layers = [
+      ['criteria.list.summary.appTypes', now.appTypes, read.appTypes],
+      ['criteria.list.summary.parts', now.productParts, read.productParts],
+      ['criteria.list.summary.testTypes', now.testTypes, read.testTypes],
+    ] as const;
+    for (const [label, values, before] of layers) {
+      if (values.join('\n') !== before.join('\n')) fields.push({ label: text(label), value: values.join(', ') });
+    }
+    const reload = await ConflictDialog.show(this.dialog, {
+      editorDisplayName: this.conflict.editorDisplayName,
+      changes: changesText([{ fields }]),
+    });
+    if (reload) await this.router.navigateByUrl(savedListPath(list.id));
+  }
+
+  private draftSelection(): CriteriaSelection {
+    return toCriteriaSelection(this.store.configurator.draft());
   }
 
   /** Shows a refused selection at its step, as S10-E does: field error and focus into the field. */

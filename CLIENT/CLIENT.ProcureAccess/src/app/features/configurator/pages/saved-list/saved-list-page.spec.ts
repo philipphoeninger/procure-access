@@ -5,6 +5,7 @@
 import { signal } from '@angular/core';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { render, screen, within } from '@testing-library/angular';
 import { fireEvent } from '@testing-library/dom';
 import { BehaviorSubject, of } from 'rxjs';
@@ -76,6 +77,8 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
   let copyToActiveRelease: ReturnType<typeof vi.fn>;
   let paramMap: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
   let noteCriteriaAdded: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
+  let load: SavedListLoad;
 
   async function openPage({
     view = listView(),
@@ -87,7 +90,8 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     copyToActiveRelease = vi.fn().mockResolvedValue({ id: 'list-2', releaseVersion: 'T.2', droppedValues: [], notCarried: [] });
     paramMap = new BehaviorSubject(convertToParamMap({ id: 'list-1' }));
     noteCriteriaAdded = vi.fn();
-    const load = new SavedListLoad();
+    focusPageHeading = vi.fn();
+    load = new SavedListLoad();
     load.view = view;
     const rendered = await render(SavedListPage, {
       routes: [{ path: 'kriterienlisten/:id', children: [] }, { path: 'kriterienlisten/:id/auswahl', children: [] }],
@@ -97,13 +101,18 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
         { provide: SavedListLoad, useValue: load },
         SavedListEditor,
         { provide: ActivatedRoute, useValue: { paramMap, snapshot: { data: {} } } },
-        { provide: PageTitleStrategy, useValue: { setPageTitleState } },
+        { provide: PageTitleStrategy, useValue: { setPageTitleState, focusPageHeading } },
         provideLoadedConfiguratorSettings(),
         { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: ConfiguratorApiService, useValue: { decide, copyToActiveRelease } },
         {
           provide: ProcureAccessStore,
-          useValue: { organizations: signal(role === null ? [] : [membership(role)]), noteCriteriaAdded },
+          useValue: {
+            organizations: signal(role === null ? [] : [membership(role)]),
+            noteCriteriaAdded,
+            incrementLoadingCount: vi.fn(),
+            decrementLoadingCount: vi.fn(),
+          },
         },
       ],
     });
@@ -273,6 +282,80 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
       expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-2', {
         state: { savedListArrival: { kind: 'copied', releaseVersion: 'T.2', droppedValues: [], notCarried: [] } },
       });
+    });
+  });
+
+  describe('409 conflict (R-CAN-11, S37; owner decision S6-21 D3 (a))', () => {
+    const conflict = () =>
+      new HttpErrorResponse({
+        status: 409,
+        error: { type: 'https://procureaccess.de/problems/conflict', status: 409, editorDisplayName: 'a.schmidt@example.test' },
+      });
+
+    async function settle(fixture: { whenStable(): Promise<unknown> }) {
+      await fixture.whenStable();
+      await new Promise((resolve) => setTimeout(resolve));
+      await fixture.whenStable();
+    }
+
+    it('INV:API-03 opens S37 and keeps the shown decision; after Escape a further change opens it again without a request', async () => {
+      const fixture = await openPage();
+      decide.mockRejectedValueOnce(conflict());
+
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await settle(fixture);
+
+      const s37 = screen.getByRole('alertdialog', { name: 'Inzwischen geändert' });
+      expect(s37.textContent).toContain('a.schmidt@example.test hat diesen Inhalt geändert');
+
+      fireEvent.keyDown(s37, { key: 'Escape', code: 'Escape', keyCode: 27 });
+      await settle(fixture);
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(card('Überschriften').textContent).toContain('Nicht in Ihrer Liste');
+
+      within(card('Alles geht mit der Tastatur')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await settle(fixture);
+      expect(decide).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy();
+    });
+
+    it('copies each changed criterion under its title with its changed parts', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      try {
+        const fixture = await openPage();
+        decide.mockRejectedValueOnce(conflict());
+        within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+        await settle(fixture);
+
+        within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Meine Änderungen kopieren' }).click();
+        await settle(fixture);
+
+        expect(writeText).toHaveBeenCalledWith('Überschriften\nIn Liste aufnehmen: Nein');
+      } finally {
+        Reflect.deleteProperty(navigator, 'clipboard');
+      }
+    });
+
+    it('„Neue Fassung laden“ reads the list again as the route did, shows it and focuses the H1', async () => {
+      const fixture = await openPage();
+      const stored: SavedList = { ...LIST, etag: '"1-7"', name: 'Von anderen umbenannt' };
+      load.reload = vi.fn().mockResolvedValue({ ...listView(), list: stored });
+      decide.mockRejectedValueOnce(conflict());
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await settle(fixture);
+
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neue Fassung laden' }).click();
+      await settle(fixture);
+
+      expect(load.reload).toHaveBeenCalledOnce();
+      expect(screen.getByRole('heading', { level: 1, name: 'Von anderen umbenannt' })).toBeTruthy();
+      expect(card('Überschriften').textContent).not.toContain('Nicht in Ihrer Liste');
+      expect(focusPageHeading).toHaveBeenCalled();
+
+      within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
+      await settle(fixture);
+      expect(decide).toHaveBeenLastCalledWith('list-1', 202, expect.anything(), '"1-7"');
     });
   });
 
