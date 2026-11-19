@@ -16,10 +16,10 @@ import { CandidatesApiService } from '../../services/api/candidates-api.service'
 import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { CandidateFormPage } from '../candidate-form/candidate-form';
 import { CandidateApis, CandidateLoad, CandidateView, isProjectEditor, loadCandidateView, paramOf } from './candidate-load';
+import { CandidateAssessment } from './assessment/candidate-assessment';
 import { CandidateDetailPage } from './candidate-detail';
 import { CandidateEvidence } from './evidence/candidate-evidence';
 import { CandidateOverview } from './overview/candidate-overview';
-import { CANDIDATE_TAB_DATA, CandidateTabPlaceholder } from './tab-placeholder/candidate-tab-placeholder';
 
 function apis(): CandidateApis {
   return {
@@ -77,8 +77,6 @@ export const candidateFormResolver: ResolveFn<string> = async (route) => {
   return candidateId === null ? 'pageTitle.candidate.new' : 'pageTitle.candidate.edit';
 };
 
-const tab = (data: string) => ({ [CANDIDATE_TAB_DATA]: data });
-
 /**
  * The candidates of a project below `/projekte/:id/produkte` (lazy, signed in only): S33 „neu“ and
  * „:pid/bearbeiten“, S34 at `:pid` with its tabs as child routes (R-CAN-03; Figma mapping §2:
@@ -108,7 +106,7 @@ export const CANDIDATE_ROUTES: Routes = [
     children: [
       { path: CANDIDATE_TAB_SEGMENTS.overview, pathMatch: 'full', component: CandidateOverview },
       { path: CANDIDATE_TAB_SEGMENTS.evidence, component: CandidateEvidence },
-      { path: CANDIDATE_TAB_SEGMENTS.assessment, component: CandidateTabPlaceholder, data: tab('assessment') },
+      { path: CANDIDATE_TAB_SEGMENTS.assessment, component: CandidateAssessment },
     ],
   },
 ];

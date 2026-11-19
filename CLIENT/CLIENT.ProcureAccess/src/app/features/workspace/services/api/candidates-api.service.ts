@@ -10,6 +10,7 @@ import { API_URL } from '@app/app.config';
 import { ifMatch, withEtag } from '@app/core/concurrency/etag';
 import { CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
+import { AssessmentRow, CandidateAssessments } from '../../models/assessments';
 import { Candidate, CandidateRequest, TestEvidence, TestEvidenceRequest, TestStatus } from '../../models/candidates';
 
 /**
@@ -111,6 +112,33 @@ export class CandidatesApiService {
       this.http.put<TestEvidence>(`${this.apiUrl}/v1/test-evidences/${encodeURIComponent(id)}`, body, {
         context: formContext(),
         headers: ifMatch(etag),
+      }),
+    );
+  }
+
+  /**
+   * The assessment tab S34b of a candidate (R-CAN-06 – R-CAN-08; SPEC v2.56-1): the included
+   * requirement criteria of the project's list with their values, and the derived „Geprüft nach …“
+   * rows. S34b shows a failure itself ({@link CALLER_SHOWS_FAILURES}).
+   */
+  assessments(candidateId: string): Promise<CandidateAssessments> {
+    return lastValueFrom(
+      this.http.get<CandidateAssessments>(`${this.apiUrl}/v1/candidates/${encodeURIComponent(candidateId)}/assessments`, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+      }),
+    );
+  }
+
+  /**
+   * Stores the whole row of one criterion (SPEC v2.56-2): the last write wins, no `If-Match`
+   * (R-CAN-11). Autosaved, so a failure keeps the error interceptor's system states (the general
+   * text, `project-archived`, `email-unconfirmed`); the answer is not needed.
+   */
+  async saveAssessment(candidateId: string, criterionRevisionId: number, row: AssessmentRow): Promise<void> {
+    await lastValueFrom(
+      this.http.put<unknown>(`${this.apiUrl}/v1/candidates/${encodeURIComponent(candidateId)}/assessments/${criterionRevisionId}`, {
+        value: row.value,
+        note: row.note === null || row.note.trim() === '' ? null : row.note,
       }),
     );
   }

@@ -1,0 +1,72 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// K6 (Figma `2012:2430`, S34b `2022:841`, S34b-M `2136:3127`): an outlined card on
+// surface-container-lowest, padding md below 600 px and lg from 600 px; the title in title/medium,
+// the question in body/small; the radios in a row that wraps; the note field the full width of the
+// card. Compact: the select the full width, the note button below it (48 px target, Material's text
+// button). No colour per level (SIG-05).
+:host {
+  display: block;
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-assessment-input__group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.pa-assessment-input__title {
+  padding: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+.pa-assessment-input__question {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pa-assessment-input__options {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--pa-space-md);
+}
+
+// An outlined field's floated label sits on its top edge: room for it below the title (S34b-M)
+.pa-assessment-input__select {
+  margin-block-start: var(--pa-space-xs);
+}
+
+.pa-assessment-input__select,
+.pa-assessment-input__note,
+.pa-assessment-input__note mat-form-field {
+  inline-size: 100%;
+}
+
+// The floated label „Worauf stützt sich Ihre Einschätzung? (optional)“ is longer than the field at
+// 320 px: Material cuts it off with an ellipsis, but browsers still count its full text as overflow
+// of the page (A11Y-09; as S34a, TESTING V378). `clip` keeps that inside the field without making it
+// a scroll container; nothing visible changes. The cut label stays open (protocol S6-19a).
+mat-form-field {
+  overflow-x: clip;
+}
+
+.pa-assessment-input__note[hidden] {
+  display: none;
+}

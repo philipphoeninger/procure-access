@@ -1,0 +1,56 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+<fieldset class="pa-assessment-input__group">
+  <legend class="pa-assessment-input__title" [id]="titleId">{{ criterionTitle() }}</legend>
+
+  @if (layout() === 'radios') {
+    <p class="pa-assessment-input__question" [id]="questionId">{{ 'candidate.assessment.legend' | translate }}</p>
+    <mat-radio-group class="pa-assessment-input__options" [name]="id" [value]="value()" [attr.aria-describedby]="questionId"
+      (change)="choose($event.value)">
+      @for (option of options(); track option) {
+        <mat-radio-button [value]="option">{{ optionKey(option) | translate }}</mat-radio-button>
+      }
+    </mat-radio-group>
+  } @else {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pa-assessment-input__select">
+      <mat-label>{{ 'candidate.assessment.select' | translate }}</mat-label>
+      <mat-select [value]="value()" (selectionChange)="choose($event.value)">
+        @for (option of options(); track option) {
+          <mat-option [value]="option">{{ optionKey(option) | translate }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button
+      matButton
+      type="button"
+      class="pa-assessment-input__note-toggle"
+      [attr.aria-expanded]="noteOpen()"
+      [attr.aria-controls]="noteId"
+      [attr.aria-describedby]="titleId"
+      (click)="toggleNote()"
+    >
+      {{ (note().trim() === '' ? 'candidate.assessment.note.add' : 'candidate.assessment.note.edit') | translate }}
+    </button>
+  }
+
+  <div class="pa-assessment-input__note" [id]="noteId" [hidden]="layout() === 'compact' && !noteOpen()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'candidate.assessment.note' | translate }}</mat-label>
+      <textarea
+        #noteField
+        matInput
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="2"
+        [formControl]="noteControl"
+        [attr.aria-describedby]="titleId"
+      ></textarea>
+      @if (noteError(); as error) {
+        <mat-error>{{ 'errors.field.maxLength' | translate: error }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+</fieldset>

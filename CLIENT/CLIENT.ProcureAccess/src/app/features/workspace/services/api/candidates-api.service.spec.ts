@@ -9,7 +9,7 @@ import { API_URL } from '@app/app.config';
 import { CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
 import { CandidateRequest, TestEvidence, TestEvidenceRequest } from '../../models/candidates';
-import { bodyOf, TEST_CANDIDATE } from '../../testing/candidate-fixtures';
+import { bodyOf, TEST_ASSESSMENTS, TEST_CANDIDATE } from '../../testing/candidate-fixtures';
 import { CandidatesApiService } from './candidates-api.service';
 
 const BODY: CandidateRequest = {
@@ -126,5 +126,34 @@ describe('CandidatesApiService', () => {
     expect(remove.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'not-found']);
     remove.flush(null, { status: 204, statusText: 'No Content' });
     await expect(removed).resolves.toBeNull();
+  });
+
+  it('reads the assessment tab of a candidate, every failure shown by the caller (S34b, R-CAN-06)', async () => {
+    const read = api.assessments('c/1');
+
+    const request = backend.expectOne('/api/v1/candidates/c%2F1/assessments');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
+    request.flush(TEST_ASSESSMENTS);
+    await expect(read).resolves.toEqual(TEST_ASSESSMENTS);
+  });
+
+  it('saves the whole row of a criterion with PUT and without If-Match; a blank note is sent as none; failures keep the system states (R-CAN-06, R-CAN-11)', async () => {
+    const saved = api.saveAssessment('c/1', 12, { value: 'barrier', note: '  ' });
+
+    const request = backend.expectOne('/api/v1/candidates/c%2F1/assessments/12');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ value: 'barrier', note: null });
+    expect(request.request.headers.has('If-Match')).toBe(false);
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual([]);
+    expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(false);
+    request.flush({ criterionRevisionId: 12, value: 'barrier', note: null });
+    await expect(saved).resolves.toBeUndefined();
+
+    // A note without a value is stored too (it is no assessment, SPEC v2.56-2)
+    void api.saveAssessment('c-1', 11, { value: 'unknown', note: 'Laut Anbieter.' });
+    const noteOnly = backend.expectOne('/api/v1/candidates/c-1/assessments/11');
+    expect(noteOnly.request.body).toEqual({ value: 'unknown', note: 'Laut Anbieter.' });
+    noteOnly.flush({ criterionRevisionId: 11, value: 'unknown', note: 'Laut Anbieter.' });
   });
 });

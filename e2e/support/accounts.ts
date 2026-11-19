@@ -138,3 +138,16 @@ export async function createProjectThroughApi(
   }
   return id;
 }
+
+/**
+ * Adds a product to the project as the user `request` is signed in as (Editor or Owner; S6-19):
+ * for tests whose subject is not S33. Returns the candidate's id.
+ */
+export async function createCandidateThroughApi(request: APIRequestContext, projectId: string, name: string): Promise<string> {
+  const response = await request.post(`/api/v1/projects/${projectId}/candidates`, {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(request) },
+    data: { name, vendor: '', website: '', functionalSummary: '', contactNotes: '', internalNotes: '' },
+  });
+  expect(response.status(), `adding ${name}`).toBe(201);
+  return ((await response.json()) as { id: string }).id;
+}

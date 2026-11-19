@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { CandidateAssessments } from '../models/assessments';
 import { Candidate } from '../models/candidates';
 import { Project } from '../models/projects';
 import { CandidateCriteria, CandidateView } from '../pages/candidate-detail/candidate-load';
@@ -60,3 +61,51 @@ export const TEST_CRITERIA: CandidateCriteria = {
 export function candidateView(changes: Partial<Extract<CandidateView, { kind: 'candidate' }>> = {}): CandidateView {
   return { kind: 'candidate', project: TEST_PROJECT, candidate: TEST_CANDIDATE, criteria: TEST_CRITERIA, ...changes };
 }
+
+/**
+ * The assessment tab of {@link TEST_CANDIDATE} (Figma S34b `2022:841`): three requirement criteria —
+ * the first without „Nicht anwendbar“, assessed „Erfüllt“ with a note; the second „Einschränkung“;
+ * the third not assessed and without a plain-language title — and two „Geprüft nach …“ rows.
+ */
+export const TEST_ASSESSMENTS: CandidateAssessments = {
+  candidateId: 'c-1',
+  releaseVersion: 'T.1',
+  ratingsFromSeveralProcedures: false,
+  progress: { done: 2, total: 3 },
+  criteria: [
+    {
+      criterionRevisionId: 11,
+      number: '11.2.1.1',
+      title: 'Bedienbarkeit per Tastatur',
+      plainLanguageTitle: 'Formulare lassen sich vollständig mit der Tastatur bedienen',
+      productPart: null,
+      allowedRatings: ['fulfilled', 'slightRestriction', 'restriction', 'barrier', 'blockade'],
+      value: 'fulfilled',
+      note: 'Eigener Test mit der Tastatur.',
+    },
+    {
+      criterionRevisionId: 12,
+      number: '11.1.4.4',
+      title: 'Textgröße ändern',
+      plainLanguageTitle: 'Inhalte bleiben bei 200 % Vergrößerung vollständig nutzbar',
+      productPart: null,
+      allowedRatings: ['fulfilled', 'slightRestriction', 'restriction', 'barrier', 'blockade', 'notApplicable'],
+      value: 'restriction',
+      note: null,
+    },
+    {
+      criterionRevisionId: 13,
+      number: '11.3.3.1',
+      title: 'Fehlermeldungen werden dem betroffenen Eingabefeld zugeordnet und vorgelesen',
+      plainLanguageTitle: null,
+      productPart: null,
+      allowedRatings: ['fulfilled', 'slightRestriction', 'restriction', 'barrier', 'blockade', 'notApplicable'],
+      value: 'unknown',
+      note: null,
+    },
+  ],
+  procedureAnswers: [
+    { criterionRevisionId: 91, testTypeId: 'softwareTest', title: 'Geprüft nach BIT inklusiv Software-Test', answer: 'yes' },
+    { criterionRevisionId: 92, testTypeId: 'bikWeb', title: 'Geprüft nach BIK BITV-Test (Web)', answer: 'notStated' },
+  ],
+};
