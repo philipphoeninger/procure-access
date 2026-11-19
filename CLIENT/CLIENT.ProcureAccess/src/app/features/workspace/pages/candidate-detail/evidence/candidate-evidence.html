@@ -1,0 +1,126 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (editable()) {
+  @if (confirmationRequired()) {
+    <!-- The gate refused the unconfirmed address (SEC-10); focused when it appears -->
+    <div #confirmNotice class="pa-evidence__narrow" tabindex="-1">
+      <pa-confirm-required-notice />
+    </div>
+  }
+
+  <form class="pa-evidence__form" novalidate (submit)="save($event)">
+    <pa-error-summary [items]="summary()" />
+
+    <div class="pa-evidence__card">
+      <fieldset class="pa-evidence__status">
+        <legend class="pa-evidence__legend">{{ 'candidate.evidence.tested' | translate }}</legend>
+        <mat-radio-group name="testStatus" class="pa-evidence__options" [formControl]="status"
+          aria-describedby="pa-evidence-status-hint" (change)="statusChanged($event.value)">
+          @for (option of statuses; track option) {
+            <mat-radio-button [id]="statusId(option)" [value]="option">{{ statusKey(option) | translate }}</mat-radio-button>
+          }
+        </mat-radio-group>
+        <p id="pa-evidence-status-hint" class="pa-evidence__text">{{ 'candidate.evidence.tested.hint' | translate }}</p>
+      </fieldset>
+    </div>
+
+    @if (tested()) {
+      <h2 class="pa-evidence__title">{{ 'candidate.evidence.list.title' | translate }}</h2>
+      <!-- The cards have required fields: the note of every such form (UX copy §5.0, U176); not in the frame -->
+      <p class="pa-evidence__text">{{ 'common.requiredNote' | translate }}</p>
+      @for (card of cards(); track card.key; let index = $index) {
+        @let title = heading(card, index);
+        <div class="pa-evidence__card">
+          <h3 class="pa-evidence__card-title" [id]="headingId(card)" tabindex="-1">{{ title.key | translate: title.params }}</h3>
+          <div class="pa-evidence__fields">
+            <mat-form-field appearance="outline" class="pa-evidence__wide">
+              <mat-label>{{ labels.kind | translate }}</mat-label>
+              <mat-select [id]="fieldId(card, 'kind')" [formControl]="card.kind" required
+                [errorStateMatcher]="matcher(card)" (selectionChange)="kindChanged(card)">
+                <mat-select-trigger>{{ kindKey(card.kind.value) | translate }}</mat-select-trigger>
+                @for (procedure of procedures; track procedure) {
+                  <mat-option [value]="procedure">{{ kindKey(procedure) | translate }}</mat-option>
+                }
+                <!-- The frame's divider as a border: a separator is no allowed child of a listbox -->
+                <mat-option value="other" class="pa-evidence__option-first">
+                  <span class="pa-evidence__option-name">{{ 'testType.other' | translate }}</span>
+                  <span class="pa-evidence__option-hint">{{ 'testType.other.hint' | translate }}</span>
+                </mat-option>
+                <mat-option value="own">{{ 'testType.own' | translate }}</mat-option>
+              </mat-select>
+              @if (message(card, 'kind'); as message) {
+                <mat-error>{{ message.key | translate: message.params }}</mat-error>
+              }
+            </mat-form-field>
+
+            @if (card.kind.value === 'other') {
+              <ng-container *ngTemplateOutlet="text; context: { card, field: 'otherName', wide: true, required: true }" />
+            }
+            <ng-container *ngTemplateOutlet="text; context: { card, field: 'testedBy', required: true }" />
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ labels.testDate | translate }}</mat-label>
+              <input matInput [id]="fieldId(card, 'testDate')" name="testDate" autocomplete="off" required
+                [formControl]="card.testDate" [errorStateMatcher]="matcher(card)" />
+              @if (message(card, 'testDate'); as message) {
+                <mat-error>{{ message.key | translate: message.params }}</mat-error>
+              } @else {
+                <mat-hint>{{ 'common.date.hint' | translate: { example: dateExample } }}</mat-hint>
+              }
+            </mat-form-field>
+
+            <ng-container *ngTemplateOutlet="text; context: { card, field: 'testedVersion' }" />
+            <ng-container *ngTemplateOutlet="text; context: { card, field: 'evidenceUrl', url: true }" />
+
+            <!-- Private (PRV-01): never published; the hint says so, as S33's private section -->
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pa-evidence__wide">
+              <mat-label>{{ labels.qualificationNote | translate }} {{ 'common.optional' | translate }}</mat-label>
+              <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="1" [id]="fieldId(card, 'qualificationNote')"
+                name="qualificationNote" [formControl]="card.qualificationNote" [errorStateMatcher]="matcher(card)"></textarea>
+              @if (message(card, 'qualificationNote'); as message) {
+                <mat-error>{{ message.key | translate: message.params }}</mat-error>
+              } @else {
+                <mat-hint>{{ 'candidate.form.privateSection' | translate }}: {{ 'candidate.form.privateSection.text' | translate }}</mat-hint>
+              }
+            </mat-form-field>
+          </div>
+          <div>
+            <button matButton type="button" (click)="remove(index)">
+              {{ 'candidate.evidence.list.remove' | translate: { n: index + 1 } }}
+            </button>
+          </div>
+        </div>
+      }
+      <div>
+        <button #addButton matButton type="button" (click)="add()">{{ 'candidate.evidence.list.add' | translate }}</button>
+      </div>
+    } @else {
+      <p class="pa-evidence__text">{{ 'candidate.evidence.details.hint' | translate }}</p>
+    }
+
+    <div class="pa-evidence__actions">
+      <button matButton="filled" type="submit" class="pa-evidence__submit" [attr.aria-disabled]="busy() || null">
+        @if (busy()) {
+          <mat-progress-spinner class="pa-evidence__spinner" mode="indeterminate" diameter="20" aria-hidden="true" />
+        }
+        {{ 'common.actions.save' | translate }}
+      </button>
+    </div>
+  </form>
+}
+
+<ng-template #text let-card="card" let-field="field" let-wide="wide" let-required="required" let-url="url">
+  <!-- „Geprüfte Version (optional)“ and „Link zum Prüfbericht (optional)“ carry the word in their own text -->
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" [class.pa-evidence__wide]="wide">
+    <mat-label>{{ labels[field] | translate }}</mat-label>
+    <input matInput [id]="fieldId(card, field)" [name]="field" [type]="url ? 'url' : 'text'" autocomplete="off"
+      [required]="!!required" [formControl]="card.control(field)" [errorStateMatcher]="matcher(card)" />
+    @if (message(card, field); as message) {
+      <mat-error>{{ message.key | translate: message.params }}</mat-error>
+    }
+  </mat-form-field>
+</ng-template>

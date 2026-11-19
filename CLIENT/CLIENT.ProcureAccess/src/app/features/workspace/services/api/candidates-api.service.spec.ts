@@ -8,7 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
 import { CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
-import { CandidateRequest } from '../../models/candidates';
+import { CandidateRequest, TestEvidence, TestEvidenceRequest } from '../../models/candidates';
 import { bodyOf, TEST_CANDIDATE } from '../../testing/candidate-fixtures';
 import { CandidatesApiService } from './candidates-api.service';
 
@@ -22,6 +22,19 @@ const BODY: CandidateRequest = {
 };
 
 const CANDIDATE_BODY = bodyOf(TEST_CANDIDATE);
+
+const EVIDENCE_BODY: TestEvidenceRequest = {
+  testKind: 'procedure',
+  testTypeId: 'softwareTest',
+  otherTestTypeName: null,
+  testedBy: 'Prüfstelle Beispiel',
+  testDate: '2026-03-14',
+  testedVersion: '4.2',
+  evidenceUrl: '',
+  qualificationNote: '',
+};
+
+const EVIDENCE: TestEvidence = { id: 'e-1', etag: '"1-1"', ...EVIDENCE_BODY, evidenceUrl: null, qualificationNote: null };
 
 describe('CandidatesApiService', () => {
   let api: CandidatesApiService;
@@ -69,5 +82,49 @@ describe('CandidatesApiService', () => {
     expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed']);
     request.flush(CANDIDATE_BODY, { headers: { ETag: '"1-5"' } });
     await expect(changed).resolves.toEqual({ ...TEST_CANDIDATE, etag: '"1-5"' });
+  });
+
+  it('sets the test status with PUT and the candidate’s tag in If-Match, and keeps the new tag; S34a also handles the conflict of leaving „Ja“ itself (R-CAN-05, WSP-01, API-03)', async () => {
+    const changed = api.changeTestStatus('c/1', 'notTested', true, '"1-4"');
+
+    const request = backend.expectOne('/api/v1/candidates/c%2F1/test-status');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ testStatus: 'notTested', removeEvidences: true });
+    expect(request.request.headers.get('If-Match')).toBe('"1-4"');
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual([
+      'validation',
+      'antiforgery',
+      'email-unconfirmed',
+      'test-status-conflict',
+    ]);
+    request.flush({ ...CANDIDATE_BODY, testStatus: 'notTested' }, { headers: { ETag: '"1-5"' } });
+    await expect(changed).resolves.toEqual({ ...TEST_CANDIDATE, testStatus: 'notTested', etag: '"1-5"' });
+  });
+
+  it('adds an evidence without a tag, changes and removes it with its own tag in If-Match; the card shows field errors, antiforgery and the unconfirmed address (R-CAN-05, API-03)', async () => {
+    const added = api.addEvidence('c/1', EVIDENCE_BODY);
+    const post = backend.expectOne('/api/v1/candidates/c%2F1/test-evidences');
+    expect(post.request.method).toBe('POST');
+    expect(post.request.headers.has('If-Match')).toBe(false);
+    expect(post.request.body).toEqual(EVIDENCE_BODY);
+    expect(post.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed']);
+    post.flush(EVIDENCE, { status: 201, statusText: 'Created' });
+    await expect(added).resolves.toEqual(EVIDENCE);
+
+    const changed = api.changeEvidence('e/1', EVIDENCE_BODY, '"1-1"');
+    const put = backend.expectOne('/api/v1/test-evidences/e%2F1');
+    expect(put.request.method).toBe('PUT');
+    expect(put.request.headers.get('If-Match')).toBe('"1-1"');
+    expect(put.request.body).toEqual(EVIDENCE_BODY);
+    put.flush(EVIDENCE);
+    await expect(changed).resolves.toEqual(EVIDENCE);
+
+    const removed = api.removeEvidence('e/1', '"1-2"');
+    const remove = backend.expectOne('/api/v1/test-evidences/e%2F1');
+    expect(remove.request.method).toBe('DELETE');
+    expect(remove.request.headers.get('If-Match')).toBe('"1-2"');
+    expect(remove.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['validation', 'antiforgery', 'email-unconfirmed', 'not-found']);
+    remove.flush(null, { status: 204, statusText: 'No Content' });
+    await expect(removed).resolves.toBeNull();
   });
 });

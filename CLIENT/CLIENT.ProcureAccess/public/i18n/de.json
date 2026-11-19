@@ -945,7 +945,10 @@
         "removed": "Prüfnachweis entfernt.",
         "duplicate": "Für dieses Prüfverfahren gibt es schon einen Prüfnachweis.",
         "statusChange": "Ihre {{count}} Prüfnachweise werden dabei entfernt. Möchten Sie fortfahren?",
-        "statusChange.one": "Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren?"
+        "statusChange.one": "Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren?",
+        "item.untyped": "Prüfnachweis {{n}}",
+        "statusChange.title": "Prüfnachweise entfernen?",
+        "statusChange.confirm": "Nachweise entfernen"
       },
       "testType": "Art der Prüfung",
       "testType.otherName": "Name des Prüfverfahrens",
@@ -953,7 +956,8 @@
       "testDate": "Datum der Prüfung",
       "version": "Geprüfte Version (optional)",
       "url": "Link zum Prüfbericht (optional)",
-      "qualification": "Ihre Notiz zur Qualifikation der prüfenden Stelle"
+      "qualification": "Ihre Notiz zur Qualifikation der prüfenden Stelle",
+      "saved": "Prüfnachweis gespeichert."
     },
     "assessment": {
       "intro": "Schätzen Sie für jedes Kriterium ein, wie gut das Produkt es erfüllt. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. Grundlage können eigene Tests, Prüfberichte oder Angaben des Anbieters sein. Notieren Sie, worauf Sie sich stützen.",

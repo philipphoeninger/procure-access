@@ -14,5 +14,9 @@ export interface TextKey {
  */
 export interface ErrorSummaryItem {
   message: TextKey;
-  field?: { id: string; labelKey: string };
+  /**
+   * `group` names the part of the form a repeated label belongs to, e.g. „Prüfnachweis 2“ in S34a:
+   * the line then reads „Prüfnachweis 2 – Wer hat geprüft?: …“.
+   */
+  field?: { id: string; labelKey: string; group?: TextKey };
 }

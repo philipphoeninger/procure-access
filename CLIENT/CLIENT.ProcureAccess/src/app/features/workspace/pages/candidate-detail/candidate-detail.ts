@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,8 +22,9 @@ import { CandidateLoad } from './candidate-load';
  * The page title of a tab of S34, „{{tab}} – {{product}} – {{project}}“ (`pageTitle.candidate`,
  * R-CAN-03): the full name of the tab also below 600 px, where the tab shows its short label (U31).
  * Called by each tab, since every tab change is a page change that clears the title's parameters.
+ * A tab with a form passes `error`, so the title starts with „Fehler:“ while its error summary shows.
  */
-export function candidateTabTitle(tab: CandidateTab): void {
+export function candidateTabTitle(tab: CandidateTab, error?: Signal<boolean>): void {
   const load = inject(CandidateLoad);
   const pageTitle = inject(PageTitleStrategy);
   // A stream, not `instant`: on a direct load the texts may arrive after the page opened
@@ -31,7 +32,8 @@ export function candidateTabTitle(tab: CandidateTab): void {
   effect(() => {
     const view = load.view();
     if (view.kind !== 'candidate' || view.candidate === null) return;
-    pageTitle.setPageTitleState({ params: { tab: tabName(), product: view.candidate.name, project: view.project.name } });
+    const params = { tab: tabName(), product: view.candidate.name, project: view.project.name };
+    pageTitle.setPageTitleState(error === undefined ? { params } : { params, error: error() });
   });
 }
 

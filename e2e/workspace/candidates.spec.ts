@@ -16,7 +16,9 @@ import { signInThroughApi } from '../support/session';
  * their own page titles; „Bearbeiten“ leads to S33 with the facts filled, and a change shows on
  * S34. S33 is reached from S32's menu „Produkt hinzufügen“ › „Neu erfassen“, and the path above S34
  * leads back to S32, which lists the product with its test status, progress and seven counts
- * (S6-14; R-PRJ-03, SIG-13). Axe in both appearances on every new state (A11Y-01, A11Y-08).
+ * (S6-14; R-PRJ-03, SIG-13). On the tab Prüfnachweis S34a an evidence is saved, a second one of the
+ * same procedure is refused, and leaving „Ja“ asks first and leaves the product at „Nein“ (S6-17;
+ * R-CAN-05, WSP-01). Axe in both appearances on every new state (A11Y-01, A11Y-08).
  */
 const WIDE = { width: 1280, height: 800 };
 const PASSWORD = 'e2e-Passwort-lang-genug';
@@ -31,7 +33,10 @@ async function settled(locator: Locator): Promise<void> {
 }
 
 test.describe('Products of a project S33, S34', () => {
-  test('INV:A11Y-01 INV:A11Y-08 INV:SIG-13 an Owner adds a product from S32 in S33, sees S34 Überblick, switches tabs, edits it and finds it on S32', async ({ page, request }, testInfo) => {
+  test('INV:A11Y-01 INV:A11Y-08 INV:SIG-13 INV:WSP-01 an Owner adds a product from S32 in S33, sees S34 Überblick, records its evidence in S34a, edits it and finds it on S32', async ({ page, request }, testInfo) => {
+    // S32, S33, S34 and S34a with ten states, each checked by axe in two appearances, take longer
+    // than the default 30 s in WebKit (as J1)
+    test.setTimeout(90_000);
     await page.setViewportSize(WIDE);
     const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
     const address = `candidates-${suffix}@example.test`;
@@ -119,8 +124,72 @@ test.describe('Products of a project S33, S34', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's34-evidence-tab');
 
+    // S34a (S6-17, R-CAN-05, WSP-01): „Ja“ shows the first card; one evidence of a procedure is saved.
+    // Up to the last axe run of S34a the form is found by CSS: Playwright's name lookups of form
+    // fields followed by axe crash Firefox's page process now and then (TESTING V226, V367); the
+    // names are checked by the component tests and by axe. Buttons are found by role (V165).
+    const radio = (status: string) => main(page).locator(`#pa-evidence-status-${status} input[type="radio"]`);
+    const card = (index: number) => main(page).locator('.pa-evidence__card:has(.pa-evidence__card-title)').nth(index);
+    const field = (index: number, name: string) => card(index).locator(`[name="${name}"]`);
+    const option = (name: string) => page.locator('mat-option', { hasText: name });
+    await expect(radio('unknown')).toBeChecked();
+    await radio('tested').check();
+    await expect(card(0).locator('h3')).toHaveText('Prüfnachweis 1');
+    await card(0).locator('mat-select').click();
+    await option('BIT inklusiv Software-Test').click();
+    await expect(card(0).locator('h3')).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
+    await field(0, 'testedBy').fill('Prüfstelle Beispiel');
+    await field(0, 'testDate').fill('14.03.2026');
+    await field(0, 'testedVersion').fill('4.2');
+    const savedEvidence = page.waitForResponse(
+      (response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/test-evidences'),
+    );
+    await main(page).getByRole('button', { name: 'Speichern' }).press('Enter');
+    expect((await savedEvidence).status()).toBe(201);
+    await expect(page.locator('.cdk-live-announcer-element')).toHaveText('Prüfnachweis gespeichert.');
+    await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
+    await settled(main(page));
+    await expectNoAxeViolations(page, testInfo, 's34a-evidence');
+
+    // A second card with the same procedure is refused before sending (`candidate.evidence.list.duplicate`)
+    await main(page).getByRole('button', { name: 'Weiteren Prüfnachweis hinzufügen' }).press('Enter');
+    await expect(card(1).locator('mat-select')).toBeFocused();
+    await card(1).locator('mat-select').click();
+    await option('BIT inklusiv Software-Test').click();
+    await field(1, 'testedBy').fill('Eigene Prüfung');
+    await field(1, 'testDate').fill('01.04.2026');
+    await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
+    await main(page).getByRole('button', { name: 'Speichern' }).press('Enter');
+    await expect(main(page).locator('pa-error-summary pa-notice')).toBeFocused();
+    await expect(main(page).locator('pa-error-summary')).toContainText(
+      'Prüfnachweis 2 – Art der Prüfung: Für dieses Prüfverfahren gibt es schon einen Prüfnachweis.',
+    );
+    await expect(page).toHaveTitle(/^Fehler: Prüfnachweis – BewerberPro/);
+    await settled(main(page));
+    await expectNoAxeViolations(page, testInfo, 's34a-duplicate');
+    await main(page).getByRole('button', { name: 'Prüfnachweis 2 entfernen' }).press('Enter');
+    await expect(card(0).locator('h3')).toBeFocused();
+
+    // Leaving „Ja“ with an evidence asks first (`candidate.evidence.list.statusChange`)
+    await radio('notTested').check();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.locator('h2')).toHaveText('Prüfnachweise entfernen?');
+    await expect(dialog.locator('h2')).toBeFocused();
+    await expect(dialog).toContainText('Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren?');
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's34a-status-change');
+    await dialog.getByRole('button', { name: 'Nachweise entfernen' }).press('Enter');
+    await expect(dialog).toBeHidden();
+    await expect(main(page).locator('.pa-evidence__title')).toHaveCount(0);
+    // One request: leaving „Ja“ removes the evidence with the status (the candidate's tag, S6-20)
+    const statusSaved = page.waitForResponse((response) => new URL(response.url()).pathname.endsWith('/test-status'));
+    await main(page).getByRole('button', { name: 'Speichern' }).press('Enter');
+    expect((await statusSaved).status()).toBe(200);
+    await expect(page.locator('.cdk-live-announcer-element')).toHaveText('Prüfnachweis gespeichert.');
+
     await tabs.first().press('Enter');
     await expect(page).toHaveTitle(`Überblick – BewerberPro – ${project} – ProcureAccess`);
+    await expect(main(page)).toContainText('Auf Barrierefreiheit geprüft: Nein');
 
     // „Bearbeiten“ → S33 with the facts filled and Überblick selected
     await main(page).getByRole('link', { name: 'Bearbeiten' }).first().press('Enter');
@@ -148,7 +217,8 @@ test.describe('Products of a project S33, S34', () => {
     const item = main(page).getByRole('listitem').filter({ has: page.getByRole('heading', { level: 3, name: 'BewerberPro' }) });
     await expect(item.getByRole('link')).toHaveText(['BewerberPro']);
     await expect(item).toContainText('Anbieter: Muster AG');
-    await expect(item).toContainText('Nicht bekannt');
+    // S34a above left the product at „Nein“ (S6-17)
+    await expect(item.locator('dt:text-is("Auf Barrierefreiheit geprüft") + dd')).toHaveText('Nein');
     await expect(item).toContainText(`0 von ${total} Kriterien eingeschätzt`);
     // SIG-13: all seven counts, label first, in the order of the scale
     await expect(item.locator('.pa-project__counts li')).toHaveText([

@@ -10,8 +10,10 @@ SPDX-License-Identifier: MIT
       @for (item of items(); track $index) {
         <li>
           @if (item.field; as field) {
+            @let label = field.labelKey | translate;
+            @let fieldName = field.group ? (field.group.key | translate: field.group.params) + ' – ' + label : label;
             <a [href]="'#' + field.id" (click)="focusField($event, field.id)">
-              {{ 'errors.summary.item' | translate: { field: (field.labelKey | translate), message: (item.message.key | translate: item.message.params) } }}
+              {{ 'errors.summary.item' | translate: { field: fieldName, message: (item.message.key | translate: item.message.params) } }}
             </a>
           } @else {
             {{ item.message.key | translate: item.message.params }}

@@ -12,8 +12,8 @@ import { candidateTabTitle } from '../candidate-detail';
 export const CANDIDATE_TAB_DATA = 'candidateTab';
 
 /**
- * The tabs Prüfnachweis (S34a, S6-17) and Einschätzung nach Kriterien (S34b, S6-19) until their
- * tasks build them: the tab is a page of its own with its title (R-CAN-03), and shows nothing yet —
+ * The tab Einschätzung nach Kriterien (S34b) until S6-19 builds it (Prüfnachweis S34a: S6-17):
+ * the tab is a page of its own with its title (R-CAN-03), and shows nothing yet —
  * no text of its own, since the UX copy has none for a tab that is not built.
  */
 @Component({
