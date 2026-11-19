@@ -143,7 +143,7 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Prüfnachweis 1' })).toBeTruthy();
     expect(screen.queryByText(/^Angaben zu Art, Stelle und Datum der Prüfung/)).toBeNull();
     const card = screen.getByRole('heading', { level: 3 }).parentElement!;
-    expect([...card.querySelectorAll('mat-label')].map((label) => label.textContent?.trim())).toEqual([
+    expect([...card.querySelectorAll('mat-label, label.pa-evidence__label')].map((label) => label.textContent?.trim())).toEqual([
       'Art der Prüfung',
       'Wer hat geprüft?',
       'Datum der Prüfung',
@@ -151,6 +151,11 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
       'Link zum Prüfbericht (optional)',
       'Ihre Notiz zur Qualifikation der prüfenden Stelle (optional)',
     ]);
+    // Too long to float at 320 px: the label stands above its field and still names it (D7 (a))
+    const note = screen.getByRole('textbox', { name: 'Ihre Notiz zur Qualifikation der prüfenden Stelle (optional)' });
+    const noteLabel = card.querySelector('label.pa-evidence__label')!;
+    expect(noteLabel.closest('mat-form-field')).toBeNull();
+    expect(noteLabel.getAttribute('for')).toBe(note.id);
     expect(screen.getByText(/^Nur für Ihre Organisation: Diese Angaben werden nie veröffentlicht/)).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Prüfnachweis 1 entfernen' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Weiteren Prüfnachweis hinzufügen' })).toBeTruthy();
