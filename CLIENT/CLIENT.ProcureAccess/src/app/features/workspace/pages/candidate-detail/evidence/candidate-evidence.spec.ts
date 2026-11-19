@@ -96,7 +96,8 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
   async function chooseKind(fixture: { whenStable(): Promise<unknown> }, option: string, index = 0) {
     screen.getAllByRole('combobox', { name: 'Art der Prüfung' })[index].click();
     await fixture.whenStable();
-    screen.getByRole('option', { name: new RegExp(`^${option.replace(/[()]/g, '\\$&')}`) }).click();
+    // „Andere Prüfung“ has a second line in its name: match its start, without building a RegExp
+    screen.getByRole('option', { name: (name) => name.startsWith(option) }).click();
     await settle(fixture);
   }
 
