@@ -34,6 +34,9 @@ async function settled(locator: Locator): Promise<void> {
 
 test.describe('Products of a project S33, S34', () => {
   test('INV:A11Y-01 INV:A11Y-08 INV:SIG-13 INV:WSP-01 an Owner adds a product from S32 in S33, sees S34 Überblick, records its evidence in S34a, edits it and finds it on S32', async ({ page, request }, testInfo) => {
+    // S32, S33, S34 and S34a with ten states, each checked by axe in two appearances, take longer
+    // than the default 30 s in WebKit (as J1)
+    test.setTimeout(90_000);
     await page.setViewportSize(WIDE);
     const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
     const address = `candidates-${suffix}@example.test`;
