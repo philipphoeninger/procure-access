@@ -129,6 +129,17 @@ describe('CandidatesApiService', () => {
     await expect(removed).resolves.toBeNull();
   });
 
+  it('removes a candidate with its tag in If-Match; only an already removed one is the caller’s (R-CAN-09, API-03)', async () => {
+    const removed = api.remove('c/1', '"1-4"');
+
+    const request = backend.expectOne('/api/v1/candidates/c%2F1');
+    expect(request.request.method).toBe('DELETE');
+    expect(request.request.headers.get('If-Match')).toBe('"1-4"');
+    expect(request.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['not-found']);
+    request.flush(null, { status: 204, statusText: 'No Content' });
+    await expect(removed).resolves.toBeNull();
+  });
+
   it('reads the assessment tab of a candidate, every failure shown by the caller (S34b, R-CAN-06)', async () => {
     const read = api.assessments('c/1');
 

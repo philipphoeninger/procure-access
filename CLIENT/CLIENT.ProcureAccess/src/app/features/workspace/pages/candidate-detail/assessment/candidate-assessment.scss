@@ -4,7 +4,8 @@
 
 // S34b (Figma `2022:841`, S34b-M `2136:3127`): the intro, then the K6 cards and the derived rows
 // one below the other with md between them. A derived row is a card like K6 (outlined on
-// surface-container-lowest), its title in K6's title style, the hint in body/small.
+// surface-container-lowest), its title in K6's title style, the hint in body/small. The read-only
+// row of a criterion (Readers, archived projects) is the same card with value and note as a list.
 :host {
   display: block;
 }
@@ -49,7 +50,7 @@
   }
 }
 
-.pa-assessment__procedure {
+.pa-assessment__card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -64,7 +65,7 @@
   }
 }
 
-.pa-assessment__procedure-title {
+.pa-assessment__card-title {
   margin: 0;
   font: var(--mat-sys-title-medium);
   overflow-wrap: anywhere;
@@ -73,4 +74,28 @@
 .pa-assessment__hint {
   margin: 0;
   font: var(--mat-sys-body-small);
+}
+
+// The read-only row: dt above dd, as the facts of Überblick below 600 px
+.pa-assessment__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  align-self: stretch;
+  margin: 0;
+
+  dt {
+    font: var(--mat-sys-label-medium);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    overflow-wrap: anywhere;
+  }
+}
+
+// Text the user typed keeps its line breaks
+.pa-assessment__note {
+  white-space: pre-line;
 }

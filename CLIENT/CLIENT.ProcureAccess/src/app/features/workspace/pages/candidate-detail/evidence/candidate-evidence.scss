@@ -132,3 +132,41 @@
   align-items: center;
   gap: var(--pa-space-xs);
 }
+
+// The read-only view (Readers, archived projects): dt above dd below 600 px, a column of terms
+// from 600 px, as the facts of S34 Überblick
+.pa-evidence__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-xs);
+  align-self: stretch;
+  margin: 0;
+
+  div {
+    @media (min-width: 37.5em) {
+      display: grid;
+      grid-template-columns: 10.5rem 1fr;
+      column-gap: var(--pa-space-md);
+    }
+  }
+
+  dt {
+    font: var(--mat-sys-label-medium);
+  }
+
+  dd {
+    grid-column: 2;
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    overflow-wrap: anywhere;
+  }
+}
+
+// Text the user typed keeps its line breaks
+.pa-evidence__note {
+  white-space: pre-line;
+}
+
+.pa-evidence__facts .pa-evidence__private {
+  font: var(--mat-sys-body-small);
+}

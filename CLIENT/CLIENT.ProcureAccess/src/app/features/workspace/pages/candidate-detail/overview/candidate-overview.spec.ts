@@ -2,9 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
-import { render, screen } from '@testing-library/angular';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { Router } from '@angular/router';
+import { render, screen, within } from '@testing-library/angular';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { OrganizationRole } from '@app/features/organization/models/organization';
@@ -12,6 +16,7 @@ import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 
 import { Candidate, TestEvidence } from '../../../models/candidates';
+import { CandidatesApiService } from '../../../services/api/candidates-api.service';
 import { candidateView, TEST_CANDIDATE, TEST_PROJECT } from '../../../testing/candidate-fixtures';
 import { CandidateLoad, CandidateView } from '../candidate-load';
 import { CandidateOverview } from './candidate-overview';
@@ -31,16 +36,24 @@ const EVIDENCE: TestEvidence = {
 
 describe('CandidateOverview (S34 Überblick, R-CAN-04)', () => {
   let setPageTitleState: ReturnType<typeof vi.fn>;
+  let announce: ReturnType<typeof vi.fn>;
+  let api: { get: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> };
+  let load: CandidateLoad;
 
   async function openTab(view: CandidateView = candidateView(), role: OrganizationRole = 'editor') {
     setPageTitleState = vi.fn();
-    const load = new CandidateLoad();
+    announce = vi.fn().mockResolvedValue(undefined);
+    api = { get: vi.fn(), remove: vi.fn().mockResolvedValue(undefined) };
+    load = new CandidateLoad();
     load.view.set(view);
     const rendered = await render(CandidateOverview, {
       routes: [{ path: '**', children: [] }],
       providers: [
         provideTestTranslations(),
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
         { provide: CandidateLoad, useValue: load },
+        { provide: CandidatesApiService, useValue: api },
+        { provide: A11yAnnouncerService, useValue: { announce } },
         { provide: PageTitleStrategy, useValue: { setPageTitleState } },
         { provide: ProcureAccessStore, useValue: { organizations: signal([{ id: 'org-1', name: 'Personalamt', type: 'publicBody', role }]) } },
       ],
@@ -204,6 +217,95 @@ describe('CandidateOverview (S34 Überblick, R-CAN-04)', () => {
     it('is not offered for an archived project (R-PRJ-05)', async () => {
       await openTab(candidateView({ project: { ...TEST_PROJECT, status: 'archived' } }), 'owner');
       expect(screen.queryByRole('link', { name: 'Bearbeiten' })).toBeNull();
+    });
+  });
+
+  describe('„Produkt aus dem Projekt entfernen“ (R-CAN-09)', () => {
+    const removeButton = () => screen.getByRole('button', { name: 'Produkt aus dem Projekt entfernen' });
+    const problem = (status: number, name: string) =>
+      new HttpErrorResponse({ status, error: { type: `https://procureaccess.de/problems/${name}`, status } });
+
+    /** Clicks the button and, in the dialog that names the product, `action`. */
+    async function removeAnd(action: 'Produkt entfernen' | 'Abbrechen') {
+      removeButton().click();
+      const dialog = await screen.findByRole('dialog', { name: 'Produkt entfernen?' });
+      expect(dialog.textContent).toContain(
+        '„BewerberPro“ wird mit Prüfnachweisen und Einschätzungen aus diesem Projekt entfernt. Das lässt sich nicht rückgängig machen.',
+      );
+      within(dialog).getByRole('button', { name: action }).click();
+    }
+
+    it('is the last action of the tab; after the confirmation the product is removed with its tag, S32 opens and the removal is announced', async () => {
+      const { fixture, container } = await openTab();
+      const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+
+      expect([...container.querySelectorAll('a[href], button')].at(-1)).toBe(removeButton());
+      await removeAnd('Produkt entfernen');
+      await vi.waitFor(() => expect(announce).toHaveBeenCalled());
+
+      expect(api.remove).toHaveBeenCalledWith('c-1', '"1-1"');
+      expect(navigate).toHaveBeenCalledWith('/projekte/p-1');
+      expect(announce).toHaveBeenCalledWith('candidate.removed', { product: 'BewerberPro' });
+      // The note about a published entry comes with the publication (step 6)
+      expect(document.body.textContent).not.toContain('Beitragsprofil');
+    });
+
+    it('removes nothing when the user cancels', async () => {
+      const { fixture } = await openTab();
+
+      await removeAnd('Abbrechen');
+      await fixture.whenStable();
+
+      expect(api.remove).not.toHaveBeenCalled();
+      expect(announce).not.toHaveBeenCalled();
+    });
+
+    it('counts a product another session removed meanwhile as removed', async () => {
+      const { fixture } = await openTab();
+      const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+      api.remove.mockRejectedValue(problem(404, 'not-found'));
+
+      await removeAnd('Produkt entfernen');
+      await vi.waitFor(() => expect(announce).toHaveBeenCalledWith('candidate.removed', { product: 'BewerberPro' }));
+
+      expect(navigate).toHaveBeenCalledWith('/projekte/p-1');
+    });
+
+    it('stays on the tab after a refused removal and reads the product again, so the next try carries the stored tag', async () => {
+      const { fixture } = await openTab();
+      const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+      api.remove.mockRejectedValueOnce(problem(409, 'conflict'));
+      api.get.mockResolvedValue({ ...TEST_CANDIDATE, name: 'BewerberPro 2', etag: '"1-2"' });
+
+      await removeAnd('Produkt entfernen');
+      await vi.waitFor(() => expect(api.get).toHaveBeenCalledWith('c-1'));
+      await fixture.whenStable();
+
+      expect(navigate).not.toHaveBeenCalled();
+      expect(announce).not.toHaveBeenCalled();
+      expect(screen.getByText('BewerberPro 2')).toBeTruthy();
+      removeButton().click();
+      within(await screen.findByRole('dialog', { name: 'Produkt entfernen?' }))
+        .getByRole('button', { name: 'Produkt entfernen' })
+        .click();
+      await vi.waitFor(() => expect(api.remove).toHaveBeenLastCalledWith('c-1', '"1-2"'));
+    });
+
+    it('is not offered to a Reader, who gets no action in the tab but the ways to the other tabs (R-CAN-10)', async () => {
+      const { container } = await openTab(candidateView(), 'reader');
+
+      expect(screen.queryByRole('button', { name: 'Produkt aus dem Projekt entfernen' })).toBeNull();
+      expect(container.querySelector('input, select, textarea')).toBeNull();
+      expect(screen.getAllByRole('link').map((link) => link.textContent?.trim())).toEqual([
+        'https://www.beispiel-software.de/bewerberpro',
+        'Zum Prüfnachweis',
+        'Zur Einschätzung',
+      ]);
+    });
+
+    it('is not offered for an archived project (R-PRJ-05)', async () => {
+      await openTab(candidateView({ project: { ...TEST_PROJECT, status: 'archived' } }), 'owner');
+      expect(screen.queryByRole('button', { name: 'Produkt aus dem Projekt entfernen' })).toBeNull();
     });
   });
 });

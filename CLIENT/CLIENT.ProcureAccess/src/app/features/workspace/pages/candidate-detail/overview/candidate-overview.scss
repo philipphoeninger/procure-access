@@ -116,3 +116,9 @@
   margin: 0;
   font: var(--mat-sys-title-small);
 }
+
+// „Produkt aus dem Projekt entfernen“ below the cards, at the start of its row
+.pa-overview__remove {
+  display: flex;
+  justify-content: flex-start;
+}

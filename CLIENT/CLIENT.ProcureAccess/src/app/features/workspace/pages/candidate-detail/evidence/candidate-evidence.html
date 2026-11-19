@@ -117,6 +117,70 @@ SPDX-License-Identifier: MIT
       </button>
     </div>
   </form>
+} @else if (candidate(); as candidate) {
+  <!-- Read only (R-CAN-10, R-PRJ-05): the stored status and evidences as text, no input -->
+  <div class="pa-evidence__form">
+    <div class="pa-evidence__card">
+      <dl class="pa-evidence__facts">
+        <div>
+          <dt>{{ 'candidate.evidence.tested' | translate }}</dt>
+          <dd>{{ statusKey(candidate.testStatus) | translate }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    @if (candidate.testStatus === 'tested' && candidate.testEvidences.length > 0) {
+      <h2 class="pa-evidence__title">{{ 'candidate.evidence.list.title' | translate }}</h2>
+      @for (evidence of candidate.testEvidences; track evidence.id; let index = $index) {
+        @let title = storedHeading(evidence, index);
+        <div class="pa-evidence__card">
+          <h3 class="pa-evidence__card-title">{{ title.key | translate: title.params }}</h3>
+          <dl class="pa-evidence__facts">
+            <div>
+              <dt>{{ labels.kind | translate }}</dt>
+              <dd>{{ storedKindKey(evidence) | translate }}</dd>
+            </div>
+            @if (evidence.testKind === 'other' && evidence.otherTestTypeName) {
+              <div>
+                <dt>{{ labels.otherName | translate }}</dt>
+                <dd>{{ evidence.otherTestTypeName }}</dd>
+              </div>
+            }
+            <div>
+              <dt>{{ labels.testedBy | translate }}</dt>
+              <dd>{{ evidence.testedBy }}</dd>
+            </div>
+            <div>
+              <dt>{{ labels.testDate | translate }}</dt>
+              <dd>{{ date(evidence.testDate) }}</dd>
+            </div>
+            @if (evidence.testedVersion) {
+              <div>
+                <dt>{{ 'candidate.evidence.version.heading' | translate }}</dt>
+                <dd>{{ evidence.testedVersion }}</dd>
+              </div>
+            }
+            @if (evidence.evidenceUrl) {
+              <div>
+                <dt>{{ 'candidate.evidence.url.heading' | translate }}</dt>
+                <dd><a [href]="evidence.evidenceUrl">{{ evidence.evidenceUrl }}</a></dd>
+              </div>
+            }
+            @if (evidence.qualificationNote) {
+              <!-- Private (PRV-01): never published; the second dd says so, as the hint of the form -->
+              <div>
+                <dt>{{ 'candidate.evidence.qualification.heading' | translate }}</dt>
+                <dd class="pa-evidence__note">{{ evidence.qualificationNote }}</dd>
+                <dd class="pa-evidence__private">
+                  {{ 'candidate.form.privateSection' | translate }}: {{ 'candidate.form.privateSection.text' | translate }}
+                </dd>
+              </div>
+            }
+          </dl>
+        </div>
+      }
+    }
+  </div>
 }
 
 <ng-template #text let-card="card" let-field="field" let-wide="wide" let-required="required" let-url="url">

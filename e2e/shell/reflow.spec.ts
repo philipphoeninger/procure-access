@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { SessionClock } from '../support/clock';
 import { chooseFirstOption } from '../support/combobox';
 import { expireSessionOnce, signInThroughApi } from '../support/session';
-import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from '../support/users';
+import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, ORG_READER, TEST_USER_PASSWORD } from '../support/users';
 
 /**
  * Reflow of the shell pages (A11Y-09; S2-18, R-SHL-10, WCAG 1.4.10): at 320 × 256 CSS px, which is a
@@ -24,7 +24,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
  * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
  * Überblick with its tabs since S6-16; the project overview S32 with its menu and the dialog „Projekt
- * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19; the conflict dialog S37 over „Projekt bearbeiten“ since S6-21a. The legacy screens are
+ * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19; the conflict dialog S37 over „Projekt bearbeiten“ since S6-21a; S34a and S34b read only for a Reader since S6-22. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -622,6 +622,47 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await main.getByRole('textbox', { name: 'Wer hat geprüft?' }).nth(2).fill('Prüfstelle');
     await main.getByRole('button', { name: 'Speichern' }).click();
     await expect(main.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page, { scrollingTabBars: true });
+  });
+
+  test('S34a and S34b read only for a Reader, with two evidences, long texts and the open legend, need no horizontal scrolling', async ({ page }) => {
+    const evidence = {
+      testedBy: 'Prüfstelle für barrierefreie Informationstechnik der Freien und Hansestadt Hamburg',
+      testDate: '2026-03-14',
+      testedVersion: '4.2.1-LTS (Build 2026-03-01)',
+      evidenceUrl: 'https://pruefstelle-beispiel.de/berichte/bewerbermanagementsystem/2026/barrierefreiheit.pdf',
+      qualificationNote: 'Akkreditierte Prüfstelle, langjährige Erfahrung mit Software für die Personalverwaltung',
+    };
+    const { projectId, candidateId } = await routeCandidate(page, {
+      testStatus: 'tested',
+      testEvidences: [
+        { id: '0e2e0000-0000-4000-8000-0000000000e1', etag: '"1-1"', testKind: 'procedure', testTypeId: 'softwareTest', otherTestTypeName: null, ...evidence },
+        { id: '0e2e0000-0000-4000-8000-0000000000e2', etag: '"1-1"', testKind: 'other', testTypeId: null, otherTestTypeName: 'Hausinterner Prüfleitfaden der Personalverwaltung', ...evidence },
+      ],
+    });
+    // The seeded Reader only reads (owner decision S5-16 7a); the answers are routed (R-CAN-10, S6-22)
+    await signInThroughApi(page, ORG_READER, TEST_USER_PASSWORD);
+    const main = page.getByRole('main');
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}/pruefnachweis`);
+    await expect(main.getByRole('heading', { level: 3, name: 'Prüfnachweis 2: Hausinterner Prüfleitfaden der Personalverwaltung' })).toBeVisible();
+    await expect(main.locator('.pa-evidence__facts')).toHaveCount(3);
+    await expect(main.locator('input, textarea, mat-select')).toHaveCount(0);
+    await expectReflow(page, { scrollingTabBars: true });
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
+    await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
+    await expect(main.locator('.pa-assessment__facts')).toHaveCount(2);
+    await expect(main.locator('.pa-assessment__procedure')).toHaveCount(2);
+    await expect(main.locator('input, textarea, mat-select')).toHaveCount(0);
+    await expectReflow(page, { scrollingTabBars: true });
+
+    // Opening the legend stores the choice in the user's settings: answered here, the seeded user stays unchanged
+    await page.route('**/api/v1/account/preferences', (route) =>
+      route.request().method() === 'PUT' ? route.fulfill({ status: 200, json: route.request().postDataJSON() as unknown }) : route.continue(),
+    );
+    await main.locator('pa-rating-legend button').click();
+    await expect(main.locator('pa-rating-legend dl')).toBeVisible();
     await expectReflow(page, { scrollingTabBars: true });
   });
 

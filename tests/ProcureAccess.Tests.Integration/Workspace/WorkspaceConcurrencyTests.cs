@@ -371,6 +371,7 @@ public sealed class WorkspaceConcurrencyTests(ApiFixture api) : IntegrationTest(
         SetTestStatus,
         ChangeEvidence,
         RemoveEvidence,
+        RemoveCandidate,
     }
 
     public static TheoryData<Change> Changes => [.. Enum.GetValues<Change>()];
@@ -379,7 +380,7 @@ public sealed class WorkspaceConcurrencyTests(ApiFixture api) : IntegrationTest(
     private static Change CompetingChangeOf(Change change) => change switch
     {
         Change.RenameProject or Change.AssignList => Change.RenameProject,
-        Change.ChangeCandidate or Change.SetTestStatus => Change.ChangeCandidate,
+        Change.ChangeCandidate or Change.SetTestStatus or Change.RemoveCandidate => Change.ChangeCandidate,
         _ => Change.ChangeEvidence,
     };
 
@@ -398,6 +399,7 @@ public sealed class WorkspaceConcurrencyTests(ApiFixture api) : IntegrationTest(
         Change.ChangeEvidence => client.SendWithTagAsync(
             HttpMethod.Put, EvidencePath, EvidenceBody(competing ? "Kollegin" : "Andere Prüfstelle"), ifMatch, Cancellation),
         Change.RemoveEvidence => client.SendWithTagAsync(HttpMethod.Delete, EvidencePath, ifMatch, Cancellation),
+        Change.RemoveCandidate => client.SendWithTagAsync(HttpMethod.Delete, CandidatePath, ifMatch, Cancellation),
         _ => throw new ArgumentOutOfRangeException(nameof(change)),
     };
 

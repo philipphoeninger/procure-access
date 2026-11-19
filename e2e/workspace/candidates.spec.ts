@@ -3,7 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { createOrganizationThroughApi, createProjectThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
+import {
+  acceptInvitationThroughApi,
+  createCandidateThroughApi,
+  createOrganizationThroughApi,
+  createProjectThroughApi,
+  inviteThroughApi,
+  registerConfirmedAccount,
+  saveListThroughApi,
+} from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
 
@@ -19,6 +27,14 @@ import { signInThroughApi } from '../support/session';
  * (S6-14; R-PRJ-03, SIG-13). On the tab Prüfnachweis S34a an evidence is saved, a second one of the
  * same procedure is refused, and leaving „Ja“ asks first and leaves the product at „Nein“ (S6-17;
  * R-CAN-05, WSP-01). Axe in both appearances on every new state (A11Y-01, A11Y-08).
+ *
+ * Removing a product (S6-22; R-CAN-09, WSP-04): „Produkt aus dem Projekt entfernen“ on Überblick
+ * asks first; Escape keeps the product, the confirmation removes it, S32 opens with the focus on
+ * its H1 and the removal is announced.
+ *
+ * The Reader view (S6-22; R-CAN-10): a Reader of the Owner's organisation, in a browser context of
+ * their own, finds S32 and the three tabs of S34 without any input or action — the evidence and
+ * the assessment the Owner stored are shown as text.
  */
 const WIDE = { width: 1280, height: 800 };
 const PASSWORD = 'e2e-Passwort-lang-genug';
@@ -234,4 +250,174 @@ test.describe('Products of a project S33, S34', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's32-products');
   });
+
+  test('INV:A11Y-01 INV:A11Y-08 an Owner removes a product from S34 Überblick after a confirmation; S32 opens without it and the removal is announced', async ({ page, request }, testInfo) => {
+    await page.setViewportSize(WIDE);
+    const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
+    const address = `remove-${suffix}@example.test`;
+    await registerConfirmedAccount(request, address, PASSWORD);
+    await signInThroughApi(page, address, PASSWORD);
+    const organizationId = await createOrganizationThroughApi(page, `Amt ${suffix}`);
+    const project = `Bewerbermanagement ${suffix}`;
+    const projectId = await createProjectThroughApi(page.request, organizationId, project);
+    const candidateId = await createCandidateThroughApi(page.request, projectId, 'BewerberPro');
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}`);
+    await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
+    const remove = main(page).getByRole('button', { name: 'Produkt aus dem Projekt entfernen' });
+    await remove.press('Enter');
+    const dialog = page.getByRole('dialog', { name: 'Produkt entfernen?' });
+    // MatDialog moves the focus when it has opened (S6-01): the title, so the question is read first
+    await expect(dialog.getByRole('heading', { name: 'Produkt entfernen?' })).toBeFocused();
+    await expect(dialog).toContainText(
+      '„BewerberPro“ wird mit Prüfnachweisen und Einschätzungen aus diesem Projekt entfernt. Das lässt sich nicht rückgängig machen.',
+    );
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's34-remove');
+
+    // Escape keeps the product and returns the focus to the button
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(remove).toBeFocused();
+
+    // The removal is announced before the page title of S32: record what the live region says from now on
+    await page.evaluate(() => {
+      const seen: string[] = [];
+      (window as unknown as { paAnnouncements: string[] }).paAnnouncements = seen;
+      new MutationObserver(() => {
+        const text = document.querySelector('.cdk-live-announcer-element')?.textContent?.trim();
+        if (text && seen.at(-1) !== text) seen.push(text);
+      }).observe(document.body, { subtree: true, childList: true, characterData: true });
+    });
+    await remove.press('Enter');
+    await expect(dialog.getByRole('heading', { name: 'Produkt entfernen?' })).toBeFocused();
+    const removed = page.waitForResponse((response) => response.request().method() === 'DELETE');
+    await dialog.getByRole('button', { name: 'Produkt entfernen' }).press('Enter');
+    expect((await removed).status()).toBe(204);
+    await expect(page).toHaveURL(new RegExp(`/projekte/${projectId}$`));
+    await expect(main(page).getByRole('heading', { level: 1, name: project })).toBeFocused();
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { paAnnouncements: string[] }).paAnnouncements))
+      .toContain('„BewerberPro“ wurde aus dem Projekt entfernt.');
+    await expect(main(page)).toContainText('Noch keine Produkte in diesem Projekt.');
+  });
+
+  test('INV:A11Y-01 INV:A11Y-08 a Reader finds S32 and the three tabs of S34 read only: the stored evidence and assessment as text, no input, no action', async ({ page, browser, request }, testInfo) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize(WIDE);
+    const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
+    const owner = `readonly-owner-${suffix}@example.test`;
+    const reader = `readonly-reader-${suffix}@example.test`;
+    await registerConfirmedAccount(request, owner, PASSWORD);
+    await registerConfirmedAccount(request, reader, PASSWORD);
+    await signInThroughApi(page, owner, PASSWORD);
+    const organizationId = await createOrganizationThroughApi(page, `Amt ${suffix}`);
+    const listId = await saveListThroughApi(page.request, organizationId, 'HR-Software 2027');
+    const project = `Bewerbermanagement ${suffix}`;
+    const projectId = await createProjectThroughApi(page.request, organizationId, project, listId);
+    const candidateId = await createCandidateThroughApi(page.request, projectId, 'BewerberPro');
+    const criterion = await storeEvidenceAndAssessment(page, candidateId);
+    await inviteThroughApi(page, organizationId, reader, 'reader');
+
+    const context = await browser.newContext({ viewport: WIDE });
+    try {
+      const other = await context.newPage();
+      await signInThroughApi(other, reader, PASSWORD);
+      await acceptInvitationThroughApi(other, request, reader, 2);
+      const inputs = main(other).locator('input, textarea, select, mat-select, mat-radio-group, form');
+
+      // S32: no „Projekt bearbeiten“, no „Produkt hinzufügen“, no „Kriterienliste anpassen“
+      await other.goto(`/projekte/${projectId}`);
+      await expect(main(other).getByRole('heading', { level: 1, name: project })).toBeVisible();
+      await expect(main(other).getByRole('link', { name: 'BewerberPro' })).toBeVisible();
+      await expect(main(other).getByRole('button')).toHaveCount(0);
+      await expect(inputs).toHaveCount(0);
+
+      // Überblick: the facts and the ways to the other tabs, no „Bearbeiten“, no removal
+      await main(other).getByRole('link', { name: 'BewerberPro' }).press('Enter');
+      await expect(main(other).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeFocused();
+      await expect(main(other)).toContainText('Auf Barrierefreiheit geprüft: Ja – 1 Prüfnachweis: BIT inklusiv Software-Test');
+      await expect(main(other).getByRole('link', { name: 'Bearbeiten' })).toHaveCount(0);
+      await expect(main(other).getByRole('button', { name: 'Produkt aus dem Projekt entfernen' })).toHaveCount(0);
+      await expect(inputs).toHaveCount(0);
+
+      // S34a: the stored answer and the evidence as text
+      await main(other).getByRole('link', { name: 'Zum Prüfnachweis' }).press('Enter');
+      await expect(other).toHaveURL(/\/pruefnachweis$/);
+      await expect(main(other).locator('dt:text-is("Wurde das Produkt auf Barrierefreiheit geprüft?") + dd')).toHaveText('Ja');
+      const evidence = main(other).locator('.pa-evidence__card').filter({ has: other.getByRole('heading', { level: 3 }) });
+      await expect(evidence.getByRole('heading', { level: 3 })).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
+      await expect(evidence.locator('dt')).toHaveText([
+        'Art der Prüfung',
+        'Wer hat geprüft?',
+        'Datum der Prüfung',
+        'Geprüfte Version',
+        'Notiz zur Qualifikation der prüfenden Stelle',
+      ]);
+      await expect(evidence).toContainText('15.01.2026');
+      await expect(evidence).toContainText('Nur für Ihre Organisation:');
+      await expect(inputs).toHaveCount(0);
+      await expect(main(other).getByRole('button')).toHaveCount(0);
+      await settled(main(other));
+      await expectNoAxeViolations(other, testInfo, 's34a-readonly');
+
+      // S34b: progress, legend and the stored level and note as text
+      await main(other).getByRole('tab').nth(2).press('Enter');
+      await expect(other).toHaveURL(/\/einschaetzung$/);
+      const card = main(other).locator('.pa-assessment__card').filter({ has: other.getByRole('heading', { level: 2, name: criterion }) });
+      await expect(card.locator('dt')).toHaveText(['Einschätzung', 'Begründung']);
+      await expect(card.locator('dd')).toHaveText(['Leichte Einschränkung', 'Eigener Test mit der Tastatur.']);
+      await expect(main(other).locator('.pa-assessment__count')).toHaveText(/^1 von \d+ Kriterien eingeschätzt$/);
+      await expect(main(other)).not.toContainText('Schätzen Sie für jedes Kriterium ein');
+      await expect(main(other).locator('pa-assessment-input')).toHaveCount(0);
+      await expect(inputs).toHaveCount(0);
+      // The only button opens and closes the legend
+      await expect(main(other).getByRole('button')).toHaveCount(1);
+      await expect(main(other).locator('pa-rating-legend button')).toHaveCount(1);
+      await settled(main(other));
+      await expectNoAxeViolations(other, testInfo, 's34b-readonly');
+    } finally {
+      await context.close();
+    }
+  });
 });
+
+/**
+ * As the Owner signed in on `page`: sets the product to „Ja“ with one evidence and assesses the
+ * first criterion of the project's list with a note. Returns the title S34b shows for that criterion.
+ */
+async function storeEvidenceAndAssessment(page: Page, candidateId: string): Promise<string> {
+  const token = async () => {
+    expect((await page.request.get('/api/v1/auth/session')).ok()).toBe(true);
+    return (await page.context().cookies()).find((cookie) => cookie.name === 'XSRF-TOKEN')!.value;
+  };
+  const candidate = await page.request.get(`/api/v1/candidates/${candidateId}`);
+  const status = await page.request.put(`/api/v1/candidates/${candidateId}/test-status`, {
+    headers: { 'X-XSRF-TOKEN': await token(), 'If-Match': candidate.headers()['etag'] },
+    data: { testStatus: 'tested' },
+  });
+  expect(status.status(), 'the test status „Ja“').toBe(200);
+  const evidence = await page.request.post(`/api/v1/candidates/${candidateId}/test-evidences`, {
+    headers: { 'X-XSRF-TOKEN': await token() },
+    data: {
+      testKind: 'procedure',
+      testTypeId: 'softwareTest',
+      testedBy: 'Prüfstelle Beispiel',
+      testDate: '2026-01-15',
+      testedVersion: '4.2',
+      qualificationNote: 'Akkreditierte Prüfstelle',
+    },
+  });
+  expect(evidence.status(), 'the evidence').toBe(201);
+
+  const assessments = await page.request.get(`/api/v1/candidates/${candidateId}/assessments`);
+  expect(assessments.ok(), 'the assessments of the product').toBe(true);
+  const first = ((await assessments.json()) as { criteria: { criterionRevisionId: number; title: string; plainLanguageTitle: string | null }[] })
+    .criteria[0];
+  const assessed = await page.request.put(`/api/v1/candidates/${candidateId}/assessments/${first.criterionRevisionId}`, {
+    headers: { 'X-XSRF-TOKEN': await token() },
+    data: { value: 'slightRestriction', note: 'Eigener Test mit der Tastatur.' },
+  });
+  expect(assessed.status(), 'the assessment').toBe(200);
+  return first.plainLanguageTitle ?? first.title;
+}

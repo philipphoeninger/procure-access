@@ -5,17 +5,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { problemTypeName } from '@app/core/errors/problem-details';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { Notice } from '@app/shared/components/notice/notice';
 import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { FulfillmentBreakdown } from '@app/shared/components/signals/fulfillment-breakdown/fulfillment-breakdown';
 import { pluralKey } from '@app/shared/pipes/translate-plural.pipe';
 
 import { Candidate, candidatePath, editCandidatePath, TestEvidence, testStatusKey } from '../../../models/candidates';
-import { Project } from '../../../models/projects';
+import { Project, projectPath } from '../../../models/projects';
+import { CandidatesApiService } from '../../../services/api/candidates-api.service';
 import { candidateTabTitle } from '../candidate-detail';
 import { CandidateCriteria, CandidateLoad, isProjectEditor } from '../candidate-load';
 
@@ -44,8 +49,16 @@ interface Overview {
  * - „Nur für Ihre Organisation“ on surface-container-low: `candidate.form.privateSection.text`, the
  *   contacts and internal notes; „Bearbeiten“ → S33. Never part of a publication (PRV-02).
  *
- * „Bearbeiten“ only for Editor and Owner of a project that is not archived (R-PRJ-05; Readers see
- * every tab read-only with S6-22, R-CAN-10); each is described by its card's heading.
+ * „Bearbeiten“ only for Editor and Owner of a project that is not archived (R-PRJ-05); each is
+ * described by its card's heading. Readers see the tab without any action (R-CAN-10).
+ *
+ * „Produkt aus dem Projekt entfernen“ (R-CAN-09, WSP-04; S6-22) for the same roles, below the cards
+ * (owner decision D4 (a)): `ConfirmDialog` with `candidate.remove.*`, then `DELETE` with the
+ * candidate's tag, S32 — the route change moves the focus to its H1 — and `candidate.removed`
+ * announced. A product another session removed meanwhile counts as removed. Any other failure
+ * shows the error interceptor's text (a stale tag the general one, owner decision D3 (a)); the
+ * product is then read again, so the tab shows what is stored and the next try carries its tag.
+ * `candidate.remove.publishedNote` comes with the publication of step 6.
  *
  * Progress and K1 are the server's (S6-18, owner decision S6-16 D3 (b)): requirement criteria
  * only, never „Geprüft nach …“ (CAT-17), seven counts without `notCovered` (SIG-13); the copy is
@@ -67,6 +80,13 @@ export class CandidateOverview {
   private readonly load = inject(CandidateLoad);
   private readonly store = inject(ProcureAccessStore);
   private readonly translate = inject(TranslateService);
+  private readonly api = inject(CandidatesApiService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly announcer = inject(A11yAnnouncerService);
+
+  /** A removal is on its way: a second click does nothing. */
+  private removing = false;
 
   constructor() {
     candidateTabTitle('overview');
@@ -104,6 +124,43 @@ export class CandidateOverview {
     }) as string;
   });
 
+  /** „Produkt aus dem Projekt entfernen“: confirm, remove, S32, announce. */
+  protected async remove(overview: Overview): Promise<void> {
+    if (this.removing) return;
+    const { project, candidate } = overview;
+    this.removing = true;
+    try {
+      const confirmed = await ConfirmDialog.confirm(this.dialog, {
+        titleKey: 'candidate.remove.title',
+        bodyKey: 'candidate.remove.body',
+        bodyParams: { product: candidate.name },
+        confirmKey: 'candidate.remove.confirm',
+      });
+      if (!confirmed) return;
+      try {
+        await this.api.remove(candidate.id, candidate.etag);
+      } catch (error: unknown) {
+        if (problemTypeName(error) !== 'not-found') {
+          await this.readAgain(candidate.id);
+          return;
+        }
+      }
+      await this.router.navigateByUrl(projectPath(project.id));
+      void this.announcer.announce('candidate.removed', { product: candidate.name });
+    } finally {
+      this.removing = false;
+    }
+  }
+
+  /** After a refused removal: what is stored now, with its tag. A failed read keeps what is shown. */
+  private async readAgain(candidateId: string): Promise<void> {
+    try {
+      const candidate = await this.api.get(candidateId);
+      this.load.view.update((view) => (view.kind === 'candidate' && view.candidate?.id === candidateId ? { ...view, candidate } : view));
+    } catch {
+      // The removal's failure is already shown.
+    }
+  }
 
   protected editPath(overview: Overview): string {
     return editCandidatePath(overview.project.id, overview.candidate.id);

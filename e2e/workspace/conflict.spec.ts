@@ -4,9 +4,9 @@
 
 import { expect, test, type APIRequestContext, type Browser, type BrowserContext, type Locator, type Page, type TestInfo } from '@playwright/test';
 import {
+  acceptInvitationThroughApi,
   createOrganizationThroughApi,
   createProjectThroughApi,
-  invitationLinkOf,
   inviteThroughApi,
   registerConfirmedAccount,
   saveListThroughApi,
@@ -37,14 +37,6 @@ async function settled(locator: Locator): Promise<void> {
   await locator.evaluate((element) =>
     Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
   );
-}
-
-/** The XSRF token of the page's browser context, after the session probe issued it. */
-async function xsrfToken(page: Page): Promise<string> {
-  expect((await page.request.get('/api/v1/auth/session')).ok()).toBe(true);
-  const token = (await page.context().cookies()).find((cookie) => cookie.name === 'XSRF-TOKEN')?.value;
-  expect(token, 'the probe issues XSRF-TOKEN').toBeTruthy();
-  return token!;
 }
 
 /** Opens „Projekt bearbeiten“ on S32 and returns the dialog with its name field focused. */
@@ -85,12 +77,7 @@ async function ownerAndEditor(page: Page, browser: Browser, browserName: string,
   if (browserName === 'chromium') await editorContext.grantPermissions(['clipboard-read', 'clipboard-write']);
   const other = await editorContext.newPage();
   await signInThroughApi(other, editor, PASSWORD);
-  const link = await invitationLinkOf(request, editor, 2);
-  const accepted = await other.request.post('/api/v1/invitations/accept', {
-    headers: { 'X-XSRF-TOKEN': await xsrfToken(other) },
-    data: { token: new URL(link, 'http://localhost').searchParams.get('token') },
-  });
-  expect(accepted.status(), 'the Editor accepts the invitation').toBe(200);
+  await acceptInvitationThroughApi(other, request, editor, 2);
   return { suffix, owner, organizationId, other, editorContext };
 }
 

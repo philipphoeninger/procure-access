@@ -67,12 +67,17 @@ const RESULTS_THROTTLE_MS = 1000;
  *   described by the title (R-CAN-07, CAT-17: no input, never counted).
  * - Without a list, `projects.detail.noCriteria` (as Überblick). A failed read shows the S80
  *   server text as an error notice in place.
- * - Only Editor and Owner of a project that is not archived get the tab's content (R-PRJ-05); the
- *   Reader view comes with S6-22 (owner decision S6-19 Q3 (a), as S6-17 D5 (a)).
+ * - Only Editor and Owner of a project that is not archived assess (R-PRJ-05). A Reader, and
+ *   everyone in an archived project, reads the tab (R-CAN-10; S6-22): the progress row without
+ *   the filter, the legend, and per criterion a card with its title as H2 and a `<dl>` —
+ *   „Einschätzung“ (`candidate.assessment.select`) with the stored level and, when there is one,
+ *   „Begründung“ (`candidate.assessment.note.heading`) with the note —, then the derived rows
+ *   without „Prüfnachweis bearbeiten“. No intro, no union note (both speak to the person
+ *   assessing), no input; nothing is saved or read again on leaving.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2136-3127
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2022-841
- * @spec docs/SPEC_v2.md R-CAN-06, R-CAN-07, R-CAN-08; docs/design_handoff_procureaccess_v1.md §4.6, §4.11, §5.1
+ * @spec docs/SPEC_v2.md R-CAN-06, R-CAN-07, R-CAN-08, R-CAN-10; docs/design_handoff_procureaccess_v1.md §4.6, §4.11, §5.1
  * @invariants CAT-15, CAT-17, A11Y-01, A11Y-09
  */
 @Component({
@@ -93,15 +98,17 @@ export class CandidateAssessment {
   protected readonly noteLimit = ASSESSMENT_NOTE_LIMIT;
   protected readonly layout = computed(() => (this.wide() ? 'radios' : 'compact'));
 
-  /** The project and candidate shown, when the user may assess: Editor or Owner, project not archived. */
-  private readonly shown = computed(() => {
+  /** The project and candidate shown; every member of the organisation reads the tab (R-CAN-10). */
+  protected readonly shown = computed(() => {
     const view = this.load.view();
-    if (view.kind !== 'candidate' || view.candidate === null) return null;
-    if (view.project.status === 'archived' || !isProjectEditor(this.store.organizations(), view.project)) return null;
-    return { project: view.project, candidate: view.candidate };
+    return view.kind === 'candidate' && view.candidate !== null ? { project: view.project, candidate: view.candidate } : null;
   });
 
-  protected readonly editable = computed(() => this.shown() !== null);
+  /** Who may assess: Editor or Owner of a project that is not archived (R-CAN-06, R-PRJ-05). */
+  protected readonly editable = computed(() => {
+    const shown = this.shown();
+    return shown !== null && shown.project.status !== 'archived' && isProjectEditor(this.store.organizations(), shown.project);
+  });
   protected readonly hasList = computed(() => this.shown()?.project.criteriaList != null);
 
   /** The assessments of the shown candidate, once read. */
