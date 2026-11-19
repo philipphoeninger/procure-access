@@ -87,10 +87,12 @@ test.describe('Assessment tab S34b', () => {
     // Keyboard only: from the top of the page, Tab reaches the checked radio of the first criterion
     await tabTo(page, 'pa-assessment-input:first-of-type input[type="radio"]:checked');
     const saved = assessmentSaved(page, candidateId);
-    // The arrow moves on from the last option to the first one and checks it
-    await page.keyboard.press('ArrowDown');
-    await expect(radios.first()).toBeChecked();
-    const level = (await first.locator('mat-radio-button').first().textContent())?.trim();
+    // ArrowUp moves from „Nicht eingeschätzt“ to the level before it and checks it (an arrow key past
+    // the end of the group wraps in Chromium and Firefox, but not in WebKit)
+    const chosen = (await radios.count()) - 2;
+    await page.keyboard.press('ArrowUp');
+    await expect(radios.nth(chosen)).toBeChecked();
+    const level = (await first.locator('mat-radio-button').nth(chosen).textContent())?.trim() ?? '';
     const valueSaved = await saved;
     expect(valueSaved.status()).toBe(200);
     expect(valueSaved.request().postDataJSON()).toMatchObject({ note: null });
@@ -109,7 +111,7 @@ test.describe('Assessment tab S34b', () => {
     // Both stay after a reload (stored on the server, R-CAN-06)
     await page.reload();
     await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
-    await expect(cards.first().locator('input[type="radio"]').first()).toBeChecked();
+    await expect(cards.first().locator('input[type="radio"]').nth(chosen)).toBeChecked();
     await expect(cards.first().locator('textarea')).toHaveValue('Eigener Test mit der Tastatur.');
 
     // Überblick counts the assessed criterion (the server's counts, read after leaving the tab)
@@ -119,14 +121,14 @@ test.describe('Assessment tab S34b', () => {
     await page.keyboard.press('Enter');
     await expect(page).toHaveTitle(`Überblick – BewerberPro – ${project} – ProcureAccess`);
     await expect(main(page)).toContainText(/1 von \d+ Kriterien eingeschätzt/);
-    await expect(main(page).locator('pa-fulfillment-breakdown dt').first()).toHaveText('Erfüllt');
-    if (level === 'Erfüllt') await expect(main(page).locator('pa-fulfillment-breakdown dd').first()).toHaveText('1 Kriterium');
+    const row = main(page).locator('.pa-fulfillment__row', { has: page.locator(`dt:text-is("${level}")`) });
+    await expect(row.locator('dd')).toHaveText('1 Kriterium');
 
     // Below 600 px K6 is the compact form: a select „Einschätzung“ and the note behind a button (Handoff §2.2)
     await page.setViewportSize(NARROW);
     await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
     await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
-    await expect(cards.first().locator('mat-select')).toContainText(level ?? '');
+    await expect(cards.first().locator('mat-select')).toContainText(level);
     await expect(cards.first().locator('.pa-assessment-input__note-toggle')).toHaveText('Begründung bearbeiten');
     await expect(cards.first().locator('textarea')).toBeHidden();
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
