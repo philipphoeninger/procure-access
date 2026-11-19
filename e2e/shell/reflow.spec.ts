@@ -23,7 +23,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
  * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
- * Überblick with its tabs since S6-16. The legacy screens are
+ * Überblick with its tabs since S6-16; the evidence tab S34a since S6-17. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -78,6 +78,76 @@ async function toStep4(page: Page): Promise<void> {
   await next(page, 'Welche Funktionen hat das Produkt?');
   await page.getByRole('checkbox', { name: 'Audio', exact: true }).press('Space');
   await next(page, /Soll das Produkt nach einem bestimmten Verfahren geprüft sein/);
+}
+
+/**
+ * Answers a project with its copy of a list and one product of it (S33, S34, S34a), so the seeded
+ * organisation stays unchanged (owner decision S5-16 7a); the criteria come from T.1. `candidate`
+ * changes the product's answer.
+ */
+async function routeCandidate(page: Page, candidate: Record<string, unknown> = {}): Promise<{ projectId: string; candidateId: string }> {
+  const projectId = '0e2e0000-0000-4000-8000-0000000000c1';
+  const candidateId = '0e2e0000-0000-4000-8000-0000000000c2';
+  const listId = '0e2e0000-0000-4000-8000-0000000000c3';
+  const projectName = 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke';
+  const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
+  // The client keeps the ETag of a project and a candidate and refuses an answer without one (API-03, S6-20).
+  await page.route(`**/api/v1/projects/${projectId}`, (route) =>
+    route.fulfill({
+      status: 200,
+      headers: { ETag: '"1-1"' },
+      json: {
+        id: projectId,
+        organizationId: E2E_ORGANIZATION.id,
+        name: projectName,
+        status: 'open',
+        productCount: 1,
+        createdAt: '2026-11-18T09:00:00Z',
+        modifiedAt: '2026-11-18T09:00:00Z',
+        criteriaList: { id: listId, name: listName, releaseVersion: 'T.1' },
+      },
+    }),
+  );
+  await page.route(`**/api/v1/candidates/${candidateId}`, (route) =>
+    route.fulfill({
+      status: 200,
+      headers: { ETag: '"1-1"' },
+      json: {
+        id: candidateId,
+        projectId,
+        organizationId: E2E_ORGANIZATION.id,
+        name: 'Bewerbermanagementsystem mit Stellenausschreibung und Terminplanung',
+        vendor: 'Beispiel Software Gesellschaft mit beschränkter Haftung',
+        website: 'https://www.beispiel-software.de/produkte/bewerbermanagement/barrierefreiheit',
+        functionalSummary: 'Bewerbermanagement, Stellenausschreibungen, Terminplanung',
+        testStatus: 'unknown',
+        privateSection: { contactNotes: 'Frau Beispiel, Vertrieb – vertrieb@beispiel-software.de', internalNotes: 'Demo vereinbart.' },
+        testEvidences: [],
+        createdAt: '2026-11-18T09:00:00Z',
+        modifiedAt: '2026-11-18T09:00:00Z',
+        progress: { done: 36, total: 146 },
+        fulfillment: { fulfilled: 22, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 110 },
+        ...candidate,
+      },
+    }),
+  );
+  await page.route(`**/api/v1/configurations/${listId}`, (route) =>
+    route.fulfill({
+      status: 200,
+      json: {
+        id: listId,
+        organizationId: E2E_ORGANIZATION.id,
+        name: listName,
+        releaseVersion: 'T.1',
+        createdAt: '2026-11-18T09:00:00Z',
+        modifiedAt: '2026-11-18T09:00:00Z',
+        procurementProjectId: projectId,
+        selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
+        criteria: [],
+      },
+    }),
+  );
+  return { projectId, candidateId };
 }
 
 test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
@@ -299,68 +369,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
   });
 
   test('S33 with its error summary, and S34 Überblick with K1, the open legend and its tabs, need no horizontal scrolling', async ({ page }) => {
-    // Project, product and the project's copy are answered here (the criteria come from T.1), so
-    // the seeded organisation stays unchanged (owner decision S5-16 7a)
-    const projectId = '0e2e0000-0000-4000-8000-0000000000c1';
-    const candidateId = '0e2e0000-0000-4000-8000-0000000000c2';
-    const listId = '0e2e0000-0000-4000-8000-0000000000c3';
-    const projectName = 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke';
-    const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
-    // The client keeps the ETag of a project and a candidate and refuses an answer without one (API-03, S6-20).
-    await page.route(`**/api/v1/projects/${projectId}`, (route) =>
-      route.fulfill({
-        status: 200,
-        headers: { ETag: '"1-1"' },
-        json: {
-          id: projectId,
-          organizationId: E2E_ORGANIZATION.id,
-          name: projectName,
-          status: 'open',
-          productCount: 1,
-          createdAt: '2026-11-18T09:00:00Z',
-          modifiedAt: '2026-11-18T09:00:00Z',
-          criteriaList: { id: listId, name: listName, releaseVersion: 'T.1' },
-        },
-      }),
-    );
-    await page.route(`**/api/v1/candidates/${candidateId}`, (route) =>
-      route.fulfill({
-        status: 200,
-        headers: { ETag: '"1-1"' },
-        json: {
-          id: candidateId,
-          projectId,
-          organizationId: E2E_ORGANIZATION.id,
-          name: 'Bewerbermanagementsystem mit Stellenausschreibung und Terminplanung',
-          vendor: 'Beispiel Software Gesellschaft mit beschränkter Haftung',
-          website: 'https://www.beispiel-software.de/produkte/bewerbermanagement/barrierefreiheit',
-          functionalSummary: 'Bewerbermanagement, Stellenausschreibungen, Terminplanung',
-          testStatus: 'unknown',
-          privateSection: { contactNotes: 'Frau Beispiel, Vertrieb – vertrieb@beispiel-software.de', internalNotes: 'Demo vereinbart.' },
-          testEvidences: [],
-          createdAt: '2026-11-18T09:00:00Z',
-          modifiedAt: '2026-11-18T09:00:00Z',
-          progress: { done: 36, total: 146 },
-          fulfillment: { fulfilled: 22, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 110 },
-        },
-      }),
-    );
-    await page.route(`**/api/v1/configurations/${listId}`, (route) =>
-      route.fulfill({
-        status: 200,
-        json: {
-          id: listId,
-          organizationId: E2E_ORGANIZATION.id,
-          name: listName,
-          releaseVersion: 'T.1',
-          createdAt: '2026-11-18T09:00:00Z',
-          modifiedAt: '2026-11-18T09:00:00Z',
-          procurementProjectId: projectId,
-          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
-          criteria: [],
-        },
-      }),
-    );
+    const { projectId, candidateId } = await routeCandidate(page);
     await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
     const main = page.getByRole('main');
 
@@ -400,6 +409,42 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
     await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
     await selectedTabInView(2);
+    await expectReflow(page, { scrollingTabBars: true });
+  });
+
+  test('S34a with two evidence cards, „Andere Prüfung“ with its name, and its error summary needs no horizontal scrolling', async ({ page }) => {
+    const evidence = {
+      testedBy: 'Prüfstelle für barrierefreie Informationstechnik der Freien und Hansestadt Hamburg',
+      testDate: '2026-03-14',
+      testedVersion: '4.2.1-LTS (Build 2026-03-01)',
+      evidenceUrl: 'https://pruefstelle-beispiel.de/berichte/bewerbermanagementsystem/2026/barrierefreiheit.pdf',
+      qualificationNote: 'Akkreditierte Prüfstelle, langjährige Erfahrung mit Software für die Personalverwaltung',
+    };
+    const { projectId, candidateId } = await routeCandidate(page, {
+      testStatus: 'tested',
+      testEvidences: [
+        { id: '0e2e0000-0000-4000-8000-0000000000e1', etag: '"1-1"', testKind: 'procedure', testTypeId: 'softwareTest', otherTestTypeName: null, ...evidence },
+        { id: '0e2e0000-0000-4000-8000-0000000000e2', etag: '"1-1"', testKind: 'other', testTypeId: null, otherTestTypeName: 'Hausinterner Prüfleitfaden der Personalverwaltung', ...evidence },
+      ],
+    });
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    const main = page.getByRole('main');
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}/pruefnachweis`);
+    await expect(main.getByRole('heading', { level: 3, name: 'Prüfnachweis 2: Hausinterner Prüfleitfaden der Personalverwaltung' })).toBeVisible();
+    await expectReflow(page, { scrollingTabBars: true });
+
+    // The open list of „Art der Prüfung“ with the two lines of „Andere Prüfung“
+    await main.getByRole('combobox', { name: 'Art der Prüfung' }).first().click();
+    await expect(page.getByRole('option', { name: /^Andere Prüfung/ })).toBeVisible();
+    await expectReflow(page, { scrollingTabBars: true });
+    await page.keyboard.press('Escape');
+
+    // A third card sent half filled: the error summary names each field with its card (no request is sent)
+    await main.getByRole('button', { name: 'Weiteren Prüfnachweis hinzufügen' }).click();
+    await main.getByRole('textbox', { name: 'Wer hat geprüft?' }).nth(2).fill('Prüfstelle');
+    await main.getByRole('button', { name: 'Speichern' }).click();
+    await expect(main.locator('pa-error-summary pa-notice')).toBeFocused();
     await expectReflow(page, { scrollingTabBars: true });
   });
 

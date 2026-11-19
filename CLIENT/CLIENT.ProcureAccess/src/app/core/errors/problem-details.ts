@@ -21,6 +21,8 @@ export interface ProblemDetails {
   invitedEmail?: string;
   /** Of a `sole-owner` problem (409): the organisations for `account.delete.soleOwner` (SPEC §8.6 v2.45). */
   organizations?: string[];
+  /** Of a `test-status-conflict` problem (409): the evidences that block leaving „Ja“ (SPEC §8.6 v2.53). */
+  evidenceCount?: number;
 }
 
 /**

@@ -73,7 +73,25 @@ export function testStatusKey(status: TestStatus): string {
 /** The kind of a test evidence: a catalog procedure, „Andere Prüfung“ or „Eigene Prüfung ohne festes Verfahren“. */
 export type TestKind = 'procedure' | 'other' | 'own';
 
-/** A test evidence as its card in S34a shows it (S6-17 builds the card), with its private note. */
+/**
+ * The catalog procedures of „Art der Prüfung“ in catalog order (UX copy `testType.*`, Handoff §5.1
+ * S34a-J). The same five keys the catalog seeds as filter values (`FilterValueSeed.TestTypes`,
+ * which belong to no release, C104) and the server accepts as `testTypeId`. Kept here rather than
+ * read from `GET /api/v1/catalog/filter-options`, which answers 404 while no release is active
+ * (S6-17 plan); a new procedure needs a migration of the seed and new UX copy keys anyway.
+ */
+export const TEST_PROCEDURES = ['softwareTest', 'appTest', 'pdfTest', 'bikWeb', 'bikApp'] as const;
+
+/** The field limits of an evidence card as the server checks them (SPEC §7.2; `TestEvidence`, `TestEvidencePrivateNote`). */
+export const EVIDENCE_LIMITS = {
+  otherTestTypeName: 120,
+  testedBy: 200,
+  testedVersion: 200,
+  evidenceUrl: 2048,
+  qualificationNote: 2000,
+} as const;
+
+/** A test evidence as its card in S34a shows it, with its private note. */
 export interface TestEvidence {
   id: string;
   testKind: TestKind;
@@ -152,4 +170,21 @@ export interface CandidateRequest {
   functionalSummary: string;
   contactNotes: string;
   internalNotes: string;
+}
+
+/**
+ * Body of adding (`POST /api/v1/candidates/{id}/test-evidences`) and changing
+ * (`PUT /api/v1/test-evidences/{id}`) an evidence: every field of the card (S6-15). `testTypeId`
+ * only with `procedure`, `otherTestTypeName` only with `other`; an empty optional text clears it.
+ */
+export interface TestEvidenceRequest {
+  testKind: TestKind;
+  testTypeId: string | null;
+  otherTestTypeName: string | null;
+  testedBy: string;
+  /** `yyyy-MM-dd`, not after today (Europe/Berlin on the server). */
+  testDate: string;
+  testedVersion: string;
+  evidenceUrl: string;
+  qualificationNote: string;
 }

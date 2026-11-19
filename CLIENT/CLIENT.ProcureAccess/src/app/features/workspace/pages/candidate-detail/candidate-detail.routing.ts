@@ -17,6 +17,7 @@ import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { CandidateFormPage } from '../candidate-form/candidate-form';
 import { CandidateApis, CandidateLoad, CandidateView, isProjectEditor, loadCandidateView, paramOf } from './candidate-load';
 import { CandidateDetailPage } from './candidate-detail';
+import { CandidateEvidence } from './evidence/candidate-evidence';
 import { CandidateOverview } from './overview/candidate-overview';
 import { CANDIDATE_TAB_DATA, CandidateTabPlaceholder } from './tab-placeholder/candidate-tab-placeholder';
 
@@ -106,7 +107,7 @@ export const CANDIDATE_ROUTES: Routes = [
     resolve: { [PAGE_TITLE_KEY]: candidateResolver },
     children: [
       { path: CANDIDATE_TAB_SEGMENTS.overview, pathMatch: 'full', component: CandidateOverview },
-      { path: CANDIDATE_TAB_SEGMENTS.evidence, component: CandidateTabPlaceholder, data: tab('evidence') },
+      { path: CANDIDATE_TAB_SEGMENTS.evidence, component: CandidateEvidence },
       { path: CANDIDATE_TAB_SEGMENTS.assessment, component: CandidateTabPlaceholder, data: tab('assessment') },
     ],
   },

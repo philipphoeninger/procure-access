@@ -1,0 +1,120 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S34a (Figma `2022:267`, S34a-L `2144:3508`): outlined cards on surface-container-lowest as S34
+// Überblick, padding md below 600 px and lg from 600 px. The radio group in a row that wraps; in a
+// card the fields one below the other, from 600 px in pairs (Wer hat geprüft? / Datum, Version /
+// Link) at most 40rem wide; „Art der Prüfung“, the name of „Andere Prüfung“ and the private note
+// take the whole row. „Speichern“ right-aligned from 600 px, the full width below.
+:host {
+  display: block;
+}
+
+.pa-evidence__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-evidence__narrow {
+  max-inline-size: 40rem;
+}
+
+.pa-evidence__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-evidence__status {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.pa-evidence__legend {
+  padding: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-evidence__options {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--pa-space-md);
+  margin-block: var(--pa-space-xs);
+}
+
+.pa-evidence__text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-evidence__title {
+  margin: var(--pa-space-sm) 0 0;
+  font: var(--mat-sys-title-large);
+}
+
+.pa-evidence__card-title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+.pa-evidence__fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--pa-space-md);
+  row-gap: var(--pa-space-xs);
+  inline-size: 100%;
+  max-inline-size: 40rem;
+
+  @media (min-width: 37.5em) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pa-evidence__wide {
+  grid-column: 1 / -1;
+}
+
+// „Andere Prüfung“ starts the second group of the list (the frame's divider) and has a second line
+.pa-evidence__option-first {
+  border-block-start: 1px solid var(--mat-sys-outline-variant);
+}
+
+.pa-evidence__option-name,
+.pa-evidence__option-hint {
+  display: block;
+}
+
+.pa-evidence__option-hint {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pa-evidence__actions {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 37.5em) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.pa-evidence__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pa-space-xs);
+}
