@@ -4,6 +4,7 @@
 
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { NgTemplateOutlet } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -31,6 +32,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
+import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
 import { problemDetails, problemFieldErrors, problemTypeName } from '@app/core/errors/problem-details';
 import { ProcureAccessStore } from '@app/core/state/app.store';
@@ -38,6 +40,8 @@ import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm
 import { ConfirmDialog } from '@app/shared/components/confirm-dialog/confirm-dialog';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
 import { formatGermanDate, todayIsoDate } from '@app/shared/date/german-date';
+import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
+import { ChangedGroup, changesText, EditConflict } from '@app/shared/components/conflict-dialog/edit-conflict';
 import { pluralKey } from '@app/shared/pipes/translate-plural.pipe';
 
 import { Candidate, EVIDENCE_LIMITS, TEST_PROCEDURES, TestEvidence, TestStatus } from '../../../models/candidates';
@@ -73,12 +77,16 @@ const STATUSES: readonly TestStatus[] = ['tested', 'notTested', 'unknown'];
  *   candidate's tag (leaving „Ja“ removes the removed evidences with it; a 409
  *   `test-status-conflict` asks again with the server's count and repeats with `removeEvidences`),
  *   then the removed evidences with their own tags, then each card that is new (no tag) or changed
- *   (its tag), in card order (`If-Match`, API-03, S6-20; an ETag `conflict` shows the general text
- *   until S37). What the server took stays saved; a card it refused keeps its input and shows
+ *   (its tag), in card order (`If-Match`, API-03, S6-20). What the server took stays saved; a card it refused keeps its input and shows
  *   the errors (a second evidence of a procedure: `candidate.evidence.list.duplicate`, also found
  *   before sending). Success announces `candidate.evidence.saved` (D3 (a)), the focus stays.
  *   Errors follow the S20 pattern of S33: the summary takes the focus and names each card's field
  *   „Prüfnachweis n – …“; the title starts with „Fehler:“.
+ * - A 409 `conflict` (someone else changed the product or an evidence since it was read; API-03,
+ *   R-CAN-11) stops the save there and opens S37 with what is still unsaved as text — the changed
+ *   status, then each card's heading with its changed fields (S6-21). „Neue Fassung laden“ reads
+ *   the product again, fills the tab with it and moves the focus to the H1; after Escape
+ *   „Speichern“ opens S37 again without a request until then.
  * - Only Editor and Owner of a project that is not archived get the form (R-CAN-05, R-PRJ-05);
  *   the Reader view comes with S6-22 (D5 (a)), the publish button with step 6.
  *
@@ -116,6 +124,7 @@ export class CandidateEvidence {
   private readonly translate = inject(TranslateService);
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
+  private readonly pageTitle = inject(PageTitleStrategy);
 
   protected readonly statuses = STATUSES;
   protected readonly procedures = TEST_PROCEDURES;
@@ -146,6 +155,7 @@ export class CandidateEvidence {
   private nextKey = 0;
   private destroyed = false;
   private readonly matchers = new WeakMap<EvidenceCard, ErrorStateMatcher>();
+  private readonly conflict = new EditConflict();
 
   protected readonly candidate = computed<Candidate | null>(() => {
     const view = this.load.view();
@@ -301,8 +311,15 @@ export class CandidateEvidence {
       return;
     }
 
+    // After a conflict nothing is sent until the product is read again (S37)
+    if (this.conflict.blocked) {
+      await this.showConflict(candidate.id);
+      return;
+    }
+
     this.busy.set(true);
     const refused: ErrorSummaryItem[] = [];
+    let conflicted = false;
     try {
       // The status first, with the candidate's tag as it was read: adding or removing an evidence
       // changes that tag (S6-20). Leaving „Ja“ removes the evidences the user removed with it.
@@ -338,8 +355,12 @@ export class CandidateEvidence {
         }
       }
     } catch (error: unknown) {
-      this.refused(error);
-      return;
+      if (this.conflict.caught(error)) {
+        conflicted = true;
+      } else {
+        this.refused(error);
+        return;
+      }
     } finally {
       this.busy.set(false);
       // Whatever the server took shows on the other tabs too
@@ -347,6 +368,10 @@ export class CandidateEvidence {
     }
 
     this.showErrors(refused);
+    if (conflicted) {
+      if (!this.destroyed) await this.showConflict(candidate.id);
+      return;
+    }
     if (refused.length === 0) {
       this.submitted.set(false);
       void this.announcer.announce('candidate.evidence.saved');
@@ -369,6 +394,63 @@ export class CandidateEvidence {
       await this.api.changeTestStatus(candidate.id, status, true, candidate.etag);
       return true;
     }
+  }
+
+  /** S37 with what is unsaved (UX copy U189); „Neue Fassung laden“ reads the product again. */
+  private async showConflict(candidateId: string): Promise<void> {
+    const reload = await ConflictDialog.show(this.dialog, {
+      editorDisplayName: this.conflict.editorDisplayName,
+      changes: changesText(this.unsaved()),
+    });
+    if (reload && !this.destroyed) await this.reload(candidateId);
+  }
+
+  /**
+   * What the server does not hold: the status when it differs from the stored one, then each card
+   * that still needs saving under its heading with its changed fields.
+   */
+  private unsaved(): ChangedGroup[] {
+    const text = (key: string, params?: Record<string, unknown>) => this.translate.instant(key, params) as string;
+    const groups: ChangedGroup[] = [];
+    const candidate = this.candidate();
+    if (candidate !== null && this.status.value !== candidate.testStatus) {
+      groups.push({ fields: [{ label: text('candidate.evidence.tested'), value: text(this.statusKey(this.status.value)) }] });
+    }
+    if (!this.tested()) return groups;
+    this.cards().forEach((card, index) => {
+      if (!card.needsSaving()) return;
+      const heading = this.heading(card, index);
+      groups.push({
+        heading: text(heading.key, heading.params),
+        fields: card.changedFields().map((field) => ({
+          label: text(EVIDENCE_LABELS[field]),
+          value: field === 'kind' ? text(this.kindKey(card.kind.value)) : card.control(field).value.trim(),
+        })),
+      });
+    });
+    return groups;
+  }
+
+  /** „Neue Fassung laden“: the tab is filled from the stored product, the focus goes to the H1. */
+  private async reload(candidateId: string): Promise<void> {
+    this.store.incrementLoadingCount();
+    let candidate: Candidate;
+    try {
+      candidate = await this.api.get(candidateId);
+    } catch (error: unknown) {
+      const status = error instanceof HttpErrorResponse ? error.status : 0;
+      this.load.view.set(status === 404 || status === 400 ? { kind: 'notFound' } : { kind: 'server' });
+      this.pageTitle.focusPageHeading();
+      return;
+    } finally {
+      this.store.decrementLoadingCount();
+    }
+    if (this.destroyed) return;
+    this.conflict.clear();
+    this.filledFor = null;
+    // The effect fills the tab with the stored version
+    this.load.view.update((view) => (view.kind === 'candidate' ? { ...view, candidate } : view));
+    this.pageTitle.focusPageHeading();
   }
 
   private confirmRemoval(count: number): Promise<boolean> {

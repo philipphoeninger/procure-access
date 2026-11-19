@@ -16,7 +16,8 @@ import { Project, ProjectChange, ProjectCriteriaList, ProjectSummary } from '../
  * Client of the project endpoints of the Workspace module (ARCHITECTURE §7.2; S6-11). Every request
  * is marked {@link CALLER_SHOWS_FAILURES}: S30 shows a failed list as the S80 server text in place,
  * S31 every failure of creating in its error notice, S32 a failed read as S80 in place and the
- * dialog „Projekt bearbeiten“ a failed change in its error notice (S6-14); a failed assignment of a
+ * dialog „Projekt bearbeiten“ a failed change in its error notice (S6-14) and a 409 `conflict` in
+ * the conflict dialog S37 (S6-21); a failed assignment of a
  * list after creating the project shows the general notice on S32 (owner decision S6-12 D5 (b)).
  * Every answer with a project carries its `ETag`, kept as `etag`; a change of the project sends it
  * back in `If-Match` (API-03, S6-20).

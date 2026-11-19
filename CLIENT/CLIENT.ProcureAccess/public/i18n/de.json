@@ -1048,5 +1048,14 @@
         "unknown": "Nicht eingeschätzt: {{count}}"
       }
     }
+  },
+  "conflict": {
+    "title": "Inzwischen geändert",
+    "body": "{{name}} hat diesen Inhalt geändert, während Sie ihn bearbeitet haben. Ihre Änderungen sind noch nicht gespeichert.",
+    "body.unknown": "Eine andere Person hat diesen Inhalt geändert, während Sie ihn bearbeitet haben. Ihre Änderungen sind noch nicht gespeichert.",
+    "reload": "Neue Fassung laden",
+    "reload.hint": "Wenn Sie „Neue Fassung laden“ wählen, gehen Ihre Änderungen verloren. Kopieren Sie sie vorher, wenn Sie sie behalten möchten.",
+    "copy": "Meine Änderungen kopieren",
+    "copied": "Ihre Änderungen wurden kopiert."
   }
 }

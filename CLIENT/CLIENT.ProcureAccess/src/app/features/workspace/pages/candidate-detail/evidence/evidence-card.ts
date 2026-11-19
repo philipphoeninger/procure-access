@@ -117,6 +117,18 @@ export class EvidenceCard {
     return JSON.stringify(this.request()) !== JSON.stringify(requestOf(this.saved));
   }
 
+  /**
+   * The fields the user changed: of a new card every field with input, of a saved one every field
+   * that no longer shows the saved value — what S37 copies (UX copy U189, S6-21).
+   */
+  changedFields(): EvidenceField[] {
+    const before = this.saved === null ? null : shownValues(this.saved);
+    return EVIDENCE_FIELDS.filter((field) => {
+      const value = this.control(field).value.trim();
+      return before === null ? value.length > 0 : value !== before[field].trim();
+    });
+  }
+
   /** The body of the card's request (S6-15): trimmed, the procedure or the given name only with their kind. */
   request(): TestEvidenceRequest {
     const kind = this.kind.value;
@@ -134,14 +146,23 @@ export class EvidenceCard {
   }
 
   private fill(evidence: TestEvidence): void {
-    this.kind.setValue(evidence.testKind === 'procedure' ? ((evidence.testTypeId ?? '') as KindChoice) : evidence.testKind);
-    this.otherName.setValue(evidence.otherTestTypeName ?? '');
-    this.testedBy.setValue(evidence.testedBy);
-    this.testDate.setValue(formatGermanDate(evidence.testDate));
-    this.testedVersion.setValue(evidence.testedVersion ?? '');
-    this.evidenceUrl.setValue(evidence.evidenceUrl ?? '');
-    this.qualificationNote.setValue(evidence.qualificationNote ?? '');
+    const values = shownValues(evidence);
+    this.kind.setValue(values.kind as KindChoice);
+    for (const field of EVIDENCE_FIELDS) if (field !== 'kind') this.control(field).setValue(values[field]);
   }
+}
+
+/** A saved evidence as its card shows it. */
+function shownValues(evidence: TestEvidence): Record<EvidenceField, string> {
+  return {
+    kind: evidence.testKind === 'procedure' ? (evidence.testTypeId ?? '') : evidence.testKind,
+    otherName: evidence.otherTestTypeName ?? '',
+    testedBy: evidence.testedBy,
+    testDate: formatGermanDate(evidence.testDate),
+    testedVersion: evidence.testedVersion ?? '',
+    evidenceUrl: evidence.evidenceUrl ?? '',
+    qualificationNote: evidence.qualificationNote ?? '',
+  };
 }
 
 /** The body a saved evidence would send unchanged, to tell whether a card changed. */

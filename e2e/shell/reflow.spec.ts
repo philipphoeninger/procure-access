@@ -24,7 +24,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
  * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
  * Überblick with its tabs since S6-16; the project overview S32 with its menu and the dialog „Projekt
- * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19. The legacy screens are
+ * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19; the conflict dialog S37 over „Projekt bearbeiten“ since S6-21a. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -411,9 +411,10 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });
 
-  test('S32 with its list, products, the open menu and the dialog „Projekt bearbeiten“ with its error summary needs no horizontal scrolling', async ({ page }) => {
+  test('S32 with its list, products, the open menu, the dialog „Projekt bearbeiten“ with its error summary and S37 over it needs no horizontal scrolling', async ({ page }) => {
     // Project and the project's copy are answered here (the criteria come from T.1), and the dialog
-    // is only submitted empty and cancelled: the seeded organisation stays unchanged (owner decision S5-16 7a)
+    // is submitted empty, then refused with a conflict, and cancelled: the seeded organisation stays
+    // unchanged (owner decision S5-16 7a)
     const projectId = '0e2e0000-0000-4000-8000-0000000000d1';
     const listId = '0e2e0000-0000-4000-8000-0000000000d2';
     const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
@@ -430,9 +431,21 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
       fulfillment: { fulfilled: 122, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 10 },
       procedureAnswers: [],
     });
-    // The client keeps the ETag of a project and refuses an answer without one (API-03, S6-20).
+    // The client keeps the ETag of a project and refuses an answer without one (API-03, S6-20); a
+    // change is refused as stale, so S37 opens (S6-21a).
     await page.route(`**/api/v1/projects/${projectId}`, (route) =>
-      route.fulfill({
+      route.request().method() === 'PATCH'
+        ? route.fulfill({
+            status: 409,
+            contentType: 'application/problem+json',
+            body: JSON.stringify({
+              type: 'https://procureaccess.de/problems/conflict',
+              title: 'Conflict',
+              status: 409,
+              editorDisplayName: 'mitarbeiterin.der.personalverwaltung.mit.langer.adresse@stadtwerke-beispielstadt.example',
+            }),
+          })
+        : route.fulfill({
         status: 200,
         headers: { ETag: '"1-1"' },
         json: {
@@ -492,6 +505,14 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await dialog.getByRole('button', { name: 'Speichern' }).click();
     await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
     await expectReflow(page);
+
+    await name.fill('Neuer Name');
+    await dialog.getByRole('button', { name: 'Speichern' }).click();
+    const conflict = page.getByRole('alertdialog', { name: 'Inzwischen geändert' });
+    await expect(conflict.getByRole('button', { name: 'Meine Änderungen kopieren' })).toBeFocused();
+    await expectReflow(page);
+    await page.keyboard.press('Escape');
+    await expect(conflict).toBeHidden();
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
   });
 

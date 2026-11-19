@@ -15,6 +15,8 @@ import { distinctUntilChanged, skip } from 'rxjs';
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { CatalogApiService } from '@app/features/configurator/services/api/catalog-api.service';
+import { ConfiguratorApiService } from '@app/features/configurator/services/api/configurator-api.service';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { Breadcrumb, BreadcrumbItem } from '@app/shared/components/breadcrumb/breadcrumb';
 import { Notice } from '@app/shared/components/notice/notice';
@@ -23,9 +25,10 @@ import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plur
 
 import { candidatePath, newCandidatePath, testStatusKey } from '../../models/candidates';
 import { Project, ProjectCandidate, ProjectEvidenceType, projectCriteriaListPath, PROJECTS_PATH, statusKey } from '../../models/projects';
-import { EditProjectDialog } from '../../dialogs/edit-project-dialog/edit-project-dialog';
+import { EditProjectDialog, RELOAD_PROJECT } from '../../dialogs/edit-project-dialog/edit-project-dialog';
+import { ProjectsApiService } from '../../services/api/projects-api.service';
 import { isProjectEditor } from '../candidate-detail/candidate-load';
-import { ProjectLoad, ProjectView } from './project-detail-load';
+import { loadProjectView, ProjectLoad, ProjectView } from './project-detail-load';
 
 /**
  * S32 · Projektübersicht at `/projekte/:id` (R-PRJ-03, R-PRJ-05; Handoff §5.1 S32; Figma 360
@@ -52,6 +55,8 @@ import { ProjectLoad, ProjectView } from './project-detail-load';
  *   „Abgleich“ is a list of all seven counts in the fixed order of the scale, label first, zeros
  *   included, no total (SIG-08, SIG-13). Nothing sorts or filters by the counts (D3). Progress and
  *   counts are left out while the project has no list. No product: `projects.detail.empty`.
+ * - „Neue Fassung laden“ of the conflict dialog S37 over „Projekt bearbeiten“ (R-CAN-11, S6-21)
+ *   reads the project again in place, with the loading bar, and moves the focus to the H1.
  * - Archived: read-only (R-PRJ-05) — no menu, no „Kriterienliste anpassen“; „Projekt bearbeiten“
  *   stays for the status.
  * - When the header switches to another organisation, S30 of that organisation opens (S6-13 open
@@ -78,6 +83,9 @@ export class ProjectDetailPage {
   private readonly translate = inject(TranslateService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly projectsApi = inject(ProjectsApiService);
+  private readonly configuratorApi = inject(ConfiguratorApiService);
+  private readonly catalogApi = inject(CatalogApiService);
 
   protected readonly view = signal<ProjectView>(this.load.view);
   /** The criteria S11 of the copy took into the list on the way here; 0 shows nothing. */
@@ -148,14 +156,34 @@ export class ProjectDetailPage {
     return candidate.testEvidences.map((evidence) => this.evidenceTypeName(evidence)).join(', ');
   }
 
-  /** „Projekt bearbeiten“: the changed project replaces the shown one; the list facts stay. */
+  /**
+   * „Projekt bearbeiten“: the changed project replaces the shown one; the list facts stay. After
+   * „Neue Fassung laden“ in S37 the project is read again.
+   */
   protected edit(project: Project): void {
     EditProjectDialog.open(this.dialog, project)
       .afterClosed()
-      .subscribe((changed) => {
+      .subscribe((result) => {
+        if (result === RELOAD_PROJECT) {
+          void this.reload(project.id);
+          return;
+        }
         const view = this.view();
-        if (changed !== undefined && view.kind === 'project') this.view.set({ ...view, project: changed });
+        if (result !== undefined && view.kind === 'project') this.view.set({ ...view, project: result });
       });
+  }
+
+  /** Reads the project and the facts of its list again (S37 „Neue Fassung laden“), then the focus to the H1. */
+  private async reload(id: string): Promise<void> {
+    this.store.incrementLoadingCount();
+    try {
+      this.view.set(
+        await loadProjectView({ projects: this.projectsApi, configurator: this.configuratorApi, catalog: this.catalogApi }, id),
+      );
+    } finally {
+      this.store.decrementLoadingCount();
+    }
+    this.pageTitle.focusPageHeading();
   }
 
   private evidenceTypeName(evidence: ProjectEvidenceType): string {

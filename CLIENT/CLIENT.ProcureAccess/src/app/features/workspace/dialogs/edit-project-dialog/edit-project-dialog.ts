@@ -18,6 +18,8 @@ import { ErrorSummaryItem, TextKey } from '@app/core/errors/error-summary-item';
 import { applyServerErrors, problemTypeName } from '@app/core/errors/problem-details';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ConfirmRequiredNotice } from '@app/features/identity/components/confirm-required-notice/confirm-required-notice';
+import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
+import { changesText, ChangedField, EditConflict } from '@app/shared/components/conflict-dialog/edit-conflict';
 import { ErrorSummary } from '@app/shared/components/error-summary/error-summary';
 import { Notice } from '@app/shared/components/notice/notice';
 
@@ -33,6 +35,12 @@ function nameLength(control: AbstractControl<string>): ValidationErrors | null {
 
 /** A failure the dialog shows in its error notice above the actions (Handoff §5.1 S13-E). */
 type ChangeError = 'failed' | 'archived' | 'antiforgery';
+
+/** The dialog closes with this when the user chose „Neue Fassung laden“ in S37: S32 reads the project again. */
+export const RELOAD_PROJECT = 'reload';
+
+/** What the dialog closes with: the changed project, {@link RELOAD_PROJECT}, or nothing. */
+export type EditProjectResult = Project | typeof RELOAD_PROJECT;
 
 /**
  * Dialog „Projekt bearbeiten“ of S32 (R-PRJ-05; owner decision S6-14 D1 (a), UX copy v44; Handoff
@@ -50,8 +58,12 @@ type ChangeError = 'failed' | 'archived' | 'antiforgery';
  * - The change names the project's tag (`If-Match`, API-03). 403 `email-unconfirmed` (SEC-10)
  *   shows `pa-confirm-required-notice`, which takes the focus; 409 `project-archived` (archived
  *   meanwhile) shows `projects.archived.note`; `antiforgery` its text; a field error at `name` shows
- *   at the field; any other failure — also 409 `conflict` until S37 (S6-21) — `projects.edit.error`
- *   under the title `projects.edit.error.title`.
+ *   at the field; any other failure `projects.edit.error` under the title
+ *   `projects.edit.error.title`.
+ * - 409 `conflict` (someone else changed the project since it was read; API-03, R-CAN-11) opens
+ *   S37 over this dialog with the changed name and status as text (S6-21). „Neue Fassung laden“
+ *   closes both with {@link RELOAD_PROJECT}; Escape returns to this dialog, whose „Speichern“ then
+ *   opens S37 again without a request until the project is read again.
  *
  * Below 600 px the dialog fills the screen and stacks its actions in DOM order (S13-M).
  *
@@ -79,7 +91,7 @@ type ChangeError = 'failed' | 'archived' | 'antiforgery';
 })
 export class EditProjectDialog {
   /** Opens the dialog for `project`; it closes with the changed project, or nothing. */
-  static open(dialog: MatDialog, project: Project): MatDialogRef<EditProjectDialog, Project> {
+  static open(dialog: MatDialog, project: Project): MatDialogRef<EditProjectDialog, EditProjectResult> {
     return dialog.open(EditProjectDialog, {
       data: project,
       // Archived: no name field; the focus goes to the chosen status, as Tab would reach it.
@@ -93,7 +105,8 @@ export class EditProjectDialog {
   private readonly store = inject(ProcureAccessStore);
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly translate = inject(TranslateService);
-  private readonly dialogRef = inject<MatDialogRef<EditProjectDialog, Project>>(MatDialogRef);
+  private readonly dialogRef = inject<MatDialogRef<EditProjectDialog, EditProjectResult>>(MatDialogRef);
+  private readonly dialog = inject(MatDialog);
   private readonly injector = inject(Injector);
   private readonly confirmNotice = viewChild<ElementRef<HTMLElement>>('confirmNotice');
 
@@ -114,6 +127,7 @@ export class EditProjectDialog {
   protected readonly confirmationRequired = signal(false);
 
   private readonly submitted = signal(false);
+  private readonly conflict = new EditConflict();
   private destroyed = false;
 
   /** Field errors show after the first submit (Handoff §6.4), server errors at once. */
@@ -170,12 +184,20 @@ export class EditProjectDialog {
 
     this.summary.set([]);
     this.error.set(null);
+    // After a conflict nothing is sent until the project is read again (S37)
+    if (this.conflict.blocked) {
+      await this.showConflict(change);
+      return;
+    }
     this.busy.set(true);
     let changed: Project;
     try {
       changed = await this.store.changeProject(this.project.id, change, this.project.etag);
     } catch (error: unknown) {
-      if (!this.destroyed) this.refused(error);
+      this.busy.set(false);
+      if (this.destroyed) return;
+      if (this.conflict.caught(error)) await this.showConflict(change);
+      else this.refused(error);
       return;
     } finally {
       this.busy.set(false);
@@ -183,6 +205,19 @@ export class EditProjectDialog {
 
     this.dialogRef.close(changed);
     void this.announcer.announce('projects.edit.saved');
+  }
+
+  /** S37 with the changed fields; „Neue Fassung laden“ closes this dialog too, so S32 reads the project again. */
+  private async showConflict(change: ProjectChange): Promise<void> {
+    const fields: ChangedField[] = [];
+    const label = (key: string) => this.translate.instant(key) as string;
+    if (change.name !== undefined) fields.push({ label: label('projects.create.name'), value: change.name });
+    if (change.status !== undefined) fields.push({ label: label('projects.status.label'), value: label(statusKey(change.status)) });
+    const reload = await ConflictDialog.show(this.dialog, {
+      editorDisplayName: this.conflict.editorDisplayName,
+      changes: changesText([{ fields }]),
+    });
+    if (reload && !this.destroyed) this.dialogRef.close(RELOAD_PROJECT);
   }
 
   private refused(error: unknown): void {

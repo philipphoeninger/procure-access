@@ -9,7 +9,7 @@ import { TestBed } from '@angular/core/testing';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { fireEvent } from '@testing-library/dom';
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import { of } from 'rxjs';
 
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
@@ -18,6 +18,7 @@ import { OrganizationRole } from '@app/features/organization/models/organization
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 
+import { Candidate } from '../../models/candidates';
 import { CandidatesApiService } from '../../services/api/candidates-api.service';
 import { candidateView, TEST_CANDIDATE, TEST_PROJECT } from '../../testing/candidate-fixtures';
 import { CandidateLoad, CandidateView } from '../candidate-detail/candidate-load';
@@ -38,11 +39,18 @@ describe('CandidateFormPage (S33, R-CAN-02)', () => {
   let create: ReturnType<typeof vi.fn>;
   let change: ReturnType<typeof vi.fn>;
   let setPageTitleState: ReturnType<typeof vi.fn>;
+  let focusPageHeading: ReturnType<typeof vi.fn>;
+  let get: ReturnType<typeof vi.fn>;
 
-  async function openForm(view: CandidateView = NEW_VIEW, { role = 'editor', api }: { role?: OrganizationRole; api?: ReturnType<typeof vi.fn> } = {}) {
+  async function openForm(
+    view: CandidateView = NEW_VIEW,
+    { role = 'editor', api, stored }: { role?: OrganizationRole; api?: ReturnType<typeof vi.fn>; stored?: Candidate } = {},
+  ) {
     create = api ?? vi.fn().mockResolvedValue(TEST_CANDIDATE);
     change = api ?? vi.fn().mockResolvedValue(TEST_CANDIDATE);
+    get = vi.fn().mockResolvedValue(stored ?? TEST_CANDIDATE);
     setPageTitleState = vi.fn();
+    focusPageHeading = vi.fn();
     const load = new CandidateLoad();
     load.view.set(view);
     const rendered = await render(CandidateFormPage, {
@@ -51,9 +59,16 @@ describe('CandidateFormPage (S33, R-CAN-02)', () => {
         provideTestTranslations(),
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
         { provide: CandidateLoad, useValue: load },
-        { provide: CandidatesApiService, useValue: { create, change } },
-        { provide: PageTitleStrategy, useValue: { setPageTitleState } },
-        { provide: ProcureAccessStore, useValue: { organizations: signal([{ id: 'org-1', name: 'Personalamt', type: 'publicBody', role }]) } },
+        { provide: CandidatesApiService, useValue: { create, change, get } },
+        { provide: PageTitleStrategy, useValue: { setPageTitleState, focusPageHeading } },
+        {
+          provide: ProcureAccessStore,
+          useValue: {
+            organizations: signal([{ id: 'org-1', name: 'Personalamt', type: 'publicBody', role }]),
+            incrementLoadingCount: vi.fn(),
+            decrementLoadingCount: vi.fn(),
+          },
+        },
         { provide: BreakpointObserver, useValue: { observe: () => of({ matches: true }), isMatched: () => true } },
       ],
     });
@@ -165,6 +180,71 @@ describe('CandidateFormPage (S33, R-CAN-02)', () => {
       internalNotes: 'Demo am 20.10.2026 vereinbart.',
     }, TEST_CANDIDATE.etag);
     expect(TestBed.inject(Router).url).toBe('/projekte/p-1/produkte/c-1');
+  });
+
+  describe('409 conflict when editing (R-CAN-11, S37)', () => {
+    const conflict = () => problem(409, { type: `${base}conflict`, status: 409, editorDisplayName: 'a.schmidt@example.test' });
+    const stored: Candidate = { ...TEST_CANDIDATE, etag: '"1-7"', vendor: 'Neuer Anbieter AG' };
+
+    it('INV:API-03 opens S37; after Escape „Speichern“ sends nothing and opens S37 again', async () => {
+      const { fixture } = await openForm(candidateView({ criteria: null }), { api: vi.fn().mockRejectedValue(conflict()) });
+
+      type('Anbieter (optional)', 'Meine GmbH');
+      await save(fixture);
+
+      const s37 = screen.getByRole('alertdialog', { name: 'Inzwischen geändert' });
+      expect(s37.textContent).toContain('a.schmidt@example.test hat diesen Inhalt geändert');
+      // No error summary: S37 is the only message
+      expect(document.querySelector('pa-error-summary')?.textContent?.trim() ?? '').toBe('');
+
+      fireEvent.keyDown(s37, { key: 'Escape', code: 'Escape', keyCode: 27 });
+      await fixture.whenStable();
+      await new Promise((resolve) => setTimeout(resolve));
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(field('Anbieter (optional)').value).toBe('Meine GmbH');
+
+      await save(fixture);
+      expect(change).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy();
+    });
+
+    it('copies the changed fields with their labels', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      try {
+        const { fixture } = await openForm(candidateView({ criteria: null }), { api: vi.fn().mockRejectedValue(conflict()) });
+        type('Anbieter (optional)', 'Meine GmbH');
+        type('Interne Notizen (optional)', 'Rückruf am Montag');
+        await save(fixture);
+
+        within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Meine Änderungen kopieren' }).click();
+        await fixture.whenStable();
+        await new Promise((resolve) => setTimeout(resolve));
+
+        expect(writeText).toHaveBeenCalledWith('Anbieter: Meine GmbH\nInterne Notizen: Rückruf am Montag');
+      } finally {
+        Reflect.deleteProperty(navigator, 'clipboard');
+      }
+    });
+
+    it('„Neue Fassung laden“ reads the product, fills the form with it, focuses the H1 and saves again with its tag', async () => {
+      const { fixture } = await openForm(candidateView({ criteria: null }), { api: vi.fn().mockRejectedValue(conflict()), stored });
+
+      type('Anbieter (optional)', 'Meine GmbH');
+      await save(fixture);
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neue Fassung laden' }).click();
+      await fixture.whenStable();
+      await new Promise((resolve) => setTimeout(resolve));
+      await fixture.whenStable();
+
+      expect(get).toHaveBeenCalledWith(TEST_CANDIDATE.id);
+      expect(field('Anbieter (optional)').value).toBe('Neuer Anbieter AG');
+      expect(focusPageHeading).toHaveBeenCalled();
+
+      change.mockResolvedValue(stored);
+      await save(fixture);
+      expect(change).toHaveBeenLastCalledWith(TEST_CANDIDATE.id, expect.objectContaining({ vendor: 'Neuer Anbieter AG' }), '"1-7"');
+    });
   });
 
   it('INV:API-02 shows a server field error at its field and in the error summary', async () => {
