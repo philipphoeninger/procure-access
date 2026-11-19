@@ -105,17 +105,23 @@ test.describe('Products of a project S33, S34', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's34-evidence-tab');
 
-    // S34a (S6-17, R-CAN-05, WSP-01): „Ja“ shows the first card; one evidence of a procedure is saved
-    const status = main(page).getByRole('radiogroup');
-    await expect(main(page).getByRole('radio', { name: 'Nicht bekannt' })).toBeChecked();
-    await main(page).getByRole('radio', { name: 'Ja' }).check();
-    await expect(main(page).getByRole('heading', { level: 3, name: 'Prüfnachweis 1' })).toBeVisible();
-    await main(page).getByRole('combobox', { name: 'Art der Prüfung' }).click();
-    await page.getByRole('option', { name: 'BIT inklusiv Software-Test' }).click();
-    await expect(main(page).getByRole('heading', { level: 3, name: 'Prüfnachweis 1: BIT inklusiv Software-Test' })).toBeVisible();
-    await main(page).getByRole('textbox', { name: 'Wer hat geprüft?' }).fill('Prüfstelle Beispiel');
-    await main(page).getByRole('textbox', { name: 'Datum der Prüfung' }).fill('14.03.2026');
-    await main(page).getByRole('textbox', { name: 'Geprüfte Version (optional)' }).fill('4.2');
+    // S34a (S6-17, R-CAN-05, WSP-01): „Ja“ shows the first card; one evidence of a procedure is saved.
+    // Up to the last axe run of S34a the form is found by CSS: Playwright's name lookups of form
+    // fields followed by axe crash Firefox's page process now and then (TESTING V226, V367); the
+    // names are checked by the component tests and by axe. Buttons are found by role (V165).
+    const radio = (status: string) => main(page).locator(`#pa-evidence-status-${status} input[type="radio"]`);
+    const card = (index: number) => main(page).locator('.pa-evidence__card:has(.pa-evidence__card-title)').nth(index);
+    const field = (index: number, name: string) => card(index).locator(`[name="${name}"]`);
+    const option = (name: string) => page.locator('mat-option', { hasText: name });
+    await expect(radio('unknown')).toBeChecked();
+    await radio('tested').check();
+    await expect(card(0).locator('h3')).toHaveText('Prüfnachweis 1');
+    await card(0).locator('mat-select').click();
+    await option('BIT inklusiv Software-Test').click();
+    await expect(card(0).locator('h3')).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
+    await field(0, 'testedBy').fill('Prüfstelle Beispiel');
+    await field(0, 'testDate').fill('14.03.2026');
+    await field(0, 'testedVersion').fill('4.2');
     const savedEvidence = page.waitForResponse(
       (response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/test-evidences'),
     );
@@ -128,12 +134,11 @@ test.describe('Products of a project S33, S34', () => {
 
     // A second card with the same procedure is refused before sending (`candidate.evidence.list.duplicate`)
     await main(page).getByRole('button', { name: 'Weiteren Prüfnachweis hinzufügen' }).press('Enter');
-    const secondKind = main(page).getByRole('combobox', { name: 'Art der Prüfung' }).nth(1);
-    await expect(secondKind).toBeFocused();
-    await secondKind.click();
-    await page.getByRole('option', { name: 'BIT inklusiv Software-Test' }).click();
-    await main(page).getByRole('textbox', { name: 'Wer hat geprüft?' }).nth(1).fill('Eigene Prüfung');
-    await main(page).getByRole('textbox', { name: 'Datum der Prüfung' }).nth(1).fill('01.04.2026');
+    await expect(card(1).locator('mat-select')).toBeFocused();
+    await card(1).locator('mat-select').click();
+    await option('BIT inklusiv Software-Test').click();
+    await field(1, 'testedBy').fill('Eigene Prüfung');
+    await field(1, 'testDate').fill('01.04.2026');
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
     await main(page).getByRole('button', { name: 'Speichern' }).press('Enter');
     await expect(main(page).locator('pa-error-summary pa-notice')).toBeFocused();
@@ -144,23 +149,24 @@ test.describe('Products of a project S33, S34', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's34a-duplicate');
     await main(page).getByRole('button', { name: 'Prüfnachweis 2 entfernen' }).press('Enter');
-    await expect(main(page).getByRole('heading', { level: 3, name: 'Prüfnachweis 1: BIT inklusiv Software-Test' })).toBeFocused();
+    await expect(card(0).locator('h3')).toBeFocused();
 
     // Leaving „Ja“ with an evidence asks first (`candidate.evidence.list.statusChange`)
-    await status.getByRole('radio', { name: 'Nein' }).check();
+    await radio('notTested').check();
     const dialog = page.getByRole('dialog');
-    await expect(dialog.getByRole('heading', { name: 'Prüfnachweise entfernen?' })).toBeFocused();
+    await expect(dialog.locator('h2')).toHaveText('Prüfnachweise entfernen?');
+    await expect(dialog.locator('h2')).toBeFocused();
     await expect(dialog).toContainText('Ihr Prüfnachweis wird dabei entfernt. Möchten Sie fortfahren?');
     await settled(dialog);
     await expectNoAxeViolations(page, testInfo, 's34a-status-change');
     await dialog.getByRole('button', { name: 'Nachweise entfernen' }).press('Enter');
     await expect(dialog).toBeHidden();
-    await expect(main(page).getByRole('heading', { level: 2, name: 'Prüfnachweise' })).toBeHidden();
-    const removed = page.waitForResponse((response) => response.request().method() === 'DELETE');
+    await expect(main(page).locator('.pa-evidence__title')).toHaveCount(0);
+    // One request: leaving „Ja“ removes the evidence with the status (the candidate's tag, S6-20)
     const statusSaved = page.waitForResponse((response) => new URL(response.url()).pathname.endsWith('/test-status'));
     await main(page).getByRole('button', { name: 'Speichern' }).press('Enter');
-    expect((await removed).status()).toBe(204);
     expect((await statusSaved).status()).toBe(200);
+    await expect(page.locator('.cdk-live-announcer-element')).toHaveText('Prüfnachweis gespeichert.');
 
     await tabs.first().press('Enter');
     await expect(page).toHaveTitle(`Überblick – BewerberPro – ${project} – ProcureAccess`);

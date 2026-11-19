@@ -88,6 +88,14 @@
   grid-column: 1 / -1;
 }
 
+// A floated label longer than its field („Ihre Notiz zur Qualifikation der prüfenden Stelle
+// (optional)“ at 320 px) is cut off with an ellipsis by Material, but browsers still count its full
+// text as overflow of the page (A11Y-09, CI of #418). `clip` keeps that inside the field without
+// making it a scroll container; nothing visible changes. The cut label is open point 7 of S6-17.
+.pa-evidence__fields > mat-form-field {
+  overflow-x: clip;
+}
+
 // „Andere Prüfung“ starts the second group of the list (the frame's divider) and has a second line
 .pa-evidence__option-first {
   border-block-start: 1px solid var(--mat-sys-outline-variant);
