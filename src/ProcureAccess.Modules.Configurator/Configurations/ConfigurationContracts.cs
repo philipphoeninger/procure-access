@@ -44,7 +44,8 @@ internal sealed record ConfigurationResponse(
     DateTimeOffset ModifiedAt,
     Guid? ProcurementProjectId,
     ConfigurationSelectionResponse Selection,
-    IReadOnlyList<ConfigurationCriterionResponse> Criteria);
+    IReadOnlyList<ConfigurationCriterionResponse> Criteria,
+    [property: JsonIgnore] string Etag);
 
 /// <summary>The selection by the value keys of the pinned release, named as in the request and the criteria endpoint.</summary>
 internal sealed record ConfigurationSelectionResponse(
@@ -67,12 +68,22 @@ internal sealed record ConfigurationCriterionResponse(
     string? Note);
 
 /// <summary>A list as S14 lists it (owner decision S5-20 3a: no creator).</summary>
+/// <param name="Etag">
+/// The <c>ETag</c> of the list, for <c>If-Match</c> when S14 deletes it (API-03; S6-20b). A member
+/// of the body, because the answer holds many lists.
+/// </param>
 internal sealed record ConfigurationSummaryResponse(
     Guid Id,
     string Name,
     string ReleaseVersion,
     DateTimeOffset CreatedAt,
-    DateTimeOffset ModifiedAt);
+    DateTimeOffset ModifiedAt,
+    string Etag);
+
+/// <summary>Who changes a saved list and which version they have seen (API-03; S6-20b).</summary>
+/// <param name="UserId">The signed-in user, stored as the editor of the new version.</param>
+/// <param name="IfMatch">The <c>If-Match</c> header; the endpoint has refused a missing one (428).</param>
+internal sealed record ListEdit(string UserId, string IfMatch);
 
 /// <summary>
 /// Body of <c>PATCH /api/v1/configurations/{id}/criteria/{criterionRevisionId}</c> (R-SAV-03): the

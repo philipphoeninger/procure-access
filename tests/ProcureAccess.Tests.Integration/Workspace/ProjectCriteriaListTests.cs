@@ -309,11 +309,11 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         var excluded = criteria[0]!["revisionId"]!.GetValue<int>();
         var prioritised = criteria[1]!["revisionId"]!.GetValue<int>();
 
-        using var exclude = await client.PatchAsJsonAsync(
+        using var exclude = await client.PatchListAsync(
             CriterionPath(copy.Id, excluded), new { isIncluded = false, note = "Für dieses Projekt nicht nötig" }, Cancellation);
-        using var priority = await client.PatchAsJsonAsync(
+        using var priority = await client.PatchListAsync(
             CriterionPath(copy.Id, prioritised), new { isIncluded = true, overrideLevel = "Info" }, Cancellation);
-        using var includeAgain = await client.PatchAsJsonAsync(
+        using var includeAgain = await client.PatchListAsync(
             CriterionPath(copy.Id, excluded), new { isIncluded = true, note = "Doch nötig" }, Cancellation);
 
         foreach (var response in new[] { exclude, priority, includeAgain })
@@ -348,11 +348,11 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         await AssessAsync(client, first.Id, assessed, "fulfilled", "Prüfbericht");
         var before = await ReadAssessmentsAsync(client, first.Id);
 
-        using var exclude = await client.PatchAsJsonAsync(CriterionPath(copy.Id, assessed), new { isIncluded = false }, Cancellation);
+        using var exclude = await client.PatchListAsync(CriterionPath(copy.Id, assessed), new { isIncluded = false }, Cancellation);
         exclude.StatusCode.ShouldBe(HttpStatusCode.NoContent, await exclude.Content.ReadAsStringAsync(Cancellation));
         var whileExcluded = await ReadAssessmentsAsync(client, first.Id);
-        using var includeNew = await client.PatchAsJsonAsync(CriterionPath(copy.Id, newlyIncluded), new { isIncluded = true }, Cancellation);
-        using var includeAgain = await client.PatchAsJsonAsync(CriterionPath(copy.Id, assessed), new { isIncluded = true }, Cancellation);
+        using var includeNew = await client.PatchListAsync(CriterionPath(copy.Id, newlyIncluded), new { isIncluded = true }, Cancellation);
+        using var includeAgain = await client.PatchListAsync(CriterionPath(copy.Id, assessed), new { isIncluded = true }, Cancellation);
 
         includeNew.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         includeAgain.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -390,7 +390,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         selection["releaseVersion"] = MiniCatalog.T1Version;
         selection["useCaseTemplateId"] = null;
 
-        using var response = await client.PutAsJsonAsync(
+        using var response = await client.PutListAsync(
             $"{ConfigurationsPath}/{copy.Id}/selection", new JsonObject { ["selection"] = selection }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict, await response.Content.ReadAsStringAsync(Cancellation));
@@ -406,7 +406,7 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         using var client = CreateClient(TestUsers.OwnerA);
         var copy = await AssignAsync(client, project.Id, sourceId);
 
-        using var delete = await client.DeleteAsync($"{ConfigurationsPath}/{copy.Id}", Cancellation);
+        using var delete = await client.DeleteListAsync($"{ConfigurationsPath}/{copy.Id}", Cancellation);
         using var copyToRelease = await client.PostAsJsonAsync($"{ConfigurationsPath}/{copy.Id}/copies", new { release = "active" }, Cancellation);
 
         foreach (var response in new[] { delete, copyToRelease })

@@ -19,7 +19,8 @@ import { selectionOf } from './saved-list-load';
  */
 @Injectable()
 export class SavedListSelection {
-  list: { id: string; release: string } | null = null;
+  /** With the tag the list was read at, for the `If-Match` of the selection change (API-03, S6-20b). */
+  list: { id: string; release: string; etag: string } | null = null;
 }
 
 /**
@@ -51,7 +52,7 @@ export const savedListSelectionGuard: CanActivateFn = async (route) => {
       store.endSavedListSelection();
       return back;
     }
-    context.list = { id: list.id, release: list.releaseVersion };
+    context.list = { id: list.id, release: list.releaseVersion, etag: list.etag };
     return true;
   } catch {
     return back;

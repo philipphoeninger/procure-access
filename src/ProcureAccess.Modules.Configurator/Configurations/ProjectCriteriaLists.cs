@@ -25,10 +25,14 @@ internal sealed class ProjectCriteriaLists(ConfiguratorDbContext db, TimeProvide
         {
             return await ReplaceAsync(sourceConfigurationId, projectId, organizationId, userId, cancellationToken);
         }
-        catch (DbUpdateException exception) when (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        catch (DbUpdateException exception) when (
+            exception is DbUpdateConcurrencyException
+            || exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
             // Two first assignments at once: the one that loses the insert replaces the winner's
-            // copy, as a later assignment would (the last change wins until API-03, S6-20).
+            // copy, as a later assignment would. Or the copy to replace got a new version (a
+            // decision on S11) or went since it was loaded: the replacement does not depend on the
+            // copy's version — the project's If-Match guards the assignment (API-03, S6-20).
             db.ChangeTracker.Clear();
             return await ReplaceAsync(sourceConfigurationId, projectId, organizationId, userId, cancellationToken);
         }

@@ -70,6 +70,18 @@ internal sealed class CriteriaConfiguration
     /// <summary>When the list or one of its decisions last changed; the creation time until then.</summary>
     public DateTimeOffset ModifiedAt { get; private set; }
 
+    /// <summary>
+    /// Counts the changes of the list — a decision, the selection (<see cref="MarkEdited"/>); the
+    /// concurrency token of the row and, with the 🔧 epoch, the <c>ETag</c> (API-03, API-04; S6-20b).
+    /// </summary>
+    public int Version { get; private set; }
+
+    /// <summary>
+    /// The user id (IdentityAccess) of who made <see cref="Version"/>, the competing editor of a 409
+    /// <c>conflict</c>; <c>null</c> for a row older than S6-20b. No foreign key across contexts (ADR-014).
+    /// </summary>
+    public string? ModifiedByUserId { get; private set; }
+
     public IReadOnlyList<ConfigurationAppType> AppTypes => _appTypes;
 
     public IReadOnlyList<ConfigurationProductPart> ProductParts => _productParts;
@@ -127,6 +139,8 @@ internal sealed class CriteriaConfiguration
             CreatedByUserId = createdByUserId,
             CreatedAt = createdAt,
             ModifiedAt = createdAt,
+            Version = 1,
+            ModifiedByUserId = createdByUserId,
         };
         configuration._appTypes.AddRange(appTypeKeys.Select(key => new ConfigurationAppType(key)));
         configuration._productParts.AddRange(productPartKeys.Select(key => new ConfigurationProductPart(key)));
@@ -168,6 +182,17 @@ internal sealed class CriteriaConfiguration
                 c.CriterionRevisionId, c.ResolvedLevel, c.IsIncluded, c.OverrideLevel, c.OverrideWeight, c.NoteDe))]);
         copy.ProcurementProjectId = projectId;
         return copy;
+    }
+
+    /// <summary>
+    /// Counts a decision or a selection change by <paramref name="userId"/>: a new
+    /// <see cref="Version"/>, so every <c>ETag</c> issued before is stale (API-03).
+    /// </summary>
+    public void MarkEdited(string userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        Version++;
+        ModifiedByUserId = userId;
     }
 
     /// <summary>

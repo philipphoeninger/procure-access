@@ -82,7 +82,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         Clock.Advance(TimeSpan.FromHours(1));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
+        using var response = await client.PatchListAsync(
             CriterionPath(id, revision), new { isIncluded = true, overrideLevel = "B", overrideWeight = 8, note = "Mit Anbieter klären" }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent, await response.Content.ReadAsStringAsync(Cancellation));
@@ -94,7 +94,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
             c => c.OverrideWeight.ShouldBe(8),
             c => c.Note.ShouldBe("Mit Anbieter klären"));
 
-        using var excluded = await client.PatchAsJsonAsync(
+        using var excluded = await client.PatchListAsync(
             CriterionPath(id, revision), new { isIncluded = false, overrideLevel = "Info" }, Cancellation);
 
         excluded.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -114,7 +114,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         using var client = CreateClient(TestUsers.EditorA);
         var before = await ReadRawAsync(client, id);
 
-        using var response = await client.PatchAsJsonAsync(
+        using var response = await client.PatchListAsync(
             CriterionPath(id, revision),
             new { overrideLevel = "C", overrideWeight = 99, note = new string('n', 1001) },
             Cancellation);
@@ -130,9 +130,9 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var recommendedA = criteria.First(c => c!["resolvedPriority"]!["level"]!.GetValue<string>() == "A")!["revisionId"]!.GetValue<int>();
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var withoutLevel = await client.PatchAsJsonAsync(
+        using var withoutLevel = await client.PatchListAsync(
             CriterionPath(id, recommendedA), new { isIncluded = true, overrideWeight = 3 }, Cancellation);
-        using var withB = await client.PatchAsJsonAsync(
+        using var withB = await client.PatchListAsync(
             CriterionPath(id, recommendedA), new { isIncluded = true, overrideLevel = "B", overrideWeight = 3 }, Cancellation);
 
         await ShouldBeProblemAsync(withoutLevel, ProblemTypes.Validation, "overrideWeight");
@@ -145,7 +145,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var (id, criteria) = await SaveAsync(TestUsers.OwnerA, WebSelection);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
+        using var response = await client.PatchListAsync(
             CriterionPath(id, RevisionOf(criteria, Keys.DefaultOnly)), new { isIncluded = true, resolvedLevel = "Info" }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -159,7 +159,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var other = await CriteriaAsync(anonymous, MiniCatalog.T1Version, HrAudioSelection, Cancellation);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
+        using var response = await client.PatchListAsync(
             CriterionPath(id, RevisionOf(other, Keys.AudioOnly)), new { isIncluded = false }, Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -172,7 +172,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         await ActivateAsync(MiniCatalog.T2Version);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PatchAsJsonAsync(
+        using var response = await client.PatchListAsync(
             CriterionPath(id, RevisionOf(criteria, Keys.DefaultOnly)), new { isIncluded = false }, Cancellation);
 
         // Owner decision S5-21 5a: the criteria of an older list stay editable; only its selection is fixed.
@@ -268,7 +268,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         Clock.Advance(TimeSpan.FromHours(1));
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PutAsJsonAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation);
+        using var response = await client.PutListAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         var answer = (await response.Content.ReadFromJsonAsync<ChangedSelection>(Cancellation)).ShouldNotBeNull();
@@ -302,7 +302,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         await ActivateAsync(MiniCatalog.T2Version);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PutAsJsonAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation);
+        using var response = await client.PutListAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation);
 
         await ShouldBeProblemAsync(response, ProblemTypes.ReleaseMismatch, "selection.releaseVersion");
     }
@@ -313,7 +313,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var (id, _) = await SaveAsync(TestUsers.OwnerA, WebSelection);
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.PutAsJsonAsync(
+        using var response = await client.PutListAsync(
             SelectionPath(id), SelectionBody(HrAudioSelection, MiniCatalog.T2Version), Cancellation);
 
         await ShouldBeProblemAsync(response, ProblemTypes.ReleaseMismatch, "selection.releaseVersion");
@@ -328,7 +328,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var selection = (JsonObject)HrAudioSelection.DeepClone();
         selection["productPartIds"] = new JsonArray("base", "video"); // HR excludes video in T.1
 
-        using var response = await client.PutAsJsonAsync(SelectionPath(id), SelectionBody(selection), Cancellation);
+        using var response = await client.PutListAsync(SelectionPath(id), SelectionBody(selection), Cancellation);
 
         await ShouldBeProblemAsync(response, ProblemTypes.SelectionExcluded, "selection.productPartIds[1]");
     }
@@ -343,7 +343,7 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         selection["useCaseTemplateId"] = "databaseApplication";
         selection["testTypeIds"] = new JsonArray();
 
-        using var response = await client.PutAsJsonAsync(SelectionPath(id), SelectionBody(selection), Cancellation);
+        using var response = await client.PutListAsync(SelectionPath(id), SelectionBody(selection), Cancellation);
 
         await ShouldBeProblemAsync(response, ProblemTypes.Validation, "selection.useCaseTemplateId");
     }
@@ -355,8 +355,8 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
         var (other, _) = await SaveAsync(TestUsers.OwnerA, WebSelection, name: "Andere Liste");
         using var client = CreateClient(TestUsers.EditorA);
 
-        using var response = await client.DeleteAsync($"{Path}/{id}", Cancellation);
-        using var again = await client.DeleteAsync($"{Path}/{id}", Cancellation);
+        using var response = await client.DeleteListAsync($"{Path}/{id}", Cancellation);
+        using var again = await client.DeleteListAsync($"{Path}/{id}", Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         again.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -472,9 +472,9 @@ public sealed class SavedListChangeTests(ApiFixture api) : IntegrationTest(api),
     /// <summary>The request of a change of the list <paramref name="id"/>, valid for an Editor of its organisation.</summary>
     private static Task<HttpResponseMessage> SendAsync(HttpClient client, string action, Guid id, int revision) => action switch
     {
-        "decide" => client.PatchAsJsonAsync(CriterionPath(id, revision), new { isIncluded = false }, Cancellation),
-        "selection" => client.PutAsJsonAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation),
-        "delete" => client.DeleteAsync($"{Path}/{id}", Cancellation),
+        "decide" => client.PatchListAsync(CriterionPath(id, revision), new { isIncluded = false }, Cancellation),
+        "selection" => client.PutListAsync(SelectionPath(id), SelectionBody(HrAudioSelection), Cancellation),
+        "delete" => client.DeleteListAsync($"{Path}/{id}", Cancellation),
         "copy" => client.PostAsJsonAsync($"{Path}/{id}/copies", new { release = "active" }, Cancellation),
         _ => throw new ArgumentOutOfRangeException(nameof(action), action, "Unknown action."),
     };

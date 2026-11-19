@@ -4,6 +4,8 @@
 
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql;
 using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.Platform.Persistence;
@@ -75,6 +77,43 @@ public sealed class ConfiguratorMigrationTests(ApiFixture api) : IAsyncDisposabl
 
         await using var configurator = Configurator(connectionString);
         (await configurator.Database.GetAppliedMigrationsAsync(cancellationToken)).ShouldBe(configurator.Database.GetMigrations());
+    }
+
+    /// <summary>
+    /// S6-20b (API-03): a list stored before <c>ListVersions</c> gets version 1 and no editor, so
+    /// its first ETag is the one of a new list.
+    /// </summary>
+    [Fact(DisplayName = "INV:OPS-03 " + nameof(ListVersions_ListStoredBefore_StartsAtVersionOneWithoutAnEditor))]
+    [Trait("Invariant", "OPS-03")]
+    public async Task ListVersions_ListStoredBefore_StartsAtVersionOneWithoutAnEditor()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = NewDatabase();
+        await using (var legacy = Legacy(connectionString))
+        {
+            await legacy.Database.MigrateAsync(cancellationToken);
+        }
+
+        await using var configurator = Configurator(connectionString);
+        await configurator.GetService<IMigrator>().MigrateAsync("ProjectCopies", cancellationToken);
+        await using (var connection = new NpgsqlConnection(connectionString))
+        {
+            await connection.OpenAsync(cancellationToken);
+            await using var insert = new NpgsqlCommand(
+                $"""
+                INSERT INTO configurator."CriteriaConfigurations"
+                    ("Id", "OrganizationId", "Name", "ReleaseVersion", "CreatedByUserId", "CreatedAt", "ModifiedAt")
+                VALUES ('{Guid.NewGuid()}', '{Guid.NewGuid()}', 'Liste', 'T.1', 'user', now(), now())
+                """,
+                connection);
+            await insert.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await configurator.Database.MigrateAsync(cancellationToken);
+
+        (await ScalarAsync(connectionString, """
+            SELECT count(*) FROM configurator."CriteriaConfigurations" WHERE "Version" = 1 AND "ModifiedByUserId" IS NULL
+            """)).ShouldBe(1);
     }
 
     public async ValueTask DisposeAsync()

@@ -17,6 +17,7 @@ import { savedListResolver } from './saved-list.routing';
 
 const LIST: SavedList = {
   id: 'list-1',
+  etag: '"1-1"',
   organizationId: 'org-1',
   name: 'Vergabe Personalsoftware 2027',
   releaseVersion: 'T.1',
