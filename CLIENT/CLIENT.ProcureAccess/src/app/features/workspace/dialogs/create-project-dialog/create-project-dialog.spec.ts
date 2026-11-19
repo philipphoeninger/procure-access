@@ -43,7 +43,7 @@ const CREATED: Project = {
 };
 
 function savedList(id: string, name: string): SavedListSummary {
-  return { id, name, releaseVersion: 'T.1', createdAt: '2026-11-10T09:00:00Z', modifiedAt: '2026-11-10T09:00:00Z' };
+  return { id, name, releaseVersion: 'T.1', createdAt: '2026-11-10T09:00:00Z', modifiedAt: '2026-11-10T09:00:00Z', etag: '"1-1"' };
 }
 
 function problem(status: number, body: object): HttpErrorResponse {

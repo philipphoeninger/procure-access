@@ -542,10 +542,10 @@ export class CriteriaSelect {
    * Saves the checked selection on the saved list (R-SAV-03) and opens the list with the decisions
    * that were dropped. A failure keeps the page; the error interceptor shows it.
    */
-  private async saveSelectionOfSavedList(list: { id: string; release: string }): Promise<void> {
+  private async saveSelectionOfSavedList(list: { id: string; release: string; etag: string }): Promise<void> {
     const selection = toCriteriaSelection(this.store.configurator.draft());
     try {
-      const changed = await this.configurator.changeSelection(list.id, {
+      const request = {
         selection: {
           releaseVersion: list.release,
           ...(selection.useCase === undefined ? {} : { useCaseTemplateId: selection.useCase }),
@@ -553,7 +553,8 @@ export class CriteriaSelect {
           productPartIds: [...selection.productPartIds],
           testTypeIds: [...selection.testTypeIds],
         },
-      });
+      };
+      const changed = await this.configurator.changeSelection(list.id, request, list.etag);
       const state: SavedListNavigationState = {
         savedListArrival: { kind: 'selectionChanged', droppedDecisions: changed.droppedDecisions },
       };

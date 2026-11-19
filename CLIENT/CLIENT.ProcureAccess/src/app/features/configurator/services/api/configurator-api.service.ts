@@ -5,6 +5,7 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { API_URL } from '@app/app.config';
+import { ifMatch, withEtag } from '@app/core/concurrency/etag';
 import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { lastValueFrom } from 'rxjs';
 
@@ -66,13 +67,17 @@ export class ConfiguratorApiService {
     return created.id;
   }
 
-  /** A saved list of an organisation the user belongs to; 404 for any other (TEN-01). */
+  /**
+   * A saved list of an organisation the user belongs to, with the `ETag` of the answer as `etag`
+   * (API-03, S6-20b); 404 for any other (TEN-01).
+   */
   get(id: string): Promise<SavedList> {
     return lastValueFrom(
-      this.http.get<SavedList>(`${this.apiUrl}/v1/configurations/${encodeURIComponent(id)}`, {
+      this.http.get<Omit<SavedList, 'etag'>>(`${this.apiUrl}/v1/configurations/${encodeURIComponent(id)}`, {
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+        observe: 'response',
       }),
-    );
+    ).then(withEtag);
   }
 
   /** The lists of the organisation for S14 (R-SAV-02), the most recently changed first. */
@@ -85,21 +90,33 @@ export class ConfiguratorApiService {
     );
   }
 
-  /** Saves the decision on one criterion of a saved list (R-SAV-03); a failure shows the general error. */
-  decide(id: string, criterionRevisionId: number, decision: SavedListDecisionRequest): Promise<unknown> {
+  /**
+   * Saves the decision on one criterion of a saved list (R-SAV-03) as a change of the list read at
+   * `etag`, and resolves to the list's new tag for the next change (API-03, S6-20b). A failure —
+   * also a 409 `conflict` until S37 (S6-21) — shows the general error.
+   */
+  async decide(id: string, criterionRevisionId: number, decision: SavedListDecisionRequest, etag: string): Promise<string> {
+    const response = await lastValueFrom(
+      this.http.patch(`${this.listUrl(id)}/criteria/${criterionRevisionId}`, decision, {
+        headers: ifMatch(etag),
+        observe: 'response',
+      }),
+    );
+    const next = response.headers.get('ETag');
+    if (next === null) throw new Error('The answer of a saved decision has no ETag.');
+    return next;
+  }
+
+  /** „Auswahl ändern“ (R-SAV-03): the new selection under the list's release, for the list read at `etag` (API-03). */
+  changeSelection(id: string, request: SavedListSelectionRequest, etag: string): Promise<ChangedSelection> {
     return lastValueFrom(
-      this.http.patch(`${this.listUrl(id)}/criteria/${criterionRevisionId}`, decision),
+      this.http.put<ChangedSelection>(`${this.listUrl(id)}/selection`, request, { headers: ifMatch(etag) }),
     );
   }
 
-  /** „Auswahl ändern“ (R-SAV-03): the new selection under the list's release. */
-  changeSelection(id: string, request: SavedListSelectionRequest): Promise<ChangedSelection> {
-    return lastValueFrom(this.http.put<ChangedSelection>(`${this.listUrl(id)}/selection`, request));
-  }
-
-  /** Deletes a saved list (R-SAV-06); a failure shows the general error. */
-  delete(id: string): Promise<unknown> {
-    return lastValueFrom(this.http.delete(this.listUrl(id)));
+  /** Deletes a saved list as it was read at `etag` (R-SAV-06, API-03); a failure shows the general error. */
+  delete(id: string, etag: string): Promise<unknown> {
+    return lastValueFrom(this.http.delete(this.listUrl(id), { headers: ifMatch(etag) }));
   }
 
   /** „Neue Liste mit derselben Auswahl“ (R-LST-14, CAT-22): a copy on the active release. */

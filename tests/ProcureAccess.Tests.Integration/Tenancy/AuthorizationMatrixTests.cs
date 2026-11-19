@@ -603,11 +603,11 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             SaveList => await client.PostAsJsonAsync(ConfigurationsPath, await SaveBodyAsync(client), Cancellation),
             ReadList => await client.GetAsync($"{ConfigurationsPath}/{_listOfA!.Id}", Cancellation),
             ListLists => await client.GetAsync($"{ConfigurationsPath}?organizationId={a}", Cancellation),
-            DecideInList => await client.PatchAsJsonAsync(
+            DecideInList => await client.PatchListAsync(
                 $"{ConfigurationsPath}/{_listOfA!.Id}/criteria/{RevisionOfListOfA}", new { isIncluded = false }, Cancellation),
-            ChangeSelection => await client.PutAsJsonAsync(
+            ChangeSelection => await client.PutListAsync(
                 $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T1Version)}/selection", ChangeSelectionBody(), Cancellation),
-            DeleteList => await client.DeleteAsync($"{ConfigurationsPath}/{_listOfA!.Id}", Cancellation),
+            DeleteList => await client.DeleteListAsync($"{ConfigurationsPath}/{_listOfA!.Id}", Cancellation),
             CopyList => await client.PostAsJsonAsync(
                 $"{ConfigurationsPath}/{await SavedListOfAAsync(MiniCatalog.T2Version)}/copies", new { release = "active" }, Cancellation),
             ExportList => await client.PostAsJsonAsync(

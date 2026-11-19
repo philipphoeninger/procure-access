@@ -33,6 +33,7 @@ const PROJECT: Project = {
 
 const COPY: SavedList = {
   id: 'copy-1',
+  etag: '"1-1"',
   organizationId: 'org-1',
   name: 'HR-Software 2027',
   releaseVersion: 'T.1',

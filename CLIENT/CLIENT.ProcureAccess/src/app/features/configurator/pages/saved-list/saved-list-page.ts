@@ -358,7 +358,7 @@ export class SavedListPage {
     this.announcedFilter = undefined;
     const view = this.load.view;
     if (view.kind === 'list') {
-      this.editor.start(view.list.id, view.criteria.criteria, view.decisions);
+      this.editor.start(view.list.id, view.list.etag, view.criteria.criteria, view.decisions);
     }
     this.view.set(view);
     const state = this.router.currentNavigation()?.extras.state as SavedListNavigationState | undefined;

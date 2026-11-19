@@ -40,9 +40,14 @@ namespace ProcureAccess.Modules.Configurator.Configurations;
 /// <para><b>Changes (S5-21a).</b> Changing, deleting and copying a list take the organisation from
 /// the stored list and need Editor on it (404 non-member, 403 Reader), a confirmed address (SEC-10)
 /// and antiforgery. A project's copy (C53, S6-12) is read and its criteria are changed here as on
-/// any list (C51); its selection change, its deletion and its copy answer 409 <c>project-copy</c>.
-/// No <c>ETag</c>/<c>If-Match</c> yet: the concurrency of shared resources comes
-/// with API-03 in migration step 5 (owner decision S5-21 2a); until then the last change wins.</para>
+/// any list (C51); its selection change, its deletion and its copy answer 409 <c>project-copy</c>.</para>
+/// <para><b>Concurrency (API-03, API-04; S6-20b).</b> <c>GET /configurations/{id}</c> answers with
+/// the list's <c>ETag</c>; the lists of S14 name theirs as <c>etag</c>. Changing a decision,
+/// changing the selection and deleting need it in <c>If-Match</c>: 428 <c>precondition-required</c>
+/// without the header (after the role check, before the validation), 409 <c>conflict</c> with
+/// <c>editorDisplayName</c> for a stale one — also when another change lands while this one is
+/// saved, and before <c>project-copy</c>. The answers of the two changes carry the new tag.
+/// Saving a new list and copying one need none.</para>
 /// <para><b>Ids.</b> No route constraint on <c>{id}</c>, so a malformed id answers 400
 /// <c>validation</c> like every other bad input (API-01), as the organisation endpoints do.</para>
 /// </remarks>
@@ -53,6 +58,7 @@ internal static class ConfigurationEndpoints
     /// <summary>As the anonymous export (SPEC §7.2 „body ≤ 1 MB“): the same draft plus a name.</summary>
     public const long MaxRequestBodySize = 1024 * 1024;
 
+    private const string IfMatchHeader = "If-Match";
     private const string OrganizationField = "organizationId";
     private const string NameField = "name";
 
@@ -108,15 +114,19 @@ internal static class ConfigurationEndpoints
                       .WithName("PatchConfigurationCriterion")
                       .WithSummary("Changes the decision on one criterion of a saved list (Editor or Owner)")
                       .WithDescription(
-                          "204. The body is the whole decision { isIncluded, overrideLevel, overrideWeight, note }, keyed as a " +
+                          "204 with the list's new ETag. Needs If-Match with the ETag of the list. The body is the whole decision " +
+                          "{ isIncluded, overrideLevel, overrideWeight, note }, keyed as a " +
                           "row of the save request; also on a list of an older release. 400 validation; 400 antiforgery; 401; " +
                           "403 email-unconfirmed or below Editor; 404 for an unknown list, one of another organisation or a " +
-                          "criterion that is not on the list.")
+                          "criterion that is not on the list; 409 conflict with editorDisplayName for a stale If-Match; 428 " +
+                          "precondition-required without If-Match.")
                       .Accepts<ConfigurationDecisionBody>("application/json")
                       .Produces(StatusCodes.Status204NoContent)
                       .ProducesValidationProblem()
                       .ProducesProblem(StatusCodes.Status403Forbidden)
-                      .ProducesProblem(StatusCodes.Status404NotFound);
+                      .ProducesProblem(StatusCodes.Status404NotFound)
+                      .ProducesProblem(StatusCodes.Status409Conflict)
+                      .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         configurations.MapPut("/{id}/selection", ChangeSelectionAsync)
                       .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
@@ -128,8 +138,9 @@ internal static class ConfigurationEndpoints
                           "left with the old selection; decisions of criteria that stay are kept. Only while the list's release " +
                           "is active. 400 validation (also an inactive use case), selection-excluded or release-mismatch (another " +
                           "release, or the list's release is no longer active); 400 antiforgery; 401; 403 email-unconfirmed or " +
-                          "below Editor; 404 for an unknown list or one of another organisation; 409 project-copy for a project's " +
-                          "list, whose selection is fixed.")
+                          "below Editor; 404 for an unknown list or one of another organisation; 409 conflict with editorDisplayName " +
+                          "for a stale If-Match; 409 project-copy for a project's list, whose selection is fixed; 428 " +
+                          "precondition-required without If-Match (the ETag of the list; the answer carries the new one).")
                       .Accepts<ChangeSelectionBody>("application/json")
                       .Produces<ChangedSelection>()
                       .ProducesValidationProblem()
@@ -142,9 +153,10 @@ internal static class ConfigurationEndpoints
                       .WithName("DeleteConfiguration")
                       .WithSummary("Deletes a saved list (Editor or Owner)")
                       .WithDescription(
-                          "204. Project copies are not affected. 400 antiforgery; 401; 403 email-unconfirmed or below Editor; " +
-                          "404 for an unknown list or one of another organisation; 409 project-copy for a project's list, which goes " +
-                          "only when the project's list is replaced.")
+                          "204. Needs If-Match with the ETag of the list. Project copies are not affected. 400 antiforgery; 401; " +
+                          "403 email-unconfirmed or below Editor; 404 for an unknown list or one of another organisation; 409 " +
+                          "conflict with editorDisplayName for a stale If-Match; 409 project-copy for a project's list, which goes " +
+                          "only when the project's list is replaced; 428 precondition-required without If-Match.")
                       .Produces(StatusCodes.Status204NoContent)
                       .ProducesProblem(StatusCodes.Status403Forbidden)
                       .ProducesProblem(StatusCodes.Status404NotFound)
@@ -228,10 +240,17 @@ internal static class ConfigurationEndpoints
     private static async Task<Results<Ok<ConfigurationResponse>, ProblemHttpResult>> GetAsync(
         Guid id,
         ConfigurationService configurations,
-        CancellationToken cancellationToken) =>
-        await configurations.FindAsync(id, cancellationToken) is { } list
-            ? TypedResults.Ok(list)
-            : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+        HttpResponse response,
+        CancellationToken cancellationToken)
+    {
+        if (await configurations.FindAsync(id, cancellationToken) is not { } list)
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+        }
+
+        response.Headers.ETag = list.Etag;
+        return TypedResults.Ok(list);
+    }
 
     private static async Task<IResult> ListAsync(
         [FromQuery] Guid? organizationId,
@@ -259,9 +278,12 @@ internal static class ConfigurationEndpoints
         Guid id,
         int criterionRevisionId,
         ConfigurationDecisionBody body,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ConfigurationService configurations,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
@@ -269,16 +291,25 @@ internal static class ConfigurationEndpoints
             return refused;
         }
 
-        var result = await configurations.DecideAsync(id, criterionRevisionId, body, cancellationToken);
-        return result.Outcome == EditOutcome.Done ? TypedResults.NoContent() : ProblemOf(result);
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return PreconditionRequired();
+        }
+
+        var result = await configurations.DecideAsync(
+            id, criterionRevisionId, body, new ListEdit(UserIdOf(user), ifMatch), cancellationToken);
+        return await AnswerAsync(result, TypedResults.NoContent(), users, response, cancellationToken);
     }
 
     private static async Task<IResult> ChangeSelectionAsync(
         Guid id,
         ChangeSelectionBody body,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ConfigurationService configurations,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
@@ -286,16 +317,24 @@ internal static class ConfigurationEndpoints
             return refused;
         }
 
-        var result = await configurations.ChangeSelectionAsync(id, body.Selection, cancellationToken);
-        return result.Outcome == EditOutcome.Done ? TypedResults.Ok(result.Value) : ProblemOf(result);
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return PreconditionRequired();
+        }
+
+        var result = await configurations.ChangeSelectionAsync(
+            id, body.Selection, new ListEdit(UserIdOf(user), ifMatch), cancellationToken);
+        return await AnswerAsync(result, TypedResults.Ok(result.Value), users, response, cancellationToken);
     }
 
     private static async Task<IResult> DeleteAsync(
         Guid id,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         ConfigurationService configurations,
         IShareLinks links,
+        IUserDirectory users,
         CancellationToken cancellationToken)
     {
         if (await RefusedForListAsync(authorization, user, configurations, id, cancellationToken) is { } refused)
@@ -303,7 +342,17 @@ internal static class ConfigurationEndpoints
             return refused;
         }
 
-        var result = await configurations.DeleteAsync(id, cancellationToken);
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return PreconditionRequired();
+        }
+
+        var result = await configurations.DeleteAsync(id, new ListEdit(UserIdOf(user), ifMatch), cancellationToken);
+        if (result.Outcome == EditOutcome.Conflict)
+        {
+            return await ConflictAsync(users, result.EditorUserId, cancellationToken);
+        }
+
         if (result.Outcome != EditOutcome.Done)
         {
             return ProblemOf(result);
@@ -354,6 +403,57 @@ internal static class ConfigurationEndpoints
         await configurations.OrganizationOfAsync(id, cancellationToken) is { } organizationId
             ? await RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor)
             : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, type: ProblemTypes.NotFound);
+
+    /// <summary>
+    /// The answer of a change that needed <c>If-Match</c>: <paramref name="done"/> with the list's
+    /// new <c>ETag</c>, 409 <c>conflict</c> with the editor's name, or <see cref="ProblemOf{T}"/>.
+    /// </summary>
+    private static async Task<IResult> AnswerAsync<T>(
+        EditResult<T> result, IResult done, IUserDirectory users, HttpResponse response, CancellationToken cancellationToken)
+    {
+        switch (result.Outcome)
+        {
+            case EditOutcome.Done:
+                response.Headers.ETag = result.Etag;
+                return done;
+            case EditOutcome.Conflict:
+                return await ConflictAsync(users, result.EditorUserId, cancellationToken);
+            default:
+                return ProblemOf(result);
+        }
+    }
+
+    /// <summary>
+    /// 428 <c>precondition-required</c>: a change of a saved list without <c>If-Match</c> (API-03;
+    /// owner decision S6-20 D3 (a)).
+    /// </summary>
+    private static ProblemHttpResult PreconditionRequired() =>
+        TypedResults.Problem(
+            detail: "Send the ETag of the version you read in If-Match.",
+            statusCode: StatusCodes.Status428PreconditionRequired,
+            type: ProblemTypes.PreconditionRequired);
+
+    /// <summary>
+    /// 409 <c>conflict</c> for a stale <c>If-Match</c> (API-03), with the display name of who made
+    /// the stored version as <c>editorDisplayName</c> for S37 — <c>null</c> when the row names
+    /// nobody or the account is gone. The caller has checked that the request's user may edit the
+    /// list (<see cref="IUserDirectory"/>).
+    /// </summary>
+    private static async Task<ProblemHttpResult> ConflictAsync(
+        IUserDirectory users, string? editorUserId, CancellationToken cancellationToken)
+    {
+        string? name = null;
+        if (editorUserId is not null)
+        {
+            (await users.GetDisplayNamesAsync([editorUserId], cancellationToken)).TryGetValue(editorUserId, out name);
+        }
+
+        return TypedResults.Problem(
+            detail: "The content has changed since you read it.",
+            statusCode: StatusCodes.Status409Conflict,
+            type: ProblemTypes.Conflict,
+            extensions: new Dictionary<string, object?>(StringComparer.Ordinal) { ["editorDisplayName"] = name });
+    }
 
     private static IResult ProblemOf<T>(EditResult<T> result) => result.Outcome switch
     {

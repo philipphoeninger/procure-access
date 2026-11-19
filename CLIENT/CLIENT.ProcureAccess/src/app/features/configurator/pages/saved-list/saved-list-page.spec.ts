@@ -35,6 +35,7 @@ function answer(): CriteriaResponse {
 
 const LIST: SavedList = {
   id: 'list-1',
+  etag: '"1-1"',
   organizationId: 'org-1',
   name: 'Vergabe Personalsoftware 2027',
   releaseVersion: 'T.1',
@@ -82,7 +83,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
   }: { view?: SavedListView; role?: OrganizationRole | null } = {}) {
     setPageTitleState = vi.fn();
     announce = vi.fn().mockResolvedValue(undefined);
-    decide = vi.fn().mockResolvedValue(null);
+    decide = vi.fn().mockResolvedValue('"1-2"');
     copyToActiveRelease = vi.fn().mockResolvedValue({ id: 'list-2', releaseVersion: 'T.2', droppedValues: [], notCarried: [] });
     paramMap = new BehaviorSubject(convertToParamMap({ id: 'list-1' }));
     noteCriteriaAdded = vi.fn();
@@ -192,7 +193,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
       within(card('Überschriften')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
       await fixture.whenStable();
 
-      expect(decide).toHaveBeenCalledWith('list-1', 202, { isIncluded: false, overrideLevel: 'A', overrideWeight: null, note: null });
+      expect(decide).toHaveBeenCalledWith('list-1', 202, { isIncluded: false, overrideLevel: 'A', overrideWeight: null, note: null }, '\"1-1\"');
       expect(card('Überschriften').textContent).toContain('Nicht in Ihrer Liste');
       expect(announce).toHaveBeenCalledWith('criteria.list.status.count', { included: 2, total: 4 }, { throttleMs: 1000 });
     });
@@ -362,7 +363,7 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
 
       within(card('Bilder haben einen Alternativtext')).getByRole('checkbox', { name: /^In Liste aufnehmen/ }).click();
       await fixture.whenStable();
-      expect(decide).toHaveBeenCalledWith('list-1', 200, { isIncluded: true, overrideLevel: null, overrideWeight: null, note: null });
+      expect(decide).toHaveBeenCalledWith('list-1', 200, { isIncluded: true, overrideLevel: null, overrideWeight: null, note: null }, '\"1-1\"');
 
       fixture.destroy();
       expect(noteCriteriaAdded).toHaveBeenCalledWith('project-1', 1);

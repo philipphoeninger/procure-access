@@ -22,12 +22,12 @@ const A: OrganizationSummary = { id: 'org-a', name: 'Stadt Musterhausen', type: 
 const B: OrganizationSummary = { id: 'org-b', name: 'Verein Beispiel', type: 'association', role: 'owner' };
 
 const LISTS_A: SavedListSummary[] = [
-  { id: 'l-1', name: 'Zeiterfassung', releaseVersion: 'T.1', createdAt: '2026-11-10T09:00:00Z', modifiedAt: '2026-11-15T09:00:00Z' },
-  { id: 'l-2', name: 'Ärztliche Software', releaseVersion: 'T.1', createdAt: '2026-11-14T09:00:00Z', modifiedAt: '2026-11-14T09:00:00Z' },
-  { id: 'l-3', name: 'Bürgerportal', releaseVersion: 'T.2', createdAt: '2026-11-12T09:00:00Z', modifiedAt: '2026-11-12T09:00:00Z' },
+  { id: 'l-1', name: 'Zeiterfassung', releaseVersion: 'T.1', createdAt: '2026-11-10T09:00:00Z', modifiedAt: '2026-11-15T09:00:00Z', etag: '\"1-1\"' },
+  { id: 'l-2', name: 'Ärztliche Software', releaseVersion: 'T.1', createdAt: '2026-11-14T09:00:00Z', modifiedAt: '2026-11-14T09:00:00Z', etag: '\"1-1\"' },
+  { id: 'l-3', name: 'Bürgerportal', releaseVersion: 'T.2', createdAt: '2026-11-12T09:00:00Z', modifiedAt: '2026-11-12T09:00:00Z', etag: '\"1-1\"' },
 ];
 const LISTS_B: SavedListSummary[] = [
-  { id: 'l-9', name: 'Liste von B', releaseVersion: 'T.1', createdAt: '2026-11-15T09:00:00Z', modifiedAt: '2026-11-15T09:00:00Z' },
+  { id: 'l-9', name: 'Liste von B', releaseVersion: 'T.1', createdAt: '2026-11-15T09:00:00Z', modifiedAt: '2026-11-15T09:00:00Z', etag: '\"1-1\"' },
 ];
 
 describe('SavedListsPage (S14, R-SAV-02)', () => {
@@ -189,7 +189,7 @@ describe('SavedListsPage (S14, R-SAV-02)', () => {
         bodyParams: { name: 'Zeiterfassung' },
         confirmKey: 'criteria.saved.delete.confirm',
       });
-      expect(remove).toHaveBeenCalledWith('l-1');
+      expect(remove).toHaveBeenCalledWith('l-1', '"1-1"');
       expect(announce).toHaveBeenCalledWith('criteria.saved.deleted', { name: 'Zeiterfassung' });
       expect(names()).toEqual(['Ärztliche Software', 'Bürgerportal']);
       confirm.mockRestore();
@@ -218,7 +218,7 @@ describe('sortSavedLists', () => {
   });
 
   it('breaks a tie of one key with the other', () => {
-    const same = LISTS_A.map((l) => ({ ...l, modifiedAt: '2026-11-10T09:00:00Z' }));
+    const same = LISTS_A.map((l) => ({ ...l, modifiedAt: '2026-11-10T09:00:00Z', etag: '\"1-1\"' }));
     expect(sortSavedLists(same, 'modified', collator).map((l) => l.name)).toEqual(['Ärztliche Software', 'Bürgerportal', 'Zeiterfassung']);
   });
 });
