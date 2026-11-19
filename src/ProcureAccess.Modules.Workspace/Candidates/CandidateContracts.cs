@@ -73,6 +73,7 @@ internal sealed record TestEvidenceBody(
 /// <param name="ModifiedAt">The last change of the facts, the private section, the test status, an evidence or an assessment.</param>
 /// <param name="Progress">How many requirement criteria of the project's list are assessed (S6-18); <c>null</c> while the project has no list.</param>
 /// <param name="Fulfillment">The seven counts (C34, SIG-13); <c>null</c> while the project has no list.</param>
+/// <param name="Etag">The <c>ETag</c> header of the answer (API-03; S6-20); not a member of the body.</param>
 internal sealed record CandidateResponse(
     Guid Id,
     Guid ProjectId,
@@ -87,7 +88,8 @@ internal sealed record CandidateResponse(
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt,
     AssessmentProgressResponse? Progress,
-    FulfillmentCountsResponse? Fulfillment);
+    FulfillmentCountsResponse? Fulfillment,
+    [property: JsonIgnore] string Etag);
 
 /// <summary>The private section of a candidate; never published (PRV-01, PRV-02).</summary>
 internal sealed record CandidatePrivateSectionResponse(string? ContactNotes, string? InternalNotes);
@@ -95,6 +97,11 @@ internal sealed record CandidatePrivateSectionResponse(string? ContactNotes, str
 /// <summary>A test evidence as its card in S34a shows it, with its private note.</summary>
 /// <param name="TestKind"><c>procedure</c>, <c>other</c> or <c>own</c>.</param>
 /// <param name="TestTypeId">The key of the catalog procedure; <c>null</c> unless <c>procedure</c>.</param>
+/// <param name="Etag">
+/// The <c>ETag</c> of the evidence, for <c>If-Match</c> when it is changed or removed (API-03;
+/// S6-20). A member of the body, because an evidence is read only inside its candidate, whose
+/// header is the candidate's tag.
+/// </param>
 internal sealed record TestEvidenceResponse(
     Guid Id,
     string TestKind,
@@ -104,7 +111,8 @@ internal sealed record TestEvidenceResponse(
     DateOnly TestDate,
     string? TestedVersion,
     string? EvidenceUrl,
-    string? QualificationNote);
+    string? QualificationNote,
+    string Etag);
 
 /// <summary>
 /// A candidate in the product list of a project (S32), in the order they were added, with its

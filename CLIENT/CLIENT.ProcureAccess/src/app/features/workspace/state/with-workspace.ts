@@ -112,11 +112,12 @@ export const withWorkspace = () =>
 
         /**
          * Changes the name, the status or both (R-PRJ-05; S32's dialog „Projekt bearbeiten“, S6-14)
-         * and updates the project in the loaded list of its organisation, so S30 shows the change
-         * without a new load. Rejects with the error of the request; the dialog shows it.
+         * of the project read with `etag` (API-03) and updates the project in the loaded list of its
+         * organisation, so S30 shows the change without a new load. Rejects with the error of the
+         * request; the dialog shows it.
          */
-        async changeProject(id: string, change: ProjectChange): Promise<Project> {
-          const project = await api.change(id, change);
+        async changeProject(id: string, change: ProjectChange, etag: string): Promise<Project> {
+          const project = await api.change(id, change, etag);
           const projects = store.workspace.projects();
           if (projects.organizationId === project.organizationId && projects.status === 'loaded') {
             const { name, status, productCount, modifiedAt } = project;
@@ -128,11 +129,12 @@ export const withWorkspace = () =>
         },
 
         /**
-         * Gives the project its own copy of an organisation list (R-PRJ-02, R-PRJ-04). Rejects with
-         * the error of the request; the caller shows it.
+         * Gives the project its own copy of an organisation list (R-PRJ-02, R-PRJ-04), as a change
+         * of the project read with `projectEtag` (API-03). Rejects with the error of the request;
+         * the caller shows it.
          */
-        assignCriteriaList(projectId: string, sourceConfigurationId: string): Promise<ProjectCriteriaList> {
-          return api.assignCriteriaList(projectId, sourceConfigurationId);
+        assignCriteriaList(projectId: string, sourceConfigurationId: string, projectEtag: string): Promise<ProjectCriteriaList> {
+          return api.assignCriteriaList(projectId, sourceConfigurationId, projectEtag);
         },
 
         /**

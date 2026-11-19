@@ -196,19 +196,27 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await first.uncheck();
     expect((await excluded).ok()).toBe(true);
 
+    // From here on CSS locators instead of accessible names: once axe has run on S11, Firefox's
+    // page process crashes at Playwright's name lookup — since S6-14 also of S32's H1 (TESTING V165,
+    // V368). The names are checked by the unit tests and by axe.
+    const heading = main(page).locator('h1');
+
     // Leaving out is no addition: S32 shows no report
     await page.goBack();
-    await expect(main(page).getByRole('heading', { level: 1, name: project })).toBeFocused();
+    await expect(heading).toHaveText(project);
+    await expect(heading).toBeFocused();
     await expect(main(page)).not.toContainText('neu in der Liste');
 
-    await main(page).getByRole('link', { name: 'Kriterienliste anpassen' }).press('Enter');
-    await expect(main(page).getByRole('heading', { level: 1, name: 'HR-Software 2027' })).toBeFocused();
+    await main(page).locator('a', { hasText: 'Kriterienliste anpassen' }).press('Enter');
+    await expect(heading).toHaveText('HR-Software 2027');
+    await expect(heading).toBeFocused();
     const included = decide(true);
     await main(page).locator('pa-criterion-card').first().getByRole('checkbox').check();
     expect((await included).ok()).toBe(true);
 
     await page.goBack();
-    await expect(main(page).getByRole('heading', { level: 1, name: project })).toBeFocused();
+    await expect(heading).toHaveText(project);
+    await expect(heading).toBeFocused();
     await expect(main(page)).toContainText('1 Kriterium neu in der Liste. Es ist bei allen Produkten noch nicht eingeschätzt.');
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's32-criteria-added');
@@ -216,7 +224,7 @@ test.describe('Procurement projects S30, S31, S32', () => {
     // The copy has one address, its project's (owner decision S6-12 D7 (a))
     await page.goto(`/kriterienlisten/${copyId}`);
     await expect(page).toHaveURL(/\/projekte\/[0-9a-f-]{36}\/kriterienliste$/);
-    await expect(main(page).getByRole('heading', { level: 1, name: 'HR-Software 2027' })).toBeVisible();
+    await expect(heading).toHaveText('HR-Software 2027');
   });
 
   test('INV:A11Y-01 INV:A11Y-08 S32 renames a project and archives it; archived, only its status can change', async ({ page, request }, testInfo) => {

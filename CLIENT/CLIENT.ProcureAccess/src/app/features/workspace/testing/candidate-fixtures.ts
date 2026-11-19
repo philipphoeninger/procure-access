@@ -6,10 +6,18 @@ import { Candidate } from '../models/candidates';
 import { Project } from '../models/projects';
 import { CandidateCriteria, CandidateView } from '../pages/candidate-detail/candidate-load';
 
+/** A project or a candidate as the body of an answer names it: the tag is the `ETag` header (API-03). */
+export function bodyOf<T extends { etag: string }>(resource: T): Omit<T, 'etag'> {
+  const { etag, ...body } = resource;
+  void etag;
+  return body;
+}
+
 /** A project of `org-1` with its own copy of a list, as the specs of S33 and S34 read it. */
 export const TEST_PROJECT: Project = {
   id: 'p-1',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'Neues Bewerbermanagement 2027',
   status: 'open',
   productCount: 1,
@@ -25,6 +33,7 @@ export const TEST_CANDIDATE: Candidate = {
   id: 'c-1',
   projectId: 'p-1',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'BewerberPro',
   vendor: 'Beispiel Software GmbH',
   website: 'https://www.beispiel-software.de/bewerberpro',

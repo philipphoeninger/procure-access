@@ -20,6 +20,7 @@ import { projectResolver } from './project-detail.routing';
 const PROJECT: Project = {
   id: 'p-1',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'Bewerbermanagement',
   status: 'open',
   productCount: 0,

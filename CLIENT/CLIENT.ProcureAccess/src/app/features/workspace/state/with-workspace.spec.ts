@@ -19,6 +19,7 @@ const SUMMARY: ProjectSummary = { id: 'p1', name: 'Alt', status: 'open', product
 const CREATED: Project = {
   id: 'p2',
   organizationId: 'o1',
+  etag: '"1-1"',
   name: 'Neu',
   status: 'open',
   productCount: 0,
@@ -81,7 +82,7 @@ describe('withWorkspace', () => {
     await loaded;
 
     const created = store.createProject('o1', 'Neu');
-    backend.expectOne('/api/v1/organizations/o1/projects').flush(CREATED, { status: 201, statusText: 'Created' });
+    backend.expectOne('/api/v1/organizations/o1/projects').flush(CREATED, { status: 201, statusText: 'Created', headers: { ETag: CREATED.etag } });
 
     await expect(created).resolves.toEqual(CREATED);
     expect(store.workspace.projects().items).toEqual([
@@ -96,7 +97,7 @@ describe('withWorkspace', () => {
     await loaded;
 
     const created = store.createProject('o1', 'Neu');
-    backend.expectOne('/api/v1/organizations/o1/projects').flush(CREATED, { status: 201, statusText: 'Created' });
+    backend.expectOne('/api/v1/organizations/o1/projects').flush(CREATED, { status: 201, statusText: 'Created', headers: { ETag: CREATED.etag } });
     await created;
 
     expect(store.workspace.projects().items).toEqual([]);
@@ -107,11 +108,13 @@ describe('withWorkspace', () => {
     backend.expectOne('/api/v1/organizations/o1/projects').flush([SUMMARY, { ...SUMMARY, id: 'p3', name: 'Andere' }]);
     await loaded;
 
-    const changed = store.changeProject('p1', { name: 'Umbenannt', status: 'done' });
+    const changed = store.changeProject('p1', { name: 'Umbenannt', status: 'done' }, '"1-3"');
     const request = backend.expectOne('/api/v1/projects/p1');
     expect(request.request.body).toEqual({ name: 'Umbenannt', status: 'done' });
-    const answer: Project = { ...CREATED, id: 'p1', name: 'Umbenannt', status: 'done', productCount: 2, modifiedAt: '2026-11-18T10:00:00Z' };
-    request.flush(answer);
+    expect(request.request.headers.get('If-Match')).toBe('"1-3"');
+    const answer: Project = { ...CREATED, id: 'p1', etag: '"1-4"', name: 'Umbenannt', status: 'done', productCount: 2, modifiedAt: '2026-11-18T10:00:00Z' };
+    const { etag, ...body } = answer;
+    request.flush(body, { headers: { ETag: etag } });
 
     await expect(changed).resolves.toEqual(answer);
     expect(store.workspace.projects().items).toEqual([
@@ -125,7 +128,7 @@ describe('withWorkspace', () => {
     backend.expectOne('/api/v1/organizations/o1/projects').flush([SUMMARY]);
     await loaded;
 
-    const changed = store.changeProject('p1', { name: 'Umbenannt' });
+    const changed = store.changeProject('p1', { name: 'Umbenannt' }, '"1-3"');
     backend.expectOne('/api/v1/projects/p1').flush(null, { status: 409, statusText: 'Conflict' });
 
     await expect(changed).rejects.toMatchObject({ status: 409 });
@@ -149,9 +152,10 @@ describe('withWorkspace', () => {
   });
 
   it('assigns a list to a project and resolves to its copy (R-PRJ-02, R-PRJ-04)', async () => {
-    const assigned = store.assignCriteriaList('p2', 'list-1');
+    const assigned = store.assignCriteriaList('p2', 'list-1', '"1-1"');
     const request = backend.expectOne('/api/v1/projects/p2/criteria-configuration');
     expect(request.request.body).toEqual({ sourceConfigurationId: 'list-1' });
+    expect(request.request.headers.get('If-Match')).toBe('"1-1"');
     request.flush({ id: 'copy-1', name: 'HR', releaseVersion: 'T.1' });
 
     await expect(assigned).resolves.toEqual({ id: 'copy-1', name: 'HR', releaseVersion: 'T.1' });

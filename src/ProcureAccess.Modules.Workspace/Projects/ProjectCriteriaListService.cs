@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
+using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
 
@@ -13,8 +14,9 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// Assigns or replaces the criteria list of a procurement project (SPEC R-PRJ-02, R-PRJ-04;
 /// ARCHITECTURE §5.4, C47, C53; S6-12) for <see cref="ProjectCriteriaListEndpoint"/>: the project
 /// gets its own copy of an organisation list, made and stored by Configurator
-/// (<see cref="IProjectCriteriaLists"/>), which also deletes the previous copy. The project row is
-/// not changed: the link lives on the copy (owner decision S6-12 D1 (a)).
+/// (<see cref="IProjectCriteriaLists"/>), which also deletes the previous copy. The link lives on
+/// the copy (owner decision S6-12 D1 (a)); the project row only counts the assignment as a new
+/// version.
 /// </summary>
 /// <remarks>
 /// <para><b>The lock (C47, C51, C53; WSP-02; S6-18).</b> The list can be replaced until a candidate
@@ -25,28 +27,42 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// <para><b>Not one transaction.</b> The copy is stored by Configurator's context, the assessments
 /// by this one, so an assessment saved between the check and the copy is not seen; such a row keeps
 /// its value and locks the new list (S6-18 open point 1).</para>
+/// <para><b>Concurrency (API-03; S6-20, owner decision D2 (a)).</b> The assignment is a change of
+/// the project — its answers name the list —, so it needs the project's <c>ETag</c> in
+/// <c>If-Match</c> and counts a new version of the project. The copy is stored before the version:
+/// a version counted for a refused source would make the sender's own tag stale for nothing. In
+/// turn, a rename or status change that lands between the check and the save of the version
+/// answers 409 <c>conflict</c> although the copy is already replaced; the reload the conflict
+/// asks for shows it.</para>
 /// </remarks>
-internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProjectCriteriaLists lists)
+internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProjectCriteriaLists lists, EntityTags tags)
 {
     /// <summary>
     /// Copies <paramref name="sourceConfigurationId"/> into the project. In this order: an unknown
-    /// project (also another organisation's, TEN-01), an archived one (R-PRJ-05), a locked list
+    /// project (also another organisation's, TEN-01), a stale <c>If-Match</c> (API-03), an archived
+    /// project (R-PRJ-05), a locked list
     /// (<see cref="IsLockedAsync"/>, C47), then the source — a list of the project's organisation
     /// that is not a project copy (WSP-02).
     /// </summary>
-    public async Task<CriteriaListAssignment> AssignAsync(
-        Guid projectId, Guid sourceConfigurationId, string userId, CancellationToken cancellationToken)
+    public Task<CriteriaListAssignment> AssignAsync(
+        Guid projectId, Guid sourceConfigurationId, EditPrecondition edit, CancellationToken cancellationToken) =>
+        ConcurrentChange.RunAsync(db, () => AssignOnceAsync(projectId, sourceConfigurationId, edit, cancellationToken));
+
+    private async Task<CriteriaListAssignment> AssignOnceAsync(
+        Guid projectId, Guid sourceConfigurationId, EditPrecondition edit, CancellationToken cancellationToken)
     {
-        var project = await db.ProcurementProjects.AsNoTracking()
-                              .Where(p => p.Id == projectId)
-                              .Select(p => new { p.OrganizationId, p.Status })
-                              .SingleOrDefaultAsync(cancellationToken);
+        var project = await db.ProcurementProjects.SingleOrDefaultAsync(p => p.Id == projectId, cancellationToken);
         if (project is null)
         {
             return new CriteriaListAssignment(CriteriaListAssignmentOutcome.NotFound, null);
         }
 
-        if (project.Status == ProjectStatus.Archived)
+        if (!tags.Matches(edit.IfMatch, project.Version))
+        {
+            return new CriteriaListAssignment(CriteriaListAssignmentOutcome.Conflict, null, EditorUserId: project.ModifiedByUserId);
+        }
+
+        if (project.IsArchived)
         {
             return new CriteriaListAssignment(CriteriaListAssignmentOutcome.Archived, null);
         }
@@ -56,16 +72,20 @@ internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProject
             return new CriteriaListAssignment(CriteriaListAssignmentOutcome.Locked, null);
         }
 
-        var copy = await lists.CopyIntoProjectAsync(sourceConfigurationId, projectId, project.OrganizationId, userId, cancellationToken);
+        var copy = await lists.CopyIntoProjectAsync(
+            sourceConfigurationId, projectId, project.OrganizationId, edit.UserId, cancellationToken);
         if (copy.Outcome == ProjectCopyOutcome.Copied)
         {
             // What is left are notes without a value on criteria of the replaced copy.
             await AssessmentsOf(projectId).Where(a => a.Fulfillment == Fulfillment.Unknown).ExecuteDeleteAsync(cancellationToken);
+            project.MarkEdited(edit.UserId);
+            await db.SaveChangesAsync(cancellationToken);
         }
 
         return copy.Outcome switch
         {
-            ProjectCopyOutcome.Copied => new CriteriaListAssignment(CriteriaListAssignmentOutcome.Done, ResponseOf(copy.List!)),
+            ProjectCopyOutcome.Copied => new CriteriaListAssignment(
+                CriteriaListAssignmentOutcome.Done, ResponseOf(copy.List!), tags.Of(project.Version)),
             ProjectCopyOutcome.SourceNotFound => new CriteriaListAssignment(CriteriaListAssignmentOutcome.SourceNotFound, null),
             ProjectCopyOutcome.SourceIsProjectCopy => new CriteriaListAssignment(CriteriaListAssignmentOutcome.SourceIsProjectCopy, null),
             _ => throw new InvalidOperationException($"Unknown outcome {copy.Outcome} of a project copy."),
@@ -105,7 +125,13 @@ internal enum CriteriaListAssignmentOutcome
 
     /// <summary>The source is a project's copy, never offered as a source (400 at <c>sourceConfigurationId</c>, WSP-02).</summary>
     SourceIsProjectCopy,
+
+    /// <summary>The <c>If-Match</c> is not the tag of the project's stored version (409 <c>conflict</c>, API-03).</summary>
+    Conflict,
 }
 
 /// <param name="List">The project's new copy; only with <see cref="CriteriaListAssignmentOutcome.Done"/>.</param>
-internal sealed record CriteriaListAssignment(CriteriaListAssignmentOutcome Outcome, ProjectCriteriaListResponse? List);
+/// <param name="ProjectEtag">The <c>ETag</c> of the project after the assignment; only with <see cref="CriteriaListAssignmentOutcome.Done"/>.</param>
+/// <param name="EditorUserId">Who made the project's stored version; only with <see cref="CriteriaListAssignmentOutcome.Conflict"/>.</param>
+internal sealed record CriteriaListAssignment(
+    CriteriaListAssignmentOutcome Outcome, ProjectCriteriaListResponse? List, string? ProjectEtag = null, string? EditorUserId = null);

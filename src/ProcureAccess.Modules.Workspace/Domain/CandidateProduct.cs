@@ -65,6 +65,21 @@ internal sealed class CandidateProduct
     /// <summary>When the facts, the test status or an evidence last changed; the creation time until then.</summary>
     public DateTimeOffset ModifiedAt { get; private set; }
 
+    /// <summary>
+    /// Counts the changes of the facts, the private section, the test status and the set of evidences (<see cref="MarkEdited"/>); the concurrency
+    /// token and, with the 🔧 epoch, the <c>ETag</c> (API-03, API-04; S6-20). A changed field of
+    /// an evidence counts on the evidence, an assessment nowhere (R-CAN-11): both only move
+    /// <see cref="ModifiedAt"/>.
+    /// </summary>
+    public int Version { get; private set; }
+
+    /// <summary>
+    /// The user id (IdentityAccess) of who made <see cref="Version"/>, the competing editor of a 409
+    /// <c>conflict</c>; <c>null</c> for a row older than S6-20 or made without a user. No foreign
+    /// key across contexts (ADR-014).
+    /// </summary>
+    public string? ModifiedByUserId { get; private set; }
+
     /// <summary>The test evidences, in the order they were added.</summary>
     public IReadOnlyList<TestEvidence> TestEvidences => _testEvidences;
 
@@ -72,7 +87,9 @@ internal sealed class CandidateProduct
     /// Creates a candidate of <paramref name="project"/> with the status „Nicht bekannt“ and no
     /// evidence. Throws for an archived project (R-PRJ-05) and for facts outside their limits.
     /// </summary>
-    public static CandidateProduct Create(ProcurementProject project, CandidateFacts facts, DateTimeOffset createdAt)
+    /// <param name="createdByUserId">The first <see cref="ModifiedByUserId"/>; <c>null</c> when no user is known.</param>
+    public static CandidateProduct Create(
+        ProcurementProject project, CandidateFacts facts, DateTimeOffset createdAt, string? createdByUserId = null)
     {
         ArgumentNullException.ThrowIfNull(project);
         CheckOpen(project);
@@ -89,6 +106,8 @@ internal sealed class CandidateProduct
             TestStatus = TestStatus.Unknown,
             CreatedAt = createdAt,
             ModifiedAt = createdAt,
+            Version = 1,
+            ModifiedByUserId = createdByUserId,
         };
     }
 
@@ -141,7 +160,8 @@ internal sealed class CandidateProduct
     /// Adds an evidence (WSP-01): refused while the status is not „Ja“ and for a catalog procedure
     /// that already has one.
     /// </summary>
-    public EvidenceChange AddEvidence(TestEvidenceFacts facts, DateTimeOffset now)
+    /// <param name="createdByUserId">The first editor of the evidence; <c>null</c> when no user is known.</param>
+    public EvidenceChange AddEvidence(TestEvidenceFacts facts, DateTimeOffset now, string? createdByUserId = null)
     {
         ArgumentNullException.ThrowIfNull(facts);
         if (Refusal(facts, except: null) is { } refused)
@@ -149,7 +169,7 @@ internal sealed class CandidateProduct
             return new EvidenceChange(refused, null);
         }
 
-        var evidence = TestEvidence.Create(this, facts, now);
+        var evidence = TestEvidence.Create(this, facts, now, createdByUserId);
         _testEvidences.Add(evidence);
         ModifiedAt = now;
         return new EvidenceChange(EvidenceChangeOutcome.Done, evidence);
@@ -179,8 +199,20 @@ internal sealed class CandidateProduct
     }
 
     /// <summary>
-    /// Records a change of what belongs to the candidate outside this type — its private section or
-    /// the private note of an evidence — as its last change.
+    /// Counts a change of the facts, the private section, the test status or the set of evidences by <paramref name="userId"/>: a new
+    /// <see cref="Version"/>, so every <c>ETag</c> issued before is stale (API-03).
+    /// </summary>
+    public void MarkEdited(string userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        Version++;
+        ModifiedByUserId = userId;
+    }
+
+    /// <summary>
+    /// Records a change of what belongs to the candidate outside this type — its private section,
+    /// the private note of an evidence or an assessment — as its last change. The
+    /// <see cref="Version"/> stays.
     /// </summary>
     public void MarkChanged(DateTimeOffset now) => ModifiedAt = now;
 

@@ -88,6 +88,8 @@ export interface ProjectCandidate {
 /** A project (`GET /api/v1/projects/{id}` and the answers of creating and changing it). The creator is not served (S6-11 4 (a)). */
 export interface Project extends ProjectSummary {
   organizationId: string;
+  /** The `ETag` of the answer, sent back in `If-Match` with a change (API-03, S6-20); not a member of the body. */
+  etag: string;
   createdAt: string;
   /** The project's copy of a list; null while it has none (S6-12). The answer of creating a project has none yet. */
   criteriaList: ProjectCriteriaList | null;

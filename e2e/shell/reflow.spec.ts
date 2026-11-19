@@ -318,9 +318,11 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
       fulfillment: { fulfilled: 122, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 10 },
       procedureAnswers: [],
     });
+    // The client keeps the ETag of a project and refuses an answer without one (API-03, S6-20).
     await page.route(`**/api/v1/projects/${projectId}`, (route) =>
       route.fulfill({
         status: 200,
+        headers: { ETag: '"1-1"' },
         json: {
           id: projectId,
           organizationId: E2E_ORGANIZATION.id,
@@ -388,9 +390,11 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     const listId = '0e2e0000-0000-4000-8000-0000000000c3';
     const projectName = 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke';
     const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
+    // The client keeps the ETag of a project and a candidate and refuses an answer without one (API-03, S6-20).
     await page.route(`**/api/v1/projects/${projectId}`, (route) =>
       route.fulfill({
         status: 200,
+        headers: { ETag: '"1-1"' },
         json: {
           id: projectId,
           organizationId: E2E_ORGANIZATION.id,
@@ -408,6 +412,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.route(`**/api/v1/candidates/${candidateId}`, (route) =>
       route.fulfill({
         status: 200,
+        headers: { ETag: '"1-1"' },
         json: {
           id: candidateId,
           projectId,

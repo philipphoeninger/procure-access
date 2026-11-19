@@ -22,6 +22,7 @@ import { ProjectDetailPage } from './project-detail';
 const PROJECT: Project = {
   id: 'p-1',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'Neues Bewerbermanagement 2027',
   status: 'open',
   productCount: 0,

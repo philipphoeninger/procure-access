@@ -6,6 +6,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 
@@ -44,6 +45,38 @@ internal static class WorkspaceAccess
             detail: "The project is archived; only its status can change.",
             statusCode: StatusCodes.Status409Conflict,
             type: ProblemTypes.ProjectArchived);
+
+    /// <summary>
+    /// 428 <c>precondition-required</c>: a change of a project, a candidate or an evidence without
+    /// <c>If-Match</c> (API-03; owner decision S6-20 D3 (a)).
+    /// </summary>
+    public static ProblemHttpResult PreconditionRequired() =>
+        TypedResults.Problem(
+            detail: "Send the ETag of the version you read in If-Match.",
+            statusCode: StatusCodes.Status428PreconditionRequired,
+            type: ProblemTypes.PreconditionRequired);
+
+    /// <summary>
+    /// 409 <c>conflict</c> for a stale <c>If-Match</c> (API-03), with the display name of who made
+    /// the current version as <c>editorDisplayName</c> for S37 — <c>null</c> when the row names
+    /// nobody or the account is gone. The caller has checked that the request's user may read the
+    /// resource (<see cref="IUserDirectory"/>).
+    /// </summary>
+    public static async Task<ProblemHttpResult> ConflictAsync(
+        IUserDirectory users, string? editorUserId, CancellationToken cancellationToken)
+    {
+        string? name = null;
+        if (editorUserId is not null)
+        {
+            (await users.GetDisplayNamesAsync([editorUserId], cancellationToken)).TryGetValue(editorUserId, out name);
+        }
+
+        return TypedResults.Problem(
+            detail: "The content has changed since you read it.",
+            statusCode: StatusCodes.Status409Conflict,
+            type: ProblemTypes.Conflict,
+            extensions: new Dictionary<string, object?>(StringComparer.Ordinal) { ["editorDisplayName"] = name });
+    }
 
     /// <summary>The signed-in user's id; the groups require a sign-in, so it is always there.</summary>
     public static string UserIdOf(ClaimsPrincipal user) =>

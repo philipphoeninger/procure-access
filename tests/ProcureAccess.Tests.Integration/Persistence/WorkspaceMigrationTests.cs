@@ -4,6 +4,8 @@
 
 using DAL.ProcureAccess.EFStructures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Npgsql;
 using ProcureAccess.Modules.Workspace.Persistence;
 using ProcureAccess.Modules.Platform.Persistence;
@@ -111,6 +113,42 @@ public sealed class WorkspaceMigrationTests(ApiFixture api) : IAsyncDisposable
 
         await using var workspace = Workspace(connectionString);
         (await workspace.Database.GetAppliedMigrationsAsync(cancellationToken)).ShouldBe(workspace.Database.GetMigrations());
+    }
+
+    /// <summary>
+    /// S6-20 (API-03): a project and a candidate stored before <c>ResourceVersions</c> get version 1
+    /// and no editor, so their first ETag is the one of a new row.
+    /// </summary>
+    [Fact(DisplayName = "INV:OPS-03 " + nameof(ResourceVersions_RowsStoredBefore_StartAtVersionOneWithoutAnEditor))]
+    [Trait("Invariant", "OPS-03")]
+    public async Task ResourceVersions_RowsStoredBefore_StartAtVersionOneWithoutAnEditor()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = NewDatabase();
+        await using (var legacy = Legacy(connectionString))
+        {
+            await legacy.Database.MigrateAsync(cancellationToken);
+        }
+
+        await using var workspace = Workspace(connectionString);
+        await workspace.GetService<IMigrator>().MigrateAsync("CandidateAssessments", cancellationToken);
+        var project = Guid.NewGuid();
+        var organization = Guid.NewGuid();
+        await ExecuteAsync(connectionString, $"""
+            INSERT INTO workspace."ProcurementProjects" ("Id", "OrganizationId", "Name", "Status", "CreatedByUserId", "CreatedAt", "ModifiedAt")
+            VALUES ('{project}', '{organization}', 'Projekt', 'Open', 'user', now(), now());
+            INSERT INTO workspace."CandidateProducts" ("Id", "OrganizationId", "ProcurementProjectId", "Name", "CreatedAt", "ModifiedAt")
+            VALUES ('{Guid.NewGuid()}', '{organization}', '{project}', 'Produkt', now(), now());
+            """);
+
+        await workspace.Database.MigrateAsync(cancellationToken);
+
+        foreach (var table in new[] { "ProcurementProjects", "CandidateProducts" })
+        {
+            (await ScalarAsync(connectionString, $"""
+                SELECT count(*) FROM workspace."{table}" WHERE "Version" = 1 AND "ModifiedByUserId" IS NULL
+                """)).ShouldBe(1, table);
+        }
     }
 
     public async ValueTask DisposeAsync()

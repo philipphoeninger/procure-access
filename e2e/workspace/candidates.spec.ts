@@ -150,7 +150,7 @@ test.describe('Products of a project S33, S34', () => {
     await expect(item).toContainText('Anbieter: Muster AG');
     await expect(item).toContainText('Nicht bekannt');
     await expect(item).toContainText(`0 von ${total} Kriterien eingeschätzt`);
-    // INV:SIG-13: all seven counts, label first, in the order of the scale
+    // SIG-13: all seven counts, label first, in the order of the scale
     await expect(item.locator('.pa-project__counts li')).toHaveText([
       'Erfüllt: 0',
       'Leichte Einschränkung: 0',

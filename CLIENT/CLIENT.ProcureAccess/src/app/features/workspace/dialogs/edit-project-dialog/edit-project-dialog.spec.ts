@@ -23,6 +23,7 @@ const base = 'https://procureaccess.de/problems/';
 const PROJECT: Project = {
   id: 'p-1',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'Neues Bewerbermanagement 2027',
   status: 'open',
   productCount: 0,
@@ -116,7 +117,7 @@ describe('dialog „Projekt bearbeiten“ of S32 (R-PRJ-05)', () => {
     within(dialog).getByRole('radio', { name: 'Abgeschlossen' }).click();
     await save(fixture, dialog);
 
-    expect(change).toHaveBeenCalledWith('p-1', { name: 'Bewerbermanagement 2028', status: 'done' });
+    expect(change).toHaveBeenCalledWith('p-1', { name: 'Bewerbermanagement 2028', status: 'done' }, '"1-1"');
     expect(host.result).toEqual(changed);
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(announce).toHaveBeenCalledWith('projects.edit.saved');
@@ -159,7 +160,7 @@ describe('dialog „Projekt bearbeiten“ of S32 (R-PRJ-05)', () => {
 
     within(dialog).getByRole('radio', { name: 'Laufend' }).click();
     await save(fixture, dialog);
-    expect(change).toHaveBeenCalledWith('p-1', { status: 'open' });
+    expect(change).toHaveBeenCalledWith('p-1', { status: 'open' }, '"1-1"');
   });
 
   it('INV:SEC-10 shows the confirmation notice for an unconfirmed address and keeps the input', async () => {

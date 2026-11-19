@@ -47,9 +47,10 @@ type ChangeError = 'failed' | 'archived' | 'antiforgery';
  *   takes the focus. Only what changed is sent; nothing changed closes the dialog without a request.
  * - While saving, „Speichern“ shows the spinner and is `aria-disabled`. Success closes the dialog
  *   with the changed project and announces `projects.edit.saved`.
- * - 403 `email-unconfirmed` (SEC-10) shows `pa-confirm-required-notice`, which takes the focus;
- *   409 `project-archived` (archived meanwhile) shows `projects.archived.note`; `antiforgery` its
- *   text; a field error at `name` shows at the field; any other failure `projects.edit.error`
+ * - The change names the project's tag (`If-Match`, API-03). 403 `email-unconfirmed` (SEC-10)
+ *   shows `pa-confirm-required-notice`, which takes the focus; 409 `project-archived` (archived
+ *   meanwhile) shows `projects.archived.note`; `antiforgery` its text; a field error at `name` shows
+ *   at the field; any other failure — also 409 `conflict` until S37 (S6-21) — `projects.edit.error`
  *   under the title `projects.edit.error.title`.
  *
  * Below 600 px the dialog fills the screen and stacks its actions in DOM order (S13-M).
@@ -172,7 +173,7 @@ export class EditProjectDialog {
     this.busy.set(true);
     let changed: Project;
     try {
-      changed = await this.store.changeProject(this.project.id, change);
+      changed = await this.store.changeProject(this.project.id, change, this.project.etag);
     } catch (error: unknown) {
       if (!this.destroyed) this.refused(error);
       return;
