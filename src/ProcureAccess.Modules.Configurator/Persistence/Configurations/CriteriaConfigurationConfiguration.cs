@@ -38,6 +38,9 @@ internal sealed class CriteriaConfigurationConfiguration : IEntityTypeConfigurat
         builder.Property(x => x.UseCaseKey).HasMaxLength(CriteriaConfiguration.ValueKeyMaxLength);
         builder.Property(x => x.CreatedByUserId).IsRequired();
 
+        // The concurrency token behind the ETag (API-03, S6-20b); rows older than it start at 1.
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(1);
+
         // The lists of an organisation (S14) and the lists a user created (personal data export).
         builder.HasIndex(x => x.OrganizationId);
         builder.HasIndex(x => x.CreatedByUserId);

@@ -38,6 +38,9 @@ namespace ProcureAccess.Modules.Configurator.Persistence.Migrations
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ModifiedByUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -57,6 +60,12 @@ namespace ProcureAccess.Modules.Configurator.Persistence.Migrations
                     b.Property<string>("UseCaseKey")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.HasKey("Id");
 

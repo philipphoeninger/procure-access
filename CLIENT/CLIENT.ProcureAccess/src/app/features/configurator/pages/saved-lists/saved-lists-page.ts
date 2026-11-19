@@ -132,7 +132,7 @@ export class SavedListsPage {
     if (!confirmed || this.destroyed) return;
     this.deleting.set(list.id);
     try {
-      await this.api.delete(list.id);
+      await this.api.delete(list.id, list.etag);
       if (this.destroyed) return;
       void this.announcer.announce('criteria.saved.deleted', { name: list.name });
     } catch {

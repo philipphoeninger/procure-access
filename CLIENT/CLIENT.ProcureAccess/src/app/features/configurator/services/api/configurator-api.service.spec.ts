@@ -64,6 +64,46 @@ describe('ConfiguratorApiService', () => {
     await revoked;
   });
 
+  it('INV:API-03 reads a saved list with the ETag of the answer and sends it back with a decision, a selection change and a deletion', async () => {
+    const read = api.get('l1');
+    const get = backend.expectOne('/api/v1/configurations/l1');
+    expect(get.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
+    get.flush({ id: 'l1', name: 'Liste' }, { headers: { ETag: '"1-4"' } });
+    await expect(read).resolves.toEqual({ id: 'l1', name: 'Liste', etag: '"1-4"' });
+
+    const decision = { isIncluded: false, overrideLevel: null, overrideWeight: null, note: null };
+    const decided = api.decide('l1', 11, decision, '"1-4"');
+    const patch = backend.expectOne('/api/v1/configurations/l1/criteria/11');
+    expect(patch.request.method).toBe('PATCH');
+    expect(patch.request.body).toEqual(decision);
+    expect(patch.request.headers.get('If-Match')).toBe('"1-4"');
+    patch.flush(null, { status: 204, statusText: 'No Content', headers: { ETag: '"1-5"' } });
+    // The new tag of the list, for the next change.
+    await expect(decided).resolves.toBe('"1-5"');
+
+    const selection = { selection: { releaseVersion: 'T.1', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] } };
+    const changed = api.changeSelection('l1', selection, '"1-5"');
+    const put = backend.expectOne('/api/v1/configurations/l1/selection');
+    expect(put.request.method).toBe('PUT');
+    expect(put.request.headers.get('If-Match')).toBe('"1-5"');
+    put.flush({ droppedDecisions: [] });
+    await expect(changed).resolves.toEqual({ droppedDecisions: [] });
+
+    const deleted = api.delete('l1', '"1-6"');
+    const remove = backend.expectOne('/api/v1/configurations/l1');
+    expect(remove.request.method).toBe('DELETE');
+    expect(remove.request.headers.get('If-Match')).toBe('"1-6"');
+    remove.flush(null, { status: 204, statusText: 'No Content' });
+    await deleted;
+  });
+
+  it('INV:API-03 refuses the answer of a decision without an ETag: the next change could not name its version', async () => {
+    const decided = api.decide('l1', 11, { isIncluded: true, overrideLevel: null, overrideWeight: null, note: null }, '"1-4"');
+    backend.expectOne('/api/v1/configurations/l1/criteria/11').flush(null, { status: 204, statusText: 'No Content' });
+
+    await expect(decided).rejects.toThrowError(/no ETag/);
+  });
+
   it('reads a shared list by its token, its failures shown by S16 (SPEC §8.5)', async () => {
     const read = api.shared('abc_-1');
 

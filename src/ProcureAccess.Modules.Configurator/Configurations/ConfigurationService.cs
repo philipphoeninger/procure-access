@@ -8,6 +8,7 @@ using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Configurator.Persistence;
+using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 
 namespace ProcureAccess.Modules.Configurator.Configurations;
 
@@ -24,6 +25,7 @@ internal sealed class ConfigurationService(
     ICatalogSelectionResolver catalog,
     ICatalogReleaseCarryOver carryOver,
     PriorityWeightRange weights,
+    EntityTags tags,
     TimeProvider clock)
 {
     private const string SelectionField = "selection";
@@ -84,7 +86,8 @@ internal sealed class ConfigurationService(
                 list.ModifiedAt,
                 list.ProcurementProjectId,
                 SelectionOf(list),
-                DecisionsOf(list));
+                DecisionsOf(list),
+                tags.Of(list.Version));
     }
 
     /// <summary>The selection of a list by the value keys of its release, as S11 reads it.</summary>
@@ -110,13 +113,17 @@ internal sealed class ConfigurationService(
     /// sorts them (S14). Only the columns of the list, none of its rows. The copies the projects own
     /// are not listed (R-SAV-02, R-PRJ-02: never offered as a source, WSP-02).
     /// </summary>
-    public async Task<IReadOnlyList<ConfigurationSummaryResponse>> ListAsync(Guid organizationId, CancellationToken cancellationToken) =>
-        await db.CriteriaConfigurations.AsNoTracking()
-                .Where(c => c.OrganizationId == organizationId && c.ProcurementProjectId == null)
-                .OrderByDescending(c => c.ModifiedAt)
-                .ThenBy(c => c.Id)
-                .Select(c => new ConfigurationSummaryResponse(c.Id, c.Name, c.ReleaseVersion, c.CreatedAt, c.ModifiedAt))
-                .ToListAsync(cancellationToken);
+    public async Task<IReadOnlyList<ConfigurationSummaryResponse>> ListAsync(Guid organizationId, CancellationToken cancellationToken)
+    {
+        var lists = await db.CriteriaConfigurations.AsNoTracking()
+                            .Where(c => c.OrganizationId == organizationId && c.ProcurementProjectId == null)
+                            .OrderByDescending(c => c.ModifiedAt)
+                            .ThenBy(c => c.Id)
+                            .Select(c => new { c.Id, c.Name, c.ReleaseVersion, c.CreatedAt, c.ModifiedAt, c.Version })
+                            .ToListAsync(cancellationToken);
+        return [.. lists.Select(c => new ConfigurationSummaryResponse(
+            c.Id, c.Name, c.ReleaseVersion, c.CreatedAt, c.ModifiedAt, tags.Of(c.Version)))];
+    }
 
     /// <summary>The organisation of the list, or <c>null</c> when it does not exist for the request (TEN-01).</summary>
     public async Task<Guid?> OrganizationOfAsync(Guid id, CancellationToken cancellationToken) =>
@@ -137,15 +144,27 @@ internal sealed class ConfigurationService(
     /// level name, the 🔧 weight range and B only, the note limit —, keyed by the body's members.
     /// <see cref="EditOutcome.NotFound"/> for an unknown list or a criterion that is not on it.
     /// Also on a list of an older release: its criteria stay editable (owner decision S5-21 5a), and
-    /// on a project's copy (C51, WSP-03).
+    /// on a project's copy (C51, WSP-03). A stale <c>If-Match</c> is refused before the criterion
+    /// is looked for, so a criterion that a selection change removed meanwhile is a conflict, not a
+    /// 404 (API-03). Every stored decision counts a version of the list, as it stamps its last change.
     /// </summary>
     public async Task<EditResult<bool>> DecideAsync(
-        Guid id, int criterionRevisionId, ConfigurationDecisionBody body, CancellationToken cancellationToken)
+        Guid id, int criterionRevisionId, ConfigurationDecisionBody body, ListEdit edit, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(body);
         var list = await db.CriteriaConfigurations.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
-        var row = list?.Criteria.SingleOrDefault(c => c.CriterionRevisionId == criterionRevisionId);
-        if (list is null || row is null)
+        if (list is null)
+        {
+            return EditResult<bool>.NotFound();
+        }
+
+        if (!tags.Matches(edit.IfMatch, list.Version))
+        {
+            return EditResult<bool>.Conflict(list.ModifiedByUserId);
+        }
+
+        var row = list.Criteria.SingleOrDefault(c => c.CriterionRevisionId == criterionRevisionId);
+        if (row is null)
         {
             return EditResult<bool>.NotFound();
         }
@@ -185,8 +204,8 @@ internal sealed class ConfigurationService(
         }
 
         list.Decide(criterionRevisionId, body.IsIncluded!.Value, level, body.OverrideWeight, body.Note, clock.GetUtcNow());
-        await db.SaveChangesAsync(cancellationToken);
-        return EditResult<bool>.Done(true);
+        list.MarkEdited(edit.UserId);
+        return await SaveAsync(list, true, cancellationToken);
     }
 
     /// <summary>
@@ -199,12 +218,17 @@ internal sealed class ConfigurationService(
     /// selection layers of a project's copy are fixed: <see cref="EditOutcome.ProjectCopy"/> (WSP-03).
     /// </summary>
     public async Task<EditResult<ChangedSelection>> ChangeSelectionAsync(
-        Guid id, DraftSelection? selection, CancellationToken cancellationToken)
+        Guid id, DraftSelection? selection, ListEdit edit, CancellationToken cancellationToken)
     {
         var list = await db.CriteriaConfigurations.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
         if (list is null)
         {
             return EditResult<ChangedSelection>.NotFound();
+        }
+
+        if (!tags.Matches(edit.IfMatch, list.Version))
+        {
+            return EditResult<ChangedSelection>.Conflict(list.ModifiedByUserId);
         }
 
         if (list.IsProjectCopy)
@@ -284,8 +308,8 @@ internal sealed class ConfigurationService(
             [.. valid.Criteria.Select(c => DecisionCarryOver.Carry(
                 c.RevisionId, c.RecommendedPriority.Level, rows.GetValueOrDefault(c.RevisionId)))],
             clock.GetUtcNow());
-        await db.SaveChangesAsync(cancellationToken);
-        return EditResult<ChangedSelection>.Done(new ChangedSelection(dropped));
+        list.MarkEdited(edit.UserId);
+        return await SaveAsync(list, new ChangedSelection(dropped), cancellationToken);
     }
 
     /// <summary>
@@ -294,12 +318,17 @@ internal sealed class ConfigurationService(
     /// replaced (<see cref="EditOutcome.ProjectCopy"/>). The endpoint deletes the list's share links
     /// in Platform afterwards (S5-28a); until then they answer 404, because the read finds no list.
     /// </summary>
-    public async Task<EditResult<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<EditResult<bool>> DeleteAsync(Guid id, ListEdit edit, CancellationToken cancellationToken)
     {
         var list = await db.CriteriaConfigurations.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
         if (list is null)
         {
             return EditResult<bool>.NotFound();
+        }
+
+        if (!tags.Matches(edit.IfMatch, list.Version))
+        {
+            return EditResult<bool>.Conflict(list.ModifiedByUserId);
         }
 
         if (list.IsProjectCopy)
@@ -308,8 +337,7 @@ internal sealed class ConfigurationService(
         }
 
         db.CriteriaConfigurations.Remove(list);
-        await db.SaveChangesAsync(cancellationToken);
-        return EditResult<bool>.Done(true);
+        return await SaveAsync(list, true, cancellationToken);
     }
 
     /// <summary>
@@ -401,6 +429,31 @@ internal sealed class ConfigurationService(
             new CopiedConfiguration(copy.Id, copy.ReleaseVersion, [.. result.DroppedValues.Select(v => v.Name)], notCarried));
     }
 
+    /// <summary>
+    /// Saves a change of <paramref name="list"/> whose <c>If-Match</c> matched when it was loaded.
+    /// The version is the concurrency token of the row, so a save that meets a change made since —
+    /// another decision, a selection change that removed the criterion (the 500 of S5-21a R1), a
+    /// deletion — fails; it is answered as the conflict it is, with who made the stored version, or
+    /// as 404 when the list is gone (API-03).
+    /// </summary>
+    private async Task<EditResult<T>> SaveAsync<T>(CriteriaConfiguration list, T value, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+            return EditResult<T>.Done(value) with { Etag = tags.Of(list.Version) };
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            db.ChangeTracker.Clear();
+            var stored = await db.CriteriaConfigurations.AsNoTracking()
+                                 .Where(c => c.Id == list.Id)
+                                 .Select(c => new { c.ModifiedByUserId })
+                                 .SingleOrDefaultAsync(cancellationToken);
+            return stored is null ? EditResult<T>.NotFound() : EditResult<T>.Conflict(stored.ModifiedByUserId);
+        }
+    }
+
     /// <summary>The level names of SPEC §8.2 and the UX keys.</summary>
     internal static string LevelName(PriorityLevel level) => level switch
     {
@@ -447,6 +500,9 @@ internal enum EditOutcome
 
     /// <summary>409 <c>project-copy</c>: the action is for organisation lists, the list is a project's copy (C53, S6-12).</summary>
     ProjectCopy = 6,
+
+    /// <summary>409 <c>conflict</c>: the <c>If-Match</c> is not the tag of the stored version (API-03, S6-20b).</summary>
+    Conflict = 7,
 }
 
 /// <summary>The organisation of a stored list and whether a project owns it as its copy (C53).</summary>
@@ -455,6 +511,15 @@ internal sealed record ListOwner(Guid OrganizationId, bool IsProjectCopy);
 /// <summary>The outcome of a change, its answer when it is done, else a detail and the field errors.</summary>
 internal sealed record EditResult<T>(EditOutcome Outcome, T? Value, string? Detail, IReadOnlyDictionary<string, string[]> Errors)
 {
+    /// <summary>The <c>ETag</c> of the list after a change that needed <c>If-Match</c>; only with <see cref="EditOutcome.Done"/>.</summary>
+    public string? Etag { get; init; }
+
+    /// <summary>Who made the stored version; only with <see cref="EditOutcome.Conflict"/>.</summary>
+    public string? EditorUserId { get; init; }
+
+    public static EditResult<T> Conflict(string? editorUserId) =>
+        new(EditOutcome.Conflict, default, null, new Dictionary<string, string[]>()) { EditorUserId = editorUserId };
+
     public static EditResult<T> Done(T value) => new(EditOutcome.Done, value, null, new Dictionary<string, string[]>());
 
     public static EditResult<T> NotFound() => new(EditOutcome.NotFound, default, null, new Dictionary<string, string[]>());

@@ -49,6 +49,30 @@ internal static class IfMatchRequests
         return await client.SendWithTagAsync(HttpMethod.Put, path, body, await client.TagOfAsync(parent, cancellationToken), cancellationToken);
     }
 
+    /// <summary><c>PATCH …/configurations/{id}/criteria/{revision}</c> with the current tag of the list (S6-20b).</summary>
+    public static async Task<HttpResponseMessage> PatchListAsync<T>(
+        this HttpClient client, string path, T body, CancellationToken cancellationToken) =>
+        await client.SendWithTagAsync(HttpMethod.Patch, path, body, await client.TagOfListAsync(path, cancellationToken), cancellationToken);
+
+    /// <summary><c>PUT …/configurations/{id}/selection</c> with the current tag of the list (S6-20b).</summary>
+    public static async Task<HttpResponseMessage> PutListAsync<T>(
+        this HttpClient client, string path, T body, CancellationToken cancellationToken) =>
+        await client.SendWithTagAsync(HttpMethod.Put, path, body, await client.TagOfListAsync(path, cancellationToken), cancellationToken);
+
+    /// <summary><c>DELETE …/configurations/{id}</c> with the current tag of the list (S6-20b).</summary>
+    public static async Task<HttpResponseMessage> DeleteListAsync(
+        this HttpClient client, string path, CancellationToken cancellationToken) =>
+        await client.SendWithTagAsync(HttpMethod.Delete, path, await client.TagOfListAsync(path, cancellationToken), cancellationToken);
+
+    /// <summary>The tag of the saved list a path below <c>/configurations/{id}</c> names.</summary>
+    private static Task<string> TagOfListAsync(this HttpClient client, string path, CancellationToken cancellationToken)
+    {
+        const string Lists = "/configurations/";
+        var start = path.IndexOf(Lists, StringComparison.Ordinal) + Lists.Length;
+        var end = path.IndexOf('/', start);
+        return client.TagOfAsync(end < 0 ? path : path[..end], cancellationToken);
+    }
+
     /// <summary>A request with <paramref name="ifMatch"/>; <c>null</c> sends no <c>If-Match</c>.</summary>
     public static async Task<HttpResponseMessage> SendWithTagAsync<T>(
         this HttpClient client, HttpMethod method, string path, T? body, string? ifMatch, CancellationToken cancellationToken)

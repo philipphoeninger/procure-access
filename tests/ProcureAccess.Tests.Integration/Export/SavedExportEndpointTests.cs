@@ -182,7 +182,7 @@ public sealed class SavedExportEndpointTests(ApiFixture api) : IntegrationTest(a
     private static async Task DecideAsync(HttpClient client, Guid id, JsonArray criteria, string key, object decision)
     {
         var revision = criteria.Single(c => c!["key"]!.GetValue<string>() == key)!["revisionId"]!.GetValue<int>();
-        using var response = await client.PatchAsJsonAsync($"{Path}/{id}/criteria/{revision}", decision, Cancellation);
+        using var response = await client.PatchListAsync($"{Path}/{id}/criteria/{revision}", decision, Cancellation);
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent, await response.Content.ReadAsStringAsync(Cancellation));
     }
 

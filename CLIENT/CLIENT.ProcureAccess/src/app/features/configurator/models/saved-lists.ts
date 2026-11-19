@@ -34,6 +34,8 @@ export interface SavedListSummary {
   releaseVersion: string;
   createdAt: string;
   modifiedAt: string;
+  /** The tag of the list for `If-Match` when S14 deletes it (API-03, S6-20b); a member of the body. */
+  etag: string;
 }
 
 /** The decision on one criterion of a saved list, by its revision in the pinned release. */
@@ -51,6 +53,8 @@ export interface SavedListCriterion {
 /** A saved list (`GET /api/v1/configurations/{id}`); texts and order come from the criteria of its release. */
 export interface SavedList {
   id: string;
+  /** The `ETag` of the answer, sent back in `If-Match` with a change (API-03, S6-20b); not a member of the body. */
+  etag: string;
   organizationId: string;
   name: string;
   releaseVersion: string;

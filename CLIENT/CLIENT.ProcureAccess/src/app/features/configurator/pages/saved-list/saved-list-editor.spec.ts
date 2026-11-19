@@ -19,7 +19,9 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
   let editor: SavedListEditor;
 
   function setUp(criteria: Criterion[] = [A, B]) {
-    decide = vi.fn().mockResolvedValue(null);
+    // Every saved decision answers with the next tag of the list (API-03).
+    let version = 1;
+    decide = vi.fn().mockImplementation(() => Promise.resolve(`"1-${++version}"`));
     TestBed.configureTestingModule({
       providers: [
         SavedListEditor,
@@ -28,7 +30,7 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
       ],
     });
     editor = TestBed.inject(SavedListEditor);
-    editor.start('list-1', criteria, {});
+    editor.start('list-1', '"1-1"', criteria, {});
   }
 
   const settle = () => new Promise((resolve) => setTimeout(resolve));
@@ -44,16 +46,49 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
     await settle();
     editor.overridePriority('1.1', 'B');
     editor.setWeight('1.1', 7);
-    answer(null);
+    answer('"1-2"');
     await settle();
 
-    // The second save starts after the first answered and carries the newest decision; the third
-    // finds nothing left to save.
+    // The second save starts after the first answered and carries the newest decision and the
+    // tag of that answer; the third finds nothing left to save.
     expect(decide.mock.calls).toEqual([
-      ['list-1', 11, { isIncluded: false, overrideLevel: null, overrideWeight: null, note: null }],
-      ['list-1', 11, { isIncluded: false, overrideLevel: 'B', overrideWeight: 7, note: null }],
+      ['list-1', 11, { isIncluded: false, overrideLevel: null, overrideWeight: null, note: null }, '"1-1"'],
+      ['list-1', 11, { isIncluded: false, overrideLevel: 'B', overrideWeight: 7, note: null }, '"1-2"'],
     ]);
     expect(editor.decisions()['1.1']).toEqual({ included: false, overrideLevel: 'B', overrideWeight: 7, note: '' });
+  });
+
+  it('INV:API-03 saves the changes of different criteria one after the other, each with the tag the save before answered', async () => {
+    setUp();
+    let answer: (value: unknown) => void = () => undefined;
+    decide.mockReturnValueOnce(new Promise((resolve) => (answer = resolve)));
+
+    editor.setIncluded('1.1', false);
+    editor.setIncluded('2.2', false);
+    await settle();
+    // Two saves under way at once would send the same tag, and the second would conflict with the first.
+    expect(decide).toHaveBeenCalledOnce();
+    answer('"1-2"');
+    await editor.settled();
+
+    expect(decide).toHaveBeenCalledTimes(2);
+    expect(decide).toHaveBeenNthCalledWith(1, 'list-1', 11, expect.anything(), '"1-1"');
+    expect(decide).toHaveBeenNthCalledWith(2, 'list-1', 22, expect.anything(), '"1-2"');
+  });
+
+  it('INV:API-03 keeps the tag after a failed save, so a conflict stays one until the list is loaded again', async () => {
+    setUp();
+    decide.mockRejectedValueOnce(new Error('409'));
+
+    editor.setIncluded('1.1', false);
+    await editor.settled();
+    editor.setIncluded('2.2', false);
+    await editor.settled();
+
+    expect(decide).toHaveBeenCalledTimes(2);
+    expect(decide).toHaveBeenNthCalledWith(1, 'list-1', 11, expect.anything(), '"1-1"');
+    expect(decide).toHaveBeenNthCalledWith(2, 'list-1', 22, expect.anything(), '"1-1"');
+    expect(editor.decisions()['1.1']?.included ?? true).toBe(true);
   });
 
   it('puts a criterion back to its last saved decision when the save fails', async () => {
@@ -94,7 +129,7 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
       overrideLevel: null,
       overrideWeight: null,
       note: 'Mit Anbieter',
-    });
+    }, '\"1-1\"');
 
     editor.setNote('1.1', 'x'.repeat(1001));
     await vi.advanceTimersByTimeAsync(NOTE_SAVE_DELAY_MS);
@@ -114,7 +149,7 @@ describe('SavedListEditor (R-SAV-03; owner decision S5-21b 1a)', () => {
       overrideLevel: null,
       overrideWeight: null,
       note: 'Prüfen',
-    });
+    }, '\"1-1\"');
   });
 });
 
@@ -130,7 +165,7 @@ describe('SavedListEditor.settled', () => {
       ],
     });
     const editor = TestBed.inject(SavedListEditor);
-    editor.start('list-1', [A], {});
+    editor.start('list-1', '"1-1"', [A], {});
     let done = false;
 
     editor.setNote('1.1', 'Prüfen');

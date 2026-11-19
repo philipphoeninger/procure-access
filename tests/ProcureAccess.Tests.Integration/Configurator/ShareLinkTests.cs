@@ -173,7 +173,7 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
                 Clock.SetUtcNow(created.ExpiresAt);
                 break;
             case "list-deleted":
-                (await editor.DeleteAsync($"/api/v1/configurations/{List.Id}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+                (await editor.DeleteListAsync($"/api/v1/configurations/{List.Id}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
                 break;
             case "unknown":
                 token = Base64Url.EncodeToString(RandomNumberGenerator.GetBytes(32));
@@ -360,7 +360,7 @@ public sealed class ShareLinkTests(ApiFixture api) : IntegrationTest(api), IAsyn
         using var client = CreateClient(TestUsers.EditorA);
         (await client.DeleteAsync($"/api/v1/share-links/{revoked.Id}", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        using var response = await client.DeleteAsync($"/api/v1/configurations/{List.Id}", Cancellation);
+        using var response = await client.DeleteListAsync($"/api/v1/configurations/{List.Id}", Cancellation);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         await using var db = Platform(Fixture.A.Id);

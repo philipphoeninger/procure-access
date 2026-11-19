@@ -689,7 +689,7 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
     }
 
     describe('„Auswahl ändern“ of a saved list (R-SAV-03; owner decision S5-21b 2a)', () => {
-      const SAVED = { id: 'list-1', release: 'T.1' };
+      const SAVED = { id: 'list-1', release: 'T.1', etag: '"1-3"' };
 
       it('offers „Abbrechen“ back to the list; S10 of the draft does not', async () => {
         await setUp({ savedList: SAVED });
@@ -720,9 +720,12 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         await vi.waitFor(() => expect(navigate).toHaveBeenCalled());
 
         expect(api.getCriteria).toHaveBeenCalled();
-        expect(changeSelection).toHaveBeenCalledWith('list-1', {
-          selection: { releaseVersion: 'T.1', useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] },
-        });
+        // With the tag the list was read at (API-03).
+        expect(changeSelection).toHaveBeenCalledWith(
+          'list-1',
+          { selection: { releaseVersion: 'T.1', useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base'], testTypeIds: [] } },
+          '"1-3"',
+        );
         expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-1', {
           state: { savedListArrival: { kind: 'selectionChanged', droppedDecisions: dropped } },
         });
