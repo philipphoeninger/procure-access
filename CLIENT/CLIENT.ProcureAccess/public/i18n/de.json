@@ -161,7 +161,8 @@
       "done": "erledigt"
     },
     "loaded.one": "1 Ergebnis geladen.",
-    "loaded.zero": "Keine Ergebnisse geladen."
+    "loaded.zero": "Keine Ergebnisse geladen.",
+    "breadcrumb": "Sie sind hier"
   },
   "auth": {
     "confirm": {
@@ -843,7 +844,8 @@
         "tested.evidences.one": "Ja – 1 Prüfnachweis: {{types}}",
         "progress": "Einschätzung",
         "counts": "Abgleich",
-        "publication": "Veröffentlichung"
+        "publication": "Veröffentlichung",
+        "publication.none": "Nicht veröffentlicht"
       },
       "products": "Produkte in diesem Projekt",
       "addProduct": "Produkt hinzufügen",
@@ -864,7 +866,13 @@
     "archived": {
       "note": "Dieses Projekt ist archiviert. Sie können es ansehen, aber nicht mehr bearbeiten. Um es wieder zu bearbeiten, setzen Sie den Stand auf „Laufend“."
     },
-    "create.criteria.none": "Keine Liste"
+    "create.criteria.none": "Keine Liste",
+    "edit": {
+      "title": "Projekt bearbeiten",
+      "error.title": "Änderungen nicht gespeichert",
+      "error": "Das Projekt konnte nicht geändert werden. Bitte versuchen Sie es erneut. Wenn der Fehler bleibt, schreiben Sie uns.",
+      "saved": "Das Projekt wurde gespeichert."
+    }
   },
   "candidate": {
     "form": {
@@ -1017,6 +1025,19 @@
       "details": "Einschätzung je Kriterium anzeigen",
       "release": "Eingeschätzt nach Katalogversion {{entryRelease}}. Ihre Liste nutzt Version {{configRelease}}.",
       "none": "Keine Einschätzungen einzelner Kriterien veröffentlicht."
+    }
+  },
+  "directory": {
+    "entry": {
+      "row": {
+        "fulfilled": "Erfüllt: {{count}}",
+        "slightRestriction": "Leichte Einschränkung: {{count}}",
+        "restriction": "Einschränkung: {{count}}",
+        "barrier": "Barriere: {{count}}",
+        "blockade": "Blockade: {{count}}",
+        "notApplicable": "Nicht anwendbar: {{count}}",
+        "unknown": "Nicht eingeschätzt: {{count}}"
+      }
     }
   }
 }

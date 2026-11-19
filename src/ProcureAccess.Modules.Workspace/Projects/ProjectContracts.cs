@@ -36,6 +36,11 @@ internal sealed record ChangeProjectBody(string? Name, string? Status);
 /// decision S6-15 5 (a)).
 /// </param>
 /// <param name="CriteriaList">The project's own copy of a list (S6-12, C53); <c>null</c> while it has none.</param>
+/// <param name="CriteriaListLocked">
+/// <c>true</c> once a candidate has an assessment other than „Nicht eingeschätzt“, also on a criterion
+/// excluded at the moment: the list can no longer be replaced (R-PRJ-04, C47, WSP-02) and S32 shows
+/// <c>projects.detail.criteriaLocked</c> (S6-14).
+/// </param>
 internal sealed record ProjectResponse(
     Guid Id,
     Guid OrganizationId,
@@ -46,6 +51,7 @@ internal sealed record ProjectResponse(
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt,
     ProjectCriteriaListResponse? CriteriaList,
+    bool CriteriaListLocked,
     [property: JsonIgnore] string Etag);
 
 /// <summary>

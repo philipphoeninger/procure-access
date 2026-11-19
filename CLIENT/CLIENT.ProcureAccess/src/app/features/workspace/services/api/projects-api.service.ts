@@ -10,15 +10,16 @@ import { API_URL } from '@app/app.config';
 import { ifMatch, withEtag } from '@app/core/concurrency/etag';
 import { CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
-import { Project, ProjectCriteriaList, ProjectSummary } from '../../models/projects';
+import { Project, ProjectChange, ProjectCriteriaList, ProjectSummary } from '../../models/projects';
 
 /**
  * Client of the project endpoints of the Workspace module (ARCHITECTURE §7.2; S6-11). Every request
  * is marked {@link CALLER_SHOWS_FAILURES}: S30 shows a failed list as the S80 server text in place,
- * S31 every failure of creating in its error notice, S32 a failed read as S80 in place; a failed
- * assignment of a list after creating the project shows the general notice on S32 (owner decision
- * S6-12 D5 (b)). Every answer with a project carries its `ETag`, kept as `etag`; a change of the
- * project sends it back in `If-Match` (API-03, S6-20).
+ * S31 every failure of creating in its error notice, S32 a failed read as S80 in place and the
+ * dialog „Projekt bearbeiten“ a failed change in its error notice (S6-14); a failed assignment of a
+ * list after creating the project shows the general notice on S32 (owner decision S6-12 D5 (b)).
+ * Every answer with a project carries its `ETag`, kept as `etag`; a change of the project sends it
+ * back in `If-Match` (API-03, S6-20).
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectsApiService {
@@ -50,6 +51,22 @@ export class ProjectsApiService {
     return lastValueFrom(
       this.http.get<ProjectBody>(`${this.apiUrl}/v1/projects/${encodeURIComponent(id)}`, {
         context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+        observe: 'response',
+      }),
+    ).then(withEtag);
+  }
+
+  /**
+   * Changes the name, the status or both (R-PRJ-05; `PATCH /api/v1/projects/{id}`); Editor or Owner,
+   * confirmed address. An archived project changes only its status (409 `project-archived`). `etag`
+   * is the tag of the project as it was read (409 `conflict` when someone changed it since, API-03);
+   * the answer carries the new one.
+   */
+  change(id: string, change: ProjectChange, etag: string): Promise<Project> {
+    return lastValueFrom(
+      this.http.patch<ProjectBody>(`${this.apiUrl}/v1/projects/${encodeURIComponent(id)}`, change, {
+        context: new HttpContext().set(CALLER_SHOWS_FAILURES, true),
+        headers: ifMatch(etag),
         observe: 'response',
       }),
     ).then(withEtag);

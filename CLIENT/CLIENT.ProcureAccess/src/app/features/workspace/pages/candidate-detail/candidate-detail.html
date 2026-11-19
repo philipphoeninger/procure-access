@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 -->
 
 @if (shown(); as shown) {
+  <pa-breadcrumb [items]="breadcrumb()" />
   <h1 class="pa-candidate__title">{{ shown.candidate.name }}</h1>
   @if (shown.candidate.vendor) {
     <p class="pa-candidate__meta">{{ 'candidate.vendorLine' | translate: { vendor: shown.candidate.vendor } }}</p>

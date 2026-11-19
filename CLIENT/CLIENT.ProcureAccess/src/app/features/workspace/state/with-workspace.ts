@@ -7,7 +7,7 @@ import { patchState, signalStoreFeature, withMethods, withState } from '@ngrx/si
 
 import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
-import { Project, ProjectCriteriaList, ProjectSummary } from '../models/projects';
+import { Project, ProjectChange, ProjectCriteriaList, ProjectSummary } from '../models/projects';
 import { ProjectsApiService } from '../services/api/projects-api.service';
 
 /**
@@ -106,6 +106,24 @@ export const withWorkspace = () =>
           if (projects.organizationId === organizationId && projects.status === 'loaded') {
             const { id, status, productCount, modifiedAt } = project;
             patchProjects({ items: [{ id, name: project.name, status, productCount, modifiedAt }, ...projects.items] });
+          }
+          return project;
+        },
+
+        /**
+         * Changes the name, the status or both (R-PRJ-05; S32's dialog „Projekt bearbeiten“, S6-14)
+         * of the project read with `etag` (API-03) and updates the project in the loaded list of its
+         * organisation, so S30 shows the change without a new load. Rejects with the error of the
+         * request; the dialog shows it.
+         */
+        async changeProject(id: string, change: ProjectChange, etag: string): Promise<Project> {
+          const project = await api.change(id, change, etag);
+          const projects = store.workspace.projects();
+          if (projects.organizationId === project.organizationId && projects.status === 'loaded') {
+            const { name, status, productCount, modifiedAt } = project;
+            patchProjects({
+              items: projects.items.map((item) => (item.id === id ? { id, name, status, productCount, modifiedAt } : item)),
+            });
           }
           return project;
         },

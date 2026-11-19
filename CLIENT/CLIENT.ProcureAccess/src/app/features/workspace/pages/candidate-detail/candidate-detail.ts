@@ -10,10 +10,12 @@ import { Observable } from 'rxjs';
 
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ErrorPage } from '@app/pages/error/error-page';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/components/breadcrumb/breadcrumb';
 import { Notice } from '@app/shared/components/notice/notice';
 
 import { CandidateTabs } from '../../components/candidate-tabs/candidate-tabs';
 import { CandidateTab } from '../../models/candidates';
+import { projectPath, PROJECTS_PATH } from '../../models/projects';
 import { CandidateLoad } from './candidate-load';
 
 /**
@@ -47,7 +49,9 @@ export function candidateTabTitle(tab: CandidateTab, error?: Signal<boolean>): v
  *   (`pruefnachweis`), Einschätzung nach Kriterien (`einschaetzung`). Each tab is a page with its
  *   own title ({@link candidateTabTitle}); the route change moves the focus to the H1.
  * - A project or candidate the user cannot see shows „Seite nicht gefunden“ in place, a failed read
- *   the S80 server text. The breadcrumb of the frame comes with S6-14 (D6 (a)).
+ *   the S80 server text.
+ * - Above the H1 the path „Projekte › {{project}} › {{product}}“ (`pa-breadcrumb`; owner
+ *   decisions S6-16 D6 (a), S6-14 D6 (a)).
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2134-3184
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2097-2627
@@ -56,13 +60,14 @@ export function candidateTabTitle(tab: CandidateTab, error?: Signal<boolean>): v
  */
 @Component({
   selector: 'pa-candidate-detail',
-  imports: [CandidateTabs, ErrorPage, Notice, RouterOutlet, TranslatePipe],
+  imports: [Breadcrumb, CandidateTabs, ErrorPage, Notice, RouterOutlet, TranslatePipe],
   templateUrl: './candidate-detail.html',
   styleUrl: './candidate-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CandidateDetailPage {
   private readonly load = inject(CandidateLoad);
+  private readonly translate = inject(TranslateService);
 
   protected readonly view = this.load.view;
 
@@ -70,6 +75,17 @@ export class CandidateDetailPage {
   protected readonly shown = computed(() => {
     const view = this.view();
     return view.kind === 'candidate' && view.candidate !== null ? { project: view.project, candidate: view.candidate } : null;
+  });
+
+  protected readonly breadcrumb = computed<BreadcrumbItem[]>(() => {
+    const shown = this.shown();
+    return shown === null
+      ? []
+      : [
+          { label: this.translate.instant('shell.nav.projects') as string, link: `/${PROJECTS_PATH}` },
+          { label: shown.project.name, link: projectPath(shown.project.id) },
+          { label: shown.candidate.name },
+        ];
   });
 
   protected readonly errorKind = computed(() => {

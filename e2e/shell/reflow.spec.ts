@@ -23,7 +23,8 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * the delete dialog of S14; the settings page S60 since S5-26; the account page S61 with its dialog and refusal notice since
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
  * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
- * Überblick with its tabs since S6-16; the evidence tab S34a since S6-17. The legacy screens are
+ * Überblick with its tabs since S6-16; the project overview S32 with its menu and the dialog „Projekt
+ * bearbeiten“ since S6-14; the evidence tab S34a since S6-17. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -105,6 +106,8 @@ async function routeCandidate(page: Page, candidate: Record<string, unknown> = {
         createdAt: '2026-11-18T09:00:00Z',
         modifiedAt: '2026-11-18T09:00:00Z',
         criteriaList: { id: listId, name: listName, releaseVersion: 'T.1' },
+        criteriaListLocked: false,
+        candidates: [],
       },
     }),
   );
@@ -363,6 +366,89 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
 
     await dialog.getByRole('button', { name: 'Projekt anlegen' }).click();
+    await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
+    await expectReflow(page);
+    await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+  });
+
+  test('S32 with its list, products, the open menu and the dialog „Projekt bearbeiten“ with its error summary needs no horizontal scrolling', async ({ page }) => {
+    // Project and the project's copy are answered here (the criteria come from T.1), and the dialog
+    // is only submitted empty and cancelled: the seeded organisation stays unchanged (owner decision S5-16 7a)
+    const projectId = '0e2e0000-0000-4000-8000-0000000000d1';
+    const listId = '0e2e0000-0000-4000-8000-0000000000d2';
+    const listName = 'Kriterienliste für die Fachanwendung der Personalverwaltung mit einem langen Namen';
+    const candidate = (id: string, name: string) => ({
+      id,
+      name,
+      vendor: 'Beispiel Software Gesellschaft mit beschränkter Haftung',
+      testStatus: 'tested',
+      testEvidences: [
+        { testKind: 'procedure', testTypeId: 'softwareTest', otherTestTypeName: null },
+        { testKind: 'other', testTypeId: null, otherTestTypeName: 'Prüfung der Schwerbehindertenvertretung mit Screenreadern' },
+      ],
+      progress: { done: 136, total: 146 },
+      fulfillment: { fulfilled: 122, slightRestriction: 3, restriction: 6, barrier: 2, blockade: 1, notApplicable: 2, unknown: 10 },
+      procedureAnswers: [],
+    });
+    // The client keeps the ETag of a project and refuses an answer without one (API-03, S6-20).
+    await page.route(`**/api/v1/projects/${projectId}`, (route) =>
+      route.fulfill({
+        status: 200,
+        headers: { ETag: '"1-1"' },
+        json: {
+          id: projectId,
+          organizationId: E2E_ORGANIZATION.id,
+          name: 'Barrierefreie Beschaffung einer Fachanwendung für die Personalverwaltung der Stadtwerke',
+          status: 'open',
+          productCount: 2,
+          createdAt: '2026-11-18T09:00:00Z',
+          modifiedAt: '2026-11-18T09:00:00Z',
+          criteriaList: { id: listId, name: listName, releaseVersion: 'T.1' },
+          criteriaListLocked: true,
+          candidates: [
+            candidate('0e2e0000-0000-4000-8000-0000000000d3', 'Bewerbermanagementsystem mit Stellenausschreibung und Terminplanung'),
+            candidate('0e2e0000-0000-4000-8000-0000000000d4', 'Personalverwaltungssoftware'),
+          ],
+        },
+      }),
+    );
+    await page.route(`**/api/v1/configurations/${listId}`, (route) =>
+      route.fulfill({
+        status: 200,
+        json: {
+          id: listId,
+          organizationId: E2E_ORGANIZATION.id,
+          name: listName,
+          releaseVersion: 'T.1',
+          createdAt: '2026-11-18T09:00:00Z',
+          modifiedAt: '2026-11-18T09:00:00Z',
+          procurementProjectId: projectId,
+          selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: ['bikWeb'] },
+          criteria: [],
+        },
+      }),
+    );
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    const main = page.getByRole('main');
+
+    await page.goto(`/projekte/${projectId}`);
+    await expect(main.getByRole('heading', { level: 1, name: /^Barrierefreie Beschaffung/ })).toBeVisible();
+    await expect(main.locator('.pa-project__counts').first().locator('li')).toHaveCount(7);
+    await expect(main).toContainText('Die Kriterienliste kann nicht mehr gegen eine andere ausgetauscht werden');
+    await expectReflow(page);
+
+    await main.getByRole('button', { name: 'Produkt hinzufügen' }).click();
+    await expect(page.getByRole('menu').getByRole('menuitem', { name: 'Neu erfassen' })).toBeVisible();
+    await expectReflow(page);
+    await page.keyboard.press('Escape');
+
+    await main.getByRole('button', { name: 'Projekt bearbeiten' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Projekt bearbeiten' });
+    const name = dialog.getByRole('textbox', { name: 'Name des Projekts' });
+    await expect(name).toBeFocused();
+    await expectReflow(page);
+    await name.fill('');
+    await dialog.getByRole('button', { name: 'Speichern' }).click();
     await expect(dialog.locator('pa-error-summary pa-notice')).toBeFocused();
     await expectReflow(page);
     await dialog.getByRole('button', { name: 'Abbrechen' }).click();
