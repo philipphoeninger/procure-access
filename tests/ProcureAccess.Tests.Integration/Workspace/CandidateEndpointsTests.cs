@@ -95,7 +95,10 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         // The project lists it and counts it, and its last change moved (owner decision S6-15 5 (a)).
         var projectRead = (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(project.Id), Cancellation)).ShouldNotBeNull();
         projectRead.ProductCount.ShouldBe(1);
-        projectRead.Candidates.ShouldHaveSingleItem().ShouldBe(new CandidateSummaryResponse(created.Id, "Bewerbermanager", "Anbieter GmbH", "unknown", null, null, null));
+        var summary = projectRead.Candidates.ShouldHaveSingleItem();
+        summary.TestEvidences.ShouldBeEmpty();
+        summary.ShouldBe(new CandidateSummaryResponse(
+            created.Id, "Bewerbermanager", "Anbieter GmbH", "unknown", summary.TestEvidences, null, null, null));
         projectRead.ModifiedAt.ShouldBe(Clock.GetUtcNow());
         var list = await client.GetFromJsonAsync<List<ProjectSummaryResponse>>($"/api/v1/organizations/{Fixture.A.Id}/projects", Cancellation);
         list.ShouldNotBeNull().ShouldHaveSingleItem().ProductCount.ShouldBe(1);
@@ -269,6 +272,16 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
             ("own", null, null),
         ]);
         read.TestEvidences[0].ShouldBe(firstEvidence);
+
+        // S32 names their kinds in the same order (S6-14).
+        var projectRead = (await client.GetFromJsonAsync<ProjectResponse>(ProjectPath(candidate.ProcurementProjectId), Cancellation)).ShouldNotBeNull();
+        projectRead.Candidates.ShouldHaveSingleItem().TestEvidences.ShouldBe(
+        [
+            new TestEvidenceTypeResponse("procedure", "softwareTest", null),
+            new TestEvidenceTypeResponse("procedure", "bikWeb", null),
+            new TestEvidenceTypeResponse("other", null, "Hausinterner Test"),
+            new TestEvidenceTypeResponse("own", null, null),
+        ]);
     }
 
     [Theory(DisplayName = "INV:WSP-01 " + nameof(AddEvidence_StatusNotTested_Returns409TestStatusConflictAndStoresNothing))]

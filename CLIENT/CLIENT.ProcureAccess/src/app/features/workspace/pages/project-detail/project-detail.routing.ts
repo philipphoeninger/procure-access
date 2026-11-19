@@ -2,35 +2,35 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { ResolveFn, Routes } from '@angular/router';
 
 import { PAGE_TITLE_KEY } from '@app/core/a11y/page-title.strategy';
 import { authGuard } from '@app/core/guards/auth.guard';
 import { ProcureAccessStore } from '@app/core/state/app.store';
+import { CatalogApiService } from '@app/features/configurator/services/api/catalog-api.service';
+import { ConfiguratorApiService } from '@app/features/configurator/services/api/configurator-api.service';
 
 import { CANDIDATES_SEGMENT } from '../../models/candidates';
 import { PROJECT_CRITERIA_LIST_SEGMENT } from '../../models/projects';
 import { ProjectsApiService } from '../../services/api/projects-api.service';
-import { ProjectLoad } from './project-detail-load';
+import { loadProjectView, ProjectLoad } from './project-detail-load';
 import { ProjectDetailPage } from './project-detail';
 
 /**
- * Loads the project before S32 shows, so the route change titles, focuses and announces
- * „{{project}} – Beschaffungsprojekte“ with the name already known (A11Y-03). A project the user
- * cannot see (unknown, or of another organisation: 404, TEN-01) shows „Seite nicht gefunden“ in
- * place, any other failure the S80 server text, as a saved list does. The loading bar shows meanwhile.
+ * Loads the project and the facts of its list before S32 shows, so the route change titles,
+ * focuses and announces „{{project}} – Beschaffungsprojekte“ with the name already known (A11Y-03).
+ * A project the user cannot see (unknown, or of another organisation: 404, TEN-01) shows „Seite
+ * nicht gefunden“ in place, any other failure the S80 server text, as a saved list does
+ * ({@link loadProjectView}). The loading bar shows meanwhile.
  */
 export const projectResolver: ResolveFn<string> = async (route) => {
   const load = inject(ProjectLoad);
   const store = inject(ProcureAccessStore);
-  const api = inject(ProjectsApiService);
+  const apis = { projects: inject(ProjectsApiService), configurator: inject(ConfiguratorApiService), catalog: inject(CatalogApiService) };
   store.incrementLoadingCount();
   try {
-    load.view = { kind: 'project', project: await api.get(route.paramMap.get('id') ?? '') };
-  } catch (error: unknown) {
-    load.view = error instanceof HttpErrorResponse && error.status === 404 ? { kind: 'notFound' } : { kind: 'server' };
+    load.view = await loadProjectView(apis, route.paramMap.get('id') ?? '');
   } finally {
     store.decrementLoadingCount();
   }

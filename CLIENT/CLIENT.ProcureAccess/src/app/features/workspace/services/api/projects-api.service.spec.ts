@@ -22,6 +22,8 @@ const PROJECT: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: null,
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 const BODY = bodyOf(PROJECT);
@@ -69,6 +71,18 @@ describe('ProjectsApiService', () => {
     expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
     request.flush(BODY, { headers: { ETag: '"1-7"' } });
     await expect(read).resolves.toEqual({ ...PROJECT, etag: '"1-7"' });
+  });
+
+  it("changes name or status with a PATCH of what changes and the project's tag in If-Match, and keeps the new tag (R-PRJ-05, API-03)", async () => {
+    const changed = api.change('p/1', { status: 'archived' }, '"1-4"');
+
+    const request = backend.expectOne('/api/v1/projects/p%2F1');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ status: 'archived' });
+    expect(request.request.headers.get('If-Match')).toBe('"1-4"');
+    expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(true);
+    request.flush({ ...BODY, status: 'archived' }, { headers: { ETag: '"1-5"' } });
+    await expect(changed).resolves.toEqual({ ...PROJECT, status: 'archived', etag: '"1-5"' });
   });
 
   it("gives the project its own copy of a list with a PUT of the source and the project's tag in If-Match, every failure shown by the caller (R-PRJ-02, R-PRJ-04, API-03)", async () => {

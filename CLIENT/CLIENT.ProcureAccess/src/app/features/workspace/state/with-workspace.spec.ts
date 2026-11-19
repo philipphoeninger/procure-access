@@ -26,6 +26,8 @@ const CREATED: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: null,
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 describe('withWorkspace', () => {
@@ -99,6 +101,38 @@ describe('withWorkspace', () => {
     await created;
 
     expect(store.workspace.projects().items).toEqual([]);
+  });
+
+  it('changes a project and shows the change in the loaded list of its organisation (R-PRJ-05)', async () => {
+    const loaded = store.loadProjects('o1');
+    backend.expectOne('/api/v1/organizations/o1/projects').flush([SUMMARY, { ...SUMMARY, id: 'p3', name: 'Andere' }]);
+    await loaded;
+
+    const changed = store.changeProject('p1', { name: 'Umbenannt', status: 'done' }, '"1-3"');
+    const request = backend.expectOne('/api/v1/projects/p1');
+    expect(request.request.body).toEqual({ name: 'Umbenannt', status: 'done' });
+    expect(request.request.headers.get('If-Match')).toBe('"1-3"');
+    const answer: Project = { ...CREATED, id: 'p1', etag: '"1-4"', name: 'Umbenannt', status: 'done', productCount: 2, modifiedAt: '2026-11-18T10:00:00Z' };
+    const { etag, ...body } = answer;
+    request.flush(body, { headers: { ETag: etag } });
+
+    await expect(changed).resolves.toEqual(answer);
+    expect(store.workspace.projects().items).toEqual([
+      { id: 'p1', name: 'Umbenannt', status: 'done', productCount: 2, modifiedAt: '2026-11-18T10:00:00Z' },
+      { ...SUMMARY, id: 'p3', name: 'Andere' },
+    ]);
+  });
+
+  it('rejects with the error of a refused change and keeps the list', async () => {
+    const loaded = store.loadProjects('o1');
+    backend.expectOne('/api/v1/organizations/o1/projects').flush([SUMMARY]);
+    await loaded;
+
+    const changed = store.changeProject('p1', { name: 'Umbenannt' }, '"1-3"');
+    backend.expectOne('/api/v1/projects/p1').flush(null, { status: 409, statusText: 'Conflict' });
+
+    await expect(changed).rejects.toMatchObject({ status: 409 });
+    expect(store.workspace.projects().items).toEqual([SUMMARY]);
   });
 
   it('rejects with the error of a refused creation', async () => {

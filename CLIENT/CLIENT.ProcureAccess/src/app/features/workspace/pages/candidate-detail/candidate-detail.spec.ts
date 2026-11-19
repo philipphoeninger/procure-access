@@ -6,7 +6,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { render, screen } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import { of } from 'rxjs';
 
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
@@ -60,6 +60,13 @@ describe('CandidateDetailPage (S34 with its tabs as routes, R-CAN-03)', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeTruthy();
     expect(screen.getByText('Anbieter: Beispiel Software GmbH')).toBeTruthy();
+    // The path of the frame (owner decision S6-14 D6 (a)): Projekte › project › product
+    const path = screen.getByRole('navigation', { name: 'Sie sind hier' });
+    expect(within(path).getAllByRole('link').map((link) => [link.textContent?.trim(), link.getAttribute('href')])).toEqual([
+      ['Projekte', '/projekte'],
+      ['Neues Bewerbermanagement 2027', '/projekte/p-1'],
+    ]);
+    expect(within(path).getByText('BewerberPro').getAttribute('aria-current')).toBe('page');
     const links = tabLinks();
     expect(links.map((link) => link.textContent?.trim())).toEqual(['Überblick', 'Prüfnachweis', 'Einschätzung nach Kriterien']);
     expect(links.map((link) => link.getAttribute('href'))).toEqual([
