@@ -43,11 +43,16 @@ export class PreferencesApiService {
   }
 
   /**
-   * Replaces all four settings (`PUT`, SPEC §8.12). Unmarked: a failure shows the system states of
-   * the error interceptor — the offline notice, the S80 page or the snackbar of its problem type
-   * (owner decision S5-26 D2 (a)).
+   * Replaces the settings (`PUT`, SPEC §8.12). Unmarked for S60: a failure shows the system states
+   * of the error interceptor — the offline notice, the S80 page or the snackbar of its problem type
+   * (owner decision S5-26 D2 (a)). With `background` (S34b remembering its legend, S6-19b) it is a
+   * {@link BACKGROUND_REQUEST}: nobody asked to save, so a failure shows nothing.
    */
-  save(preferences: UserPreferences): Promise<UserPreferences> {
-    return lastValueFrom(this.http.put<UserPreferences>(`${this.apiUrl}/v1/account/preferences`, preferences));
+  save(preferences: UserPreferences, { background = false }: { background?: boolean } = {}): Promise<UserPreferences> {
+    return lastValueFrom(
+      this.http.put<UserPreferences>(`${this.apiUrl}/v1/account/preferences`, preferences, {
+        context: new HttpContext().set(BACKGROUND_REQUEST, background),
+      }),
+    );
   }
 }

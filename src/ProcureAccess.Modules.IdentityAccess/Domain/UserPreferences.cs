@@ -7,7 +7,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Domain;
 /// <summary>
 /// The settings of one user (SPEC R-SET-01, R-SET-02; ARCHITECTURE §5.2, C73; S5-25a): language,
 /// appearance, motion and contrast, applied by the client on every device after the sign-in
-/// (A11Y-06). One row per user, keyed by the user id (a foreign key onto the users since
+/// (A11Y-06); since S6-19b also the state of the rating legend on the assessment tab S34b
+/// (SPEC R-CAN-08, owner decision S6-19 Q1 (b)). One row per user, keyed by the user id (a foreign key onto the users since
 /// S6-10b). A user without a row has <see cref="Defaults"/>.
 /// </summary>
 internal sealed class UserPreferences
@@ -32,6 +33,9 @@ internal sealed class UserPreferences
 
     public ContrastPreference Contrast { get; private set; }
 
+    /// <summary>The rating legend on S34b: <see cref="AssessmentLegendPreference.Auto"/> until the user decides or assesses.</summary>
+    public AssessmentLegendPreference AssessmentLegend { get; private set; }
+
     /// <summary>The settings of a user who never saved any: German, everything as in the system.</summary>
     public static UserPreferences Defaults(string userId)
     {
@@ -43,6 +47,7 @@ internal sealed class UserPreferences
             Appearance = AppearancePreference.System,
             Motion = MotionPreference.System,
             Contrast = ContrastPreference.System,
+            AssessmentLegend = AssessmentLegendPreference.Auto,
         };
     }
 
@@ -78,6 +83,17 @@ internal sealed class UserPreferences
         Motion = motion;
         Contrast = contrast;
     }
+
+    /// <summary>Stores the state of the rating legend on S34b (S6-19b); throws for an undefined value.</summary>
+    public void ChangeAssessmentLegend(AssessmentLegendPreference assessmentLegend)
+    {
+        if (!Enum.IsDefined(assessmentLegend))
+        {
+            throw new ArgumentOutOfRangeException(nameof(assessmentLegend), assessmentLegend, "Unknown legend state.");
+        }
+
+        AssessmentLegend = assessmentLegend;
+    }
 }
 
 /// <summary>Light or dark appearance, or the system's (<c>prefers-color-scheme</c>; SPEC §7.5, C73).</summary>
@@ -103,4 +119,17 @@ internal enum ContrastPreference
 {
     System,
     High,
+}
+
+/// <summary>
+/// The rating legend <c>pa-rating-legend</c> on the assessment tab S34b (SPEC R-CAN-08, Handoff
+/// §4.11; owner decisions S6-19 Q1 (b), S6-19b (a)): <see cref="Auto"/> — expanded from 600 px
+/// until the user's first assessment, which the client stores as <see cref="Collapsed"/>; or what
+/// the user chose by opening or closing it.
+/// </summary>
+internal enum AssessmentLegendPreference
+{
+    Auto,
+    Expanded,
+    Collapsed,
 }

@@ -24,7 +24,8 @@ namespace ProcureAccess.Tests.Integration.Persistence;
 /// OPS-03 for the IdentityAccess migration <c>AddUserForeignKeys</c> (S6-10b; owner decisions
 /// S6-10 3 and 4): a database from before it, with the rows a Development rebuild left without
 /// their user and with a soft-deleted account that still holds roles, migrates; the orphans are
-/// gone, the rows of existing users stay, and the five keys exist with their delete rules.
+/// gone, the rows of existing users stay, and the five keys exist with their delete rules; and for
+/// <c>AssessmentLegendPreference</c> (S6-19b) the settings stored before it.
 /// Each test uses a database of its own on the shared container.
 /// </summary>
 public sealed class UserForeignKeysMigrationTests(ApiFixture api) : IAsyncDisposable
@@ -33,6 +34,9 @@ public sealed class UserForeignKeysMigrationTests(ApiFixture api) : IAsyncDispos
     private const string Before = "20261118015819_AdoptIdentityTables";
 
     private const string Gone = "user-that-no-longer-exists";
+
+    /// <summary>The last migration before the legend state joined the settings (S6-19b).</summary>
+    private const string BeforeAssessmentLegend = "20261118123722_RevokePlatformAdminModerationReview";
 
     private readonly List<string> _databases = [];
 
@@ -80,13 +84,16 @@ public sealed class UserForeignKeysMigrationTests(ApiFixture api) : IAsyncDispos
             identity.AccountTokens.AddRange(
                 AccountToken.Create(kept.Id, AccountTokenPurpose.EmailConfirmation, Hash(), now, TimeSpan.FromHours(24)),
                 AccountToken.Create(Gone, AccountTokenPurpose.PasswordReset, Hash(), now, TimeSpan.FromHours(2)));
-            identity.UserPreferences.AddRange(UserPreferences.Defaults(kept.Id), UserPreferences.Defaults(Gone));
             var keptProfile = ContributorProfile.Create("Bleibt", ContributorKind.Individual, now);
             var orphanProfile = ContributorProfile.Create("Verwaist", ContributorKind.Vendor, now);
             identity.ContributorProfiles.AddRange(keptProfile, orphanProfile);
             identity.UserContributorLinks.AddRange(
                 UserContributorLink.Create(kept.Id, keptProfile), UserContributorLink.Create(Gone, orphanProfile));
             await identity.SaveChangesAsync(cancellationToken);
+
+            // In the columns of this migration: the entity has more since (S6-19b)
+            await InsertPreferencesAsync(identity, kept.Id, cancellationToken);
+            await InsertPreferencesAsync(identity, Gone, cancellationToken);
         }
 
         await using (var identity = IdentityAccess(connectionString))
@@ -124,6 +131,46 @@ public sealed class UserForeignKeysMigrationTests(ApiFixture api) : IAsyncDispos
             "UserContributorLinks.FK_UserContributorLinks_Users_UserId c",
             "UserPreferences.FK_UserPreferences_Users_UserId c",
         ]);
+    }
+
+    /// <summary>
+    /// S6-19b (SPEC R-CAN-08, owner decision S6-19 Q1 (b)): the settings stored before
+    /// <c>AssessmentLegendPreference</c> keep their values and get the legend state <c>Auto</c>,
+    /// the value of a user who never saved any.
+    /// </summary>
+    [Fact(DisplayName = "INV:OPS-03 " + nameof(AssessmentLegendPreference_SettingsStoredBefore_KeepTheirValuesAndStartAtAuto))]
+    [Trait("Invariant", "OPS-03")]
+    public async Task AssessmentLegendPreference_SettingsStoredBefore_KeepTheirValuesAndStartAtAuto()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = NewDatabase();
+        await using (var legacy = Legacy(connectionString))
+        {
+            await legacy.Database.MigrateAsync(cancellationToken);
+        }
+
+        var user = TestAccounts.WithId("settings-user");
+        await using (var identity = IdentityAccess(connectionString))
+        {
+            await identity.GetService<IMigrator>().MigrateAsync(BeforeAssessmentLegend, cancellationToken);
+            identity.Users.Add(user);
+            await identity.SaveChangesAsync(cancellationToken);
+            await identity.Database.ExecuteSqlAsync($"""
+                INSERT INTO identity."UserPreferences" ("UserId", "Language", "Appearance", "Motion", "Contrast")
+                VALUES ({user.Id}, 'de', 'Dark', 'Reduced', 'System')
+                """, cancellationToken);
+        }
+
+        await using (var identity = IdentityAccess(connectionString))
+        {
+            await identity.Database.MigrateAsync(cancellationToken);
+        }
+
+        await using var after = IdentityAccess(connectionString);
+        var stored = await after.UserPreferences.AsNoTracking().SingleAsync(p => p.UserId == user.Id, cancellationToken);
+        stored.Appearance.ShouldBe(AppearancePreference.Dark);
+        stored.Motion.ShouldBe(MotionPreference.Reduced);
+        stored.AssessmentLegend.ShouldBe(AssessmentLegendPreference.Auto);
     }
 
     [Fact]
@@ -177,6 +224,13 @@ public sealed class UserForeignKeysMigrationTests(ApiFixture api) : IAsyncDispos
             await context.Database.EnsureDeletedAsync();
         }
     }
+
+    /// <summary>Default settings of <paramref name="userId"/> in the four columns of S5-25a.</summary>
+    private static Task<int> InsertPreferencesAsync(IdentityAccessDbContext identity, string userId, CancellationToken cancellationToken) =>
+        identity.Database.ExecuteSqlAsync($"""
+            INSERT INTO identity."UserPreferences" ("UserId", "Language", "Appearance", "Motion", "Contrast")
+            VALUES ({userId}, 'de', 'System', 'System', 'System')
+            """, cancellationToken);
 
     private static byte[] Hash() => SHA256.HashData(RandomNumberGenerator.GetBytes(32));
 

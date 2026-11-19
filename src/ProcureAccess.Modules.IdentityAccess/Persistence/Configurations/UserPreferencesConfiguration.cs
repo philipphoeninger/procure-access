@@ -30,5 +30,6 @@ internal sealed class UserPreferencesConfiguration : IEntityTypeConfiguration<Us
         builder.Property(x => x.Appearance).HasConversion<string>().HasMaxLength(16);
         builder.Property(x => x.Motion).HasConversion<string>().HasMaxLength(16);
         builder.Property(x => x.Contrast).HasConversion<string>().HasMaxLength(16);
+        builder.Property(x => x.AssessmentLegend).HasConversion<string>().HasMaxLength(16);
     }
 }

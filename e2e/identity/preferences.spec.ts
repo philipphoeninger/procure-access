@@ -134,7 +134,7 @@ test.describe('User preferences (R-SET-01, R-SET-02)', () => {
 
     await test.step('saved: the server answers them, and S60 shows them after a reload', async () => {
       const stored = await page.request.get('/api/v1/account/preferences');
-      expect(await stored.json()).toEqual({ language: 'de', appearance: 'dark', motion: 'reduced', contrast: 'system' });
+      expect(await stored.json()).toEqual({ language: 'de', appearance: 'dark', motion: 'reduced', contrast: 'system', assessmentLegend: 'auto' });
       await page.reload();
       await expect(page.getByRole('heading', { level: 1, name: 'Einstellungen' })).toBeVisible();
       await expect(page.getByRole('radio', { name: 'Dunkel' })).toBeChecked();

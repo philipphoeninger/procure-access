@@ -36,7 +36,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// every candidate with its private section and test evidences (owner decisions S6-25 D1 (a),
 /// D2 (a)), for the same organisations.</para>
 /// <para><b>Settings</b> (S5-25a, owner decision S5-25 4): <c>preferences</c> holds the effective
-/// values — the defaults for a user who never saved any —, spelled as the settings API does.</para>
+/// values — the defaults for a user who never saved any —, spelled as the settings API does, with
+/// the state of the S34b rating legend since S6-19b (format still 1).</para>
 /// <para><b>Section not built yet</b> (owner decision S5-27 1a): <c>contributions</c> (step 6) is
 /// an empty array. Its task fills it and its part of PRV-07; the format stays
 /// <c>formatVersion</c> 1. <c>account.createdAt</c> is <c>null</c> for accounts created before
@@ -138,7 +139,7 @@ internal static class AccountExportEndpoints
                 e.TestKind, e.TestType, e.OtherTestTypeName, e.TestedBy, e.TestDate, e.TestedVersion, e.EvidenceUrl, e.QualificationNote))]))]);
 
     private static AccountExportPreferences PreferencesOf(UserPreferencesValues settings) =>
-        new(settings.Language, settings.Appearance, settings.Motion, settings.Contrast);
+        new(settings.Language, settings.Appearance, settings.Motion, settings.Contrast, settings.AssessmentLegend);
 }
 
 /// <summary>The export file of SPEC §8.4, its properties in the order of the SPEC.</summary>
@@ -158,7 +159,7 @@ internal sealed record AccountExportAccount(string? Email, DateTimeOffset? Creat
 /// The settings (S5-25a): language <c>de</c>; appearance <c>system</c> / <c>light</c> / <c>dark</c>;
 /// motion <c>system</c> / <c>reduced</c>; contrast <c>system</c> / <c>high</c>.
 /// </summary>
-internal sealed record AccountExportPreferences(string Language, string Appearance, string Motion, string Contrast);
+internal sealed record AccountExportPreferences(string Language, string Appearance, string Motion, string Contrast, string AssessmentLegend);
 
 /// <summary>A membership: organisation name, role (<c>owner</c>, <c>editor</c>, <c>reader</c>) and since when.</summary>
 internal sealed record AccountExportMembership(string Organization, string Role, DateTimeOffset Since);

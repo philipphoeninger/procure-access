@@ -468,6 +468,11 @@ namespace ProcureAccess.Modules.IdentityAccess.Persistence.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
+                    b.Property<string>("AssessmentLegend")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<string>("Contrast")
                         .IsRequired()
                         .HasMaxLength(16)

@@ -14,7 +14,7 @@ import { PreferencesApiService } from './preferences-api.service';
 describe('PreferencesApiService (SPEC §8.12)', () => {
   let api: PreferencesApiService;
   let backend: HttpTestingController;
-  const stored: UserPreferences = { language: 'de', appearance: 'dark', motion: 'reduced', contrast: 'system' };
+  const stored: UserPreferences = { language: 'de', appearance: 'dark', motion: 'reduced', contrast: 'system', assessmentLegend: 'collapsed' };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -57,6 +57,18 @@ describe('PreferencesApiService (SPEC §8.12)', () => {
     expect(request.request.body).toEqual(stored);
     expect(request.request.context.get(CALLER_SHOWS_FAILURES)).toBe(false);
     expect(request.request.context.get(BACKGROUND_REQUEST)).toBe(false);
+    request.flush(stored);
+
+    await expect(answer).resolves.toEqual(stored);
+  });
+
+  it('saves in the background for S34b remembering its legend, so a failure shows nothing (S6-19b)', async () => {
+    const answer = api.save(stored, { background: true });
+
+    const request = backend.expectOne('/api/v1/account/preferences');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual(stored);
+    expect(request.request.context.get(BACKGROUND_REQUEST)).toBe(true);
     request.flush(stored);
 
     await expect(answer).resolves.toEqual(stored);

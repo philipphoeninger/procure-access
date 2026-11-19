@@ -979,7 +979,8 @@
       "note.edit": "Begründung bearbeiten",
       "note": "Worauf stützt sich Ihre Einschätzung? (optional)",
       "saved": "Einschätzung gespeichert.",
-      "unionNote": "Ihre Liste gilt für mehrere Anwendungstypen. Bei jedem Kriterium stehen alle Stufen zur Auswahl, die für mindestens einen davon vorgesehen sind."
+      "unionNote": "Ihre Liste gilt für mehrere Anwendungstypen. Bei jedem Kriterium stehen alle Stufen zur Auswahl, die für mindestens einen davon vorgesehen sind.",
+      "list": "Kriterienliste: {{list}} (Katalogversion {{release}})"
     },
     "publish": {
       "cta": "Im Produktverzeichnis veröffentlichen",

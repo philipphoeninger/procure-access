@@ -18,6 +18,20 @@ SPDX-License-Identifier: MIT
       <div class="pa-assessment">
         <p class="pa-assessment__text">{{ 'candidate.assessment.intro' | translate }}</p>
 
+        <div class="pa-assessment__status">
+          <div class="pa-assessment__progress">
+            <p class="pa-assessment__count">{{ 'candidate.assessment.progress' | translate: progress() }}</p>
+            @if (listLine(); as line) {
+              <p class="pa-assessment__hint">{{ 'candidate.assessment.list' | translate: line }}</p>
+            }
+          </div>
+          <mat-checkbox class="pa-assessment__filter" [checked]="filterOn()" (change)="filterChanged($event.checked)">
+            {{ 'candidate.assessment.filter.unassessed' | translate }}
+          </mat-checkbox>
+        </div>
+
+        <pa-rating-legend [values]="legendValues()" [expanded]="legendExpanded()" (expandedChange)="legendToggled($event)" />
+
         @if (view.ratingsFromSeveralProcedures) {
           <pa-notice kind="info">
             <p>{{ 'candidate.assessment.unionNote' | translate }}</p>
@@ -25,7 +39,7 @@ SPDX-License-Identifier: MIT
         }
 
         <div class="pa-assessment__list">
-          @for (criterion of view.criteria; track criterion.criterionRevisionId) {
+          @for (criterion of shownCriteria(); track criterion.criterionRevisionId) {
             <pa-assessment-input
               [criterionTitle]="title(criterion)"
               [allowedValues]="criterion.allowedRatings"
@@ -36,18 +50,25 @@ SPDX-License-Identifier: MIT
               (valueChange)="valueChanged(criterion, $event)"
               (noteChange)="noteChanged(criterion, $event)"
             />
+          } @empty {
+            @if (filterOn()) {
+              <p class="pa-assessment__text">{{ 'criteria.list.emptyFilter' | translate }}</p>
+            }
           }
 
-          @for (procedure of view.procedureAnswers; track procedure.criterionRevisionId) {
-            <!-- Derived, read only (CAT-17): no K6, no input, never counted -->
-            <div class="pa-assessment__procedure">
-              <p class="pa-assessment__procedure-title" [id]="procedureTitleId(procedure)">{{ procedure.title }}</p>
-              <p class="pa-assessment__text">{{ answerKey(procedure) | translate }}</p>
-              <p class="pa-assessment__hint">{{ 'assessment.procedure.derived.hint' | translate }}</p>
-              <a matButton [routerLink]="evidencePath()" [attr.aria-describedby]="procedureTitleId(procedure)">
-                {{ 'assessment.procedure.derived.edit' | translate }}
-              </a>
-            </div>
+          <!-- Hidden while the filter is on: they need no assessment -->
+          @if (!filterOn()) {
+            @for (procedure of view.procedureAnswers; track procedure.criterionRevisionId) {
+              <!-- Derived, read only (CAT-17): no K6, no input, never counted -->
+              <div class="pa-assessment__procedure">
+                <p class="pa-assessment__procedure-title" [id]="procedureTitleId(procedure)">{{ procedure.title }}</p>
+                <p class="pa-assessment__text">{{ answerKey(procedure) | translate }}</p>
+                <p class="pa-assessment__hint">{{ 'assessment.procedure.derived.hint' | translate }}</p>
+                <a matButton [routerLink]="evidencePath()" [attr.aria-describedby]="procedureTitleId(procedure)">
+                  {{ 'assessment.procedure.derived.edit' | translate }}
+                </a>
+              </div>
+            }
           }
         </div>
       </div>

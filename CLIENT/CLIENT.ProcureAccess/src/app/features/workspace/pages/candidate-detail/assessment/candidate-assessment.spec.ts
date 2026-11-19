@@ -17,6 +17,7 @@ import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { OrganizationRole } from '@app/features/organization/models/organization';
+import { AssessmentLegendSetting, SYSTEM_PREFERENCES, UserPreferences } from '@app/features/settings/models/user-preferences';
 import { withLoading } from '@app/shared/state/with-loading';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
@@ -29,12 +30,21 @@ import { CandidateLoad, CandidateView } from '../candidate-load';
 import { CandidateAssessment } from './candidate-assessment';
 
 const role = signal<OrganizationRole>('editor');
+const preferences = signal<UserPreferences | null>(SYSTEM_PREFERENCES);
+const rememberAssessmentLegend = vi.fn<(state: AssessmentLegendSetting) => void>();
 
-/** The root store as S34b reads it: the real workspace slice and the user's role in `org-1`. */
+/**
+ * The root store as S34b reads it: the real workspace slice, the user's role in `org-1` and the
+ * user's settings with the legend state (`withSettings()`, S6-19b).
+ */
 const AssessmentTestStore = signalStore(
   withLoading(),
   withWorkspace(),
-  withMethods(() => ({ organizations: () => [{ id: 'org-1', name: 'Personalamt', type: 'publicBody' as const, role: role() }] })),
+  withMethods(() => ({
+    organizations: () => [{ id: 'org-1', name: 'Personalamt', type: 'publicBody' as const, role: role() }],
+    preferences: () => preferences(),
+    rememberAssessmentLegend: (state: AssessmentLegendSetting) => rememberAssessmentLegend(state),
+  })),
 );
 
 const URL = '/api/v1/candidates/c-1/assessments';
@@ -83,7 +93,11 @@ describe('CandidateAssessment (S34b „Einschätzung nach Kriterien“, R-CAN-06
     return rendered;
   }
 
-  beforeEach(() => role.set('editor'));
+  beforeEach(() => {
+    role.set('editor');
+    preferences.set(SYSTEM_PREFERENCES);
+    rememberAssessmentLegend.mockReset();
+  });
   afterEach(() => backend.verify());
 
   it('shows the intro, one K6 per requirement criterion with its allowed levels, and the derived rows (INV:CAT-15)', async () => {
@@ -229,5 +243,137 @@ describe('CandidateAssessment (S34b „Einschätzung nach Kriterien“, R-CAN-06
 
     backend.expectNone(URL);
     expect((fixture.nativeElement as HTMLElement).textContent?.trim()).toBe('');
+  });
+
+  describe('progress, filter and legend (R-CAN-08, S6-19b)', () => {
+    const legendButton = () => screen.getByRole('button', { name: /Bewertungsstufen/ });
+
+    /** Sends the saves still waiting for their 800 ms and answers them, so none fires after the test. */
+    async function settleSaves(): Promise<void> {
+      const flushed = (TestBed.inject(ProcureAccessStore) as unknown as { flushAssessments(): Promise<void> }).flushAssessments();
+      await new Promise((resolve) => setTimeout(resolve));
+      backend.match(() => true).forEach((request) => request.flush({}));
+      await flushed;
+    }
+
+    it('shows the progress of the requirement criteria and the list with its release; the derived rows are not counted', async () => {
+      await openTab();
+
+      expect(screen.getByText('2 von 3 Kriterien eingeschätzt')).toBeTruthy();
+      expect(screen.getByText('Kriterienliste: HR-Software 2027 (Katalogversion T.1)')).toBeTruthy();
+      await expectNoAxeViolations();
+    });
+
+    it('announces the progress when a choice changes it, at most every 5 s, and not for a note', async () => {
+      const { fixture } = await openTab();
+
+      fireEvent.input(within(screen.getAllByRole('group')[0]).getByRole('textbox'), { target: { value: 'Neu' } });
+      await fixture.whenStable();
+      expect(announce).not.toHaveBeenCalledWith('candidate.assessment.progress', expect.anything(), expect.anything());
+
+      screen.getAllByRole('radio', { name: 'Barriere' })[2].click();
+      await fixture.whenStable();
+
+      expect(screen.getByText('3 von 3 Kriterien eingeschätzt')).toBeTruthy();
+      expect(announce).toHaveBeenCalledWith('candidate.assessment.progress', { done: 3, total: 3 }, { throttleMs: 5000 });
+      await settleSaves();
+    });
+
+    it('filters to the criteria not assessed when it is ticked, announces the count and keeps a row assessed meanwhile', async () => {
+      const { fixture } = await openTab();
+      const filter = screen.getByRole('checkbox', { name: 'Nur noch nicht eingeschätzte anzeigen' });
+
+      filter.click();
+      await fixture.whenStable();
+
+      const groups = screen.getAllByRole('group');
+      expect(groups.map((group) => group.querySelector('legend')?.textContent?.trim())).toEqual([TITLES[2]]);
+      expect(screen.queryByText('Geprüft nach BIT inklusiv Software-Test')).toBeNull();
+      expect(announce).toHaveBeenCalledWith('common.results.shown.one', { count: 1 }, { throttleMs: 1000, throttleKey: 'common.results.shown' });
+
+      // Assessed while the filter is on: the row stays under the focus until the filter changes
+      within(groups[0]).getByRole('radio', { name: 'Erfüllt' }).click();
+      await fixture.whenStable();
+      expect(screen.getAllByRole('group')).toHaveLength(1);
+      await expectNoAxeViolations();
+
+      filter.click();
+      await fixture.whenStable();
+      expect(screen.getAllByRole('group')).toHaveLength(3);
+      expect(screen.getByText('Geprüft nach BIT inklusiv Software-Test')).toBeTruthy();
+
+      filter.click();
+      await fixture.whenStable();
+      expect(screen.queryByRole('group')).toBeNull();
+      expect(screen.getByText('Keine Kriterien passen zu Ihrem Filter.')).toBeTruthy();
+      expect(announce).toHaveBeenLastCalledWith('common.results.shown.zero', { count: 0 }, { throttleMs: 1000, throttleKey: 'common.results.shown' });
+      await settleSaves();
+    });
+
+    it('expands the legend from 600 px until the first assessment, with the levels of the list and „Nicht eingeschätzt“ (Handoff §4.11)', async () => {
+      await openTab();
+
+      expect(legendButton().textContent?.trim()).toBe('Erklärung der Bewertungsstufen ausblenden');
+      expect(legendButton().getAttribute('aria-expanded')).toBe('true');
+      const panel = document.getElementById(legendButton().getAttribute('aria-controls') ?? '')!;
+      expect([...panel.querySelectorAll('dt')].map((term) => term.textContent?.trim())).toEqual([
+        'Erfüllt',
+        'Leichte Einschränkung',
+        'Einschränkung',
+        'Barriere',
+        'Blockade',
+        'Nicht anwendbar',
+        'Nicht eingeschätzt',
+      ]);
+      // Above the list, after the progress row
+      expect(panel.compareDocumentPosition(screen.getAllByRole('group')[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('stores „collapsed“ at the first assessment, but keeps the legend open in this visit (owner decision S6-19b (a))', async () => {
+      const { fixture } = await openTab();
+
+      screen.getAllByRole('radio', { name: 'Blockade' })[2].click();
+      preferences.set({ ...SYSTEM_PREFERENCES, assessmentLegend: 'collapsed' });
+      await fixture.whenStable();
+
+      expect(rememberAssessmentLegend).toHaveBeenCalledExactlyOnceWith('collapsed');
+      expect(legendButton().getAttribute('aria-expanded')).toBe('true');
+      await settleSaves();
+    });
+
+    it('stores what the user chooses by opening or closing the legend', async () => {
+      const { fixture } = await openTab();
+
+      legendButton().click();
+      await fixture.whenStable();
+      expect(legendButton().getAttribute('aria-expanded')).toBe('false');
+      expect(rememberAssessmentLegend).toHaveBeenLastCalledWith('collapsed');
+
+      legendButton().click();
+      await fixture.whenStable();
+      expect(rememberAssessmentLegend).toHaveBeenLastCalledWith('expanded');
+    });
+
+    it('starts collapsed after the user closed it or assessed before, and stores nothing at an assessment then', async () => {
+      preferences.set({ ...SYSTEM_PREFERENCES, assessmentLegend: 'collapsed' });
+      const { fixture } = await openTab();
+
+      expect(legendButton().getAttribute('aria-expanded')).toBe('false');
+      screen.getAllByRole('radio', { name: 'Blockade' })[2].click();
+      await fixture.whenStable();
+      expect(rememberAssessmentLegend).not.toHaveBeenCalled();
+      await settleSaves();
+    });
+
+    it('starts collapsed below 600 px unless the user chose to see it (Handoff §2.2)', async () => {
+      await openTab({ wide: false });
+      expect(legendButton().getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('starts expanded below 600 px when the user chose so', async () => {
+      preferences.set({ ...SYSTEM_PREFERENCES, assessmentLegend: 'expanded' });
+      await openTab({ wide: false });
+      expect(legendButton().getAttribute('aria-expanded')).toBe('true');
+    });
   });
 });

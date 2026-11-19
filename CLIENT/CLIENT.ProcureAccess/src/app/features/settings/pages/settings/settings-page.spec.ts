@@ -13,7 +13,7 @@ import { UserPreferences } from '../../models/user-preferences';
 import { SettingsLoad } from './settings-load';
 import { SettingsPage } from './settings-page';
 
-const DEFAULTS: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system' };
+const DEFAULTS: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system', assessmentLegend: 'auto' };
 
 describe('SettingsPage (S60, R-SET-01)', () => {
   let preferences: ReturnType<typeof signal<UserPreferences | null>>;
