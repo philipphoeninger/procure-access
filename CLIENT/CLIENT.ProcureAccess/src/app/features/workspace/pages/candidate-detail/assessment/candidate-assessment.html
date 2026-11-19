@@ -1,0 +1,56 @@
+<!--
+SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+
+SPDX-License-Identifier: MIT
+-->
+
+@if (editable()) {
+  @if (!hasList()) {
+    <pa-notice kind="info">
+      <p>{{ 'projects.detail.noCriteria' | translate }}</p>
+    </pa-notice>
+  } @else if (assessments(); as state) {
+    @if (state.status === 'failed') {
+      <pa-notice kind="error" [title]="'errors.server.title' | translate">
+        <p>{{ 'errors.server.body' | translate }}</p>
+      </pa-notice>
+    } @else if (state.view; as view) {
+      <div class="pa-assessment">
+        <p class="pa-assessment__text">{{ 'candidate.assessment.intro' | translate }}</p>
+
+        @if (view.ratingsFromSeveralProcedures) {
+          <pa-notice kind="info">
+            <p>{{ 'candidate.assessment.unionNote' | translate }}</p>
+          </pa-notice>
+        }
+
+        <div class="pa-assessment__list">
+          @for (criterion of view.criteria; track criterion.criterionRevisionId) {
+            <pa-assessment-input
+              [criterionTitle]="title(criterion)"
+              [allowedValues]="criterion.allowedRatings"
+              [layout]="layout()"
+              [noteMaxLength]="noteLimit"
+              [value]="criterion.value"
+              [note]="criterion.note ?? ''"
+              (valueChange)="valueChanged(criterion, $event)"
+              (noteChange)="noteChanged(criterion, $event)"
+            />
+          }
+
+          @for (procedure of view.procedureAnswers; track procedure.criterionRevisionId) {
+            <!-- Derived, read only (CAT-17): no K6, no input, never counted -->
+            <div class="pa-assessment__procedure">
+              <p class="pa-assessment__procedure-title" [id]="procedureTitleId(procedure)">{{ procedure.title }}</p>
+              <p class="pa-assessment__text">{{ answerKey(procedure) | translate }}</p>
+              <p class="pa-assessment__hint">{{ 'assessment.procedure.derived.hint' | translate }}</p>
+              <a matButton [routerLink]="evidencePath()" [attr.aria-describedby]="procedureTitleId(procedure)">
+                {{ 'assessment.procedure.derived.edit' | translate }}
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+}

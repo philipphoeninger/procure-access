@@ -24,7 +24,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from 
  * S5-28b; the session warning since S5-30; the open rating legend on S11, a saved list and S16 since
  * S5-31; the project list S30 and the create dialog S31 since S6-13; the product form S33 and S34
  * Überblick with its tabs since S6-16; the project overview S32 with its menu and the dialog „Projekt
- * bearbeiten“ since S6-14; the evidence tab S34a since S6-17. The legacy screens are
+ * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
  * step (TESTING_v26 V87).
  *
@@ -148,6 +148,45 @@ async function routeCandidate(page: Page, candidate: Record<string, unknown> = {
         procurementProjectId: projectId,
         selection: { useCaseTemplateId: 'hr', appTypeIds: ['web'], productPartIds: ['base', 'audio'], testTypeIds: [] },
         criteria: [],
+      },
+    }),
+  );
+  // S34b (S6-19): long titles, a note, the union note and two derived rows
+  const levels = ['fulfilled', 'slightRestriction', 'restriction', 'barrier', 'blockade', 'notApplicable'];
+  await page.route(`**/api/v1/candidates/${candidateId}/assessments`, (route) =>
+    route.fulfill({
+      status: 200,
+      json: {
+        candidateId,
+        releaseVersion: 'T.1',
+        ratingsFromSeveralProcedures: true,
+        progress: { done: 1, total: 2 },
+        criteria: [
+          {
+            criterionRevisionId: 1,
+            number: '11.2.1.1',
+            title: 'Tastaturbedienbarkeit',
+            plainLanguageTitle: 'Formulare und Bedienelemente der Bewerbungsverwaltung lassen sich vollständig mit der Tastatur bedienen',
+            productPart: null,
+            allowedRatings: levels.slice(0, 5),
+            value: 'slightRestriction',
+            note: 'Eigener Test mit der Tastatur und dem Bildschirmleseprogramm NVDA in der Version 2026.1 unter Windows 11',
+          },
+          {
+            criterionRevisionId: 2,
+            number: '11.1.4.4',
+            title: 'Fehlermeldungen werden dem betroffenen Eingabefeld zugeordnet und vom Bildschirmleseprogramm vorgelesen',
+            plainLanguageTitle: null,
+            productPart: null,
+            allowedRatings: levels,
+            value: 'unknown',
+            note: null,
+          },
+        ],
+        procedureAnswers: [
+          { criterionRevisionId: 3, testTypeId: 'softwareTest', title: 'Geprüft nach BIT inklusiv Software-Test', answer: 'yes' },
+          { criterionRevisionId: 4, testTypeId: 'bikWeb', title: 'Geprüft nach BIK BITV-Test (Web)', answer: 'notStated' },
+        ],
       },
     }),
   );
@@ -497,6 +536,22 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
     await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
     await selectedTabInView(2);
+    await expectReflow(page, { scrollingTabBars: true });
+  });
+
+  test('S34b with compact K6, an open note, the union note and the derived rows needs no horizontal scrolling', async ({ page }) => {
+    const { projectId, candidateId } = await routeCandidate(page);
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    const main = page.getByRole('main');
+
+    await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
+    await expect(main.getByRole('heading', { level: 1, name: /^Bewerbermanagementsystem/ })).toBeVisible();
+    await expect(main.locator('pa-assessment-input mat-select')).toHaveCount(2);
+    await expect(main.locator('.pa-assessment__procedure')).toHaveCount(2);
+    await expectReflow(page, { scrollingTabBars: true });
+
+    await main.locator('.pa-assessment-input__note-toggle').first().click();
+    await expect(main.locator('pa-assessment-input textarea').first()).toBeFocused();
     await expectReflow(page, { scrollingTabBars: true });
   });
 

@@ -664,6 +664,14 @@
       "show": "Was bedeuten die Bewertungsstufen?",
       "hide": "Erklärung der Bewertungsstufen ausblenden",
       "footnote": "Welche Stufen bei einem Kriterium möglich sind, steht in seinen Details. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. ProcureAccess bildet daraus kein Gesamturteil."
+    },
+    "procedure": {
+      "derived": "Geprüft nach {{testType}}: {{value}}",
+      "derived.yes": "Ja",
+      "derived.no": "Nein",
+      "derived.notStated": "Nicht angegeben",
+      "derived.hint": "Ergibt sich aus dem Prüfnachweis. Zählt im Abgleich mit Kriterien nicht mit.",
+      "derived.edit": "Prüfnachweis bearbeiten"
     }
   },
   "org": {

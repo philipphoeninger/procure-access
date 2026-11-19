@@ -2,12 +2,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import { patchState, signalStoreFeature, withMethods, withState } from '@ngrx/signals';
 
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { LOADING_INPUT } from '@app/shared/state/with-loading';
 
+import {
+  AssessmentRow,
+  AUTOSAVE_DEBOUNCE_MS,
+  CandidateAssessments,
+  noteTooLong,
+  SAVED_ANNOUNCEMENT_INTERVAL_MS,
+} from '../models/assessments';
 import { Project, ProjectChange, ProjectCriteriaList, ProjectSummary } from '../models/projects';
+import { CandidatesApiService } from '../services/api/candidates-api.service';
 import { ProjectsApiService } from '../services/api/projects-api.service';
 
 /**
@@ -35,17 +44,46 @@ export interface CriteriaAdded {
   count: number;
 }
 
-/** The workspace of the active organisation; candidates and assessments join with S6-15 and S6-18. */
+/**
+ * - `idle`: nothing read since the start or the last reset
+ * - `loading`: the assessments of `candidateId` are read and none of them are known yet
+ * - `loaded`: `view` is the assessment of `candidateId`, with the user's changes
+ * - `failed`: the last read failed; S34b shows the S80 server text in place
+ */
+export type AssessmentsStatus = 'idle' | 'loading' | 'loaded' | 'failed';
+
+/**
+ * The assessment tab S34b of one candidate (R-CAN-06; S6-19): as the server answered it, with every
+ * change the user made applied at once — also while it waits for its autosave —, so the last state
+ * shows again when the user comes back to the tab (Handoff §5.1 S34b).
+ */
+export interface AssessmentsState {
+  candidateId: string | null;
+  status: AssessmentsStatus;
+  view: CandidateAssessments | null;
+}
+
+/** The workspace of the active organisation (S6-13); the assessment tab of a candidate since S6-19. */
 export interface WorkspaceState {
   projects: ProjectsState;
   /** Waiting for S32 of its project; null when there is nothing to report. */
   criteriaAdded: CriteriaAdded | null;
+  assessments: AssessmentsState;
 }
 
 export const initialWorkspaceState: WorkspaceState = {
   projects: { organizationId: null, status: 'idle', items: [] },
   criteriaAdded: null,
+  assessments: { candidateId: null, status: 'idle', view: null },
 };
+
+/** A changed row waiting for its autosave; without a timer while its note is too long to be saved. */
+interface WaitingRow {
+  candidateId: string;
+  criterionRevisionId: number;
+  row: AssessmentRow;
+  timer: ReturnType<typeof setTimeout> | undefined;
+}
 
 /**
  * The workspace slice of the root store (ARCHITECTURE §8.1; S6-13): the procurement projects of the
@@ -59,20 +97,144 @@ export const initialWorkspaceState: WorkspaceState = {
  * (`noteCriteriaAdded`, `takeCriteriaAdded`; any way back counts: a link, the header, the browser).
  * The legacy `withProducts()` / `withFavorites()` stay with the legacy product
  * screens until step 6 replaces them (owner decision S6-13 D3 (a)).
+ *
+ * The assessment tab S34b (S6-19): `loadAssessments` reads a candidate's assessments, and
+ * `changeAssessment` applies a change at once and saves the whole row 800 ms after the row's last
+ * change (R-CAN-06, Handoff §4.6); the saves of one row run one after another, so the last change is
+ * the one stored (the server's last write wins, R-CAN-11). Each save announces
+ * `candidate.assessment.saved`, at most every 5 s. A row whose note is too long is not saved until
+ * the note is short enough; K6 shows the error. `flushAssessments` saves every waiting row at once:
+ * S34b calls it when the tab is left, so a change made just before is not lost. A failed save keeps
+ * the error interceptor's system states and the change on screen; the next change of the row sends
+ * the whole row again.
  */
 export const withWorkspace = () =>
   signalStoreFeature(
     LOADING_INPUT,
     withState({ workspace: initialWorkspaceState }),
     withMethods((store, api = inject(ProjectsApiService)) => {
+      // Read when S34b first uses them, so the slice needs neither HTTP nor the texts before
+      const injector = inject(Injector);
+      const candidates = () => injector.get(CandidatesApiService);
+      const announcer = () => injector.get(A11yAnnouncerService);
       let latestLoad = 0;
+      let latestAssessmentRead = 0;
+      /** Changed rows waiting for their autosave, by {@link rowKey}. */
+      const waiting = new Map<string, WaitingRow>();
+      /** The save of each row in flight, by {@link rowKey}; the next save of the row starts after it. */
+      const sending = new Map<string, Promise<void>>();
+      const rowKey = (candidateId: string, criterionRevisionId: number) => `${candidateId}/${criterionRevisionId}`;
 
       const patchProjects = (changes: Partial<ProjectsState>) =>
         patchState(store, (state) => ({
           workspace: { ...state.workspace, projects: { ...state.workspace.projects, ...changes } },
         }));
 
+      const patchAssessments = (changes: Partial<AssessmentsState>) =>
+        patchState(store, (state) => ({
+          workspace: { ...state.workspace, assessments: { ...state.workspace.assessments, ...changes } },
+        }));
+
+      /** Sends the waiting change of the row, after the row's save in flight; resolves when it settled. */
+      function send(key: string): Promise<void> {
+        const entry = waiting.get(key);
+        const previous = sending.get(key) ?? Promise.resolve();
+        if (entry === undefined) return previous;
+        clearTimeout(entry.timer);
+        if (noteTooLong(entry.row.note)) {
+          // Not sent, but kept as unsaved: a new read keeps what the user typed, K6 shows the error
+          waiting.set(key, { ...entry, timer: undefined });
+          return previous;
+        }
+        waiting.delete(key);
+
+        const saved: Promise<void> = previous
+          .then(() => candidates().saveAssessment(entry.candidateId, entry.criterionRevisionId, entry.row))
+          .then(() => announcer().announce('candidate.assessment.saved', undefined, { throttleMs: SAVED_ANNOUNCEMENT_INTERVAL_MS }))
+          // The error interceptor shows a failure; the change stays on screen
+          .catch(() => undefined)
+          .finally(() => {
+            if (sending.get(key) === saved) sending.delete(key);
+          });
+        sending.set(key, saved);
+        return saved;
+      }
+
+      /**
+       * The answer of a read with the rows that still wait or are being saved as the user left them,
+       * so a read never shows an older value than the one on its way to the server.
+       */
+      function withUnsaved(read: CandidateAssessments): CandidateAssessments {
+        const shown = store.workspace.assessments().view;
+        if (shown?.candidateId !== read.candidateId) return read;
+        const unsaved = (id: number) => waiting.has(rowKey(read.candidateId, id)) || sending.has(rowKey(read.candidateId, id));
+        return {
+          ...read,
+          criteria: read.criteria.map((criterion) => {
+            const local = unsaved(criterion.criterionRevisionId)
+              ? shown.criteria.find((item) => item.criterionRevisionId === criterion.criterionRevisionId)
+              : undefined;
+            return local === undefined ? criterion : { ...criterion, value: local.value, note: local.note };
+          }),
+        };
+      }
+
       return {
+        /**
+         * Reads the assessment tab of a candidate (S34b) with the loading bar. Coming back to the
+         * candidate shows the last state at once while it is read again. Never rejects: a failure
+         * is the status `failed`; an answer a later read or a reset replaced is dropped.
+         */
+        async loadAssessments(candidateId: string): Promise<void> {
+          const read = ++latestAssessmentRead;
+          const shown = store.workspace.assessments();
+          if (shown.candidateId !== candidateId || shown.view === null) {
+            patchAssessments({ candidateId, status: 'loading', view: null });
+          }
+          store.incrementLoadingCount();
+          try {
+            const answer = await candidates().assessments(candidateId);
+            if (read === latestAssessmentRead) patchAssessments({ candidateId, status: 'loaded', view: withUnsaved(answer) });
+          } catch {
+            if (read === latestAssessmentRead) patchAssessments({ candidateId, status: 'failed', view: null });
+          } finally {
+            store.decrementLoadingCount();
+          }
+        },
+
+        /**
+         * The user changed value or note of a criterion: shown at once, saved as a whole row
+         * {@link AUTOSAVE_DEBOUNCE_MS} after the row's last change (R-CAN-06).
+         */
+        changeAssessment(candidateId: string, criterionRevisionId: number, row: AssessmentRow): void {
+          const view = store.workspace.assessments().view;
+          if (view?.candidateId === candidateId) {
+            patchAssessments({
+              view: {
+                ...view,
+                criteria: view.criteria.map((criterion) =>
+                  criterion.criterionRevisionId === criterionRevisionId ? { ...criterion, ...row } : criterion,
+                ),
+              },
+            });
+          }
+          const key = rowKey(candidateId, criterionRevisionId);
+          const earlier = waiting.get(key);
+          if (earlier !== undefined) clearTimeout(earlier.timer);
+          waiting.set(key, {
+            candidateId,
+            criterionRevisionId,
+            row,
+            timer: setTimeout(() => void send(key), AUTOSAVE_DEBOUNCE_MS),
+          });
+        },
+
+        /** Saves every waiting row now; resolves when every save in flight has settled. */
+        async flushAssessments(): Promise<void> {
+          for (const key of [...waiting.keys()]) void send(key);
+          await Promise.all(sending.values());
+        },
+
         /**
          * Loads the projects of the organisation. Resolves to true when this answer is the one
          * shown (`loaded` or `failed`), false when a later load or a reset replaced it — the
@@ -154,9 +316,15 @@ export const withWorkspace = () =>
           return added?.projectId === projectId ? added.count : 0;
         },
 
-        /** Forgets the projects (sign-out, another account through the login overlay); a running load is dropped. */
+        /**
+         * Forgets the projects and assessments (sign-out, another account through the login
+         * overlay); a running load is dropped, and so are the changes still waiting for their save.
+         */
         resetWorkspace(): void {
           latestLoad++;
+          latestAssessmentRead++;
+          for (const entry of waiting.values()) clearTimeout(entry.timer);
+          waiting.clear();
           patchState(store, { workspace: initialWorkspaceState });
         },
       };

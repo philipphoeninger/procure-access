@@ -1,0 +1,48 @@
+// SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+//
+// SPDX-License-Identifier: MIT
+
+// S34b (Figma `2022:841`, S34b-M `2136:3127`): the intro, then the K6 cards and the derived rows
+// one below the other with md between them. A derived row is a card like K6 (outlined on
+// surface-container-lowest), its title in K6's title style, the hint in body/small.
+:host {
+  display: block;
+}
+
+.pa-assessment,
+.pa-assessment__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-space-md);
+}
+
+.pa-assessment__text {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.pa-assessment__procedure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pa-space-sm);
+  padding: var(--pa-space-md);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container-lowest);
+
+  @media (min-width: 37.5em) {
+    padding: var(--pa-space-lg);
+  }
+}
+
+.pa-assessment__procedure-title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+.pa-assessment__hint {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+}

@@ -8,9 +8,12 @@ import { TestBed } from '@angular/core/testing';
 import { signalStore } from '@ngrx/signals';
 
 import { API_URL } from '@app/app.config';
+import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { withLoading } from '@app/shared/state/with-loading';
 
+import { CandidateAssessments } from '../models/assessments';
 import { Project, ProjectSummary } from '../models/projects';
+import { TEST_ASSESSMENTS } from '../testing/candidate-fixtures';
 import { withWorkspace } from './with-workspace';
 
 const WorkspaceTestStore = signalStore(withLoading(), withWorkspace());
@@ -33,10 +36,18 @@ const CREATED: Project = {
 describe('withWorkspace', () => {
   let store: InstanceType<typeof WorkspaceTestStore>;
   let backend: HttpTestingController;
+  const announce = vi.fn<A11yAnnouncerService['announce']>();
 
   beforeEach(() => {
+    announce.mockReset().mockResolvedValue(undefined);
     TestBed.configureTestingModule({
-      providers: [WorkspaceTestStore, provideHttpClient(), provideHttpClientTesting(), { provide: API_URL, useValue: '/api' }],
+      providers: [
+        WorkspaceTestStore,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: API_URL, useValue: '/api' },
+        { provide: A11yAnnouncerService, useValue: { announce } },
+      ],
     });
     store = TestBed.inject(WorkspaceTestStore);
     backend = TestBed.inject(HttpTestingController);
@@ -179,5 +190,171 @@ describe('withWorkspace', () => {
     store.noteCriteriaAdded('p1', 1);
     store.resetWorkspace();
     expect(store.takeCriteriaAdded('p1')).toBe(0);
+  });
+
+  describe('assessments of S34b (R-CAN-06, S6-19)', () => {
+    const URL = '/api/v1/candidates/c-1/assessments';
+    const row = (id: number) => `${URL}/${id}`;
+    const criterion = (view: CandidateAssessments | null, id: number) => view?.criteria.find((item) => item.criterionRevisionId === id);
+
+    async function loaded(): Promise<void> {
+      const loading = store.loadAssessments('c-1');
+      backend.expectOne(URL).flush(TEST_ASSESSMENTS);
+      await loading;
+    }
+
+    /** Lets the save chain of a row reach its request. */
+    async function settle(): Promise<void> {
+      for (let i = 0; i < 20; i++) await Promise.resolve();
+    }
+
+    afterEach(() => vi.useRealTimers());
+
+    it('reads the assessments of a candidate with the loading bar', async () => {
+      const loading = store.loadAssessments('c-1');
+      expect(store.workspace.assessments()).toEqual({ candidateId: 'c-1', status: 'loading', view: null });
+      expect(store.isLoading()).toBe(true);
+
+      backend.expectOne(URL).flush(TEST_ASSESSMENTS);
+      await loading;
+
+      expect(store.workspace.assessments()).toEqual({ candidateId: 'c-1', status: 'loaded', view: TEST_ASSESSMENTS });
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('records a failed read as failed without rejecting', async () => {
+      const loading = store.loadAssessments('c-1');
+      backend.expectOne(URL).flush(null, { status: 500, statusText: 'Server Error' });
+      await loading;
+
+      expect(store.workspace.assessments()).toEqual({ candidateId: 'c-1', status: 'failed', view: null });
+    });
+
+    it('shows a change at once and saves the whole row 800 ms after the last change, then announces it (R-CAN-06)', async () => {
+      await loaded();
+      vi.useFakeTimers();
+
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: null });
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: 'Laut Anbieter' });
+      expect(criterion(store.workspace.assessments().view, 13)).toMatchObject({ value: 'barrier', note: 'Laut Anbieter' });
+
+      vi.advanceTimersByTime(799);
+      await settle();
+      backend.expectNone(row(13));
+
+      vi.advanceTimersByTime(1);
+      await settle();
+      const put = backend.expectOne(row(13));
+      expect(put.request.method).toBe('PUT');
+      expect(put.request.body).toEqual({ value: 'barrier', note: 'Laut Anbieter' });
+      put.flush({ criterionRevisionId: 13, value: 'barrier', note: 'Laut Anbieter' });
+      await settle();
+
+      expect(announce).toHaveBeenCalledExactlyOnceWith('candidate.assessment.saved', undefined, { throttleMs: 5000 });
+    });
+
+    it('saves the rows of a candidate independently, and a row again only after its save in flight (the last change is stored)', async () => {
+      await loaded();
+      vi.useFakeTimers();
+
+      store.changeAssessment('c-1', 12, { value: 'fulfilled', note: null });
+      store.changeAssessment('c-1', 13, { value: 'blockade', note: null });
+      vi.advanceTimersByTime(800);
+      await settle();
+      const first12 = backend.expectOne(row(12));
+      backend.expectOne(row(13)).flush({});
+
+      store.changeAssessment('c-1', 12, { value: 'barrier', note: null });
+      vi.advanceTimersByTime(800);
+      await settle();
+      backend.expectNone(row(12));
+
+      first12.flush({});
+      await settle();
+      expect(backend.expectOne(row(12)).request.body).toEqual({ value: 'barrier', note: null });
+    });
+
+    it('does not save a row while its note is too long, and keeps it on a new read (SPEC §7.2)', async () => {
+      await loaded();
+      vi.useFakeTimers();
+
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: 'x'.repeat(1001) });
+      vi.advanceTimersByTime(800);
+      await settle();
+      backend.expectNone(row(13));
+
+      // A new read keeps the note the user typed (K6 shows the error)
+      const reading = store.loadAssessments('c-1');
+      backend.expectOne(URL).flush(TEST_ASSESSMENTS);
+      await reading;
+      expect(criterion(store.workspace.assessments().view, 13)?.note).toBe('x'.repeat(1001));
+
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: ` ${'x'.repeat(1000)} ` });
+      vi.advanceTimersByTime(800);
+      await settle();
+      backend.expectOne(row(13)).flush({});
+    });
+
+    it('saves every waiting row at once when the tab is left, and resolves when they are saved', async () => {
+      await loaded();
+
+      store.changeAssessment('c-1', 11, { value: 'slightRestriction', note: 'Eigener Test mit der Tastatur.' });
+      let done = false;
+      const flushed = store.flushAssessments().then(() => (done = true));
+      await settle();
+      const put = backend.expectOne(row(11));
+      expect(put.request.body).toEqual({ value: 'slightRestriction', note: 'Eigener Test mit der Tastatur.' });
+      expect(done).toBe(false);
+
+      put.flush({});
+      await flushed;
+      expect(done).toBe(true);
+    });
+
+    it('a failed save keeps the change on screen and is not announced; the interceptor shows the failure', async () => {
+      await loaded();
+
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: null });
+      const flushed = store.flushAssessments();
+      await settle();
+      backend.expectOne(row(13)).flush(null, { status: 409, statusText: 'Conflict' });
+      await flushed;
+
+      expect(criterion(store.workspace.assessments().view, 13)?.value).toBe('barrier');
+      expect(announce).not.toHaveBeenCalled();
+    });
+
+    it('coming back shows the last state at once, and a new read keeps a change that is still on its way (Handoff §5.1)', async () => {
+      await loaded();
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: null });
+      const flushed = store.flushAssessments();
+      await settle();
+      const put = backend.expectOne(row(13));
+
+      const reading = store.loadAssessments('c-1');
+      expect(store.workspace.assessments().status).toBe('loaded');
+      expect(criterion(store.workspace.assessments().view, 13)?.value).toBe('barrier');
+      const changedElsewhere = { ...TEST_ASSESSMENTS, criteria: TEST_ASSESSMENTS.criteria.map((item) => ({ ...item, value: 'notApplicable' as const })) };
+      backend.expectOne(URL).flush(changedElsewhere);
+      await reading;
+
+      expect(criterion(store.workspace.assessments().view, 13)?.value).toBe('barrier');
+      expect(criterion(store.workspace.assessments().view, 12)?.value).toBe('notApplicable');
+      put.flush({});
+      await flushed;
+    });
+
+    it('forgets the assessments on reset and drops the changes still waiting', async () => {
+      await loaded();
+      vi.useFakeTimers();
+      store.changeAssessment('c-1', 13, { value: 'barrier', note: null });
+
+      store.resetWorkspace();
+      vi.advanceTimersByTime(800);
+      await settle();
+
+      backend.expectNone(row(13));
+      expect(store.workspace.assessments()).toEqual({ candidateId: null, status: 'idle', view: null });
+    });
   });
 });

@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
 import { of } from 'rxjs';
 
@@ -14,13 +14,21 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { expectNoAxeViolations } from '@app/testing/axe';
 import { provideTestTranslations } from '@app/testing/provide-test-translations';
 
+import { CandidateTab } from '../../models/candidates';
 import { candidateView, TEST_CANDIDATE, TEST_PROJECT } from '../../testing/candidate-fixtures';
-import { CandidateDetailPage } from './candidate-detail';
+import { CandidateDetailPage, candidateTabTitle } from './candidate-detail';
 import { CandidateLoad, CandidateView } from './candidate-load';
-import { CANDIDATE_TAB_DATA, CandidateTabPlaceholder } from './tab-placeholder/candidate-tab-placeholder';
 
 @Component({ selector: 'pa-test-overview', template: '' })
 class OverviewStub {}
+
+/** A tab without content: titles the page as every tab does. */
+@Component({ selector: 'pa-test-tab', template: '' })
+class TabStub {
+  constructor() {
+    candidateTabTitle(inject(ActivatedRoute).snapshot.data['tab'] as CandidateTab);
+  }
+}
 
 describe('CandidateDetailPage (S34 with its tabs as routes, R-CAN-03)', () => {
   let setPageTitleState: ReturnType<typeof vi.fn>;
@@ -35,8 +43,8 @@ describe('CandidateDetailPage (S34 with its tabs as routes, R-CAN-03)', () => {
           path: 'projekte/:id/produkte/:pid',
           children: [
             { path: '', pathMatch: 'full', component: OverviewStub },
-            { path: 'pruefnachweis', component: CandidateTabPlaceholder, data: { [CANDIDATE_TAB_DATA]: 'evidence' } },
-            { path: 'einschaetzung', component: CandidateTabPlaceholder, data: { [CANDIDATE_TAB_DATA]: 'assessment' } },
+            { path: 'pruefnachweis', component: TabStub, data: { tab: 'evidence' } },
+            { path: 'einschaetzung', component: TabStub, data: { tab: 'assessment' } },
           ],
         },
       ],
