@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { createOrganizationThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
+import { createOrganizationThroughApi, createProjectThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
 import { ORG_READER, TEST_USER_PASSWORD } from '../support/users';
@@ -12,8 +12,10 @@ import { ORG_READER, TEST_USER_PASSWORD } from '../support/users';
  * Procurement projects (S6-13; R-PRJ-01, R-PRJ-02, R-SHL-02): „Projekte“ in the header leads to
  * S30; a Reader of the seeded organisation sees its list without „Projekt anlegen“ (only read,
  * owner decision S5-16 7a); an Owner of an organisation of its own creates a project in S31, which
- * opens S32 (the placeholder until S6-14) and is then listed on S30. Axe in both appearances on
- * every new state (A11Y-01, A11Y-08).
+ * opens S32 and is then listed on S30. Axe in both appearances on every new state (A11Y-01, A11Y-08).
+ *
+ * S32's dialog „Projekt bearbeiten“ (S6-14; R-PRJ-05): an Owner renames the project and archives it;
+ * archived, S32 is read-only — only the status can change, back to „Laufend“.
  *
  * The project's own copy of a list (S6-12; R-PRJ-02, R-PRJ-06, WSP-03): S31 copies a saved list of
  * the organisation into the new project; S11 of the copy fixes the selection and changes the
@@ -33,7 +35,7 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
-test.describe('Procurement projects S30, S31', () => {
+test.describe('Procurement projects S30, S31, S32', () => {
   test('INV:A11Y-01 INV:A11Y-08 „Projekte“ leads a Reader to S30, current there, without „Projekt anlegen“', async ({ page }, testInfo) => {
     await page.setViewportSize(WIDE);
     await signInThroughApi(page, ORG_READER, TEST_USER_PASSWORD);
@@ -90,8 +92,10 @@ test.describe('Procurement projects S30, S31', () => {
     await expect(page).toHaveTitle(`${project} – Beschaffungsprojekte – ProcureAccess`);
     await expect(main(page)).toContainText('Stand: Laufend · noch keine Produkte · nur für Ihre Organisation sichtbar');
     await expect(mainNav(page).getByRole('link', { name: 'Projekte' })).toHaveAttribute('aria-current', 'page');
+    await expect(main(page)).toContainText('Diesem Projekt ist noch keine Kriterienliste zugeordnet.');
+    await expect(main(page)).toContainText('Noch keine Produkte in diesem Projekt.');
     await settled(main(page));
-    await expectNoAxeViolations(page, testInfo, 's32-placeholder');
+    await expectNoAxeViolations(page, testInfo, 's32-new');
 
     await mainNav(page).getByRole('link', { name: 'Projekte' }).press('Enter');
     await expect(main(page).getByRole('heading', { level: 1, name: 'Beschaffungsprojekte' })).toBeFocused();
@@ -192,19 +196,27 @@ test.describe('Procurement projects S30, S31', () => {
     await first.uncheck();
     expect((await excluded).ok()).toBe(true);
 
+    // From here on CSS locators instead of accessible names: once axe has run on S11, Firefox's
+    // page process crashes at Playwright's name lookup — since S6-14 also of S32's H1 (TESTING V165,
+    // V368). The names are checked by the unit tests and by axe.
+    const heading = main(page).locator('h1');
+
     // Leaving out is no addition: S32 shows no report
     await page.goBack();
-    await expect(main(page).getByRole('heading', { level: 1, name: project })).toBeFocused();
+    await expect(heading).toHaveText(project);
+    await expect(heading).toBeFocused();
     await expect(main(page)).not.toContainText('neu in der Liste');
 
-    await main(page).getByRole('link', { name: 'Kriterienliste anpassen' }).press('Enter');
-    await expect(main(page).getByRole('heading', { level: 1, name: 'HR-Software 2027' })).toBeFocused();
+    await main(page).locator('a', { hasText: 'Kriterienliste anpassen' }).press('Enter');
+    await expect(heading).toHaveText('HR-Software 2027');
+    await expect(heading).toBeFocused();
     const included = decide(true);
     await main(page).locator('pa-criterion-card').first().getByRole('checkbox').check();
     expect((await included).ok()).toBe(true);
 
     await page.goBack();
-    await expect(main(page).getByRole('heading', { level: 1, name: project })).toBeFocused();
+    await expect(heading).toHaveText(project);
+    await expect(heading).toBeFocused();
     await expect(main(page)).toContainText('1 Kriterium neu in der Liste. Es ist bei allen Produkten noch nicht eingeschätzt.');
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's32-criteria-added');
@@ -212,6 +224,55 @@ test.describe('Procurement projects S30, S31', () => {
     // The copy has one address, its project's (owner decision S6-12 D7 (a))
     await page.goto(`/kriterienlisten/${copyId}`);
     await expect(page).toHaveURL(/\/projekte\/[0-9a-f-]{36}\/kriterienliste$/);
-    await expect(main(page).getByRole('heading', { level: 1, name: 'HR-Software 2027' })).toBeVisible();
+    await expect(heading).toHaveText('HR-Software 2027');
+  });
+
+  test('INV:A11Y-01 INV:A11Y-08 S32 renames a project and archives it; archived, only its status can change', async ({ page, request }, testInfo) => {
+    await page.setViewportSize(WIDE);
+    const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
+    const address = `projects-edit-${suffix}@example.test`;
+    await registerConfirmedAccount(request, address, PASSWORD);
+    await signInThroughApi(page, address, PASSWORD);
+    const organizationId = await createOrganizationThroughApi(page, `Amt ${suffix}`);
+    const project = await createProjectThroughApi(page.request, organizationId, `Projekt ${suffix}`);
+    await page.goto(`/projekte/${project}`);
+    await expect(main(page).getByRole('heading', { level: 1, name: `Projekt ${suffix}` })).toBeVisible();
+
+    const edit = main(page).getByRole('button', { name: 'Projekt bearbeiten' });
+    await edit.press('Enter');
+    const dialog = page.getByRole('dialog', { name: 'Projekt bearbeiten' });
+    const name = dialog.getByRole('textbox', { name: 'Name des Projekts' });
+    // MatDialog moves the focus when it has opened (S6-01)
+    await expect(name).toBeFocused();
+    await expect(dialog.getByRole('radio', { name: 'Laufend' })).toBeChecked();
+    await expect(dialog.locator('mat-form-field.mat-form-field-animations-enabled')).toHaveCount(1);
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 's32-edit-dialog');
+
+    const renamed = `Umbenannt ${suffix}`;
+    await name.fill(renamed);
+    await dialog.getByRole('radio', { name: 'Archiviert' }).check();
+    const changed = page.waitForResponse((response) => response.request().method() === 'PATCH');
+    await dialog.getByRole('button', { name: 'Speichern' }).press('Enter');
+    expect((await changed).status()).toBe(200);
+    await expect(dialog).toBeHidden();
+    await expect(edit).toBeFocused();
+    await expect(main(page).getByRole('heading', { level: 1, name: renamed })).toBeVisible();
+    await expect(page).toHaveTitle(`${renamed} – Beschaffungsprojekte – ProcureAccess`);
+    await expect(main(page)).toContainText('Stand: Archiviert');
+    await expect(main(page)).toContainText('Dieses Projekt ist archiviert.');
+    // Read-only (R-PRJ-05): no menu; „Projekt bearbeiten“ stays for the status
+    await expect(main(page).getByRole('button', { name: 'Produkt hinzufügen' })).toHaveCount(0);
+    await settled(main(page));
+    await expectNoAxeViolations(page, testInfo, 's32-archived');
+
+    await edit.press('Enter');
+    await expect(dialog.getByRole('textbox')).toHaveCount(0);
+    await expect(dialog.getByRole('radio', { name: 'Archiviert' })).toBeFocused();
+    await dialog.getByRole('radio', { name: 'Laufend' }).check();
+    await dialog.getByRole('button', { name: 'Speichern' }).press('Enter');
+    await expect(dialog).toBeHidden();
+    await expect(main(page)).toContainText('Stand: Laufend');
+    await expect(main(page).getByRole('button', { name: 'Produkt hinzufügen' })).toBeVisible();
   });
 });

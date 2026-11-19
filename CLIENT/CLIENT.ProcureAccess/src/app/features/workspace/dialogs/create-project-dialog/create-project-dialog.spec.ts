@@ -40,6 +40,8 @@ const CREATED: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: null,
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 function savedList(id: string, name: string): SavedListSummary {

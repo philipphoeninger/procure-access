@@ -3,45 +3,69 @@
 // SPDX-License-Identifier: MIT
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { skip } from 'rxjs';
+import { distinctUntilChanged, skip } from 'rxjs';
 
 import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorPage } from '@app/pages/error/error-page';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/components/breadcrumb/breadcrumb';
 import { Notice } from '@app/shared/components/notice/notice';
+import { ASSESSMENT_VALUES } from '@app/shared/components/rating-legend/rating-legend';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
 
-import { projectCriteriaListPath, statusKey } from '../../models/projects';
+import { candidatePath, newCandidatePath, testStatusKey } from '../../models/candidates';
+import { Project, ProjectCandidate, ProjectEvidenceType, projectCriteriaListPath, PROJECTS_PATH, statusKey } from '../../models/projects';
+import { EditProjectDialog } from '../../dialogs/edit-project-dialog/edit-project-dialog';
+import { isProjectEditor } from '../candidate-detail/candidate-load';
 import { ProjectLoad, ProjectView } from './project-detail-load';
 
 /**
- * S32 „Projektübersicht“ at `/projekte/:id` — the placeholder of S6-13, which S31 opens after
- * creating a project and S30 links by name. It shows only what the existing texts allow: the
- * project name as H1, the line `projects.detail.meta` (status, number of products, visible only
- * to the organisation) and, for an archived project, `projects.archived.note` (R-PRJ-05).
+ * S32 · Projektübersicht at `/projekte/:id` (R-PRJ-03, R-PRJ-05; Handoff §5.1 S32; Figma 360
+ * `2148:4697`, desktop `2148:3877`; S6-14). Signed in; S31 opens it after creating a project, S30
+ * links it by name.
  *
- * Since S6-12 a short section „Kriterienliste“ leads to S11 of the project's own copy (R-PRJ-06;
- * owner decision S6-12 D8 (a)): the list name as a link and its release, and „Kriterienliste
- * anpassen“ for Editor and Owner of an open or finished project; without a list
- * `projects.detail.noCriteria` (its button „Kriterienliste zuordnen“ comes with S6-14). After S11 of
- * the copy took criteria into the list, `projects.detail.criteriaAdded` shows there and is
- * announced once (WSP-03). S6-14 replaces the section by the criteria card of the Handoff.
+ * - Above the H1 the path „Projekte › {{project}}“ (`pa-breadcrumb`, owner decision S6-14 D6 (a)).
+ *   The title row holds the H1 and, for Editor and Owner, the outlined „Projekt bearbeiten“, which
+ *   opens the dialog for name and status (R-PRJ-05; D1 (a)); then the line `projects.detail.meta`
+ *   and, for an archived project, `projects.archived.note`.
+ * - Card „Kriterienliste“: a `<dl>` with the list (a link to S11 of the project's copy, R-PRJ-06),
+ *   its release, the scope (`.scope.value`: the requirement criteria by level, the „Geprüft nach …“
+ *   criteria named apart and never counted, or `.scope.value.noProcedures`), use case, app types
+ *   and — only with a selection — test types; then `copyNote`, `projects.detail.criteriaAdded` after
+ *   S11 took criteria in (shown and announced once, WSP-03) and `projects.detail.criteriaLocked`
+ *   once the server reports the lock (R-PRJ-04). „Kriterienliste anpassen“ for Editor and Owner of a
+ *   project that is not archived. Without a list `projects.detail.noCriteria`; assigning a list from
+ *   S32 is not built (owner decision S6-14 D2 (a)).
+ * - Card „Produkte in diesem Projekt“: the menu „Produkt hinzufügen“ (`aria-haspopup="menu"`, the
+ *   item „Neu erfassen“ → S33; „Aus dem Produktverzeichnis übernehmen“ is hidden until M6, D3 (a))
+ *   for Editor and Owner of a project that is not archived; `projects.detail.orderNote`; a `<ul>`
+ *   with the last added product first: its name (H3) is the only link to S34, then the vendor line
+ *   and a `<dl>` „Auf Barrierefreiheit geprüft“, „Einschätzung“, „Abgleich“ and „Veröffentlichung“.
+ *   „Abgleich“ is a list of all seven counts in the fixed order of the scale, label first, zeros
+ *   included, no total (SIG-08, SIG-13). Nothing sorts or filters by the counts (D3). Progress and
+ *   counts are left out while the project has no list. No product: `projects.detail.empty`.
+ * - Archived: read-only (R-PRJ-05) — no menu, no „Kriterienliste anpassen“; „Projekt bearbeiten“
+ *   stays for the status.
+ * - When the header switches to another organisation, S30 of that organisation opens (S6-13 open
+ *   point 2). A project the user cannot see shows „Seite nicht gefunden“ in place, a failed read
+ *   the S80 server text. No `<section>`: Firefox crashes axe on named regions (TESTING V229).
  *
- * The full criteria card, the product list, the add-product menu, renaming and the status change come with
- * S6-14 (R-PRJ-03, Figma 360 `2148:4697`, desktop `2148:3877`). A project the user cannot see
- * shows „Seite nicht gefunden“ in place, a failed read the S80 server text.
- *
- * @spec docs/SPEC_v2.md R-PRJ-03 (placeholder), R-PRJ-05, R-PRJ-06
- * @invariants TEN-01, WSP-03
+ * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2148-4697
+ * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2148-3877
+ * @spec docs/SPEC_v2.md R-PRJ-03, R-PRJ-05, R-PRJ-06; docs/design_handoff_procureaccess_v1.md §5.1
+ * @invariants SIG-08, SIG-13, TEN-01, WSP-03, A11Y-09
  */
 @Component({
   selector: 'pa-project-detail',
-  imports: [ErrorPage, MatButtonModule, Notice, RouterLink, TranslatePipe, TranslatePluralPipe],
+  imports: [Breadcrumb, ErrorPage, MatButtonModule, MatIconModule, MatMenuModule, Notice, RouterLink, TranslatePipe, TranslatePluralPipe],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,6 +76,8 @@ export class ProjectDetailPage {
   private readonly store = inject(ProcureAccessStore);
   private readonly announcer = inject(A11yAnnouncerService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   protected readonly view = signal<ProjectView>(this.load.view);
   /** The criteria S11 of the copy took into the list on the way here; 0 shows nothing. */
@@ -61,13 +87,26 @@ export class ProjectDetailPage {
     const view = this.view();
     return view.kind === 'project' ? view.project : null;
   });
-  /** „Kriterienliste anpassen“: Editor or Owner of the project's organisation, not for an archived project (R-PRJ-05). */
-  protected readonly canAdjust = computed(() => {
+
+  /** Editor or Owner of the project's organisation: „Projekt bearbeiten“, also for an archived project. */
+  protected readonly canEdit = computed(() => {
     const project = this.project();
-    if (project === null || project.status === 'archived') return false;
-    const role = this.store.organizations().find((organization) => organization.id === project.organizationId)?.role;
-    return role === 'owner' || role === 'editor';
+    return project !== null && isProjectEditor(this.store.organizations(), project);
   });
+
+  /** Changes inside the project — products, the list — need an editor and a project that is not archived (R-PRJ-05). */
+  protected readonly canChange = computed(() => this.canEdit() && this.project()?.status !== 'archived');
+
+  /** The products with the last added first (`projects.detail.orderNote`); the server lists them as added. */
+  protected readonly products = computed(() => [...(this.project()?.candidates ?? [])].reverse());
+
+  protected readonly breadcrumb = computed<BreadcrumbItem[]>(() => [
+    { label: this.translate.instant('shell.nav.projects') as string, link: `/${PROJECTS_PATH}` },
+    { label: this.project()?.name ?? '' },
+  ]);
+
+  /** The rows of „Abgleich“ in the fixed order of the scale (SIG-08); never sorted by value. */
+  protected readonly countValues = ASSESSMENT_VALUES;
 
   constructor() {
     this.showAddedCriteria();
@@ -79,15 +118,56 @@ export class ProjectDetailPage {
         this.showAddedCriteria();
       });
 
+    // Another organisation in the header: its projects (S30), not this one (R-SHL-03). No
+    // organisation any more (sign-out, account deletion) is left to the flow that cleared it, which
+    // navigates itself.
+    toObservable(computed(() => this.store.activeOrganization()?.id ?? null))
+      .pipe(distinctUntilChanged(), skip(1), takeUntilDestroyed())
+      .subscribe((organizationId) => {
+        const project = this.project();
+        if (project !== null && organizationId !== null && organizationId !== project.organizationId) {
+          void this.router.navigateByUrl(`/${PROJECTS_PATH}`);
+        }
+      });
+
     // The route change clears the title state; the name is known from the resolver.
     effect(() => {
-      const view = this.view();
-      if (view.kind === 'project') this.pageTitle.setPageTitleState({ params: { project: view.project.name } });
+      const project = this.project();
+      if (project !== null) this.pageTitle.setPageTitleState({ params: { project: project.name } });
     });
   }
 
   protected statusKey = statusKey;
+  protected testStatusKey = testStatusKey;
   protected criteriaListPath = projectCriteriaListPath;
+  protected newCandidatePath = newCandidatePath;
+  protected candidatePath = candidatePath;
+
+  /** „BIT inklusiv Software-Test, BIK BITV-Test (Web)“ of `projects.detail.row.tested.evidences` (UX copy U60). */
+  protected evidenceTypes(candidate: ProjectCandidate): string {
+    return candidate.testEvidences.map((evidence) => this.evidenceTypeName(evidence)).join(', ');
+  }
+
+  /** „Projekt bearbeiten“: the changed project replaces the shown one; the list facts stay. */
+  protected edit(project: Project): void {
+    EditProjectDialog.open(this.dialog, project)
+      .afterClosed()
+      .subscribe((changed) => {
+        const view = this.view();
+        if (changed !== undefined && view.kind === 'project') this.view.set({ ...view, project: changed });
+      });
+  }
+
+  private evidenceTypeName(evidence: ProjectEvidenceType): string {
+    switch (evidence.testKind) {
+      case 'procedure':
+        return this.translate.instant(`testType.${evidence.testTypeId ?? ''}`) as string;
+      case 'other':
+        return evidence.otherTestTypeName ?? (this.translate.instant('testType.other') as string);
+      default:
+        return this.translate.instant('testType.own') as string;
+    }
+  }
 
   /** `projects.detail.criteriaAdded` once, for the project S11 of its copy reported (R-PRJ-06). */
   private showAddedCriteria(): void {

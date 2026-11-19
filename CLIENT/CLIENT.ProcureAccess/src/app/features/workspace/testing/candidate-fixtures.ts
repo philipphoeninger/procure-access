@@ -24,6 +24,8 @@ export const TEST_PROJECT: Project = {
   createdAt: '2026-11-18T09:00:00Z',
   modifiedAt: '2026-11-18T09:00:00Z',
   criteriaList: { id: 'list-1', name: 'HR-Software 2027', releaseVersion: 'T.1' },
+  criteriaListLocked: false,
+  candidates: [],
 };
 
 /** A candidate of {@link TEST_PROJECT} with every fact and both private fields (Figma S34 example data). */

@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
 - **Starting point:** `main` at c92bfb4 (S6-20a merged): `EntityTags`, the epoch, `precondition-required`, `core/concurrency/etag.ts` and `IfMatchRequests` exist; the saved lists have no concurrency, and a decision racing a selection change answers 500.
 - **Migration:** Configurator, `Version` and `ModifiedByUserId` on `CriteriaConfigurations`.
 - **Code:** the entity, the three changing paths of `ConfigurationService`, their endpoints; `ConfiguratorApiService`, `SavedListEditor`, S10's selection change, S14's deletion.
-- **Tests:** 428, 409 and success per change; the race made deterministic; API-03 complete in TESTING v103.
+- **Tests:** 428, 409 and success per change; the race made deterministic; API-03 complete in TESTING v104.
 - **Two details chosen within the decisions:** every stored decision counts a version; the lists of S14 name their tag in the body.
 - **Size:** one session.
 
@@ -50,7 +50,7 @@ SPDX-License-Identifier: MIT
 - Adapted to send `If-Match`: `SavedListChangeTests`, `ShareLinkTests`, `SavedExportEndpointTests`, `ProjectCriteriaListTests`, `AuthorizationMatrixTests` (through `PatchListAsync`, `PutListAsync`, `DeleteListAsync`, new in `IfMatchRequests`); the client specs of S10, S14 and the saved list; `e2e/shell/reflow.spec.ts`.
 
 **Documents**
-- ARCHITECTURE v98 (C186; §7.1, §7.2; v96 deleted), SPEC v2.60 (three rows), TESTING v103 (V363 – V367; API-03 complete; v101 deleted), `CODEBASE_v1.md` §2.105 and §3.
+- ARCHITECTURE v99 (C187; §7.1, §7.2; v97 deleted), SPEC v2.61 (three rows), TESTING v104 (V369 – V373; API-03 complete; v102 deleted), `CODEBASE_v1.md` §2.106 and §3.
 - `CLAUDE.md`: the concurrency rule names S6-20 as a whole, the state line the lists (39 999 characters).
 - No UX copy, Handoff or Figma mapping change; no screen, so no Figma frame to compare.
 
