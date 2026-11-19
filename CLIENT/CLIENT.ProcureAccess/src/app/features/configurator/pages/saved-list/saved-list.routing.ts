@@ -32,12 +32,13 @@ export const savedListResolver: ResolveFn<string> = async (route) => {
   const store = inject(ProcureAccessStore);
   const settings = inject(ConfiguratorSettings);
   const router = inject(Router);
+  const configurator = inject(ConfiguratorApiService);
+  const catalog = inject(CatalogApiService);
+  const id = route.paramMap.get('id') ?? '';
+  load.reload = () => loadSavedListView(configurator, catalog, id);
   store.incrementLoadingCount();
   try {
-    const [view, settingsReady] = await Promise.all([
-      loadSavedListView(inject(ConfiguratorApiService), inject(CatalogApiService), route.paramMap.get('id') ?? ''),
-      settings.ready(),
-    ]);
+    const [view, settingsReady] = await Promise.all([loadSavedListView(configurator, catalog, id), settings.ready()]);
     load.view = view.kind === 'list' && !settingsReady ? { kind: 'server' } : view;
   } finally {
     store.decrementLoadingCount();

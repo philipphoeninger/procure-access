@@ -6,7 +6,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_URL } from '@app/app.config';
-import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 
 import { ConfiguratorApiService } from './configurator-api.service';
 
@@ -77,6 +77,8 @@ describe('ConfiguratorApiService', () => {
     expect(patch.request.method).toBe('PATCH');
     expect(patch.request.body).toEqual(decision);
     expect(patch.request.headers.get('If-Match')).toBe('"1-4"');
+    // A conflict opens S37 on S11, not the general error (S6-21b)
+    expect(patch.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['conflict']);
     patch.flush(null, { status: 204, statusText: 'No Content', headers: { ETag: '"1-5"' } });
     // The new tag of the list, for the next change.
     await expect(decided).resolves.toBe('"1-5"');
@@ -86,6 +88,7 @@ describe('ConfiguratorApiService', () => {
     const put = backend.expectOne('/api/v1/configurations/l1/selection');
     expect(put.request.method).toBe('PUT');
     expect(put.request.headers.get('If-Match')).toBe('"1-5"');
+    expect(put.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual(['conflict']);
     put.flush({ droppedDecisions: [] });
     await expect(changed).resolves.toEqual({ droppedDecisions: [] });
 
@@ -93,6 +96,8 @@ describe('ConfiguratorApiService', () => {
     const remove = backend.expectOne('/api/v1/configurations/l1');
     expect(remove.request.method).toBe('DELETE');
     expect(remove.request.headers.get('If-Match')).toBe('"1-6"');
+    // S14 keeps the general error for a conflict (S6-21a open point 2)
+    expect(remove.request.context.get(CALLER_HANDLES_PROBLEMS)).toEqual([]);
     remove.flush(null, { status: 204, statusText: 'No Content' });
     await deleted;
   });

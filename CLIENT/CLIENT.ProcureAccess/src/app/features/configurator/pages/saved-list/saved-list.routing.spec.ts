@@ -65,6 +65,15 @@ describe('savedListResolver (SPEC §8.10, §8.11)', () => {
     expect(load.view.kind).toBe('list');
   });
 
+  it('reads the same list again for „Neue Fassung laden“ of S37 (S6-21b)', async () => {
+    await resolve();
+    list = { ...LIST, etag: '"1-5"', name: 'Von anderen umbenannt' };
+
+    const again = await load.reload();
+
+    expect(again.kind === 'list' && [again.list.name, again.list.etag]).toEqual(['Von anderen umbenannt', '"1-5"']);
+  });
+
   it('shows the server text in place when the settings fail (the weight range, TD-45)', async () => {
     settingsReady = false;
 

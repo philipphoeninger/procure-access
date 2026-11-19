@@ -67,9 +67,11 @@ export const projectCriteriaListResolver: ResolveFn<string> = async (route) => {
   const configurator = inject(ConfiguratorApiService);
   const catalog = inject(CatalogApiService);
   const settings = inject(ConfiguratorSettings);
+  const projectId = projectIdOf(route);
+  load.reload = () => loadProjectCriteriaList(projects, configurator, catalog, settings, projectId);
   store.incrementLoadingCount();
   try {
-    load.view = await loadProjectCriteriaList(projects, configurator, catalog, settings, projectIdOf(route));
+    load.view = await loadProjectCriteriaList(projects, configurator, catalog, settings, projectId);
   } finally {
     store.decrementLoadingCount();
   }

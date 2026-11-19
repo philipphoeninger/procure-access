@@ -6,7 +6,7 @@ import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { API_URL } from '@app/app.config';
 import { ifMatch, withEtag } from '@app/core/concurrency/etag';
-import { BACKGROUND_REQUEST, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
+import { BACKGROUND_REQUEST, CALLER_HANDLES_PROBLEMS, CALLER_SHOWS_FAILURES } from '@app/core/errors/problem-details';
 import { lastValueFrom } from 'rxjs';
 
 import { ConfiguratorSettingsResponse } from '../../models/configurator-settings';
@@ -92,12 +92,13 @@ export class ConfiguratorApiService {
 
   /**
    * Saves the decision on one criterion of a saved list (R-SAV-03) as a change of the list read at
-   * `etag`, and resolves to the list's new tag for the next change (API-03, S6-20b). A failure —
-   * also a 409 `conflict` until S37 (S6-21) — shows the general error.
+   * `etag`, and resolves to the list's new tag for the next change (API-03, S6-20b). A 409
+   * `conflict` is the caller's (S11 opens S37, S6-21b); any other failure shows the general error.
    */
   async decide(id: string, criterionRevisionId: number, decision: SavedListDecisionRequest, etag: string): Promise<string> {
     const response = await lastValueFrom(
       this.http.patch(`${this.listUrl(id)}/criteria/${criterionRevisionId}`, decision, {
+        context: conflictContext(),
         headers: ifMatch(etag),
         observe: 'response',
       }),
@@ -107,10 +108,13 @@ export class ConfiguratorApiService {
     return next;
   }
 
-  /** „Auswahl ändern“ (R-SAV-03): the new selection under the list's release, for the list read at `etag` (API-03). */
+  /**
+   * „Auswahl ändern“ (R-SAV-03): the new selection under the list's release, for the list read at
+   * `etag` (API-03). A 409 `conflict` is the caller's (S10 opens S37, S6-21b).
+   */
   changeSelection(id: string, request: SavedListSelectionRequest, etag: string): Promise<ChangedSelection> {
     return lastValueFrom(
-      this.http.put<ChangedSelection>(`${this.listUrl(id)}/selection`, request, { headers: ifMatch(etag) }),
+      this.http.put<ChangedSelection>(`${this.listUrl(id)}/selection`, request, { context: conflictContext(), headers: ifMatch(etag) }),
     );
   }
 
@@ -165,4 +169,9 @@ export class ConfiguratorApiService {
   private listUrl(id: string): string {
     return `${this.apiUrl}/v1/configurations/${encodeURIComponent(id)}`;
   }
+}
+
+/** A change of a saved list whose caller shows a 409 `conflict` in S37 (R-CAN-11, S6-21b). */
+function conflictContext(): HttpContext {
+  return new HttpContext().set(CALLER_HANDLES_PROBLEMS, ['conflict']);
 }

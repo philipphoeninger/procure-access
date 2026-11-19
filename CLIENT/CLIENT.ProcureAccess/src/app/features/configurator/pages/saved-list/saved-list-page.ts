@@ -27,6 +27,8 @@ import { A11yAnnouncerService } from '@app/core/a11y/a11y-announcer.service';
 import { PageTitleStrategy } from '@app/core/a11y/page-title.strategy';
 import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorPage } from '@app/pages/error/error-page';
+import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
+import { ChangedField, ChangedGroup, changesText } from '@app/shared/components/conflict-dialog/edit-conflict';
 import { Notice } from '@app/shared/components/notice/notice';
 import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
@@ -37,16 +39,25 @@ import { CriteriaListSummary } from '../../components/criteria-list-summary/crit
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
 import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
 import { ShareDialog } from '../../dialogs/share-dialog/share-dialog';
-import { PriorityLevel } from '../../models/criteria';
+import { Criterion, PriorityLevel } from '../../models/criteria';
 import { CriteriaListFilter } from '../../models/criteria-list';
 import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '../../models/saved-lists';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { catalogNames } from '../../state/catalog-names';
-import { decisionOf, filterCriteria, firstTooLongNote, includedCount, levelCounts } from '../../state/criteria-list-rules';
+import {
+  decisionOf,
+  effectiveLevel,
+  effectiveWeight,
+  filterCriteria,
+  firstTooLongNote,
+  includedCount,
+  levelCounts,
+} from '../../state/criteria-list-rules';
+import { procedureTestType, requirementTitle } from '../../state/criterion-card-rules';
 import { ratingsOfList } from '../../state/criterion-detail-rules';
 import { selectionNames } from '../../state/selection-names';
 import { CRITERIA_SEARCH_DEBOUNCE_MS } from '../../state/with-configurator';
-import { SavedListEditor } from './saved-list-editor';
+import { SavedListEditor, UnsavedDecision } from './saved-list-editor';
 import { SavedListArrival, SavedListLoad, SavedListNavigationState, SavedListView } from './saved-list-load';
 
 /** Handoff §3.4: counters are announced at most once per second, the newest count wins. */
@@ -93,6 +104,13 @@ const STATUS_KEY = 'criteria.list.status.count';
  * „Kriterienliste – {{project}} – Beschaffungsprojekte“ (D6 (a)). Leaving the page reports to the
  * workspace how many criteria were taken into the list, for `projects.detail.criteriaAdded` on the
  * next S32 of the project.
+ *
+ * **Conflict** (R-CAN-11, API-03; S6-21b, owner decision S6-21 D3 (a)): when someone else changed
+ * the list since it was read, the refused save opens S37 (Figma `2056:2519`). The shown decisions
+ * stay; nothing more is saved, and every further change opens S37 again. „Meine Änderungen
+ * kopieren“ copies each changed criterion under its title with its changed parts (UX copy U189);
+ * „Neue Fassung laden“ reads the list again as the route did (`SavedListLoad.reload`), shows it and
+ * moves the focus to the H1.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2020-70
  * @spec docs/SPEC_v2.md R-SAV-02, R-SAV-03, R-SAV-04, R-LST-06, R-LST-10, R-LST-14, R-PRJ-06, §8.10; docs/design_handoff_procureaccess_v1.md §5.1 S11, §5.3
@@ -186,6 +204,9 @@ export class SavedListPage {
   protected readonly copying = signal(false);
 
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
+  /** S37 is open: further conflicts of the editor do not open it a second time. */
+  private conflictShown = false;
+  private destroyed = false;
   /** The filter the last announcement counted; a change by the user announces the cards shown. */
   private announcedFilter: CriteriaListFilter | undefined;
   private countedView: SavedListView | null = null;
@@ -199,7 +220,10 @@ export class SavedListPage {
       .paramMap.pipe(skip(1), takeUntilDestroyed())
       .subscribe(() => this.show());
 
+    this.editor.conflicts.pipe(takeUntilDestroyed()).subscribe(() => void this.showConflict());
+
     inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
       clearTimeout(this.searchTimer);
       this.editor.flush();
       this.reportAddedCriteria();
@@ -348,8 +372,78 @@ export class SavedListPage {
     this.store.noteCriteriaAdded(shown.project.id, added);
   }
 
-  private show(): void {
-    this.reportAddedCriteria();
+  /** S37 with the unsaved decisions; „Neue Fassung laden“ reads the list again (S6-21b). */
+  private async showConflict(): Promise<void> {
+    if (this.conflictShown || this.destroyed) return;
+    this.conflictShown = true;
+    let reload: boolean;
+    try {
+      reload = await ConflictDialog.show(this.dialog, {
+        editorDisplayName: this.editor.conflictEditor,
+        changes: changesText(this.editor.unsaved().map((unsaved) => this.changedGroup(unsaved))),
+      });
+    } finally {
+      this.conflictShown = false;
+    }
+    if (reload && !this.destroyed) await this.reload();
+  }
+
+  /**
+   * One criterion of the copied text (UX copy U189): its title as the card shows it, then what
+   * changed — included, the level that applies, the weight, the note — with the card's labels.
+   */
+  private changedGroup({ criterion, saved, shown }: UnsavedDecision): ChangedGroup {
+    const text = (key: string, params?: Record<string, unknown>) => this.translate.instant(key, params) as string;
+    const fields: ChangedField[] = [];
+    if (shown.included !== saved.included) {
+      fields.push({ label: text('criteria.item.include'), value: text(shown.included ? 'common.yes' : 'common.no') });
+    }
+    const level = effectiveLevel(criterion, shown);
+    if (level !== effectiveLevel(criterion, saved)) {
+      fields.push({ label: text('criteria.priority.changeLabel'), value: text(`criteria.priority.${level}`) });
+    }
+    const weight = effectiveWeight(criterion, shown);
+    if (weight !== null && weight !== effectiveWeight(criterion, saved)) {
+      fields.push({ label: text('criteria.priority.weightLabel'), value: String(weight) });
+    }
+    if (shown.note !== saved.note) fields.push({ label: text('criteria.item.note'), value: shown.note });
+    return { heading: this.cardTitle(criterion), fields };
+  }
+
+  /** The H2 of a card: the plain-language title, or „Geprüft nach …“ for a procedure criterion. */
+  private cardTitle(criterion: Criterion): string {
+    const testType = procedureTestType(criterion);
+    return testType === null
+      ? requirementTitle(criterion)
+      : (this.translate.instant('criteria.item.testedBy.title', {
+          testType: this.translate.instant(`testType.${testType}`) as string,
+        }) as string);
+  }
+
+  /**
+   * „Neue Fassung laden“: the list as stored now, with the loading bar; the editor starts on it, the
+   * focus goes to the H1. A list that is gone shows „Seite nicht gefunden“ in place.
+   */
+  private async reload(): Promise<void> {
+    this.store.incrementLoadingCount();
+    let view: SavedListView;
+    try {
+      view = await this.load.reload();
+    } finally {
+      this.store.decrementLoadingCount();
+    }
+    if (this.destroyed) return;
+    this.load.view = view;
+    this.show({ fromRoute: false });
+    this.pageTitle.focusPageHeading();
+  }
+
+  /**
+   * Shows the view of the route; `fromRoute: false` for a list read again after a conflict, which
+   * reports no added criteria (the shown decisions held unsaved ones) and has no arrival report.
+   */
+  private show({ fromRoute }: { fromRoute: boolean } = { fromRoute: true }): void {
+    if (fromRoute) this.reportAddedCriteria();
     clearTimeout(this.searchTimer);
     this.searchInput.set('');
     this.query.set('');
@@ -361,7 +455,7 @@ export class SavedListPage {
       this.editor.start(view.list.id, view.list.etag, view.criteria.criteria, view.decisions);
     }
     this.view.set(view);
-    const state = this.router.currentNavigation()?.extras.state as SavedListNavigationState | undefined;
+    const state = fromRoute ? (this.router.currentNavigation()?.extras.state as SavedListNavigationState | undefined) : undefined;
     const arrival = view.kind === 'list' ? (state?.savedListArrival ?? null) : null;
     this.arrival.set(arrival);
     if (arrival !== null) void this.announceArrival(arrival);

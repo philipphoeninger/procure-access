@@ -21,7 +21,7 @@ import { CatalogApiService } from '../../services/api/catalog-api.service';
 import { ConfiguratorApiService } from '../../services/api/configurator-api.service';
 import { withConfigurator } from '../../state/with-configurator';
 import { excluded, filterOptions, filterOptionsAnswer } from '../../testing/filter-options-fixture';
-import { SavedListSelection } from '../saved-list/saved-list-selection';
+import { SavedListSelection, SavedListSelectionContext } from '../saved-list/saved-list-selection';
 import { CriteriaSelect } from './criteria-select';
 
 // The real configurator slice stands in for the root store, so the page runs the S4-09 rules.
@@ -86,7 +86,7 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
     wide = true,
     layers = options(),
     savedList = null,
-  }: { wide?: boolean; layers?: FilterOptionsLayers; savedList?: { id: string; release: string } | null } = {}) {
+  }: { wide?: boolean; layers?: FilterOptionsLayers; savedList?: SavedListSelectionContext | null } = {}) {
     changeSelection = vi.fn().mockResolvedValue({ droppedDecisions: [] });
     announce = vi.fn().mockResolvedValue(undefined);
     setPageTitleState = vi.fn();
@@ -689,7 +689,12 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
     }
 
     describe('„Auswahl ändern“ of a saved list (R-SAV-03; owner decision S5-21b 2a)', () => {
-      const SAVED = { id: 'list-1', release: 'T.1', etag: '"1-3"' };
+      const SAVED: SavedListSelectionContext = {
+        id: 'list-1',
+        release: 'T.1',
+        etag: '"1-3"',
+        selection: { useCase: 'hr', appTypeIds: [], productPartIds: ['base'], testTypeIds: [] },
+      };
 
       it('offers „Abbrechen“ back to the list; S10 of the draft does not', async () => {
         await setUp({ savedList: SAVED });
@@ -728,6 +733,62 @@ describe('CriteriaSelect (S10, R-CON-01 – R-CON-08, R-CON-10)', () => {
         );
         expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-1', {
           state: { savedListArrival: { kind: 'selectionChanged', droppedDecisions: dropped } },
+        });
+      });
+
+      describe('409 conflict (R-CAN-11, S37; owner decision S6-21 D4 (a))', () => {
+        const conflict = () =>
+          new HttpErrorResponse({
+            status: 409,
+            error: { type: 'https://procureaccess.de/problems/conflict', status: 409, editorDisplayName: null },
+          });
+
+        async function submitChangedSelection(): Promise<void> {
+          await choose('HR-Anwendung');
+          await next();
+          checkbox('Website oder Webanwendung').click();
+          await fixture.whenStable();
+          await next();
+          await next();
+          submitButton().click();
+          await vi.waitFor(() => expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy());
+        }
+
+        it('INV:API-03 opens S37 with the changed layers; after Escape „Kriterienliste anzeigen“ opens it again without a request', async () => {
+          const writeText = vi.fn().mockResolvedValue(undefined);
+          Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+          try {
+            await setUp({ layers: catalog(), savedList: SAVED });
+            changeSelection.mockRejectedValue(conflict());
+            await submitChangedSelection();
+
+            const s37 = screen.getByRole('alertdialog');
+            expect(s37.textContent).toContain('Eine andere Person hat diesen Inhalt geändert');
+            within(s37).getByRole('button', { name: 'Meine Änderungen kopieren' }).click();
+            await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('Anwendungstyp: Website oder Webanwendung'));
+
+            fireEvent.keyDown(s37, { key: 'Escape', code: 'Escape', keyCode: 27 });
+            await vi.waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+            const checks = api.getCriteria.mock.calls.length;
+
+            submitButton().click();
+            await vi.waitFor(() => expect(screen.getByRole('alertdialog', { name: 'Inzwischen geändert' })).toBeTruthy());
+            expect(changeSelection).toHaveBeenCalledTimes(1);
+            expect(api.getCriteria).toHaveBeenCalledTimes(checks);
+          } finally {
+            Reflect.deleteProperty(navigator, 'clipboard');
+          }
+        });
+
+        it('„Neue Fassung laden“ opens the list as stored now', async () => {
+          await setUp({ layers: catalog(), savedList: SAVED });
+          changeSelection.mockRejectedValue(conflict());
+          const navigate = vi.spyOn(fixture.debugElement.injector.get(Router), 'navigateByUrl').mockResolvedValue(true);
+          await submitChangedSelection();
+
+          within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neue Fassung laden' }).click();
+
+          await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith('/kriterienlisten/list-1'));
         });
       });
 

@@ -92,6 +92,17 @@ describe('projectCriteriaListResolver (S11 of a project copy, R-PRJ-06)', () => 
     expect(load.view.kind === 'list' && load.view.project).toEqual({ id: 'p-1', name: 'Bewerbermanagement', archived: false });
   });
 
+  it('reads the project and its copy again for „Neue Fassung laden“ of S37 (S6-21b)', async () => {
+    setUp(vi.fn().mockResolvedValue(PROJECT));
+    await resolve();
+
+    const again = await load.reload();
+
+    expect(getProject).toHaveBeenCalledTimes(2);
+    expect(getList).toHaveBeenCalledTimes(2);
+    expect(again.kind === 'list' && again.project?.id).toBe('p-1');
+  });
+
   it('marks the copy of an archived project (owner decision S6-12 D3 (a))', async () => {
     setUp(vi.fn().mockResolvedValue({ ...PROJECT, status: 'archived' }));
 

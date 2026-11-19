@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 import { inject, Injectable, signal } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+
+import { EditConflict } from '@app/shared/components/conflict-dialog/edit-conflict';
 
 import { Criterion, PriorityLevel } from '../../models/criteria';
 import { CriterionDecision, CriterionDecisions } from '../../models/criteria-list';
@@ -22,6 +25,15 @@ import { ConfiguratorSettings } from '../../state/configurator-settings';
 
 /** A note is saved this long after the last keystroke (owner decision S5-21b 1a). */
 export const NOTE_SAVE_DELAY_MS = 800;
+
+/** A criterion whose shown decision the server does not hold (after a conflict, S37). */
+export interface UnsavedDecision {
+  criterion: Criterion;
+  /** The decision the server last confirmed. */
+  saved: CriterionDecision;
+  /** The decision the page shows. */
+  shown: CriterionDecision;
+}
 
 /** The body of `PATCH …/criteria/{revision}` for a decision: the weight only while B applies, no empty note. */
 export function toDecisionRequest(criterion: Criterion, decision: CriterionDecision): SavedListDecisionRequest {
@@ -54,9 +66,11 @@ function sameDecision(a: CriterionDecision, b: CriterionDecision): boolean {
  *   every save is a change of the list read at its `ETag` and answers with the next one (API-03,
  *   S6-20b), so two saves under way at once would send the same tag and the second would conflict
  *   with the first.
- * - After a 409 `conflict` — someone else changed the list — the tag stays stale and every further
- *   save fails until the list is loaded again; the conflict dialog S37 (S6-21) will say so.
- * - A failed save puts the criterion back to its last saved decision, unless the user has changed
+ * - After a 409 `conflict` — someone else changed the list — the shown decisions stay (owner
+ *   decision S6-21 D3 (a)), nothing more is sent until {@link start} with the list read again, and
+ *   {@link conflicts} emits: for the refused save and for every later save that would have been
+ *   sent. The page shows S37 with {@link unsaved} (R-CAN-11, S6-21b).
+ * - Any other failed save puts the criterion back to its last saved decision, unless the user has changed
  *   it again meanwhile (then the next save carries the newer decision). The error interceptor shows
  *   the general error, or the server page for a 5xx.
  * - {@link flush} saves a waiting note at once; the page calls it when it is left. {@link settled}
@@ -82,6 +96,16 @@ export class SavedListEditor {
   /** The saves of the list, one after the other. */
   private chain: Promise<void> = Promise.resolve();
   private noteTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly conflict = new EditConflict();
+  private readonly conflictEvents = new Subject<void>();
+
+  /** Emits when a save met a conflict, or would have been sent after one (S37). */
+  readonly conflicts: Observable<void> = this.conflictEvents.asObservable();
+
+  /** The other editor of the last conflict; null when the server named nobody. */
+  get conflictEditor(): string | null {
+    return this.conflict.editorDisplayName;
+  }
 
   /** Starts on a loaded list; waiting notes of an earlier list are dropped. */
   start(listId: string, etag: string, criteria: readonly Criterion[], decisions: CriterionDecisions): void {
@@ -91,7 +115,17 @@ export class SavedListEditor {
     this.criteria = new Map(criteria.map((criterion) => [criterion.key, criterion]));
     this.saved = new Map(criteria.map((criterion) => [criterion.key, decisionOf(decisions, criterion.key)]));
     this.chain = Promise.resolve();
+    this.conflict.clear();
     this.current.set(decisions);
+  }
+
+  /** The criteria whose shown decision differs from the saved one, in the order of the list. */
+  unsaved(): UnsavedDecision[] {
+    return [...this.criteria.values()].flatMap((criterion) => {
+      const saved = this.saved.get(criterion.key) ?? decisionOf({}, criterion.key);
+      const shown = decisionOf(this.current(), criterion.key);
+      return sameDecision(saved, shown) ? [] : [{ criterion, saved, shown }];
+    });
   }
 
   setIncluded(key: string, included: boolean): void {
@@ -162,13 +196,24 @@ export class SavedListEditor {
       // A note that is too long is not sent; the card shows its length error (R-LST-05).
       if (noteLengthError(decision.note) !== null) return;
       if (sameDecision(decision, this.saved.get(key) ?? decisionOf({}, key))) return;
+      // After a conflict nothing is sent until the list is read again (Handoff §5.1 S37)
+      if (this.conflict.blocked) {
+        this.conflictEvents.next();
+        return;
+      }
       try {
         const etag = await this.api.decide(listId, criterion.revisionId, toDecisionRequest(criterion, decision), this.etag);
         if (listId !== this.listId) return;
         this.etag = etag;
         this.saved.set(key, decision);
-      } catch {
-        if (listId !== this.listId || !sameDecision(decisionOf(this.current(), key), decision)) return;
+      } catch (error: unknown) {
+        if (listId !== this.listId) return;
+        // The shown decision stays, so the user can copy it (D3 (a))
+        if (this.conflict.caught(error)) {
+          this.conflictEvents.next();
+          return;
+        }
+        if (!sameDecision(decisionOf(this.current(), key), decision)) return;
         const back = this.saved.get(key) ?? decisionOf({}, key);
         this.current.update((decisions) => ({ ...decisions, [key]: back }));
       }
