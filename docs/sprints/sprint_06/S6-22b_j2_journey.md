@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 # S6-22b — Journey J2 up to the assessment
 
-> **Sprint:** 06, task S6-22 (3 points), part b of the split the owner confirmed on 2026-11-19 (S6-22 D1 (a)); after S6-22a (#427). Started on `main` at `4dc19727` (S6-22a merged). Documents: TESTING v111, CODEBASE §2.113; ARCHITECTURE v105, SPEC v2.67, UX copy v48, Handoff 1.45 and Figma mapping 1.35 unchanged. **Issues:** none.
+> **Sprint:** 06, task S6-22 (3 points), part b of the split the owner confirmed on 2026-11-19 (S6-22 D1 (a)); after S6-22a (#427). Started on `main` at `4dc19727` (S6-22a merged). Documents: TESTING v111, CODEBASE §2.113; ARCHITECTURE v105, SPEC v2.67, UX copy v48, Handoff 1.45 and Figma mapping 1.35 unchanged. **Issues:** #429 (opened from open point 1).
 > **Requirements / invariants:** the E2E part of S6-22 — J2 (TESTING §5.4) up to the assessment, with R-CAN-10's Reader view; **A11Y-02** gains J2; A11Y-01, A11Y-08 gain its states. No invariant changes status.
 > **Status:** done by Claude Code (2026-11-19) — pull request open. **A test only:** no server change, no client change, no EF migration, no UX key, no dependency. Run locally in Chromium, Firefox and mobile Chrome; WebKit and mobile Safari left to CI.
 > **Scope:** `e2e/journeys/j2-workspace.spec.ts` — create project → assign a list → adjust it → add a product → evidence → assessment → Reader view, keyboard only, axe in both appearances, on all five browser projects. This is the M5 exit check. Not in scope: the publication half of J2 (step 6).
@@ -54,7 +54,7 @@ Review with the checklist of CLAUDE §6.7 (skill *engineering:code-review*), for
 
 ## 5. Open points
 
-1. **S11 of a project's copy has no way back to its project** but the browser's „back“ and „Projekte“ in the header (F5). S34 has the path `pa-breadcrumb`; the same path on the copy's page would close the gap. Needs no new text (project name, list name). Proposed as an issue for the owner — a small UI change, not part of this task.
+1. **S11 of a project's copy has no way back to its project** but the browser's „back“ and „Projekte“ in the header (F5). S34 has the path `pa-breadcrumb`; the same path on the copy's page would close the gap. Needs no new text (project name, list name). Issue **#429** (opened on 2026-11-19 at the owner's request) — a small UI change, not part of this task.
 2. **The rest of J2** with step 6: the publication blocked while the status is „Nicht bekannt“, the second evidence with the derived „Geprüft nach …“ rows (a list with a test procedure), publishing, the directory.
 3. **Shared keyboard helpers** (`tabTo`, `arrowTo`, `settled`) for `e2e/support/` when the next journey is written.
 4. **M5 exit:** with J2 green on all five projects in CI, the step-5 success criterion „Remove and read-only (M5.5)“ of SPRINT_06 is met; ticking it is the owner's at the sprint review.
