@@ -229,20 +229,72 @@ describe('CandidateAssessment (S34b „Einschätzung nach Kriterien“, R-CAN-06
     backend.expectNone(URL);
   });
 
-  it('shows nothing to a Reader until S6-22 (owner decision S6-19 Q3 (a))', async () => {
-    role.set('reader');
-    const { fixture } = await openTab({ answer: null });
+  describe('read only (R-CAN-10, S6-22)', () => {
+    /** Title, then the terms and values of each read-only card. */
+    const cards = () =>
+      screen.getAllByRole('heading', { level: 2 }).map((heading) => [
+        heading.textContent?.trim(),
+        ...[...heading.parentElement!.querySelectorAll('dl > div')].map(
+          (row) => `${row.querySelector('dt')?.textContent?.trim()}: ${row.querySelector('dd')?.textContent?.trim()}`,
+        ),
+      ]);
 
-    backend.expectNone(URL);
-    expect((fixture.nativeElement as HTMLElement).textContent?.trim()).toBe('');
-  });
+    function expectNoInput(container: Element): void {
+      expect(container.querySelector('input, select, textarea, mat-select, [contenteditable]')).toBeNull();
+      expect(screen.queryByRole('group')).toBeNull();
+      expect(screen.queryByRole('link')).toBeNull();
+      // The only button opens and closes the legend
+      expect(screen.getAllByRole('button')).toEqual([screen.getByRole('button', { name: /Bewertungsstufen/ })]);
+    }
 
-  it('shows nothing in an archived project (R-PRJ-05)', async () => {
-    role.set('owner');
-    const { fixture } = await openTab({ view: candidateView({ project: { ...TEST_PROJECT, status: 'archived' } }), answer: null });
+    it('shows a Reader the progress, the legend and each criterion with its stored level and note as text, without any input', async () => {
+      role.set('reader');
+      const { container, fixture } = await openTab();
 
-    backend.expectNone(URL);
-    expect((fixture.nativeElement as HTMLElement).textContent?.trim()).toBe('');
+      expect(screen.getByText('2 von 3 Kriterien eingeschätzt')).toBeTruthy();
+      expect(screen.getByText('Kriterienliste: HR-Software 2027 (Katalogversion T.1)')).toBeTruthy();
+      expect(cards()).toEqual([
+        [TITLES[0], 'Einschätzung: Erfüllt', 'Begründung: Eigener Test mit der Tastatur.'],
+        [TITLES[1], 'Einschätzung: Einschränkung'],
+        [TITLES[2], 'Einschätzung: Nicht eingeschätzt'],
+      ]);
+      // Intro, filter and union note speak to the person assessing
+      expect(screen.queryByText(/^Schätzen Sie für jedes Kriterium ein/)).toBeNull();
+      expect(screen.queryByText('Nur noch nicht eingeschätzte anzeigen')).toBeNull();
+      expectNoInput(container);
+      await expectNoAxeViolations();
+
+      // Leaving the tab saves and reads nothing
+      fixture.destroy();
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+
+    it('shows a Reader the derived „Geprüft nach …“ rows without „Prüfnachweis bearbeiten“ (CAT-17)', async () => {
+      role.set('reader');
+      await openTab({ answer: { ...TEST_ASSESSMENTS, ratingsFromSeveralProcedures: true } });
+
+      const row = screen.getByText('Geprüft nach BIT inklusiv Software-Test').parentElement!;
+      expect(within(row).getByText('Ja')).toBeTruthy();
+      expect(within(row).getByText('Ergibt sich aus dem Prüfnachweis. Zählt im Abgleich mit Kriterien nicht mit.')).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'Prüfnachweis bearbeiten' })).toBeNull();
+      expect(screen.queryByText(/^Ihre Liste gilt für mehrere Anwendungstypen/)).toBeNull();
+    });
+
+    it('shows an Owner the same read-only view in an archived project (R-PRJ-05)', async () => {
+      role.set('owner');
+      const { container } = await openTab({ view: candidateView({ project: { ...TEST_PROJECT, status: 'archived' } }) });
+
+      expect(cards().map(([title]) => title)).toEqual(TITLES);
+      expectNoInput(container);
+    });
+
+    it('tells a Reader of a project without a list that there is none', async () => {
+      role.set('reader');
+      await openTab({ view: candidateView({ project: { ...TEST_PROJECT, criteriaList: null }, criteria: null }), answer: null });
+
+      expect(screen.getByText(/^Diesem Projekt ist noch keine Kriterienliste zugeordnet\./)).toBeTruthy();
+      backend.expectNone(URL);
+    });
   });
 
   describe('progress, filter and legend (R-CAN-08, S6-19b)', () => {

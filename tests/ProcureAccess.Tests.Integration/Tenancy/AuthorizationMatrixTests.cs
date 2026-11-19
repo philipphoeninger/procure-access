@@ -41,8 +41,8 @@ namespace ProcureAccess.Tests.Integration.Tenancy;
 /// Reader; create, change, test status, add, change and remove an evidence: Editor; the organisation taken from the stored
 /// project, candidate or evidence); since S6-12 with the project's copy of a list (Editor); since S6-18 with the assessments of a
 /// candidate (read: Reader; set: Editor — the project of the matrix has no list, so a role that may set one gets the 400 of the
-/// check that follows the role check; the 200 is <c>AssessmentEndpointsTests</c>). Every user has a confirmed account, so the gate of saving
-/// (SEC-10) passes; the other workspace endpoints add their rows with their tasks of step 5.
+/// check that follows the role check; the 200 is <c>AssessmentEndpointsTests</c>); since S6-22 with removing a candidate (Editor),
+/// which completes the workspace endpoints of step 5. Every user has a confirmed account, so the gate of saving (SEC-10) passes.
 /// </summary>
 public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -143,6 +143,9 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
 
     /// <summary><c>DELETE /test-evidences/{id}</c> of an evidence of A (S6-15): Editor and Owner.</summary>
     private const string RemoveEvidence = "remove-evidence";
+
+    /// <summary><c>DELETE /candidates/{id}</c> of a candidate of A (S6-22): Editor and Owner.</summary>
+    private const string RemoveCandidate = "remove-candidate";
 
     /// <summary><c>GET /candidates/{id}/assessments</c> of a candidate of A (S6-18): every member of A.</summary>
     private const string ReadAssessments = "read-assessments";
@@ -365,6 +368,12 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
         { TestUsers.OwnerB.Name, RemoveEvidence, HttpStatusCode.NotFound },
         { TestUsers.Member.Name, RemoveEvidence, HttpStatusCode.NotFound },
         { Anonymous, RemoveEvidence, HttpStatusCode.Unauthorized },
+        { TestUsers.OwnerA.Name, RemoveCandidate, HttpStatusCode.NoContent },
+        { TestUsers.EditorA.Name, RemoveCandidate, HttpStatusCode.NoContent },
+        { TestUsers.ReaderA.Name, RemoveCandidate, HttpStatusCode.Forbidden },
+        { TestUsers.OwnerB.Name, RemoveCandidate, HttpStatusCode.NotFound },
+        { TestUsers.Member.Name, RemoveCandidate, HttpStatusCode.NotFound },
+        { Anonymous, RemoveCandidate, HttpStatusCode.Unauthorized },
         { TestUsers.OwnerA.Name, ReadAssessments, HttpStatusCode.OK },
         { TestUsers.EditorA.Name, ReadAssessments, HttpStatusCode.OK },
         { TestUsers.ReaderA.Name, ReadAssessments, HttpStatusCode.OK },
@@ -632,6 +641,7 @@ public sealed class AuthorizationMatrixTests(ApiFixture api) : IntegrationTest(a
             AddEvidence => await client.PostAsJsonAsync($"{CandidateOfAPath}/test-evidences", EvidenceBody("own"), Cancellation),
             ChangeEvidence => await client.SendWithTagAsync(HttpMethod.Put, EvidenceOfAPath, EvidenceBody("procedure", "softwareTest"), IfMatchRequests.FirstTag, Cancellation),
             RemoveEvidence => await client.SendWithTagAsync(HttpMethod.Delete, EvidenceOfAPath, IfMatchRequests.FirstTag, Cancellation),
+            RemoveCandidate => await client.SendWithTagAsync(HttpMethod.Delete, CandidateOfAPath, IfMatchRequests.FirstTag, Cancellation),
             ReadAssessments => await client.GetAsync($"{CandidateOfAPath}/assessments", Cancellation),
             SetAssessment => await client.PutAsJsonAsync(
                 $"{CandidateOfAPath}/assessments/{RevisionOfListOfA}", new { value = "fulfilled" }, Cancellation),

@@ -965,7 +965,10 @@
       "version": "Geprüfte Version (optional)",
       "url": "Link zum Prüfbericht (optional)",
       "qualification": "Ihre Notiz zur Qualifikation der prüfenden Stelle",
-      "saved": "Prüfnachweis gespeichert."
+      "saved": "Prüfnachweis gespeichert.",
+      "version.heading": "Geprüfte Version",
+      "url.heading": "Link zum Prüfbericht",
+      "qualification.heading": "Notiz zur Qualifikation der prüfenden Stelle"
     },
     "assessment": {
       "intro": "Schätzen Sie für jedes Kriterium ein, wie gut das Produkt es erfüllt. Die Stufen stammen aus den Prüfverfahren von BIT inklusiv. Grundlage können eigene Tests, Prüfberichte oder Angaben des Anbieters sein. Notieren Sie, worauf Sie sich stützen.",
@@ -980,7 +983,8 @@
       "note": "Worauf stützt sich Ihre Einschätzung? (optional)",
       "saved": "Einschätzung gespeichert.",
       "unionNote": "Ihre Liste gilt für mehrere Anwendungstypen. Bei jedem Kriterium stehen alle Stufen zur Auswahl, die für mindestens einen davon vorgesehen sind.",
-      "list": "Kriterienliste: {{list}} (Katalogversion {{release}})"
+      "list": "Kriterienliste: {{list}} (Katalogversion {{release}})",
+      "note.heading": "Begründung"
     },
     "publish": {
       "cta": "Im Produktverzeichnis veröffentlichen",

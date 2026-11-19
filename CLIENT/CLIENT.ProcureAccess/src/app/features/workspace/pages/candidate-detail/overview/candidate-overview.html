@@ -118,4 +118,11 @@ SPDX-License-Identifier: MIT
       </dl>
     }
   </section>
+
+  @if (canEdit()) {
+    <!-- Last in the tab: the action that cannot be undone (R-CAN-09, owner decision S6-22 D4 (a)) -->
+    <div class="pa-overview__remove">
+      <button matButton="outlined" type="button" (click)="remove(overview)">{{ 'candidate.remove' | translate }}</button>
+    </div>
+  }
 }

@@ -466,13 +466,81 @@ describe('CandidateEvidence (S34a, R-CAN-05)', () => {
     expect(radio('Nein').checked).toBe(true);
   });
 
-  it.each<[string, CandidateView, OrganizationRole]>([
-    ['a Reader', candidateView(), 'reader'],
-    ['an archived project', candidateView({ project: { ...TEST_PROJECT, status: 'archived' } }), 'editor'],
-  ])('shows no form for %s (Reader view: S6-22)', async (_case, view, role) => {
-    await openTab(view, role);
+  describe('read only (R-CAN-10, S6-22)', () => {
+    /** The terms and values of every `<dl>` row inside `scope`. */
+    const facts = (scope: Element) =>
+      [...scope.querySelectorAll('dl > div')].map((row) => [
+        row.querySelector('dt')?.textContent?.trim(),
+        ...[...row.querySelectorAll('dd')].map((value) => value.textContent?.trim()),
+      ]);
 
-    expect(screen.queryByRole('radiogroup')).toBeNull();
-    expect(screen.queryByRole('button')).toBeNull();
+    function expectNoInput(container: Element): void {
+      expect(container.querySelector('form, input, select, textarea, mat-select, mat-radio-group')).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+    }
+
+    it('shows a Reader the stored status and each evidence as text; optional facts under their display headings, the private note marked', async () => {
+      const other: TestEvidence = {
+        ...SOFTWARE_TEST,
+        id: 'e-2',
+        testKind: 'other',
+        testTypeId: null,
+        otherTestTypeName: 'Hausprüfung',
+        testedVersion: null,
+        evidenceUrl: null,
+        qualificationNote: null,
+      };
+      const { container } = await openTab(candidateView({ candidate: { ...TESTED, testEvidences: [SOFTWARE_TEST, other] } }), 'reader');
+
+      expect(facts(container.querySelector('.pa-evidence__card')!)).toEqual([['Wurde das Produkt auf Barrierefreiheit geprüft?', 'Ja']]);
+      expect(screen.getByRole('heading', { level: 2, name: 'Prüfnachweise' })).toBeTruthy();
+      const first = screen.getByRole('heading', { level: 3, name: 'Prüfnachweis 1: BIT inklusiv Software-Test' }).parentElement!;
+      expect(facts(first)).toEqual([
+        ['Art der Prüfung', 'BIT inklusiv Software-Test'],
+        ['Wer hat geprüft?', 'Prüfstelle Beispiel'],
+        ['Datum der Prüfung', '14.03.2026'],
+        ['Geprüfte Version', '4.2'],
+        ['Link zum Prüfbericht', 'https://pruefstelle-beispiel.de/berichte/bewerberpro'],
+        [
+          'Notiz zur Qualifikation der prüfenden Stelle',
+          'Akkreditierte Prüfstelle',
+          expect.stringMatching(/^Nur für Ihre Organisation: Diese Angaben werden nie veröffentlicht/),
+        ],
+      ]);
+      expect(screen.getByRole('link', { name: 'https://pruefstelle-beispiel.de/berichte/bewerberpro' }).getAttribute('href')).toBe(
+        'https://pruefstelle-beispiel.de/berichte/bewerberpro',
+      );
+      // Empty optional facts are left out; „Andere Prüfung“ names its procedure
+      const second = screen.getByRole('heading', { level: 3, name: 'Prüfnachweis 2: Hausprüfung' }).parentElement!;
+      expect(facts(second)).toEqual([
+        ['Art der Prüfung', expect.stringMatching(/^Andere Prüfung/)],
+        ['Name des Prüfverfahrens', 'Hausprüfung'],
+        ['Wer hat geprüft?', 'Prüfstelle Beispiel'],
+        ['Datum der Prüfung', '14.03.2026'],
+      ]);
+      expectNoInput(container);
+      expect(container.textContent).not.toContain('(optional)');
+      await expectNoAxeViolations();
+    });
+
+    it.each<[string, Candidate, string]>([
+      ['„Nicht bekannt“', TEST_CANDIDATE, 'Nicht bekannt'],
+      ['„Nein“', { ...TEST_CANDIDATE, testStatus: 'notTested' }, 'Nein'],
+      ['„Ja“ without evidences', { ...TEST_CANDIDATE, testStatus: 'tested' }, 'Ja'],
+    ])('shows a Reader only the status for %s, without the hints that ask for input', async (_case, candidate, status) => {
+      const { container } = await openTab(candidateView({ candidate }), 'reader');
+
+      expect(facts(container)).toEqual([['Wurde das Produkt auf Barrierefreiheit geprüft?', status]]);
+      expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
+      expect(screen.queryByText(/erscheinen, sobald Sie „Ja“ wählen/)).toBeNull();
+      expectNoInput(container);
+    });
+
+    it('shows an Editor the same read-only view in an archived project (R-PRJ-05)', async () => {
+      const { container } = await openTab(candidateView({ project: { ...TEST_PROJECT, status: 'archived' }, candidate: TESTED }), 'editor');
+
+      expect(screen.getByRole('heading', { level: 3, name: 'Prüfnachweis 1: BIT inklusiv Software-Test' })).toBeTruthy();
+      expectNoInput(container);
+    });
   });
 });

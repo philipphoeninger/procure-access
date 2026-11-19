@@ -87,12 +87,18 @@ const STATUSES: readonly TestStatus[] = ['tested', 'notTested', 'unknown'];
  *   status, then each card's heading with its changed fields (S6-21). „Neue Fassung laden“ reads
  *   the product again, fills the tab with it and moves the focus to the H1; after Escape
  *   „Speichern“ opens S37 again without a request until then.
- * - Only Editor and Owner of a project that is not archived get the form (R-CAN-05, R-PRJ-05);
- *   the Reader view comes with S6-22 (D5 (a)), the publish button with step 6.
+ * - Only Editor and Owner of a project that is not archived get the form (R-CAN-05, R-PRJ-05).
+ *   A Reader, and everyone in an archived project, reads the tab (R-CAN-10; S6-22): a card with
+ *   the question and the stored answer as a `<dl>`, and with „Ja“ and evidences the H2 and one
+ *   card per evidence — the same H3, then a `<dl>` with the form's labels for the required fields
+ *   and the display headings `candidate.evidence.version.heading`, `.url.heading` (a link) and
+ *   `.qualification.heading` for the optional ones, which are left out when empty; the private
+ *   note keeps its text „Nur für Ihre Organisation: …“ (PRV-01). No input, no hint that asks for
+ *   one. The publish button comes with step 6.
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2022-267
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2144-3508
- * @spec docs/SPEC_v2.md R-CAN-05; docs/design_handoff_procureaccess_v1.md §5.1
+ * @spec docs/SPEC_v2.md R-CAN-05, R-CAN-10; docs/design_handoff_procureaccess_v1.md §5.1
  * @invariants WSP-01, SIG-03, PRV-02, API-02, SEC-10, A11Y-09
  */
 @Component({
@@ -162,7 +168,7 @@ export class CandidateEvidence {
     return view.kind === 'candidate' ? view.candidate : null;
   });
 
-  /** The form only for Editor and Owner of a project that is not archived (R-PRJ-05; Readers: S6-22). */
+  /** The form only for Editor and Owner of a project that is not archived (R-PRJ-05); everyone else reads (R-CAN-10). */
   protected readonly editable = computed(() => {
     const view = this.load.view();
     return (
@@ -211,6 +217,25 @@ export class CandidateEvidence {
         ? card.otherName.value.trim()
         : (this.translate.instant(`testType.${kind}`) as string);
     return { key: 'candidate.evidence.list.item', params: { n: index + 1, testType: name } };
+  }
+
+  /** H3 of a stored evidence in the read-only view, as {@link heading} names a card. */
+  protected storedHeading(evidence: TestEvidence, index: number): TextKey {
+    const name =
+      evidence.testKind === 'other' && evidence.otherTestTypeName
+        ? evidence.otherTestTypeName
+        : (this.translate.instant(this.storedKindKey(evidence)) as string);
+    return { key: 'candidate.evidence.list.item', params: { n: index + 1, testType: name } };
+  }
+
+  /** „Art der Prüfung“ of a stored evidence: its catalog procedure, „Andere Prüfung“ or „Eigene Prüfung …“. */
+  protected storedKindKey(evidence: TestEvidence): string {
+    return `testType.${evidence.testKind === 'procedure' ? evidence.testTypeId : evidence.testKind}`;
+  }
+
+  /** A stored date as the form shows it (TT.MM.JJJJ). */
+  protected date(isoDate: string): string {
+    return formatGermanDate(isoDate);
   }
 
   /** The label of a procedure option, also the text of the select's trigger. */

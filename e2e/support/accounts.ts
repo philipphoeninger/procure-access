@@ -69,6 +69,20 @@ export async function invitationLinkOf(request: APIRequestContext, address: stri
 }
 
 /**
+ * Accepts the invitation mailed to `address` as the user `page` is signed in as, so the user is a
+ * member with the invited role (S6-21a, S6-22). `count` is the number of mails the address has got
+ * by then (2 for an account registered through {@link registerConfirmedAccount} and invited once).
+ */
+export async function acceptInvitationThroughApi(page: Page, request: APIRequestContext, address: string, count: number): Promise<void> {
+  const link = await invitationLinkOf(request, address, count);
+  const accepted = await page.request.post('/api/v1/invitations/accept', {
+    headers: { 'X-XSRF-TOKEN': await xsrfToken(page.request) },
+    data: { token: new URL(link, 'http://localhost').searchParams.get('token') },
+  });
+  expect(accepted.status(), `${address} accepts the invitation`).toBe(200);
+}
+
+/**
  * Signs the request context in as `address` and creates an organisation it owns (S5-20b): the
  * account of a test that saves lists, so the browser page itself can stay signed out until the test
  * signs in through S01. Returns the organisation's id.

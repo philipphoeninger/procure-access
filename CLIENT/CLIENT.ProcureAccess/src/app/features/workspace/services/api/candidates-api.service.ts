@@ -36,8 +36,8 @@ export const SAVE_TEST_STATUS_PROBLEMS: readonly string[] = [...SAVE_CANDIDATE_P
  * S33 and S34a show the problems of {@link SAVE_CANDIDATE_PROBLEMS} themselves; S34a also
  * `test-status-conflict` of the test status (S6-17). Every answer with a candidate carries its
  * `ETag`, kept as `etag`; an evidence names its tag as the body member `etag`. A change sends the
- * tag back in `If-Match` (API-03, S6-20): the candidate's for its facts and its test status, the
- * evidence's for changing or removing it; adding one needs none. A 409 `conflict` is the caller's:
+ * tag back in `If-Match` (API-03, S6-20): the candidate's for its facts, its test status and
+ * removing it (S6-22), the evidence's for changing or removing it; adding one needs none. A 409 `conflict` is the caller's:
  * S33 and S34a open the conflict dialog S37 (S6-21).
  */
 @Injectable({ providedIn: 'root' })
@@ -93,6 +93,21 @@ export class CandidatesApiService {
         { context: formContext(SAVE_TEST_STATUS_PROBLEMS), headers: ifMatch(etag), observe: 'response' },
       ),
     ).then(withEtag);
+  }
+
+  /**
+   * Removes a candidate with its evidences and assessments from its project (R-CAN-09, WSP-04);
+   * Editor or Owner, confirmed address, not archived. `etag` is the candidate's tag (API-03). The
+   * caller handles `not-found` — a candidate another session removed meanwhile is gone, as asked —;
+   * every other failure, a stale tag included, keeps the error interceptor's texts.
+   */
+  remove(id: string, etag: string): Promise<void> {
+    return lastValueFrom(
+      this.http.delete<void>(`${this.apiUrl}/v1/candidates/${encodeURIComponent(id)}`, {
+        context: formContext(['not-found']),
+        headers: ifMatch(etag),
+      }),
+    );
   }
 
   /** Adds an evidence while the status is „Ja“; a second one of a catalog procedure is 400 at `testTypeId` (WSP-01). */

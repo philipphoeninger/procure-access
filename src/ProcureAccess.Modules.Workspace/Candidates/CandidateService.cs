@@ -12,8 +12,8 @@ using ProcureAccess.Modules.Workspace.Persistence;
 namespace ProcureAccess.Modules.Workspace.Candidates;
 
 /// <summary>
-/// Creates, reads and changes the candidate products of a project with their private section, test
-/// status and test evidences (SPEC R-CAN-02, R-CAN-05; WSP-01; S6-15) for
+/// Creates, reads, changes and removes the candidate products of a project with their private section, test
+/// status and test evidences (SPEC R-CAN-02, R-CAN-05, R-CAN-09; WSP-01, WSP-04; S6-15, S6-22) for
 /// <see cref="CandidateEndpoints"/>. Every read runs through the organisation filter of the request
 /// (TEN-01); the endpoints check the role on the organisation before they call it.
 /// </summary>
@@ -297,6 +297,43 @@ internal sealed class CandidateService(
         project.MarkChanged(now);
         await db.SaveChangesAsync(cancellationToken);
         return CandidateResult<TestEvidenceResponse>.Of(CandidateOutcome.Done);
+    }
+
+    /// <summary>
+    /// Removes a candidate from its project (SPEC R-CAN-09, WSP-04; S6-22): the database removes its
+    /// private section, its evidences with their private notes and its assessments with it.
+    /// </summary>
+    /// <remarks>
+    /// The published entry of a candidate stays in the directory and loses its link to the candidate
+    /// (WSP-04, PRV-03): that part comes with the publication of migration step 6.
+    /// </remarks>
+    public Task<CandidateResult<CandidateResponse>> RemoveAsync(Guid id, EditPrecondition edit, CancellationToken cancellationToken) =>
+        ConcurrentChange.RunAsync(db, () => RemoveOnceAsync(id, edit, cancellationToken));
+
+    /// <returns>No value: <see cref="CandidateOutcome.Done"/> says the candidate is gone.</returns>
+    private async Task<CandidateResult<CandidateResponse>> RemoveOnceAsync(
+        Guid id, EditPrecondition edit, CancellationToken cancellationToken)
+    {
+        if (await LoadAsync(id, cancellationToken) is not { } loaded)
+        {
+            return CandidateResult<CandidateResponse>.Of(CandidateOutcome.NotFound);
+        }
+
+        var (candidate, project) = loaded;
+        if (!tags.Matches(edit.IfMatch, candidate.Version))
+        {
+            return CandidateResult<CandidateResponse>.Conflict(candidate.ModifiedByUserId);
+        }
+
+        if (project.IsArchived)
+        {
+            return CandidateResult<CandidateResponse>.Of(CandidateOutcome.ProjectArchived);
+        }
+
+        db.CandidateProducts.Remove(candidate);
+        project.MarkChanged(clock.GetUtcNow());
+        await db.SaveChangesAsync(cancellationToken);
+        return CandidateResult<CandidateResponse>.Of(CandidateOutcome.Done);
     }
 
     /// <summary>A change's optional text: <c>null</c> keeps <paramref name="current"/>, <c>""</c> clears it.</summary>

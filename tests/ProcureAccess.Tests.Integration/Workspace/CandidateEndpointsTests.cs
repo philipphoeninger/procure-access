@@ -23,8 +23,8 @@ using Xunit;
 namespace ProcureAccess.Tests.Integration.Workspace;
 
 /// <summary>
-/// The candidate and evidence endpoints (S6-15; SPEC R-CAN-02, R-CAN-05, §7.2, §8.6 v2.53;
-/// ARCHITECTURE §5.4, §7.2): adding, reading and changing a candidate with its private section,
+/// The candidate and evidence endpoints (S6-15, S6-22; SPEC R-CAN-02, R-CAN-05, R-CAN-09, §7.2, §8.6 v2.53;
+/// ARCHITECTURE §5.4, §7.2): adding, reading, changing and removing (WSP-04) a candidate with its private section,
 /// the test status „Nicht bekannt“ of a new candidate (SIG-03), the evidences under „Ja“ with at
 /// most one per procedure and the status change that removes them (WSP-01), archived projects,
 /// the organisation boundary and the confirmed address. Every test starts from the Tenants fixture
@@ -473,6 +473,62 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         (await CountAsync<TestEvidencePrivateNote>()).ShouldBe(1);
     }
 
+    /// <summary>
+    /// WSP-04, workspace part (R-CAN-09): the candidate goes with its private section, its evidences
+    /// and their private notes and its assessments; the other candidate of the project stays. The
+    /// published entry that stays in the directory comes with step 6.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-04 " + nameof(Remove_EditorOfA_Returns204AndRemovesEvidencesNotesAndAssessments))]
+    [Trait("Invariant", "WSP-04")]
+    public async Task Remove_EditorOfA_Returns204AndRemovesEvidencesNotesAndAssessments()
+    {
+        var (project, candidate) = await StoreCandidateAsync(Fixture.A.Id, TestStatus.Tested);
+        await StoreEvidenceAsync(candidate.Id);
+        await StoreAssessmentAsync(candidate.Id);
+        using var client = CreateClient(TestUsers.EditorA);
+        using var added = await client.PostAsJsonAsync(CandidatesPath(project.Id), new { name = "Bleibt" }, Cancellation);
+        var other = (await added.Content.ReadFromJsonAsync<CandidateResponse>(Cancellation)).ShouldNotBeNull();
+        (await ReadProjectAsync(client, project.Id)).CriteriaListLocked.ShouldBeTrue();
+        Clock.Advance(TimeSpan.FromMinutes(5));
+
+        using var response = await RemoveAsync(client, candidate.Id);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent, await response.Content.ReadAsStringAsync(Cancellation));
+        using var read = await client.GetAsync(CandidatePath(candidate.Id), Cancellation);
+        read.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await CountAsync<TestEvidence>()).ShouldBe(0);
+        (await CountAsync<TestEvidencePrivateNote>()).ShouldBe(0);
+        (await CountAsync<CandidateAssessment>()).ShouldBe(0);
+        await using (var db = Workspace(Fixture.A.Id))
+        {
+            (await db.CandidateProducts.AsNoTracking().SingleAsync(Cancellation)).Id.ShouldBe(other.Id);
+            (await db.CandidatePrivateSections.AsNoTracking().SingleAsync(Cancellation)).CandidateProductId.ShouldBe(other.Id);
+        }
+
+        // The project lists what is left, its last change moved, and the list is free again (WSP-02).
+        (await ReadProjectAsync(client, project.Id)).ShouldSatisfyAllConditions(
+            p => p.ProductCount.ShouldBe(1),
+            p => p.Candidates.ShouldHaveSingleItem().Id.ShouldBe(other.Id),
+            p => p.CriteriaListLocked.ShouldBeFalse(),
+            p => p.ModifiedAt.ShouldBe(Clock.GetUtcNow()));
+    }
+
+    [Fact(DisplayName = "INV:WSP-04 " + nameof(Remove_Twice_Returns404TheSecondTime))]
+    [Trait("Invariant", "WSP-04")]
+    public async Task Remove_Twice_Returns404TheSecondTime()
+    {
+        var (_, candidate) = await StoreCandidateAsync(Fixture.A.Id);
+        using var client = CreateClient(TestUsers.OwnerA);
+
+        using var response = await client.SendWithTagAsync(HttpMethod.Delete, CandidatePath(candidate.Id), IfMatchRequests.FirstTag, Cancellation);
+        using var again = await client.SendWithTagAsync(HttpMethod.Delete, CandidatePath(candidate.Id), IfMatchRequests.FirstTag, Cancellation);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        again.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await CountAsync<CandidateProduct>()).ShouldBe(0);
+        (await CountAsync<CandidatePrivateSection>()).ShouldBe(0);
+    }
+
     [Theory(DisplayName = "INV:API-01 " + nameof(AddEvidence_InvalidField_Returns400AtTheField))]
     [Trait("Invariant", "API-01")]
     [InlineData("testKind", null)]
@@ -558,6 +614,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
             await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation),
             await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidence.Id), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
             await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidence.Id), IfMatchRequests.FirstTag, Cancellation),
+            await RemoveAsync(client, candidate.Id),
         ];
 
         foreach (var response in responses)
@@ -592,6 +649,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
             await client.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation),
             await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidence), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
             await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidence), IfMatchRequests.FirstTag, Cancellation),
+            await RemoveAsync(client, candidate.Id),
         ];
         // Reading needs no confirmed address.
         var read = await ReadAsync(client, candidate.Id);
@@ -629,6 +687,7 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
             await client.PostAsJsonAsync(EvidencesPath(candidateOfB.Id), Procedure("bikWeb"), Cancellation),
             await client.SendWithTagAsync(HttpMethod.Put, EvidencePath(evidenceOfB), Procedure("softwareTest") with { TestedVersion = "2" }, IfMatchRequests.FirstTag, Cancellation),
             await client.SendWithTagAsync(HttpMethod.Delete, EvidencePath(evidenceOfB), IfMatchRequests.FirstTag, Cancellation),
+            await client.SendWithTagAsync(HttpMethod.Delete, CandidatePath(candidateOfB.Id), IfMatchRequests.FirstTag, Cancellation),
         ];
 
         foreach (var response in responses)
@@ -736,6 +795,22 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         await db.SaveChangesAsync(Cancellation);
         return evidence.Id;
     }
+
+    /// <summary>Stores an assessment „Erfüllt“ of the candidate for a criterion revision (no list is needed for the row).</summary>
+    private async Task StoreAssessmentAsync(Guid candidateId)
+    {
+        await using var db = Workspace(Fixture.A.Id);
+        var candidate = await db.CandidateProducts.SingleAsync(c => c.Id == candidateId, Cancellation);
+        var assessment = CandidateAssessment.Of(candidate, criterionRevisionId: 1);
+        assessment.Change(Fulfillment.Fulfilled, "Begründung", Clock.GetUtcNow());
+        db.CandidateAssessments.Add(assessment);
+        await db.SaveChangesAsync(Cancellation);
+    }
+
+    /// <summary><c>DELETE /candidates/{id}</c> with the candidate's current tag.</summary>
+    private static async Task<HttpResponseMessage> RemoveAsync(HttpClient client, Guid candidateId) =>
+        await client.SendWithTagAsync(
+            HttpMethod.Delete, CandidatePath(candidateId), await client.TagOfAsync(CandidatePath(candidateId), Cancellation), Cancellation);
 
     private async Task<int> CountAsync<TEntity>() where TEntity : class
     {

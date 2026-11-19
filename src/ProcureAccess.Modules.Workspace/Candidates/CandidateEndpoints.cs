@@ -19,9 +19,9 @@ namespace ProcureAccess.Modules.Workspace.Candidates;
 
 /// <summary>
 /// The candidate products of a project with their private section, test status and test evidences
-/// (SPEC R-CAN-02, R-CAN-05; ARCHITECTURE §5.4, §7.2; WSP-01; S6-15): add a candidate, read and
-/// change it, set its test status, add, change and remove its evidences. Removing a candidate comes
-/// with S6-22 (R-CAN-09), „Merken“ from the directory with M6 (R-CAN-01).
+/// (SPEC R-CAN-02, R-CAN-05, R-CAN-09; ARCHITECTURE §5.4, §7.2; WSP-01, WSP-04; S6-15, S6-22): add a
+/// candidate, read, change and remove it, set its test status, add, change and remove its evidences.
+/// „Merken“ from the directory comes with M6 (R-CAN-01).
 /// </summary>
 /// <remarks>
 /// <para><b>Sign-in and organisation</b> as for the projects (<see cref="ProjectEndpoints"/>): the
@@ -39,8 +39,8 @@ namespace ProcureAccess.Modules.Workspace.Candidates;
 /// <para><b>Concurrency (API-03, API-04; S6-20, owner decision D2 (a)).</b> An answer with a
 /// candidate carries its <c>ETag</c>, an answer with an evidence the evidence's; every evidence
 /// also names its tag as <c>etag</c>, because it is read inside its candidate. Changing a
-/// candidate or its test status needs the candidate's tag in <c>If-Match</c>, changing or removing
-/// an evidence the evidence's: 428 <c>precondition-required</c> without the header (after the role
+/// candidate or its test status and removing it need the candidate's tag in <c>If-Match</c>,
+/// changing or removing an evidence the evidence's: 428 <c>precondition-required</c> without the header (after the role
 /// check, before the validation), 409 <c>conflict</c> with <c>editorDisplayName</c> for a stale
 /// one. Adding a candidate or an evidence needs none. An added or removed evidence gives the
 /// candidate a new tag (<see cref="CandidateService"/>).</para>
@@ -124,6 +124,20 @@ internal static class CandidateEndpoints
                   .Accepts<TestStatusBody>("application/json")
                   .Produces<CandidateResponse>()
                   .ProducesValidationProblem()
+                  .ProducesProblem(StatusCodes.Status403Forbidden)
+                  .ProducesProblem(StatusCodes.Status404NotFound)
+                  .ProducesProblem(StatusCodes.Status409Conflict)
+                  .ProducesProblem(StatusCodes.Status428PreconditionRequired);
+
+        candidates.MapDelete("/{id}", RemoveAsync)
+                  .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
+                  .WithName("DeleteCandidate")
+                  .WithSummary("Removes a candidate product with its test evidences and assessments from its project (Editor or Owner)")
+                  .WithDescription(
+                      "204. Needs If-Match with the ETag of the candidate. 400 antiforgery; 401; 403 email-unconfirmed or below " +
+                      "Editor; 404; 409 conflict with editorDisplayName for a stale If-Match; 409 project-archived; 428 " +
+                      "precondition-required without If-Match.")
+                  .Produces(StatusCodes.Status204NoContent)
                   .ProducesProblem(StatusCodes.Status403Forbidden)
                   .ProducesProblem(StatusCodes.Status404NotFound)
                   .ProducesProblem(StatusCodes.Status409Conflict)
@@ -390,6 +404,35 @@ internal static class CandidateEndpoints
         }
 
         var result = await candidates.RemoveEvidenceAsync(id, EditOf(user, ifMatch), cancellationToken);
+        return result.Outcome switch
+        {
+            CandidateOutcome.Done => TypedResults.NoContent(),
+            CandidateOutcome.Conflict => await WorkspaceAccess.ConflictAsync(users, result.EditorUserId, cancellationToken),
+            _ => Problem(result),
+        };
+    }
+
+    private static async Task<IResult> RemoveAsync(
+        Guid id,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
+        ClaimsPrincipal user,
+        IAuthorizationService authorization,
+        CandidateService candidates,
+        IUserDirectory users,
+        CancellationToken cancellationToken)
+    {
+        var organizationId = await candidates.OrganizationOfCandidateAsync(id, cancellationToken);
+        if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
+        {
+            return refused;
+        }
+
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
+        }
+
+        var result = await candidates.RemoveAsync(id, EditOf(user, ifMatch), cancellationToken);
         return result.Outcome switch
         {
             CandidateOutcome.Done => TypedResults.NoContent(),
