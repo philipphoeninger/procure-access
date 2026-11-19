@@ -274,7 +274,7 @@ describe('withWorkspace', () => {
       expect(backend.expectOne(row(12)).request.body).toEqual({ value: 'barrier', note: null });
     });
 
-    it('does not save a row while its note is too long (SPEC §7.2)', async () => {
+    it('does not save a row while its note is too long, and keeps it on a new read (SPEC §7.2)', async () => {
       await loaded();
       vi.useFakeTimers();
 
@@ -282,6 +282,12 @@ describe('withWorkspace', () => {
       vi.advanceTimersByTime(800);
       await settle();
       backend.expectNone(row(13));
+
+      // A new read keeps the note the user typed (K6 shows the error)
+      const reading = store.loadAssessments('c-1');
+      backend.expectOne(URL).flush(TEST_ASSESSMENTS);
+      await reading;
+      expect(criterion(store.workspace.assessments().view, 13)?.note).toBe('x'.repeat(1001));
 
       store.changeAssessment('c-1', 13, { value: 'barrier', note: ` ${'x'.repeat(1000)} ` });
       vi.advanceTimersByTime(800);

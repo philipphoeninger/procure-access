@@ -38,11 +38,13 @@ SPDX-License-Identifier: MIT
   }
 
   <div class="pa-assessment-input__note" [id]="noteId" [hidden]="layout() === 'compact' && !noteOpen()">
+    <!-- A long question: a visible label above the field, not a floating one (Handoff §2.2 „Forms“, as S34a) -->
+    <label class="pa-assessment-input__note-label" [for]="noteFieldId">{{ 'candidate.assessment.note' | translate }}</label>
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>{{ 'candidate.assessment.note' | translate }}</mat-label>
       <textarea
         #noteField
         matInput
+        [id]="noteFieldId"
         cdkTextareaAutosize
         cdkAutosizeMinRows="2"
         [formControl]="noteControl"

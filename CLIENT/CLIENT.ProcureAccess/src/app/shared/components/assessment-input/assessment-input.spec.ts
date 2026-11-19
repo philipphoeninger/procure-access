@@ -64,6 +64,10 @@ describe('AssessmentInput (K6 pa-assessment-input, Handoff §4.6)', () => {
       const field = noteField() as HTMLTextAreaElement;
       expect(field.closest('[hidden]')).toBeNull();
       expect(field.value).toBe('Eigener Test.');
+      // The long question is a visible label above the field, not a floating one (Handoff §2.2 „Forms“)
+      const label = field.labels?.[0];
+      expect(label?.closest('mat-form-field')).toBeNull();
+      expect(label?.nextElementSibling?.tagName).toBe('MAT-FORM-FIELD');
       expect(field.getAttribute('aria-describedby')).toContain(screen.getByText(TITLE).id);
       expect(screen.queryByRole('button', { name: /Begründung/ })).toBeNull();
 

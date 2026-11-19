@@ -77,12 +77,12 @@ export const initialWorkspaceState: WorkspaceState = {
   assessments: { candidateId: null, status: 'idle', view: null },
 };
 
-/** A changed row waiting for its autosave. */
+/** A changed row waiting for its autosave; without a timer while its note is too long to be saved. */
 interface WaitingRow {
   candidateId: string;
   criterionRevisionId: number;
   row: AssessmentRow;
-  timer: ReturnType<typeof setTimeout>;
+  timer: ReturnType<typeof setTimeout> | undefined;
 }
 
 /**
@@ -141,8 +141,12 @@ export const withWorkspace = () =>
         const previous = sending.get(key) ?? Promise.resolve();
         if (entry === undefined) return previous;
         clearTimeout(entry.timer);
+        if (noteTooLong(entry.row.note)) {
+          // Not sent, but kept as unsaved: a new read keeps what the user typed, K6 shows the error
+          waiting.set(key, { ...entry, timer: undefined });
+          return previous;
+        }
         waiting.delete(key);
-        if (noteTooLong(entry.row.note)) return previous;
 
         const saved: Promise<void> = previous
           .then(() => candidates().saveAssessment(entry.candidateId, entry.criterionRevisionId, entry.row))

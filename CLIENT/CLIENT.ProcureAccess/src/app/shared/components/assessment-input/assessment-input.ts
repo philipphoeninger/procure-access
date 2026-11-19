@@ -53,7 +53,8 @@ let nextId = 0;
  *   is too long keeps the field open.
  * - Only `allowedValues` are offered (the union of the list's app types, served by the API, C31);
  *   „Nicht eingeschätzt“ always. No sliders, no stars, no colour per level.
- * - The note: an outlined text area `candidate.assessment.note` described by the title; its length
+ * - The note: an outlined text area with the long question `candidate.assessment.note` as a
+ *   visible label above it (Handoff §2.2 „Forms“, as S34a), described by the title; its length
  *   error `errors.field.maxLength` (counted after trimming, as the server does) shows once the
  *   field was left.
  *
@@ -89,6 +90,7 @@ export class AssessmentInput {
   protected readonly titleId = `${this.id}-title`;
   protected readonly questionId = `${this.id}-question`;
   protected readonly noteId = `${this.id}-note`;
+  protected readonly noteFieldId = `${this.id}-note-field`;
 
   /** The allowed levels in scale order, „Nicht eingeschätzt“ last. */
   protected readonly options = computed<AssessmentValue[]>(() => {
