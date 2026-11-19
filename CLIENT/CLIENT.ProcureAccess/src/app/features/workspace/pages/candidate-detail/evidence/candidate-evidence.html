@@ -76,17 +76,23 @@ SPDX-License-Identifier: MIT
             <ng-container *ngTemplateOutlet="text; context: { card, field: 'testedVersion' }" />
             <ng-container *ngTemplateOutlet="text; context: { card, field: 'evidenceUrl', url: true }" />
 
-            <!-- Private (PRV-01): never published; the hint says so, as S33's private section -->
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pa-evidence__wide">
-              <mat-label>{{ labels.qualificationNote | translate }} {{ 'common.optional' | translate }}</mat-label>
-              <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="1" [id]="fieldId(card, 'qualificationNote')"
-                name="qualificationNote" [formControl]="card.qualificationNote" [errorStateMatcher]="matcher(card)"></textarea>
-              @if (message(card, 'qualificationNote'); as message) {
-                <mat-error>{{ message.key | translate: message.params }}</mat-error>
-              } @else {
-                <mat-hint>{{ 'candidate.form.privateSection' | translate }}: {{ 'candidate.form.privateSection.text' | translate }}</mat-hint>
-              }
-            </mat-form-field>
+            <!-- Private (PRV-01): never published; the hint says so, as S33's private section. Its label
+                 is too long for a floating label at 320 px, so it stands above the field (Handoff §2.2
+                 „Forms“; owner decision S6-17 D7 (a)) -->
+            <div class="pa-evidence__wide pa-evidence__labelled">
+              <label class="pa-evidence__label" [for]="fieldId(card, 'qualificationNote')">
+                {{ labels.qualificationNote | translate }} {{ 'common.optional' | translate }}
+              </label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="1" [id]="fieldId(card, 'qualificationNote')"
+                  name="qualificationNote" [formControl]="card.qualificationNote" [errorStateMatcher]="matcher(card)"></textarea>
+                @if (message(card, 'qualificationNote'); as message) {
+                  <mat-error>{{ message.key | translate: message.params }}</mat-error>
+                } @else {
+                  <mat-hint>{{ 'candidate.form.privateSection' | translate }}: {{ 'candidate.form.privateSection.text' | translate }}</mat-hint>
+                }
+              </mat-form-field>
+            </div>
           </div>
           <div>
             <button matButton type="button" (click)="remove(index)">
