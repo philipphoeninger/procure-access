@@ -163,7 +163,7 @@ describe('CandidateFormPage (S33, R-CAN-02)', () => {
       functionalSummary: 'Bewerbermanagement, Stellenausschreibungen, Terminplanung',
       contactNotes: 'Frau Beispiel, Vertrieb',
       internalNotes: 'Demo am 20.10.2026 vereinbart.',
-    });
+    }, TEST_CANDIDATE.etag);
     expect(TestBed.inject(Router).url).toBe('/projekte/p-1/produkte/c-1');
   });
 

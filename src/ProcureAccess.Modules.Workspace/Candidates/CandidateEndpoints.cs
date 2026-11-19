@@ -6,6 +6,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
@@ -35,10 +36,18 @@ namespace ProcureAccess.Modules.Workspace.Candidates;
 /// answers 409 <c>test-status-conflict</c> with a field error at <c>testStatus</c> and the extension
 /// <c>evidenceCount</c>. A second evidence of the same catalog procedure answers 400 at
 /// <c>testTypeId</c> (<c>candidate.evidence.list.duplicate</c>).</para>
-/// <para><b>Concurrency.</b> No <c>ETag</c>/<c>If-Match</c> yet: API-03 comes with S6-20.</para>
+/// <para><b>Concurrency (API-03, API-04; S6-20, owner decision D2 (a)).</b> An answer with a
+/// candidate carries its <c>ETag</c>, an answer with an evidence the evidence's; every evidence
+/// also names its tag as <c>etag</c>, because it is read inside its candidate. Changing a
+/// candidate or its test status needs the candidate's tag in <c>If-Match</c>, changing or removing
+/// an evidence the evidence's: 428 <c>precondition-required</c> without the header (after the role
+/// check, before the validation), 409 <c>conflict</c> with <c>editorDisplayName</c> for a stale
+/// one. Adding a candidate or an evidence needs none. An added or removed evidence gives the
+/// candidate a new tag (<see cref="CandidateService"/>).</para>
 /// </remarks>
 internal static class CandidateEndpoints
 {
+    private const string IfMatchHeader = "If-Match";
     private const string NameField = "name";
     private const string VendorField = "vendor";
     private const string WebsiteField = "website";
@@ -89,22 +98,27 @@ internal static class CandidateEndpoints
                   .WithName("PatchCandidate")
                   .WithSummary("Changes the facts or the private section of a candidate product (Editor or Owner)")
                   .WithDescription(
-                      "200 with the candidate. Body as for adding: what is named changes, an empty text clears an optional field. " +
-                      "400 validation; 400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404; 409 project-archived.")
+                      "200 with the candidate and its new ETag. Needs If-Match with the ETag of the candidate. Body as for " +
+                      "adding: what is named changes, an empty text clears an optional field. " +
+                      "400 validation; 400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404; 409 conflict with " +
+                      "editorDisplayName for a stale If-Match; 409 project-archived; 428 precondition-required without If-Match.")
                   .Accepts<CandidateBody>("application/json")
                   .Produces<CandidateResponse>()
                   .ProducesValidationProblem()
                   .ProducesProblem(StatusCodes.Status403Forbidden)
                   .ProducesProblem(StatusCodes.Status404NotFound)
-                  .ProducesProblem(StatusCodes.Status409Conflict);
+                  .ProducesProblem(StatusCodes.Status409Conflict)
+                  .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         candidates.MapPut("/{id}/test-status", ChangeTestStatusAsync)
                   .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
                   .WithName("PutCandidateTestStatus")
                   .WithSummary("Sets the test status of a candidate product (Editor or Owner)")
                   .WithDescription(
-                      "200 with the candidate. Body { testStatus: tested | notTested | unknown, removeEvidences? }. 400 validation; " +
-                      "400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404; 409 project-archived; 409 " +
+                      "200 with the candidate and its new ETag. Needs If-Match with the ETag of the candidate. Body { testStatus: " +
+                      "tested | notTested | unknown, removeEvidences? }. 400 validation; " +
+                      "400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404; 409 conflict with editorDisplayName " +
+                      "for a stale If-Match; 428 precondition-required without If-Match; 409 project-archived; 409 " +
                       "test-status-conflict at testStatus with evidenceCount when it leaves tested while evidences exist and " +
                       "removeEvidences is not true.")
                   .Accepts<TestStatusBody>("application/json")
@@ -112,7 +126,8 @@ internal static class CandidateEndpoints
                   .ProducesValidationProblem()
                   .ProducesProblem(StatusCodes.Status403Forbidden)
                   .ProducesProblem(StatusCodes.Status404NotFound)
-                  .ProducesProblem(StatusCodes.Status409Conflict);
+                  .ProducesProblem(StatusCodes.Status409Conflict)
+                  .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         candidates.MapPost("/{id}/test-evidences", AddEvidenceAsync)
                   .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
@@ -137,25 +152,31 @@ internal static class CandidateEndpoints
                  .WithName("PutTestEvidence")
                  .WithSummary("Replaces the fields of a test evidence, e.g. for a new product version (Editor or Owner)")
                  .WithDescription(
-                     "200 with the evidence; the row and its id stay. Body as for adding. 400 validation; 400 antiforgery; 401; " +
-                     "403 email-unconfirmed or below Editor; 404; 409 project-archived.")
+                     "200 with the evidence and its new ETag; the row and its id stay. Needs If-Match with the ETag of the " +
+                     "evidence. Body as for adding. 400 validation; 400 antiforgery; 401; " +
+                     "403 email-unconfirmed or below Editor; 404; 409 conflict with editorDisplayName for a stale If-Match; " +
+                     "409 project-archived; 428 precondition-required without If-Match.")
                  .Accepts<TestEvidenceBody>("application/json")
                  .Produces<TestEvidenceResponse>()
                  .ProducesValidationProblem()
                  .ProducesProblem(StatusCodes.Status403Forbidden)
                  .ProducesProblem(StatusCodes.Status404NotFound)
-                 .ProducesProblem(StatusCodes.Status409Conflict);
+                 .ProducesProblem(StatusCodes.Status409Conflict)
+                 .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         evidences.MapDelete("/{id}", RemoveEvidenceAsync)
                  .RequireAuthorization(IdentityAccessPolicies.ConfirmedEmail)
                  .WithName("DeleteTestEvidence")
                  .WithSummary("Removes a test evidence (Editor or Owner)")
                  .WithDescription(
-                     "204. 400 antiforgery; 401; 403 email-unconfirmed or below Editor; 404; 409 project-archived.")
+                     "204. Needs If-Match with the ETag of the evidence. 400 antiforgery; 401; 403 email-unconfirmed or below " +
+                     "Editor; 404; 409 conflict with editorDisplayName for a stale If-Match; 409 project-archived; 428 " +
+                     "precondition-required without If-Match.")
                  .Produces(StatusCodes.Status204NoContent)
                  .ProducesProblem(StatusCodes.Status403Forbidden)
                  .ProducesProblem(StatusCodes.Status404NotFound)
-                 .ProducesProblem(StatusCodes.Status409Conflict);
+                 .ProducesProblem(StatusCodes.Status409Conflict)
+                 .ProducesProblem(StatusCodes.Status428PreconditionRequired);
 
         return routes;
     }
@@ -167,6 +188,7 @@ internal static class CandidateEndpoints
         IAuthorizationService authorization,
         ProjectService projects,
         CandidateService candidates,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await projects.OrganizationOfAsync(id, cancellationToken);
@@ -182,28 +204,49 @@ internal static class CandidateEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var result = await candidates.CreateAsync(id, input, cancellationToken);
-        return result.Outcome == CandidateOutcome.Done
-            ? TypedResults.Created(CandidatePath(result.Value!.Id), result.Value)
-            : Problem(result);
+        var result = await candidates.CreateAsync(id, input, WorkspaceAccess.UserIdOf(user), cancellationToken);
+        if (result.Outcome != CandidateOutcome.Done)
+        {
+            return Problem(result);
+        }
+
+        response.Headers.ETag = result.Value!.Etag;
+        return TypedResults.Created(CandidatePath(result.Value.Id), result.Value);
     }
 
     // Every member may read (Reader is the lowest role), so the organisation filter is the whole check.
-    private static async Task<IResult> GetAsync(Guid id, CandidateService candidates, CancellationToken cancellationToken) =>
-        await candidates.FindAsync(id, cancellationToken) is { } candidate ? TypedResults.Ok(candidate) : WorkspaceAccess.NotFound();
+    private static async Task<IResult> GetAsync(
+        Guid id, CandidateService candidates, HttpResponse response, CancellationToken cancellationToken)
+    {
+        if (await candidates.FindAsync(id, cancellationToken) is not { } candidate)
+        {
+            return WorkspaceAccess.NotFound();
+        }
+
+        response.Headers.ETag = candidate.Etag;
+        return TypedResults.Ok(candidate);
+    }
 
     private static async Task<IResult> ChangeAsync(
         Guid id,
         CandidateBody body,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         CandidateService candidates,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await candidates.OrganizationOfCandidateAsync(id, cancellationToken);
         if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
+        }
+
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
         }
 
         var errors = new Dictionary<string, string[]>(StringComparer.Ordinal);
@@ -213,22 +256,30 @@ internal static class CandidateEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var result = await candidates.ChangeAsync(id, input, cancellationToken);
-        return result.Outcome == CandidateOutcome.Done ? TypedResults.Ok(result.Value) : Problem(result);
+        var result = await candidates.ChangeAsync(id, input, EditOf(user, ifMatch), cancellationToken);
+        return await AnswerAsync(result, c => c.Etag, users, response, cancellationToken);
     }
 
     private static async Task<IResult> ChangeTestStatusAsync(
         Guid id,
         TestStatusBody body,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         CandidateService candidates,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await candidates.OrganizationOfCandidateAsync(id, cancellationToken);
         if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
+        }
+
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
         }
 
         var status = body.TestStatus is null ? null : CandidateNames.StatusOf(body.TestStatus);
@@ -242,8 +293,9 @@ internal static class CandidateEndpoints
                 type: ProblemTypes.Validation);
         }
 
-        var result = await candidates.ChangeTestStatusAsync(id, status.Value, body.RemoveEvidences == true, cancellationToken);
-        return result.Outcome == CandidateOutcome.Done ? TypedResults.Ok(result.Value) : Problem(result);
+        var result = await candidates.ChangeTestStatusAsync(
+            id, status.Value, body.RemoveEvidences == true, EditOf(user, ifMatch), cancellationToken);
+        return await AnswerAsync(result, c => c.Etag, users, response, cancellationToken);
     }
 
     private static async Task<IResult> AddEvidenceAsync(
@@ -255,6 +307,7 @@ internal static class CandidateEndpoints
         ICatalogTestTypes testTypes,
         WorkspaceSettings settings,
         TimeProvider clock,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await candidates.OrganizationOfCandidateAsync(id, cancellationToken);
@@ -270,27 +323,39 @@ internal static class CandidateEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var result = await candidates.AddEvidenceAsync(id, input, cancellationToken);
-        return result.Outcome == CandidateOutcome.Done
-            ? TypedResults.Created(EvidencePath(result.Value!.Id), result.Value)
-            : Problem(result);
+        var result = await candidates.AddEvidenceAsync(id, input, WorkspaceAccess.UserIdOf(user), cancellationToken);
+        if (result.Outcome != CandidateOutcome.Done)
+        {
+            return Problem(result);
+        }
+
+        response.Headers.ETag = result.Value!.Etag;
+        return TypedResults.Created(EvidencePath(result.Value.Id), result.Value);
     }
 
     private static async Task<IResult> ChangeEvidenceAsync(
         Guid id,
         TestEvidenceBody body,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         CandidateService candidates,
         ICatalogTestTypes testTypes,
         WorkspaceSettings settings,
         TimeProvider clock,
+        IUserDirectory users,
+        HttpResponse response,
         CancellationToken cancellationToken)
     {
         var organizationId = await candidates.OrganizationOfEvidenceAsync(id, cancellationToken);
         if (await WorkspaceAccess.RefusedAsync(authorization, user, organizationId, OrganizationRoleRequirement.Editor) is { } refused)
         {
             return refused;
+        }
+
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
         }
 
         var errors = new Dictionary<string, string[]>(StringComparer.Ordinal);
@@ -300,15 +365,17 @@ internal static class CandidateEndpoints
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var result = await candidates.ChangeEvidenceAsync(id, input, cancellationToken);
-        return result.Outcome == CandidateOutcome.Done ? TypedResults.Ok(result.Value) : Problem(result);
+        var result = await candidates.ChangeEvidenceAsync(id, input, EditOf(user, ifMatch), cancellationToken);
+        return await AnswerAsync(result, e => e.Etag, users, response, cancellationToken);
     }
 
     private static async Task<IResult> RemoveEvidenceAsync(
         Guid id,
+        [FromHeader(Name = IfMatchHeader)] string? ifMatch,
         ClaimsPrincipal user,
         IAuthorizationService authorization,
         CandidateService candidates,
+        IUserDirectory users,
         CancellationToken cancellationToken)
     {
         var organizationId = await candidates.OrganizationOfEvidenceAsync(id, cancellationToken);
@@ -317,10 +384,40 @@ internal static class CandidateEndpoints
             return refused;
         }
 
-        var outcome = await candidates.RemoveEvidenceAsync(id, cancellationToken);
-        return outcome == CandidateOutcome.Done
-            ? TypedResults.NoContent()
-            : Problem(CandidateResult<TestEvidenceResponse>.Of(outcome));
+        if (string.IsNullOrWhiteSpace(ifMatch))
+        {
+            return WorkspaceAccess.PreconditionRequired();
+        }
+
+        var result = await candidates.RemoveEvidenceAsync(id, EditOf(user, ifMatch), cancellationToken);
+        return result.Outcome switch
+        {
+            CandidateOutcome.Done => TypedResults.NoContent(),
+            CandidateOutcome.Conflict => await WorkspaceAccess.ConflictAsync(users, result.EditorUserId, cancellationToken),
+            _ => Problem(result),
+        };
+    }
+
+    private static EditPrecondition EditOf(ClaimsPrincipal user, string ifMatch) => new(WorkspaceAccess.UserIdOf(user), ifMatch);
+
+    /// <summary>
+    /// The answer of a change that needed <c>If-Match</c>: 200 with the value and its new
+    /// <c>ETag</c>, 409 <c>conflict</c> with the editor's name, or <see cref="Problem{T}"/>.
+    /// </summary>
+    private static async Task<IResult> AnswerAsync<T>(
+        CandidateResult<T> result, Func<T, string> etagOf, IUserDirectory users, HttpResponse response, CancellationToken cancellationToken)
+        where T : class
+    {
+        switch (result.Outcome)
+        {
+            case CandidateOutcome.Done:
+                response.Headers.ETag = etagOf(result.Value!);
+                return TypedResults.Ok(result.Value);
+            case CandidateOutcome.Conflict:
+                return await WorkspaceAccess.ConflictAsync(users, result.EditorUserId, cancellationToken);
+            default:
+                return Problem(result);
+        }
     }
 
     /// <summary>
@@ -417,7 +514,10 @@ internal static class CandidateEndpoints
 
     private static string? NullIfEmpty(string? value) => string.IsNullOrEmpty(value) ? null : value;
 
-    /// <summary>The answer of a request that did not end <see cref="CandidateOutcome.Done"/>.</summary>
+    /// <summary>
+    /// The answer of a request that did not end <see cref="CandidateOutcome.Done"/>; a
+    /// <see cref="CandidateOutcome.Conflict"/> is answered by its handler, which knows the editor.
+    /// </summary>
     private static IResult Problem<T>(CandidateResult<T> result) where T : class => result.Outcome switch
     {
         CandidateOutcome.NotFound => WorkspaceAccess.NotFound(),

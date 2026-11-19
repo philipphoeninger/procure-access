@@ -104,7 +104,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
-| S6-20 | Optimistic locking: ETag with the configured `ETagEpoch` on project, project copy, candidate and evidence, and on saved lists (M5.4d: ends the 500 of a racing `PATCH …/criteria/{id}`, S5-21a R1); updates without `If-Match` rejected (428), a stale ETag → 409 with the competing editor's display name; assessment rows stay last-write-wins | 3.5 | R-PRJ-07, R-CAN-11 (server) met; **API-03**, **API-04** `active`; the saved-list race has a test |
+| S6-20 | Optimistic locking: ETag with the configured `ETagEpoch` on project, project copy, candidate and evidence, and on saved lists (M5.4d: ends the 500 of a racing `PATCH …/criteria/{id}`, S5-21a R1); updates without `If-Match` rejected (428), a stale ETag → 409 with the competing editor's display name; assessment rows stay last-write-wins. *Split by module (owner decision S6-20 D4 (a), 2026-11-18): **S6-20a** — the shared parts (`ETagEpoch`, the tag, 428 and 409) and the Workspace module (project, candidate, evidence, the list assignment) with its client calls; **S6-20b** — saved lists and the project copy in Configurator, the race of S5-21a R1 and the S11 editor* | 3.5 | R-PRJ-07, R-CAN-11 (server) met; **API-03**, **API-04** `active` (S6-20a: workspace part; S6-20b completes API-03); the saved-list race has a test (S6-20b) |
 | S6-21 | Conflict dialog S37 (Figma `2056:2519`) as shared component (`shared/components/conflict-dialog/`) with the behaviour of Handoff §5.1, used by the workspace forms and the saved-list edits on S11 | 2.5 | R-CAN-11 (UI) met; E2E: two contexts edit the same project, the second gets S37; compared with the frame |
 
 #### M5.5 Remove and read-only — 3 points
@@ -173,7 +173,7 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 | S6-18 | S6-15, S6-12 | internal |
 | S6-19 | S6-18, S6-16 | internal |
 | S6-20 | S6-18 (all workspace resources exist) | internal |
-| S6-21 | S6-20 | internal |
+| S6-21 | S6-20 (S6-20a for the workspace forms, S6-20b for the saved-list edits on S11) | internal |
 | S6-22 | S6-19, S6-21 | internal |
 | S6-23 | S6-10 (legacy context migration); **O-S6-4** | internal / Philipp |
 | S6-25 | S6-15, S6-10 | internal |

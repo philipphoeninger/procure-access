@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProcureAccess.Modules.Platform.Analytics;
 using ProcureAccess.Modules.Platform.Caching;
+using ProcureAccess.Modules.Platform.Concurrency;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 using ProcureAccess.Modules.Platform.Contracts.Sharing;
 using ProcureAccess.Modules.Platform.Email;
@@ -91,6 +92,9 @@ public static class PlatformModule
         services.AddSingleton(ShareLinkSettings.From(configuration));
         services.AddScoped<ShareLinkService>();
         services.AddScoped<IShareLinks>(provider => provider.GetRequiredService<ShareLinkService>());
+
+        // The ETags of shared resources with the 🔧 epoch (API-03, API-04; S6-20).
+        services.AddSingleton(ConcurrencySettings.EntityTagsFrom(configuration));
 
         return services;
     }

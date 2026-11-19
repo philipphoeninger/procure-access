@@ -111,11 +111,12 @@ export const withWorkspace = () =>
         },
 
         /**
-         * Gives the project its own copy of an organisation list (R-PRJ-02, R-PRJ-04). Rejects with
-         * the error of the request; the caller shows it.
+         * Gives the project its own copy of an organisation list (R-PRJ-02, R-PRJ-04), as a change
+         * of the project read with `projectEtag` (API-03). Rejects with the error of the request;
+         * the caller shows it.
          */
-        assignCriteriaList(projectId: string, sourceConfigurationId: string): Promise<ProjectCriteriaList> {
-          return api.assignCriteriaList(projectId, sourceConfigurationId);
+        assignCriteriaList(projectId: string, sourceConfigurationId: string, projectEtag: string): Promise<ProjectCriteriaList> {
+          return api.assignCriteriaList(projectId, sourceConfigurationId, projectEtag);
         },
 
         /**

@@ -608,6 +608,33 @@ Way of working:
 
 Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
 ```
+
+> **Split (owner decision S6-20 D4 (a), 2026-11-18):** the prompt above was run as **S6-20a** — the shared parts and the Workspace module (`docs/sprints/sprint_06/S6-20a_etag_concurrency.md`). The second part is S6-20b below.
+
+### S6-20b — Optimistic locking: ETag / If-Match for saved lists and the project copy
+
+```text
+Task S6-20b from docs/sprints/sprint_06/SPRINT_06.md (row S6-20, second part) — Optimistic locking: ETag / If-Match for saved lists and the project copy
+Issues: none
+Requirements / invariants: R-SAV-03, R-PRJ-07 (copy), R-CAN-11 (server, list edits); API-03 complete
+Depends on: S6-20a merged
+
+Read first: CLAUDE.md and the CODEBASE §2 sections of the areas this task touches; in SPRINT_06.md the row of S6-20 plus the sections Dependencies, Owner decisions, Risks and Definition of done; the issues named above and their entries in TECH_DEBT_v5.md; always the highest version of each document in docs/ (document names below carry no version on purpose).
+Also read: SPEC R-PRJ-07, R-CAN-11, §7.1; ARCHITECTURE §7.1, §9.2 (ETagEpoch, restore safety); TESTING API-03, API-04; docs/sprints/sprint_06/S6-20a_etag_concurrency.md (what is built and its open points); docs/sprints/sprint_05/S5-21a_edit_delete_server.md (R1) and S5-21b_edit_delete_client.md (open point 2)
+
+Owner decisions for this task: S6-20 D1 (a) – D4 (a) of 2026-11-18 (S6-20a protocol): the tag comes from a version column, not xmin; PATCH …/criteria/{id}, PUT …/selection and DELETE of a list need If-Match; 428 is precondition-required without a UX key
+Additional instructions: Build on the shared parts of S6-20a (EntityTags, ProblemTypes.PreconditionRequired, core/concurrency/etag.ts, IfMatchRequests). CriteriaConfiguration gets Version and ModifiedByUserId (one Configurator migration); a decision, a selection change and a deletion count a version and need the list's ETag in If-Match → 428 without, 409 conflict with the editor's display name when stale; PATCH …/criteria/{id} answers 204 with the new ETag. Include the saved-list race of S5-21a R1 (PATCH …/criteria/{id} racing PUT …/selection answers 500 today) as a test that now gets 409. Client: ConfiguratorApiService keeps and sends the tag; SavedListEditor saves one change at a time per list (today one chain per criterion — two saves of one user would conflict with each other). The project's copy is changed through the same endpoints and so gets the same (S11 in project-copy mode). The dialog comes in S6-21.
+
+Way of working:
+1. Branch sprint06/S6-20b-etag-saved-lists from an up-to-date main. Scope is exactly this row. Anything else you find goes into the protocol's open points (or a proposed issue), not into this PR.
+2. Before changing code, give me a short plan: starting point, files, invariants the task activates, tests, and whether the task adds an EF migration (and to which module). If the plan shows more than one session, propose a split (as S5-20a/b). For a screen or component: if the Figma MCP connection is available, look at its frame (node ID from the Figma mapping) before building and compare the result before pushing (CLAUDE §2, Figma files); screens without a frame follow Handoff §5.3. Stop and ask if the row, the documents and the code contradict each other, if a UX copy key or its wording is missing, or if the task needs an owner decision that is not given above (CLAUDE §2, §6.5, §6.6). Do not decide for me: give options with a recommendation.
+3. Tests come with the code: a test for an invariant carries INV:<invariant ID> in its name (e.g. INV:WSP-01) and the Invariant trait (TESTING §8.1). Flip invariants to active in a new TESTING version and record deferred parts there; if another PR merged the same TESTING version first, rebase and renumber yours. If another PR merged a migration of the same module first, rebase and regenerate yours. UI strings only by key. Every new dependency or project needs a licence check (CLAUDE §10) and my OK. SPDX headers on new files.
+4. Before pushing: the checklist of CLAUDE §6.7 (use /engineering:code-review if available), build, every test level the change touches, node scripts/check-invariants.mjs, node scripts/check-figma-links.mjs, node scripts/check-i18n.mjs, reuse lint. If another session runs the E2E stack locally at the same time, leave E2E to CI. Sort review findings per CLAUDE §6.8.
+5. Write the protocol docs/sprints/sprint_06/S6-20b_etag_saved_lists.md in the structure of the earlier sprints (header with sprint, task, issues, requirements / invariants, status, scope, owner decisions; 1 Starting point, 2 Changes, 3 Self-review, 4 Checks, 5 Open points). Update every document the change touches (CODEBASE §2 paragraph of the area and §3 layout; CLAUDE.md only for a rule, command or convention that applies across the codebase; ARCHITECTURE, SPEC §13, Figma mapping, LEGACY_EXCEPTIONS …).
+6. Open a pull request against main: task ID, R-/INV- IDs, summary, checks, open points, "Closes #n" for finished issues. Do not merge.
+
+Finish with a short report for my control chat: PR link, protocol path, owner decisions needed, deviations from the plan, open points, and whether the task fitted one session.
+```
 ### S6-21 — Conflict dialog S37
 
 ```text

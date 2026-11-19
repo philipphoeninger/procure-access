@@ -33,6 +33,7 @@ const ORG: OrganizationSummary = { id: 'org-1', name: 'Stadt Musterhausen', type
 const CREATED: Project = {
   id: 'p-2',
   organizationId: 'org-1',
+  etag: '"1-1"',
   name: 'Neues Bewerbermanagement 2027',
   status: 'open',
   productCount: 0,
@@ -207,7 +208,8 @@ describe('„Projekt anlegen“ on S30 and the create dialog S31 (R-PRJ-02)', ()
       await submit(fixture, dialog, 'Mit Liste');
 
       expect(create).toHaveBeenCalledWith('org-1', 'Mit Liste');
-      expect(assignCriteriaList).toHaveBeenCalledWith('p-2', 'list-b');
+      // With the tag of the project just created (API-03).
+      expect(assignCriteriaList).toHaveBeenCalledWith('p-2', 'list-b', CREATED.etag);
       expect(TestBed.inject(Router).url).toBe('/projekte/p-2');
       expect(announce).toHaveBeenCalledWith('projects.created', { name: 'Mit Liste' });
       expect(showError).not.toHaveBeenCalled();

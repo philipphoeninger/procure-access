@@ -239,7 +239,7 @@ export class CandidateFormPage {
       saved =
         shown.candidate === null
           ? await this.api.create(shown.project.id, body)
-          : await this.api.change(shown.candidate.id, body);
+          : await this.api.change(shown.candidate.id, body, shown.candidate.etag);
     } catch (error: unknown) {
       this.refused(error);
       return;

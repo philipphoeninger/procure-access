@@ -126,5 +126,22 @@ public class ProcurementProjectTests
         project.ModifiedAt.ShouldBe(CreatedAt);
     }
 
+    [Fact(DisplayName = "INV:API-03 " + nameof(MarkEdited_CountsAVersionWithItsEditor_AStampDoesNot))]
+    [Trait("Invariant", "API-03")]
+    public void MarkEdited_CountsAVersionWithItsEditor_AStampDoesNot()
+    {
+        var project = Project();
+        project.ShouldSatisfyAllConditions(p => p.Version.ShouldBe(1), p => p.ModifiedByUserId.ShouldBe("user-1"));
+
+        // A change below the project stamps it; a rename counts once its service says who made it.
+        project.MarkChanged(Later);
+        project.Rename("Umbenannt", Later);
+        project.Version.ShouldBe(1);
+        project.MarkEdited("user-2");
+
+        project.ShouldSatisfyAllConditions(p => p.Version.ShouldBe(2), p => p.ModifiedByUserId.ShouldBe("user-2"));
+        Should.Throw<ArgumentException>(() => project.MarkEdited(" "));
+    }
+
     private static ProcurementProject Project() => ProcurementProject.Create(Organization, "Projekt", "user-1", CreatedAt);
 }

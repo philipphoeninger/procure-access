@@ -39,8 +39,9 @@ internal sealed class AssessmentService(WorkspaceDbContext db, AssessmentReader 
         }
         catch (DbUpdateException)
         {
-            // Another request stored or removed the same row in between. Its row is there now (or
-            // gone), so the same change on a fresh read succeeds: the last write wins.
+            // Another request stored or removed the same row in between, or gave the candidate or
+            // the project, which this save only stamps, a new version (S6-20). On a fresh read the
+            // same change succeeds: the last write wins (R-CAN-11).
             db.ChangeTracker.Clear();
             return await SetOnceAsync(candidateId, criterionRevisionId, value, note, cancellationToken);
         }

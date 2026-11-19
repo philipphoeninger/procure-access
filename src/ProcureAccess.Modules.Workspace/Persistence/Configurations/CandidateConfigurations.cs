@@ -35,6 +35,9 @@ internal sealed class CandidateProductConfiguration : IEntityTypeConfiguration<C
                .HasDefaultValue(TestStatus.Unknown)
                .HasSentinel((TestStatus)(-1));
 
+        // The concurrency token behind the ETag (API-03, S6-20); rows older than it start at 1.
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(1);
+
         builder.HasOne<ProcurementProject>()
                .WithMany()
                .HasForeignKey(x => x.ProcurementProjectId)
@@ -91,6 +94,9 @@ internal sealed class TestEvidenceConfiguration : IEntityTypeConfiguration<TestE
         builder.Property(x => x.TestedByName).HasMaxLength(TestEvidence.TestedByNameMaxLength);
         builder.Property(x => x.TestedVersion).HasMaxLength(TestEvidence.TestedVersionMaxLength);
         builder.Property(x => x.EvidenceUrl).HasMaxLength(TestEvidence.EvidenceUrlMaxLength);
+
+        // The concurrency token behind the ETag (API-03, S6-20); rows older than it start at 1.
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(1);
 
         // Also the foreign key's index; the filter leaves „Andere“ and „Eigene Prüfung“ unlimited.
         builder.HasIndex(x => new { x.CandidateProductId, x.TestTypeKey })

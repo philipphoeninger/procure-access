@@ -45,7 +45,8 @@ internal sealed record ProjectResponse(
     IReadOnlyList<CandidateSummaryResponse> Candidates,
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt,
-    ProjectCriteriaListResponse? CriteriaList);
+    ProjectCriteriaListResponse? CriteriaList,
+    [property: JsonIgnore] string Etag);
 
 /// <summary>
 /// Body of <c>PUT /api/v1/projects/{id}/criteria-configuration</c> (R-PRJ-02, R-PRJ-04; S6-12):

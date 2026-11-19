@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using ProcureAccess.Modules.Configurator.Configurations;
 using ProcureAccess.Modules.Workspace.Projects;
+using ProcureAccess.Tests.Integration.Infrastructure;
 using ProcureAccess.Tests.Shared.Fixtures;
 using Shouldly;
 using static ProcureAccess.Tests.Integration.Export.ExportTestCatalog;
@@ -58,8 +59,7 @@ internal static class ProjectLists
     public static async Task<ProjectCriteriaListResponse> AssignAsync(
         HttpClient client, Guid projectId, Guid sourceId, CancellationToken cancellationToken)
     {
-        using var response = await client.PutAsJsonAsync(
-            $"/api/v1/projects/{projectId}/criteria-configuration", new { sourceConfigurationId = sourceId }, cancellationToken);
+        using var response = await client.PutBelowCurrentAsync($"/api/v1/projects/{projectId}/criteria-configuration", new { sourceConfigurationId = sourceId }, cancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(cancellationToken));
         return (await response.Content.ReadFromJsonAsync<ProjectCriteriaListResponse>(cancellationToken)).ShouldNotBeNull();
     }
