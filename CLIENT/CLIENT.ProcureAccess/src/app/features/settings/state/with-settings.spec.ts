@@ -28,7 +28,7 @@ const SettingsTestStore = signalStore(
   withSettings(),
 );
 
-const DEFAULTS: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system' };
+const DEFAULTS: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system', assessmentLegend: 'auto' };
 const DARK_REDUCED: UserPreferences = { ...DEFAULTS, appearance: 'dark', motion: 'reduced' };
 
 const userOne: SessionUser = { id: 'u1', email: 'one@example.test', roles: [], permissions: [] };
@@ -37,7 +37,7 @@ const userTwo: SessionUser = { id: 'u2', email: 'two@example.test', roles: [], p
 let media: FakeMediaMatcher;
 let get: ReturnType<typeof vi.fn<() => Promise<UserPreferences>>>;
 let read: ReturnType<typeof vi.fn<() => Promise<UserPreferences>>>;
-let save: ReturnType<typeof vi.fn<(preferences: UserPreferences) => Promise<UserPreferences>>>;
+let save: ReturnType<typeof vi.fn<(preferences: UserPreferences, options?: { background?: boolean }) => Promise<UserPreferences>>>;
 let showInfo: ReturnType<typeof vi.fn>;
 let languageUse: ReturnType<typeof vi.fn>;
 
@@ -45,7 +45,9 @@ function setUp(system: Record<string, boolean> = {}) {
   media = new FakeMediaMatcher(system);
   get = vi.fn<() => Promise<UserPreferences>>();
   read = vi.fn<() => Promise<UserPreferences>>();
-  save = vi.fn<(preferences: UserPreferences) => Promise<UserPreferences>>((preferences) => Promise.resolve(preferences));
+  save = vi.fn<(preferences: UserPreferences, options?: { background?: boolean }) => Promise<UserPreferences>>((preferences) =>
+    Promise.resolve(preferences),
+  );
   showInfo = vi.fn();
   languageUse = vi.fn();
   TestBed.configureTestingModule({
@@ -307,6 +309,56 @@ describe('withSettings', () => {
 
   // TD-25 (#234): the legacy store wrote to localStorage for signed-out users, threw when storage
   // was blocked, and opened an English snackbar on a contrast change.
+  describe('the rating legend of S34b (R-CAN-08, S6-19 Q1 (b))', () => {
+    it('INV:A11Y-06 keeps the legend state at once and saves it with the other settings in the background', async () => {
+      const store = setUp();
+      get.mockResolvedValue(DARK_REDUCED);
+      await sessionOf(store, userOne);
+
+      store.rememberAssessmentLegend('collapsed');
+
+      expect(store.preferences()).toEqual({ ...DARK_REDUCED, assessmentLegend: 'collapsed' });
+      await new Promise((resolve) => setTimeout(resolve));
+      expect(save).toHaveBeenCalledExactlyOnceWith({ ...DARK_REDUCED, assessmentLegend: 'collapsed' }, { background: true });
+      expect(html().contains('theme-dark')).toBe(true);
+    });
+
+    it('sends nothing when the state does not change', async () => {
+      const store = setUp();
+      get.mockResolvedValue({ ...DEFAULTS, assessmentLegend: 'expanded' });
+      await sessionOf(store, userOne);
+
+      store.rememberAssessmentLegend('expanded');
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(save).not.toHaveBeenCalled();
+    });
+
+    it('keeps the state for the session when saving fails, and shows nothing', async () => {
+      const store = setUp();
+      get.mockResolvedValue(DEFAULTS);
+      await sessionOf(store, userOne);
+      save.mockRejectedValueOnce(new Error('offline'));
+
+      store.rememberAssessmentLegend('expanded');
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(store.preferences()?.assessmentLegend).toBe('expanded');
+      expect(showInfo).not.toHaveBeenCalled();
+    });
+
+    it('has nothing to save without settings (signed out or not read)', async () => {
+      const store = setUp();
+      await sessionOf(store, null);
+
+      store.rememberAssessmentLegend('collapsed');
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(save).not.toHaveBeenCalled();
+      expect(store.preferences()).toBeNull();
+    });
+  });
+
   describe('without browser storage (R-SET-02, TD-25)', () => {
     afterEach(() => vi.restoreAllMocks());
 

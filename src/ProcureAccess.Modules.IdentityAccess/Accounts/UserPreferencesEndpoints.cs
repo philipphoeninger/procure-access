@@ -19,7 +19,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// </summary>
 /// <remarks>
 /// Both need a sign-in (401) but no confirmed address: SEC-10 does not gate settings. The PUT needs
-/// antiforgery like every state-changing endpoint (SEC-02) and replaces all four settings; it has no
+/// antiforgery like every state-changing endpoint (SEC-02) and replaces all four settings — the
+/// fifth, <c>assessmentLegend</c> (S6-19b), is optional and kept when it is missing —; it has no
 /// rate limit (SPEC §7.3 sets none). The answers carry the default <c>Cache-Control: no-store</c>
 /// of the versioned group (TEN-04). <c>contrast: "high"</c> is refused until the high-contrast design
 /// H2 is reviewed (SPEC R-SET-01, R-SET-04; owner decision S5-25 3).
@@ -32,6 +33,7 @@ internal static class UserPreferencesEndpoints
     private const string AppearanceField = "appearance";
     private const string MotionField = "motion";
     private const string ContrastField = "contrast";
+    private const string AssessmentLegendField = "assessmentLegend";
 
     public static IEndpointRouteBuilder Map(IEndpointRouteBuilder routes)
     {
@@ -41,8 +43,8 @@ internal static class UserPreferencesEndpoints
               .WithName("GetAccountPreferences")
               .WithSummary("The signed-in user's settings")
               .WithDescription(
-                  "200 { language, appearance, motion, contrast }; the defaults ('de', 'system' for the others) when the user " +
-                  "never saved any. 401.")
+                  "200 { language, appearance, motion, contrast, assessmentLegend }; the defaults ('de', 'system', 'system', " +
+                  "'system', 'auto') when the user never saved any. 401.")
               .Produces<UserPreferencesValues>();
 
         routes.MapPut(Path, PutAsync)
@@ -52,7 +54,8 @@ internal static class UserPreferencesEndpoints
               .WithSummary("Replaces the signed-in user's settings")
               .WithDescription(
                   "200 with the stored settings. Body { language: 'de', appearance: 'system' | 'light' | 'dark', motion: 'system' | " +
-                  "'reduced', contrast: 'system' }, all required; 'high' contrast is refused until its design is reviewed (H2). " +
+                  "'reduced', contrast: 'system', assessmentLegend?: 'auto' | 'expanded' | 'collapsed' }, the first four required, " +
+                  "a missing assessmentLegend keeps the stored one; 'high' contrast is refused until its design is reviewed (H2). " +
                   "400 validation; 400 antiforgery; 401.")
               .Accepts<UserPreferencesBody>("application/json")
               .Produces<UserPreferencesValues>()
@@ -93,12 +96,25 @@ internal static class UserPreferencesEndpoints
             errors[ContrastField] = ["High contrast is not available yet."];
         }
 
+        AssessmentLegendPreference? assessmentLegend = null;
+        if (body.AssessmentLegend is not null)
+        {
+            if (UserPreferenceSpelling.TryParse(body.AssessmentLegend, out AssessmentLegendPreference parsedLegend))
+            {
+                assessmentLegend = parsedLegend;
+            }
+            else
+            {
+                errors[AssessmentLegendField] = ["The legend state must be 'auto', 'expanded' or 'collapsed'."];
+            }
+        }
+
         if (errors.Count > 0)
         {
             return TypedResults.ValidationProblem(errors, type: ProblemTypes.Validation);
         }
 
-        var parsed = new ParsedPreferences(body.Language!, appearance, motion, contrast);
+        var parsed = new ParsedPreferences(body.Language!, appearance, motion, contrast, assessmentLegend);
         return TypedResults.Ok(await preferences.SaveAsync(UserIdOf(user), parsed, cancellationToken));
     }
 
@@ -107,5 +123,8 @@ internal static class UserPreferencesEndpoints
         ?? throw new InvalidOperationException("A signed-in principal without a user id reached the preferences endpoint.");
 }
 
-/// <summary>The body of the PUT: all four settings, spelled as in <see cref="UserPreferencesValues"/>.</summary>
-internal sealed record UserPreferencesBody(string? Language, string? Appearance, string? Motion, string? Contrast);
+/// <summary>
+/// The body of the PUT: the settings spelled as in <see cref="UserPreferencesValues"/>; the first
+/// four required, <paramref name="AssessmentLegend"/> optional (S6-19b).
+/// </summary>
+internal sealed record UserPreferencesBody(string? Language, string? Appearance, string? Motion, string? Contrast, string? AssessmentLegend = null);

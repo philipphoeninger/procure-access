@@ -19,6 +19,10 @@ import { signInThroughApi } from '../support/session';
  * arrow key chooses a level, which is saved by itself after 800 ms and announced
  * „Einschätzung gespeichert.“; Tab into its note, typing is saved the same way. After a reload both
  * are still there, and Überblick counts the criterion. Below 600 px K6 is the compact form.
+ * S6-19b (R-CAN-08): the progress „0 von n“ → „1 von n“ and the list line; the rating legend
+ * expanded until the first assessment, which stores „collapsed“ in the user's settings while the
+ * legend stays open on that visit (owner decision S6-19b (a)), collapsed after the reload; the
+ * filter „Nur noch nicht eingeschätzte anzeigen“ with Space.
  * Axe in both appearances on every state (A11Y-01, A11Y-08).
  *
  * The K6 cards are found by CSS: Playwright's name lookups of form fields followed by axe crash
@@ -39,11 +43,11 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
-/** Presses Tab until the focused element matches the CSS `selector` (keyboard only). */
-async function tabTo(page: Page, selector: string): Promise<void> {
+/** Presses Tab (or Shift+Tab) until the focused element matches the CSS `selector` (keyboard only). */
+async function tabTo(page: Page, selector: string, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
   for (let presses = 0; presses <= MAX_TABS; presses++) {
     if (await page.evaluate((css) => document.activeElement?.matches(css) ?? false, selector)) return;
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(key);
   }
   throw new Error(`${selector} was not reached with ${MAX_TABS} Tab presses`);
 }
@@ -81,12 +85,22 @@ test.describe('Assessment tab S34b', () => {
     await expect(first.locator('mat-radio-button').last()).toHaveText('Nicht eingeschätzt');
     await expect(radios.last()).toBeChecked();
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
+    // Progress, list line and the legend, expanded for a user who never assessed (R-CAN-08)
+    const total = await cards.count();
+    const count = main(page).locator('.pa-assessment__count');
+    const legend = main(page).locator('pa-rating-legend button');
+    await expect(count).toHaveText(`0 von ${total} Kriterien eingeschätzt`);
+    await expect(main(page)).toContainText('Kriterienliste: HR-Software 2027 (Katalogversion T.1)');
+    await expect(legend).toHaveAttribute('aria-expanded', 'true');
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's34b');
 
     // Keyboard only: from the top of the page, Tab reaches the checked radio of the first criterion
     await tabTo(page, 'pa-assessment-input:first-of-type input[type="radio"]:checked');
     const saved = assessmentSaved(page, candidateId);
+    const legendStored = page.waitForResponse(
+      (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname === '/api/v1/account/preferences',
+    );
     // ArrowUp moves from „Nicht eingeschätzt“ to the level before it and checks it (an arrow key past
     // the end of the group wraps in Chromium and Firefox, but not in WebKit)
     const chosen = (await radios.count()) - 2;
@@ -97,6 +111,10 @@ test.describe('Assessment tab S34b', () => {
     expect(valueSaved.status()).toBe(200);
     expect(valueSaved.request().postDataJSON()).toMatchObject({ note: null });
     await expect(page.locator('.cdk-live-announcer-element')).toHaveText('Einschätzung gespeichert.');
+    await expect(count).toHaveText(`1 von ${total} Kriterien eingeschätzt`);
+    // The first assessment stores „collapsed“; on this visit the legend stays open
+    expect((await legendStored).request().postDataJSON()).toMatchObject({ assessmentLegend: 'collapsed' });
+    await expect(legend).toHaveAttribute('aria-expanded', 'true');
 
     // Tab on into its note and type: saved by itself once typing pauses
     await tabTo(page, 'pa-assessment-input:first-of-type textarea');
@@ -113,10 +131,21 @@ test.describe('Assessment tab S34b', () => {
     await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
     await expect(cards.first().locator('input[type="radio"]').nth(chosen)).toBeChecked();
     await expect(cards.first().locator('textarea')).toHaveValue('Eigener Test mit der Tastatur.');
+    await expect(legend).toHaveAttribute('aria-expanded', 'false');
+
+    // The filter with Space: only the criteria not assessed yet, then all again
+    await tabTo(page, '.pa-assessment__filter input[type="checkbox"]');
+    await page.keyboard.press('Space');
+    await expect(cards).toHaveCount(total - 1);
+    await settled(main(page));
+    await expectNoAxeViolations(page, testInfo, 's34b-filtered');
+    await page.keyboard.press('Space');
+    await expect(cards).toHaveCount(total);
 
     // Überblick counts the assessed criterion (the server's counts, read after leaving the tab)
     // Only the selected tab is in the tab order; Home moves to the first one (ARIA tabs)
-    await tabTo(page, '[role="tab"][aria-selected="true"]');
+    // The filter is below the tabs: back with Shift+Tab
+    await tabTo(page, '[role="tab"][aria-selected="true"]', 'Shift+Tab');
     await page.keyboard.press('Home');
     await page.keyboard.press('Enter');
     await expect(page).toHaveTitle(`Überblick – BewerberPro – ${project} – ProcureAccess`);

@@ -15,8 +15,9 @@ public interface IUserPreferences
 }
 
 /// <summary>
-/// The four settings as the API spells them (<c>GET /api/v1/account/preferences</c>): language
+/// The settings as the API spells them (<c>GET /api/v1/account/preferences</c>): language
 /// <c>de</c>; appearance <c>system</c> / <c>light</c> / <c>dark</c>; motion <c>system</c> /
-/// <c>reduced</c>; contrast <c>system</c> / <c>high</c>.
+/// <c>reduced</c>; contrast <c>system</c> / <c>high</c>; since S6-19b the rating legend on S34b
+/// <c>auto</c> / <c>expanded</c> / <c>collapsed</c>.
 /// </summary>
-public sealed record UserPreferencesValues(string Language, string Appearance, string Motion, string Contrast);
+public sealed record UserPreferencesValues(string Language, string Appearance, string Motion, string Contrast, string AssessmentLegend = "auto");

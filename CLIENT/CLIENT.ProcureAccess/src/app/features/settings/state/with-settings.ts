@@ -9,7 +9,7 @@ import { patchState, signalStoreFeature, type, withHooks, withMethods, withState
 import { DEFAULT_LANGUAGE } from '@app/app.config';
 import { AppearanceService } from '@app/core/a11y/appearance';
 import { SessionUser } from '@app/features/identity/models/session';
-import { UserPreferences } from '../models/user-preferences';
+import { AssessmentLegendSetting, UserPreferences } from '../models/user-preferences';
 import { PreferencesApiService } from '../services/api/preferences-api.service';
 
 export interface SettingsState {
@@ -95,6 +95,23 @@ export const withSettings = () =>
           saving = save;
           await save;
           return mine === latest;
+        },
+
+        /**
+         * Remembers the state of the rating legend on S34b (R-CAN-08; S6-19 Q1 (b)): kept at once and
+         * saved with the other settings after any save in flight, in the background — nobody asked to
+         * save, so a failure shows nothing and the state holds for this session. Without settings
+         * (not read, or the read failed) there is nothing to save it with: the page keeps its own state.
+         */
+        rememberAssessmentLegend(assessmentLegend: AssessmentLegendSetting): void {
+          const current = store.preferences();
+          if (current === null || current.assessmentLegend === assessmentLegend) return;
+          latest++;
+          const next = { ...current, assessmentLegend };
+          patchState(store, { preferences: next });
+          const save = saving.catch(() => undefined).then(() => api.save(next, { background: true }));
+          saving = save;
+          save.catch(() => undefined);
         },
       };
     }),

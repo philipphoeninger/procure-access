@@ -336,7 +336,7 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         account.GetProperty("email").GetString().ShouldBe(TestUsers.Member.Email);
         account.GetProperty("createdAt").ValueKind.ShouldBe(JsonValueKind.Null); // an account from before S5-27
         // Never saved: the defaults (owner decision S5-25 4).
-        PreferencesOf(account).ShouldBe(("de", "system", "system", "system"));
+        PreferencesOf(account).ShouldBe(("de", "system", "system", "system", "auto"));
 
         root.GetProperty("memberships").GetArrayLength().ShouldBe(0);
         root.GetProperty("contributorProfiles").GetArrayLength().ShouldBe(0);
@@ -354,6 +354,7 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         // Editor A chose dark and reduced motion; Owner B, light — Editor A's export shows only Editor A's.
         var own = UserPreferences.Defaults(TestUsers.EditorA.Id);
         own.Change(UserPreferences.German, AppearancePreference.Dark, MotionPreference.Reduced, ContrastPreference.System);
+        own.ChangeAssessmentLegend(AssessmentLegendPreference.Collapsed);
         var other = UserPreferences.Defaults(TestUsers.OwnerB.Id);
         other.Change(UserPreferences.German, AppearancePreference.Light, MotionPreference.System, ContrastPreference.System);
         await StoreAsync(own, other);
@@ -365,8 +366,9 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         var text = await response.Content.ReadAsStringAsync(Cancellation);
         using var body = JsonDocument.Parse(text);
         var account = body.RootElement.GetProperty("account");
-        account.GetProperty("preferences").EnumerateObject().Select(p => p.Name).ShouldBe(["language", "appearance", "motion", "contrast"]);
-        PreferencesOf(account).ShouldBe(("de", "dark", "reduced", "system"));
+        account.GetProperty("preferences").EnumerateObject().Select(p => p.Name)
+               .ShouldBe(["language", "appearance", "motion", "contrast", "assessmentLegend"]);
+        PreferencesOf(account).ShouldBe(("de", "dark", "reduced", "system", "collapsed"));
         text.ShouldNotContain("\"light\"");
         text.ShouldNotContain(TestUsers.EditorA.Id, Case.Insensitive);
     }
@@ -411,14 +413,15 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         response.Headers.CacheControl.ShouldNotBeNull().NoStore.ShouldBeTrue();
     }
 
-    private static (string?, string?, string?, string?) PreferencesOf(JsonElement account)
+    private static (string?, string?, string?, string?, string?) PreferencesOf(JsonElement account)
     {
         var preferences = account.GetProperty("preferences");
         return (
             preferences.GetProperty("language").GetString(),
             preferences.GetProperty("appearance").GetString(),
             preferences.GetProperty("motion").GetString(),
-            preferences.GetProperty("contrast").GetString());
+            preferences.GetProperty("contrast").GetString(),
+            preferences.GetProperty("assessmentLegend").GetString());
     }
 
     private static User AccountOf(TestUser user, DateTimeOffset? createdAt, bool deleted = false) => new()

@@ -20,7 +20,8 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// The signed-in user's settings <c>GET</c> / <c>PUT /api/v1/account/preferences</c> (S5-25a;
 /// SPEC R-SET-01, R-SET-02; ARCHITECTURE §5.2, C73). The client applies them in S5-25b, which
 /// activates A11Y-06; here: stored per user, the defaults without a row, the checks of the PUT
-/// (owner decision S5-25 3: no high contrast before H2), sign-in and antiforgery.
+/// (owner decision S5-25 3: no high contrast before H2), sign-in and antiforgery. Since S6-19b the
+/// fifth setting <c>assessmentLegend</c>, optional in the PUT (owner decision S6-19 Q1 (b)).
 /// </summary>
 public sealed class UserPreferencesTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
 {
@@ -116,7 +117,24 @@ public sealed class UserPreferencesTests(ApiFixture api) : IntegrationTest(api),
         }
     }
 
+    [Fact]
+    public async Task Put_AssessmentLegend_IsStoredAndKeptByALaterPutWithoutIt()
+    {
+        using var client = CreateClient(TestUsers.Member);
+
+        using var put = await client.PutAsync(Preferences, Body("de", "dark", "system", "system", "expanded"), Cancellation);
+
+        (await ValuesOf(put)).ShouldBe(new UserPreferencesValues("de", "dark", "system", "system", "expanded"));
+        using var withoutIt = await client.PutAsync(Preferences, Body("de", "light", "system", "system"), Cancellation);
+        (await ValuesOf(withoutIt)).ShouldBe(new UserPreferencesValues("de", "light", "system", "system", "expanded"));
+        using var collapsed = await client.PutAsync(Preferences, Body("de", "light", "system", "system", "collapsed"), Cancellation);
+        using var get = await client.GetAsync(Preferences, Cancellation);
+        (await ValuesOf(get)).ShouldBe(new UserPreferencesValues("de", "light", "system", "system", "collapsed"));
+    }
+
     [Theory]
+    [InlineData("""{"language":"de","appearance":"system","motion":"system","contrast":"system","assessmentLegend":"open"}""", "assessmentLegend")]
+    [InlineData("""{"language":"de","appearance":"system","motion":"system","contrast":"system","assessmentLegend":"Auto"}""", "assessmentLegend")]
     [InlineData("""{"language":"en","appearance":"system","motion":"system","contrast":"system"}""", "language")]
     [InlineData("""{"language":"de","appearance":"Dark","motion":"system","contrast":"system"}""", "appearance")]
     [InlineData("""{"language":"de","appearance":"system","motion":"none","contrast":"system"}""", "motion")]
@@ -181,16 +199,20 @@ public sealed class UserPreferencesTests(ApiFixture api) : IntegrationTest(api),
     private static JsonContent Body(string language, string appearance, string motion, string contrast) =>
         JsonContent.Create(new { language, appearance, motion, contrast });
 
+    private static JsonContent Body(string language, string appearance, string motion, string contrast, string assessmentLegend) =>
+        JsonContent.Create(new { language, appearance, motion, contrast, assessmentLegend });
+
     private static async Task<UserPreferencesValues> ValuesOf(HttpResponseMessage response)
     {
         response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync(Cancellation));
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Cancellation));
         var root = body.RootElement;
-        root.EnumerateObject().Select(p => p.Name).ShouldBe(["language", "appearance", "motion", "contrast"]);
+        root.EnumerateObject().Select(p => p.Name).ShouldBe(["language", "appearance", "motion", "contrast", "assessmentLegend"]);
         return new UserPreferencesValues(
             root.GetProperty("language").GetString()!,
             root.GetProperty("appearance").GetString()!,
             root.GetProperty("motion").GetString()!,
-            root.GetProperty("contrast").GetString()!);
+            root.GetProperty("contrast").GetString()!,
+            root.GetProperty("assessmentLegend").GetString()!);
     }
 }

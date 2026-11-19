@@ -18,15 +18,30 @@ export type MotionSetting = 'system' | 'reduced';
 export type ContrastSetting = 'system' | 'high';
 
 /**
+ * The rating legend on the assessment tab S34b (SPEC R-CAN-08, Handoff §4.11; owner decisions S6-19
+ * Q1 (b), S6-19b (a)): `auto` — expanded from 600 px until the user's first assessment, which
+ * stores `collapsed` —, or what the user chose by opening or closing it.
+ */
+export type AssessmentLegendSetting = 'auto' | 'expanded' | 'collapsed';
+
+/**
  * A signed-in user's settings, the answer of `GET /api/v1/account/preferences` (SPEC §8.12). The
- * language is German in v1 (SD12): there is nothing to apply.
+ * language is German in v1 (SD12): there is nothing to apply. S60 shows the first four; the fifth
+ * is S34b's (S6-19b) and travels with every save.
  */
 export interface UserPreferences {
   language: 'de';
   appearance: AppearanceSetting;
   motion: MotionSetting;
   contrast: ContrastSetting;
+  assessmentLegend: AssessmentLegendSetting;
 }
 
 /** The settings of a user who never saved any (SPEC §8.12): German, and everything as the system says. */
-export const SYSTEM_PREFERENCES: UserPreferences = { language: 'de', appearance: 'system', motion: 'system', contrast: 'system' };
+export const SYSTEM_PREFERENCES: UserPreferences = {
+  language: 'de',
+  appearance: 'system',
+  motion: 'system',
+  contrast: 'system',
+  assessmentLegend: 'auto',
+};

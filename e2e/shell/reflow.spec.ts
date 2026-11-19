@@ -539,7 +539,7 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page, { scrollingTabBars: true });
   });
 
-  test('S34b with compact K6, an open note, the union note and the derived rows needs no horizontal scrolling', async ({ page }) => {
+  test('S34b with compact K6, an open note, the union note, the derived rows, the progress row, the open legend and the filter needs no horizontal scrolling', async ({ page }) => {
     const { projectId, candidateId } = await routeCandidate(page);
     await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
     const main = page.getByRole('main');
@@ -552,6 +552,19 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
 
     await main.locator('.pa-assessment-input__note-toggle').first().click();
     await expect(main.locator('pa-assessment-input textarea').first()).toBeFocused();
+    await expectReflow(page, { scrollingTabBars: true });
+
+    // S6-19b: the progress row, the open legend and the filter. Opening the legend stores the choice
+    // in the user's settings: answered here, because the seeded user is shared and stays unchanged
+    await page.route('**/api/v1/account/preferences', (route) =>
+      route.request().method() === 'PUT' ? route.fulfill({ status: 200, json: route.request().postDataJSON() as unknown }) : route.continue(),
+    );
+    await expect(main.locator('.pa-assessment__count')).toHaveText('1 von 2 Kriterien eingeschätzt');
+    await main.locator('pa-rating-legend button').click();
+    await expect(main.locator('pa-rating-legend dl')).toBeVisible();
+    await expectReflow(page, { scrollingTabBars: true });
+    await main.locator('.pa-assessment__filter input[type="checkbox"]').check();
+    await expect(main.locator('pa-assessment-input')).toHaveCount(1);
     await expectReflow(page, { scrollingTabBars: true });
   });
 

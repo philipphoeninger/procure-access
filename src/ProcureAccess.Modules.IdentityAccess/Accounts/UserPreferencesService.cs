@@ -53,14 +53,26 @@ internal sealed class UserPreferencesService(IdentityAccessDbContext db) : IUser
         }
 
         preferences.Change(values.Language, values.Appearance, values.Motion, values.Contrast);
+        if (values.AssessmentLegend is { } assessmentLegend)
+        {
+            preferences.ChangeAssessmentLegend(assessmentLegend);
+        }
+
         await db.SaveChangesAsync(cancellationToken);
         return UserPreferenceSpelling.ValuesOf(preferences);
     }
 }
 
-/// <summary>Settings the endpoint has checked, ready for <see cref="UserPreferences.Change"/>.</summary>
+/// <summary>
+/// Settings the endpoint has checked, ready for <see cref="UserPreferences.Change"/>; a
+/// <c>null</c> <paramref name="AssessmentLegend"/> keeps the stored one (S6-19b).
+/// </summary>
 internal sealed record ParsedPreferences(
-    string Language, AppearancePreference Appearance, MotionPreference Motion, ContrastPreference Contrast);
+    string Language,
+    AppearancePreference Appearance,
+    MotionPreference Motion,
+    ContrastPreference Contrast,
+    AssessmentLegendPreference? AssessmentLegend = null);
 
 /// <summary>
 /// The spelling of the settings in the API and the export (SPEC §8.4, owner decision S5-25 4):
@@ -72,7 +84,8 @@ internal static class UserPreferenceSpelling
         preferences.Language,
         NameOf(preferences.Appearance),
         NameOf(preferences.Motion),
-        NameOf(preferences.Contrast));
+        NameOf(preferences.Contrast),
+        NameOf(preferences.AssessmentLegend));
 
     public static string NameOf(AppearancePreference appearance) => appearance switch
     {
@@ -94,6 +107,14 @@ internal static class UserPreferenceSpelling
         ContrastPreference.System => "system",
         ContrastPreference.High => "high",
         _ => throw new ArgumentOutOfRangeException(nameof(contrast), contrast, "Unknown contrast setting."),
+    };
+
+    public static string NameOf(AssessmentLegendPreference assessmentLegend) => assessmentLegend switch
+    {
+        AssessmentLegendPreference.Auto => "auto",
+        AssessmentLegendPreference.Expanded => "expanded",
+        AssessmentLegendPreference.Collapsed => "collapsed",
+        _ => throw new ArgumentOutOfRangeException(nameof(assessmentLegend), assessmentLegend, "Unknown legend state."),
     };
 
     /// <summary>The value spelled <paramref name="name"/> (exactly, lower case), if there is one.</summary>
@@ -119,6 +140,7 @@ internal static class UserPreferenceSpelling
             AppearancePreference appearance => NameOf(appearance),
             MotionPreference motion => NameOf(motion),
             ContrastPreference contrast => NameOf(contrast),
+            AssessmentLegendPreference assessmentLegend => NameOf(assessmentLegend),
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Not a setting."),
         };
 }

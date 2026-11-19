@@ -21,6 +21,34 @@
   font: var(--mat-sys-body-medium);
 }
 
+// The progress row of the frames: progress and list line, the filter beside them from 600 px
+// (right-aligned, the row wraps), below them on narrow screens
+.pa-assessment__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--pa-space-lg);
+  row-gap: var(--pa-space-xs);
+}
+
+.pa-assessment__progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--pa-space-md);
+}
+
+.pa-assessment__count {
+  margin: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.pa-assessment__filter {
+  @media (min-width: 37.5em) {
+    margin-inline-start: auto;
+  }
+}
+
 .pa-assessment__procedure {
   display: flex;
   flex-direction: column;
