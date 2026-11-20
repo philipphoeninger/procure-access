@@ -71,13 +71,22 @@ async function tabTo(page: Page, target: Locator, key: 'Tab' | 'Shift+Tab' = 'Ta
 /** The option of the open list of a `mat-select` that the arrow keys have reached. */
 const activeOption = (page: Page) => page.locator('mat-option.mat-mdc-option-active');
 
-/** Presses ArrowDown in the open list of a `mat-select` until the option with the text is active. */
+/**
+ * Presses ArrowDown in the open list of a `mat-select` until the option with the text is active.
+ * The select marks its first (or selected) option active when the list opens, but the class is
+ * rendered a moment later; a press before that skipped the first option, and the list does not
+ * wrap, so the target was never reached. Hence wait for the active option before the first
+ * check and for each press to move it before the next one.
+ */
 async function arrowToOption(page: Page, text: string): Promise<void> {
+  await expect(activeOption(page)).toHaveCount(1);
   for (let presses = 0; presses <= 10; presses++) {
-    if ((await activeOption(page).count()) > 0 && ((await activeOption(page).textContent()) ?? '').trim().startsWith(text)) {
+    const current = ((await activeOption(page).textContent()) ?? '').trim();
+    if (current.startsWith(text)) {
       return;
     }
     await page.keyboard.press('ArrowDown');
+    await expect(activeOption(page), `ArrowDown did not move past „${current}“ towards „${text}“`).not.toHaveText(current);
   }
   throw new Error(`The option „${text}“ was not reached with the arrow keys`);
 }
