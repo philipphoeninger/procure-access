@@ -36,10 +36,14 @@ services:
     environment:
       Catalog__TestRelease__Path: /app/catalog/test-releases
       Catalog__TestRelease__Version: T.1
-      # Mail to Mailpit, without TLS or sign-in (Development and E2E only, S5-11), with links to the local client
+      # Mail to Mailpit, without TLS or sign-in (Development and E2E only, S5-11), with links to the local client.
+      # The empty login overrides SMTP_USERNAME/SMTP_PASSWORD that docker-compose.yml takes from .env (as
+      # docker-compose.e2e.yml does): Mailpit offers no sign-in, so with a login no mail is sent.
       Email__Smtp__Host: mailpit
       Email__Smtp__Port: "1025"
       Email__Smtp__Security: None
+      Email__Smtp__Username: ""
+      Email__Smtp__Password: ""
       App__BaseUrl: http://localhost:4200
     volumes:
       - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
