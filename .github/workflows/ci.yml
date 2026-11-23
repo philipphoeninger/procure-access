@@ -234,13 +234,20 @@ jobs:
   # One job per Playwright project, in parallel; each builds and starts its own stack. No
   # `needs: build`: the stack builds its own images. The required check is the job `e2e-result`.
   e2e:
-    name: 6. E2E + a11y (${{ matrix.project }})
+    name: 6. E2E + a11y (${{ matrix.project }} ${{ matrix.variant }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari]
+        # DEBUG (#355, #339, never merged)
+        include:
+          - { project: firefox, variant: j1-unfixed, nofix: '1', args: 'journeys/j1-configurator.spec.ts -g second.part --repeat-each=10' }
+          - { project: firefox, variant: j1-fixed-1, nofix: '', args: 'journeys/j1-configurator.spec.ts -g second.part --repeat-each=20' }
+          - { project: firefox, variant: j1-fixed-2, nofix: '', args: 'journeys/j1-configurator.spec.ts -g second.part --repeat-each=20' }
+          - { project: firefox, variant: suite-fixed, nofix: '', args: '--repeat-each=2' }
+          - { project: webkit, variant: s10-fixed, nofix: '', args: 'configurator/s10-step1.spec.ts --repeat-each=40' }
+          - { project: mobile-safari, variant: s10-fixed, nofix: '', args: 'configurator/s10-step1.spec.ts --repeat-each=40' }
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -307,19 +314,21 @@ jobs:
         run: >-
           docker run --rm --init --ipc=host --network=host
           --user "$(id -u):$(id -g)" -e HOME=/tmp
-          -e CI -e GITHUB_ACTIONS -e GITHUB_WORKSPACE=/work -e PROJECT
+          -e CI -e GITHUB_ACTIONS -e GITHUB_WORKSPACE=/work -e PROJECT -e S606_NOFIX
           -v "$GITHUB_WORKSPACE:/work" -w /work/e2e
-          "$IMAGE" npx playwright test --project="$PROJECT"
+          "$IMAGE" npx playwright test --project="$PROJECT" $E2E_ARGS
         env:
           IMAGE: ${{ steps.image.outputs.image }}
           PROJECT: ${{ matrix.project }}
+          S606_NOFIX: ${{ matrix.nofix }}
+          E2E_ARGS: ${{ matrix.args }}
       - name: Collect stack logs
         if: failure()
         run: $COMPOSE logs --no-color > e2e/compose.log 2>&1 || true
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: playwright-report-${{ matrix.project }}-${{ matrix.variant }}
           path: |
             e2e/playwright-report/
             e2e/test-results/

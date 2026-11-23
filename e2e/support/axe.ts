@@ -153,6 +153,7 @@ async function checkOneAppearance(
  * findings as long as no script sets the property, which the client never does.
  */
 async function keepAxeOffLabelledByElements(page: Page): Promise<void> {
+  if (process.env['S606_NOFIX']) return; // DEBUG (#355), never merged
   if (page.context().browser()?.browserType().name() !== 'firefox') return;
   await page.evaluate(() => Reflect.deleteProperty(Element.prototype, 'ariaLabelledByElements'));
 }
