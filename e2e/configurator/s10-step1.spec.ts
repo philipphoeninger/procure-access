@@ -35,6 +35,10 @@ async function openPage(page: Page, viewport: { width: number; height: number })
   await page.setViewportSize(viewport);
   await page.goto('/kriterien');
   await expect(page.getByRole('heading', { level: 1, name: 'Kriterien zusammenstellen' })).toBeVisible();
+  // Material adds `mat-form-field-animations-enabled` 300 ms after a field starts; text shown
+  // before that fades in again, and axe would measure its colour halfway (#339).
+  await expect(page.getByRole('main').locator('mat-form-field.mat-form-field-animations-enabled')).toHaveCount(1);
+  await settled(page.getByRole('main'));
 }
 
 test.describe('S10 Kriterien zusammenstellen, step 1', () => {

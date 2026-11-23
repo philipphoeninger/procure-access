@@ -62,6 +62,7 @@ export async function expectNoAxeViolations(
 ): Promise<void> {
   const suppressions = options.suppressions ?? axeSuppressions;
   validateAxeSuppressions(suppressions);
+  await keepAxeOffLabelledByElements(page);
 
   const failures: string[] = [];
   if (options.explicitAppearance) {
@@ -143,6 +144,17 @@ async function checkOneAppearance(
   }
 
   return blocking;
+}
+
+/**
+ * Firefox's page process segfaults when `ariaLabelledByElements` of one element is read in the
+ * page's main world (axe) and in Playwright's isolated world (its name lookups) (#355). Without
+ * the property in the main world, axe resolves `aria-labelledby` from the attribute, with the same
+ * findings as long as no script sets the property, which the client never does.
+ */
+async function keepAxeOffLabelledByElements(page: Page): Promise<void> {
+  if (page.context().browser()?.browserType().name() !== 'firefox') return;
+  await page.evaluate(() => Reflect.deleteProperty(Element.prototype, 'ariaLabelledByElements'));
 }
 
 /** The appearance the page shows: its `prefers-color-scheme` as the page sees it. */
