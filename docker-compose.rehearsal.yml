@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2026 Blinden- und Sehbehindertenverein Hamburg e.V.
+#
+# SPDX-License-Identifier: MIT
+
+# Throwaway stack of the restore rehearsal (R-ADM-04, ARCHITECTURE §10.4; S6-29). Applied on top of
+# docker-compose.yml by scripts/rehearse-restore.mjs, which writes its own env file, so the real
+# .env is never read. It can run beside the dev or E2E stack:
+# - own project name, so containers, network and images mix with neither;
+# - no fixed host port: only the API, on a free port of the loopback address;
+# - database in memory (tmpfs): nothing persists, and a recreated `db` is an empty server.
+name: procureaccess-rehearsal
+
+services:
+  db:
+    container_name: !reset null
+    ports: !reset []
+    volumes: !reset []
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  api:
+    environment:
+      # appsettings.Development.json sets it to true, which would delete every restored user.
+      RebuildDatabase: "false"
+      # No mail leaves the rehearsal: this host does not exist (RFC 2606).
+      Email__Smtp__Host: mail.invalid
+      Email__Smtp__Port: "1025"
+      Email__Smtp__Security: None
+      Email__Smtp__Username: ""
+      Email__Smtp__Password: ""
+      App__BaseUrl: http://localhost:4200
+      # The seeders fill only the source database. They are empty for the restored one, so what it
+      # holds can only have come from the dump.
+      TestUsers__Password: ${REHEARSAL_SEED_PASSWORD:-}
+      Catalog__TestRelease__Path: ${REHEARSAL_TEST_RELEASE_PATH:-}
+      Catalog__TestRelease__Version: ${REHEARSAL_TEST_RELEASE_VERSION:-}
+    ports: !override
+      - "127.0.0.1::8080"
+    volumes:
+      - ./tests/ProcureAccess.Tests.Shared/Fixtures/Releases:/app/catalog/test-releases:ro
+    restart: "no"
+
+networks:
+  dokploy-network:
+    external: false
