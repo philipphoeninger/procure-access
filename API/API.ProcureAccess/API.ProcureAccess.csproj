@@ -39,7 +39,7 @@ SPDX-License-Identifier: MIT
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.4" />
     <!--
       Swashbuckle brings Microsoft.OpenApi at the version it requires (3.11.0 for 11.0.1); there is no
       direct reference on purpose (owner, 2026-11-04, #74). CVE-2026-49451 (GHSA-v5pm-xwqc-g5wc,

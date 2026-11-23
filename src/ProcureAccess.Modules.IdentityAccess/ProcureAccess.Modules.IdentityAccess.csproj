@@ -18,7 +18,7 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.4" />
   </ItemGroup>
 
   <!-- Exactly the references ARCHITECTURE §4.3 allows: the module's own contracts, the listed contracts of other modules and Platform's contracts. Never a legacy project (API, DAL, MODELS, SERVICES). -->
