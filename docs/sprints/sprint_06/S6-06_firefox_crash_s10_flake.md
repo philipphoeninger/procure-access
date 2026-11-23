@@ -4,7 +4,7 @@
 > **Requirements / invariants:** A11Y-01 and A11Y-02 stay green; A11Y-02's J1 part and the M3 exit check (EXP-06) run in Firefox again; no invariant flipped
 > **Status:** done — draft pull request open (2026-11-23)
 > **Scope:** exactly the row of S6-06: E2E helper and specs, documents. No server or client change, no EF migration, no new dependency, no UX key. No Figma comparison, because no screen changed.
-> **Owner decisions:** none for this task. S5-20b (Firefox skips J1's second part until #355 finds why) has run its course: the cause is found.
+> **Owner decisions:** none needed for the task. S5-20b (Firefox skips J1's second part until #355 finds why) has run its course: the cause is found. After the report (2026-11-23): the older Firefox workarounds are retired in follow-up #434; the bug is not reported to Mozilla.
 
 ## 0. Plan (written before the code, confirmed by the owner on 2026-11-23)
 
@@ -41,9 +41,9 @@ Security: test code only; no secret, no request to a third party. Correctness: t
 | The helper changes only the top frame; axe also runs in iframes | won't fix | The client has no iframe |
 | The property stays removed until the document is replaced | won't fix | Nothing in the client reads it; only Firefox test pages are affected |
 | `settled` in `s10-step1.spec.ts` would wait forever on an endless animation | won't fix | S10's only spinner shows during the submit of step 4, never when the page opens; 400 runs passed |
-| The workarounds of V129 – V378 and the rule of V229 are probably no longer needed | follow-up | Open point 1; outside this row |
-| `members-page.html` still has a named section, against V229 | follow-up | Open point 3; harmless with the fix |
-| The Firefox bug is not reported to Mozilla | follow-up | Open point 2; an outward step for the owner |
+| The workarounds of V129 – V378 and the rule of V229 are probably no longer needed | follow-up | #434; outside this row |
+| `members-page.html` still has a named section, against V229 | follow-up | #434; harmless with the fix |
+| The Firefox bug is not reported to Mozilla | won't fix | Owner decision of 2026-11-23 |
 
 ## 4. Checks
 
@@ -64,9 +64,9 @@ Security: test code only; no secret, no request to a third party. Correctness: t
 
 ## 5. Open points
 
-1. **Retire the Firefox workarounds (owner decision).** CSS locators and notes in eleven spec files, J2 without axe on S31 (V341), and the rule that a new `<section>` has no accessible name (V229). Recommendation: a follow-up task that removes them with repeated Firefox runs in CI, before step 6, because SIG-09 needs named K1/K2 regions there.
-2. **Report the bug to Mozilla (owner's choice).** The smallest case of F4 is ready. Until Firefox fixes it, the helper stays; recheck with the next Playwright update.
-3. **`members-page.html`** has a `<section aria-labelledby>` from S5-17b, against V229. Harmless now; it goes with point 1.
-4. **For M5 screens:** Firefox runs every new workspace page. Axe through `expectNoAxeViolations` no longer collides with name lookups, so new specs can use role and name lookups. A test must not read `ariaLabelledByElements` itself in `page.evaluate`. Of the Firefox crashes in CI since 2026-11-16, six were in `workspace/projects.spec.ts`; that spec keeps its workarounds until point 1.
+1. **Retire the Firefox workarounds: #434 (owner decision, 2026-11-23).** CSS locators and notes in eleven spec files, J2 without axe on S31 (V341), and the rule that a new `<section>` has no accessible name (V229), with repeated Firefox runs in CI, before step 6, because SIG-09 needs named K1/K2 regions there.
+2. **Mozilla: not reported (owner decision, 2026-11-23).** The helper stays for as long as Firefox has the bug; recheck with the next Playwright update.
+3. **`members-page.html`** has a `<section aria-labelledby>` from S5-17b, against V229. Harmless now; it goes with #434.
+4. **For M5 screens:** Firefox runs every new workspace page. Axe through `expectNoAxeViolations` no longer collides with name lookups, so new specs can use role and name lookups. A test must not read `ariaLabelledByElements` itself in `page.evaluate`. Of the Firefox crashes in CI since 2026-11-16, six were in `workspace/projects.spec.ts`; that spec keeps its workarounds until #434.
 5. **Not explained:** why the crash in J1 showed only with two or more workers in S5-20b. The smallest case crashes with one page every time.
 6. **O-S6-7** planned to move #355 to M5. When this pull request closes #355, that part of the decision falls away.
