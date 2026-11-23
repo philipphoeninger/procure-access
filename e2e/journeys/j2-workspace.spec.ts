@@ -30,10 +30,7 @@ import { signInThroughApi } from '../support/session';
  * appears (those are in `workspace/assessment.spec.ts` and the component tests). The publication and
  * the directory follow with step 6.
  *
- * Every element is found by CSS, never by its accessible name: Playwright's name lookups combined
- * with axe crash Firefox's page process on these screens (TESTING V165, V226, V341, V368). The names
- * are checked by the component tests and by axe. For the same reason S31, a dialog with a
- * `mat-select`, gets no axe run here (V341); it has one in `workspace/projects.spec.ts`.
+ * Controls are found by role and accessible name, so the journey fails when a name goes missing.
  */
 const PASSWORD = 'e2e-Passwort-lang-genug';
 const LIST = 'HR-Software 2027';
@@ -44,7 +41,7 @@ const NOTE = 'Eigener Test mit der Tastatur.';
 const MAX_TABS = 80;
 
 const main = (page: Page) => page.locator('main');
-const heading = (page: Page) => page.locator('main h1');
+const heading = (page: Page) => main(page).getByRole('heading', { level: 1 });
 const announcement = (page: Page) => page.locator('.cdk-live-announcer-element');
 
 /** Waits until Material's animations are over, so axe sees the final colours. */
@@ -97,8 +94,8 @@ async function arrowToOption(page: Page, text: string): Promise<void> {
  * to the H1.
  */
 async function openTab(page: Page, index: number, from: 'above' | 'below'): Promise<void> {
-  const tabs = main(page).locator('[role="tab"]');
-  await tabTo(page, main(page).locator('[role="tab"][aria-selected="true"]'), from === 'below' ? 'Shift+Tab' : 'Tab');
+  const tabs = main(page).getByRole('tab');
+  await tabTo(page, main(page).getByRole('tab', { selected: true }), from === 'below' ? 'Shift+Tab' : 'Tab');
   for (let presses = 0; presses <= 3; presses++) {
     if (await tabs.nth(index).evaluate((element) => element === document.activeElement)) break;
     await page.keyboard.press('ArrowRight');
@@ -132,21 +129,26 @@ test.describe('J2 workspace up to the assessment', () => {
     await expect(main(page)).toContainText('Noch keine Beschaffungsprojekte.');
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 'j2-s30');
-    await tabTo(page, main(page).locator('button', { hasText: 'Projekt anlegen' }));
+    await tabTo(page, main(page).getByRole('button', { name: 'Projekt anlegen' }));
     await page.keyboard.press('Enter');
-    const dialog = page.locator('mat-dialog-container');
+    const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     // MatDialog moves the focus when it has opened (S6-01)
-    await expect(dialog.locator('input[name="name"]')).toBeFocused();
+    await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
     await page.keyboard.type(project);
-    await tabTo(page, dialog.locator('mat-select'));
+    const listChoice = dialog.getByRole('combobox', { name: 'Kriterienliste (optional)' });
+    await tabTo(page, listChoice);
     await page.keyboard.press('Enter');
     await arrowToOption(page, LIST);
     await page.keyboard.press('Enter');
-    await expect(dialog.locator('mat-select')).toContainText(LIST);
+    await expect(listChoice).toContainText(LIST);
+    await expect(page.getByRole('option')).toHaveCount(0);
+    await expect(dialog.locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
+    await settled(dialog);
+    await expectNoAxeViolations(page, testInfo, 'j2-s31');
     const assigned = page.waitForResponse(
       (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname.endsWith('/criteria-configuration'),
     );
-    await tabTo(page, dialog.locator('button[type="submit"]'));
+    await tabTo(page, dialog.getByRole('button', { name: 'Projekt anlegen' }));
     await page.keyboard.press('Enter');
     expect((await assigned).status()).toBe(200);
 
@@ -160,7 +162,7 @@ test.describe('J2 workspace up to the assessment', () => {
     await expectNoAxeViolations(page, testInfo, 'j2-s32-new');
 
     // S11 of the copy: one criterion is taken out; it is saved by itself (R-PRJ-06)
-    await tabTo(page, main(page).locator('a', { hasText: 'Kriterienliste anpassen' }));
+    await tabTo(page, main(page).getByRole('link', { name: 'Kriterienliste anpassen' }));
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/kriterienliste$/);
     await expect(heading(page)).toHaveText(LIST);
@@ -171,10 +173,11 @@ test.describe('J2 workspace up to the assessment', () => {
     const excluded = page.waitForResponse(
       (response) => response.request().method() === 'PATCH' && new URL(response.url()).pathname.includes('/criteria/'),
     );
-    await tabTo(page, cards.first().locator('input[type="checkbox"]'));
+    const include = cards.first().getByRole('checkbox', { name: /^In Liste aufnehmen / });
+    await tabTo(page, include);
     await page.keyboard.press('Space');
     expect((await excluded).ok()).toBe(true);
-    await expect(cards.first().locator('input[type="checkbox"]')).not.toBeChecked();
+    await expect(include).not.toBeChecked();
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 'j2-s11-copy');
 
@@ -185,16 +188,15 @@ test.describe('J2 workspace up to the assessment', () => {
     await expect(heading(page)).toBeFocused();
 
     // S32's menu „Produkt hinzufügen“ › „Neu erfassen“ → S33 (R-CAN-02)
-    await tabTo(page, main(page).locator('button.pa-project__add'));
+    await tabTo(page, main(page).getByRole('button', { name: 'Produkt hinzufügen' }));
     await page.keyboard.press('Enter');
-    const entry = page.locator('.mat-mdc-menu-panel a[mat-menu-item]');
-    await expect(entry).toHaveText('Neu erfassen');
+    const entry = page.getByRole('menuitem', { name: 'Neu erfassen' });
     await expect(entry).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/produkte\/neu$/);
     await expect(heading(page)).toHaveText('Produkt hinzufügen');
     await expect(heading(page)).toBeFocused();
-    await tabTo(page, main(page).locator('input[name="name"]'));
+    await tabTo(page, main(page).getByRole('textbox', { name: 'Produktname' }));
     await page.keyboard.type(PRODUCT);
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
     await settled(main(page));
@@ -202,7 +204,7 @@ test.describe('J2 workspace up to the assessment', () => {
     const created = page.waitForResponse(
       (response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/candidates'),
     );
-    await tabTo(page, main(page).locator('button[type="submit"]'));
+    await tabTo(page, main(page).getByRole('button', { name: 'Speichern' }));
     await page.keyboard.press('Enter');
     expect((await created).status()).toBe(201);
 
@@ -221,28 +223,29 @@ test.describe('J2 workspace up to the assessment', () => {
     // S34a: „Ja“, then one evidence of the first procedure (R-CAN-05, WSP-01)
     await openTab(page, 1, 'above');
     await expect(page).toHaveURL(/\/pruefnachweis$/);
-    const status = (name: string) => main(page).locator(`#pa-evidence-status-${name} input[type="radio"]`);
-    await tabTo(page, status('unknown'));
-    await expect(status('unknown')).toBeChecked();
+    const status = (name: string) => main(page).getByRole('radio', { name, exact: true });
+    await tabTo(page, status('Nicht bekannt'));
+    await expect(status('Nicht bekannt')).toBeChecked();
     // „Ja“ is the first of the three: two steps up, without wrapping past the end (WebKit does not wrap)
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('ArrowUp');
-    await expect(status('tested')).toBeChecked();
+    await expect(status('Ja')).toBeChecked();
     const card = main(page).locator('.pa-evidence__card:has(.pa-evidence__card-title)');
-    await expect(card.locator('h3')).toHaveText('Prüfnachweis 1');
-    await tabTo(page, card.locator('mat-select'));
+    const cardHeading = card.getByRole('heading', { level: 3 });
+    await expect(cardHeading).toHaveText('Prüfnachweis 1');
+    await tabTo(page, card.getByRole('combobox', { name: 'Art der Prüfung' }));
     await page.keyboard.press('Enter');
     await arrowToOption(page, 'BIT inklusiv Software-Test');
     await page.keyboard.press('Enter');
-    await expect(card.locator('h3')).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
-    await tabTo(page, card.locator('[name="testedBy"]'));
+    await expect(cardHeading).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
+    await tabTo(page, card.getByRole('textbox', { name: 'Wer hat geprüft?' }));
     await page.keyboard.type('Prüfstelle Beispiel');
-    await tabTo(page, card.locator('[name="testDate"]'));
+    await tabTo(page, card.getByRole('textbox', { name: 'Datum der Prüfung' }));
     await page.keyboard.type('14.03.2026');
     const evidenceSaved = page.waitForResponse(
       (response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/test-evidences'),
     );
-    await tabTo(page, main(page).locator('button[type="submit"]'));
+    await tabTo(page, main(page).getByRole('button', { name: 'Speichern' }));
     await page.keyboard.press('Enter');
     expect((await evidenceSaved).status()).toBe(201);
     await expect(announcement(page)).toHaveText('Prüfnachweis gespeichert.');
@@ -263,17 +266,18 @@ test.describe('J2 workspace up to the assessment', () => {
         (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname.includes('/assessments/'),
       );
     const valueSaved = saved();
-    const compact = (await first.locator('mat-select').count()) > 0;
+    const levelSelect = first.getByRole('combobox', { name: 'Einschätzung' });
+    const compact = (await levelSelect.count()) > 0;
     if (compact) {
       // Below 600 px: the select „Einschätzung“; its list opens on the chosen „Nicht eingeschätzt“, the last option
-      await tabTo(page, first.locator('mat-select'));
+      await tabTo(page, levelSelect);
       await page.keyboard.press('Enter');
       await expect(activeOption(page)).toHaveText('Nicht eingeschätzt');
       await page.keyboard.press('ArrowUp');
       await page.keyboard.press('Enter');
     } else {
       // From 600 px: the radio group; ArrowUp checks the level before „Nicht eingeschätzt“
-      await tabTo(page, first.locator('input[type="radio"]:checked'));
+      await tabTo(page, first.getByRole('radio', { checked: true }));
       await page.keyboard.press('ArrowUp');
     }
     const stored = await valueSaved;
@@ -282,12 +286,13 @@ test.describe('J2 workspace up to the assessment', () => {
     expect(level).not.toBe('unknown');
     await expect(main(page).locator('.pa-assessment__count')).toHaveText(`1 von ${total} Kriterien eingeschätzt`);
     const noteSaved = saved();
+    const noteField = first.getByRole('textbox', { name: 'Worauf stützt sich Ihre Einschätzung? (optional)' });
     if (compact) {
-      await tabTo(page, first.locator('.pa-assessment-input__note-toggle'));
+      await tabTo(page, first.getByRole('button', { name: 'Begründung hinzufügen' }));
       await page.keyboard.press('Enter');
-      await expect(first.locator('textarea')).toBeFocused();
+      await expect(noteField).toBeFocused();
     } else {
-      await tabTo(page, first.locator('textarea'));
+      await tabTo(page, noteField);
     }
     await page.keyboard.type(NOTE);
     expect((await noteSaved).request().postDataJSON()).toMatchObject({ value: level, note: NOTE });
@@ -299,13 +304,13 @@ test.describe('J2 workspace up to the assessment', () => {
     await expect(page).toHaveURL(productUrl);
     await expect(main(page)).toContainText('Auf Barrierefreiheit geprüft: Ja – 1 Prüfnachweis: BIT inklusiv Software-Test');
     await expect(main(page)).toContainText(`1 von ${total} Kriterien eingeschätzt`);
-    await tabTo(page, main(page).locator('pa-breadcrumb a', { hasText: project }), 'Shift+Tab');
+    await tabTo(page, main(page).getByRole('navigation', { name: 'Sie sind hier' }).getByRole('link', { name: project }), 'Shift+Tab');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(projectUrl);
     await expect(heading(page)).toHaveText(project);
     await expect(heading(page)).toBeFocused();
     const item = main(page).locator('.pa-project__product');
-    await expect(item.locator('h3')).toHaveText(PRODUCT);
+    await expect(item.getByRole('heading', { level: 3 })).toHaveText(PRODUCT);
     await expect(item).toContainText(`1 von ${total} Kriterien eingeschätzt`);
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 'j2-s32-product');
@@ -320,18 +325,18 @@ test.describe('J2 workspace up to the assessment', () => {
 
       await other.goto(projectUrl);
       await expect(heading(other)).toHaveText(project);
-      await expect(main(other).locator('button')).toHaveCount(0);
+      await expect(main(other).getByRole('button')).toHaveCount(0);
       await expect(controls).toHaveCount(0);
       await settled(main(other));
       await expectNoAxeViolations(other, testInfo, 'j2-reader-s32');
 
-      await tabTo(other, main(other).locator('.pa-project__product-name a'));
+      await tabTo(other, main(other).getByRole('link', { name: PRODUCT, exact: true }));
       await other.keyboard.press('Enter');
       await expect(other).toHaveURL(productUrl);
       await expect(heading(other)).toHaveText(PRODUCT);
       await expect(heading(other)).toBeFocused();
-      await expect(main(other).locator('a', { hasText: 'Bearbeiten' })).toHaveCount(0);
-      await expect(main(other).locator('button')).toHaveCount(1); // the legend
+      await expect(main(other).getByRole('link', { name: 'Bearbeiten' })).toHaveCount(0);
+      await expect(main(other).getByRole('button')).toHaveCount(1); // the legend
       await expect(controls).toHaveCount(0);
       await settled(main(other));
       await expectNoAxeViolations(other, testInfo, 'j2-reader-s34');
@@ -339,10 +344,10 @@ test.describe('J2 workspace up to the assessment', () => {
       await openTab(other, 1, 'above');
       await expect(valuesOf(main(other), 'Wurde das Produkt auf Barrierefreiheit geprüft?')).toHaveText('Ja');
       const evidence = main(other).locator('.pa-evidence__card:has(.pa-evidence__card-title)');
-      await expect(evidence.locator('h3')).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
+      await expect(evidence.getByRole('heading', { level: 3 })).toHaveText('Prüfnachweis 1: BIT inklusiv Software-Test');
       await expect(valuesOf(evidence, 'Wer hat geprüft?')).toHaveText('Prüfstelle Beispiel');
       await expect(valuesOf(evidence, 'Datum der Prüfung')).toHaveText('14.03.2026');
-      await expect(main(other).locator('button')).toHaveCount(0);
+      await expect(main(other).getByRole('button')).toHaveCount(0);
       await expect(controls).toHaveCount(0);
       await settled(main(other));
       await expectNoAxeViolations(other, testInfo, 'j2-reader-s34a');

@@ -83,9 +83,7 @@ test.describe('S03 „Passwort zurücksetzen“', () => {
     expect(link.search).not.toContain(encodeURIComponent(address));
 
     await page.goto(link.href);
-    // Waits by id, not by label: a name computation of the field before axe crashes Firefox now and
-    // then (like TESTING V129, V165); the label is checked by the component test and used after axe
-    await expect(main(page).locator('#pa-new-password')).toBeVisible();
+    await expect(main(page).getByLabel('Neues Passwort')).toBeVisible();
     expect(page.url()).not.toContain('token');
     await expect(page).toHaveTitle('Passwort zurücksetzen – ProcureAccess');
     await settled(main(page));

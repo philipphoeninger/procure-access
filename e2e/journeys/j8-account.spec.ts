@@ -45,9 +45,7 @@ async function press(locator: Locator, key = 'Enter'): Promise<void> {
 async function register(page: Page, address: string): Promise<void> {
   await main(page).getByLabel('E-Mail-Adresse').fill(address);
   await main(page).getByLabel('Passwort', { exact: true }).fill(PASSWORD);
-  // By role alone, the only checkbox of S02: a name check of a mat-checkbox together with axe crashes
-  // Firefox (TESTING V129, V165); the component test and axe check its name.
-  const consent = main(page).getByRole('checkbox');
+  const consent = main(page).getByRole('checkbox', { name: /^Ich habe die Datenschutzhinweise/ });
   await press(consent, 'Space');
   await expect(consent).toBeChecked();
   await press(main(page).getByRole('button', { name: 'Konto erstellen' }));

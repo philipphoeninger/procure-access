@@ -78,9 +78,7 @@ test.describe('S10 Kriterien zusammenstellen, steps 2–4', () => {
     await expect(base).toHaveAttribute('aria-disabled', 'true');
     await expect(base).toHaveAccessibleDescription('Immer ausgewählt.');
     await expectExcluded(checkbox(page, 'Video'), 'Passt nicht zum Verwendungszweck HR-Anwendung');
-    // Unnamed on purpose: in Firefox 159 (Playwright 1.65) any name check of this mat-slide-toggle
-    // followed by an axe run crashes the page. It is the only switch; the unit test checks its name.
-    await page.getByRole('switch').click();
+    await page.getByRole('switch', { name: 'Erklärungen anzeigen' }).click();
     await expect(checkbox(page, 'Audio')).toHaveAccessibleDescription(/akustische/);
     await settled(page.getByRole('main'));
     await expectNoAxeViolations(page, testInfo, 's10 step 3, explanations shown');

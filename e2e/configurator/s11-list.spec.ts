@@ -13,9 +13,6 @@ import { chooseFirstOption } from '../support/combobox';
  * (WCAG 2.4.11). Axe in both appearances (A11Y-01, A11Y-08). Since S4-18b also the usage event
  * `CriteriaListShown`: one report per new selection. Since S5-31 the rating legend above the list;
  * since S5-32 the title row and the sticky bar across the viewport (Figma `2020:102`, `2034:1193`).
- *
- * Axe runs before any name-based locator on S11: in Firefox such locators followed by axe crashed
- * the page process (S4-16 P5, the class of TESTING_v43 V129).
  */
 const WIDE = { width: 1280, height: 800 };
 
@@ -278,8 +275,7 @@ test.describe('S11 summary, notices, suggestion link and action bar', () => {
 
 /**
  * The export dialog S13 (S4-21b; R-LST-11), by keyboard on T.1. Axe in both appearances on the
- * dialog and its error state S13-E (A11Y-01, A11Y-08). The dialog is found by role before axe runs,
- * its texts only afterwards (Firefox, see above).
+ * dialog and its error state S13-E (A11Y-01, A11Y-08).
  */
 test.describe('S13 export dialog', () => {
   const XLSX = 'Excel-Datei (.xlsx) – für Vergabeunterlagen';
@@ -292,7 +288,7 @@ test.describe('S13 export dialog', () => {
     await exportButton.focus();
     await page.keyboard.press('Enter');
     // The dialog moves the focus to the selected format once it is open; keys go there only then.
-    await expect(page.getByRole('dialog').locator('input[type="radio"]:checked')).toBeFocused();
+    await expect(page.getByRole('dialog', { name: 'Kriterienliste exportieren' }).getByRole('radio', { name: XLSX })).toBeFocused();
     return exportButton;
   }
 
