@@ -79,7 +79,7 @@ Checked without a finding: the database name is validated before it enters SQL; 
 | Licence headers | `reuse lint-file` on the new and changed files passed; the full `reuse lint` runs in CI, because it cannot read `.gitignore` in a worktree |
 | Restore rehearsal | passed, 14 of 14 steps |
 | .NET build and tests | not run: no C# changed. The API image was built from this branch for the rehearsal |
-| **E2E** | **not run locally, left to CI** (another session used the local E2E stack) |
+| **E2E** | **not run locally, left to CI** (another session used the local E2E stack). The first CI run of this pull request failed one WebKit test outside this change (open point 8); the checks of the pull request show the run on the final commit |
 | POSIX shells | parsed and run in the Alpine image (BusyBox); Ubuntu's `dash` is covered by the self-test in CI |
 
 ## 5. Open points
@@ -91,3 +91,5 @@ Checked without a finding: the database name is validated before it enters SQL; 
 5. **File store (step 7):** that step must add its files to the backup and the runbook.
 6. **`CLAUDE.md` is full (39 998 of 40 000 characters):** the document table does not name `TECHNICAL.md` yet. It needs a shortening first, which is outside this task.
 7. **Sprint close-out:** TECH_DEBT v6 should record that the backup part of #4 is done; ROADMAP GP.2 stays open until the staging run.
+8. **Proposed issue, flaky E2E test:** `e2e/identity/account.spec.ts:120` timed out once in WebKit (run 45184273467). The trace shows `fill` finished, but the field was empty afterwards, so „Konto endgültig löschen“ stayed `aria-disabled` and the click waited until the timeout. The test types without waiting for the dialog's first focus, which CLAUDE §3 (E2E) requires, so that is the likely cause; it was not reproduced. Not changed here (scope).
+9. **Proposed issue, log sink at the first start:** on an empty database the Serilog sink writes before the migrations have created the schema, and PostgreSQL logs `schema "logging" does not exist` (same CI run). The entries of that moment are lost; a restored database already has the schema.
