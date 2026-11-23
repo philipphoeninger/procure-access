@@ -53,6 +53,19 @@ const pageFailingOnlyInDark = `
     <body><main><h1>Fixture</h1><p id="dark-only">Nur im Dunkelmodus schwer lesbar</p></main></body>
   </html>`;
 
+/** A region named through `aria-labelledby`: axe and Playwright's name lookup both resolve it (#355). */
+const pageWithNamedRegion = `
+  <!doctype html>
+  <html lang="de">
+    <head><title>Axe helper fixture</title></head>
+    <body>
+      <main>
+        <h1>Fixture</h1>
+        <section aria-labelledby="region-heading"><h2 id="region-heading">Abschnitt</h2><p>Text</p></section>
+      </main>
+    </body>
+  </html>`;
+
 const issue = 'https://github.com/philipphoeninger/procure-access/issues/1';
 
 function suppression(rule: string, selector: string): AxeSuppression {
@@ -128,6 +141,14 @@ test.describe('axe helper', () => {
     await expectNoAxeViolations(page, testInfo, 'all suppressed', {
       suppressions: [suppression('image-alt', '#no-alt'), suppression('button-name', '#no-name')],
     });
+  });
+
+  test('keeps the page alive when a name lookup and axe resolve the same aria-labelledby (#355)', async ({ page }, testInfo) => {
+    await page.setContent(pageWithNamedRegion);
+
+    await expectNoAxeViolations(page, testInfo, 'named region');
+    await expect(page.getByRole('region', { name: 'Abschnitt' })).toBeVisible();
+    await expectNoAxeViolations(page, testInfo, 'named region, after the lookup');
   });
 });
 

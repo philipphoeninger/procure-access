@@ -102,12 +102,12 @@ interface CriteriaAnswer {
  * Presses Tab until the target has the focus, as a keyboard user moves through the page. Fails when
  * the target is not reached, i.e. when it is not in the tab order after the current focus.
  */
-async function tabTo(page: Page, target: Locator): Promise<void> {
+async function tabTo(page: Page, target: Locator, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
   for (let presses = 0; presses <= MAX_TABS; presses++) {
     if (await target.evaluate((element) => element === document.activeElement)) {
       return;
     }
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(key);
   }
   throw new Error(`${target.toString()} was not reached with ${MAX_TABS} Tab presses`);
 }
@@ -424,10 +424,7 @@ test.describe('J1 configurator without account', () => {
     });
   });
 
-  test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 INV:EXP-06 second part: the draft survives the sign-in from „Liste speichern“, is saved, opened, exported again with the same file, listed and deleted (S5-20b, S5-21b)', async ({ page, request, browserName }, testInfo) => {
-    // Firefox's page process crashes right after the save is answered when Playwright runs two or
-    // more workers (TESTING V254; owner decision S5-20b: skipped on Firefox until the issue finds why).
-    test.fixme(browserName === 'firefox', 'Firefox page crash after saving (TESTING V254)');
+  test('INV:A11Y-02 INV:A11Y-01 INV:A11Y-08 INV:EXP-06 second part: the draft survives the sign-in from „Liste speichern“, is saved, opened, exported again with the same file, listed and deleted (S5-20b, S5-21b)', async ({ page, request }, testInfo) => {
     // Nine states, each checked by axe in two appearances, after S10 and S11 by keyboard.
     test.setTimeout(300_000);
     /** The file of the draft, exported before saving; the saved list's file must hold the same. */
@@ -556,7 +553,8 @@ test.describe('J1 configurator without account', () => {
 
     await test.step('S14 through „Kriterienlisten“ of the account menu, sorted by name (R-SAV-02)', async () => {
       if (await accountMenuButton(page).isVisible()) {
-        await tabTo(page, accountMenuButton(page));
+        // Back up to the header: past the end of the page Firefox goes on inside `main` (#355).
+        await tabTo(page, accountMenuButton(page), 'Shift+Tab');
         await page.keyboard.press('Enter');
         await arrowTo(page, page.getByRole('menu').getByRole('menuitem', { name: 'Kriterienlisten' }));
       } else {
