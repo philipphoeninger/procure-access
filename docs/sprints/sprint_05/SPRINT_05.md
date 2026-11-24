@@ -118,7 +118,7 @@ Points use the roadmap scale; task estimates add up to the package estimates of 
 | ID | Task | Pts | Done when |
 |---|---|---:|---|
 | S5-27 | Personal data export `GET /api/v1/account/export` as JSON per SPEC §8.4 (only the user's own data) | 2 | **PRV-07** (account part) `active` |
-| S5-28 | Account page S61: export download, change e-mail and password (rebuilt from the legacy profile), account deletion with its rules (sole Owner of an organisation with other members is refused; an organisation whose last member leaves is deleted with its lists, share links and projects) ⚖️ texts as written; the legacy delete dialog with its contrast (#234 TD-26) and native `disabled` goes | 3 | **TEN-11** (account part) `active`; R-AUTH-09, R-AUTH-10 met; #234 closed; S61 in `reflow.spec.ts` |
+| S5-28 | Account page S61: export download, change e-mail and password (rebuilt from the legacy profile) *[Added in S6-09 (2026-11-24): owner decision S5-28 1a dropped changing the e-mail address and the password from S61; see `S5-28a_account_deletion_server.md` and ARCHITECTURE §16.5 O-25.]*, account deletion with its rules (sole Owner of an organisation with other members is refused; an organisation whose last member leaves is deleted with its lists, share links and projects) ⚖️ texts as written; the legacy delete dialog with its contrast (#234 TD-26) and native `disabled` goes | 3 | **TEN-11** (account part) `active`; R-AUTH-09, R-AUTH-10 met; #234 closed; S61 in `reflow.spec.ts` |
 
 ### P2 — stretch (10 points, only if P0 is done)
 

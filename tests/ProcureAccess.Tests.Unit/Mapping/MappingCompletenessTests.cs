@@ -10,7 +10,7 @@ using Xunit;
 namespace ProcureAccess.Tests.Unit.Mapping;
 
 /// <summary>
-/// ARC-06 (TESTING_v27 §4.10): every map between an entity and its DTO sets every member of its
+/// ARC-06 (TESTING §4.10): every map between an entity and its DTO sets every member of its
 /// target or names it as ignored in <see cref="MapCases"/>. Replaces AutoMapper's
 /// <c>AssertConfigurationIsValid</c> (ADR-015, #31), which could not see a missing map (#90).
 /// </summary>

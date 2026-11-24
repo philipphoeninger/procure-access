@@ -13,7 +13,7 @@ namespace ProcureAccess.Modules.Catalog.Domain;
 /// <para><b>CAT-13.</b> <see cref="Create"/> refuses a rule whose target layer is not lower than its
 /// source layer; the table has a CHECK constraint with the same rule, plus exactly one source and
 /// exactly one target (<c>FilterExclusionConfiguration</c>).</para>
-/// <para>The typed foreign keys follow ARCHITECTURE v7 (Y5): sources are use cases, app types or
+/// <para>The typed foreign keys follow ARCHITECTURE C49 (review finding Y5): sources are use cases, app types or
 /// product parts; targets are app types, product parts or test types. A rule has no method that
 /// changes it, like <see cref="StandardReference"/>: a rule of a published release is part of it,
 /// and a changed reason is a new rule.</para>

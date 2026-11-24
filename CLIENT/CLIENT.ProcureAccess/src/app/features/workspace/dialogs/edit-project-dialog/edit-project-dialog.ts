@@ -43,7 +43,7 @@ export const RELOAD_PROJECT = 'reload';
 export type EditProjectResult = Project | typeof RELOAD_PROJECT;
 
 /**
- * Dialog „Projekt bearbeiten“ of S32 (R-PRJ-05; owner decision S6-14 D1 (a), UX copy v44; Handoff
+ * Dialog „Projekt bearbeiten“ of S32 (R-PRJ-05; owner decision S6-14 D1 (a), UX copy U177; Handoff
  * §5.3: no Figma frame, the S13 dialog rules as S31): „Name des Projekts“ and „Stand“ („Laufend“,
  * „Abgeschlossen“, „Archiviert“ as a radio group), „Abbrechen“ and „Speichern“.
  *
