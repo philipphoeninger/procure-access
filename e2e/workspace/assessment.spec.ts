@@ -24,10 +24,6 @@ import { signInThroughApi } from '../support/session';
  * legend stays open on that visit (owner decision S6-19b (a)), collapsed after the reload; the
  * filter „Nur noch nicht eingeschätzte anzeigen“ with Space.
  * Axe in both appearances on every state (A11Y-01, A11Y-08).
- *
- * The K6 cards are found by CSS: Playwright's name lookups of form fields followed by axe crash
- * Firefox's page process now and then (TESTING V226, V367); the names are checked by the
- * component tests and by axe.
  */
 const WIDE = { width: 1280, height: 800 };
 const NARROW = { width: 360, height: 800 };
@@ -43,13 +39,13 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
-/** Presses Tab (or Shift+Tab) until the focused element matches the CSS `selector` (keyboard only). */
-async function tabTo(page: Page, selector: string, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
+/** Presses Tab (or Shift+Tab) until the target has the focus (keyboard only). */
+async function tabTo(page: Page, target: Locator, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
   for (let presses = 0; presses <= MAX_TABS; presses++) {
-    if (await page.evaluate((css) => document.activeElement?.matches(css) ?? false, selector)) return;
+    if (await target.evaluate((element) => element === document.activeElement)) return;
     await page.keyboard.press(key);
   }
-  throw new Error(`${selector} was not reached with ${MAX_TABS} Tab presses`);
+  throw new Error(`${target.toString()} was not reached with ${MAX_TABS} presses of ${key}`);
 }
 
 /** The PUT of one row of the candidate's assessment. */
@@ -80,9 +76,10 @@ test.describe('Assessment tab S34b', () => {
     const cards = main(page).locator('pa-assessment-input');
     await expect(cards.first()).toBeVisible();
     const first = cards.first();
-    const radios = first.locator('input[type="radio"]');
+    const radios = first.getByRole('radio');
+    const note = first.getByRole('textbox', { name: 'Worauf stützt sich Ihre Einschätzung? (optional)' });
     // Only the allowed levels and „Nicht eingeschätzt“, which is last and preset (CAT-15)
-    await expect(first.locator('mat-radio-button').last()).toHaveText('Nicht eingeschätzt');
+    await expect(radios.last()).toHaveAccessibleName('Nicht eingeschätzt');
     await expect(radios.last()).toBeChecked();
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
     // Progress, list line and the legend, expanded for a user who never assessed (R-CAN-08)
@@ -96,7 +93,7 @@ test.describe('Assessment tab S34b', () => {
     await expectNoAxeViolations(page, testInfo, 's34b');
 
     // Keyboard only: from the top of the page, Tab reaches the checked radio of the first criterion
-    await tabTo(page, 'pa-assessment-input:first-of-type input[type="radio"]:checked');
+    await tabTo(page, first.getByRole('radio', { checked: true }));
     const saved = assessmentSaved(page, candidateId);
     const legendStored = page.waitForResponse(
       (response) => response.request().method() === 'PUT' && new URL(response.url()).pathname === '/api/v1/account/preferences',
@@ -117,7 +114,7 @@ test.describe('Assessment tab S34b', () => {
     await expect(legend).toHaveAttribute('aria-expanded', 'true');
 
     // Tab on into its note and type: saved by itself once typing pauses
-    await tabTo(page, 'pa-assessment-input:first-of-type textarea');
+    await tabTo(page, note);
     const noteSaved = assessmentSaved(page, candidateId);
     await page.keyboard.type('Eigener Test mit der Tastatur.');
     const withNote = await noteSaved;
@@ -129,12 +126,12 @@ test.describe('Assessment tab S34b', () => {
     // Both stay after a reload (stored on the server, R-CAN-06)
     await page.reload();
     await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
-    await expect(cards.first().locator('input[type="radio"]').nth(chosen)).toBeChecked();
-    await expect(cards.first().locator('textarea')).toHaveValue('Eigener Test mit der Tastatur.');
+    await expect(radios.nth(chosen)).toBeChecked();
+    await expect(note).toHaveValue('Eigener Test mit der Tastatur.');
     await expect(legend).toHaveAttribute('aria-expanded', 'false');
 
     // The filter with Space: only the criteria not assessed yet, then all again
-    await tabTo(page, '.pa-assessment__filter input[type="checkbox"]');
+    await tabTo(page, main(page).getByRole('checkbox', { name: 'Nur noch nicht eingeschätzte anzeigen' }));
     await page.keyboard.press('Space');
     await expect(cards).toHaveCount(total - 1);
     await settled(main(page));
@@ -145,7 +142,7 @@ test.describe('Assessment tab S34b', () => {
     // Überblick counts the assessed criterion (the server's counts, read after leaving the tab)
     // Only the selected tab is in the tab order; Home moves to the first one (ARIA tabs)
     // The filter is below the tabs: back with Shift+Tab
-    await tabTo(page, '[role="tab"][aria-selected="true"]', 'Shift+Tab');
+    await tabTo(page, main(page).getByRole('tab', { selected: true }), 'Shift+Tab');
     await page.keyboard.press('Home');
     await page.keyboard.press('Enter');
     await expect(page).toHaveTitle(`Überblick – BewerberPro – ${project} – ProcureAccess`);
@@ -157,8 +154,8 @@ test.describe('Assessment tab S34b', () => {
     await page.setViewportSize(NARROW);
     await page.goto(`/projekte/${projectId}/produkte/${candidateId}/einschaetzung`);
     await expect(main(page).getByRole('heading', { level: 1, name: 'BewerberPro' })).toBeVisible();
-    await expect(cards.first().locator('mat-select')).toContainText(level);
-    await expect(cards.first().locator('.pa-assessment-input__note-toggle')).toHaveText('Begründung bearbeiten');
+    await expect(first.getByRole('combobox', { name: 'Einschätzung' })).toContainText(level);
+    await expect(first.getByRole('button', { name: 'Begründung bearbeiten' })).toBeVisible();
     await expect(cards.first().locator('textarea')).toBeHidden();
     await expect(main(page).locator('mat-form-field:not(.mat-form-field-animations-enabled)')).toHaveCount(0);
     await settled(main(page));

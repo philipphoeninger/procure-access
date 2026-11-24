@@ -143,20 +143,6 @@ async function settled(locator: Locator): Promise<void> {
   );
 }
 
-/**
- * The texts an element's `aria-labelledby` points to, i.e. its accessible name. Used for the include
- * checkbox of an S11 card: Playwright's own name computation of that checkbox crashes the page in
- * Firefox once axe has run on S11 (S4-22; the class of TESTING V129 and S4-16 P5).
- */
-function labelledBy(locator: Locator): Promise<string> {
-  return locator.evaluate((element) =>
-    (element.getAttribute('aria-labelledby') ?? '')
-      .split(/\s+/)
-      .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
-      .join(' '),
-  );
-}
-
 /** Presses a key until the target has the focus, as in a menu or listbox; fails after `max` presses. */
 async function arrowTo(page: Page, target: Locator, key = 'ArrowDown', max = 10): Promise<void> {
   for (let presses = 0; presses <= max; presses++) {
@@ -353,10 +339,8 @@ test.describe('J1 configurator without account', () => {
 
     await test.step('S11: 99.7 left out of the list (R-LST-04)', async () => {
       const excluded = card(page, CHANGED.excluded.title);
-      // The card has one checkbox; its name is read through `labelledBy` (Firefox, see there).
-      const include = excluded.getByRole('checkbox');
+      const include = excluded.getByRole('checkbox', { name: `In Liste aufnehmen ${CHANGED.excluded.title}`, exact: true });
       await tabTo(page, include);
-      expect(await labelledBy(include)).toBe(`In Liste aufnehmen ${CHANGED.excluded.title}`);
       await expect(include).toBeChecked();
       await page.keyboard.press('Space');
 
@@ -372,8 +356,7 @@ test.describe('J1 configurator without account', () => {
     await test.step('S11: the procedure criterion „Geprüft nach BIK BITV-Test (Web)“ (CAT-17)', async () => {
       const testedBy = card(page, 'Geprüft nach BIK BITV-Test (Web)');
       await expect(testedBy).toContainText('Der Anbieter oder eine unabhängige Stelle hat das Produkt nach dem BIK BITV-Test (Web) geprüft');
-      const include = testedBy.getByRole('checkbox');
-      expect(await labelledBy(include)).toBe('In Liste aufnehmen Geprüft nach BIK BITV-Test (Web)');
+      const include = testedBy.getByRole('checkbox', { name: 'In Liste aufnehmen Geprüft nach BIK BITV-Test (Web)', exact: true });
       await expect(include).toBeChecked();
     });
 
@@ -470,8 +453,7 @@ test.describe('J1 configurator without account', () => {
       await page.keyboard.press('Enter');
       await expect(priority.getByRole('button', { name: 'Priorität: Hinweis' })).toBeFocused();
 
-      // The checkbox's name is read through `labelledBy` (Firefox, see there); no axe has run yet.
-      const include = card(page, CHANGED.excluded.title).getByRole('checkbox');
+      const include = card(page, CHANGED.excluded.title).getByRole('checkbox', { name: `In Liste aufnehmen ${CHANGED.excluded.title}`, exact: true });
       await tabTo(page, include);
       await page.keyboard.press('Space');
       await expect(include).not.toBeChecked();
@@ -492,11 +474,9 @@ test.describe('J1 configurator without account', () => {
     });
 
     await test.step('S01: sign-in by keyboard; S11 again with the draft as changed and the hint (S5-20b 1a)', async () => {
-      // CSS locators: after axe on S01, Playwright's name computation of these fields crashed the
-      // Firefox page process (the class of TESTING V165, V226; S5-20b).
-      await tabTo(page, page.locator('main input[name="email"]'));
+      await tabTo(page, page.getByRole('main').getByLabel('E-Mail-Adresse'));
       await page.keyboard.type(address);
-      await tabTo(page, page.locator('main input[name="password"]'));
+      await tabTo(page, page.getByRole('main').getByLabel('Passwort', { exact: true }));
       await page.keyboard.type(PASSWORD);
       await page.keyboard.press('Enter');
 
@@ -571,11 +551,8 @@ test.describe('J1 configurator without account', () => {
       await settled(main);
       await expectNoAxeViolations(page, testInfo, 'j1 s14');
 
-      // mat-select keeps the focus on the combobox and points at the active option. A CSS locator and
-      // its name through `labelledBy`: after axe on S14, Playwright's name computation of the select
-      // (`aria-labelledby`, like the S11 checkbox) crashed the Firefox page process (TESTING V165).
-      const sort = main.locator('mat-select');
-      expect(await labelledBy(sort)).toContain('Sortieren nach');
+      // mat-select keeps the focus on the combobox and points at the active option.
+      const sort = main.getByRole('combobox', { name: 'Sortieren nach' });
       await tabTo(page, sort);
       await page.keyboard.press('Enter');
       const optionId = await page.getByRole('listbox').getByRole('option', { name: 'Name' }).getAttribute('id');

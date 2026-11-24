@@ -107,10 +107,6 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await expectNoAxeViolations(page, testInfo, 's30-list');
   });
 
-  // Axe on S31 with the list choice in a test of its own (TESTING V341): in Firefox, axe on the dialog
-  // with its select crashes the page process when the select or its options were found by name before
-  // (as V129) or when the dialog closes after it. So this test finds them by role or CSS and ends with
-  // axe; the journey below checks S31 without axe. The names are checked by the unit test.
   test('INV:A11Y-01 INV:A11Y-08 S31 offers „Keine Liste“ and the saved lists of the organisation', async ({ page, request }, testInfo) => {
     await page.setViewportSize(WIDE);
     const suffix = `${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}`;
@@ -122,16 +118,16 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await page.goto('/projekte');
 
     await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
-    const dialog = page.locator('mat-dialog-container');
-    await expect(dialog.locator('input')).toBeFocused();
+    const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
+    await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
     await expect(dialog).toContainText('Kriterienliste (optional)');
     await expect(dialog).toContainText('Das Projekt erhält eine eigene Kopie der Liste');
-    const choice = dialog.locator('mat-select');
+    const choice = dialog.getByRole('combobox', { name: 'Kriterienliste (optional)' });
     await expect(choice).toContainText('Keine Liste');
     await choice.click();
-    await expect(page.locator('mat-option')).toHaveText(['Keine Liste', 'HR-Software 2027']);
-    await page.locator('mat-option', { hasText: 'HR-Software 2027' }).click();
-    await expect(page.locator('mat-option')).toHaveCount(0);
+    await expect(page.getByRole('option')).toHaveText(['Keine Liste', 'HR-Software 2027']);
+    await page.getByRole('option', { name: 'HR-Software 2027' }).click();
+    await expect(page.getByRole('option')).toHaveCount(0);
     await expect(choice).toContainText('HR-Software 2027');
     await settled(dialog);
     await expectNoAxeViolations(page, testInfo, 's31-list-choice');
@@ -150,8 +146,6 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await main(page).getByRole('button', { name: 'Projekt anlegen' }).press('Enter');
     const dialog = page.getByRole('dialog', { name: 'Beschaffungsprojekt anlegen' });
     await expect(dialog.getByRole('textbox', { name: 'Name des Projekts' })).toBeFocused();
-    // S31's axe run is a test of its own (below): with the select in the dialog, axe followed by the
-    // dialog closing crashes Firefox's page process (TESTING V341)
     const project = `Mit Liste ${suffix}`;
     await dialog.getByRole('textbox', { name: 'Name des Projekts' }).fill(project);
     const choice = dialog.getByRole('combobox', { name: 'Kriterienliste (optional)' });
@@ -182,9 +176,7 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 's11-project-copy');
 
-    // The include checkbox by role inside its card, without its name: after axe on S11 the name
-    // computation of that checkbox crashes Firefox (TESTING V165, as J1)
-    const first = main(page).locator('pa-criterion-card').first().getByRole('checkbox');
+    const first = main(page).locator('pa-criterion-card').first().getByRole('checkbox', { name: /^In Liste aufnehmen / });
     const decide = (included: boolean) =>
       page.waitForResponse(
         (response) =>
@@ -196,10 +188,7 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await first.uncheck();
     expect((await excluded).ok()).toBe(true);
 
-    // From here on CSS locators instead of accessible names: once axe has run on S11, Firefox's
-    // page process crashes at Playwright's name lookup — since S6-14 also of S32's H1 (TESTING V165,
-    // V368). The names are checked by the unit tests and by axe.
-    const heading = main(page).locator('h1');
+    const heading = main(page).getByRole('heading', { level: 1 });
 
     // Leaving out is no addition: S32 shows no report
     await page.goBack();
@@ -207,11 +196,11 @@ test.describe('Procurement projects S30, S31, S32', () => {
     await expect(heading).toBeFocused();
     await expect(main(page)).not.toContainText('neu in der Liste');
 
-    await main(page).locator('a', { hasText: 'Kriterienliste anpassen' }).press('Enter');
+    await main(page).getByRole('link', { name: 'Kriterienliste anpassen' }).press('Enter');
     await expect(heading).toHaveText('HR-Software 2027');
     await expect(heading).toBeFocused();
     const included = decide(true);
-    await main(page).locator('pa-criterion-card').first().getByRole('checkbox').check();
+    await first.check();
     expect((await included).ok()).toBe(true);
 
     await page.goBack();
