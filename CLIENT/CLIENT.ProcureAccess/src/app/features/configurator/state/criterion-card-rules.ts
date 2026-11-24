@@ -50,7 +50,7 @@ export function sourceTitle(criterion: Criterion): CardText | null {
 }
 
 /**
- * The meta line of a requirement card (UX copy v18 U100, owner decision O-S4-31 (a)): product part
+ * The meta line of a requirement card (UX copy U100, owner decision O-S4-31 (a)): product part
  * and the clause of the EN 301 549 reference — not the criterion number, which for the PDF/UA-1
  * criteria is `UA1-…`. Only the parts that exist; null when neither does.
  */

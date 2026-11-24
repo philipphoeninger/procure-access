@@ -28,7 +28,7 @@ namespace ProcureAccess.Tests.Integration.Api;
 /// API-01: every validation failure is an RFC 9457 Problem Details document of type
 /// <c>validation</c> with an <c>errors</c> map keyed by field path (SPEC §7.1, §8.6;
 /// ARCHITECTURE §7.1). Also the other errors Platform turns into Problem Details on the shared host:
-/// unknown routes and the former ad-hoc error object of the UI customisation (TECH_DEBT_v1 §5).
+/// unknown routes and the former ad-hoc error object of the UI customisation (tech-debt register of sprint 01, roadmap M1.3).
 /// </summary>
 public sealed class ProblemDetailsTests(ApiFixture api) : IntegrationTest(api)
 {

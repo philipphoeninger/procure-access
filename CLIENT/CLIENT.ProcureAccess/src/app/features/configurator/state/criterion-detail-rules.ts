@@ -39,7 +39,7 @@ export const RATING_KEYS: Readonly<Record<RatingName, string>> = {
 
 const RATING_ORDER = Object.keys(RATING_KEYS) as RatingName[];
 
-/** Short tab labels of the procedures (UX copy v19 U101, owner decision O-S4-38 (a)). */
+/** Short tab labels of the procedures (UX copy U101, owner decision O-S4-38 (a)). */
 const TAB_LABEL_KEYS: Readonly<Record<string, string>> = {
   softwareTest: 'criteria.item.detail.tabs.softwareTest',
   appTest: 'criteria.item.detail.tabs.appTest',

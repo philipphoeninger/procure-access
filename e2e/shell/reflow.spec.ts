@@ -26,7 +26,7 @@ import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_OWNER, ORG_READER, TEST_USER_PASS
  * Überblick with its tabs since S6-16; the project overview S32 with its menu and the dialog „Projekt
  * bearbeiten“ since S6-14; the evidence tab S34a since S6-17; the assessment tab S34b since S6-19; the conflict dialog S37 over „Projekt bearbeiten“ since S6-21a; S34a and S34b read only for a Reader since S6-22. The legacy screens are
  * checked by hand until they are rebuilt (protocol S2-18). A rebuilt screen joins this list in its
- * step (TESTING_v26 V87).
+ * step (TESTING V87).
  *
  * The width is compared with the set viewport, not with the document: mobile browsers widen the
  * layout viewport to fit content that is too wide, so the document alone would hide the overflow.
