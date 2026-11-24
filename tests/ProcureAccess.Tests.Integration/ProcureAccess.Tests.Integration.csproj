@@ -37,6 +37,8 @@ SPDX-License-Identifier: MIT
     <None Update="Catalog/Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
     <!-- The real release folders (catalog/releases/<version>/), every file as the API image ships them, imported by Release2026_1Tests (S3-27). -->
     <None Include="../../catalog/releases/**/*" Link="CatalogReleases/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The metric queries of R-MET-02 are run from the document itself by MetricQueryTests (S6-30). -->
+    <None Include="../../docs/TECHNICAL.md" Link="Docs/TECHNICAL.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
