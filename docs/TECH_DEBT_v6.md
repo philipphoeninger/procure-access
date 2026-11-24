@@ -262,7 +262,6 @@ CLAUDE §6.6: Claude Code must not decide these. Decided in sprint 06 (see `SPRI
 | **TD-98** per-address sign-in limit or failures only | S6-26 P3 | pilot feedback | keep until the pilot |
 | **TD-29** legal page content from WERTE.IT; the O-6 channel | S6-28 P1 | before G-P | — |
 | **TD-101** split `CODEBASE_v1.md` | this review | next documentation session | one file per area under `docs/codebase/` |
-| #158 milestone: G-R, or a new milestone "Legacy removal (2026.1)" | §7 | any time | a new milestone, which #52 joins too |
 | **O-S6-8** "release 2026.1 active" in the G-P gate | SPRINT_06 | G-P planning (sprint 07) | yes |
 | **M5.5** tick at the sprint review: J2 is green on all five browser projects on `main` since 98ea8031 | S6-22b P4 | sprint review | yes |
 | **TD-79** UX copy: the v5 list and the ten new keys of §3.6 | S6-09 P1 and the protocols named there | next UX copy version | — |
@@ -289,11 +288,13 @@ CLAUDE §6.6: Claude Code must not decide these. Decided in sprint 06 (see `SPRI
 
 - **Milestones moved on 2026-11-24** (owner's go-ahead, O-S6-7):
   - #82 and #170 → M6 (both are legacy product screens), #377 → G-P; **M3 closed**.
-  - #236 and #259 → G-P (staging is GP.1); #52 and #299 stay in M2 (#52 goes with #158, #299 waits for K-1).
+  - #236 and #259 → G-P (staging is GP.1); #299 stays in M2 (it waits for K-1).
+  - New milestone **Legacy removal (2026.1)**: #158 (from M5) and #52 (from M2), the first row of §5.
   - #429 → M5 (it belongs to R-PRJ-06), #436 and #437 → G-P. No open issue is left without a milestone.
 - **Open milestones:**
-  - **M5** has #158, #414, #420, #429 and #453. Close it when #414, #420, #429 and #453 are done. #158 waits for the legacy removal, and no milestone covers that yet (§6).
-  - **M2** has #52 and #299.
+  - **M5** has #414, #420, #429 and #453; close it when they are done.
+  - **M2** has #299.
+  - **Legacy removal (2026.1)** has #52 and #158; it starts when O-1/K-1 arrive.
   - **G-P** has 15 open issues, among them TD-28 (#236), #447 – #449, #451, #452 and #454 – #456.
 - **Follow-ups without an issue:** the protocols named S6-01 P2 "proposed issue", S6-27 P7 "an issue if it recurs" (it did), S6-21a P2 "proposed issue", S6-27 P1 "follow-up issue", S6-15 P5 "small follow-up issue" and S6-05 P2 "follow-up issue if wanted", but no issue was created. This register tracks them as TD-85 (a), TD-84, TD-90 (now O-29), TD-89, TD-88 and TD-94; all but TD-90 have an issue now (§8).
 - **#240** keeps only its dark part. The comment that the light part is done is on the issue (2026-11-11).
