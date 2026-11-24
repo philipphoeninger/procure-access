@@ -116,7 +116,7 @@ The API reads `appsettings.json`, then `appsettings.<Environment>.json`, then en
 | `Export:ToolUrl` | `https://procureaccess.de` | The link to the tool in exported files |
 | `ProblemTypes:BaseUri` | `https://procureaccess.de` | The base of the `type` URI of every error answer (`ARCHITECTURE §7.1`) |
 
-Until compose lists them (open point of S6-30), set them for a deployment in a compose override file next to `docker-compose.yml` (`services: api: environment: App__BaseUrl: https://…`) or in the platform's compose editor. The development and E2E overrides set `App__BaseUrl` to `http://localhost:4200` this way.
+Until compose lists them (issue #447), set them for a deployment in a compose override file next to `docker-compose.yml` (`services: api: environment: App__BaseUrl: https://…`) or in the platform's compose editor. The development and E2E overrides set `App__BaseUrl` to `http://localhost:4200` this way.
 
 ### 3.2 Settings that are not secret
 
@@ -150,7 +150,7 @@ One host, `docker compose`, the three services of §1 plus the nightly `backup` 
 ### 4.3 What the database server and the network must allow
 
 - **The application's database user creates schemas and objects.** The migrations create one schema per module and the ICU collation `public.identity_case_insensitive` (case-insensitive unique contributor names). With the compose stack the user is the server's superuser. On a managed PostgreSQL, the user must own the database or have `CREATE` on it **and** `CREATE` on the schema `public` (`GRANT CREATE ON SCHEMA public TO <user>;` — PostgreSQL 15 and later no longer grant it to everyone). Without it the first migration of IdentityAccess fails.
-- **Only the reverse proxy is public.** The database port is bound to `127.0.0.1`. The compose file publishes the API on port 5000 and the client on 4200 on every interface, because the local stacks need them; on a server, keep both closed to the internet (a host firewall does not help: Docker's port publishing bypasses tools such as ufw — bind them to `127.0.0.1` in the host's override, which must replace the list rather than add to it — `ports: !override ["127.0.0.1:5000:8080"]`, as `docker-compose.e2e.yml` does with `!reset` — or block them at the provider). The API trusts `X-Forwarded-For` only from private networks and for at most `ForwardedHeaders:ForwardLimit` hops (🔧 2: Traefik → nginx → API); a caller that reaches the API port directly could choose its own rate-limit counter.
+- **Only the reverse proxy is public.** The database port is bound to `127.0.0.1`. The compose file publishes the API on port 5000 and the client on 4200 on every interface, because the local stacks need them; on a server, keep both closed to the internet (a host firewall does not help: Docker's port publishing bypasses tools such as ufw — bind them to `127.0.0.1` in the host's override, which must replace the list rather than add to it — `ports: !override ["127.0.0.1:5000:8080"]`, as `docker-compose.e2e.yml` does with `!reset` — or block them at the provider; issue #449). The API trusts `X-Forwarded-For` only from private networks and for at most `ForwardedHeaders:ForwardLimit` hops (🔧 2: Traefik → nginx → API); a caller that reaches the API port directly could choose its own rate-limit counter.
 - **The proxy must not rewrite `/api/` answers** in a way that weakens their ETags (compression that turns a strong tag weak breaks `If-Match`, `ARCHITECTURE §7.1`).
 - **Outbound SMTP** to the relay on port 587 with STARTTLS (`Email:Smtp`).
 
@@ -198,7 +198,7 @@ A change takes effect at the user's **next sign-in**: a running session keeps th
 | `/health/live` | 200 while the process serves requests; checks nothing else |
 | `/health/ready` | 200 when the API reaches the database, 503 otherwise. At most 🔧 2 checks run at a time (`Health:ReadyConcurrentChecks`; a further call gets 429), each with a 🔧 5 s timeout (`Health:ReadyTimeout`) |
 
-The client's nginx forwards only `/api/`, so the health endpoints are not reachable through the public address: check them on the host (`curl http://127.0.0.1:5000/health/ready`) or inside the compose network (`http://api:8080/health/ready`, as the E2E stack's health check does). An uptime monitor outside the host needs a route to them in the reverse proxy (open point of S6-30). The backup service has its own health state (§7.3). Design: `ARCHITECTURE §9.5`.
+The client's nginx forwards only `/api/`, so the health endpoints are not reachable through the public address: check them on the host (`curl http://127.0.0.1:5000/health/ready`) or inside the compose network (`http://api:8080/health/ready`, as the E2E stack's health check does). An uptime monitor outside the host needs a route to them in the reverse proxy (issue #448). The backup service has its own health state (§7.3). Design: `ARCHITECTURE §9.5`.
 
 ### 6.2 Logs
 
