@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Session;
 
 namespace ProcureAccess.Modules.IdentityAccess.Session;
@@ -25,19 +26,13 @@ namespace ProcureAccess.Modules.IdentityAccess.Session;
 /// idle limit of the cookie ticket, <c>absoluteExpiresAt</c> the stored sign-in time plus the
 /// absolute limit; both are left out for a sign-in without session limits (the test scheme of the
 /// integration host). <c>user.permissions</c> are the role claims of type
-/// <see cref="PermissionClaimType"/>, which Identity's claims factory puts into the cookie principal
+/// <see cref="PlatformPermissions.ClaimType"/>, which Identity's claims factory puts into the cookie principal
 /// (S5-08, owner decision 3 (a)). The response is never cached: issuing the token sets
 /// <c>Cache-Control: no-cache, no-store</c> (TEN-04).
 /// </remarks>
 internal static class SessionProbeEndpoint
 {
     public const string Path = "/session";
-
-    /// <summary>
-    /// Claim type of a permission (legacy <c>CustomClaimTypes.Permission</c> of the MODELS project,
-    /// which a module never references; the role claims of ARCHITECTURE §8.1 carry it).
-    /// </summary>
-    public const string PermissionClaimType = "permission";
 
     public static RouteHandlerBuilder Map(IEndpointRouteBuilder routes) =>
         routes.MapGet(Path, Handle)
@@ -67,7 +62,7 @@ internal static class SessionProbeEndpoint
                 user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "",
                 user.FindFirstValue(ClaimTypes.Email) ?? user.FindFirstValue(ClaimTypes.Name) ?? "",
                 [.. user.FindAll(ClaimTypes.Role).Select(c => c.Value)],
-                [.. user.FindAll(PermissionClaimType).Select(c => c.Value).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]),
+                [.. user.FindAll(PlatformPermissions.ClaimType).Select(c => c.Value).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]),
             properties?.ExpiresUtc,
             properties is null ? null : SessionCookieEvents.AbsoluteExpiry(properties, settings),
             (int)settings.WarningLead.TotalSeconds));

@@ -91,6 +91,9 @@ try
         app.Logger.LogInformation("Migrations applied successfully!");
     }
 
+    // The log table exists now: the PostgreSQL sink writes what it held since the start (#437)
+    app.StartDatabaseLogSink();
+
     // Sample data only in Development, whatever the configuration says (SEC-06)
     await app.RebuildDatabaseIfAllowedAsync();
 
@@ -143,6 +146,8 @@ try
 }
 catch (Exception ex)
 {
+    // Also when the migrations failed: the entry reaches the log table if it exists
+    app.StartDatabaseLogSink();
     app.Logger.LogCritical(ex, Program.StartupFailedMessage);
     await app.DisposeAsync();
     throw;

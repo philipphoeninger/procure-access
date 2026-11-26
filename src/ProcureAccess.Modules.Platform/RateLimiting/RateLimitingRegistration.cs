@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.RateLimiting;
 
@@ -160,14 +161,14 @@ internal static class RateLimitingRegistration
             ArgumentNullException.ThrowIfNull(configuration);
             var section = configuration.GetSection($"{SectionName}:{policy}");
             var permitLimit = section.GetValue<int?>(nameof(PermitLimit));
-            var window = section.GetValue<TimeSpan?>(nameof(Window));
-            if (permitLimit is null or < 1 || window is null || window <= TimeSpan.Zero)
+            if (permitLimit is null or < 1)
             {
                 throw new InvalidOperationException(
-                    $"{SectionName}:{policy} needs {nameof(PermitLimit)} >= 1 and a positive {nameof(Window)} (SPEC §7.3, e.g. 30 and 00:10:00).");
+                    $"{SectionName}:{policy} needs {nameof(PermitLimit)} >= 1 (SPEC §7.3, e.g. 30).");
             }
 
-            return new FixedWindowLimit(permitLimit.Value, window.Value);
+            var window = DurationSetting.Read(section[nameof(Window)], $"{SectionName}:{policy}:{nameof(Window)}");
+            return new FixedWindowLimit(permitLimit.Value, window);
         }
     }
 }

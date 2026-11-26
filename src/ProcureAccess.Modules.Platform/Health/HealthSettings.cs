@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.Extensions.Configuration;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 
 namespace ProcureAccess.Modules.Platform.Health;
 
@@ -19,14 +20,14 @@ internal sealed record HealthSettings(TimeSpan ReadyTimeout, int ReadyConcurrent
     {
         ArgumentNullException.ThrowIfNull(configuration);
         var section = configuration.GetSection(SectionName);
-        var timeout = section.GetValue<TimeSpan?>(nameof(ReadyTimeout));
+        var timeout = DurationSetting.Read(section[nameof(ReadyTimeout)], $"{SectionName}:{nameof(ReadyTimeout)}");
         var concurrentChecks = section.GetValue<int?>(nameof(ReadyConcurrentChecks));
-        if (timeout is null || timeout <= TimeSpan.Zero || concurrentChecks is null or < 1)
+        if (concurrentChecks is null or < 1)
         {
             throw new InvalidOperationException(
-                $"{SectionName} needs a positive {nameof(ReadyTimeout)} and {nameof(ReadyConcurrentChecks)} >= 1 (SPEC §7.3: 00:00:05 and 2).");
+                $"{SectionName} needs {nameof(ReadyConcurrentChecks)} >= 1 (SPEC §7.3: 2).");
         }
 
-        return new HealthSettings(timeout.Value, concurrentChecks.Value);
+        return new HealthSettings(timeout, concurrentChecks.Value);
     }
 }

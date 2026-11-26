@@ -120,7 +120,7 @@ Until compose lists them (issue #447), set them for a deployment in a compose ov
 
 ### 3.2 Settings that are not secret
 
-Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
+Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A duration — a lifetime, timeout, interval, delay or window, also set through an environment variable such as `Email__Smtp__Timeout` — is written `hh:mm:ss` or `d.hh:mm:ss` (`00:00:15`, `1.00:00:00`); any other form stops the start, also a bare number such as `15`, which .NET would otherwise read as 15 days. A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
 
 The client has **no runtime configuration**: its few settings are build-time values in `src/environments/environment*.ts`, the same image everywhere. Some copy a server value and must stay in step with it (`passwordMinLength` ↔ `Account:Password:MinLength`, `lockout` ↔ `Account:Lockout:*`; `CLAUDE.md §3`).
 
@@ -216,7 +216,8 @@ The log table is part of the backup (§7.1); its rows hold user ids and request 
 ### 6.3 Known gaps
 
 - Nothing alerts anybody yet: an unhealthy API or backup service is visible only to whoever looks (open point of S6-29, planned with GP.1).
-- On an empty database the log sink writes once before the migrations have created the `logging` schema; PostgreSQL logs `schema "logging" does not exist` once (issue #437).
+
+Until the migrations have run, the PostgreSQL sink holds its events in memory (at most `AppLoggingSettings:PostgreSQL:QueueLimit`) and writes them afterwards, so the first start on an empty database stores every line of the start and leaves no `schema "logging" does not exist` in the database server's log (issue #437, S7-02). The errors `relation "…__EFMigrationsHistory" does not exist` that PostgreSQL logs at that start are EF Core asking whether a schema has migrations yet; they are expected.
 
 ---
 

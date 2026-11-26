@@ -6,10 +6,16 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
+using ProcureAccess.Modules.Workspace;
+using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Candidates;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
@@ -317,6 +323,57 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
 
         await ShouldBeValidationProblemAsync(response, "testTypeId");
         (await CountAsync<TestEvidence>()).ShouldBe(1);
+    }
+
+    /// <summary>
+    /// Two requests add the same procedure at once (#453, TD-88): both pass the aggregate's check,
+    /// and the one that saves second meets the unique index. It is refused as the check refuses it
+    /// (400 at <c>testTypeId</c>), not with a 500. The other request saves while this one is between
+    /// its check and its save.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-01 " + nameof(AddEvidence_SameProcedureSavedMeanwhile_IsRefusedAsADuplicate))]
+    [Trait("Invariant", "WSP-01")]
+    public async Task AddEvidence_SameProcedureSavedMeanwhile_IsRefusedAsADuplicate()
+    {
+        var (_, candidate) = await StoreCandidateAsync(Fixture.A.Id, TestStatus.Tested);
+        using var owner = CreateClient(TestUsers.OwnerA);
+
+        var result = await WithServiceAsync(
+            async () =>
+            {
+                using var meanwhile = await owner.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("softwareTest"), Cancellation);
+                meanwhile.StatusCode.ShouldBe(HttpStatusCode.Created, await meanwhile.Content.ReadAsStringAsync(Cancellation));
+            },
+            service => service.AddEvidenceAsync(candidate.Id, Input("softwareTest"), TestUsers.EditorA.Id, Cancellation));
+
+        result.Outcome.ShouldBe(CandidateOutcome.DuplicateTestType);
+        (await CountAsync<TestEvidence>()).ShouldBe(1);
+        (await CountAsync<TestEvidencePrivateNote>()).ShouldBe(1);
+    }
+
+    /// <summary>The same race when a change moves an evidence to the procedure another request has just added (#453).</summary>
+    [Fact(DisplayName = "INV:WSP-01 " + nameof(ChangeEvidence_ToAProcedureSavedMeanwhile_IsRefusedAsADuplicate))]
+    [Trait("Invariant", "WSP-01")]
+    public async Task ChangeEvidence_ToAProcedureSavedMeanwhile_IsRefusedAsADuplicate()
+    {
+        var (_, candidate) = await StoreCandidateAsync(Fixture.A.Id, TestStatus.Tested);
+        using var owner = CreateClient(TestUsers.OwnerA);
+        using var added = await owner.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("bikWeb"), Cancellation);
+        var evidence = (await added.Content.ReadFromJsonAsync<TestEvidenceResponse>(Cancellation)).ShouldNotBeNull();
+        var tag = added.Headers.ETag.ShouldNotBeNull().ToString();
+
+        var result = await WithServiceAsync(
+            async () =>
+            {
+                using var meanwhile = await owner.PostAsJsonAsync(EvidencesPath(candidate.Id), Procedure("softwareTest"), Cancellation);
+                meanwhile.StatusCode.ShouldBe(HttpStatusCode.Created, await meanwhile.Content.ReadAsStringAsync(Cancellation));
+            },
+            service => service.ChangeEvidenceAsync(
+                evidence.Id, Input("softwareTest"), new EditPrecondition(TestUsers.EditorA.Id, tag), Cancellation));
+
+        result.Outcome.ShouldBe(CandidateOutcome.DuplicateTestType);
+        await using var db = Workspace(Fixture.A.Id);
+        (await db.TestEvidences.Select(e => e.TestTypeKey).OrderBy(k => k).ToListAsync(Cancellation)).ShouldBe(["bikWeb", "softwareTest"]);
     }
 
     /// <summary>The unique index holds the rule also below the endpoint (WSP-01, ARCHITECTURE §5.4).</summary>
@@ -818,6 +875,34 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         return await db.Set<TEntity>().CountAsync(Cancellation);
     }
 
+    /// <summary>
+    /// Runs <paramref name="change"/> on a <see cref="CandidateService"/> of its own, as the endpoint
+    /// of Editor A calls it, with <paramref name="meanwhile"/> once before its first save reaches
+    /// the database — after the load and the aggregate's checks.
+    /// </summary>
+    private async Task<CandidateResult<TestEvidenceResponse>> WithServiceAsync(
+        Func<Task> meanwhile, Func<CandidateService, Task<CandidateResult<TestEvidenceResponse>>> change)
+    {
+        await using var scope = Api.Factory.Services.CreateAsyncScope();
+        var services = scope.ServiceProvider;
+        await using var db = new WorkspaceDbContext(
+            new DbContextOptionsBuilder<WorkspaceDbContext>()
+                .UseNpgsql(Api.ConnectionString)
+                .AddInterceptors(new BeforeFirstSave(meanwhile))
+                .Options,
+            FixedOrganizationContext.Of(Fixture.A.Id));
+        var service = new CandidateService(
+            db,
+            services.GetRequiredService<IProjectCriteriaLists>(),
+            services.GetRequiredService<AssessmentReader>(),
+            services.GetRequiredService<EntityTags>(),
+            Clock);
+        return await change(service);
+    }
+
+    private static EvidenceInput Input(string testTypeKey) =>
+        new(new TestEvidenceFacts(TestKind.Procedure, testTypeKey, null, "Prüfstelle", TestDate, null, null), null);
+
     /// <summary>A context of its own outside any request that sees <paramref name="organizationIds"/>.</summary>
     private WorkspaceDbContext Workspace(params Guid[] organizationIds) =>
         new(new DbContextOptionsBuilder<WorkspaceDbContext>().UseNpgsql(Api.ConnectionString).Options,
@@ -859,4 +944,22 @@ public sealed class CandidateEndpointsTests(ApiFixture api) : IntegrationTest(ap
         string? TestedVersion,
         string? EvidenceUrl,
         string? QualificationNote);
+
+    /// <summary>Runs an action once, before the first save of its context reaches the database.</summary>
+    private sealed class BeforeFirstSave(Func<Task> action) : SaveChangesInterceptor
+    {
+        private bool _done;
+
+        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            if (!_done)
+            {
+                _done = true;
+                await action();
+            }
+
+            return await base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+    }
 }

@@ -47,6 +47,7 @@ describe('Confirmation page of S02 (R-AUTH-02, /registrieren/bestaetigen)', () =
     incrementLoadingCount: ReturnType<typeof vi.fn>;
     decrementLoadingCount: ReturnType<typeof vi.fn>;
   };
+  let announcer: { announce: ReturnType<typeof vi.fn>; announcePageTitle: ReturnType<typeof vi.fn> };
 
   async function openLink(url: string, answer: { rejectWith?: unknown } = {}) {
     calls = [];
@@ -64,6 +65,7 @@ describe('Confirmation page of S02 (R-AUTH-02, /registrieren/bestaetigen)', () =
       incrementLoadingCount: vi.fn(() => calls.push('loading+')),
       decrementLoadingCount: vi.fn(() => calls.push('loading-')),
     };
+    announcer = { announce: vi.fn(), announcePageTitle: vi.fn().mockResolvedValue(undefined) };
     const rendered = await render(Host, {
       routes: [
         { path: '', component: HomePage, data: { [PAGE_TITLE_KEY]: 'pageTitle.home' } },
@@ -75,7 +77,7 @@ describe('Confirmation page of S02 (R-AUTH-02, /registrieren/bestaetigen)', () =
         { provide: TitleStrategy, useExisting: PageTitleStrategy },
         { provide: ProcureAccessStore, useValue: store },
         { provide: AuthService, useValue: { confirmEmail } },
-        { provide: A11yAnnouncerService, useValue: { announce: vi.fn(), announcePageTitle: vi.fn().mockResolvedValue(undefined) } },
+        { provide: A11yAnnouncerService, useValue: announcer },
       ],
     });
     const router = TestBed.inject(Router);
@@ -144,10 +146,11 @@ describe('Confirmation page of S02 (R-AUTH-02, /registrieren/bestaetigen)', () =
     expect(screen.getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeTruthy();
   });
 
-  it('confirms a second link opened on the page', async () => {
+  it('confirms a second link opened on the page, with the title, the focus and the announcement of the new result (TD-68)', async () => {
     const { router, fixture } = await openLink('/registrieren/bestaetigen?token=first', {
       rejectWith: new HttpErrorResponse({ status: 400, error: { type: `${base}validation` } }),
     });
+    await vi.waitFor(() => expect(document.title).toBe('Link nicht mehr gültig – ProcureAccess'));
     confirmEmail.mockResolvedValue(undefined);
 
     await router.navigateByUrl('/registrieren/bestaetigen?token=second');
@@ -155,6 +158,9 @@ describe('Confirmation page of S02 (R-AUTH-02, /registrieren/bestaetigen)', () =
 
     expect(confirmEmail).toHaveBeenLastCalledWith('second');
     expect(router.url).toBe('/registrieren/bestaetigen');
-    expect(screen.getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' })).toBeTruthy();
+    const heading = screen.getByRole('heading', { level: 1, name: 'E-Mail-Adresse bestätigt' });
+    await vi.waitFor(() => expect(document.title).toBe('E-Mail-Adresse bestätigt – ProcureAccess'));
+    await vi.waitFor(() => expect(announcer.announcePageTitle).toHaveBeenCalledWith('E-Mail-Adresse bestätigt – ProcureAccess'));
+    expect(document.activeElement).toBe(heading);
   });
 });

@@ -6,8 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NpgsqlTypes;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using Serilog;
+using Serilog.Configuration;
 using Serilog.Core.Enrichers;
 using Serilog.Events;
 using Serilog.Sinks.PostgreSQL;
@@ -49,7 +51,8 @@ in method {MemberName} at {FilePath}:{LineNumber}
     /// Replaces the default logging providers with Serilog: console and PostgreSQL sink
     /// (ARCHITECTURE §9.5). The PostgreSQL sink writes in batches on a background thread; if the
     /// database is unreachable it keeps at most <c>QueueLimit</c> events and drops newer ones
-    /// instead of failing requests.
+    /// instead of failing requests. Until the host has run the migrations, <see cref="DatabaseLogGate"/>
+    /// holds its events (#437).
     /// </summary>
     public static IServiceCollection AddPlatformLogging(this IServiceCollection services, IConfiguration config)
     {
@@ -100,15 +103,22 @@ in method {MemberName} at {FilePath}:{LineNumber}
                     $"{AppLoggingSettings.SectionName}:PostgreSQL:QueueLimit must be greater than 0.");
             }
 
-            loggerConfiguration.WriteTo.PostgreSQL(
-                connectionString,
-                SeriLogEntryConfiguration.Table,
-                PostgreSqlColumns(),
-                restrictedToMinimumLevel: logLevel,
-                queueLimit: settings.PostgreSQL.QueueLimit,
-                schemaName: SeriLogEntryConfiguration.Schema,
-                needAutoCreateTable: false,
-                needAutoCreateSchema: false);
+            // Behind a gate the host opens after the migrations: the table does not exist before (#437).
+            var gate = new DatabaseLogGate(settings.PostgreSQL.QueueLimit);
+            services.AddSingleton(gate);
+            loggerConfiguration.WriteTo.Sink(
+                LoggerSinkConfiguration.Wrap(
+                    gate.Wrap,
+                    sinks => sinks.PostgreSQL(
+                        connectionString,
+                        SeriLogEntryConfiguration.Table,
+                        PostgreSqlColumns(),
+                        restrictedToMinimumLevel: logLevel,
+                        queueLimit: settings.PostgreSQL.QueueLimit,
+                        schemaName: SeriLogEntryConfiguration.Schema,
+                        needAutoCreateTable: false,
+                        needAutoCreateSchema: false)),
+                restrictedToMinimumLevel: logLevel);
         }
 
         var logger = loggerConfiguration.CreateLogger();
@@ -127,10 +137,14 @@ in method {MemberName} at {FilePath}:{LineNumber}
     /// </summary>
     public static IServiceCollection AddLogRetention(this IServiceCollection services)
     {
+        // The binder reads a bare number as days, so the interval is read again through the reader (#456).
+        const string runIntervalSetting =
+            $"{AppLoggingSettings.RetentionSettings.SectionName}:{nameof(AppLoggingSettings.RetentionSettings.RunInterval)}";
         services.AddOptions<AppLoggingSettings.RetentionSettings>()
             .BindConfiguration(AppLoggingSettings.RetentionSettings.SectionName)
+            .Configure<IConfiguration>((settings, configuration) =>
+                settings.RunInterval = DurationSetting.Read(configuration[runIntervalSetting], runIntervalSetting))
             .Validate(s => s.RetentionDays > 0, "AppLoggingSettings:Retention:RetentionDays must be greater than 0.")
-            .Validate(s => s.RunInterval > TimeSpan.Zero, "AppLoggingSettings:Retention:RunInterval must be greater than 0.")
             .ValidateOnStart();
 
         services.AddScoped<LogRetentionJob>();
