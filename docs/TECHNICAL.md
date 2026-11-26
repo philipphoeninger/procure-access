@@ -140,7 +140,7 @@ One host, `docker compose`, the three services of §1 plus the nightly `backup` 
 
 1. CI on `main` is green (`TESTING §8.2`), and for production `node scripts/check-release-config.mjs` passes (§3.3).
 2. The `.env` of the host (or the platform's environment) has every required value of §3.1, and the override of §3.1 sets `App__BaseUrl`.
-3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`.
+3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`. The licences of the base images' OS packages are stated in `docs/BASE_IMAGES.md`; a changed image tag fails CI stage 1 until that file is updated.
 4. **The API applies every pending migration at its start**: first the legacy context, then each module (`ARCHITECTURE §10.5`, ADR-014 rule 3). A failing migration stops the API. Before a release that brings a migration, take a backup (`docker compose run --rm backup sh /opt/backup/backup.sh`, §7.3). Migrating at start is safe **only with a single API instance**; the log-retention job (§6.2) and the backup assume one instance as well.
 5. If the release brings a new catalog release: import and activate it (§5.1).
 6. Check: `/health/ready` answers 200 (§6.1); sign in; the catalog shows the active release.
