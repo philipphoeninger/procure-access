@@ -52,7 +52,7 @@ Security: one client focus change and test code; no secret, no request, no new i
 - `node scripts/check-invariants.mjs` passed; `check-figma-links.mjs` 12 checked, 0 pending; `check-i18n.mjs` 0 errors; `check-icons.mjs` 0 errors; `reuse lint` (Docker) compliant, 1764 / 1764 files.
 - Server: not touched; CI runs its stages.
 - **Diagnosis in CI** (draft #463, closed without merging): mobile Safari, the dark-appearance test ×60 with the colour log, all passed; the log named C3 (§1).
-- **Repeat run in CI** (draft #465, closed without merging; run 45840858451): RESULTS_PLACEHOLDER
+- **Repeat run in CI** (draft #465, closed without merging; run 45840858451): on commit 0250d314 (the code of this PR before the typing of two view queries, which changes no behaviour): **Firefox** #451 test ×40: 40 passed; **WebKit** #436 test ×30: 30 passed; **mobile Safari** #452 (a) and (b) ×40 each: 80 passed. The colour log after the new wait: 40 of 40 runs with the dark colour on the H1 and the card (`rgb(230, 225, 231)`) and no transition left (before: 38 of 60 still light).
 - E2E of the whole suite: CI of the pull request. Not run locally (S7-09's containers up, 0.9 GB free, TD-74).
 - **After the merge:** three consecutive green runs on `main` — links in the pull request when they exist.
 
