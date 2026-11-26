@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Globalization;
 using Microsoft.Extensions.Configuration;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 
 namespace ProcureAccess.Modules.IdentityAccess.Organizations;
 
@@ -31,15 +31,6 @@ internal sealed class InvitationSettings
         };
     }
 
-    private static TimeSpan Read(IConfigurationSection section, string name)
-    {
-        var value = section[name];
-        if (!TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var duration) || duration <= TimeSpan.Zero)
-        {
-            throw new InvalidOperationException(
-                $"{SectionName}:{name} must be a positive duration such as 14.00:00:00; it is '{value}'.");
-        }
-
-        return duration;
-    }
+    private static TimeSpan Read(IConfigurationSection section, string name) =>
+        DurationSetting.Read(section[name], $"{SectionName}:{name}");
 }

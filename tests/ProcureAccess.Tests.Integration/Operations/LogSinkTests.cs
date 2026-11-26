@@ -63,6 +63,32 @@ public sealed class LogSinkTests(ApiFixture api) : IntegrationTest(api)
     }
 
     /// <summary>
+    /// #437: on an empty database the events of the start, written before the migrations have
+    /// created the log table, are held and stored once it exists, the first one included. That the
+    /// sink writes nothing before (no failed write) is <c>DatabaseLogGateTests</c>.
+    /// </summary>
+    [Fact]
+    public async Task Start_EmptyDatabase_StoresTheEventsWrittenBeforeTheMigrations()
+    {
+        await using var factory = new ProcureAccessApiFactory(
+            Api.ConnectionStringForNewDatabase(),
+            Api.Clock,
+            settings: new Dictionary<string, string?> { ["AppLoggingSettings:General:RestrictedToMinimumLevel"] = "Information" });
+        var logger = factory.Services.GetRequiredService<ILogger<LogSinkTests>>();
+        var marker = $"sink-test-{Guid.NewGuid():N}";
+        logger.LogWarning("Log sink test {Marker}", marker);
+
+        await WaitForEntryAsync(factory.Services, marker);
+
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
+        var first = await db.SeriLogEntries.AsNoTracking()
+            .OrderBy(e => e.TimeStamp)
+            .FirstAsync(TestContext.Current.CancellationToken);
+        first.Message.ShouldBe("Applying pending migrations...");
+    }
+
+    /// <summary>
     /// TEN-08 (S5-23, owner decision 1a): the token of a share link travels in the read's path, which
     /// ASP.NET Core puts into the request scope of every event (<c>RequestPath</c>) and into its
     /// hosting events (<c>Path</c>). The stored event keeps the path with the token masked, in the

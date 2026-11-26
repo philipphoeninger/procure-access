@@ -10,7 +10,6 @@ global using DAL.ProcureAccess.Repos.Base;
 global using DAL.ProcureAccess.Repos.Interfaces;
 
 global using MODELS.ProcureAccess.Entities;
-global using MODELS.ProcureAccess.Entities.Authorization;
 global using MODELS.ProcureAccess.Entities.Base;
 global using MODELS.ProcureAccess.Entities.Dto;
 global using MODELS.ProcureAccess.Entities.Mapping;
@@ -24,8 +23,6 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Http;
-global using Microsoft.AspNetCore.Identity;
-global using Microsoft.AspNetCore.Identity.Data;
 global using Microsoft.AspNetCore.Mvc.Authorization;
 
 global using Microsoft.EntityFrameworkCore;

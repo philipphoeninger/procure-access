@@ -54,10 +54,21 @@ services:
       # 🔧 Part of every ETag; raise it after every restore, never lower it (ARCHITECTURE §7.1, §10.4;
       # API-04; S6-29), so a tag issued before the restore cannot match a restored version.
       Concurrency__ETagEpoch: ${CONCURRENCY_ETAG_EPOCH:-1}
+      # The public address of this deployment (S7-09, #447). The defaults are those of appsettings.json
+      # (PublicAddressDefaultsTests keeps them equal). Outside Development and E2E the API refuses to
+      # start while App__BaseUrl or Email__From still holds its default: the links of every e-mail and
+      # their sender would name another site. See .env.example and docs/TECHNICAL.md §3.1.
+      App__BaseUrl: ${APP_BASE_URL:-http://procureaccess.tech:4200}
+      Email__From: ${EMAIL_FROM:-noreply@procureaccess.tech}
+      Email__DisplayName: ${EMAIL_DISPLAY_NAME:-ProcureAccess}
+      Export__ToolUrl: ${EXPORT_TOOL_URL:-https://procureaccess.de}
+      ProblemTypes__BaseUri: ${PROBLEM_TYPES_BASE_URI:-https://procureaccess.de}
     ports:
-      # Direct access for Swagger (Development only) and the dev server (npm start); the client image calls the API
-      # through its nginx proxy (/api/ → api:8080)
-      - 5000:8080
+      # Host loopback only (S7-09, #449), like the database: Docker port publishing bypasses host
+      # firewalls such as ufw, and a caller that reached the API directly could choose its rate-limit
+      # counter through X-Forwarded-For. For Swagger (Development only), the dev server (npm start) and
+      # checks on the host; the client image calls the API through its nginx proxy (/api/ → api:8080).
+      - "127.0.0.1:5000:8080"
     # volumes:
     #   - ./API/API.ProcureAccess:/src
     networks:
@@ -71,7 +82,9 @@ services:
     depends_on:
       - api
     ports:
-      - 4200:80
+      # Host loopback only (S7-09, #449): the reverse proxy reaches the client over the compose
+      # network (dokploy-network), not over this port.
+      - "127.0.0.1:4200:80"
     # volumes:
     #   - ./:/app
         # - ./CLIENT/CLIENT.ProcureAccess:/app

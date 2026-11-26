@@ -19,6 +19,8 @@ internal static class RoleCommandHost
                         .AddIdentityAccessModule(builder.Configuration, builder.Environment);
 
         await using var app = builder.Build();
+        // The command needs a migrated database, so the log table exists (#437)
+        app.StartDatabaseLogSink();
         try
         {
             return await IdentityAccessModule.RunRolesCommandAsync(app.Services, args, Console.Out, Console.Error);

@@ -27,6 +27,8 @@ internal static class CatalogCommandHost
         builder.Services.AddSingleton<IOrganizationContext>(FixedOrganizationContext.None);
 
         await using var app = builder.Build();
+        // The command needs a migrated database, so the log table exists (#437)
+        app.StartDatabaseLogSink();
         try
         {
             return await CatalogModule.RunCommandAsync(app.Services, args, Console.Out, Console.Error);

@@ -31,7 +31,7 @@
 3. **#452 (a) — `e2e/support/axe.ts`.** `settled` waits frame by frame until a whole frame passes without a running finite animation (at most 200 frames, then it fails with a message); `showAppearance` uses it instead of its own one-round wait for transitions. No fixed sleep.
 4. **#436 — `e2e/identity/account.spec.ts`.** The sole-Owner test waits for the heading „Konto endgültig löschen?“ to be focused before it types, as the other deletion test does.
 5. **TD-99 — `e2e/support/keyboard.ts`** (new): `tabTo` (Tab or Shift+Tab, at most 80 presses), `arrowTo`, `arrowToOption` with `activeOption`, `settled(locator)` and `DOWNLOAD_TIMEOUT` (30 s, with the #380 reason from J1). The 18 specs import it; the two download waits have the bound.
-6. **Docs.** CODEBASE §2.0, §2.118, §3 (`support/`) and §1 (change history of `CLAUDE.md`); `CLAUDE.md` §3 E2E: the helpers come from `support/keyboard.ts`, every download wait gets `DOWNLOAD_TIMEOUT`. TESTING unchanged (no invariant, no new verification row needed beyond the protocol); TECH_DEBT stays at v6 (new version at the end of the sprint: TD-84, TD-85, TD-99 closed by this PR).
+6. **Docs.** CODEBASE §2.0, §2.120 (§2.118 and §2.119 went to S7-02 and S7-09, merged first), §3 (`support/`) and §1 (change history of `CLAUDE.md`); `CLAUDE.md` §3 E2E: the helpers come from `support/keyboard.ts`, every download wait gets `DOWNLOAD_TIMEOUT`. TESTING unchanged (no invariant, no new verification row needed beyond the protocol); TECH_DEBT stays at v6 (new version at the end of the sprint: TD-84, TD-85, TD-99 closed by this PR).
 
 ## 3. Self-review (CLAUDE §6.7, §6.8)
 

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MODELS.ProcureAccess.Entities.Authorization;
 using Npgsql;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.IdentityAccess.Domain;
@@ -50,8 +49,8 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
         var member = new IdentityRole("Member") { NormalizedName = "MEMBER" };
         db.Roles.AddRange(approver, admin, member);
         db.RoleClaims.AddRange(
-            new IdentityRoleClaim<string> { RoleId = approver.Id, ClaimType = CustomClaimTypes.Permission, ClaimValue = LegacyApproveClaim },
-            new IdentityRoleClaim<string> { RoleId = admin.Id, ClaimType = CustomClaimTypes.Permission, ClaimValue = LegacyApproveClaim });
+            new IdentityRoleClaim<string> { RoleId = approver.Id, ClaimType = PlatformPermissions.ClaimType, ClaimValue = LegacyApproveClaim },
+            new IdentityRoleClaim<string> { RoleId = admin.Id, ClaimType = PlatformPermissions.ClaimType, ClaimValue = LegacyApproveClaim });
         var reviewerId = await InsertUserAsync(legacy, "reviewer@example.test", cancellationToken);
         var ownerId = await InsertUserAsync(legacy, "owner@example.test", cancellationToken);
         db.UserRoles.AddRange(
@@ -125,7 +124,7 @@ public sealed class PlatformRoleMigrationTests(ApiFixture api) : IAsyncDisposabl
             from claim in db.RoleClaims.AsNoTracking()
             join role in db.Roles on claim.RoleId equals role.Id
             select new { role.Name, claim.ClaimType, claim.ClaimValue }).ToListAsync(cancellationToken);
-        claims.ShouldAllBe(c => c.ClaimType == CustomClaimTypes.Permission && c.ClaimValue == Permissions.ModerationReview);
+        claims.ShouldAllBe(c => c.ClaimType == PlatformPermissions.ClaimType && c.ClaimValue == PlatformPermissions.ModerationReview);
         claims.Select(c => c.Name).ShouldBe([PlatformRoles.Moderator, PlatformRoles.PlatformAdmin], ignoreOrder: true);
         (await db.Roles.AsNoTracking().AnyAsync(r => r.NormalizedName == "APPROVER" || r.NormalizedName == "ADMIN", cancellationToken))
             .ShouldBeFalse();

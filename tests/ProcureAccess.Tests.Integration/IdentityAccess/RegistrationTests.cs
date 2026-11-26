@@ -89,7 +89,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         var mail = Host.Emails.Sent.ShouldHaveSingleItem().ShouldBeOfType<AddressConfirmationEmail>();
         mail.Recipient.ShouldBe(Address);
         mail.ValidHours.ShouldBe(24);
-        mail.Link.GetLeftPart(UriPartial.Path).ShouldBe("http://procureaccess.tech:4200/registrieren/bestaetigen");
+        mail.Link.GetLeftPart(UriPartial.Path).ShouldBe(ProcureAccessApiFactory.ClientBaseUrl + "/registrieren/bestaetigen");
         TokenOf(mail).ShouldNotBeNullOrEmpty();
     }
 
@@ -107,7 +107,7 @@ public sealed class RegistrationTests(ApiFixture api) : IAsyncLifetime
         (await second.Content.ReadAsStringAsync(Cancellation)).ShouldBe(await first.Content.ReadAsStringAsync(Cancellation));
         var mail = Host.Emails.Sent.ShouldHaveSingleItem().ShouldBeOfType<AlreadyRegisteredEmail>();
         mail.Recipient.ShouldBe(Address);
-        mail.Link.AbsoluteUri.ShouldBe("http://procureaccess.tech:4200/(login:anmelden)");
+        mail.Link.AbsoluteUri.ShouldBe(ProcureAccessApiFactory.ClientBaseUrl + "/(login:anmelden)");
         (await CountUsersAsync()).ShouldBe(1);
     }
 

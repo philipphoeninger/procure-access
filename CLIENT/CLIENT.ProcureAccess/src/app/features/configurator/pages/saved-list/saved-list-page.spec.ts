@@ -424,6 +424,12 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Warum diese Priorität?' })).toBeTruthy();
   });
 
+  it('shows no path above the H1 of a list of the organisation (#429)', async () => {
+    await openPage({ role: 'owner' });
+
+    expect(screen.queryByRole('navigation', { name: 'Sie sind hier' })).toBeNull();
+  });
+
   describe('project copy (R-PRJ-06, WSP-03; S6-12)', () => {
     const PROJECT: SavedListProject = { id: 'project-1', name: 'Bewerbermanagement 2027', archived: false };
 
@@ -480,6 +486,24 @@ describe('SavedListPage (R-SAV-02, R-SAV-03, R-LST-14; S5-21b)', () => {
 
       expect(screen.getByText(/^Diese Liste gehört zum Beschaffungsprojekt/)).toBeTruthy();
       expect(screen.queryByRole('checkbox', { name: /^In Liste aufnehmen/ })).toBeNull();
+    });
+
+    it.each([
+      ['an Owner', 'owner', false],
+      ['a Reader', 'reader', false],
+      ['an Editor of an archived project', 'editor', true],
+    ] as const)('INV:A11Y-01 shows the path „Projekte“ › project › the H1 above the H1 of the copy for %s (#429)', async (_who, role, archived) => {
+      await openPage({ view: listView('T.1', { ...PROJECT, archived }), role });
+
+      const path = screen.getByRole('navigation', { name: 'Sie sind hier' });
+      const items = within(path).getAllByRole('listitem');
+      expect(items.map((item) => item.textContent?.trim())).toEqual(['Projekte', 'Bewerbermanagement 2027', 'Vergabe Personalsoftware 2027']);
+      expect(within(path).getByRole('link', { name: 'Projekte' }).getAttribute('href')).toBe('/projekte');
+      expect(within(path).getByRole('link', { name: 'Bewerbermanagement 2027' }).getAttribute('href')).toBe('/projekte/project-1');
+      expect(within(path).queryByRole('link', { name: 'Vergabe Personalsoftware 2027' })).toBeNull();
+      expect(within(path).getByText('Vergabe Personalsoftware 2027').getAttribute('aria-current')).toBe('page');
+      const heading = screen.getByRole('heading', { level: 1, name: 'Vergabe Personalsoftware 2027' });
+      expect(path.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
   });
 

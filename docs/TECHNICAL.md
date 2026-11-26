@@ -106,21 +106,19 @@ The API reads `appsettings.json`, then `appsettings.<Environment>.json`, then en
 | `SAMPLE_USER_PASSWORD` | `SampleData:UserPassword` | – | `Development` only, at least 12 characters (§2.2) |
 | `CONCURRENCY_ETAG_EPOCH` | `Concurrency:ETagEpoch` | – | 🔧 1. Raised by one after every restore, never lowered (§7.4) |
 | `COMPOSE_PROFILES`, `BACKUP_DIR`, `BACKUP_RETENTION_DAYS`, `BACKUP_TIME_UTC` | – (the `backup` service) | on staging and production | §7.2 |
+| `APP_BASE_URL` | `App:BaseUrl` | **yes, outside `Development` and `E2E`** | The address users open: the links in every e-mail (confirmation, reset, invitation) start with it. **Must be the deployment's HTTPS origin.** Default `http://procureaccess.tech:4200` |
+| `EMAIL_FROM` | `Email:From` | **yes, outside `Development` and `E2E`** | Sender of every e-mail; its domain needs SPF and DKIM at the relay (`SPEC §7.6`). Default `noreply@procureaccess.tech` |
+| `EMAIL_DISPLAY_NAME` | `Email:DisplayName` | – | Name shown beside the sender. Default `ProcureAccess` |
+| `EXPORT_TOOL_URL` | `Export:ToolUrl` | – | The link to the tool in exported files. Default `https://procureaccess.de` |
+| `PROBLEM_TYPES_BASE_URI` | `ProblemTypes:BaseUri` | – | The start of the `type` of every error answer (`ARCHITECTURE §7.1`): an identifier nobody opens. Keep it the same in every environment. Default `https://procureaccess.de` |
 
-**Settings compose does not pass yet.** Compose hands the API only the variables its `api.environment` lists; a variable set on the platform but not listed there never reaches the container. Four settings of `appsettings.json` name the public address of a deployment and have no entry yet:
+**The public address of a deployment (S7-09).** The last five rows name it. Their defaults are those of `appsettings.json` and suit no deployment, so **outside `Development` and `E2E` the API does not start while `App:BaseUrl` or `Email:From` still holds its default** — the message names the setting and the variable — and `App:BaseUrl` must be an absolute http(s) address in every environment. The other three are not refused: check `EXPORT_TOOL_URL` by hand before the first export of a deployment. The development and E2E overrides set `App__BaseUrl` to `http://localhost:4200` themselves. The one-off commands of §5 (`docker compose run --rm api roles …`, `… catalog …`) get the same variables from compose; `roles` goes through the check of `App:BaseUrl` as well.
 
-| Setting | Default in `appsettings.json` | Used for |
-|---|---|---|
-| `App:BaseUrl` | `http://procureaccess.tech:4200` | The links in every e-mail (confirmation, reset, invitation). **Must be the deployment's HTTPS origin**, or the links point elsewhere |
-| `Email:From`, `Email:DisplayName` | `noreply@procureaccess.tech`, `ProcureAccess` | Sender of the e-mails; the domain needs SPF and DKIM at the relay (`SPEC §7.6`) |
-| `Export:ToolUrl` | `https://procureaccess.de` | The link to the tool in exported files |
-| `ProblemTypes:BaseUri` | `https://procureaccess.de` | The base of the `type` URI of every error answer (`ARCHITECTURE §7.1`) |
-
-Until compose lists them (issue #447), set them for a deployment in a compose override file next to `docker-compose.yml` (`services: api: environment: App__BaseUrl: https://…`) or in the platform's compose editor. The development and E2E overrides set `App__BaseUrl` to `http://localhost:4200` this way.
+**A new setting a deployment must set** needs its line in `api.environment` of `docker-compose.yml` and in `.env.example`: compose hands the API only the variables listed there, and a variable set on the platform but not listed never reaches the container.
 
 ### 3.2 Settings that are not secret
 
-Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
+Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A duration — a lifetime, timeout, interval, delay or window, also set through an environment variable such as `Email__Smtp__Timeout` — is written `hh:mm:ss` or `d.hh:mm:ss` (`00:00:15`, `1.00:00:00`); any other form stops the start, also a bare number such as `15`, which .NET would otherwise read as 15 days. A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
 
 The client has **no runtime configuration**: its few settings are build-time values in `src/environments/environment*.ts`, the same image everywhere. Some copy a server value and must stay in step with it (`passwordMinLength` ↔ `Account:Password:MinLength`, `lockout` ↔ `Account:Lockout:*`; `CLAUDE.md §3`).
 
@@ -139,19 +137,19 @@ One host, `docker compose`, the three services of §1 plus the nightly `backup` 
 ### 4.2 A release step by step
 
 1. CI on `main` is green (`TESTING §8.2`), and for production `node scripts/check-release-config.mjs` passes (§3.3).
-2. The `.env` of the host (or the platform's environment) has every required value of §3.1, and the override of §3.1 sets `App__BaseUrl`.
-3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`.
+2. The `.env` of the host (or the platform's environment) has every required value of §3.1, among them `APP_BASE_URL` and `EMAIL_FROM`; without them the API stops at its start.
+3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`. The licences of the base images' OS packages are stated in `docs/BASE_IMAGES.md`; a changed image tag fails CI stage 1 until that file is updated.
 4. **The API applies every pending migration at its start**: first the legacy context, then each module (`ARCHITECTURE §10.5`, ADR-014 rule 3). A failing migration stops the API. Before a release that brings a migration, take a backup (`docker compose run --rm backup sh /opt/backup/backup.sh`, §7.3). Migrating at start is safe **only with a single API instance**; the log-retention job (§6.2) and the backup assume one instance as well.
 5. If the release brings a new catalog release: import and activate it (§5.1).
-6. Check: `/health/ready` answers 200 (§6.1); sign in; the catalog shows the active release.
+6. Check: `/health/ready` answers 200 at the public address (§6.1); `node scripts/check-client-proxy.mjs https://<public address>` passes (health route, and no proxy in front weakens the ETags, §4.3); sign in; the catalog shows the active release.
 
 **Rolling back** a release means starting the previous images. A migration of the new release stays applied: EF migrations are not reverted automatically, and an older API image may not run against a newer schema. When a release with a migration has to be undone, restore the backup taken in step 4 (§7.4).
 
 ### 4.3 What the database server and the network must allow
 
 - **The application's database user creates schemas and objects.** The migrations create one schema per module and the ICU collation `public.identity_case_insensitive` (case-insensitive unique contributor names). With the compose stack the user is the server's superuser. On a managed PostgreSQL, the user must own the database or have `CREATE` on it **and** `CREATE` on the schema `public` (`GRANT CREATE ON SCHEMA public TO <user>;` — PostgreSQL 15 and later no longer grant it to everyone). Without it the first migration of IdentityAccess fails.
-- **Only the reverse proxy is public.** The database port is bound to `127.0.0.1`. The compose file publishes the API on port 5000 and the client on 4200 on every interface, because the local stacks need them; on a server, keep both closed to the internet (a host firewall does not help: Docker's port publishing bypasses tools such as ufw — bind them to `127.0.0.1` in the host's override, which must replace the list rather than add to it — `ports: !override ["127.0.0.1:5000:8080"]`, as `docker-compose.e2e.yml` does with `!reset` — or block them at the provider; issue #449). The API trusts `X-Forwarded-For` only from private networks and for at most `ForwardedHeaders:ForwardLimit` hops (🔧 2: Traefik → nginx → API); a caller that reaches the API port directly could choose its own rate-limit counter.
-- **The proxy must not rewrite `/api/` answers** in a way that weakens their ETags (compression that turns a strong tag weak breaks `If-Match`, `ARCHITECTURE §7.1`).
+- **Only the reverse proxy is public.** The compose file binds the database port (5432), the API (5000) and the client (4200) to `127.0.0.1` (S7-09): they answer on the host itself — for a check with `curl`, or through an SSH tunnel — and nowhere else. A host firewall would not have closed them: Docker's port publishing bypasses tools such as ufw. **The reverse proxy must reach the client over the compose network** (`dokploy-network`, service `client`, port 80), not over the host port; a proxy that runs outside Docker on the same host can use `127.0.0.1:4200`. Never publish the API port wider: the API trusts `X-Forwarded-For` only from private networks and for at most `ForwardedHeaders:ForwardLimit` hops (🔧 2: Traefik → nginx → API), and a caller that reached the API port directly could choose its own rate-limit counter.
+- **The proxy must not rewrite `/api/` answers** in a way that weakens their ETags: compression turns a strong tag into a weak one, the API accepts only the strong tag in `If-Match`, and every change would answer 409 (`ARCHITECTURE §7.1`). The client image's nginx leaves `/api/` uncompressed; switch compression off for `/api/` in a proxy in front as well (Traefik: no `compress` middleware on the route). `node scripts/check-client-proxy.mjs https://<public address>` tells: it asks for a compressed answer and fails when it gets one or when the ETag is weak.
 - **Outbound SMTP** to the relay on port 587 with STARTTLS (`Email:Smtp`).
 
 ---
@@ -198,7 +196,7 @@ A change takes effect at the user's **next sign-in**: a running session keeps th
 | `/health/live` | 200 while the process serves requests; checks nothing else |
 | `/health/ready` | 200 when the API reaches the database, 503 otherwise. At most 🔧 2 checks run at a time (`Health:ReadyConcurrentChecks`; a further call gets 429), each with a 🔧 5 s timeout (`Health:ReadyTimeout`) |
 
-The client's nginx forwards only `/api/`, so the health endpoints are not reachable through the public address: check them on the host (`curl http://127.0.0.1:5000/health/ready`) or inside the compose network (`http://api:8080/health/ready`, as the E2E stack's health check does). An uptime monitor outside the host needs a route to them in the reverse proxy (issue #448). The backup service has its own health state (§7.3). Design: `ARCHITECTURE §9.5`.
+Both are reachable **at the public address** (S7-09): the client's nginx forwards exactly `/health/live` and `/health/ready` to the API and nothing else under `/health/`, so an uptime monitor outside the host can ask `https://<public address>/health/ready`. The body is only the status word (`Healthy`, `Unhealthy`); the cause of an unhealthy answer is in the API's log (§6.2), never in the answer. On the host the API also answers directly (`curl http://127.0.0.1:5000/health/ready`). A monitor should ask seldom (once a minute is enough) and treat 429 as "ask again", not as an outage: the limit of two checks at a time holds for all callers together, so anybody who asks often can make a monitor see 429 (§6.3). The backup service has its own health state (§7.3). Design: `ARCHITECTURE §9.5`.
 
 ### 6.2 Logs
 
@@ -215,8 +213,10 @@ The log table is part of the backup (§7.1); its rows hold user ids and request 
 
 ### 6.3 Known gaps
 
+- The public `/health/ready` has no limit per caller: the API runs at most 🔧 2 ready checks at a time and answers 429 beyond, whoever asks (S7-09 protocol, open point 1; to be decided with the alerting).
 - Nothing alerts anybody yet: an unhealthy API or backup service is visible only to whoever looks (open point of S6-29, planned with GP.1).
-- On an empty database the log sink writes once before the migrations have created the `logging` schema; PostgreSQL logs `schema "logging" does not exist` once (issue #437).
+
+Until the migrations have run, the PostgreSQL sink holds its events in memory (at most `AppLoggingSettings:PostgreSQL:QueueLimit`) and writes them afterwards, so the first start on an empty database stores every line of the start and leaves no `schema "logging" does not exist` in the database server's log (issue #437, S7-02). The errors `relation "…__EFMigrationsHistory" does not exist` that PostgreSQL logs at that start are EF Core asking whether a schema has migrations yet; they are expected.
 
 ---
 

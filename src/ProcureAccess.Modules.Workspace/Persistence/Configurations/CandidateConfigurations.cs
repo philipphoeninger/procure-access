@@ -83,6 +83,12 @@ internal sealed class TestEvidenceConfiguration : IEntityTypeConfiguration<TestE
 {
     public const string Table = "TestEvidences";
 
+    /// <summary>
+    /// The unique index over the procedure rows, by EF's default name; the evidence service tells
+    /// its violation by this name (#453).
+    /// </summary>
+    public const string ProcedureIndex = "IX_TestEvidences_CandidateProductId_TestTypeKey";
+
     public void Configure(EntityTypeBuilder<TestEvidence> builder)
     {
         builder.ToTable(Table);
@@ -101,7 +107,8 @@ internal sealed class TestEvidenceConfiguration : IEntityTypeConfiguration<TestE
         // Also the foreign key's index; the filter leaves „Andere“ and „Eigene Prüfung“ unlimited.
         builder.HasIndex(x => new { x.CandidateProductId, x.TestTypeKey })
                .IsUnique()
-               .HasFilter("\"TestTypeKey\" IS NOT NULL");
+               .HasFilter("\"TestTypeKey\" IS NOT NULL")
+               .HasDatabaseName(ProcedureIndex);
     }
 }
 

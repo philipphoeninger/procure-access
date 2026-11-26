@@ -99,7 +99,7 @@ public sealed class PasswordResetTests(ApiFixture api) : IAsyncLifetime
         var mail = await Host.Emails.WaitForAsync<PasswordResetEmail>();
         mail.Recipient.ShouldBe(Address);
         mail.ValidHours.ShouldBe(2);
-        mail.Link.GetLeftPart(UriPartial.Path).ShouldBe("http://procureaccess.tech:4200/passwort/neu");
+        mail.Link.GetLeftPart(UriPartial.Path).ShouldBe(ProcureAccessApiFactory.ClientBaseUrl + "/passwort/neu");
         Host.Emails.Sent.ShouldHaveSingleItem();
     }
 
