@@ -61,7 +61,7 @@ export class App {
 
   private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
   private readonly header = viewChild.required(Header);
-  private readonly menuDrawer = viewChild('menuDrawer', { read: ElementRef<HTMLElement> });
+  private readonly menuDrawer = viewChild<string, ElementRef<HTMLElement>>('menuDrawer', { read: ElementRef });
   private readonly document = inject(DOCUMENT);
 
   constructor() {

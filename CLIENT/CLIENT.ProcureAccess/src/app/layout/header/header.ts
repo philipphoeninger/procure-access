@@ -39,7 +39,7 @@ export class Header {
 
   protected readonly wide = injectWideLayout();
 
-  private readonly menuButton = viewChild('menuButton', { read: ElementRef<HTMLButtonElement> });
+  private readonly menuButton = viewChild<string, ElementRef<HTMLButtonElement>>('menuButton', { read: ElementRef });
 
   /** Moves the focus to „Menü“ (compact layout only; nothing happens in the full header). */
   focusMenuButton(): void {
