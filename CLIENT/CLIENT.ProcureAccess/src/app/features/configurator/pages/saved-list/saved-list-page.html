@@ -5,6 +5,9 @@ SPDX-License-Identifier: MIT
 -->
 
 @if (shown(); as shown) {
+  @if (breadcrumb(); as items) {
+    <pa-breadcrumb [items]="items" />
+  }
   <h1 class="pa-saved-list__title">{{ shown.list.name }}</h1>
   @if (listActions()) {
     <div class="pa-saved-list__title-actions">

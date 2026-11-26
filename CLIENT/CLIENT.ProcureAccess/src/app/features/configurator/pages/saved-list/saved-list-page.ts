@@ -29,6 +29,7 @@ import { ProcureAccessStore } from '@app/core/state/app.store';
 import { ErrorPage } from '@app/pages/error/error-page';
 import { ConflictDialog } from '@app/shared/components/conflict-dialog/conflict-dialog';
 import { ChangedField, ChangedGroup, changesText } from '@app/shared/components/conflict-dialog/edit-conflict';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/components/breadcrumb/breadcrumb';
 import { Notice } from '@app/shared/components/notice/notice';
 import { RatingLegend } from '@app/shared/components/rating-legend/rating-legend';
 import { pluralKey, TranslatePluralPipe } from '@app/shared/pipes/translate-plural.pipe';
@@ -39,6 +40,7 @@ import { CriteriaListSummary } from '../../components/criteria-list-summary/crit
 import { CriterionCard } from '../../components/criterion-card/criterion-card';
 import { ExportDialog } from '../../dialogs/export-dialog/export-dialog';
 import { ShareDialog } from '../../dialogs/share-dialog/share-dialog';
+import { PROJECTS_PATH, projectPath } from '@app/features/workspace/models/projects';
 import { Criterion, PriorityLevel } from '../../models/criteria';
 import { CriteriaListFilter } from '../../models/criteria-list';
 import { SavedListCriterionName, savedListPath, savedListSelectionPath } from '../../models/saved-lists';
@@ -103,7 +105,8 @@ const STATUS_KEY = 'criteria.list.status.count';
  * project is read-only, with `projects.archived.note` (owner decision S6-12 D3 (a)). The title is
  * „Kriterienliste – {{project}} – Beschaffungsprojekte“ (D6 (a)). Leaving the page reports to the
  * workspace how many criteria were taken into the list, for `projects.detail.criteriaAdded` on the
- * next S32 of the project.
+ * next S32 of the project — also when it is left through the path above the H1 (`pa-breadcrumb`:
+ * „Projekte“ › project › the H1, #429, owner decision O-S7-2 (a)), which only a project's copy shows.
  *
  * **Conflict** (R-CAN-11, API-03; S6-21b, owner decision S6-21 D3 (a)): when someone else changed
  * the list since it was read, the refused save opens S37 (Figma `2056:2519`). The shown decisions
@@ -119,6 +122,7 @@ const STATUS_KEY = 'criteria.list.status.count';
 @Component({
   selector: 'pa-saved-list-page',
   imports: [
+    Breadcrumb,
     CriteriaActionBar,
     CriteriaListFilterRow,
     CriteriaListSummary,
@@ -178,6 +182,20 @@ export class SavedListPage {
     return (role === 'owner' || role === 'editor') && this.project()?.archived !== true;
   });
   /** „Auswahl ändern“, „Freigabelink erstellen“ and a new list of the older release: lists of the organisation only. */
+  /**
+   * The path above the H1 in project-copy mode only (R-PRJ-06; #429, owner decision O-S7-2 (a)):
+   * „Projekte“ › the project › the H1 of the page as text.
+   */
+  protected readonly breadcrumb = computed<BreadcrumbItem[] | null>(() => {
+    const shown = this.shown();
+    if (shown === null || shown.project === null) return null;
+    return [
+      { label: this.translate.instant('shell.nav.projects') as string, link: `/${PROJECTS_PATH}` },
+      { label: shown.project.name, link: projectPath(shown.project.id) },
+      { label: shown.list.name },
+    ];
+  });
+
   protected readonly listActions = computed(() => this.canEdit() && this.project() === null);
   /** The list is on an older release than the active one (R-LST-14); only Editor and Owner see it (S5-21b 5b). */
   protected readonly olderRelease = computed(() => {
