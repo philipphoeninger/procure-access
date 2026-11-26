@@ -702,6 +702,20 @@ test.describe('INV:A11Y-09 Reflow at 320 px / 400 % zoom', () => {
     await expectReflow(page);
   });
 
+  test('S11 of a project\'s copy with the path „Projekte › project › list“ above the H1 needs no horizontal scrolling (#429, TD-91)', async ({ page }) => {
+    // Project, copy and one product are answered by routeCandidate (long names, criteria from T.1)
+    const { projectId } = await routeCandidate(page);
+    await signInThroughApi(page, ORG_OWNER, TEST_USER_PASSWORD);
+    await page.goto(`/projekte/${projectId}/kriterienliste`);
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: /^Kriterienliste für die Fachanwendung/ })).toBeVisible();
+    const path = main.getByRole('navigation', { name: 'Sie sind hier' });
+    await expect(path.getByRole('link', { name: 'Projekte' })).toBeVisible();
+    await expect(path.getByRole('link', { name: /^Barrierefreie Beschaffung/ })).toBeVisible();
+    await expect(path.locator('[aria-current="page"]')).toContainText(/^Kriterienliste für die Fachanwendung/);
+    await expectReflow(page);
+  });
+
   test('S15 with a created link and two active links needs no horizontal scrolling', async ({ page }) => {
     // The list and its links are answered here, so the seeded organisation stays unchanged
     const id = '0e2e0000-0000-4000-8000-0000000000a2';

@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 
 namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 
@@ -44,15 +44,6 @@ internal sealed class AccountTokenSettings
         };
     }
 
-    private static TimeSpan Read(IConfigurationSection section, string name)
-    {
-        var value = section[name];
-        if (!TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var lifetime) || lifetime <= TimeSpan.Zero)
-        {
-            throw new InvalidOperationException(
-                $"{SectionName}:{name} must be a positive duration such as 1.00:00:00 (ARCHITECTURE §9.1); it is '{value}'.");
-        }
-
-        return lifetime;
-    }
+    private static TimeSpan Read(IConfigurationSection section, string name) =>
+        DurationSetting.Read(section[name], $"{SectionName}:{name}");
 }

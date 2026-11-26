@@ -109,6 +109,20 @@ public static class PlatformModule
         services.AddEmailSender(configuration, environment);
 
     /// <summary>
+    /// Lets the PostgreSQL log sink write (#437): until now it held its events in memory, because
+    /// the table it writes to does not exist before the migrations. Call it once the database is
+    /// migrated — the API after its migrations, a command host after its build — and before the
+    /// entry of a failed start, so that entry reaches the table if it exists. Calling it again
+    /// changes nothing.
+    /// </summary>
+    public static IHost StartDatabaseLogSink(this IHost host)
+    {
+        ArgumentNullException.ThrowIfNull(host);
+        host.Services.GetService<DatabaseLogGate>()?.Open();
+        return host;
+    }
+
+    /// <summary>
     /// Adds the middleware of the Platform module: <c>Cache-Control: no-store</c> on every answer
     /// below <c>/api/v1</c> without a header of its own (TEN-04, S5-22), the client address from
     /// the trusted proxies, then Problem Details for unhandled exceptions and for error responses

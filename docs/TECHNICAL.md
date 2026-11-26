@@ -118,7 +118,7 @@ The API reads `appsettings.json`, then `appsettings.<Environment>.json`, then en
 
 ### 3.2 Settings that are not secret
 
-Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
+Everything else lives in `API/API.ProcureAccess/appsettings.json`, grouped by section and validated at start (a wrong value stops the API with the key in the message): session limits (`Session`), password, token and lockout rules (`Account`), invitations (`Organizations`), rate limits (`RateLimits`, values in `SPEC §7.3`), share links (`ShareLinks`), the weight range (`Configurator`), log level and retention (`AppLoggingSettings`, §6.2), health (`Health`), the proxy hop count (`ForwardedHeaders:ForwardLimit`, §4.3), the SMTP host, port, security and timeout (`Email:Smtp`). A duration — a lifetime, timeout, interval, delay or window, also set through an environment variable such as `Email__Smtp__Timeout` — is written `hh:mm:ss` or `d.hh:mm:ss` (`00:00:15`, `1.00:00:00`); any other form stops the start, also a bare number such as `15`, which .NET would otherwise read as 15 days. A value marked 🔧 in SPEC is a confirmed default: change it in configuration, not in code, and only with the owner's decision (`CLAUDE.md §6.6`).
 
 The client has **no runtime configuration**: its few settings are build-time values in `src/environments/environment*.ts`, the same image everywhere. Some copy a server value and must stay in step with it (`passwordMinLength` ↔ `Account:Password:MinLength`, `lockout` ↔ `Account:Lockout:*`; `CLAUDE.md §3`).
 
@@ -138,7 +138,7 @@ One host, `docker compose`, the three services of §1 plus the nightly `backup` 
 
 1. CI on `main` is green (`TESTING §8.2`), and for production `node scripts/check-release-config.mjs` passes (§3.3).
 2. The `.env` of the host (or the platform's environment) has every required value of §3.1, among them `APP_BASE_URL` and `EMAIL_FROM`; without them the API stops at its start.
-3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`.
+3. `docker compose up -d --build` builds the API and client images from the checkout and starts them. The API image ships the catalog release folders (`catalog/releases/`) and the licence notices (`/app/THIRD-PARTY-NOTICES.txt`); the client image ships `/3rdpartylicenses.txt`. The licences of the base images' OS packages are stated in `docs/BASE_IMAGES.md`; a changed image tag fails CI stage 1 until that file is updated.
 4. **The API applies every pending migration at its start**: first the legacy context, then each module (`ARCHITECTURE §10.5`, ADR-014 rule 3). A failing migration stops the API. Before a release that brings a migration, take a backup (`docker compose run --rm backup sh /opt/backup/backup.sh`, §7.3). Migrating at start is safe **only with a single API instance**; the log-retention job (§6.2) and the backup assume one instance as well.
 5. If the release brings a new catalog release: import and activate it (§5.1).
 6. Check: `/health/ready` answers 200 at the public address (§6.1); `node scripts/check-client-proxy.mjs https://<public address>` passes (health route, and no proxy in front weakens the ETags, §4.3); sign in; the catalog shows the active release.
@@ -215,7 +215,8 @@ The log table is part of the backup (§7.1); its rows hold user ids and request 
 
 - The public `/health/ready` has no limit per caller: the API runs at most 🔧 2 ready checks at a time and answers 429 beyond, whoever asks (S7-09 protocol, open point 1; to be decided with the alerting).
 - Nothing alerts anybody yet: an unhealthy API or backup service is visible only to whoever looks (open point of S6-29, planned with GP.1).
-- On an empty database the log sink writes once before the migrations have created the `logging` schema; PostgreSQL logs `schema "logging" does not exist` once (issue #437).
+
+Until the migrations have run, the PostgreSQL sink holds its events in memory (at most `AppLoggingSettings:PostgreSQL:QueueLimit`) and writes them afterwards, so the first start on an empty database stores every line of the start and leaves no `schema "logging" does not exist` in the database server's log (issue #437, S7-02). The errors `relation "…__EFMigrationsHistory" does not exist` that PostgreSQL logs at that start are EF Core asking whether a schema has migrations yet; they are expected.
 
 ---
 

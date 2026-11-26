@@ -37,7 +37,7 @@ SPDX-License-Identifier: MIT
 | `tests/…Integration/Infrastructure/ProcureAccessApiFactory.cs`, `RegistrationTests.cs`, `PasswordResetTests.cs` | The test host sets `App:BaseUrl` (`ClientBaseUrl`) and `Email:From`; three link assertions compare with `ClientBaseUrl` instead of the old default |
 | `docs/TECHNICAL.md` | §3.1 the five variables and the start-up rule; §4.2 steps 2 and 6; §4.3 ports, the proxy's route to the client, compression and the check; §6.1 the public health route; §6.3 the gap of open point 1 |
 | `docs/ARCHITECTURE_v108.md` (v106 deleted) | C196; §9.5, §9.7, §10.1 |
-| `docs/CODEBASE_v1.md`, `CLAUDE.md` | §2.0, §2.118, §3, §4; `CLAUDE.md` §3 (🔧 settings: a deployment setting needs its compose line) and §4 |
+| `docs/CODEBASE_v1.md`, `CLAUDE.md` | §2.0, §2.119, §3, §4; `CLAUDE.md` §3 (🔧 settings: a deployment setting needs its compose line) and §4 |
 
 **Why the defaults stay in three places.** Compose substitutes an empty value for an unset variable, and an empty environment variable overrides `appsettings.json`, so compose needs a default of its own; the API compares with a constant. `PublicAddressDefaultsTests` fails when the three differ.
 

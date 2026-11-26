@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Globalization;
 using Microsoft.Extensions.Configuration;
 
 namespace ProcureAccess.Modules.IdentityAccess.Auth;
@@ -29,13 +28,7 @@ internal sealed record LockoutPolicy(int MaxFailedAttempts, TimeSpan Duration)
                 $"{MaxFailedAttemptsSetting} must be a whole number of at least 1 (SPEC R-AUTH-03: 5).");
         }
 
-        var durationValue = configuration[DurationSetting];
-        if (!TimeSpan.TryParse(durationValue, CultureInfo.InvariantCulture, out var duration) || duration <= TimeSpan.Zero)
-        {
-            throw new InvalidOperationException(
-                $"{DurationSetting} must be a positive duration such as 00:15:00 (SPEC R-AUTH-03); it is '{durationValue}'.");
-        }
-
+        var duration = Platform.Contracts.Configuration.DurationSetting.Read(configuration[DurationSetting], DurationSetting);
         return new LockoutPolicy(attempts.Value, duration);
     }
 }

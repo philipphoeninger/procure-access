@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using MODELS.ProcureAccess.Entities.Authorization;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 namespace ProcureAccess.Tests.Shared.Auth;
@@ -18,7 +17,7 @@ namespace ProcureAccess.Tests.Shared.Auth;
 /// <param name="Id">Value of the <c>NameIdentifier</c> claim.</param>
 /// <param name="Email">Value of the <c>Email</c> claim.</param>
 /// <param name="Roles">Role claims.</param>
-/// <param name="Permissions">Permission claims (<see cref="CustomClaimTypes.Permission"/>).</param>
+/// <param name="Permissions">Permission claims (<see cref="PlatformPermissions.ClaimType"/>).</param>
 public sealed record TestUser(
     string Name,
     string Id,
@@ -74,7 +73,7 @@ public static class TestUsers
         Id: "00000000-0000-0000-0000-00000000a002",
         Email: "moderator@example.test",
         Roles: [PlatformRoles.Moderator],
-        Permissions: [MODELS.ProcureAccess.Entities.Authorization.Permissions.ModerationReview]);
+        Permissions: [PlatformPermissions.ModerationReview]);
 
     /// <summary>All fixture users, looked up by <see cref="TestUser.Name"/>.</summary>
     public static readonly IReadOnlyDictionary<string, TestUser> ByName =

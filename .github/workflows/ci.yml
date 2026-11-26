@@ -90,6 +90,12 @@ jobs:
       # Only the self-test here: the check itself needs the .NET build and runs in stage 2.
       - name: API licence notices self-test
         run: node --test scripts/check-api-notices.test.mjs
+      # The statement of the base images' licences names every image tag of the Dockerfiles and compose
+      # files; a changed tag stays red until docs/BASE_IMAGES.md is updated (S7-15, TD-44).
+      - name: Base image statement
+        run: |
+          node --test scripts/check-base-images.test.mjs
+          node scripts/check-base-images.mjs
       # Only the self-test here: the gate itself runs in stage 7 (TESTING §8.3).
       - name: Invariant gate self-test
         run: node --test scripts/check-invariants.test.mjs

@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MODELS.ProcureAccess.Entities;
-using MODELS.ProcureAccess.Entities.Authorization;
 using ProcureAccess.Tests.Integration.Infrastructure;
 using Shouldly;
 using Xunit;
