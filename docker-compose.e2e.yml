@@ -24,8 +24,8 @@
 #   test of a run comes from the same address, so the 30 per 10 minutes of production would fail
 #   the run, not test it. The limit itself is checked by the .NET integration tests (API-05).
 #
-# The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml):
-# stop one before starting the other.
+# The E2E stack publishes the same host ports 5000 and 4200 as the dev stack (docker-compose.yml),
+# on the host loopback only (S7-09): stop one before starting the other.
 #
 # Not yet here (TESTING §3.3, §6.3; later migration steps): an E2E environment of its own, the
 # products of the seeder and the test clock endpoint. Until then the API runs as
@@ -92,9 +92,9 @@ services:
   client:
     healthcheck:
       # 127.0.0.1, not localhost: in the Alpine image localhost resolves to ::1 first, and nginx listens on IPv4 only.
-      # The API is asked directly over the stack network: nginx forwards only /api/, and /health/ready
-      # stays off the public client origin (#112). The aspnet image has no wget for a check of its own.
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://api:8080/health/ready"]
+      # The API is asked through nginx's own health route (S7-09, #448), so --wait also covers that
+      # route. The aspnet image has no wget for a check of its own.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ && wget -q -O /dev/null http://127.0.0.1/health/ready"]
       interval: 5s
       timeout: 5s
       retries: 30

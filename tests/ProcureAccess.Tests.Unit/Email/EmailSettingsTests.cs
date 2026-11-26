@@ -73,6 +73,21 @@ public class EmailSettingsTests
     }
 
     [Theory]
+    [InlineData("Production", "noreply@procureaccess.tech")]
+    [InlineData("Staging", "NoReply@ProcureAccess.tech")]
+    [InlineData("Testing", "ProcureAccess <noreply@procureaccess.tech>")]
+    public void From_DefaultSenderOutsideDevelopmentAndE2E_StopsTheStart(string environment, string from) =>
+        Should.Throw<InvalidOperationException>(() => EmailSettings.From(Settings(Credentials, ("Email:From", from)), In(environment)))
+            .Message.ShouldContain("EMAIL_FROM");
+
+    [Theory]
+    [InlineData("Development")]
+    [InlineData("E2E")]
+    public void From_DefaultSenderInDevelopmentOrE2E_IsTheSender(string environment) =>
+        EmailSettings.From(Settings(("Email:From", EmailSettings.DefaultSenderAddress)), In(environment))
+            .Sender.Address.ShouldBe("noreply@procureaccess.tech");
+
+    [Theory]
     [InlineData("Email:Smtp:Host", "")]
     [InlineData("Email:Smtp:Port", "0")]
     [InlineData("Email:Smtp:Port", "smtp")]

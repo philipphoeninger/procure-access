@@ -44,6 +44,9 @@ public sealed class ProcureAccessApiFactory(
 {
     public const string EnvironmentName = "Testing";
 
+    /// <summary><c>App:BaseUrl</c> of every test host: the start of the links in the e-mails (S7-09).</summary>
+    public const string ClientBaseUrl = "https://client.example.test";
+
     /// <summary>The e-mails the API sent through this host (S5-11).</summary>
     public CapturingEmailSender Emails { get; } = new();
 
@@ -73,6 +76,12 @@ public sealed class ProcureAccessApiFactory(
         // 4a); the sender is replaced below, so these never reach a server.
         builder.UseSetting("Email:Smtp:Username", "integration-test");
         builder.UseSetting("Email:Smtp:Password", "integration-test");
+
+        // Outside Development and E2E the API does not start with the public address of
+        // appsettings.json either (S7-09, #447): the address of the client in the e-mail links and
+        // the sender. Tests of that check pass the defaults in settings.
+        builder.UseSetting("App:BaseUrl", ClientBaseUrl);
+        builder.UseSetting("Email:From", "noreply@example.test");
 
         // Every request of the test server comes from no address, so all tests share one counter
         // per rate-limit policy: limits far above what a test run sends. Tests of the limits pass
