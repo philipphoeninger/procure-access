@@ -1,6 +1,6 @@
 # Sprint 06 — Workspace: projects, candidates and assessment (M5)
 
-> **Status:** plan (2026-11-17; owner decisions O-S6-1 – O-S6-6 filled in 2026-11-18) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
+> **Status:** done (2026-11-24; plan of 2026-11-17; owner decisions O-S6-1 – O-S6-6 filled in 2026-11-18) — output of Phase 3, step 11 ("Sprint planning") of `ai_development_process.md`, created with the skill *Product Management/sprint-planning*.
 > **Based on:** `ROADMAP_v6.md` (M5, G-P), `TECH_DEBT_v5.md` (§3, §5, §6, §8, §9.1, §9.2, §9.4), the highest versions of TESTING (§4.1, §4.5, §4.6, §4.9, §4.10, §6, §9 step 5), ARCHITECTURE (§4.3, §5.4, §7.1, §7.2, §8.1, §9.1, §9.2, §12 step 5, ADR-014 – ADR-016), SPEC (R-PRJ-*, R-CAN-02 – R-CAN-11, R-SHL-07, §7.3, §8.4), the Design handoff (§5.1 workspace screens, §5.3 screens without a frame), the Figma mapping (§2: S32, S34, S34a, S34b, S37), `CODEBASE_v1.md`, the sprint-05 close-out and protocols in `docs/sprints/sprint_05/`, the open GitHub issues and pull requests as of 2026-11-17.
 > **Language:** English. **Dates:** none by design — the sprint is described in working days (D1 … D8) and halves, not calendar dates.
 > **Task prompts:** `TASK_PROMPTS.md` in this folder (one ready-to-paste prompt per task).
@@ -246,11 +246,11 @@ Stretch items are pulled in order; if one is started but not finished, it goes b
 
 | Item | Value |
 |---|---|
-| Points done (P0 / stretch) | |
-| Development days used | |
-| Velocity for forecasting | |
-| Carried over to sprint 07 (with reason) | |
-| Issues created / closed | |
-| Changes needed in roadmap or documents | |
+| Points done (P0 / stretch) | **60 / 6** by tasks — every P0 and stretch task has a merged PR; S6-10, S6-12, S6-19, S6-20, S6-21 and S6-22 were split into a/b; 36 protocols in this folder. By content **57 / 6**: two M5 requirements are not met (≈ 3 points, see "Carried over"). Extras outside the plan: the Firefox workarounds retired (#434), the dev-stack mail fix (#430), the J2 keyboard race (#431). M5 exit: J2 up to the assessment is green on all five browser projects |
+| Development days used | **about 5** — commits on 2026-11-18, 19, 20, 23 and 24 (estimate from the git history; owner to confirm) |
+| Velocity for forecasting | ≈ **13 points per development day** (sprint 05 ≈ 16, sprint 04 ≈ 19, sprint 03 ≈ 16). Sprint 07 is planned with ~90 points of capacity again (`ROADMAP_v7.md` §6) |
+| Carried over to sprint 07 (with reason) | **R-PRJ-04 in the UI** (#420): assigning or replacing a project's list on S32 waited for a dialog design — S7-07. **PRV-07 workspace part** (#414): the export leaves out the assessments, the shape is the owner's — S7-05. The path back from S11 of a copy with its reflow case (#429, TD-91) — S7-06. The evidence race answers 500 (#453) — S7-02. Three E2E failures on `main` without a named cause (#451, #452, #436) — S7-01. Outside the sprint: the staging deployment (TD-28, #236; now 15 points), disk space (TD-74), the tester's pass (#311), O-S5, the legal texts, O-1/K-1; O-S6-8 is still open |
+| Issues created / closed | **27 closed** (`TECH_DEBT_v6.md` §1, §4), among them #318, #339, #350, #355, #368, #375, #378 – #389, #296, #310, #434, #4. **Created:** #414, #420, #429, #434, #436, #437, #447 – #450 from the protocols and #451 – #456 at the register review. Milestone M3 closed, new milestone "Legacy removal (2026.1)" (O-S6-7 carried out 2026-11-24). Open Dependabot PRs: #439 – #444 |
+| Changes needed in roadmap or documents | `ROADMAP_v7.md` (M5 done except 3 points, G-P 25 → 31.5, M6 86 → 96 with debt rows, velocity, forecast). Written during the sprint: ARCHITECTURE up to v107, TESTING up to v114, UX copy up to v48, `TECHNICAL.md` and README (S6-30), `TECH_DEBT_v6.md` (#457). Still open: the documentation drift of sprint 06 and the size of `CODEBASE_v1.md` (TD-100, TD-101 — S7-04); owner documents and Figma frames (TD-79, TD-80); eight open questions in ARCHITECTURE §16.5 (O-25 – O-32) |
 
 **Next sprint (preview):** G-P completion — staging environment from CI (GP.1, after TD-28), dark theme release (GP.4, after O-S5), the manual accessibility pass of M2 – M5 and its fixes (GP.5), GP.2/GP.6 if not done as stretch, the rest of GP.d (TD-29 release pipeline, TD-44/TD-53 licence review) — and, to use the capacity, the start of M6 (M6.1 directory core). Release 2026.1 activated and the legacy filter removed as soon as O-1/K-1 arrive.
