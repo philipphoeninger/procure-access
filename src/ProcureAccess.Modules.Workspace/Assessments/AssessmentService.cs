@@ -19,8 +19,13 @@ namespace ProcureAccess.Modules.Workspace.Assessments;
 /// (<see cref="AssessmentOutcome.NotInList"/>, owner decision S6-18 2 (a)).</para>
 /// <para><b>Lazy rows.</b> The row is stored with the first value or note and removed when it has
 /// neither (C53).</para>
-/// <para><b>Last write wins</b> (R-CAN-11): no <c>If-Match</c>. Two first writes of the same row at
-/// once meet at the table's key; the one that loses is repeated on the row the other stored.</para>
+/// <para><b>Last write wins</b> (R-CAN-11): no <c>If-Match</c>.</para>
+/// <para><b>One at a time per project (O-31, owner decision O-S7-4; S7-08).</b> The save holds the
+/// row locks of the candidate and of its project (<see cref="WorkspaceRowLock"/>, in this order)
+/// from before it reads the project's list until its commit. So it cannot land between the lock
+/// check and the copy of an assignment (WSP-02): it is stored before the check, or it meets the
+/// new list. Two first writes of the same row, and a change of the candidate or the project that
+/// this save only stamps, wait for the locks as well, so the save meets no concurrent one.</para>
 /// <para><b>Last change.</b> A changed assessment moves <c>ModifiedAt</c> of the candidate and of
 /// its project (owner decision S6-18 3 (a), as S6-15 5 (a)).</para>
 /// </remarks>
@@ -30,26 +35,26 @@ internal sealed class AssessmentService(WorkspaceDbContext db, AssessmentReader 
     /// Sets value and note of the criterion <paramref name="criterionRevisionId"/> for the candidate.
     /// The caller has checked the note against its limit; <c>null</c> is no note.
     /// </summary>
-    public async Task<AssessmentResult> SetAsync(
-        Guid candidateId, int criterionRevisionId, Fulfillment value, string? note, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await SetOnceAsync(candidateId, criterionRevisionId, value, note, cancellationToken);
-        }
-        catch (DbUpdateException)
-        {
-            // Another request stored or removed the same row in between, or gave the candidate or
-            // the project, which this save only stamps, a new version (S6-20). On a fresh read the
-            // same change succeeds: the last write wins (R-CAN-11).
-            db.ChangeTracker.Clear();
-            return await SetOnceAsync(candidateId, criterionRevisionId, value, note, cancellationToken);
-        }
-    }
+    public Task<AssessmentResult> SetAsync(
+        Guid candidateId, int criterionRevisionId, Fulfillment value, string? note, CancellationToken cancellationToken) =>
+        WorkspaceRowLock.InTransactionAsync(
+            db, ct => SetOnceAsync(candidateId, criterionRevisionId, value, note, ct), cancellationToken);
 
     private async Task<AssessmentResult> SetOnceAsync(
         Guid candidateId, int criterionRevisionId, Fulfillment value, string? note, CancellationToken cancellationToken)
     {
+        // Visible through the filter first: only then the locks, and only then the rows as they are now.
+        var projectId = await db.CandidateProducts
+                                .Where(c => c.Id == candidateId)
+                                .Select(c => (Guid?)c.ProcurementProjectId)
+                                .SingleOrDefaultAsync(cancellationToken);
+        if (projectId is null)
+        {
+            return new AssessmentResult(AssessmentOutcome.NotFound, null);
+        }
+
+        await WorkspaceRowLock.LockCandidateAsync(db, candidateId, cancellationToken);
+        await WorkspaceRowLock.LockProjectAsync(db, projectId.Value, cancellationToken);
         var candidate = await db.CandidateProducts.SingleOrDefaultAsync(c => c.Id == candidateId, cancellationToken);
         if (candidate is null)
         {

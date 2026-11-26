@@ -13,12 +13,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using ProcureAccess.Modules.Configurator.Configurations;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Configurator.Persistence;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Organizations;
 using ProcureAccess.Modules.IdentityAccess.Domain;
+using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 using ProcureAccess.Modules.Platform.Contracts.Errors;
 using ProcureAccess.Modules.Platform.Contracts.Tenancy;
 using ProcureAccess.Modules.Platform.Persistence;
+using ProcureAccess.Modules.Workspace;
 using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
@@ -282,6 +285,113 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
         (await db.CriteriaConfigurations.CountAsync(c => c.ProcurementProjectId == project.Id, Cancellation)).ShouldBe(1);
     }
 
+    /// <summary>
+    /// O-31 (S7-08): an assessment cannot slip between the lock check and the copy of an assignment.
+    /// The test holds the project's row lock, so the assessment and then the replacement wait for it
+    /// in this order; released, the assessment is stored first and locks the list.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Replace_WhileAnAssessmentIsBeingSaved_WaitsForItAndReturns409LockedCriteriaList))]
+    [Trait("Invariant", "WSP-02")]
+    public async Task Replace_WhileAnAssessmentIsBeingSaved_WaitsForItAndReturns409LockedCriteriaList()
+    {
+        var (first, criteria) = await SaveListAsync("Erste Liste");
+        var (second, _) = await SaveListAsync("Zweite Liste");
+        var project = await StoreProjectAsync();
+        var candidate = await StoreCandidateAsync(project);
+        using var client = CreateClient(TestUsers.EditorA);
+        var copy = await AssignAsync(client, project.Id, first);
+        var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        var tag = await client.TagOfAsync(ProjectPath(project.Id), Cancellation);
+
+        await using var held = await HoldProjectLockAsync(project.Id);
+        var assessing = ProjectLists.SetAssessmentAsync(client, candidate.Id, revision, "fulfilled", Cancellation);
+        await WaitForLockWaitersAsync(1);
+        var replacing = client.SendWithTagAsync(HttpMethod.Put, CriteriaPath(project.Id), new { sourceConfigurationId = second }, tag, Cancellation);
+        await WaitForLockWaitersAsync(2);
+        await held.ReleaseAsync();
+        using var assessed = await assessing;
+        using var replaced = await replacing;
+
+        assessed.StatusCode.ShouldBe(HttpStatusCode.OK, await assessed.Content.ReadAsStringAsync(Cancellation));
+        replaced.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        (await TypeOf(replaced)).ShouldEndWith("/problems/" + ProblemTypes.LockedCriteriaList);
+        (await ReadProjectAsync(client, project.Id)).CriteriaList.ShouldBe(copy);
+        (await ReadAssessmentsAsync(client, candidate.Id)).Criteria.Single(c => c.CriterionRevisionId == revision).Value.ShouldBe("fulfilled");
+    }
+
+    /// <summary>
+    /// The other order (O-31, S7-08): the replacement holds the project first, so an assessment sent
+    /// meanwhile is checked against the new list, which excludes its criterion. Before the row lock
+    /// it was stored against the replaced list, invisible on the new one and locking it.
+    /// </summary>
+    [Fact(DisplayName = "INV:WSP-02 " + nameof(Assess_WhileTheListIsBeingReplaced_WaitsForItAndIsCheckedAgainstTheNewList))]
+    [Trait("Invariant", "WSP-02")]
+    public async Task Assess_WhileTheListIsBeingReplaced_WaitsForItAndIsCheckedAgainstTheNewList()
+    {
+        var (first, criteria) = await SaveListAsync("Erste Liste");
+        var (second, _) = await SaveListAsync("Zweite Liste", (index, entry) => entry["isIncluded"] = index != 0);
+        var project = await StoreProjectAsync();
+        var candidate = await StoreCandidateAsync(project);
+        using var client = CreateClient(TestUsers.EditorA);
+        await AssignAsync(client, project.Id, first);
+        var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        var tag = await client.TagOfAsync(ProjectPath(project.Id), Cancellation);
+
+        await using var held = await HoldProjectLockAsync(project.Id);
+        var replacing = client.SendWithTagAsync(HttpMethod.Put, CriteriaPath(project.Id), new { sourceConfigurationId = second }, tag, Cancellation);
+        await WaitForLockWaitersAsync(1);
+        var assessing = ProjectLists.SetAssessmentAsync(client, candidate.Id, revision, "fulfilled", Cancellation);
+        await WaitForLockWaitersAsync(2);
+        await held.ReleaseAsync();
+        using var replaced = await replacing;
+        using var assessed = await assessing;
+
+        replaced.StatusCode.ShouldBe(HttpStatusCode.OK, await replaced.Content.ReadAsStringAsync(Cancellation));
+        await ShouldBeValidationProblemAsync(assessed, "criterionRevisionId");
+        var read = await ReadProjectAsync(client, project.Id);
+        read.CriteriaList.ShouldNotBeNull().Name.ShouldBe("Zweite Liste");
+        read.CriteriaListLocked.ShouldBeFalse();
+        await using var db = Workspace(Fixture.A.Id);
+        (await db.CandidateAssessments.CountAsync(Cancellation)).ShouldBe(0);
+    }
+
+    /// <summary>
+    /// A rename cannot land between the copy and the project's new version (O-31; S6-20a R2). The
+    /// rename is sent at that very moment — after Configurator stored the copy, before the
+    /// assignment counts its version — and waits for the assignment's row lock, then meets the
+    /// version the assignment counted. Before the row lock the rename was stored there and the
+    /// assignment answered 409 although its copy was stored.
+    /// </summary>
+    [Fact(DisplayName = "INV:API-03 " + nameof(Rename_BetweenTheCopyAndTheVersionOfAnAssignment_WaitsAndReturns409Conflict))]
+    [Trait("Invariant", "API-03")]
+    public async Task Rename_BetweenTheCopyAndTheVersionOfAnAssignment_WaitsAndReturns409Conflict()
+    {
+        var (source, _) = await SaveListAsync("Liste");
+        var project = await StoreProjectAsync();
+        using var owner = CreateClient(TestUsers.OwnerA);
+        await using var workspace = Workspace(Fixture.A.Id);
+        await using var configurator = Configurator(Fixture.A.Id);
+        Task<HttpResponseMessage>? renaming = null;
+        var lists = new CopyThen(new ProjectCriteriaLists(configurator, Clock), async () =>
+        {
+            renaming = owner.SendWithTagAsync(
+                HttpMethod.Patch, ProjectPath(project.Id), new { name = "Umbenannt" }, IfMatchRequests.FirstTag, Cancellation);
+            await WaitForLockWaitersAsync(1);
+        });
+        var service = new ProjectCriteriaListService(workspace, lists, Api.Factory.Services.GetRequiredService<EntityTags>());
+
+        var assignment = await service.AssignAsync(
+            project.Id, source, new EditPrecondition(TestUsers.EditorA.Id, IfMatchRequests.FirstTag), Cancellation);
+        using var renamed = await renaming.ShouldNotBeNull();
+
+        assignment.Outcome.ShouldBe(CriteriaListAssignmentOutcome.Done);
+        renamed.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        (await TypeOf(renamed)).ShouldEndWith("/problems/" + ProblemTypes.Conflict);
+        var read = await ReadProjectAsync(owner, project.Id);
+        read.Name.ShouldBe("Projekt");
+        read.CriteriaList.ShouldNotBeNull().Name.ShouldBe("Liste");
+    }
+
     [Fact]
     public async Task Store_TwoCopiesOfOneProject_IsRefusedByTheUniqueIndex()
     {
@@ -326,6 +436,35 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
             c => c.IsIncluded.ShouldBeTrue(), c => c.Note.ShouldBe("Doch nötig"));
         decided.Single(c => c.CriterionRevisionId == prioritised).OverrideLevel.ShouldBe("Info");
         (await ReadRawAsync(client, sourceId)).ShouldBe(sourceBefore);
+    }
+
+    /// <summary>
+    /// O-30 (S7-08; SPEC R-PRJ-05): the copy of an archived project is read-only on the server too,
+    /// not only on S11 — Configurator asks Workspace for the project's status before it saves.
+    /// </summary>
+    [Fact]
+    public async Task Decide_CopyOfAnArchivedProject_Returns409ProjectArchivedAndKeepsTheCopy()
+    {
+        var (sourceId, criteria) = await SaveListAsync("Liste");
+        var project = await StoreProjectAsync();
+        using var client = CreateClient(TestUsers.EditorA);
+        var copy = await AssignAsync(client, project.Id, sourceId);
+        var revision = criteria[0]!["revisionId"]!.GetValue<int>();
+        await SetStatusAsync(project.Id, ProjectStatus.Archived);
+        var before = await ReadRawAsync(client, copy.Id);
+
+        using var refused = await client.PatchListAsync(CriterionPath(copy.Id, revision), new { isIncluded = false }, Cancellation);
+
+        refused.StatusCode.ShouldBe(HttpStatusCode.Conflict, await refused.Content.ReadAsStringAsync(Cancellation));
+        (await TypeOf(refused)).ShouldEndWith("/problems/" + ProblemTypes.ProjectArchived);
+        (await ReadRawAsync(client, copy.Id)).ShouldBe(before);
+
+        // The source is an organisation list and stays editable; reopened, so does the copy.
+        using var source = await client.PatchListAsync(CriterionPath(sourceId, revision), new { isIncluded = false }, Cancellation);
+        source.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await SetStatusAsync(project.Id, ProjectStatus.Open);
+        using var reopened = await client.PatchListAsync(CriterionPath(copy.Id, revision), new { isIncluded = false }, Cancellation);
+        reopened.StatusCode.ShouldBe(HttpStatusCode.NoContent, await reopened.Content.ReadAsStringAsync(Cancellation));
     }
 
     /// <summary>
@@ -460,6 +599,79 @@ public sealed class ProjectCriteriaListTests(ApiFixture api) : IntegrationTest(a
     }
 
     private static string CriteriaPath(Guid projectId) => $"/api/v1/projects/{projectId}/criteria-configuration";
+
+    private static string ProjectPath(Guid projectId) => $"/api/v1/projects/{projectId}";
+
+    private async Task SetStatusAsync(Guid projectId, ProjectStatus status)
+    {
+        await using var db = Workspace(Fixture.A.Id);
+        var project = await db.ProcurementProjects.SingleAsync(p => p.Id == projectId, Cancellation);
+        project.ChangeStatus(status, Clock.GetUtcNow());
+        await db.SaveChangesAsync(Cancellation);
+    }
+
+    /// <summary>
+    /// Takes the row lock of the project on a connection of the test's own, as a change of the
+    /// project that has not committed yet: what needs the lock waits until the test releases it.
+    /// </summary>
+    private async Task<HeldLock> HoldProjectLockAsync(Guid projectId)
+    {
+        var connection = new NpgsqlConnection(Api.ConnectionString);
+        await connection.OpenAsync(Cancellation);
+        var transaction = await connection.BeginTransactionAsync(Cancellation);
+        await using var command = new NpgsqlCommand(
+            """SELECT 1 FROM workspace."ProcurementProjects" WHERE "Id" = @id FOR UPDATE""", connection, transaction);
+        command.Parameters.AddWithValue("id", projectId);
+        await command.ExecuteNonQueryAsync(Cancellation);
+        return new HeldLock(connection, transaction);
+    }
+
+    /// <summary>
+    /// Waits until <paramref name="expected"/> sessions of the database wait for a lock: the
+    /// requests the test started have reached the held row. On a connection of its own, because a
+    /// transaction keeps its first view of <c>pg_stat_activity</c>. PostgreSQL serves the waiters of
+    /// a row in the order they arrived, so the test decides the order by starting one, waiting for
+    /// it here and then starting the next.
+    /// </summary>
+    private async Task WaitForLockWaitersAsync(int expected)
+    {
+        await using var connection = new NpgsqlConnection(Api.ConnectionString);
+        await connection.OpenAsync(Cancellation);
+        await using var command = new NpgsqlCommand(
+            "SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND wait_event_type = 'Lock'", connection);
+        var deadline = DateTime.UtcNow.AddSeconds(15);
+        while ((long)(await command.ExecuteScalarAsync(Cancellation))! < expected)
+        {
+            DateTime.UtcNow.ShouldBeLessThan(deadline, $"{expected} request(s) should wait for the project's row lock");
+            await Task.Delay(50, Cancellation);
+        }
+    }
+
+    /// <summary>Configurator's copy, followed by <paramref name="then"/>: the moment between the copy and the project's version.</summary>
+    private sealed class CopyThen(IProjectCriteriaLists inner, Func<Task> then) : IProjectCriteriaLists
+    {
+        public async Task<ProjectCopyResult> CopyIntoProjectAsync(
+            Guid sourceConfigurationId, Guid projectId, Guid organizationId, string userId, CancellationToken cancellationToken)
+        {
+            var result = await inner.CopyIntoProjectAsync(sourceConfigurationId, projectId, organizationId, userId, cancellationToken);
+            await then();
+            return result;
+        }
+
+        public Task<ProjectCriteriaList?> FindOfProjectAsync(Guid projectId, CancellationToken cancellationToken) =>
+            inner.FindOfProjectAsync(projectId, cancellationToken);
+    }
+
+    private sealed class HeldLock(NpgsqlConnection connection, NpgsqlTransaction transaction) : IAsyncDisposable
+    {
+        public Task ReleaseAsync() => transaction.RollbackAsync(Cancellation);
+
+        public async ValueTask DisposeAsync()
+        {
+            await transaction.DisposeAsync();
+            await connection.DisposeAsync();
+        }
+    }
 
     private static string CriterionPath(Guid id, int revision) => $"{ConfigurationsPath}/{id}/criteria/{revision}";
 

@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ProcureAccess.Modules.Catalog.Contracts;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Domain;
 using ProcureAccess.Modules.Configurator.Drafts;
@@ -24,6 +25,7 @@ internal sealed class ConfigurationService(
     IConfigurationDraftCheck drafts,
     ICatalogSelectionResolver catalog,
     ICatalogReleaseCarryOver carryOver,
+    IProjectStatusReader projects,
     PriorityWeightRange weights,
     EntityTags tags,
     TimeProvider clock)
@@ -147,6 +149,8 @@ internal sealed class ConfigurationService(
     /// on a project's copy (C51, WSP-03). A stale <c>If-Match</c> is refused before the criterion
     /// is looked for, so a criterion that a selection change removed meanwhile is a conflict, not a
     /// 404 (API-03). Every stored decision counts a version of the list, as it stamps its last change.
+    /// The copy of an archived project is read-only like its project (R-PRJ-05):
+    /// <see cref="EditOutcome.ProjectArchived"/>, asked of Workspace before the save (O-30, S7-08).
     /// </summary>
     public async Task<EditResult<bool>> DecideAsync(
         Guid id, int criterionRevisionId, ConfigurationDecisionBody body, ListEdit edit, CancellationToken cancellationToken)
@@ -161,6 +165,12 @@ internal sealed class ConfigurationService(
         if (!tags.Matches(edit.IfMatch, list.Version))
         {
             return EditResult<bool>.Conflict(list.ModifiedByUserId);
+        }
+
+        if (list.ProcurementProjectId is { } projectId && await projects.IsArchivedAsync(projectId, cancellationToken))
+        {
+            return EditResult<bool>.Refused(
+                EditOutcome.ProjectArchived, "The criteria list of an archived project is read-only.", NoErrors());
         }
 
         var row = list.Criteria.SingleOrDefault(c => c.CriterionRevisionId == criterionRevisionId);
@@ -503,6 +513,9 @@ internal enum EditOutcome
 
     /// <summary>409 <c>conflict</c>: the <c>If-Match</c> is not the tag of the stored version (API-03, S6-20b).</summary>
     Conflict = 7,
+
+    /// <summary>409 <c>project-archived</c>: the list is the copy of an archived project, which is read-only (R-PRJ-05; O-30, S7-08).</summary>
+    ProjectArchived = 8,
 }
 
 /// <summary>The organisation of a stored list and whether a project owns it as its copy (C53).</summary>

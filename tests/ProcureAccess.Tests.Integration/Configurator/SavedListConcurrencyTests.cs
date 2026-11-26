@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using ProcureAccess.Modules.Catalog.Contracts;
 using ProcureAccess.Modules.Configurator.Configurations;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Configurator.Contracts.Drafts;
 using ProcureAccess.Modules.Configurator.Drafts;
 using ProcureAccess.Modules.Configurator.Persistence;
@@ -267,6 +268,7 @@ public sealed class SavedListConcurrencyTests(ApiFixture api) : IntegrationTest(
             services.GetRequiredService<IConfigurationDraftCheck>(),
             services.GetRequiredService<ICatalogSelectionResolver>(),
             services.GetRequiredService<ICatalogReleaseCarryOver>(),
+            services.GetRequiredService<IProjectStatusReader>(),
             services.GetRequiredService<PriorityWeightRange>(),
             services.GetRequiredService<EntityTags>(),
             Clock);

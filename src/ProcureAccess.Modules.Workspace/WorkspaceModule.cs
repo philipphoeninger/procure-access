@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 using ProcureAccess.Modules.Platform.Contracts.Persistence;
 using ProcureAccess.Modules.Workspace.Accounts;
@@ -58,6 +59,9 @@ public static class WorkspaceModule
         services.AddScoped<ProjectCriteriaListService>();
         services.AddScoped<AssessmentReader>();
         services.AddScoped<AssessmentService>();
+
+        // Configurator asks whether the project of a copy is archived (O-30; S7-08).
+        services.AddScoped<IProjectStatusReader, ProjectStatusReader>();
 
         // The module's parts of the account deletion and of the personal data export (S6-25),
         // called by IdentityAccess through its contracts.
