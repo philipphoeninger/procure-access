@@ -24,16 +24,19 @@ namespace ProcureAccess.Modules.Workspace.Projects;
 /// value — a note without a value — do not lock; they belong to criteria of the replaced copy and
 /// are deleted with it (owner decision S6-18 4 (a)). Adjusting the copy within its release is
 /// never locked: that goes through the saved-list endpoints.</para>
-/// <para><b>Not one transaction.</b> The copy is stored by Configurator's context, the assessments
-/// by this one, so an assessment saved between the check and the copy is not seen; such a row keeps
-/// its value and locks the new list (S6-18 open point 1).</para>
+/// <para><b>One step for the project (O-31, owner decision O-S7-4; S7-08).</b> The copy is stored by
+/// Configurator's context, the assessments by this one, and no transaction spans both. So the
+/// assignment holds the project's row lock (<see cref="WorkspaceRowLock"/>) from before its checks
+/// until its commit, and so does the save of an assessment: an assessment either is stored before
+/// the lock is checked, and locks the list, or is checked against the new list. What the lock does
+/// not give: when the process ends between Configurator's commit and this one, the copy is replaced
+/// while the notes without a value and the project's version are as before.</para>
 /// <para><b>Concurrency (API-03; S6-20, owner decision D2 (a)).</b> The assignment is a change of
 /// the project — its answers name the list —, so it needs the project's <c>ETag</c> in
 /// <c>If-Match</c> and counts a new version of the project. The copy is stored before the version:
-/// a version counted for a refused source would make the sender's own tag stale for nothing. In
-/// turn, a rename or status change that lands between the check and the save of the version
-/// answers 409 <c>conflict</c> although the copy is already replaced; the reload the conflict
-/// asks for shows it.</para>
+/// a version counted for a refused source would make the sender's own tag stale for nothing. A
+/// rename or status change sent meanwhile waits for the row lock and then answers 409
+/// <c>conflict</c> itself, as its tag is stale by then.</para>
 /// </remarks>
 internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProjectCriteriaLists lists, EntityTags tags)
 {
@@ -46,11 +49,19 @@ internal sealed class ProjectCriteriaListService(WorkspaceDbContext db, IProject
     /// </summary>
     public Task<CriteriaListAssignment> AssignAsync(
         Guid projectId, Guid sourceConfigurationId, EditPrecondition edit, CancellationToken cancellationToken) =>
-        ConcurrentChange.RunAsync(db, () => AssignOnceAsync(projectId, sourceConfigurationId, edit, cancellationToken));
+        ConcurrentChange.RunAsync(db, () => WorkspaceRowLock.InTransactionAsync(
+            db, ct => AssignOnceAsync(projectId, sourceConfigurationId, edit, ct), cancellationToken));
 
     private async Task<CriteriaListAssignment> AssignOnceAsync(
         Guid projectId, Guid sourceConfigurationId, EditPrecondition edit, CancellationToken cancellationToken)
     {
+        // Visible through the filter first: only then the lock, and only then the row as it is now.
+        if (!await db.ProcurementProjects.AnyAsync(p => p.Id == projectId, cancellationToken))
+        {
+            return new CriteriaListAssignment(CriteriaListAssignmentOutcome.NotFound, null);
+        }
+
+        await WorkspaceRowLock.LockProjectAsync(db, projectId, cancellationToken);
         var project = await db.ProcurementProjects.SingleOrDefaultAsync(p => p.Id == projectId, cancellationToken);
         if (project is null)
         {

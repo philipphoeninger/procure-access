@@ -58,6 +58,10 @@ public class IgnoreQueryFiltersAllowListTests
         // link by the token's hash, then the provider of the owning module reads the one list it names.
         ["src/ProcureAccess.Modules.Platform/Sharing/ShareLinkService.cs"] = 1,
         ["src/ProcureAccess.Modules.Configurator/Sharing/ConfigurationShareProvider.cs"] = 1,
+        // Raw SQL that reads nothing: the row locks of a project and of a candidate, which make the
+        // lock check and the copy of a list one step for an assessment or a rename (WSP-02, API-03;
+        // O-31, S7-08), taken only after a filtered read found the row.
+        ["src/ProcureAccess.Modules.Workspace/WorkspaceRowLock.cs"] = 2,
         // Legacy: the generic repositories bypass the legacy context's own filters (soft delete)
         // and offer raw SQL (ExecuteSqlRaw, FromSqlRaw; two calls each with IgnoreQueryFilters).
         // UserRepo's call went with its unused RestoreUserAsync (S5-10), UserRepo itself with S5-28b.

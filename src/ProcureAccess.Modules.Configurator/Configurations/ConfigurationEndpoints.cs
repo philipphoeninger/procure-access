@@ -118,8 +118,8 @@ internal static class ConfigurationEndpoints
                           "{ isIncluded, overrideLevel, overrideWeight, note }, keyed as a " +
                           "row of the save request; also on a list of an older release. 400 validation; 400 antiforgery; 401; " +
                           "403 email-unconfirmed or below Editor; 404 for an unknown list, one of another organisation or a " +
-                          "criterion that is not on the list; 409 conflict with editorDisplayName for a stale If-Match; 428 " +
-                          "precondition-required without If-Match.")
+                          "criterion that is not on the list; 409 conflict with editorDisplayName for a stale If-Match; 409 " +
+                          "project-archived for the copy of an archived project; 428 precondition-required without If-Match.")
                       .Accepts<ConfigurationDecisionBody>("application/json")
                       .Produces(StatusCodes.Status204NoContent)
                       .ProducesValidationProblem()
@@ -465,6 +465,8 @@ internal static class ConfigurationEndpoints
         EditOutcome.ReleaseMismatch => TypedResults.ValidationProblem(
             result.Errors, detail: result.Detail, type: ProblemTypes.ReleaseMismatch),
         EditOutcome.ProjectCopy => ProjectCopyConflict(result.Detail),
+        EditOutcome.ProjectArchived => TypedResults.Problem(
+            detail: result.Detail, statusCode: StatusCodes.Status409Conflict, type: ProblemTypes.ProjectArchived),
         _ => throw new InvalidOperationException($"No problem for outcome {result.Outcome}."),
     };
 
