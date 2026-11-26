@@ -181,8 +181,10 @@ test.describe('J2 workspace up to the assessment', () => {
     await settled(main(page));
     await expectNoAxeViolations(page, testInfo, 'j2-s11-copy');
 
-    // Back to the project as the browser goes back (Alt+←): S11 of a copy has no link to its project
-    await page.goBack();
+    // Back to the project through the path above the H1 (#429): the link „Projekte › project“ by keyboard
+    const path = main(page).getByRole('navigation', { name: 'Sie sind hier' });
+    await tabTo(page, path.getByRole('link', { name: project }), 'Shift+Tab');
+    await page.keyboard.press('Enter');
     await expect(page).toHaveURL(projectUrl);
     await expect(heading(page)).toHaveText(project);
     await expect(heading(page)).toBeFocused();
