@@ -46,6 +46,7 @@ public sealed class DurationSettingTests
     [InlineData("00:15")] // hours and minutes only
     [InlineData("1.00:00")]
     [InlineData("24:00:00")]
+    [InlineData("8:00:00")] // one-digit hour
     [InlineData("00:60:00")]
     [InlineData("-00:00:15")]
     [InlineData("15s")]
