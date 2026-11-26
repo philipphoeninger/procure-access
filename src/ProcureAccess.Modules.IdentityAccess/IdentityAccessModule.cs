@@ -62,6 +62,10 @@ public static class IdentityAccessModule
                 $"Set the environment variable ConnectionStrings__{ConnectionStringName} (see .env.example).");
         }
 
+        // The address of the client in every e-mail link (S7-09, #447): a deployment that still has
+        // the default of appsettings.json stops here, before the host is built.
+        ClientLinks.EnsureDeploymentAddress(configuration, environment);
+
         services.AddNpgsql<IdentityAccessDbContext>(connectionString, options =>
         {
             options.EnableRetryOnFailure().CommandTimeout(60);

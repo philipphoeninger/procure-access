@@ -123,7 +123,7 @@ jobs:
       - name: Dev server smoke (ng serve renders)
         working-directory: CLIENT/CLIENT.ProcureAccess
         run: |
-          node --test ../../scripts/smoke-dev-server.test.mjs ../../scripts/check-chunk-cache.test.mjs
+          node --test ../../scripts/smoke-dev-server.test.mjs ../../scripts/check-chunk-cache.test.mjs ../../scripts/check-client-proxy.test.mjs
           npx ng serve --port 4200 > "$RUNNER_TEMP/ng-serve.log" 2>&1 &
           server=$!
           status=0
@@ -303,6 +303,13 @@ jobs:
         if: matrix.project == 'chromium'
         run: |
           node scripts/check-chunk-cache.mjs http://localhost:4200
+      # The client image's nginx forwards /health/live and /health/ready and nothing else under
+      # /health/ (S7-09, #448), and leaves /api/ answers uncompressed, so their ETags stay strong
+      # (TD-28 point 15): compared with the API asked directly.
+      - name: Health route and ETags through the client image
+        if: matrix.project == 'chromium'
+        run: |
+          node scripts/check-client-proxy.mjs http://localhost:4200 http://localhost:5000
       # The host network reaches the stack on localhost like a local run. e2e/node_modules comes
       # from `npm ci` above; it has no native module, so it runs on the image's Node. The runner's
       # user keeps the reports writable for the next steps. GITHUB_WORKSPACE inside the container

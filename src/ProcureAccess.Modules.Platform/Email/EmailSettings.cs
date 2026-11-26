@@ -28,7 +28,8 @@ internal enum SmtpSecurity
 /// <c>Email:From</c> and <c>Email:DisplayName</c>; the 🔧 <c>Email:Smtp:Timeout</c> per SMTP operation
 /// comes from <c>appsettings.json</c> (owner decision O-S6-3: 15 s). Only <c>Development</c> and <c>E2E</c> may send
 /// without credentials or without TLS (Mailpit); every other environment stops at startup without
-/// them (owner decision S5-11 4a), like the key-ring certificate (S4-26). Not a record: its
+/// them (owner decision S5-11 4a), like the key-ring certificate (S4-26), and with the sender address
+/// of <c>appsettings.json</c> (<see cref="DefaultSenderAddress"/>; S7-09, #447). Not a record: its
 /// <c>ToString</c> would print the password.
 /// </summary>
 internal sealed class EmailSettings
@@ -37,6 +38,12 @@ internal sealed class EmailSettings
 
     /// <summary>Environment of the E2E stack once it has its own (TESTING §3.3); until then it runs as Development.</summary>
     public const string E2EEnvironmentName = "E2E";
+
+    /// <summary>
+    /// <c>Email:From</c> of <c>appsettings.json</c>: a placeholder that no deployment may keep (S7-09,
+    /// #447; owner decision O-S7-5). <c>PublicAddressDefaultsTests</c> keeps it equal to the file.
+    /// </summary>
+    public const string DefaultSenderAddress = "noreply@procureaccess.tech";
 
     private EmailSettings(string host, int port, string? username, string? password, SmtpSecurity security, TimeSpan timeout, MailboxAddress sender)
     {
@@ -136,6 +143,13 @@ internal sealed class EmailSettings
         if (!MailboxAddress.TryParse(email["From"], out var sender) || string.IsNullOrEmpty(sender.Address) || !sender.Address.Contains('@', StringComparison.Ordinal))
         {
             throw Invalid("Email:From must be one e-mail address.");
+        }
+
+        if (!lenient && string.Equals(sender.Address, DefaultSenderAddress, StringComparison.OrdinalIgnoreCase))
+        {
+            throw Invalid(
+                "Email:From still holds the default of appsettings.json. Outside Development and E2E it must be the " +
+                "sender address of this deployment, on a domain the relay may send for (SPF, DKIM): set EMAIL_FROM (see .env.example).");
         }
 
         var displayName = email["DisplayName"];
