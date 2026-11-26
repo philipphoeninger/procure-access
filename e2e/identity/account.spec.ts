@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { createOrganizationThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
+import { DOWNLOAD_TIMEOUT } from '../support/keyboard';
 import { accountMenuButton, signInThroughApi } from '../support/session';
 import { E2E_ORGANIZATION, ORG_OWNER, TEST_USER_PASSWORD } from '../support/users';
 
@@ -57,7 +58,7 @@ test.describe('Account page S61 (R-AUTH-09, R-AUTH-10)', () => {
     });
 
     await test.step('„Daten herunterladen“ hands over the JSON file with the user’s own data', async () => {
-      const downloading = page.waitForEvent('download');
+      const downloading = page.waitForEvent('download', { timeout: DOWNLOAD_TIMEOUT });
       await main.getByRole('button', { name: 'Daten herunterladen' }).click();
       const download = await downloading;
       expect(download.suggestedFilename()).toMatch(/^ProcureAccess_Daten_\d{4}-\d{2}-\d{2}\.json$/);
@@ -128,6 +129,8 @@ test.describe('Account page S61 (R-AUTH-09, R-AUTH-10)', () => {
 
     await main.getByRole('button', { name: 'Konto löschen' }).click();
     const dialog = page.getByRole('dialog');
+    // The dialog's first focus comes when it has opened; typing before it lost the text (#436, CLAUDE §3)
+    await expect(dialog.getByRole('heading', { name: 'Konto endgültig löschen?' })).toBeFocused();
     await dialog.getByRole('textbox', { name: 'E-Mail-Adresse' }).fill(ORG_OWNER);
     await dialog.getByRole('button', { name: 'Konto endgültig löschen' }).click();
 

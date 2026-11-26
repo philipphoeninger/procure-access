@@ -6,6 +6,7 @@ import { expect, test, type Locator, type Page, type TestInfo } from '@playwrigh
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
 import { accountMenuButton, signOutThroughHeader } from '../support/session';
+import { settled } from '../support/keyboard';
 
 /**
  * J8, account (TESTING §5.4; S5-14), on the real E2E stack by keyboard: register on S02 → read the
@@ -26,13 +27,6 @@ const header = (page: Page) => page.getByRole('banner');
 /** A new address per run and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
   return `j8-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 /** Moves the focus to `locator` and presses `key` there, as Tab and a key would. */

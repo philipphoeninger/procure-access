@@ -9,9 +9,9 @@ SPDX-License-Identifier: MIT
   @if (!wide()) {
     <!-- Compact menu (Handoff §2.2): Esc and „Menü schließen“ close it and return the focus to „Menü“.
          Open, it traps the focus like a modal, so it is announced as one (role, aria-modal, name). -->
-    <mat-sidenav class="pa-shell__menu" mode="over" position="end" [fixedInViewport]="true"
+    <mat-sidenav #menuDrawer class="pa-shell__menu" mode="over" position="end" [fixedInViewport]="true"
       role="dialog" aria-modal="true" [attr.aria-label]="'shell.nav.menu' | translate"
-      [opened]="menuOpen()" (closedStart)="menuOpen.set(false)">
+      [opened]="menuOpen()" (closedStart)="menuClosing()">
       <button matButton class="pa-shell__menu-close" type="button" (click)="menuOpen.set(false)">{{ 'shell.nav.menu.close' | translate }}</button>
       <pa-main-nav layout="drawer" (navigated)="menuOpen.set(false)" />
     </mat-sidenav>

@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { createOrganizationThroughApi, createProjectThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
 import { ORG_READER, TEST_USER_PASSWORD } from '../support/users';
+import { settled } from '../support/keyboard';
 
 /**
  * Procurement projects (S6-13; R-PRJ-01, R-PRJ-02, R-SHL-02): „Projekte“ in the header leads to
@@ -27,13 +28,6 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 
 const main = (page: Page) => page.getByRole('main');
 const mainNav = (page: Page) => page.getByRole('banner').getByRole('navigation', { name: 'Hauptnavigation' });
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 test.describe('Procurement projects S30, S31, S32', () => {
   test('INV:A11Y-01 INV:A11Y-08 „Projekte“ leads a Reader to S30, current there, without „Projekt anlegen“', async ({ page }, testInfo) => {

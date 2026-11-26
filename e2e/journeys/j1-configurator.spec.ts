@@ -10,6 +10,7 @@ import { chooseFirstOption } from '../support/combobox';
 import { readXlsxSheet } from '../support/xlsx';
 import { organizationOfAccount, registerConfirmedAccount } from '../support/accounts';
 import { accountMenuButton } from '../support/session';
+import { arrowTo, DOWNLOAD_TIMEOUT, settled, tabTo } from '../support/keyboard';
 
 /**
  * J1, configurator without account (TESTING §5.4), on S10 and the active test release T.1 of the
@@ -74,16 +75,6 @@ const XLSX_HEADERS = [
   'Link zum Prüfschritt',
 ];
 
-// S11 with an open detail panel has more tab stops than S10.
-const MAX_TABS = 80;
-
-/**
- * The longest wait for an export's download. The export answers in about a second; without a
- * bound, a download that never starts (Enter on the wrong element) held the test for its whole
- * 5 minutes (#380, S6-01).
- */
-const DOWNLOAD_TIMEOUT = 30_000;
-
 interface CriteriaAnswer {
   readonly release: string;
   readonly criteria: readonly {
@@ -96,20 +87,6 @@ interface CriteriaAnswer {
       readonly matchedRule: { readonly kind: string; readonly appType: string | null; readonly useCase: string | null };
     };
   }[];
-}
-
-/**
- * Presses Tab until the target has the focus, as a keyboard user moves through the page. Fails when
- * the target is not reached, i.e. when it is not in the tab order after the current focus.
- */
-async function tabTo(page: Page, target: Locator, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
-  for (let presses = 0; presses <= MAX_TABS; presses++) {
-    if (await target.evaluate((element) => element === document.activeElement)) {
-      return;
-    }
-    await page.keyboard.press(key);
-  }
-  throw new Error(`${target.toString()} was not reached with ${MAX_TABS} Tab presses`);
 }
 
 /** Tab to the option, then Space, as a keyboard user checks it. */
@@ -134,24 +111,6 @@ async function next(page: Page, heading: string | RegExp): Promise<void> {
   await tabTo(page, page.getByRole('button', { name: 'Weiter' }));
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { level: 2, name: heading })).toBeFocused();
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
-
-/** Presses a key until the target has the focus, as in a menu or listbox; fails after `max` presses. */
-async function arrowTo(page: Page, target: Locator, key = 'ArrowDown', max = 10): Promise<void> {
-  for (let presses = 0; presses <= max; presses++) {
-    if (await target.evaluate((element) => element === document.activeElement)) {
-      return;
-    }
-    await page.keyboard.press(key);
-  }
-  throw new Error(`${target.toString()} was not reached with ${max} presses of ${key}`);
 }
 
 /** The S11 card whose H2 is the title. */

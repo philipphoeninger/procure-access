@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
     <pa-main-nav layout="bar" />
   } @else {
     <!-- pa-app-header-compact: the navigation opens in the shell's mat-sidenav (Handoff §2.2) -->
-    <button matButton class="pa-header__menu" type="button"
+    <button #menuButton matButton class="pa-header__menu" type="button"
       aria-controls="main-nav" [attr.aria-expanded]="menuOpen()"
       (click)="menuToggle.emit()">{{ 'shell.nav.menu' | translate }}</button>
   }

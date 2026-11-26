@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import {
   createOrganizationThroughApi,
   invitationLinkOf,
@@ -13,6 +13,7 @@ import {
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
 import { CONFIRMED_USER, TEST_USER_PASSWORD } from '../support/users';
+import { settled } from '../support/keyboard';
 
 /**
  * Invitations (S5-17b; R-ORG-02, R-ORG-03) on the real E2E stack, each test on an organisation of
@@ -32,13 +33,6 @@ const escape = (text: string) => text.replaceAll('.', '\\.');
 /** A new address per test, role and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo, role: string): string {
   return `inv-${role}-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 test.describe('Invitations', () => {

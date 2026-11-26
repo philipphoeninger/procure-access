@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
+import { settled } from '../support/keyboard';
 
 /**
  * S10 reset notice, „Bisherige Auswahl“ and the hand-over to S11 (S4-12; R-CON-07, R-CON-08,
@@ -20,13 +21,6 @@ const combobox = (page: Page) => page.getByRole('combobox', { name: 'Verwendungs
 const next = (page: Page) => page.getByRole('button', { name: 'Weiter' });
 const change = (page: Page, description: string) =>
   page.getByRole('button', { name: 'Ändern', description, exact: true });
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /** Types into the combobox and takes the first matching use case by keyboard. */
 async function chooseUseCase(page: Page, typed: string, name: string): Promise<void> {

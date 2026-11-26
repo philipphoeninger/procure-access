@@ -7,6 +7,7 @@ import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
 import { accountMenuButton, expireSessionOnce, signOutThroughHeader } from '../support/session';
 import { CONFIRMED_USER, TEST_USER_PASSWORD } from '../support/users';
+import { settled } from '../support/keyboard';
 
 /**
  * Sign-in S01, the login overlay and sign-out (S5-09; R-AUTH-03, R-AUTH-07 base, R-AUTH-08) on
@@ -21,13 +22,6 @@ const WIDE = { width: 1280, height: 800 };
 const combobox = (page: Page) => page.getByRole('combobox', { name: 'Verwendungszweck' });
 const header = (page: Page) => page.getByRole('banner');
 const main = (page: Page) => page.getByRole('main');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /** Focuses a control and presses a key, as a keyboard user does after reaching it. */
 async function press(control: Locator, key: string): Promise<void> {

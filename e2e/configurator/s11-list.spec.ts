@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
+import { DOWNLOAD_TIMEOUT, settled } from '../support/keyboard';
 
 /**
  * S11 around the list (S4-18a; R-LST-09, R-LST-10, R-LST-13) on the active test release T.1 of the
@@ -18,13 +19,6 @@ const WIDE = { width: 1280, height: 800 };
 
 const combobox = (page: Page) => page.getByRole('combobox', { name: 'Verwendungszweck' });
 const actionBar = (page: Page) => page.locator('pa-criteria-action-bar');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 async function pressSpace(box: Locator): Promise<void> {
   await box.focus();
@@ -321,7 +315,7 @@ test.describe('S13 export dialog', () => {
     await page.keyboard.press('Tab');
     await expect(dialog.getByRole('button', { name: 'Datei herunterladen' })).toBeFocused();
 
-    const download = page.waitForEvent('download');
+    const download = page.waitForEvent('download', { timeout: DOWNLOAD_TIMEOUT });
     await page.keyboard.press('Enter');
 
     expect((await download).suggestedFilename()).toMatch(/^ProcureAccess_Kriterien_T\.1_\d{4}-\d{2}-\d{2}\.csv$/);

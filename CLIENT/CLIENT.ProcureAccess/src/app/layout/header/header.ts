@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -17,7 +17,8 @@ import { injectWideLayout } from '@layout/shell/wide-layout';
  * layouts show.
  *
  * The compact menu itself is the shell's `mat-sidenav` (it must be a child of the sidenav
- * container), so this component only reports the toggle and shows its state.
+ * container), so this component reports the toggle, shows its state and takes the focus back
+ * when the shell closes the menu ({@link focusMenuButton}).
  *
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2017-650
  * @figma https://www.figma.com/design/rPeSyK8NNe3d8AnUEXW9mt/ProcureAccess?node-id=2039-2131 (compact)
@@ -37,4 +38,11 @@ export class Header {
   readonly menuToggle = output();
 
   protected readonly wide = injectWideLayout();
+
+  private readonly menuButton = viewChild<string, ElementRef<HTMLButtonElement>>('menuButton', { read: ElementRef });
+
+  /** Moves the focus to „Menü“ (compact layout only; nothing happens in the full header). */
+  focusMenuButton(): void {
+    this.menuButton()?.nativeElement.focus();
+  }
 }

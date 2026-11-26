@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   acceptInvitationThroughApi,
   createCandidateThroughApi,
@@ -14,6 +14,7 @@ import {
 } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
+import { settled } from '../support/keyboard';
 
 /**
  * Products of a procurement project (S6-16; R-CAN-02 UI, R-CAN-03, R-CAN-04): an Owner of an
@@ -40,13 +41,6 @@ const WIDE = { width: 1280, height: 800 };
 const PASSWORD = 'e2e-Passwort-lang-genug';
 
 const main = (page: Page) => page.getByRole('main');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 test.describe('Products of a project S33, S34', () => {
   test('INV:A11Y-01 INV:A11Y-08 INV:SIG-13 INV:WSP-01 an Owner adds a product from S32 in S33, sees S34 Überblick, records its evidence in S34a, edits it and finds it on S32', async ({ page, request }, testInfo) => {
