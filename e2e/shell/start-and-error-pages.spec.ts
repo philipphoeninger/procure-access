@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page, type Route } from '@playwright/test';
+import { expect, test, type Page, type Route } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { settled } from '../support/keyboard';
 

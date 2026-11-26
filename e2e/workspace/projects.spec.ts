@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { createOrganizationThroughApi, createProjectThroughApi, registerConfirmedAccount, saveListThroughApi } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';

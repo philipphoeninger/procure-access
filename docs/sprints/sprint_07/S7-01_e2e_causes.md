@@ -48,7 +48,7 @@ Security: one client focus change and test code; no secret, no request, no new i
 ## 4. Checks
 
 - Client: `ng test` 108 files, 1157 tests passed; `npm run lint` clean (after typing the two view queries, which lint first flagged as `any`).
-- E2E package: `npm run typecheck` and `eslint .` clean.
+- E2E package: `npm run typecheck` and `npm run lint` (CI's command, `e2e` and `scripts` with `e2e/eslint.config.mjs`) clean. The first push was checked only with `eslint .` inside `e2e/`, which missed nine `Locator` imports the helper move had left unused; CI stage 1 found them, fixed in a follow-up commit.
 - `node scripts/check-invariants.mjs` passed; `check-figma-links.mjs` 12 checked, 0 pending; `check-i18n.mjs` 0 errors; `check-icons.mjs` 0 errors; `reuse lint` (Docker) compliant, 1764 / 1764 files.
 - Server: not touched; CI runs its stages.
 - **Diagnosis in CI** (draft #463, closed without merging): mobile Safari, the dark-appearance test ×60 with the colour log, all passed; the log named C3 (§1).
