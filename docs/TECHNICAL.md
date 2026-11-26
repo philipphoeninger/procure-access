@@ -216,7 +216,8 @@ The log table is part of the backup (§7.1); its rows hold user ids and request 
 ### 6.3 Known gaps
 
 - Nothing alerts anybody yet: an unhealthy API or backup service is visible only to whoever looks (open point of S6-29, planned with GP.1).
-- On an empty database the log sink writes once before the migrations have created the `logging` schema; PostgreSQL logs `schema "logging" does not exist` once (issue #437).
+
+Until the migrations have run, the PostgreSQL sink holds its events in memory (at most `AppLoggingSettings:PostgreSQL:QueueLimit`) and writes them afterwards, so the first start on an empty database stores every line of the start and leaves no `schema "logging" does not exist` in the database server's log (issue #437, S7-02). The errors `relation "…__EFMigrationsHistory" does not exist` that PostgreSQL logs at that start are EF Core asking whether a schema has migrations yet; they are expected.
 
 ---
 
