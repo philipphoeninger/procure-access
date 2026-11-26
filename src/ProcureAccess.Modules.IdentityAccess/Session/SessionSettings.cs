@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.Extensions.Configuration;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 
 namespace ProcureAccess.Modules.IdentityAccess.Session;
 
@@ -67,18 +68,6 @@ internal sealed class SessionSettings
         };
     }
 
-    private static TimeSpan Read(IConfigurationSection section, string name, bool zeroAllowed = false)
-    {
-        var value = section[name];
-        if (!TimeSpan.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, out var duration)
-            || duration < TimeSpan.Zero
-            || (duration == TimeSpan.Zero && !zeroAllowed))
-        {
-            var expected = zeroAllowed ? "a duration of zero or more such as 00:00:00" : "a positive duration such as 00:30:00";
-            throw new InvalidOperationException(
-                $"{SectionName}:{name} must be {expected} (ARCHITECTURE §9.1); it is '{value}'.");
-        }
-
-        return duration;
-    }
+    private static TimeSpan Read(IConfigurationSection section, string name, bool zeroAllowed = false) =>
+        DurationSetting.Read(section[name], $"{SectionName}:{name}", zeroAllowed);
 }

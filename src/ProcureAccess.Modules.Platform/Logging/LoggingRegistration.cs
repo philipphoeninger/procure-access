@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NpgsqlTypes;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 using ProcureAccess.Modules.Platform.Persistence.Configurations;
 using Serilog;
 using Serilog.Core.Enrichers;
@@ -127,10 +128,14 @@ in method {MemberName} at {FilePath}:{LineNumber}
     /// </summary>
     public static IServiceCollection AddLogRetention(this IServiceCollection services)
     {
+        // The binder reads a bare number as days, so the interval is read again through the reader (#456).
+        const string runIntervalSetting =
+            $"{AppLoggingSettings.RetentionSettings.SectionName}:{nameof(AppLoggingSettings.RetentionSettings.RunInterval)}";
         services.AddOptions<AppLoggingSettings.RetentionSettings>()
             .BindConfiguration(AppLoggingSettings.RetentionSettings.SectionName)
+            .Configure<IConfiguration>((settings, configuration) =>
+                settings.RunInterval = DurationSetting.Read(configuration[runIntervalSetting], runIntervalSetting))
             .Validate(s => s.RetentionDays > 0, "AppLoggingSettings:Retention:RetentionDays must be greater than 0.")
-            .Validate(s => s.RunInterval > TimeSpan.Zero, "AppLoggingSettings:Retention:RunInterval must be greater than 0.")
             .ValidateOnStart();
 
         services.AddScoped<LogRetentionJob>();

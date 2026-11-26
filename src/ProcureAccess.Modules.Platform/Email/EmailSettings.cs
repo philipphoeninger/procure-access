@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MimeKit;
+using ProcureAccess.Modules.Platform.Contracts.Configuration;
 
 namespace ProcureAccess.Modules.Platform.Email;
 
@@ -112,9 +112,8 @@ internal sealed class EmailSettings
         }
 
         // MailKit takes whole milliseconds as an int.
-        if (!TimeSpan.TryParse(smtp["Timeout"], CultureInfo.InvariantCulture, out var timeout)
-            || timeout < TimeSpan.FromMilliseconds(1)
-            || timeout > TimeSpan.FromMilliseconds(int.MaxValue))
+        var timeout = DurationSetting.Read(smtp["Timeout"], "Email:Smtp:Timeout");
+        if (timeout < TimeSpan.FromMilliseconds(1) || timeout > TimeSpan.FromMilliseconds(int.MaxValue))
         {
             throw Invalid("Email:Smtp:Timeout must be a positive duration such as 00:00:15 (owner decision O-S6-3).");
         }
