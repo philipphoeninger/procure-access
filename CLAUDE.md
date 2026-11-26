@@ -157,6 +157,7 @@ node scripts/check-figma-links.mjs        # CI stage 1: @figma tags of built map
 node scripts/check-i18n.mjs [--write]     # CI stage 1: client, export and e-mail texts match the UX copy; --write copies them first
 node scripts/check-icons.mjs              # CI stage 1: icon list and font subset match the used icons
 node scripts/check-api-notices.mjs [--write]   # CI stage 2 after a build: THIRD-PARTY-NOTICES.txt matches the shipped NuGet packages
+node scripts/check-base-images.mjs         # CI stage 1: every image tag of the Dockerfiles and compose files is named in docs/BASE_IMAGES.md (change both together)
 node scripts/check-release-config.mjs     # before a production release only (🔧 placeholders)
 ```
 
