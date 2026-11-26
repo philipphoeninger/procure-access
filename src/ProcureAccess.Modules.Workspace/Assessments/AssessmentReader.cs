@@ -36,6 +36,36 @@ internal sealed class AssessmentReader(
     /// <summary>The criteria of <paramref name="list"/> for the assessments; <c>null</c> without a list.</summary>
     public async Task<ProjectCriteriaScope?> ScopeOfAsync(ProjectCriteriaList? list, CancellationToken cancellationToken)
     {
+        if (await ResolveAsync(list, cancellationToken) is not var (saved, selection))
+        {
+            return null;
+        }
+
+        var included = saved.Criteria.Where(c => c.IsIncluded).Select(c => c.CriterionRevisionId).ToHashSet();
+        var criteria = selection.Criteria.Where(c => included.Contains(c.RevisionId)).ToList();
+        return new ProjectCriteriaScope(
+            saved.ReleaseVersion,
+            [.. criteria.Where(c => c.Kind == CriterionKind.Requirement)],
+            [.. criteria.Where(c => c.Kind == CriterionKind.TestProcedure && c.TestTypeKey is not null)],
+            selection.MappedTestTypeKeys.Count > 1);
+    }
+
+    /// <summary>
+    /// Every requirement criterion of the selection of <paramref name="list"/> in list order, also
+    /// one the list excludes; <c>null</c> without a list. A stored assessment of an excluded
+    /// criterion stays (C51, WSP-03), and the personal data export names it (S7-05). Procedure
+    /// criteria are derived and have no rows (CAT-17).
+    /// </summary>
+    public async Task<IReadOnlyList<ResolvedCatalogCriterion>?> RequirementsOfSelectionAsync(
+        ProjectCriteriaList? list, CancellationToken cancellationToken) =>
+        await ResolveAsync(list, cancellationToken) is var (_, selection)
+            ? [.. selection.Criteria.Where(c => c.Kind == CriterionKind.Requirement)]
+            : null;
+
+    /// <summary>The stored list and its selection under the list's release; <c>null</c> without a list.</summary>
+    private async Task<(SavedConfiguration Saved, ResolvedCatalogSelection Selection)?> ResolveAsync(
+        ProjectCriteriaList? list, CancellationToken cancellationToken)
+    {
         if (list is null)
         {
             return null;
@@ -59,13 +89,7 @@ internal sealed class AssessmentReader(
                 $"The selection of criteria list {list.Id} does not resolve under release {saved.ReleaseVersion}: {resolved.Outcome}.");
         }
 
-        var included = saved.Criteria.Where(c => c.IsIncluded).Select(c => c.CriterionRevisionId).ToHashSet();
-        var criteria = selection.Criteria.Where(c => included.Contains(c.RevisionId)).ToList();
-        return new ProjectCriteriaScope(
-            saved.ReleaseVersion,
-            [.. criteria.Where(c => c.Kind == CriterionKind.Requirement)],
-            [.. criteria.Where(c => c.Kind == CriterionKind.TestProcedure && c.TestTypeKey is not null)],
-            selection.MappedTestTypeKeys.Count > 1);
+        return (saved, selection);
     }
 
     /// <summary>

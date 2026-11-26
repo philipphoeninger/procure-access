@@ -43,8 +43,17 @@ public sealed record ExportedProject(
 /// <summary>The criteria list of a project: its name and the catalog release it is pinned to.</summary>
 public sealed record ExportedProjectCriteriaList(string Name, string Release);
 
-/// <summary>A candidate product with its private section and its test evidences in the order they were added.</summary>
+/// <summary>
+/// A candidate product with its private section, its test evidences in the order they were added
+/// and its stored assessments.
+/// </summary>
 /// <param name="TestStatus">As the candidates API names it: <c>tested</c>, <c>notTested</c>, <c>unknown</c>.</param>
+/// <param name="Assessments">
+/// The stored assessments in the order of the project's criteria list (S7-05, owner decision
+/// O-S7-1): only what was entered, so a criterion without a value and without a note has no entry,
+/// and a „Geprüft nach …“ criterion never has one (CAT-17). An assessment of a criterion the list
+/// excludes by now is stored and therefore listed.
+/// </param>
 public sealed record ExportedCandidate(
     string Name,
     string? Vendor,
@@ -54,7 +63,19 @@ public sealed record ExportedCandidate(
     string? ContactNotes,
     string? InternalNotes,
     DateTimeOffset CreatedAt,
-    IReadOnlyList<ExportedTestEvidence> TestEvidences);
+    IReadOnlyList<ExportedTestEvidence> TestEvidences,
+    IReadOnlyList<ExportedAssessment> Assessments);
+
+/// <summary>
+/// The assessment of one criterion for a candidate: the criterion by number and title of the
+/// release the project's list is pinned to, as the exported criteria lists name it; no id.
+/// </summary>
+/// <param name="Value">
+/// As the assessment API names it: <c>fulfilled</c>, <c>slightRestriction</c>, <c>restriction</c>,
+/// <c>barrier</c>, <c>blockade</c>, <c>notApplicable</c>, or <c>unknown</c> for a note without a value.
+/// </param>
+/// <param name="Note">The note „Worauf stützt sich Ihre Einschätzung?“, or <c>null</c>.</param>
+public sealed record ExportedAssessment(string? Number, string Title, string Value, string? Note);
 
 /// <summary>A test evidence with its private note.</summary>
 /// <param name="TestKind">As the candidates API names it: <c>procedure</c>, <c>other</c>, <c>own</c>.</param>
