@@ -7,7 +7,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MODELS.ProcureAccess.Entities.Authorization;
+using ProcureAccess.Modules.IdentityAccess.Contracts.Accounts;
 
 namespace ProcureAccess.Tests.Shared.Auth;
 
@@ -52,7 +52,7 @@ public sealed class TestAuthHandler(
             new(ClaimTypes.Email, user.Email),
         };
         claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
-        claims.AddRange(user.Permissions.Select(p => new Claim(CustomClaimTypes.Permission, p)));
+        claims.AddRange(user.Permissions.Select(p => new Claim(PlatformPermissions.ClaimType, p)));
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, SchemeName));
         return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(principal, SchemeName)));
