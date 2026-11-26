@@ -33,8 +33,8 @@ namespace ProcureAccess.Modules.IdentityAccess.Accounts;
 /// and creation time; criteria lists their name, organisation, release, selection and criteria
 /// with the user's decisions (owner decision S5-19 4), for the organisations the user still
 /// belongs to; projects their name, organisation, status, criteria list by name and release, and
-/// every candidate with its private section and test evidences (owner decisions S6-25 D1 (a),
-/// D2 (a)), for the same organisations.</para>
+/// every candidate with its private section, test evidences (owner decisions S6-25 D1 (a),
+/// D2 (a)) and stored assessments (S7-05, O-S7-1), for the same organisations.</para>
 /// <para><b>Settings</b> (S5-25a, owner decision S5-25 4): <c>preferences</c> holds the effective
 /// values — the defaults for a user who never saved any —, spelled as the settings API does, with
 /// the state of the S34b rating legend since S6-19b (format still 1).</para>
@@ -136,7 +136,8 @@ internal static class AccountExportEndpoints
         [.. project.Candidates.Select(c => new AccountExportCandidate(
             c.Name, c.Vendor, c.Website, c.FunctionalSummary, c.TestStatus, c.ContactNotes, c.InternalNotes, c.CreatedAt,
             [.. c.TestEvidences.Select(e => new AccountExportTestEvidence(
-                e.TestKind, e.TestType, e.OtherTestTypeName, e.TestedBy, e.TestDate, e.TestedVersion, e.EvidenceUrl, e.QualificationNote))]))]);
+                e.TestKind, e.TestType, e.OtherTestTypeName, e.TestedBy, e.TestDate, e.TestedVersion, e.EvidenceUrl, e.QualificationNote))],
+            [.. c.Assessments.Select(a => new AccountExportAssessment(a.Number, a.Title, a.Value, a.Note))]))]);
 
     private static AccountExportPreferences PreferencesOf(UserPreferencesValues settings) =>
         new(settings.Language, settings.Appearance, settings.Motion, settings.Contrast, settings.AssessmentLegend);
@@ -220,7 +221,16 @@ internal sealed record AccountExportCandidate(
     string? ContactNotes,
     string? InternalNotes,
     DateTimeOffset CreatedAt,
-    IReadOnlyList<AccountExportTestEvidence> TestEvidences);
+    IReadOnlyList<AccountExportTestEvidence> TestEvidences,
+    IReadOnlyList<AccountExportAssessment> Assessments);
+
+/// <summary>
+/// A stored assessment of a candidate (S7-05, owner decision O-S7-1): the criterion by number and
+/// title, the value as <c>fulfilled</c>, <c>slightRestriction</c>, <c>restriction</c>,
+/// <c>barrier</c>, <c>blockade</c>, <c>notApplicable</c> or <c>unknown</c>, and the note. Stored
+/// values only: no count and no sum (SIG-01).
+/// </summary>
+internal sealed record AccountExportAssessment(string? Number, string Title, string Value, string? Note);
 
 /// <summary>
 /// A test evidence with its private note: kind as <c>procedure</c>, <c>other</c>, <c>own</c>; the

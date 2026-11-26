@@ -28,7 +28,8 @@ namespace ProcureAccess.Tests.Integration.IdentityAccess;
 /// contributor profile; Owner B has one too, which Editor A's export must not show. The criteria
 /// lists the user created came with S5-19 (owner decision S5-19 4), the settings with S5-25a (the
 /// effective values, owner decision S5-25 4), the procurement projects with S6-25 (owner decisions
-/// S6-25 D1 (a), D2 (a)). The part of PRV-07 that step 6 fills (contributions and purged content)
+/// S6-25 D1 (a), D2 (a)), the stored assessments of their candidates with S7-05 (owner decision
+/// O-S7-1). The part of PRV-07 that step 6 fills (contributions and purged content)
 /// is empty here (owner decision S5-27 1a).
 /// </summary>
 public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), IAsyncLifetime
@@ -191,6 +192,11 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
     [Trait("Invariant", "PRV-07")]
     public async Task Export_UserWhoCreatedProjects_ContainsTheirContentAndNoProjectOfOthersOrOfALeftOrganization()
     {
+        await ExportTestCatalog.ImportBothAndActivateAsync(Api.Factory.Services, Clock, MiniCatalog.T1Version, Cancellation);
+        var selection = await SavedLists.ResolveAsync(Api.Factory.Services, MiniCatalog.T1Version, Cancellation);
+        var requirements = selection.Criteria.Where(c => c.Kind == CriterionKind.Requirement).ToList();
+        requirements.Count.ShouldBeGreaterThan(3);
+        selection.Criteria.ShouldContain(c => c.Kind == CriterionKind.TestProcedure);
         var now = Clock.GetUtcNow();
         var testDate = DateOnly.FromDateTime(now.UtcDateTime).AddDays(-30);
 
@@ -208,10 +214,18 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
             new TestEvidenceFacts(TestKind.Other, null, "Hausinterne Prüfung", "IT-Referat", testDate.AddDays(1), null, null),
             now.AddHours(-1)).Evidence!;
         var bare = CandidateProduct.Create(own, new CandidateFacts("Kursraum", null, null, null), now.AddHours(-1));
-        var copy = CriteriaConfiguration.Create(
-            Fixture.A.Id, "Vergabe 2027", TestUsers.OwnerA.Id, now, MiniCatalog.T1Version, "hr",
-            ["web"], ["base"], ["softwareTest"], [new ConfigurationCriterionDraft(1, PriorityLevel.A)])
+        // The list leaves out its third requirement criterion, which was assessed before (WSP-03).
+        var copy = SavedLists.Build(
+                Fixture.A.Id, TestUsers.OwnerA.Id, "Vergabe 2027", now, MiniCatalog.T1Version, selection,
+                c => c == requirements[2] ? SavedLists.Draft(c, isIncluded: false) : null)
             .CopyForProject(own.Id, TestUsers.OwnerA.Id, now);
+
+        // The stored assessments of the first candidate, entered against the list order: a value
+        // with a note, a note without a value, a value of the criterion the list excludes by now.
+        // The fourth criterion and the second candidate have no row.
+        var excludedValue = Assessment(full, requirements[2], Fulfillment.Fulfilled, null, now);
+        var valueWithNote = Assessment(full, requirements[1], Fulfillment.Restriction, "Laut Prüfbericht, Abschnitt 3", now);
+        var noteOnly = Assessment(full, requirements[0], Fulfillment.Unknown, "Beim Anbieter nachfragen", now);
 
         // A later one in B, archived, without candidates and without a list.
         var ownInB = ProcurementProject.Create(Fixture.B.Id, "Rahmenvertrag", TestUsers.EditorA.Id, now.AddHours(-1));
@@ -220,10 +234,15 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         // Not Editor A's: a project of a colleague in A, and one Editor A created in an organisation they have left.
         var colleagues = ProcurementProject.Create(Fixture.A.Id, "Projekt der Kollegin", TestUsers.OwnerA.Id, now);
         var colleaguesCandidate = CandidateProduct.Create(colleagues, new CandidateFacts("Fremdes Produkt", null, null, null), now);
+        var colleaguesCopy = SavedLists.Build(
+                Fixture.A.Id, TestUsers.OwnerA.Id, "Liste der Kollegin", now, MiniCatalog.T1Version, selection)
+            .CopyForProject(colleagues.Id, TestUsers.OwnerA.Id, now);
+        var colleaguesAssessment = Assessment(colleaguesCandidate, requirements[0], Fulfillment.Barrier, "Einschätzung der Kollegin", now);
         var left = Organization.Create("Verlassene Organisation", OrganizationType.Association, TestUsers.OwnerB.Id, now);
         var inLeft = ProcurementProject.Create(left.Id, "Projekt von früher", TestUsers.EditorA.Id, now);
         await StoreAsync(
-            left, own, full, bare, copy, ownInB, colleagues, colleaguesCandidate, inLeft,
+            left, own, full, bare, copy, ownInB, colleagues, colleaguesCandidate, colleaguesCopy, inLeft,
+            excludedValue, valueWithNote, noteOnly, colleaguesAssessment,
             CandidatePrivateSection.Of(full, "Frau Beispiel, Vertrieb", "Angebot bis März"),
             TestEvidencePrivateNote.Of(procedure, "Zertifizierte Prüferin"),
             TestEvidencePrivateNote.Of(other, null),
@@ -255,7 +274,7 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         candidates.Select(c => c.GetProperty("name").GetString()).ShouldBe(["Lernwelt", "Kursraum"]);
         var candidate = candidates[0];
         candidate.EnumerateObject().Select(p => p.Name).ShouldBe(
-            ["name", "vendor", "website", "functionalSummary", "testStatus", "contactNotes", "internalNotes", "createdAt", "testEvidences"]);
+            ["name", "vendor", "website", "functionalSummary", "testStatus", "contactNotes", "internalNotes", "createdAt", "testEvidences", "assessments"]);
         candidate.GetProperty("vendor").GetString().ShouldBe("Lernwelt GmbH");
         candidate.GetProperty("website").GetString().ShouldBe("https://lernwelt.example");
         candidate.GetProperty("functionalSummary").GetString().ShouldBe("Kurse, Tests");
@@ -281,11 +300,27 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         evidences[1].GetProperty("otherTestTypeName").GetString().ShouldBe("Hausinterne Prüfung");
         evidences[1].GetProperty("qualificationNote").ValueKind.ShouldBe(JsonValueKind.Null);
 
-        // A candidate with only a name: „unknown“, no private section, no evidence.
+        // The stored assessments in list order (O-S7-1): number, title, value and note, nothing
+        // else. No entry for a criterion without a row or for a „Geprüft nach …“ criterion
+        // (CAT-17); the row of the excluded criterion is stored and listed.
+        var assessments = candidate.GetProperty("assessments").EnumerateArray().ToList();
+        assessments.ShouldAllBe(a => a.EnumerateObject().Select(p => p.Name).SequenceEqual(new[] { "number", "title", "value", "note" }));
+        assessments.Select(a => (
+                a.GetProperty("number").GetString(), a.GetProperty("title").GetString(),
+                a.GetProperty("value").GetString(), a.GetProperty("note").GetString()))
+            .ShouldBe(
+            [
+                (requirements[0].Number, TitleOf(requirements[0]), "unknown", "Beim Anbieter nachfragen"),
+                (requirements[1].Number, TitleOf(requirements[1]), "restriction", "Laut Prüfbericht, Abschnitt 3"),
+                (requirements[2].Number, TitleOf(requirements[2]), "fulfilled", null),
+            ]);
+
+        // A candidate with only a name: „unknown“, no private section, no evidence, no assessment.
         candidates[1].GetProperty("testStatus").GetString().ShouldBe("unknown");
         candidates[1].GetProperty("contactNotes").ValueKind.ShouldBe(JsonValueKind.Null);
         candidates[1].GetProperty("internalNotes").ValueKind.ShouldBe(JsonValueKind.Null);
         candidates[1].GetProperty("testEvidences").GetArrayLength().ShouldBe(0);
+        candidates[1].GetProperty("assessments").GetArrayLength().ShouldBe(0);
 
         projects[1].GetProperty("criteriaList").ValueKind.ShouldBe(JsonValueKind.Null);
         projects[1].GetProperty("candidates").GetArrayLength().ShouldBe(0);
@@ -294,11 +329,16 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
         text.ShouldNotContain("Projekt der Kollegin");
         text.ShouldNotContain("Fremdes Produkt");
         text.ShouldNotContain("Kontakt der Kollegin");
+        text.ShouldNotContain("Einschätzung der Kollegin");
+        text.ShouldNotContain("Liste der Kollegin");
+        text.ShouldNotContain("\"barrier\"");
+        text.ShouldNotContain("revisionId", Case.Insensitive);
         text.ShouldNotContain("Projekt von früher");
         text.ShouldNotContain("Verlassene Organisation");
         foreach (var id in new[]
                  {
                      own.Id, ownInB.Id, colleagues.Id, inLeft.Id, full.Id, bare.Id, procedure.Id, other.Id, copy.Id,
+                     colleaguesCandidate.Id, colleaguesCopy.Id,
                      Fixture.A.Id, Fixture.B.Id, left.Id,
                  })
         {
@@ -314,6 +354,17 @@ public sealed class AccountExportTests(ApiFixture api) : IntegrationTest(api), I
             }
         }
     }
+
+    private static CandidateAssessment Assessment(
+        CandidateProduct candidate, ResolvedCatalogCriterion criterion, Fulfillment value, string? note, DateTimeOffset at)
+    {
+        var assessment = CandidateAssessment.Of(candidate, criterion.RevisionId);
+        assessment.Change(value, note, at);
+        return assessment;
+    }
+
+    /// <summary>The title as the export names a criterion, in the lists and in the assessments.</summary>
+    private static string TitleOf(ResolvedCatalogCriterion criterion) => criterion.PlainLanguageTitle ?? criterion.Title;
 
     [Fact(DisplayName = "INV:PRV-07 " + nameof(Export_UserWithoutMembershipOrProfile_HasEverySectionOfSpec84AndTheUnbuiltOnesEmpty))]
     [Trait("Invariant", "PRV-07")]
