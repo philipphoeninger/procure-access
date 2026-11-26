@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using ProcureAccess.Modules.Configurator.Contracts.Configurations;
 using ProcureAccess.Modules.Platform.Contracts.Concurrency;
 using ProcureAccess.Modules.Workspace.Assessments;
 using ProcureAccess.Modules.Workspace.Domain;
 using ProcureAccess.Modules.Workspace.Persistence;
+using ProcureAccess.Modules.Workspace.Persistence.Configurations;
 
 namespace ProcureAccess.Modules.Workspace.Candidates;
 
@@ -31,7 +33,9 @@ namespace ProcureAccess.Modules.Workspace.Candidates;
 /// <item>of the evidence — its fields and its private note; the candidate keeps its version.</item>
 /// </list>
 /// The project keeps its version through all of them; it is only stamped. A save that met a
-/// concurrent one runs again (<see cref="ConcurrentChange"/>).</para>
+/// concurrent one runs again (<see cref="ConcurrentChange"/>). Two requests that save the same
+/// procedure at once both pass the aggregate's check; the second meets the unique index and is
+/// refused as a duplicate (WSP-01; #453).</para>
 /// <para>The private rows are read and written beside the candidate, never through it.</para>
 /// </remarks>
 internal sealed class CandidateService(
@@ -186,7 +190,7 @@ internal sealed class CandidateService(
     /// <summary>Adds an evidence with its private note (WSP-01).</summary>
     public Task<CandidateResult<TestEvidenceResponse>> AddEvidenceAsync(
         Guid candidateId, EvidenceInput input, string userId, CancellationToken cancellationToken) =>
-        ConcurrentChange.RunAsync(db, () => AddEvidenceOnceAsync(candidateId, input, userId, cancellationToken));
+        RefusingRacedDuplicatesAsync(() => ConcurrentChange.RunAsync(db, () => AddEvidenceOnceAsync(candidateId, input, userId, cancellationToken)));
 
     private async Task<CandidateResult<TestEvidenceResponse>> AddEvidenceOnceAsync(
         Guid candidateId, EvidenceInput input, string userId, CancellationToken cancellationToken)
@@ -224,7 +228,7 @@ internal sealed class CandidateService(
     /// </summary>
     public Task<CandidateResult<TestEvidenceResponse>> ChangeEvidenceAsync(
         Guid evidenceId, EvidenceInput input, EditPrecondition edit, CancellationToken cancellationToken) =>
-        ConcurrentChange.RunAsync(db, () => ChangeEvidenceOnceAsync(evidenceId, input, edit, cancellationToken));
+        RefusingRacedDuplicatesAsync(() => ConcurrentChange.RunAsync(db, () => ChangeEvidenceOnceAsync(evidenceId, input, edit, cancellationToken)));
 
     private async Task<CandidateResult<TestEvidenceResponse>> ChangeEvidenceOnceAsync(
         Guid evidenceId, EvidenceInput input, EditPrecondition edit, CancellationToken cancellationToken)
@@ -340,6 +344,27 @@ internal sealed class CandidateService(
     private static string? Merged(string? named, string? current) => named is null ? current : Cleared(named);
 
     private static string? Cleared(string? value) => string.IsNullOrEmpty(value) ? null : value;
+
+    /// <summary>
+    /// Refuses an evidence whose procedure another request saved between this one's check and its
+    /// save, as the check refuses it (WSP-01; #453): the unique index keeps the data right, and its
+    /// violation answers 400 at the procedure, not 500.
+    /// </summary>
+    private async Task<CandidateResult<TestEvidenceResponse>> RefusingRacedDuplicatesAsync(
+        Func<Task<CandidateResult<TestEvidenceResponse>>> change)
+    {
+        try
+        {
+            return await change();
+        }
+        catch (DbUpdateException exception) when (exception.InnerException is PostgresException unique
+            && unique.SqlState == PostgresErrorCodes.UniqueViolation
+            && unique.ConstraintName == TestEvidenceConfiguration.ProcedureIndex)
+        {
+            db.ChangeTracker.Clear();
+            return CandidateResult<TestEvidenceResponse>.Of(CandidateOutcome.DuplicateTestType);
+        }
+    }
 
     private static CandidateResult<T>? Refused<T>(EvidenceChange change, CandidateProduct candidate) where T : class =>
         change.Outcome switch
