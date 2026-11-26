@@ -4,6 +4,7 @@
 
 import { expect, test, type Locator, type Page, type Route } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
+import { settled } from '../support/keyboard';
 
 /**
  * Start page S04 (R-SHL-05), error pages S80 and the offline notice (R-SHL-08), and the loading
@@ -15,18 +16,10 @@ import { expectNoAxeViolations } from '../support/axe';
 const WIDE = { width: 1280, height: 800 };
 const COMPACT = { width: 360, height: 780 };
 const API = '**/api/**';
+/** The catalog reads of S10 (its filter options), which it waits for before it opens (O-S4-3). */
+const CATALOG_API = '**/api/v1/catalog/**';
 
 const mainNav = (page: Page) => page.getByRole('navigation', { name: 'Hauptnavigation' });
-
-/**
- * Waits until the transitions of a clicked element are over, so axe sees the settled colours.
- * A transition that is cancelled (e.g. the focus moved on) rejects `finished`: it is over too.
- */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /**
  * Records every text of CDK LiveAnnouncer's live region (the only one A11yAnnouncerService
@@ -109,7 +102,10 @@ test.describe('Error pages S80', () => {
 
   test('INV:A11Y-01 INV:A11Y-08 a server error shows „Etwas ist schiefgelaufen“ in place, with the focus on the H1', async ({ page }, testInfo) => {
     await page.goto('/');
-    await page.route(API, (route) => route.fulfill({ status: 500, contentType: 'application/problem+json', body: '{"status":500}' }));
+    // Only S10's own reads fail. With every API request, a start-up read still pending after `goto`
+    // (the legacy products) showed S80 before the click; the click then moved the focus to the
+    // link, and the router dropped S10's second „error“ as the same address (#451).
+    await page.route(CATALOG_API, (route) => route.fulfill({ status: 500, contentType: 'application/problem+json', body: '{"status":500}' }));
 
     const criteria = mainNav(page).getByRole('link', { name: 'Kriterien' });
     await criteria.click();

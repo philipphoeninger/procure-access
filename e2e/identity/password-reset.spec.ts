@@ -6,6 +6,7 @@ import { expect, test, type APIRequestContext, type Locator, type Page, type Tes
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
 import { accountMenuButton } from '../support/session';
+import { settled } from '../support/keyboard';
 
 /**
  * Password reset S03 and the lockout note of S01 (S5-13b; R-AUTH-03, R-AUTH-04) on the real E2E
@@ -22,13 +23,6 @@ const main = (page: Page) => page.getByRole('main');
 /** A new address per test and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
   return `reset-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 /** Registers through the API with the probe's antiforgery token; S02 itself is tested in register.spec.ts. */

@@ -78,8 +78,8 @@ export async function expectNoAxeViolations(
   const other: Appearance = current === 'light' ? 'dark' : 'light';
 
   for (const appearance of [current, other]) {
-    if (appearance !== current) await showAppearance(page, appearance);
-    await settled(page);
+    if (appearance === current) await settled(page);
+    else await showAppearance(page, appearance);
     const blocking = await checkOneAppearance(page, testInfo, state, appearance, suppressions);
     if (blocking.length > 0) failures.push(formatFailure(state, appearance, page.url(), blocking));
   }
@@ -170,26 +170,37 @@ async function explicitAppearanceOf(page: Page): Promise<Appearance> {
 }
 
 /**
- * Waits until every running CSS animation and transition that ends has ended (two frames first,
- * so those just started are counted), so axe never measures a colour halfway — e.g. a dialog
- * still fading in (S5-24's S15 check failed so in CI, S5-25b). Infinite ones such as spinners
- * are left running.
+ * Waits until a whole frame passes without a running CSS animation or transition that ends, so axe
+ * never measures a colour halfway — e.g. a dialog still fading in (S5-24's S15 check failed so in
+ * CI, S5-25b). Infinite ones such as spinners are left running.
+ *
+ * It waits again after each round, because a transition can start a frame after the one before it
+ * ended: under reduced motion every element transitions its colour for 0.01 ms (`theme.scss`), and
+ * an inherited colour reaches one DOM level per frame. After a switch to dark the cards' text kept
+ * its light colour for many frames, after a single wait had returned (#452, S7-01). Fails when
+ * animations are still starting after 200 frames.
  */
 async function settled(page: Page): Promise<void> {
   await page.evaluate(async () => {
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const ending = document
-      .getAnimations()
-      .filter((animation) => animation.playState === 'running' && animation.effect?.getComputedTiming().endTime !== Infinity);
-    await Promise.all(ending.map((animation) => animation.finished.catch(() => undefined)));
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    await nextFrame();
+    for (let round = 0; round < 200; round++) {
+      await nextFrame();
+      const ending = document
+        .getAnimations()
+        .filter((animation) => animation.playState === 'running' && animation.effect?.getComputedTiming().endTime !== Infinity);
+      if (ending.length === 0) return;
+      await Promise.all(ending.map((animation) => animation.finished.catch(() => undefined)));
+    }
+    throw new Error('CSS animations or transitions were still starting after 200 frames');
   });
 }
 
 /**
  * Emulates the appearance and waits until the page shows it: the app's class on `<html>`
  * (`theme-light`/`theme-dark`, set by `AppearanceService`; pages without it, such as the helper's
- * fixtures, only follow the media query) and the end of the colour transitions it started, so
- * axe never measures a colour halfway.
+ * fixtures, only follow the media query) and the end of the colour transitions it started
+ * ({@link settled}), so axe never measures a colour halfway.
  */
 async function showAppearance(page: Page, appearance: Appearance): Promise<void> {
   await page.emulateMedia({ colorScheme: appearance });
@@ -204,11 +215,7 @@ async function showAppearance(page: Page, appearance: Appearance): Promise<void>
       { message: `the page did not switch to the ${appearance} appearance` },
     )
     .toBe(true);
-  await page.evaluate(async () => {
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const transitions = document.getAnimations().filter((animation) => animation instanceof CSSTransition);
-    await Promise.all(transitions.map((transition) => transition.finished.catch(() => undefined)));
-  });
+  await settled(page);
 }
 
 function toFinding(violation: Result, node: NodeResult): Finding {

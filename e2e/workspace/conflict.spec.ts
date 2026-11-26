@@ -13,6 +13,7 @@ import {
 } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
+import { settled } from '../support/keyboard';
 
 /**
  * The conflict dialog S37 (S6-21a; R-CAN-11, API-03; Handoff §5.1, Figma `2056:2519`): two members
@@ -31,13 +32,6 @@ import { signInThroughApi } from '../support/session';
 const PASSWORD = 'e2e-Passwort-lang-genug';
 
 const main = (page: Page) => page.getByRole('main');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /** Opens „Projekt bearbeiten“ on S32 and returns the dialog with its name field focused. */
 async function openEditDialog(page: Page): Promise<Locator> {

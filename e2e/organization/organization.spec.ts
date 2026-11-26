@@ -8,6 +8,7 @@ import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
 import { signInThroughApi } from '../support/session';
 import { E2E_ORGANIZATION, ORG_OWNER, ORG_READER, TEST_USER_PASSWORD } from '../support/users';
+import { settled } from '../support/keyboard';
 
 /**
  * Organisations S20 and S21 (S5-16b; R-ORG-01, R-ORG-03, R-ORG-04) on the real E2E stack. S20 with
@@ -26,13 +27,6 @@ const membersPath = (id: string) => `/organisation/${id}/mitglieder`;
 /** A new address per test and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
   return `org-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 async function openMembers(page: Page, email: string): Promise<void> {

@@ -7,6 +7,7 @@ import { createOrganizationThroughApi, registerConfirmedAccount } from '../suppo
 import { expectNoAxeViolations } from '../support/axe';
 import { accountMenuButton, openAccountMenu, signInThroughApi } from '../support/session';
 import { CONFIRMED_USER, E2E_ORGANIZATION, ORG_READER, TEST_USER_PASSWORD } from '../support/users';
+import { settled } from '../support/keyboard';
 
 /**
  * The signed-in header (S5-18; R-SHL-02, R-SHL-03): SignedInNoOrg with the seeded confirmed user
@@ -22,13 +23,6 @@ const PASSWORD = 'e2e-Passwort-lang-genug';
 
 const main = (page: Page) => page.getByRole('main');
 const banner = (page: Page) => page.getByRole('banner');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /** A confirmed account of its own with two organisations; returns their names and ids, by name. */
 async function userWithTwoOrganizations(page: Page, request: Page['request'], testInfo: TestInfo) {

@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { linksOf, waitForMail } from '../support/mailpit';
+import { settled } from '../support/keyboard';
 
 /**
  * Registration S02 and the confirmation page (S5-12b; R-AUTH-01, R-AUTH-02) on the real E2E stack,
@@ -21,13 +22,6 @@ const main = (page: Page) => page.getByRole('main');
 /** A new address per test and browser project: projects share one stack when run locally. */
 function newAddress(testInfo: TestInfo): string {
   return `register-${testInfo.project.name}-${testInfo.workerIndex}-${Date.now()}@example.test`;
-}
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 /** Fills S02 by keyboard and submits with Enter on „Konto erstellen“. */

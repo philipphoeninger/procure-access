@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
+import { settled } from '../support/keyboard';
 
 /**
  * S10 frame and step 1 (S4-10; R-CON-01, R-CON-02) on the active test release T.1 of the E2E
@@ -22,13 +23,6 @@ const NONE = 'Keiner davon passt Es gelten die allgemeinen Empfehlungen.';
 async function openList(page: Page): Promise<void> {
   await combobox(page).focus();
   await expect(page.getByRole('listbox')).toBeVisible();
-}
-
-/** Waits until Material's enter animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
 }
 
 async function openPage(page: Page, viewport: { width: number; height: number }): Promise<void> {

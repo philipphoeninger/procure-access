@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -59,9 +60,29 @@ export class App {
   protected readonly menuOpen = linkedSignal({ source: this.wide, computation: () => false });
 
   private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
+  private readonly header = viewChild.required(Header);
+  private readonly menuDrawer = viewChild('menuDrawer', { read: ElementRef<HTMLElement> });
+  private readonly document = inject(DOCUMENT);
 
   constructor() {
     inject(SessionWarningService).start();
+  }
+
+  /**
+   * The compact menu closes. Esc and „Menü schließen“ return the focus to „Menü“ (Handoff §2.2).
+   * The drawer does that itself, but it records the element to return to each time it reports
+   * „opened“, also on a late `transitionend` of its own, when the focus is already on the first
+   * item: Esc then left the focus in the closing menu (#452 (b)). So the shell moves it while the
+   * focus is still in the menu (or nowhere). A chosen item that opens a page keeps the page's move
+   * to its H1 (A11Y-03): by then the focus has left the menu.
+   */
+  protected menuClosing(): void {
+    this.menuOpen.set(false);
+    const active = this.document.activeElement;
+    const inMenu = !!active && !!this.menuDrawer()?.nativeElement.contains(active);
+    if (!active || active === this.document.body || inMenu) {
+      this.header().focusMenuButton();
+    }
   }
 
   /** Skip link: focus `main` without changing the URL (the router would see `#main`). */

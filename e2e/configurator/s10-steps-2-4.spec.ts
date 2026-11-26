@@ -5,6 +5,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from '../support/axe';
 import { chooseFirstOption } from '../support/combobox';
+import { settled } from '../support/keyboard';
 
 /**
  * S10 steps 2–4 (S4-11; R-CON-03 – R-CON-06) on the active test release T.1 of the E2E stack,
@@ -17,13 +18,6 @@ const COMPACT = { width: 360, height: 780 };
 
 const checkbox = (page: Page, name: string) => page.getByRole('checkbox', { name, exact: true });
 const next = (page: Page) => page.getByRole('button', { name: 'Weiter' });
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
 
 /** Opens S10 and answers step 1 with HR-Anwendung by keyboard. */
 async function toStep2(page: Page, viewport: { width: number; height: number }): Promise<void> {

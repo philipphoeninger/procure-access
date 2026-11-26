@@ -19,6 +19,25 @@ async function renderShell(wide: boolean, doubles = createShellDoubles()) {
   return fixture;
 }
 
+type Shell = Awaited<ReturnType<typeof renderShell>>;
+
+/**
+ * Until the drawer has reported what it did: without animations it reports „opened“ and „closed“
+ * in a `setTimeout` of its own, which `whenStable` does not wait for.
+ */
+async function drawerSettled(fixture: Shell): Promise<void> {
+  await fixture.whenStable();
+  await new Promise((resolve) => setTimeout(resolve));
+  await fixture.whenStable();
+}
+
+/** „Menü“ as a user activates it: focus, then click. */
+async function openMenu(fixture: Shell, menu: HTMLElement): Promise<void> {
+  menu.focus();
+  menu.click();
+  await drawerSettled(fixture);
+}
+
 const skipLink = () => screen.getByRole('link', { name: 'Zum Inhalt springen' });
 
 describe('App shell (R-SHL-01)', () => {
@@ -83,6 +102,39 @@ describe('App shell (R-SHL-01)', () => {
       await fixture.whenStable();
 
       expect(menu.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    // #452 (b): the drawer records the element to return the focus to whenever it reports „opened“,
+    // also on a late `transitionend` of its own (its transitions start 200 ms after the shell). By
+    // then the focus is on the first item, so Esc returned it there and not to „Menü“.
+    it('returns the focus to „Menü“ on Esc, also after a late transitionend of the drawer', async () => {
+      const fixture = await renderShell(false);
+      const menu = screen.getByRole('button', { name: 'Menü' });
+      await openMenu(fixture, menu);
+      // The first item has the focus when the menu has opened (cdkFocusInitial, checked in E2E).
+      const first = screen.getByRole('link', { name: 'Kriterien' });
+      first.focus();
+
+      screen.getByRole('dialog', { name: 'Menü' }).dispatchEvent(new Event('transitionend'));
+      await fixture.whenStable();
+      fireEvent.keyDown(first, { key: 'Escape', keyCode: 27 });
+      await drawerSettled(fixture);
+
+      expect(menu.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(menu);
+    });
+
+    it('returns the focus to „Menü“ when „Menü schließen“ closes it', async () => {
+      const fixture = await renderShell(false);
+      const menu = screen.getByRole('button', { name: 'Menü' });
+      await openMenu(fixture, menu);
+
+      const close = screen.getByRole('button', { name: 'Menü schließen' });
+      close.focus();
+      close.click();
+      await drawerSettled(fixture);
+
+      expect(document.activeElement).toBe(menu);
     });
 
     it('closes after an item was chosen', async () => {

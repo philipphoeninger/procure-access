@@ -12,6 +12,7 @@ import {
 } from '../support/accounts';
 import { expectNoAxeViolations } from '../support/axe';
 import { signInThroughApi } from '../support/session';
+import { settled, tabTo } from '../support/keyboard';
 
 /**
  * The assessment tab S34b (S6-19; R-CAN-06, Handoff §4.6): an Owner assesses a product with the
@@ -28,25 +29,8 @@ import { signInThroughApi } from '../support/session';
 const WIDE = { width: 1280, height: 800 };
 const NARROW = { width: 360, height: 800 };
 const PASSWORD = 'e2e-Passwort-lang-genug';
-const MAX_TABS = 30;
 
 const main = (page: Page) => page.getByRole('main');
-
-/** Waits until Material's animations are over, so axe sees the final colours. */
-async function settled(locator: Locator): Promise<void> {
-  await locator.evaluate((element) =>
-    Promise.all(element.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))),
-  );
-}
-
-/** Presses Tab (or Shift+Tab) until the target has the focus (keyboard only). */
-async function tabTo(page: Page, target: Locator, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
-  for (let presses = 0; presses <= MAX_TABS; presses++) {
-    if (await target.evaluate((element) => element === document.activeElement)) return;
-    await page.keyboard.press(key);
-  }
-  throw new Error(`${target.toString()} was not reached with ${MAX_TABS} presses of ${key}`);
-}
 
 /** The PUT of one row of the candidate's assessment. */
 function assessmentSaved(page: Page, candidateId: string) {
