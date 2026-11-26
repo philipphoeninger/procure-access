@@ -244,7 +244,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari]
+        include:
+          - project: firefox
+            spec: shell/start-and-error-pages.spec.ts
+            grep: a server error shows
+            repeat: 40
+          - project: webkit
+            spec: identity/account.spec.ts
+            grep: cannot delete the account
+            repeat: 30
+          - project: mobile-safari
+            spec: identity/preferences.spec.ts shell/shell.spec.ts
+            grep: saved dark appearance|compact menu opens
+            repeat: 40
     env:
       COMPOSE: docker compose -f docker-compose.yml -f docker-compose.e2e.yml
     steps:
@@ -313,10 +325,13 @@ jobs:
           --user "$(id -u):$(id -g)" -e HOME=/tmp
           -e CI -e GITHUB_ACTIONS -e GITHUB_WORKSPACE=/work -e PROJECT
           -v "$GITHUB_WORKSPACE:/work" -w /work/e2e
-          "$IMAGE" npx playwright test --project="$PROJECT"
+          "$IMAGE" npx playwright test --project="$PROJECT" $SPEC -g "$GREP" --repeat-each="$REPEAT" --reporter=list
         env:
           IMAGE: ${{ steps.image.outputs.image }}
           PROJECT: ${{ matrix.project }}
+          SPEC: ${{ matrix.spec }}
+          GREP: ${{ matrix.grep }}
+          REPEAT: ${{ matrix.repeat }}
       - name: Collect stack logs
         if: failure()
         run: $COMPOSE logs --no-color > e2e/compose.log 2>&1 || true

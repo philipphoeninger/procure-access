@@ -68,6 +68,7 @@ export async function expectNoAxeViolations(
   if (options.explicitAppearance) {
     const explicit = await explicitAppearanceOf(page);
     await settled(page);
+    await diagnose(page, 'after-settled');
     const blocking = await checkOneAppearance(page, testInfo, state, explicit, suppressions);
     if (blocking.length > 0) failures.push(formatFailure(state, explicit, page.url(), blocking));
     expect(failures, failures.join('\n')).toEqual([]);
@@ -267,4 +268,46 @@ function formatFailure(state: string, appearance: Appearance, url: string, block
 
 function slug(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'state';
+}
+
+/** S7-01 diagnosis only (throwaway branch): animations and computed colours around the axe run. */
+async function diagnose(page: Page, label: string): Promise<void> {
+  const info = await page.evaluate(() => {
+    const describe = (animation: Animation) => {
+      const target = (animation.effect as KeyframeEffect | null)?.target as Element | null | undefined;
+      return {
+        kind: animation.constructor.name,
+        property: (animation as CSSTransition).transitionProperty ?? (animation as CSSAnimation).animationName,
+        target: target ? `${target.tagName.toLowerCase()}.${String(target.className).slice(0, 40)}` : null,
+        state: animation.playState,
+        end: animation.effect?.getComputedTiming().endTime,
+      };
+    };
+    const pick = (selector: string) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const style = getComputedStyle(element);
+      return { color: style.color, scheme: style.colorScheme, duration: style.transitionDuration, property: style.transitionProperty };
+    };
+    const now = performance.now();
+    const listed = document.getAnimations().map(describe);
+    const card = pick('.pa-home__card-title');
+    const h1 = pick('h1');
+    // Force the style of every element, then list again: transitions created only now?
+    for (const element of document.querySelectorAll('*')) void getComputedStyle(element).color;
+    const afterFlush = document.getAnimations().map(describe);
+    return {
+      now,
+      classes: document.documentElement.className,
+      h1,
+      card,
+      cardAfterFlush: pick('.pa-home__card-title'),
+      listed: listed.length,
+      listedColor: listed.filter((a) => a.property === 'color').length,
+      afterFlush: afterFlush.length,
+      afterFlushColor: afterFlush.filter((a) => a.property === 'color').length,
+      sample: afterFlush.filter((a) => a.property === 'color').slice(0, 6),
+    };
+  });
+  console.log(`[S7-01 diag] ${label} ${JSON.stringify(info)}`);
 }
